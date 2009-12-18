@@ -17,10 +17,10 @@ public class InvoiceCQueryObject extends QueryObject {
 
     public InvoiceCQueryObject(String name, Integer siteId) {
         super(
-            "Lists all samples for a particular date range, grouped by clinic.",
-            "Sample Invoice By Clinic", MessageFormat.format(QUERY_STRING,
-                name, siteId), new String[] { "Clinic", "Patient Id",
-                "Patient Number", "Link Date", "Sample Type" });
+            "Lists all samples linked in a particular date range, ordered by clinic.",
+            name, MessageFormat.format(QUERY_STRING, name, siteId),
+            new String[] { "Clinic", "Patient Id", "Patient Number",
+                "Link Date", "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }

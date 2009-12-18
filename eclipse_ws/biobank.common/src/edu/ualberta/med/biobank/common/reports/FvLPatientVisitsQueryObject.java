@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 public class FvLPatientVisitsQueryObject extends QueryObject {
 
     public FvLPatientVisitsQueryObject(String name, Integer siteId) {
-        super("Displays the oldest and most recent activity by clinic.", name,
+        super("Compares the oldest and most recent activity by clinic.", name,
             "Select " + name + "Alias.patient.study.name, " + name
                 + "Alias.shipment.clinic.name, MIN(" + name
                 + "Alias.shipment.dateReceived), MAX(" + name

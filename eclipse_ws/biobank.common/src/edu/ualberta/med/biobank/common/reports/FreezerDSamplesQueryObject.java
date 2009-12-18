@@ -37,9 +37,11 @@ public class FreezerDSamplesQueryObject extends QueryObject {
         + " as s inner join s.contactCollection as c";
 
     public FreezerDSamplesQueryObject(String name, Integer siteId) {
-        super("Lists freezer samples by study.", name, QUERY_STRING,
-            new String[] { "Study", "Clinic", "1 Visit", "2 Visit", "3 Visit",
-                "4 Visit", "5+ Visits", "Total Visits", "Total Patients" });
+        super(
+            "Displays the total number of freezer samples per study per clinic grouped by a given time period.",
+            name, QUERY_STRING, new String[] { "Study", "Clinic", "1 Visit",
+                "2 Visit", "3 Visit", "4 Visit", "5+ Visits", "Total Visits",
+                "Total Patients" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }

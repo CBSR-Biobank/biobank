@@ -22,14 +22,14 @@ public class QueryObject {
     /**
      * Query string of this query object
      */
-    private String queryString;
+    protected String queryString;
 
     /**
      * Column names for the result
      */
     private String[] columnNames;
 
-    private List<Option> queryOptions;
+    protected List<Option> queryOptions;
 
     public class Option {
         protected String name;
@@ -77,7 +77,7 @@ public class QueryObject {
         QueryObject sampleSCountQuery = new SampleSCountQueryObject(
             "SampleCountByStudy", siteId);
         QueryObject fvlPatientVisitsQuery = new FvLPatientVisitsQueryObject(
-            "FirstvsLastPatientVisitsByClinic", siteId);
+            "FirstVsLastPatientVisitsByClinic", siteId);
         QueryObject freezerSSamplesQuery = new FreezerSSamplesQueryObject(
             "FreezerSamplesByStudy", siteId);
         QueryObject freezerCSamplesQuery = new FreezerCSamplesQueryObject(

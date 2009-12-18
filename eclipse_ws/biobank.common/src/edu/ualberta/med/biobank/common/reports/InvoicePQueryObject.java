@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.model.Sample;
 public class InvoicePQueryObject extends QueryObject {
     public InvoicePQueryObject(String name, Integer siteId) {
         super(
-            "Lists all samples for a particular date range, grouped by patient.",
+            "Lists all samples linked in a particular date range, ordered by patient.",
             name, "Select " + name + "Alias.patientVisit.patient.id, " + name
                 + "Alias.patientVisit.shipment.clinic.id, " + name
                 + "Alias.patientVisit.patient.number, " + name
