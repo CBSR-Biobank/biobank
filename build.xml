@@ -271,13 +271,11 @@
 		</sql>
 	</target>
 
-	<target name="dbdump" description="makes a copy of the current biobank2 database">
-		<echo message="running mysqldump..." />
-		<exec executable="mysqldump" failonerror="true" output="biobank2.sql">
-			<arg line="-h${database.host} -P${database.port} -u${database.username} -p${database.password} --skip-extended-insert ${database.name}" />
+	<target name="dbbackup" description="makes a copy of the current biobank2 database">
+		<echo message="running scripts/dbbackup..." />
+		<exec executable="scripts/dbbackup" failonerror="true" output="biobank2.sql">
+			<arg line="${database.host} ${database.username} ${database.password} ${database.name}" />
 		</exec>
-		<gzip src="biobank2.sql" destfile="biobank2.sql.gz" />
-		<delete file="biobank2.sql" />
 	</target>
 
 

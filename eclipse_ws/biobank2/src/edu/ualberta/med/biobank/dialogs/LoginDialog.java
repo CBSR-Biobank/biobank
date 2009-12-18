@@ -11,8 +11,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -57,6 +60,8 @@ public class LoginDialog extends TitleAreaDialog {
         .getName());
 
     public Preferences pluginPrefs = null;
+
+    private Button secureConnectionButton;
 
     public LoginDialog(Shell parentShell) {
         super(parentShell);
@@ -125,8 +130,32 @@ public class LoginDialog extends TitleAreaDialog {
         for (Iterator<String> it = servers.iterator(); it.hasNext();) {
             serverText.add(it.next());
         }
+        serverText.addSelectionListener(new SelectionListener() {
 
-        serverText.select(serverText.indexOf(pluginPrefs.get(LAST_SERVER, "")));
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                String lastServer = serverText.getText();
+                secureConnectionButton
+                    .setSelection(lastServer.contains("8443"));
+            }
+
+        });
+
+        String lastServer = pluginPrefs.get(LAST_SERVER, "");
+        serverText.select(serverText.indexOf(lastServer));
+
+        secureConnectionButton = null;
+        if (BioBankPlugin.getDefault().isDebugging()) {
+            new Label(contents, SWT.NONE);
+
+            secureConnectionButton = new Button(contents, SWT.CHECK);
+            secureConnectionButton.setText("Use secure connection");
+            secureConnectionButton.setSelection(lastServer.contains("8443"));
+        }
 
         Label userNameLabel = new Label(contents, SWT.NONE);
         userNameLabel.setText("&User Name:");
@@ -208,8 +237,11 @@ public class LoginDialog extends TitleAreaDialog {
             return;
         }
 
+        boolean secureConnection = ((secureConnectionButton == null) || secureConnectionButton
+            .getSelection());
+
         SessionHelper sessionHelper = new SessionHelper(serverText.getText(),
-            userNameText.getText(), passwordText.getText());
+            secureConnection, userNameText.getText(), passwordText.getText());
 
         BusyIndicator.showWhile(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);

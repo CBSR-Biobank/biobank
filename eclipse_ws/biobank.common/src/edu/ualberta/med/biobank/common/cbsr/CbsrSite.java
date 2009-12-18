@@ -39,7 +39,7 @@ public class CbsrSite {
 
     public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
-        getSampleTypeMap();
+        getSampleTypeMap(appService);
         cbsrSite = new SiteWrapper(appService);
         cbsrSite.setName("Canadian BioSample Repository");
         cbsrSite.setStreet1("471 Medical Sciences Building");
@@ -60,7 +60,8 @@ public class CbsrSite {
         return cbsrSite;
     }
 
-    public static void getSampleTypeMap() throws Exception {
+    public static void getSampleTypeMap(WritableApplicationService appService)
+        throws Exception {
         if (sampleTypeMap != null)
             return;
 
