@@ -9,13 +9,11 @@
       className="org.jboss.web.tomcat.tc5.StandardService">
 
       <!-- A HTTP/1.1 Connector on port 8080 -->
-      <!--
       <Connector port="8080" address="${jboss.bind.address}"
          maxThreads="250" strategy="ms" maxHttpHeaderSize="8192"
          emptySessionPath="true"
          enableLookups="false" redirectPort="8443" acceptCount="100"
          connectionTimeout="20000" disableUploadTimeout="true"/>
-     -->
 
       <!-- Add this option to the connector to avoid problems with 
           .NET clients that don't implement HTTP/1.1 correctly 
