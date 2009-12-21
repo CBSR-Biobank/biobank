@@ -171,6 +171,7 @@ public class CbsrStudies {
         addSampleSource("VAS", "6mL beige top tube");
         addSampleSource("VAS", "10ml orange top PAXgene tube");
 
+        addPvAttr("AHFEM", "PBMC Count", "number");
         addPvAttr("AHFEM", "Worksheet", "text");
         addPvAttr("BBPSP", "Consent", "select_multiple",
             "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
@@ -231,6 +232,8 @@ public class CbsrStudies {
         addContact("Janet D Sharun", "BBPSP");
         addContact("Kathy Hjalmarsson", "BBPSP");
         addContact("unknown", "BBPSP");
+        addContact("unknown2", "BBPSP");
+        addContact("Sharon Gulewich", "CL1-KDCS");
         addContact("Dr. Neesh Pannu", "CCCS");
         addContact("Wanda MacDonald", "CEGIIR");
         addContact("Dellanee Kahlke", "CHILD");
@@ -239,6 +242,7 @@ public class CbsrStudies {
         addContact("Dawn Opgenorth", "KDCS");
         addContact("Sharon Gulewich", "KDCS");
         addContact("Elizabeth Taylor", "KMS");
+        addContact("Bonny Granfield", "KMS");
         addContact("Elizabeth Taylor", "LCS");
         addContact("Bonny Granfield", "MPS");
         addContact("Shirley Cole", "NHS");
@@ -248,7 +252,7 @@ public class CbsrStudies {
         addContact("Sharon Gulewich", "TCKS");
         addContact("Sue Szigety", "TCKS");
         addContact("Dawn Opgenorth", "VAS");
-        addPvAttr("AHFEM", "PBMC Count", "number");
+        addContact("Ann Chala", "VN1");
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,

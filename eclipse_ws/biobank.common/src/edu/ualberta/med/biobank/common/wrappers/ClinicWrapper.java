@@ -394,7 +394,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     /**
-     * Search for a shipment in the clinic with the given date received.
+     * Search for a shipment in the clinic with the given date received and
+     * patient number.
      */
     public ShipmentWrapper getShipment(Date dateReceived)
         throws ApplicationException {
@@ -404,6 +405,25 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .asList(new Object[] { getId(), dateReceived }));
         List<Shipment> shipments = appService.query(criteria);
         if (shipments.size() == 1) {
+            return new ShipmentWrapper(appService, shipments.get(0));
+        }
+        return null;
+    }
+
+    /**
+     * Search for a shipment in the clinic with the given date received and
+     * patient number.
+     */
+    public ShipmentWrapper getShipment(Date dateReceived, String patientNumber)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("select shipment from "
+            + Shipment.class.getName()
+            + " as shipment join shipment.patientCollection as patients"
+            + " where shipment.clinic.id = ? and shipment.dateReceived = ? "
+            + "and patients.number = ?", Arrays.asList(new Object[] { getId(),
+            dateReceived, patientNumber }));
+        List<Shipment> shipments = appService.query(criteria);
+        if (shipments.size() > 0) {
             return new ShipmentWrapper(appService, shipments.get(0));
         }
         return null;

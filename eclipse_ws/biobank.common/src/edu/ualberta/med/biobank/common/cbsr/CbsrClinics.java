@@ -77,6 +77,9 @@ public class CbsrClinics {
             "103 Hospital Drive", "Saskatoon", "Alberta", "S7N0W8");
         addClinic(site, "TH1", null, "Thunder Bay Regional Hospital",
             "980 Oliver Road", "Thunder Bay", "Ontario", "P7B6V4");
+        ClinicWrapper clinic = addClinic(site, "TR1", null, "", "", "Toronto",
+            "Ontario", null);
+        clinic.setActivityStatus("Closed");
         addClinic(site, "VN1", "", "St Paul\'s Hospital",
             "1081 Burrard Street, Room 318 Comox Building", "Vancouver",
             "British Columbia", "V6Z1Y6");
@@ -172,6 +175,7 @@ public class CbsrClinics {
         addContact("VN1", "Ann Chala", "Research Coordinator",
             "604-682-2344 x63135", "604-806-8856",
             "achala@providencehealth.bc.ca");
+        addContact("VN1", "unknown2", null, null, null, null);
         addContact("VN2", "Colleen Fitzgerald", null, "604-875-2000 x7277",
             null, "cfitzgerald@cw.bc.ca");
         addContact("WL1", "Cathy Lent", "Clinic Director", "780-350-2025",

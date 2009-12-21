@@ -187,8 +187,8 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
-                importShipments();
-                // importPatientVisits();
+                // importShipments();
+                importPatientVisits();
                 // importCabinetSamples();
             }
 
@@ -429,7 +429,7 @@ public class Importer {
         ShipmentWrapper shipment;
         BlowfishCipher cipher = new BlowfishCipher();
 
-        // removeAllShipments();
+        removeAllShipments();
 
         logger.info("importing shipments ...");
 
@@ -464,16 +464,32 @@ public class Importer {
                 clinicName = rs.getString(3);
             }
 
-            study = getStudyFromOldShortName(studyNameShort);
-            clinic = clinicsMap.get(clinicName);
-
-            if (clinic == null) {
-                logger.error("no clinic \"" + clinicName + "\"for patient "
-                    + patientNo);
+            if (clinicName == null) {
+                logger.error("no clinic for patient " + patientNo);
+                ++count;
                 continue;
             }
 
+            study = getStudyFromOldShortName(studyNameShort);
+            study.reload();
+            clinic = clinicsMap.get(clinicName);
+            if (clinic == null) {
+                logger.error("no clinic \"" + clinicName + "\"for patient "
+                    + patientNo);
+                ++count;
+                continue;
+            }
             clinic.reload();
+
+            // make sure the clinic and study are linked via a contact
+            if (!study.hasClinic(clinicName)) {
+                logger.error("study " + study.getNameShort() + " for patient "
+                    + patientNo + " is not linked to clinic "
+                    + clinic.getName() + " via a contact");
+                ++count;
+                continue;
+            }
+
             dateReceivedStr = rs.getString(4);
             dateReceived = dateTimeFormatter.parse(dateReceivedStr);
 
@@ -488,15 +504,6 @@ public class Importer {
             if (patient == null) {
                 throw new Exception("patient not found in study: " + patientNo
                     + ",  " + studyNameShort);
-            }
-            patient.reload();
-
-            // make sure the clinic and study are linked via a contact
-            if (!study.hasClinic(clinicName)) {
-                logger.error("study " + study.getNameShort() + " for patient "
-                    + patientNo + " is not linked to clinic "
-                    + clinic.getName() + " via a contact");
-                continue;
             }
 
             shipment = clinic.getShipment(dateReceived);
@@ -594,12 +601,19 @@ public class Importer {
                 clinicName = rs.getString(3);
             }
 
+            if (clinicName == null) {
+                logger.error("no for patient " + patientNo);
+                ++count;
+                continue;
+            }
+
             study = getStudyFromOldShortName(studyNameShort);
             clinic = clinicsMap.get(clinicName);
 
             if (clinic == null) {
                 logger.error("no clinic \"" + clinicName + "\"for patient "
                     + patientNo);
+                ++count;
                 continue;
             }
 
@@ -620,13 +634,14 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateProcessed = cal.getTime();
 
-            shipment = clinic.getShipment(dateProcessed);
+            shipment = clinic.getShipment(dateProcessed, patientNo);
 
             // check for shipment
             if (shipment == null) {
-                logger.error("found 0 shipments for studyName/"
-                    + study.getNameShort() + " clinicName/" + clinicName
-                    + " dateReceived/" + dateProcessed);
+                logger.error("found 0 shipments for patientNo/" + patientNo
+                    + " studyName/" + study.getNameShort() + " clinicName/"
+                    + clinicName + " dateReceived/" + dateProcessed);
+                ++count;
                 continue;
             }
 
@@ -634,6 +649,7 @@ public class Importer {
             if (patient.getVisit(dateProcessed) != null) {
                 logger.error("patient " + patientNo
                     + " already has a visit on " + dateProcessed);
+                ++count;
                 continue;
             }
 
@@ -1027,10 +1043,6 @@ public class Importer {
         throws Exception {
         String prefix = patientNr.substring(0, 2);
         String clinicName = patientNrToClinicMap.get(prefix);
-        if (clinicName == null) {
-            throw new Exception("no clinic name associated for patient number "
-                + patientNr);
-        }
         return clinicName;
     }
 }
