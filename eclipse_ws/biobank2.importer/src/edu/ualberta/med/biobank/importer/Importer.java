@@ -43,7 +43,10 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.Shipment;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -140,10 +143,18 @@ public class Importer {
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
+    private static ImportCounts importCounts;
+
     public static void main(String[] args) throws Exception {
         dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
         tables = new ArrayList<String>();
         PropertyConfigurator.configure("conf/log4j.properties");
+
+        importCounts = new ImportCounts();
+        importCounts.patients = 0;
+        importCounts.shipments = 0;
+        importCounts.visits = 0;
+        importCounts.samples = 0;
 
         try {
             con = getMysqlConnection();
@@ -176,16 +187,20 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
-                // removeAllPatientVisits();
-                // importShipments();
+                importShipments();
                 // importPatientVisits();
-                importCabinetSamples();
+                // importCabinetSamples();
             }
 
             logger.info("import complete");
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        logger.info("patients imported: " + importCounts.patients);
+        logger.info("shipments imported: " + importCounts.shipments);
+        logger.info("visits imported: " + importCounts.visits);
+        logger.info("samples imported: " + importCounts.samples);
     }
 
     private static void importAll() throws Exception {
@@ -329,6 +344,18 @@ public class Importer {
         return false;
     }
 
+    private static void removeAllPatients() throws Exception {
+        logger.info("removing old patients ...");
+
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Patient.class.getName());
+        List<Patient> patients = appService.query(criteria);
+        for (Patient patient : patients) {
+            PatientWrapper p = new PatientWrapper(appService, patient);
+            p.delete();
+        }
+    }
+
     private static void importPatients() throws Exception {
         BlowfishCipher cipher = new BlowfishCipher();
         StudyWrapper study;
@@ -374,6 +401,7 @@ public class Importer {
             patient.setNumber(patientNo);
             patient.setStudy(study);
             patient.persist();
+            ++importCounts.patients;
             ++count;
         }
     }
@@ -381,14 +409,12 @@ public class Importer {
     private static void removeAllShipments() throws Exception {
         logger.info("removing old shipments ...");
 
-        for (ClinicWrapper clinic : clinicsMap.values()) {
-            List<ShipmentWrapper> shipments = clinic.getShipmentCollection();
-            if (shipments == null)
-                continue;
-            for (ShipmentWrapper shipment : shipments) {
-                shipment.delete();
-            }
-            clinic.reload();
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Shipment.class.getName());
+        List<Shipment> shipments = appService.query(criteria);
+        for (Shipment shipment : shipments) {
+            ShipmentWrapper s = new ShipmentWrapper(appService, shipment);
+            s.delete();
         }
     }
 
@@ -403,13 +429,14 @@ public class Importer {
         ShipmentWrapper shipment;
         BlowfishCipher cipher = new BlowfishCipher();
 
-        removeAllShipments();
+        // removeAllShipments();
 
         logger.info("importing shipments ...");
 
         String qryPart = "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
-            + "and patient_visit.patient_nr=patient.patient_nr";
+            + "and patient_visit.patient_nr=patient.patient_nr "
+            + "order by patient_visit.date_received";
 
         Statement s = con.createStatement();
         s.execute("select count(*) " + qryPart);
@@ -417,9 +444,9 @@ public class Importer {
         rs.next();
         int numShipments = rs.getInt(1);
 
-        s.execute("select study_list.study_name_short, patient.chr_nr, "
-            + "patient_visit.clinic_site, patient_visit.date_received "
-            + qryPart);
+        s.execute("select patient.chr_nr, "
+            + "study_list.study_name_short, patient_visit.clinic_site, "
+            + "patient_visit.date_received " + qryPart);
 
         rs = s.getResultSet();
         if (rs == null) {
@@ -428,12 +455,12 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            String patientNo = cipher.decode(rs.getBytes(2));
+            String patientNo = cipher.decode(rs.getBytes(1));
             if (patientNo.length() == 6) {
                 studyNameShort = getStudyShortNameFromPatientNr(patientNo);
                 clinicName = getClinicNameFromPatientNr(patientNo);
             } else {
-                studyNameShort = rs.getString(1);
+                studyNameShort = rs.getString(2);
                 clinicName = rs.getString(3);
             }
 
@@ -456,51 +483,42 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateReceived = cal.getTime();
 
-            patient = PatientWrapper.getPatientInSite(appService, patientNo,
-                cbsrSite);
-
-            // make sure the study is correct
-            if (!patient.getStudy().getNameShort().equals(study.getNameShort())) {
-                throw new Exception("patient and study do not match: "
-                    + patient.getNumber() + ",  " + studyNameShort);
+            patient = study.getPatient(patientNo);
+            // make sure patient is in the study
+            if (patient == null) {
+                throw new Exception("patient not found in study: " + patientNo
+                    + ",  " + studyNameShort);
             }
-
-            shipment = null;
-            List<ShipmentWrapper> clinicShipments = clinic
-                .getShipmentCollection();
-            if (clinicShipments != null) {
-                for (ShipmentWrapper cs : clinicShipments) {
-                    // Date.equals() checks for milliseconds and for some reason
-                    // they are not the same, instead have to convert to string
-                    // and then compare strings
-                    if (dateTimeFormatter.format(cs.getDateReceived()).equals(
-                        dateTimeFormatter.format(dateReceived))) {
-                        shipment = cs;
-                    }
-                }
-            }
+            patient.reload();
 
             // make sure the clinic and study are linked via a contact
-            if (!study.getClinicCollection().contains(clinic)) {
-                logger.debug("ERROR: study " + study.getNameShort()
-                    + " for patient " + patientNo + " is not linked to clinic "
+            if (!study.hasClinic(clinicName)) {
+                logger.error("study " + study.getNameShort() + " for patient "
+                    + patientNo + " is not linked to clinic "
                     + clinic.getName() + " via a contact");
                 continue;
             }
 
+            shipment = clinic.getShipment(dateReceived);
             if (shipment == null) {
+                ++importCounts.shipments;
+                logger.debug("new shipment: " + importCounts.shipments
+                    + " patient/" + patient.getNumber() + " clinic/"
+                    + clinic.getName() + " shipment/" + dateReceivedStr + " ("
+                    + count + "/" + numShipments + ")");
+
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
                 shipment.setWaybill(dateReceivedStr);
                 shipment.setDateReceived(dateReceived);
                 shipment.setPatientCollection(Arrays.asList(patient));
                 shipment.persist();
-
-                logger.debug("importing shipment: patient/"
+            } else if (shipment.getPatient(patientNo) == null) {
+                logger.debug("adding to shipment: patient/"
                     + patient.getNumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
-            } else {
+
                 List<PatientWrapper> patients = shipment.getPatientCollection();
                 if (patients == null) {
                     patients = new ArrayList<PatientWrapper>();
@@ -508,8 +526,8 @@ public class Importer {
                 patients.add(patient);
                 shipment.setPatientCollection(patients);
                 shipment.persist();
-
-                logger.debug("adding to shipment: patient/"
+            } else {
+                logger.debug("already in database: patient/"
                     + patient.getNumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
@@ -522,23 +540,12 @@ public class Importer {
     private static void removeAllPatientVisits() throws Exception {
         logger.info("removing old patient visits ...");
 
-        for (StudyWrapper study : studiesMap.values()) {
-            if (study.getPatientVisitCount() == 0)
-                continue;
-
-            List<PatientWrapper> patients = study.getPatientCollection();
-            if (patients == null)
-                continue;
-            for (PatientWrapper patient : patients) {
-                List<PatientVisitWrapper> visits = patient
-                    .getPatientVisitCollection();
-                if (visits == null)
-                    continue;
-                for (PatientVisitWrapper visit : visits) {
-                    visit.delete();
-                }
-            }
-            study.reload();
+        HQLCriteria criteria = new HQLCriteria("from "
+            + PatientVisit.class.getName());
+        List<PatientVisit> visits = appService.query(criteria);
+        for (PatientVisit visit : visits) {
+            PatientVisitWrapper v = new PatientVisitWrapper(appService, visit);
+            v.delete();
         }
     }
 
@@ -568,9 +575,8 @@ public class Importer {
         rs.next();
         int numPatientVisits = rs.getInt(1);
 
-        s
-            .execute("select patient_visit.*, study_list.study_name_short, patient.chr_nr "
-                + qryPart);
+        s.execute("select patient_visit.*, study_list.study_name_short, "
+            + "patient.chr_nr " + qryPart);
 
         rs = s.getResultSet();
         if (rs == null) {
@@ -600,8 +606,13 @@ public class Importer {
             dateProcessedStr = rs.getString(6);
             dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
 
-            patient = PatientWrapper.getPatientInSite(appService, patientNo,
-                cbsrSite);
+            patient = study.getPatient(patientNo);
+            // make sure patient is in the study
+            if (patient == null) {
+                throw new Exception("patient not found in study: " + patientNo
+                    + ",  " + studyNameShort);
+            }
+            patient.reload();
 
             Calendar cal = new GregorianCalendar();
             cal.setTime(dateProcessed);
@@ -610,18 +621,6 @@ public class Importer {
             dateProcessed = cal.getTime();
 
             shipment = clinic.getShipment(dateProcessed);
-
-            // make sure the clinic is correct
-            if ((shipment != null) && !shipment.getClinic().equals(clinic)) {
-                throw new Exception("shipment and clinic do not match: "
-                    + dateProcessed + ",  " + clinicName);
-            }
-
-            // make sure the study is correct
-            if (!patient.getStudy().equals(study)) {
-                throw new Exception(
-                    "patient study does not match patient visit study");
-            }
 
             // check for shipment
             if (shipment == null) {
@@ -638,15 +637,16 @@ public class Importer {
                 continue;
             }
 
+            ++importCounts.visits;
             pv = new PatientVisitWrapper(appService);
             pv.setDateProcessed(dateProcessed);
             pv.setPatient(patient);
             pv.setShipment(shipment);
             pv.setComment(rs.getString(4));
 
-            logger.debug("importing patient visit: patient/"
-                + patient.getNumber() + " visit date/" + dateProcessed + " ("
-                + count + "/" + numPatientVisits + ")");
+            logger.debug("importing patient visit: " + importCounts.visits
+                + " patient/" + patient.getNumber() + " visit date/"
+                + dateProcessed + " (" + count + "/" + numPatientVisits + ")");
 
             // now set corresponding patient visit info data
             for (String label : study.getStudyPvAttrLabels()) {
@@ -700,10 +700,10 @@ public class Importer {
         rs.next();
         int numSamples = rs.getInt(1);
 
-        s
-            .execute("select patient_visit.visit_nr, patient_visit.date_received, patient_visit.date_taken, "
-                + "study_list.study_name_short, sample_list.sample_name_short, cabinet.*, patient.chr_nr "
-                + qryPart);
+        s.execute("select patient_visit.visit_nr, "
+            + "patient_visit.date_received, patient_visit.date_taken, "
+            + "study_list.study_name_short,  sample_list.sample_name_short, "
+            + "cabinet.*, patient.chr_nr " + qryPart);
 
         rs = s.getResultSet();
         if (rs == null) {
@@ -816,6 +816,7 @@ public class Importer {
                 throw new Exception("bin cannot hold sample");
             }
             sample.persist();
+            ++importCounts.samples;
         }
     }
 
@@ -1033,3 +1034,10 @@ public class Importer {
         return clinicName;
     }
 }
+
+class ImportCounts {
+    int patients;
+    int shipments;
+    int visits;
+    int samples;
+};
