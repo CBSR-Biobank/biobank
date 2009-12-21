@@ -10,3 +10,8 @@ CABINET
   FROM cabinet
   join sample_list on sample_list.sample_nr=cabinet.sample_nr
   where cnum=1
+  
+  SELECT sample_list.sample_name, cabinet.drawer, cabinet.bin, cabinet.binpos
+  FROM cabinet
+  join sample_list on sample_list.sample_nr=cabinet.sample_nr
+  where cnum=1 and drawer='AD' and bin=8
