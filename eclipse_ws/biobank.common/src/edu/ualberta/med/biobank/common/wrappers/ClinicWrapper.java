@@ -297,6 +297,21 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         propertiesMap.put("contactCollection", contacts);
     }
 
+    /**
+     * Search for a contact in the clinic with the given name
+     */
+    public ContactWrapper getContact(String contactName)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Contact.class.getName() + " where clinic.id = ? and name = ?",
+            Arrays.asList(new Object[] { getId(), contactName }));
+        List<Contact> contacts = appService.query(criteria);
+        if (contacts.size() == 1) {
+            return new ContactWrapper(appService, contacts.get(0));
+        }
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection(boolean sort)
         throws ApplicationException {
