@@ -343,4 +343,20 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         return null;
     }
+
+    /**
+     * Search for a shipment in the site with the given date received.
+     */
+    public PatientWrapper getPatient(String patientNumber) throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select patients from "
+            + Shipment.class.getName()
+            + " as shipment inner join shipment.patientCollection as patients"
+            + " where patients.number = ?", Arrays
+            .asList(new Object[] { patientNumber }));
+        List<Patient> patients = appService.query(criteria);
+        if (patients.size() >= 1) {
+            return new PatientWrapper(appService, patients.get(0));
+        }
+        return null;
+    }
 }
