@@ -23,9 +23,13 @@ public class SampleHelper extends DbHelper {
         SampleWrapper sample = new SampleWrapper(appService);
         sample.setSampleType(sampleType);
         sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
-        sample.setParent(container);
+        if (container != null) {
+            sample.setParent(container);
+        }
         sample.setPatientVisit(pv);
-        sample.setPosition(row, col);
+        if ((row != null) && (col != null)) {
+            sample.setPosition(row, col);
+        }
         return sample;
     }
 

@@ -47,7 +47,11 @@ public class ContainerPositionWrapper extends
     }
 
     private void setParentContainer(ContainerWrapper parentContainer) {
-        setParentContainer(parentContainer.getWrappedObject());
+        if (parentContainer == null) {
+            setParentContainer((Container) null);
+        } else {
+            setParentContainer(parentContainer.getWrappedObject());
+        }
     }
 
     private ContainerWrapper getParentContainer() {

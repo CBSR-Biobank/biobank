@@ -73,7 +73,11 @@ public class SamplePositionWrapper extends
     }
 
     private void setContainer(ContainerWrapper container) {
-        setContainer(container.getWrappedObject());
+        if (container == null) {
+            setContainer((Container) null);
+        } else {
+            setContainer(container.getWrappedObject());
+        }
     }
 
     private ContainerWrapper getContainer() {

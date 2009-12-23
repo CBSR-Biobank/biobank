@@ -65,13 +65,14 @@ public class ReportsView extends ViewPart {
 
     private Button printButton;
 
+    private QueryObject currentQuery;
+
     public ReportsView() {
         searchData = new ArrayList<Object>();
     }
 
     @Override
     public void createPartControl(Composite parent) {
-
         sc = new ScrolledComposite(parent, SWT.V_SCROLL);
         sc.setLayout(new GridLayout(1, false));
         sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -143,9 +144,9 @@ public class ReportsView extends ViewPart {
             public void widgetSelected(SelectionEvent e) {
                 try {
                     printTable();
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError(
+                        "Error while printing the results", ex);
                 }
             }
         });
@@ -170,7 +171,7 @@ public class ReportsView extends ViewPart {
     private Collection<Object> search() throws ApplicationException {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
-        QueryObject query = (QueryObject) typeSelection.getFirstElement();
+        currentQuery = (QueryObject) typeSelection.getFirstElement();
         ArrayList<Object> params = new ArrayList<Object>();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof Text)
@@ -180,7 +181,8 @@ public class ReportsView extends ViewPart {
             else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
-        return query.executeQuery(SessionManager.getAppService(), params);
+        return currentQuery
+            .executeQuery(SessionManager.getAppService(), params);
     }
 
     public void comboChanged() {
@@ -316,9 +318,8 @@ public class ReportsView extends ViewPart {
                     .asList((Object[]) objects)));
             }
 
-            // marche que pour dernier rapport
-
-            ReportingUtils.printReport("CBSRReportsForm", map, cbsrCollections);
+            ReportingUtils.printReport(currentQuery.getName(), map,
+                cbsrCollections);
             return true;
         }
         return false;
