@@ -17,8 +17,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -191,13 +193,15 @@ public class Importer {
                 // importShipments();
                 // importPatientVisits();
                 // importCabinetSamples();
-                removeAllSamples();
+                // removeAllSamples();
                 importFreezerSamples();
             }
 
             logger.info("import complete");
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            con.close();
         }
 
         logger.info("patients imported: " + importCounts.patients);
@@ -788,6 +792,7 @@ public class Importer {
         String drawerName;
         RowColPos binPos;
         String sampleTypeNameShort;
+        String inventoryId;
         int visitNr;
         BlowfishCipher cipher = new BlowfishCipher();
 
@@ -799,6 +804,21 @@ public class Importer {
             if (cabinetNum != 1) {
                 logger.error("cabinet number " + cabinetNum
                     + " is invalid for visit number " + visitNr);
+                continue;
+            }
+
+            inventoryId = rs.getString(13);
+
+            // make sure inventory id is unique
+            List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+                appService, inventoryId, cbsrSite);
+            if (samples.size() > 0) {
+                String labels = "";
+                for (SampleWrapper sample : samples) {
+                    labels += sample.getPositionString(true, true) + ", ";
+                }
+                logger.error("a sample with inventory id " + inventoryId
+                    + " already exisits at " + labels);
                 continue;
             }
 
@@ -854,7 +874,7 @@ public class Importer {
             SampleWrapper sample = new SampleWrapper(appService);
             sample.setParent(bin);
             sample.setSampleType(sampleType);
-            sample.setInventoryId(rs.getString(13));
+            sample.setInventoryId(inventoryId);
             sample.setLinkDate(rs.getDate(14));
             sample.setQuantity(rs.getDouble(15));
             sample.setPosition(binPos.row, 0);
@@ -911,133 +931,164 @@ public class Importer {
         String sampleTypeNameShort;
         String inventoryId;
         BlowfishCipher cipher = new BlowfishCipher();
-
-        String qryPart = "from freezer, study_list, patient_visit, sample_list,patient "
-            + "where freezer.study_nr=study_list.study_nr "
-            + "and patient_visit.study_nr=study_list.study_nr "
-            + "and freezer.visit_nr=patient_visit.visit_nr "
-            + "and freezer.patient_nr=patient_visit.patient_nr "
-            + "and freezer.sample_nr=sample_list.sample_nr "
-            + "and patient_visit.patient_nr=patient.patient_nr";
+        SampleWrapper sample;
+        RowColPos pos;
 
         Statement s = con.createStatement();
-        s.execute("select count(*) " + qryPart);
+        s.execute("select fnum, rack from freezer group by fnum, rack "
+            + "order by fnum, rack");
         ResultSet rs = s.getResultSet();
-        rs.next();
-        int numSamples = rs.getInt(1);
-
-        // get one record at a time since heap too small for all samples
-        PreparedStatement ps = con.prepareStatement(
-            "select patient_visit.date_received, "
-                + "patient_visit.date_taken,  study_list.study_name_short, "
-                + "sample_list.sample_name_short, freezer.*, patient.chr_nr "
-                + qryPart, ResultSet.TYPE_FORWARD_ONLY,
-            ResultSet.CONCUR_READ_ONLY);
-        ps.setFetchSize(Integer.MIN_VALUE);
-
-        rs = ps.executeQuery();
         if (rs == null) {
             throw new Exception("Database query returned null");
         }
 
-        int count = 0;
+        class FreezerHotelLabel {
+            int freerzerId;
+            String hotelLabel;
+
+            FreezerHotelLabel(int fId, String hLabel) {
+                this.freerzerId = fId;
+                this.hotelLabel = hLabel;
+            }
+        }
+        ;
+
+        Set<FreezerHotelLabel> hotelLabels = new LinkedHashSet<FreezerHotelLabel>();
         while (rs.next()) {
-            ++count;
-            inventoryId = rs.getString(11);
+            int fId = rs.getInt(1);
+            if ((fId < freezers.length) && (freezers[fId] != null)) {
+                hotelLabels.add(new FreezerHotelLabel(fId, rs.getString(2)));
+            }
+        }
 
-            // make sure inventory id is unique
-            List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
-                appService, inventoryId, cbsrSite);
-            if (samples.size() > 0) {
-                String labels = "";
-                for (SampleWrapper sample : samples) {
-                    labels += sample.getPositionString(true, true) + ", ";
+        for (FreezerHotelLabel bbpdbHotelLabel : hotelLabels) {
+            PreparedStatement ps = con
+                .prepareStatement("select patient_visit.date_received, "
+                    + "patient_visit.date_taken,  study_list.study_name_short, "
+                    + "sample_list.sample_name_short, freezer.*, patient.chr_nr "
+                    + "from freezer, study_list, patient_visit, sample_list,patient "
+                    + "where freezer.study_nr=study_list.study_nr "
+                    + "and patient_visit.study_nr=study_list.study_nr "
+                    + "and freezer.visit_nr=patient_visit.visit_nr "
+                    + "and freezer.patient_nr=patient_visit.patient_nr "
+                    + "and freezer.sample_nr=sample_list.sample_nr "
+                    + "and patient_visit.patient_nr=patient.patient_nr "
+                    + "and freezer.fnum = ? and freezer.rack= ? "
+                    + "order by freezer.box, freezer.cell");
+            ps.setInt(1, bbpdbHotelLabel.freerzerId);
+            ps.setString(2, bbpdbHotelLabel.hotelLabel);
+
+            rs = ps.executeQuery();
+            if (rs == null) {
+                throw new Exception("Database query returned null");
+            }
+
+            int count = 0;
+            while (rs.next()) {
+                ++count;
+                inventoryId = rs.getString(11);
+
+                // make sure inventory id is unique
+                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+                    appService, inventoryId, cbsrSite);
+                if (samples.size() > 0) {
+                    String labels = "";
+                    for (SampleWrapper samp : samples) {
+                        labels += samp.getPositionString(true, true) + ", ";
+                    }
+                    logger.error("a sample with inventory id " + inventoryId
+                        + " already exisits at " + labels);
+                    continue;
                 }
-                logger.error("a sample with inventory id " + inventoryId
-                    + " already exisits at: " + labels);
-                continue;
+
+                freezerNum = rs.getInt(5);
+                hotelLabel = rs.getString(6);
+
+                if (freezers[freezerNum] == null) {
+                    logger.debug("Ignoring samples for freezer number "
+                        + freezerNum);
+                    continue;
+                }
+
+                freezer = freezers[freezerNum];
+                freezerType = freezer.getContainerType();
+                hotelPos = LabelingScheme.cbsrTwoCharToRowCol(hotelLabel,
+                    freezer.getRowCapacity(), freezer.getColCapacity(),
+                    freezerType.getName());
+                hotel = freezer.getChild(hotelPos.row, hotelPos.col);
+
+                if (hotel == null) {
+                    logger.error("hotel not initialized: " + " freezer/"
+                        + freezer.getLabel() + " hotel/" + hotelLabel);
+                    continue;
+                }
+
+                palletNum = rs.getInt(7) - 1;
+                palletPos = rs.getString(15);
+                pallet = hotel.getChild(palletNum, 0);
+
+                if (pallet == null) {
+                    logger.error("pallet not initialized: " + " hotel/"
+                        + hotel.getLabel() + " pallet/" + palletNum + 1);
+                    continue;
+                }
+
+                String patientNo = cipher.decode(rs.getBytes(17));
+                patient = PatientWrapper.getPatientInSite(appService,
+                    patientNo, cbsrSite);
+                dateProcessedStr = rs.getString(1);
+                dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+                Calendar cal = new GregorianCalendar();
+                cal.setTime(dateProcessed);
+                cal.set(Calendar.MILLISECOND, 0);
+                cal.set(Calendar.SECOND, 0);
+                dateProcessed = cal.getTime();
+
+                visit = patient.getVisit(dateProcessed);
+
+                if (visit == null) {
+                    logger.error("patient visit not found for date: "
+                        + dateProcessed.toString());
+                    continue;
+                }
+
+                sampleTypeNameShort = rs.getString(4);
+                if (sampleTypeNameShort.equals("RNA Later")) {
+                    sampleTypeNameShort = "RNA Biopsy";
+                }
+                sampleType = sampleTypeMap.get(sampleTypeNameShort);
+
+                pos = LabelingScheme.sbsToRowCol(palletPos);
+                sample = pallet.getSample(pos.row, pos.col);
+                if ((sample != null)
+                    && sample.getSampleType().getNameShort().equals(
+                        sampleTypeNameShort)
+                    && sample.getInventoryId().equals(inventoryId)) {
+                    logger.debug("freezer already contains sample "
+                        + pallet.getLabel() + palletPos);
+                    continue;
+                }
+
+                sample = new SampleWrapper(appService);
+                sample.setParent(pallet);
+                sample.setSampleType(sampleType);
+                sample.setInventoryId(inventoryId);
+                sample.setLinkDate(rs.getDate(12));
+                sample.setQuantity(rs.getDouble(16));
+                sample.setPosition(pos);
+                sample.setPatientVisit(visit);
+
+                if (!pallet.canHoldSample(sample)) {
+                    logger.error("bin " + pallet.getLabel()
+                        + " cannot hold sample of type" + sampleType.getName());
+                    continue;
+                }
+                sample.persist();
+
+                logger.debug("importing freezer sample " + pallet.getLabel()
+                    + palletPos);
+                ++importCounts.samples;
             }
-
-            freezerNum = rs.getInt(5);
-            hotelLabel = rs.getString(6);
-
-            if (freezers[freezerNum] == null) {
-                logger.debug("Ignoring samples for freezer number "
-                    + freezerNum);
-                continue;
-            }
-
-            freezer = freezers[freezerNum];
-            freezerType = freezer.getContainerType();
-            hotelPos = LabelingScheme.cbsrTwoCharToRowCol(hotelLabel, freezer
-                .getRowCapacity(), freezer.getColCapacity(), freezerType
-                .getName());
-
-            palletNum = rs.getInt(7) - 1;
-            palletPos = rs.getString(15);
-
-            hotel = freezer.getChild(hotelPos.row, hotelPos.col);
-
-            if (hotel == null) {
-                logger.error("hotel not initialized: " + " freezer/"
-                    + freezer.getLabel() + " hotel/" + hotelLabel);
-                continue;
-            }
-
-            pallet = hotel.getChild(palletNum, 0);
-
-            if (pallet == null) {
-                logger.error("pallet not initialized: " + " hotel/"
-                    + hotel.getLabel() + " pallet/" + palletNum + 1);
-                continue;
-            }
-
-            String patientNo = cipher.decode(rs.getBytes(17));
-            patient = PatientWrapper.getPatientInSite(appService, patientNo,
-                cbsrSite);
-            dateProcessedStr = rs.getString(1);
-            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(dateProcessed);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(Calendar.SECOND, 0);
-            dateProcessed = cal.getTime();
-
-            visit = patient.getVisit(dateProcessed);
-
-            if (visit == null) {
-                logger.error("patient visit not found for date: "
-                    + dateProcessed.toString());
-                continue;
-            }
-
-            sampleTypeNameShort = rs.getString(4);
-            if (sampleTypeNameShort.equals("RNA Later")) {
-                sampleTypeNameShort = "RNA Biopsy";
-            }
-            sampleType = sampleTypeMap.get(sampleTypeNameShort);
-
-            RowColPos rowColPos = LabelingScheme.sbsToRowCol(palletPos);
-
-            SampleWrapper sample = new SampleWrapper(appService);
-            sample.setParent(pallet);
-            sample.setSampleType(sampleType);
-            sample.setInventoryId(inventoryId);
-            sample.setLinkDate(rs.getDate(12));
-            sample.setQuantity(rs.getDouble(16));
-            sample.setPosition(rowColPos);
-            sample.setPatientVisit(visit);
-
-            if (!pallet.canHoldSample(sample)) {
-                logger.error("bin " + pallet.getLabel()
-                    + " cannot hold sample of type" + sampleType.getName());
-                continue;
-            }
-            sample.persist();
-
-            logger.debug("importing freezer sample " + pallet.getLabel()
-                + palletPos + " (" + count + "/" + numSamples + ")");
-            ++importCounts.samples;
         }
     }
 
