@@ -988,19 +988,6 @@ public class Importer {
                 ++count;
                 inventoryId = rs.getString(11);
 
-                // make sure inventory id is unique
-                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
-                    appService, inventoryId, cbsrSite);
-                if (samples.size() > 0) {
-                    String labels = "";
-                    for (SampleWrapper samp : samples) {
-                        labels += samp.getPositionString(true, true) + ", ";
-                    }
-                    logger.error("a sample with inventory id " + inventoryId
-                        + " already exisits at " + labels);
-                    continue;
-                }
-
                 freezerNum = rs.getInt(5);
                 hotelLabel = rs.getString(6);
 
@@ -1030,6 +1017,19 @@ public class Importer {
                 if (pallet == null) {
                     logger.error("pallet not initialized: " + " hotel/"
                         + hotel.getLabel() + " pallet/" + palletNum + 1);
+                    continue;
+                }
+
+                // make sure inventory id is unique
+                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+                    appService, inventoryId, cbsrSite);
+                if (samples.size() > 0) {
+                    String labels = "";
+                    for (SampleWrapper samp : samples) {
+                        labels += samp.getPositionString(true, true) + ", ";
+                    }
+                    logger.error("a sample with inventory id " + inventoryId
+                        + " already exisits at " + labels);
                     continue;
                 }
 
