@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.reporting;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,12 @@ public class ReportingUtils {
     public static JasperPrint createReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {
 
-        return JasperFillManager.fillReport(ReportingUtils.class
-            .getResourceAsStream(reportName + ".jasper"), parameters,
+        InputStream reportStream = ReportingUtils.class
+            .getResourceAsStream(reportName + ".jasper");
+        if (reportStream == null) {
+            throw new Exception("No report available with name " + reportName);
+        }
+        return JasperFillManager.fillReport(reportStream, parameters,
             new JRBeanCollectionDataSource(list));
     }
 

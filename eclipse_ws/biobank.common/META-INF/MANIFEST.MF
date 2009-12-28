@@ -58,7 +58,6 @@ Export-Package: antlr;
    edu.ualberta.med.biobank.model,
    edu.ualberta.med.biobank.common.wrappers.internal,
    gov.nih.nci.system.applicationservice",
- edu.ualberta.med.biobank.model,
  gov.nih.nci.system.applicationservice,
  gov.nih.nci.system.client,
  gov.nih.nci.system.query,

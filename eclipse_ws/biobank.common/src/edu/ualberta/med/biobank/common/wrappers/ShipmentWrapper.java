@@ -345,7 +345,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     /**
-     * Search for a shipment in the site with the given date received.
+     * Search a patient in patients list with the given patient number
      */
     public PatientWrapper getPatient(String patientNumber) throws Exception {
         HQLCriteria criteria = new HQLCriteria("select patients from "
