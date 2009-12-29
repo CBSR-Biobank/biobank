@@ -126,8 +126,10 @@ public class PatientEntryForm extends BiobankEntryForm {
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();
-        PatientAdministrationView.currentInstance.showInTree(patientAdapter
-            .getWrapper());
+        if (PatientAdministrationView.currentInstance != null) {
+            PatientAdministrationView.currentInstance.showInTree(patientAdapter
+                .getWrapper());
+        }
     }
 
     @Override
