@@ -74,7 +74,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             studyPatients = new ArrayList<PatientWrapper>();
             for (int i = 0, n = 5 + r.nextInt(15); i < n; i++) {
                 PatientWrapper patient = new PatientWrapper(appService);
-                patient.setNumber(Integer.toString(patientCount));
+                patient.setPnumber(Integer.toString(patientCount));
                 patient.setStudy(study);
                 patient.persist();
                 studyPatients.add(patient);

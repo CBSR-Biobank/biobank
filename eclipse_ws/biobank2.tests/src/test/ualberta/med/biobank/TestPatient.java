@@ -120,7 +120,7 @@ public class TestPatient extends TestDatabase {
         Assert.assertEquals(-1, patient1.compareTo(patient2));
 
         // now set patient2's number to be first when sorted
-        patient2.setNumber("12344");
+        patient2.setPnumber("12344");
         patient2.persist();
 
         Assert.assertEquals(1, patient1.compareTo(patient2));

@@ -28,13 +28,13 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         super(appService);
     }
 
-    public String getNumber() {
-        return wrappedObject.getNumber();
+    public String getPnumber() {
+        return wrappedObject.getPnumber();
     }
 
-    public void setNumber(String number) {
-        String oldNumber = getNumber();
-        wrappedObject.setNumber(number);
+    public void setPnumber(String number) {
+        String oldNumber = getPnumber();
+        wrappedObject.setPnumber(number);
         propertyChangeSupport.firePropertyChange("number", oldNumber, number);
     }
 
@@ -47,7 +47,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public void setStudy(Study study) {
-        String oldStudy = getNumber();
+        String oldStudy = getPnumber();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }
@@ -60,7 +60,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         String isSamePatient = "";
         List<Object> params = new ArrayList<Object>();
         params.add(getStudy().getSite().getId());
-        params.add(getNumber());
+        params.add(getPnumber());
         if (!isNew()) {
             isSamePatient = " and id <> ?";
             params.add(getId());
@@ -89,7 +89,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         ApplicationException {
         if (!checkPatientNumberUnique()) {
             throw new BiobankCheckException("A patient with number \""
-                + getNumber() + "\" already exists.");
+                + getPnumber() + "\" already exists.");
         }
     }
 
@@ -225,7 +225,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         ApplicationException {
         if (hasSamples()) {
             throw new BiobankCheckException("Unable to delete patient "
-                + getNumber()
+                + getPnumber()
                 + " since patient has samples stored in database.");
         }
     }
@@ -248,8 +248,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     public int compareTo(ModelWrapper<Patient> wrapper) {
         if (wrapper instanceof PatientWrapper) {
-            String number1 = wrappedObject.getNumber();
-            String number2 = wrapper.wrappedObject.getNumber();
+            String number1 = wrappedObject.getPnumber();
+            String number2 = wrapper.wrappedObject.getPnumber();
             return number1.compareTo(number2);
         }
         return 0;
@@ -257,6 +257,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     @Override
     public String toString() {
-        return getNumber();
+        return getPnumber();
     }
 }

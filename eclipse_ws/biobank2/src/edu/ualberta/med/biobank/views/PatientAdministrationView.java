@@ -73,7 +73,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         if (create) {
             PatientWrapper patient = new PatientWrapper(SessionManager
                 .getAppService());
-            patient.setNumber(text);
+            patient.setPnumber(text);
             PatientAdapter adapter = new PatientAdapter(rootNode, patient);
             AdapterBase.openForm(new FormInput(adapter), PatientEntryForm.ID);
         }

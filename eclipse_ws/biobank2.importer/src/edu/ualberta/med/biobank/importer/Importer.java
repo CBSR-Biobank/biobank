@@ -405,7 +405,7 @@ public class Importer {
             logger.debug("importing patient number " + patientNo + " (" + count
                 + "/" + numPatients + ")");
             patient = new PatientWrapper(appService);
-            patient.setNumber(patientNo);
+            patient.setPnumber(patientNo);
             patient.setStudy(study);
             patient.persist();
             ++importCounts.patients;
@@ -526,7 +526,7 @@ public class Importer {
             if (shipment == null) {
                 ++importCounts.shipments;
                 logger.debug("new shipment: " + importCounts.shipments
-                    + " patient/" + patient.getNumber() + " clinic/"
+                    + " patient/" + patient.getPnumber() + " clinic/"
                     + clinic.getName() + " shipment/" + dateReceivedStr + " ("
                     + count + "/" + numShipments + ")");
 
@@ -538,7 +538,7 @@ public class Importer {
                 shipment.persist();
             } else if (shipment.getPatient(patientNo) == null) {
                 logger.debug("adding to shipment: patient/"
-                    + patient.getNumber() + " clinic/" + clinic.getName()
+                    + patient.getPnumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
 
@@ -551,7 +551,7 @@ public class Importer {
                 shipment.persist();
             } else {
                 logger.debug("already in database: patient/"
-                    + patient.getNumber() + " clinic/" + clinic.getName()
+                    + patient.getPnumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
             }
@@ -687,7 +687,7 @@ public class Importer {
             pv.setComment(rs.getString(4));
 
             logger.debug("importing patient visit: " + importCounts.visits
-                + " patient/" + patient.getNumber() + " study/"
+                + " patient/" + patient.getPnumber() + " study/"
                 + study.getNameShort() + " dateProcessed/" + dateProcessed
                 + " (" + count + "/" + numPatientVisits + ")");
 
@@ -847,7 +847,7 @@ public class Importer {
             study = getStudyFromOldShortName(studyNameShort);
             if (!patient.getStudy().equals(study)) {
                 throw new Exception("patient and study do not match: "
-                    + patient.getNumber() + ",  " + studyNameShort);
+                    + patient.getPnumber() + ",  " + studyNameShort);
             }
 
             dateProcessedStr = rs.getString(2);

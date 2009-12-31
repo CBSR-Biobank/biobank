@@ -151,7 +151,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
                         if (appService.search(Patient.class, dbPatient).size() == 1) {
                             throw new BiobankCheckException(
                                 "Patient "
-                                    + p.getNumber()
+                                    + p.getPnumber()
                                     + " has been removed from the patients list: this patient should be deleted first.");
                         }
                     }

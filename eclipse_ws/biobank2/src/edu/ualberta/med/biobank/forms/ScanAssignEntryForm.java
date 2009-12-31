@@ -433,7 +433,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 + " from visit "
                 + expectedSample.getPatientVisit().getFormattedDateProcessed()
                 + " (patient "
-                + expectedSample.getPatientVisit().getPatient().getNumber()
+                + expectedSample.getPatientVisit().getPatient().getPnumber()
                 + ") missing";
             setStatusWithLogMessage(scanCell, SampleCellStatus.MISSING,
                 "Aliquot " + expectedSample.getInventoryId() + " missing", "?",
@@ -456,10 +456,10 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 // sample found but another sample already at this position
                 String logMsg = "Expected inventoryId "
                     + expectedSample.getInventoryId() + " from patient "
-                    + expectedSample.getPatientVisit().getPatient().getNumber()
+                    + expectedSample.getPatientVisit().getPatient().getPnumber()
                     + " -- Found inventoryId " + foundSample.getInventoryId()
                     + " from patient "
-                    + foundSample.getPatientVisit().getPatient().getNumber();
+                    + foundSample.getPatientVisit().getPatient().getPnumber();
                 setStatusWithLogMessage(
                     scanCell,
                     SampleCellStatus.ERROR,
@@ -476,7 +476,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             } else {
                 scanCell.setStatus(SampleCellStatus.NEW);
                 scanCell.setTitle(foundSample.getPatientVisit().getPatient()
-                    .getNumber());
+                    .getPnumber());
                 if (foundSample.hasParent()
                     && !foundSample.getParent().getId().equals(
                         currentPalletWrapper.getId())) {
@@ -562,7 +562,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         sb.append(" - Type: ").append(
                             sample.getSampleType().getName());
                         sb.append(" - Patient: ").append(
-                            visit.getPatient().getNumber());
+                            visit.getPatient().getPnumber());
                         sb.append(" - Visit: ").append(
                             visit.getFormattedDateProcessed());
                         sb.append(" - ").append(

@@ -81,7 +81,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         for (PatientWrapper patient : patients) {
             if (!patient.getStudy().getClinicCollection().contains(getClinic())) {
                 throw new BiobankCheckException("Patient "
-                    + patient.getNumber()
+                    + patient.getPnumber()
                     + " is not part of a study that has contact with clinic "
                     + getClinic().getName());
             }
