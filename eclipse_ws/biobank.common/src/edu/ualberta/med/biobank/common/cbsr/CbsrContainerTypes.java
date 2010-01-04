@@ -65,6 +65,10 @@ public class CbsrContainerTypes {
         ContainerTypeWrapper pallet96 = addContainerType(site, "Pallet 96",
             "P96", false, 1, 8, 12, null, pallet96SampleTypes);
 
+        ContainerTypeWrapper hotel10 = addContainerType(site, "Hotel 10",
+            "H10", false, 3, 10, 1, Arrays
+                .asList(new ContainerTypeWrapper[] { box81 }));
+
         ContainerTypeWrapper hotel13 = addContainerType(site, "Hotel 13",
             "H13", false, 3, 13, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { pallet96 }));
@@ -80,6 +84,9 @@ public class CbsrContainerTypes {
         ContainerTypeWrapper hotel19 = addContainerType(site, "Hotel 19",
             "H19", false, 3, 19, 1, Arrays.asList(new ContainerTypeWrapper[] {
                 biopsyPallet96, cellPallet96, pallet96 }));
+
+        addContainerType(site, "Freezer 3x6", "F3x6", true, 2, 3, 6, Arrays
+            .asList(new ContainerTypeWrapper[] { hotel10 }));
 
         addContainerType(site, "Freezer 3x10", "F3x10", true, 2, 3, 10, Arrays
             .asList(new ContainerTypeWrapper[] { hotel17 }));

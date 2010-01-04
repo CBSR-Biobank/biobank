@@ -41,6 +41,10 @@
 		<os family="windows" />
 	</condition>
 
+	<condition property="debugMode" value="-debug" else="">
+		<equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+	</condition>
+
 	<!--
      files included in the sdk build.xml - necessary to be sure that we have
      all the keys for the target we redefined
@@ -125,7 +129,6 @@
 
 	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
-                <echo>coucou</echo>
                 <copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"/>
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
 	</target>
@@ -224,7 +227,7 @@
 	<target name="deploy-jboss" depends="package-webapp-orm,check-jboss-uptodate" description="deploys the caCORE SDK webapp to JBoss" unless="jboss.uptodate">
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${secu-log.dir}/jboss/login-config.xml" tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
-		<copy file="${secu-log.dir}/jboss/server.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml" overwrite="true" />
+		<copy file="${secu-log.dir}/jboss/server${debugMode}.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml" overwrite="true" />
 		<copy file="${secu-log.dir}/jboss/biobank.keystore" tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore" overwrite="true" />
 		<!-- for compatibility: this file has been split -->
 		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />

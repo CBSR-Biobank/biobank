@@ -77,6 +77,9 @@ public class CbsrClinics {
             "103 Hospital Drive", "Saskatoon", "Alberta", "S7N0W8");
         addClinic(site, "TH1", null, "Thunder Bay Regional Hospital",
             "980 Oliver Road", "Thunder Bay", "Ontario", "P7B6V4");
+        ClinicWrapper clinic = addClinic(site, "TR1", null, "", "", "Toronto",
+            "Ontario", null);
+        clinic.setActivityStatus("Closed");
         addClinic(site, "VN1", "", "St Paul\'s Hospital",
             "1081 Burrard Street, Room 318 Comox Building", "Vancouver",
             "British Columbia", "V6Z1Y6");
@@ -90,40 +93,40 @@ public class CbsrClinics {
 
         addContact("CL1", "Morna Brown", null, "403-944-4057", "403-944-1745",
             "morna.brown@calgaryhealthregion.ca");
-        addContact("CL1-KDCS", "Charlynn Ursu", null, "403-944-9883", null,
-            "charlynn.ursu@calgaryhealthservices.ca");
         addContact("CL1-KDCS", "Coralea Bignell", null, "403-944-9885",
             "403-620-8075 cell", "coralea.bignell@albertahealthservices.ca");
         addContact("CL1-KDCS", "Sharon Gulewich", null, "403-944-9882",
             "403-816-1501 work cell",
             "sharon.gulewich@albertahealthservices.ca");
+        addContact("CL1-KDCS", "Charlynn Ursu", null, "403-944-9883", null,
+            "charlynn.ursu@calgaryhealthservices.ca");
         addContact("CL1-NHS", "Shirley Cole", null, "403-220-4988", null,
             "coles@ualberta.ca");
         addContact("CL2", "unknown", null, null, null, null);
-        addContact("ED1", "Erin Rezanoff", "Study Coordinator", "780-407-7448",
-            "780-407-3324", "erin.rezanoff@albertahealthservices.ca");
-        addContact("ED1", "Melanie Peters", null, "780-407-6588", null,
-            "melaniepeters@cha.ab.ca");
-        addContact("ED1", "Candace Dando", "Research Nurse", "780-721-8013",
-            "780-445-7324 (pager)", "candace.dando@capitalhealth.ca");
-        addContact("ED1", "Dawn Opgenorth", "Study Coordinator",
-            "780-407-1543", "780-445-7621 (pager)", "dawno@ualberta.ca");
+        addContact("ED1", "Dellanee Kahlke", null, "780-407-8064",
+            "780-932-2259 cell", "dellanee.kahlke@capitalhealth.ca");
         addContact("ED1", "Dr. Andrew Mason", "Principle Investigator",
             "780-492-8172", null, "andrew.mason@ualberta.ca");
         addContact("ED1", "Dr. Neesh Pannu", null, "780-401-0682 pager", null,
             null);
-        addContact("ED1", "Elizabeth Taylor", "Laboratory Technician",
-            "780-903-7093", null, "e.taylor@ualberta.ca");
-        addContact("ED1", "Dr. Justin Ezekowitz", "Principle Investigator",
-            "780-407-8719", "780-407-6452", "jae2@ualberta.ca");
-        addContact("ED1", "Dellanee Kahlke", null, "780-407-8064",
-            "780-932-2259 cell", "dellanee.kahlke@capitalhealth.ca");
         addContact("ED1", "Wanda MacDonald", "Research Coordinator",
             "780-248-1037", "780-445-7769 pager", "wmacdona@ualberta.ca");
+        addContact("ED1", "Erin Rezanoff", "Study Coordinator", "780-407-7448",
+            "780-407-3324", "erin.rezanoff@albertahealthservices.ca");
+        addContact("ED1", "Elizabeth Taylor", "Laboratory Technician",
+            "780-903-7093", null, "e.taylor@ualberta.ca");
         addContact("ED1", "Bonny Granfield", null, "780-719-6279", null,
             "bgranfield@biosample.ca");
+        addContact("ED1", "Melanie Peters", null, "780-407-6588", null,
+            "melaniepeters@cha.ab.ca");
+        addContact("ED1", "Dr. Justin Ezekowitz", "Principle Investigator",
+            "780-407-8719", "780-407-6452", "jae2@ualberta.ca");
         addContact("ED1", "Sue Szigety", null, "780-407-7868", null,
             "sszigety@ualberta.ca");
+        addContact("ED1", "Candace Dando", "Research Nurse", "780-721-8013",
+            "780-445-7324 (pager)", "candace.dando@capitalhealth.ca");
+        addContact("ED1", "Dawn Opgenorth", "Study Coordinator",
+            "780-407-1543", "780-445-7621 (pager)", "dawno@ualberta.ca");
         addContact("FM1", "Phillo King", null, "780-799-4382", null,
             "pmking@nlhr.ca");
         addContact("GP1", "Sharon Mollins", null, "780-538-7576", null,
@@ -134,6 +137,7 @@ public class CbsrClinics {
             "902-470-7414", "902-470-7456", "aleasha.warner@iwk.nshealth.ca");
         addContact("HM1", "Theresa Almonte", null, "905-521-2348", null,
             "almontet@hhsc.ca");
+        addContact("KN1", "Bonny Granfield", null, null, null, null);
         addContact("KN1", "Maryanne Gibson", null, "613-544-2631 x6625", null,
             "maryanne.gibson@krcc.on.ca");
         addContact("LM1", "Janilee Dow", null, "306-825-3058 Home", null,
@@ -169,6 +173,8 @@ public class CbsrClinics {
             "diannedufour@saskatoonhealthregion.ca");
         addContact("TH1", "Janet D Sharun", null, "807-684-6601", null,
             "sharunj@tbh.net");
+        addContact("TR1", "Tony", null, null, null, null);
+        addContact("VN1", "unknown", null, null, null, null);
         addContact("VN1", "Ann Chala", "Research Coordinator",
             "604-682-2344 x63135", "604-806-8856",
             "achala@providencehealth.bc.ca");

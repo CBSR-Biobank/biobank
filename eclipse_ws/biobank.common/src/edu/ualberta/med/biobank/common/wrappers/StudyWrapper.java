@@ -151,7 +151,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
                         if (appService.search(Patient.class, dbPatient).size() == 1) {
                             throw new BiobankCheckException(
                                 "Patient "
-                                    + p.getNumber()
+                                    + p.getPnumber()
                                     + " has been removed from the patients list: this patient should be deleted first.");
                         }
                     }
@@ -608,6 +608,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return clinicWrappers;
     }
 
+    public boolean hasClinic(String clinicName) throws Exception {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(*) from "
+                + Study.class.getName()
+                + " as study join study.contactCollection as contacts"
+                + " join contacts.clinic as clinics where study = ? and clinics.name = ?",
+            Arrays.asList(new Object[] { getWrappedObject(), clinicName }));
+        List<Long> result = appService.query(criteria);
+        return (result.get(0) > 0);
+    }
+
     @SuppressWarnings("unchecked")
     public List<PatientWrapper> getPatientCollection(boolean sort) {
         List<PatientWrapper> patientCollection = (List<PatientWrapper>) propertiesMap
@@ -630,6 +641,19 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public List<PatientWrapper> getPatientCollection() {
         return getPatientCollection(false);
+    }
+
+    public PatientWrapper getPatient(String patientNumber) throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select patients from "
+            + Study.class.getName()
+            + " as study inner join study.patientCollection"
+            + " as patients where patients.pnumber = ?", Arrays
+            .asList(new Object[] { patientNumber }));
+        List<Patient> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return new PatientWrapper(appService, result.get(0));
     }
 
     public boolean hasPatients() throws ApplicationException,

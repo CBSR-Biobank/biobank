@@ -305,7 +305,7 @@ public class TestContainer extends TestDatabase {
         }
 
         // test getFullInfoLabel()
-        Assert.assertEquals("05("
+        Assert.assertEquals("05 ("
             + container2.getContainerType().getNameShort() + ")", container2
             .getFullInfoLabel());
 

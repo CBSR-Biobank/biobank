@@ -538,7 +538,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         }
         if (currentPatient != null) {
             appendLog("-----");
-            appendLog("Found patient with number " + currentPatient.getNumber());
+            appendLog("Found patient with number " + currentPatient.getPnumber());
             // show visits list
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
@@ -624,7 +624,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     appendLog("ERROR: " + value + " - " + msg + " see visit "
                         + sample.getPatientVisit().getFormattedDateProcessed()
                         + " of patient "
-                        + sample.getPatientVisit().getPatient().getNumber());
+                        + sample.getPatientVisit().getPatient().getPnumber());
                 } else {
                     cell.setStatus(SampleCellStatus.NO_TYPE);
                 }
@@ -658,7 +658,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                 sample.persist();
                 sb.append("\nLINKED: ").append(cell.getValue());
                 sb.append(" - patient: ").append(
-                    patientVisit.getPatient().getNumber());
+                    patientVisit.getPatient().getPnumber());
                 sb.append(" - Visit: ").append(
                     patientVisit.getFormattedDateProcessed());
                 sb.append(" - ").append(

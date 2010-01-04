@@ -463,7 +463,7 @@ public class TestSample extends TestDatabase {
             pv, 2, 3);
         sample.setInventoryId(Utils.getRandomString(5));
         sample.persist();
-        SampleHelper.addSample(sampleType, container, null, 3, 3);
+        SampleHelper.addSample(sampleType, null, pv, null, null);
 
         SampleWrapper.getRandomSamplesAlreadyLinked(appService, siteId);
         SampleWrapper.getRandomSamplesAlreadyAssigned(appService, siteId);

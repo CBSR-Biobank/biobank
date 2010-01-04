@@ -122,7 +122,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                     if (create) {
                         patient = new PatientWrapper(SessionManager
                             .getAppService());
-                        patient.setNumber(patientNumber);
+                        patient.setPnumber(patientNumber);
                         ShipmentAdministrationView.currentInstance
                             .displayPatient(patient);
                         return true;
@@ -145,7 +145,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         }
         if (patients.contains(patient)) {
             BioBankPlugin.openAsyncError("Error", "Patient "
-                + patient.getNumber()
+                + patient.getPnumber()
                 + " has already been added to this shipment");
             return;
         }
@@ -171,7 +171,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
                         "Delete Patient",
                         "Are you sure you want to remove patient \""
-                            + patient.getNumber() + "\" for this shipment ?");
+                            + patient.getPnumber() + "\" for this shipment ?");
 
                     if (confirm) {
                         List<PatientWrapper> patients = shipment

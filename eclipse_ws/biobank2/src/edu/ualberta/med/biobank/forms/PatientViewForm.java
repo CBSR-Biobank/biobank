@@ -33,7 +33,7 @@ public class PatientViewForm extends BiobankViewForm {
         patientAdapter = (PatientAdapter) adapter;
         patientWrapper = patientAdapter.getWrapper();
         retrievePatient();
-        setPartName("Patient " + patientWrapper.getNumber());
+        setPartName("Patient " + patientWrapper.getPnumber());
     }
 
     private void retrievePatient() throws Exception {
@@ -42,7 +42,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient: " + patientWrapper.getNumber());
+        form.setText("Patient: " + patientWrapper.getPnumber());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -83,8 +83,8 @@ public class PatientViewForm extends BiobankViewForm {
     protected void reload() throws Exception {
         setValues();
         retrievePatient();
-        setPartName("Patient " + patientWrapper.getNumber());
-        form.setText("Patient: " + patientWrapper.getNumber());
+        setPartName("Patient " + patientWrapper.getPnumber());
+        form.setText("Patient: " + patientWrapper.getPnumber());
         visitsTable.setCollection(patientWrapper.getPatientVisitCollection());
     }
 

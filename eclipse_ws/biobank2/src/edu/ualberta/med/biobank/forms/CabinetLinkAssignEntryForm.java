@@ -354,7 +354,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 return;
 
             appendLog("-----");
-            appendLog("Found patient with number " + currentPatient.getNumber());
+            appendLog("Found patient with number " + currentPatient.getPnumber());
             // show visits list
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
@@ -445,7 +445,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         }
         sampleWrapper = samples.get(0);
         currentPatient = sampleWrapper.getPatientVisit().getPatient();
-        patientNumberText.setText(currentPatient.getNumber());
+        patientNumberText.setText(currentPatient.getPnumber());
         List<PatientVisitWrapper> collection = currentPatient
             .getPatientVisitCollection();
         viewerVisits.setInput(collection);
@@ -549,7 +549,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 + " saved in position " + sampleWrapper.getPositionString()
                 + " for visit "
                 + sampleWrapper.getPatientVisit().getFormattedDateProcessed()
-                + "(patient " + currentPatient.getNumber() + ")");
+                + "(patient " + currentPatient.getPnumber() + ")");
         } else {
             appendLog("Sample " + sampleWrapper.getInventoryId()
                 + " moved to position " + sampleWrapper.getPositionString());
