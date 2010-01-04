@@ -15,7 +15,7 @@ public class QueryObject {
     private String description;
 
     /**
-     * Name of this quety object
+     * Name of this query object
      */
     private String name;
 

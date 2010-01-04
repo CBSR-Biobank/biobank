@@ -43,6 +43,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.FreezerDSamplesQueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
@@ -180,9 +181,23 @@ public class ReportsView extends ViewPart {
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof Text)
                 params.add(((Text) widgetFields.get(i)).getText());
-            else if (widgetFields.get(i) instanceof Combo)
-                params.add(((Combo) widgetFields.get(i)).getSelectionIndex());
-            else if (widgetFields.get(i) instanceof DateTimeWidget)
+            else if (widgetFields.get(i) instanceof Combo) {
+                Combo tempCombo = (Combo) widgetFields.get(i);
+                // rather return a daterange but combo won't let me
+                // DateRange range
+                // =tempCombo.getItem(tempCombo.getSelectionIndex());
+                String range = tempCombo.getItem(tempCombo.getSelectionIndex());
+                Date date;
+                if (range.compareTo("Week") == 0)
+                    range = "7";
+                else if (range.compareTo("Month") == 0)
+                    range = "30";
+                else if (range.compareTo("Quarter") == 0)
+                    range = "91";
+                else if (range.compareTo("Year") == 0)
+                    range = "365";
+                // params.add("junk");
+            } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
         return query.executeQuery(SessionManager.getAppService(), params);
@@ -226,9 +241,12 @@ public class ReportsView extends ViewPart {
             // widget = new Text(subSection, SWT.BORDER);
             // else
             // widget = null;
-            if (option.getType() == List.class)
+            if (option.getType() == DateRange.class) {
                 widget = new Combo(subSection, SWT.NONE);
-            else if (option.getType() == Date.class)
+                Object values[] = DateRange.values();
+                for (int j = 0; j < values.length; j++)
+                    ((Combo) widget).add(values[j].toString());
+            } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
             else if (option.getType() == String.class)
                 widget = new Text(subSection, SWT.BORDER);
