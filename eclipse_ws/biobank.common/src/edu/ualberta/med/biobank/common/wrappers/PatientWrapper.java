@@ -66,7 +66,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             params.add(getId());
         }
         HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
-            + " where study.site.id = ? and number = ?" + isSamePatient, params);
+            + " where study.site.id = ? and pnumber = ?" + isSamePatient,
+            params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;

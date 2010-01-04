@@ -190,10 +190,10 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
-                // importShipments();
-                // importPatientVisits();
-                // importCabinetSamples();
-                // removeAllSamples();
+                importShipments();
+                importPatientVisits();
+                importCabinetSamples();
+                removeAllSamples();
                 importFreezerSamples();
             }
 
@@ -368,6 +368,7 @@ public class Importer {
         StudyWrapper study;
         String studyNameShort;
         PatientWrapper patient;
+        removeAllPatients();
         logger.info("importing patients ...");
 
         String qryPart = "from patient, study_list where patient.study_nr=study_list.study_nr";

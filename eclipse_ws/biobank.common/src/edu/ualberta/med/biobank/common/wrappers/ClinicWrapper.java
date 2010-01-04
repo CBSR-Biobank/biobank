@@ -435,7 +435,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             + Shipment.class.getName()
             + " as shipment join shipment.patientCollection as patients"
             + " where shipment.clinic.id = ? and shipment.dateReceived = ? "
-            + "and patients.number = ?", Arrays.asList(new Object[] { getId(),
+            + "and patients.pnumber = ?", Arrays.asList(new Object[] { getId(),
             dateReceived, patientNumber }));
         List<Shipment> shipments = appService.query(criteria);
         if (shipments.size() > 0) {
