@@ -58,7 +58,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (patientAdapter.getWrapper().isNew()) {
             tabName = "New Patient";
         } else {
-            tabName = "Patient " + patientAdapter.getWrapper().getNumber();
+            tabName = "Patient " + patientAdapter.getWrapper().getPnumber();
         }
         setPartName(tabName);
     }
@@ -142,7 +142,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             patientAdapter.getWrapper().reload();
         } catch (Exception e) {
             LOGGER.error("Error while retrieving patient "
-                + patientAdapter.getWrapper().getNumber(), e);
+                + patientAdapter.getWrapper().getPnumber(), e);
         }
     }
 

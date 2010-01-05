@@ -7,7 +7,7 @@ public class PatientHelper extends DbHelper {
 
     public static PatientWrapper newPatient(String number) {
         PatientWrapper patient = new PatientWrapper(appService);
-        patient.setNumber(number);
+        patient.setPnumber(number);
         return patient;
     }
 

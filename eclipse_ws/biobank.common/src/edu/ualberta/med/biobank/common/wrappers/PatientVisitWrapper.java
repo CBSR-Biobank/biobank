@@ -363,7 +363,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             throw new BiobankCheckException(
                 "A patient visit with date processed "
                     + getFormattedDateProcessed()
-                    + " already exist in patient " + getPatient().getNumber()
+                    + " already exist in patient " + getPatient().getPnumber()
                     + ".");
         }
     }

@@ -81,7 +81,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         for (PatientWrapper patient : patients) {
             if (!patient.getStudy().getClinicCollection().contains(getClinic())) {
                 throw new BiobankCheckException("Patient "
-                    + patient.getNumber()
+                    + patient.getPnumber()
                     + " is not part of a study that has contact with clinic "
                     + getClinic().getName());
             }
@@ -351,8 +351,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         HQLCriteria criteria = new HQLCriteria("select patients from "
             + Shipment.class.getName()
             + " as shipment inner join shipment.patientCollection as patients"
-            + " where patients.number = ?", Arrays
-            .asList(new Object[] { patientNumber }));
+            + " where shipment.id = ? and patients.pnumber = ?", Arrays
+            .asList(new Object[] { getId(), patientNumber }));
         List<Patient> patients = appService.query(criteria);
         if (patients.size() >= 1) {
             return new PatientWrapper(appService, patients.get(0));

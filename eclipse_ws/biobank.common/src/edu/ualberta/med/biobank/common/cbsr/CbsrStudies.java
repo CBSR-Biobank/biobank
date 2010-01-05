@@ -171,6 +171,7 @@ public class CbsrStudies {
         addSampleSource("VAS", "6mL beige top tube");
         addSampleSource("VAS", "10ml orange top PAXgene tube");
 
+        addPvAttr("AHFEM", "PBMC Count", "number");
         addPvAttr("AHFEM", "Worksheet", "text");
         addPvAttr("BBPSP", "Consent", "select_multiple",
             "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
@@ -210,45 +211,47 @@ public class CbsrStudies {
         addPvAttr("VAS", "PBMC Count", "number");
         addPvAttr("VAS", "Worksheet", "text");
 
-        addContact("Dr. Justin Ezekowitz", "AHFEM");
-        addContact("Morna Brown", "BBPSP");
-        addContact("Melanie Peters", "BBPSP");
-        addContact("Aleasha Warner", "BBPSP");
-        addContact("Dorine Belliveau", "BBPSP");
-        addContact("Elaine Gloutnez", "BBPSP");
-        addContact("Chantal Gagne", "BBPSP");
-        addContact("Elizabeth-Ann Paradis", "BBPSP");
-        addContact("Dianne Dufour", "BBPSP");
-        addContact("Colleen Fitzgerald", "BBPSP");
-        addContact("Niki Davis", "BBPSP");
-        addContact("Theresa Almonte", "BBPSP");
-        addContact("Maryanne Gibson", "BBPSP");
-        addContact("Sheila Schembri", "BBPSP");
-        addContact("Nathalie Aubin", "BBPSP");
-        addContact("Lucie Lacasse", "BBPSP");
-        addContact("Tammy Burtenshaw", "BBPSP");
-        addContact("Louise Bedard", "BBPSP");
-        addContact("Janet D Sharun", "BBPSP");
-        addContact("Kathy Hjalmarsson", "BBPSP");
-        addContact("unknown", "BBPSP");
-        addContact("Dr. Neesh Pannu", "CCCS");
-        addContact("Wanda MacDonald", "CEGIIR");
-        addContact("Dellanee Kahlke", "CHILD");
-        addContact("Candace Dando", "ERCIN");
-        addContact("Daisy Gibbons", "ERCIN");
-        addContact("Dawn Opgenorth", "KDCS");
-        addContact("Sharon Gulewich", "KDCS");
-        addContact("Elizabeth Taylor", "KMS");
-        addContact("Elizabeth Taylor", "LCS");
-        addContact("Bonny Granfield", "MPS");
-        addContact("Shirley Cole", "NHS");
-        addContact("Dr. Andrew Mason", "NHS");
-        addContact("Dr. Andrew Mason", "RVS");
-        addContact("Erin Rezanoff", "SPARK");
-        addContact("Sharon Gulewich", "TCKS");
-        addContact("Sue Szigety", "TCKS");
-        addContact("Dawn Opgenorth", "VAS");
-        addPvAttr("AHFEM", "PBMC Count", "number");
+        addContact("Dr. Justin Ezekowitz", "ED1", "AHFEM");
+        addContact("Morna Brown", "CL1", "BBPSP");
+        addContact("Melanie Peters", "ED1", "BBPSP");
+        addContact("Aleasha Warner", "HL2", "BBPSP");
+        addContact("Dorine Belliveau", "MC1", "BBPSP");
+        addContact("Elaine Gloutnez", "MN1", "BBPSP");
+        addContact("Chantal Gagne", "QB1", "BBPSP");
+        addContact("Elizabeth-Ann Paradis", "SD1", "BBPSP");
+        addContact("Dianne Dufour", "SS1", "BBPSP");
+        addContact("Colleen Fitzgerald", "VN2", "BBPSP");
+        addContact("Niki Davis", "HL1", "BBPSP");
+        addContact("Theresa Almonte", "HM1", "BBPSP");
+        addContact("Maryanne Gibson", "KN1", "BBPSP");
+        addContact("Sheila Schembri", "LN1", "BBPSP");
+        addContact("Nathalie Aubin", "MN2", "BBPSP");
+        addContact("Lucie Lacasse", "OT1", "BBPSP");
+        addContact("Tammy Burtenshaw", "OT2", "BBPSP");
+        addContact("Louise Bedard", "SB1", "BBPSP");
+        addContact("Janet D Sharun", "TH1", "BBPSP");
+        addContact("Kathy Hjalmarsson", "WN1", "BBPSP");
+        addContact("unknown", "CL2", "BBPSP");
+        addContact("Tony", "TR1", "BBPSP");
+        addContact("unknown", "VN1", "BBPSP");
+        addContact("Dr. Neesh Pannu", "ED1", "CCCS");
+        addContact("Wanda MacDonald", "ED1", "CEGIIR");
+        addContact("Dellanee Kahlke", "ED1", "CHILD");
+        addContact("Candace Dando", "ED1", "ERCIN");
+        addContact("Daisy Gibbons", "SF1", "ERCIN");
+        addContact("Dawn Opgenorth", "ED1", "KDCS");
+        addContact("Ann Chala", "VN1", "KDCS");
+        addContact("Sharon Gulewich", "CL1-KDCS", "KDCS");
+        addContact("Bonny Granfield", "KN1", "KMS");
+        addContact("Elizabeth Taylor", "ED1", "LCS");
+        addContact("Bonny Granfield", "ED1", "MPS");
+        addContact("Shirley Cole", "CL1-NHS", "NHS");
+        addContact("Dr. Andrew Mason", "ED1", "NHS");
+        addContact("Dr. Andrew Mason", "ED1", "RVS");
+        addContact("Erin Rezanoff", "ED1", "SPARK");
+        addContact("Sharon Gulewich", "CL1-KDCS", "TCKS");
+        addContact("Sue Szigety", "ED1", "TCKS");
+        addContact("Dawn Opgenorth", "ED1", "VAS");
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,
@@ -316,9 +319,14 @@ public class CbsrStudies {
         addPvAttr(studyNameShort, label, type, null);
     }
 
-    private static void addContact(String contactName, String studyNameShort)
-        throws Exception {
-        ContactWrapper contact = CbsrClinics.getContact(contactName);
+    private static void addContact(String contactName, String clinicName,
+        String studyNameShort) throws Exception {
+        ContactWrapper contact = CbsrClinics.getClinic(clinicName).getContact(
+            contactName);
+        if (contact == null) {
+            throw new Exception("clinic " + clinicName
+                + " does not have a contact with name " + contactName);
+        }
         StudyWrapper study = getStudy(studyNameShort);
 
         List<ContactWrapper> contacts = study.getContactCollection();

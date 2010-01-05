@@ -84,7 +84,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             PatientWrapper patient = (PatientWrapper) element;
             switch (columnIndex) {
             case 0:
-                return patient.getNumber();
+                return patient.getPnumber();
             case 1:
                 return patient.getStudy().getName();
             }
