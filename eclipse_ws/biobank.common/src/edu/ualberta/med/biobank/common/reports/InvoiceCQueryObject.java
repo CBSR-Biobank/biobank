@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.model.Sample;
 
 public class InvoiceCQueryObject extends QueryObject {
     private static String QUERY_STRING = "Select {0}Alias.patientVisit.shipment.clinic.name, "
-        + "{0}Alias.patientVisit.patient.id, {0}Alias.patientVisit.patient.number, "
+        + "{0}Alias.patientVisit.patient.id, {0}Alias.patientVisit.patient.pnumber, "
         + "{0}Alias.linkDate, {0}Alias.sampleType.name  from "
         + Sample.class.getName()
         + " as {0}Alias where {0}Alias.linkDate > ? and {0}Alias.linkDate < ? and "
