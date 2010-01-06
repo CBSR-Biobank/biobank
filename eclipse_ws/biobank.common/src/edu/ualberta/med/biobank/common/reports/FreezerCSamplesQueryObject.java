@@ -12,7 +12,7 @@ public class FreezerCSamplesQueryObject extends QueryObject {
                 + "Alias.patientVisit.shipment.clinic.name, count (*) from "
                 + Sample.class.getName() + " as " + name + "Alias where "
                 + name + "Alias.patientVisit.patient.study.site = " + siteId
-                + " Order BY " + name + "Alias.patientVisit.patient.study, "
+                + " GROUP BY " + name + "Alias.patientVisit.patient.study, "
                 + name + "Alias.patientVisit.shipment.clinic", new String[] {
                 "Study", "Clinic", "Total" });
     }

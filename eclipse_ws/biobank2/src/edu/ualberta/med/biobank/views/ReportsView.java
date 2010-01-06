@@ -179,20 +179,13 @@ public class ReportsView extends ViewPart {
                 params.add(((Text) widgetFields.get(i)).getText());
             else if (widgetFields.get(i) instanceof Combo) {
                 Combo tempCombo = (Combo) widgetFields.get(i);
-                // rather return a daterange but combo won't let me
+                // would rather return a daterange but basic combo (necessary
+                // since jface comboviewer is not a widget) won't let me
                 // DateRange range
                 // =tempCombo.getItem(tempCombo.getSelectionIndex());
                 String range = tempCombo.getItem(tempCombo.getSelectionIndex());
-                Date date;
-                if (range.compareTo("Week") == 0)
-                    range = "7";
-                else if (range.compareTo("Month") == 0)
-                    range = "30";
-                else if (range.compareTo("Quarter") == 0)
-                    range = "91";
-                else if (range.compareTo("Year") == 0)
-                    range = "365";
-                // params.add("junk");
+                params.add("week");
+                // params.add(range);
             } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
@@ -230,19 +223,12 @@ public class ReportsView extends ViewPart {
             textLabels.add(fieldLabel);
             Widget widget;
 
-            // if (fields.get(i) == Combo.class)
-            // widget = new Combo(subSection, SWT.NONE);
-            // else if (fields.get(i) == DateTimeWidget.class)
-            // widget = new DateTimeWidget(subSection, SWT.NONE, null);
-            // else if (fields.get(i) == Text.class)
-            // widget = new Text(subSection, SWT.BORDER);
-            // else
-            // widget = null;
             if (option.getType() == DateRange.class) {
-                widget = new Combo(subSection, SWT.NONE);
+                widget = new Combo(subSection, SWT.READ_ONLY);
                 Object values[] = DateRange.values();
                 for (int j = 0; j < values.length; j++)
                     ((Combo) widget).add(values[j].toString());
+                ((Combo) widget).select(0);
             } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
             else if (option.getType() == String.class)

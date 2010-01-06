@@ -12,7 +12,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class NewPatientCountQueryObject extends QueryObject {
+public class PatientVisitSummary extends QueryObject {
     private static String PVCOUNT_STRING = "(select count(*) from "
         + Patient.class.getName()
         + " as p where (select count(*) from "
@@ -39,11 +39,12 @@ public class NewPatientCountQueryObject extends QueryObject {
         + " from " + Study.class.getName()
         + " as s inner join s.contactCollection as c where s.site.id = {0}";
 
-    public NewPatientCountQueryObject(String name, Integer siteId) {
-        super("Lists freezer samples by study.", name, MessageFormat.format(
-            QUERY_STRING, siteId), new String[] { "Study", "Clinic", "1 Visit",
-            "2 Visit", "3 Visit", "4 Visit", "5+ Visits", "Total Visits",
-            "Total Patients" });
+    public PatientVisitSummary(String name, Integer siteId) {
+        super(
+            "Displays the total number of patients for each of 1-5+ visits, the total number of visits, and the total number of patients per study per clinic for a given date range.",
+            name, MessageFormat.format(QUERY_STRING, siteId), new String[] {
+                "Study", "Clinic", "1 Visit", "2 Visit", "3 Visit", "4 Visit",
+                "5+ Visits", "Total Visits", "Total Patients" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }

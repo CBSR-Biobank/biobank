@@ -16,10 +16,10 @@ public class FreezerDSamplesQueryObject extends QueryObject {
                 + "Alias.patientVisit.shipment.clinic.name, count (*) from "
                 + Sample.class.getName() + " as " + name + "Alias where "
                 + name + "Alias.patientVisit.patient.study.site = " + siteId
-                + " GROUP BY WEEK(" + name + "Alias.linkDate), " + name
+                + " GROUP BY ?(" + name + "Alias.linkDate), " + name
                 + "Alias.patientVisit.patient.study, " + name
                 + "Alias.patientVisit.shipment.clinic, count(*)", new String[] {
                 "week", "Study", "Clinic", "Total" });
-        // addOption("Date Range", DateRange.class, null);
+        addOption("Date Range", DateRange.class, DateRange.Week);
     }
 }

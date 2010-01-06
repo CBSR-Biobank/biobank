@@ -68,9 +68,9 @@ public class QueryObject {
         ArrayList<QueryObject> queries = new ArrayList<QueryObject>();
 
         // create all pre-defined queries here
-        QueryObject invoicePQuery = new InvoicePQueryObject(
+        QueryObject invoicePQuery = new SampleInvoiceByPatient(
             "SampleInvoiceByPatient", siteId);
-        QueryObject invoiceCQuery = new InvoiceCQueryObject(
+        QueryObject invoiceCQuery = new SampleInvoiceByClinic(
             "SampleInvoiceByClinic", siteId);
         QueryObject sampleCountQuery = new SampleCountQueryObject(
             "SampleCount", siteId);
@@ -84,9 +84,9 @@ public class QueryObject {
             "FreezerSamplesByStudyClinic", siteId);
         QueryObject freezerDSamplesQuery = new FreezerDSamplesQueryObject(
             "FreezerSamplesByDate", siteId);
-        // missing queries
-        QueryObject newPatientCountQuery = new NewPatientCountQueryObject(
-            "NewPatientCountByStudyClinic", siteId);
+        QueryObject patientWBC = new PatientWBC("PatientWBC", siteId);
+        QueryObject patientVisitSummary = new PatientVisitSummary(
+            "PatientVisitSummary", siteId);
 
         queries.add(invoicePQuery);
         queries.add(invoiceCQuery);
@@ -96,8 +96,8 @@ public class QueryObject {
         queries.add(freezerSSamplesQuery);
         queries.add(freezerCSamplesQuery);
         queries.add(freezerDSamplesQuery);
-        // missing queries
-        queries.add(newPatientCountQuery);
+        queries.add(patientWBC);
+        queries.add(patientVisitSummary);
 
         return queries;
     }
