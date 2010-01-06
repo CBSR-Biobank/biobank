@@ -11,7 +11,7 @@ public class SampleInvoiceByPatient extends QueryObject {
             "Lists all samples linked in a particular date range, ordered by patient.",
             name, "Select " + name + "Alias.patientVisit.patient.id, " + name
                 + "Alias.patientVisit.shipment.clinic.id, " + name
-                + "Alias.patientVisit.patient.number, " + name
+                + "Alias.patientVisit.patient.pnumber, " + name
                 + "Alias.linkDate, " + name + "Alias.sampleType.name"
                 + " from " + Sample.class.getName() + " as " + name
                 + "Alias where " + name + "Alias.linkDate > ? and " + name

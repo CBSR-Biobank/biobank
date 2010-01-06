@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.Sample;
 
-public class FreezerCSamplesQueryObject extends QueryObject {
+public class FreezerCSamples extends QueryObject {
 
-    public FreezerCSamplesQueryObject(String name, Integer siteId) {
+    public FreezerCSamples(String name, Integer siteId) {
         super(
             "Displays the total number of freezer samples per study per clinic.",
             name, "Select " + name + "Alias.patientVisit.patient.study.name, "

@@ -64,40 +64,21 @@ public class QueryObject {
         queryOptions.add(new Option(name, type, defaultValue));
     }
 
-    public static List<QueryObject> getAllQueries(Integer siteId) {
-        ArrayList<QueryObject> queries = new ArrayList<QueryObject>();
+    public static List<Class<? extends QueryObject>> getAllQueries() {
+        ArrayList<Class<? extends QueryObject>> queries = new ArrayList<Class<? extends QueryObject>>();
 
         // create all pre-defined queries here
-        QueryObject invoicePQuery = new SampleInvoiceByPatient(
-            "SampleInvoiceByPatient", siteId);
-        QueryObject invoiceCQuery = new SampleInvoiceByClinic(
-            "SampleInvoiceByClinic", siteId);
-        QueryObject sampleCountQuery = new SampleCountQueryObject(
-            "SampleCount", siteId);
-        QueryObject sampleSCountQuery = new SampleSCountQueryObject(
-            "SampleCountByStudy", siteId);
-        QueryObject fvlPatientVisitsQuery = new FvLPatientVisitsQueryObject(
-            "FirstVsLastPatientVisitsByClinic", siteId);
-        QueryObject freezerSSamplesQuery = new FreezerSSamplesQueryObject(
-            "FreezerSamplesByStudy", siteId);
-        QueryObject freezerCSamplesQuery = new FreezerCSamplesQueryObject(
-            "FreezerSamplesByStudyClinic", siteId);
-        QueryObject freezerDSamplesQuery = new FreezerDSamplesQueryObject(
-            "FreezerSamplesByDate", siteId);
-        QueryObject patientWBC = new PatientWBC("PatientWBC", siteId);
-        QueryObject patientVisitSummary = new PatientVisitSummary(
-            "PatientVisitSummary", siteId);
 
-        queries.add(invoicePQuery);
-        queries.add(invoiceCQuery);
-        queries.add(sampleCountQuery);
-        queries.add(sampleSCountQuery);
-        queries.add(fvlPatientVisitsQuery);
-        queries.add(freezerSSamplesQuery);
-        queries.add(freezerCSamplesQuery);
-        queries.add(freezerDSamplesQuery);
-        queries.add(patientWBC);
-        queries.add(patientVisitSummary);
+        queries.add(FreezerCSamples.class);
+        queries.add(FreezerDSamples.class);
+        queries.add(FreezerSSamples.class);
+        queries.add(FvLPatientVisits.class);
+        queries.add(PatientVisitSummary.class);
+        queries.add(PatientWBC.class);
+        queries.add(SampleCount.class);
+        queries.add(SampleInvoiceByClinic.class);
+        queries.add(SampleInvoiceByPatient.class);
+        queries.add(SampleSCount.class);
 
         return queries;
     }
@@ -108,6 +89,7 @@ public class QueryObject {
 
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
+        // queryOptions.add(SessionManager.)
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)

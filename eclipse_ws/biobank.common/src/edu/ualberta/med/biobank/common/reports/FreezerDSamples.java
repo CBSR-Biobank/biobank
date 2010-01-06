@@ -2,13 +2,13 @@ package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.Sample;
 
-public class FreezerDSamplesQueryObject extends QueryObject {
+public class FreezerDSamples extends QueryObject {
 
     public enum DateRange {
         Week, Month, Quarter, Year
     }
 
-    public FreezerDSamplesQueryObject(String name, Integer siteId) {
+    public FreezerDSamples(String name, Integer siteId) {
         super(
             "Displays the total number of freezer samples per study per clinic by date range.",
             name, "Select " + name + "Alias.patientVisit.patient.study.name, "
