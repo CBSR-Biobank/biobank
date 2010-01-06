@@ -191,8 +191,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         appService.executeQuery(new DeleteExampleQuery(wrappedObject));
     }
 
-    protected abstract void deleteChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException;
+    protected abstract void deleteChecks() throws Exception;
 
     public void reset() throws Exception {
         if (isNew()) {

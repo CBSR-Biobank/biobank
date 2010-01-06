@@ -35,7 +35,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public void setPnumber(String number) {
         String oldNumber = getPnumber();
         wrappedObject.setPnumber(number);
-        propertyChangeSupport.firePropertyChange("number", oldNumber, number);
+        propertyChangeSupport.firePropertyChange("pnumber", oldNumber, number);
     }
 
     public StudyWrapper getStudy() {
@@ -81,7 +81,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      */
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "number", "study", "patientVisitCollection",
+        return new String[] { "pnumber", "study", "patientVisitCollection",
             "shptSampleSourceCollection", "shipmentCollection" };
     }
 
@@ -161,7 +161,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         SiteWrapper siteWrapper) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Patient.class.getName()
-            + " where study.site.id = ? and number = ?", Arrays
+            + " where study.site.id = ? and pnumber = ?", Arrays
             .asList(new Object[] { siteWrapper.getId(), patientNumber }));
         List<Patient> patients = appService.query(criteria);
         if (patients.size() == 1) {
