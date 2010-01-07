@@ -168,7 +168,7 @@ public class Importer {
             }
 
             String[] reqdTables = { "clinics", "study_list", "patient",
-                "patient_visit", "cabinet", "freezer", "sample_list" };
+                "patient_visit", "cabinet", "freezer", "sample_list", "frz_inv_id_cnt" };
 
             for (String table : reqdTables) {
                 if (!tableExists(table))
@@ -965,16 +965,17 @@ public class Importer {
         for (FreezerHotelLabel bbpdbHotelLabel : hotelLabels) {
             PreparedStatement ps = con
                 .prepareStatement("select patient_visit.date_received, "
-                    + "patient_visit.date_taken,  study_list.study_name_short, "
-                    + "sample_list.sample_name_short, freezer.*, patient.chr_nr "
-                    + "from freezer, study_list, patient_visit, sample_list,patient "
-                    + "where freezer.study_nr=study_list.study_nr "
-                    + "and patient_visit.study_nr=study_list.study_nr "
+                    + "patient_visit.date_taken, study_list.study_name_short, "
+                    + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
+                    + "from freezer "
+                    + "join frz_inv_id_cnt on freezer.inventory_id=frz_inv_id_cnt.inventory_id "
+                    + "join study_list on freezer.study_nr=study_list.study_nr "
+                    + "join patient on patient.patient_nr=freezer.patient_nr "
+                    + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
                     + "and freezer.visit_nr=patient_visit.visit_nr "
                     + "and freezer.patient_nr=patient_visit.patient_nr "
-                    + "and freezer.sample_nr=sample_list.sample_nr "
-                    + "and patient_visit.patient_nr=patient.patient_nr "
-                    + "and freezer.fnum = ? and freezer.rack= ? "
+                    + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
+                    + "where frz_inv_id_cnt.cnt=1 and freezer.fnum = ? and freezer.rack= ?"
                     + "order by freezer.box, freezer.cell");
             ps.setInt(1, bbpdbHotelLabel.freerzerId);
             ps.setString(2, bbpdbHotelLabel.hotelLabel);
