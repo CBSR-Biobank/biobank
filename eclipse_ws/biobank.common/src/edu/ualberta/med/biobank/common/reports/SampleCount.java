@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.Sample;
 
-public class SampleCountQueryObject extends QueryObject {
+public class SampleCount extends QueryObject {
 
-    public SampleCountQueryObject(String name, Integer siteId) {
+    public SampleCount(String name, Integer siteId) {
         super("Lists the total number of each sample type.", name, "Select "
             + name + "Alias.sampleType.name, count(*) from "
             + Sample.class.getName() + " as " + name + "Alias where " + name

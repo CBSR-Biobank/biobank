@@ -201,6 +201,10 @@ public class SessionManager {
         this.siteCombo = siteCombo;
     }
 
+    public SiteCombo getSiteCombo() {
+        return this.siteCombo;
+    }
+
     public void updateSites() {
         Assert.isNotNull(siteManager, "site manager is null");
         siteManager.updateSites();

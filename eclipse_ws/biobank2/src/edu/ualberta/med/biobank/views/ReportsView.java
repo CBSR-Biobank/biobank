@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +37,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.FreezerDSamples.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -55,7 +57,7 @@ public class ReportsView extends ViewPart {
     private Composite subSection;
 
     private ComboViewer querySelect;
-    private List<QueryObject> queryObjects;
+    private List<Class<? extends QueryObject>> queryObjects;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -86,8 +88,7 @@ public class ReportsView extends ViewPart {
         header = new Composite(top, SWT.NONE);
         header.setLayout(new GridLayout(3, false));
 
-        queryObjects = QueryObject.getAllQueries(SessionManager.getInstance()
-            .getCurrentSiteWrapper().getId());
+        queryObjects = QueryObject.getAllQueries();
         querySelect = createCombo(header, queryObjects);
         querySelect
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -171,14 +172,29 @@ public class ReportsView extends ViewPart {
     private Collection<Object> search() throws ApplicationException {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
-        currentQuery = (QueryObject) typeSelection.getFirstElement();
+        try {
+            Class<? extends QueryObject> cls = ((Class<? extends QueryObject>) typeSelection
+                .getFirstElement());
+            Constructor<?> c = cls.getConstructor();
+            currentQuery = (QueryObject) c.newInstance(cls.getName(),
+                SessionManager.getInstance().getCurrentSiteWrapper().getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         ArrayList<Object> params = new ArrayList<Object>();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof Text)
                 params.add(((Text) widgetFields.get(i)).getText());
-            else if (widgetFields.get(i) instanceof Combo)
-                params.add(((Combo) widgetFields.get(i)).getSelectionIndex());
-            else if (widgetFields.get(i) instanceof DateTimeWidget)
+            else if (widgetFields.get(i) instanceof Combo) {
+                Combo tempCombo = (Combo) widgetFields.get(i);
+                // would rather return a daterange but basic combo (necessary
+                // since jface comboviewer is not a widget) won't let me
+                // DateRange range
+                // =tempCombo.getItem(tempCombo.getSelectionIndex());
+                String range = tempCombo.getItem(tempCombo.getSelectionIndex());
+                params.add("week");
+                // params.add(range);
+            } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
         return currentQuery
@@ -188,9 +204,18 @@ public class ReportsView extends ViewPart {
     public void comboChanged() {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
-        QueryObject query = (QueryObject) typeSelection.getFirstElement();
+        try {
+            Class<? extends QueryObject> cls = ((Class<? extends QueryObject>) typeSelection
+                .getFirstElement());
+            Constructor<?> c = cls.getConstructor();
+            currentQuery = (QueryObject) c.newInstance(new Object[] {
+                cls.getName(),
+                SessionManager.getInstance().getCurrentSiteWrapper().getId() });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        List<Option> queryOptions = query.getOptions();
+        List<Option> queryOptions = currentQuery.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
@@ -203,7 +228,7 @@ public class ReportsView extends ViewPart {
         subSection.setLayout(layout);
 
         Label description = new Label(subSection, SWT.NONE);
-        description.setText("Description: " + query.getDescription());
+        description.setText("Description: " + currentQuery.getDescription());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         description.setLayoutData(gd2);
@@ -215,17 +240,13 @@ public class ReportsView extends ViewPart {
             textLabels.add(fieldLabel);
             Widget widget;
 
-            // if (fields.get(i) == Combo.class)
-            // widget = new Combo(subSection, SWT.NONE);
-            // else if (fields.get(i) == DateTimeWidget.class)
-            // widget = new DateTimeWidget(subSection, SWT.NONE, null);
-            // else if (fields.get(i) == Text.class)
-            // widget = new Text(subSection, SWT.BORDER);
-            // else
-            // widget = null;
-            if (option.getType() == List.class)
-                widget = new Combo(subSection, SWT.NONE);
-            else if (option.getType() == Date.class)
+            if (option.getType() == DateRange.class) {
+                widget = new Combo(subSection, SWT.READ_ONLY);
+                Object values[] = DateRange.values();
+                for (int j = 0; j < values.length; j++)
+                    ((Combo) widget).add(values[j].toString());
+                ((Combo) widget).select(0);
+            } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
             else if (option.getType() == String.class)
                 widget = new Text(subSection, SWT.BORDER);

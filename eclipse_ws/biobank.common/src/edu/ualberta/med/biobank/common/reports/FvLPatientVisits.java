@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.PatientVisit;
 
-public class FvLPatientVisitsQueryObject extends QueryObject {
+public class FvLPatientVisits extends QueryObject {
 
-    public FvLPatientVisitsQueryObject(String name, Integer siteId) {
+    public FvLPatientVisits(String name, Integer siteId) {
         super("Compares the oldest and most recent activity by clinic.", name,
             "Select " + name + "Alias.patient.study.name, " + name
                 + "Alias.shipment.clinic.name, MIN(" + name
