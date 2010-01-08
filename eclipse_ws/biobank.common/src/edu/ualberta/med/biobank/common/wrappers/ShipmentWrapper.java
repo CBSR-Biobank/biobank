@@ -31,12 +31,11 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    protected void deleteChecks() throws Exception {
         checkNoMorePatientVisits();
     }
 
-    private void checkNoMorePatientVisits() throws BiobankCheckException {
+    private void checkNoMorePatientVisits() throws Exception {
         List<PatientVisitWrapper> patients = getPatientVisitCollection();
         if (patients != null && patients.size() > 0) {
             throw new BiobankCheckException(
@@ -167,10 +166,14 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection() {
+    public List<PatientVisitWrapper> getPatientVisitCollection()
+        throws Exception {
         List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
             .get("patientVisitCollection");
         if (patientVisitCollection == null) {
+            if (wrappedObject == null) {
+                throw new Exception("wrapped object is null");
+            }
             Collection<PatientVisit> children = wrappedObject
                 .getPatientVisitCollection();
             if (children != null) {

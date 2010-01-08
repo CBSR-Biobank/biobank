@@ -192,8 +192,8 @@ public class Importer {
 
                 importShipments();
                 importPatientVisits();
-                importCabinetSamples();
                 removeAllSamples();
+                importCabinetSamples();
                 importFreezerSamples();
             }
 
@@ -420,11 +420,9 @@ public class Importer {
         HQLCriteria criteria = new HQLCriteria("from "
             + Shipment.class.getName());
         List<Shipment> shipments = appService.query(criteria);
-        while (shipments.size() > 0) {
-            ShipmentWrapper s = new ShipmentWrapper(appService, shipments
-                .get(0));
+        for (Shipment shipment : shipments) {
+            ShipmentWrapper s = new ShipmentWrapper(appService, shipment);
             s.delete();
-            shipments.remove(0);
         }
     }
 
@@ -446,7 +444,7 @@ public class Importer {
         String qryPart = "from patient_visit, study_list, patient "
             + "where patient_visit.study_nr=study_list.study_nr "
             + "and patient_visit.patient_nr=patient.patient_nr "
-            + "order by patient_visit.date_received";
+            + "order by patient_visit.date_received desc";
 
         Statement s = con.createStatement();
         s.execute("select count(*) " + qryPart);
@@ -469,7 +467,7 @@ public class Importer {
             if (patientNo.length() == 6) {
                 if (patientNo.substring(0, 2).equals("CE")) {
                     studyNameShort = "CEGIIR";
-                    clinicName = rs.getString(3);
+                    clinicName = "ED1";
                 } else {
                     studyNameShort = getStudyShortNameFromPatientNr(patientNo);
                     clinicName = getClinicNameFromPatientNr(patientNo);
@@ -479,19 +477,18 @@ public class Importer {
                 clinicName = rs.getString(3);
             }
 
-            clinicName = clinicName.toUpperCase();
-
             if (clinicName == null) {
                 logger.error("no clinic for patient " + patientNo);
                 ++count;
                 continue;
             }
 
+            clinicName = clinicName.toUpperCase();
             study = getStudyFromOldShortName(studyNameShort);
             study.reload();
             clinic = clinicsMap.get(clinicName);
             if (clinic == null) {
-                logger.error("no clinic \"" + clinicName + "\"for patient "
+                logger.error("no clinic \"" + clinicName + "\" for patient "
                     + patientNo);
                 ++count;
                 continue;
@@ -616,7 +613,7 @@ public class Importer {
             if (patientNo.length() == 6) {
                 if (patientNo.substring(0, 2).equals("CE")) {
                     studyNameShort = "CEGIIR";
-                    clinicName = rs.getString(3);
+                    clinicName = "ED1";
                 } else {
                     studyNameShort = getStudyShortNameFromPatientNr(patientNo);
                     clinicName = getClinicNameFromPatientNr(patientNo);
@@ -638,7 +635,7 @@ public class Importer {
             clinic = clinicsMap.get(clinicName);
 
             if (clinic == null) {
-                logger.error("no clinic \"" + clinicName + "\"for patient "
+                logger.error("no clinic \"" + clinicName + "\" for patient "
                     + patientNo);
                 ++count;
                 continue;
@@ -809,6 +806,9 @@ public class Importer {
             }
 
             inventoryId = rs.getString(13);
+            if (inventoryId.length() == 4) {
+                inventoryId = "C" + inventoryId;
+            }
 
             // make sure inventory id is unique
             List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(

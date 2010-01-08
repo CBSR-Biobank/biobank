@@ -15,3 +15,7 @@ CABINET
   FROM cabinet
   join sample_list on sample_list.sample_nr=cabinet.sample_nr
   where cnum=1 and drawer='AD' and bin=8
+  
+  select cabinet.cnum, cabinet.drawer, cabinet.bin, cabinet.binpos, 
+  freezer.fnum, freezer.rack, freezer.box, freezer.cell, freezer.inventory_id 
+  from cabinet join freezer on freezer.inventory_id=cabinet.inventory_id
