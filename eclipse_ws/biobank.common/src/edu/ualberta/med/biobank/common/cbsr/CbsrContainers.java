@@ -191,8 +191,8 @@ public class CbsrContainers {
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             hairBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
-            ftaBinType, ftaBinType, ftaBinType, ftaBinType, hairBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, hairBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             ftaBinType };
