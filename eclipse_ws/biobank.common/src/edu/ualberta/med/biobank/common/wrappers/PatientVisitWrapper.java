@@ -323,7 +323,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         ApplicationException, WrapperException {
         checkHasShipment();
         checkPatientInShipment();
-        checkDateProcessedUnique();
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
     }
@@ -342,29 +341,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             || !shipmentPatients.contains(getPatient())) {
             throw new BiobankCheckException(
                 "The patient should be part of the shipment");
-        }
-    }
-
-    private void checkDateProcessedUnique() throws ApplicationException,
-        BiobankCheckException {
-        String isSameVisit = "";
-        List<Object> params = new ArrayList<Object>();
-        params.add(getPatient().getId());
-        params.add(getDateProcessed());
-        if (!isNew()) {
-            isSameVisit = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + PatientVisit.class.getName()
-            + " where patient.id=? and dateProcessed = ?" + isSameVisit, params);
-
-        List<Object> results = appService.query(c);
-        if (results.size() != 0) {
-            throw new BiobankCheckException(
-                "A patient visit with date processed "
-                    + getFormattedDateProcessed()
-                    + " already exist in patient " + getPatient().getPnumber()
-                    + ".");
         }
     }
 

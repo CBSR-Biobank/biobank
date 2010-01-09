@@ -774,6 +774,7 @@ public class ContainerWrapper extends
         }
         if (queries.size() > 0) {
             appService.executeBatchQuery(queries);
+            reload();
             return true;
         }
         return false;

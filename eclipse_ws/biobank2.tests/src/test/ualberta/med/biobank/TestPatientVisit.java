@@ -539,20 +539,6 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testCheckDateProcessedUnique() throws Exception {
-        Date date = TestCommon.getUniqueDate(r);
-        PatientVisitHelper.addPatientVisit(patient, shipment, date);
-
-        try {
-            PatientVisitHelper.addPatientVisit(patient, shipment, date);
-            Assert
-                .fail("should not be allowed to add a two visits with same date processed");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
     public void testCheckHasShipment() {
         // check valid case
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,

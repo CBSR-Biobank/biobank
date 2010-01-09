@@ -63,8 +63,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Visit Drawn Date: "
-            + patientVisit.getFormattedDateProcessed());
+        form.setText("Visit Date Processed: "
+            + patientVisit.getFormattedDateProcessed() + "for patient "
+            + patientVisit.getPatient().getPnumber());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
