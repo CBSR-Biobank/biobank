@@ -323,7 +323,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed();
+                return pv.getFormattedDateProcessed() + " - "
+                    + pv.getShipment().getWaybill();
             }
         });
         comboVisits.addKeyListener(new KeyAdapter() {
