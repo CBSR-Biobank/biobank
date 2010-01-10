@@ -94,6 +94,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
     private Button radioNew;
 
+    private CabinetInventoryIDValidator inventoryIDValidator;
+
     private static final String CHECK_CLICK_MESSAGE = "Click on check";
 
     @Override
@@ -223,10 +225,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         createVisitCombo(fieldsComposite);
 
+        inventoryIDValidator = new CabinetInventoryIDValidator();
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
             BeansObservables.observeValue(sampleWrapper, "inventoryId"),
-            new CabinetInventoryIDValidator("Enter Inventory ID (6 letters)"));
+            inventoryIDValidator);
+
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -271,6 +275,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             patientNumberText.setEnabled(!moveMode);
             viewerVisits.getCombo().setEnabled(!moveMode);
             viewerSampleTypes.getCombo().setEnabled(!moveMode);
+            inventoryIDValidator.setManageOldInventoryIDs(moveMode);
+            // Validator has change: we need to re-validate
+            inventoryIDValidator.validate(inventoryId);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error settind move mode " + moveMode,
                 ex);

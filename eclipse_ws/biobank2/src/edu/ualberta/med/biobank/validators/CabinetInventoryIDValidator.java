@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.validators;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.databinding.validation.ValidationStatus;
@@ -13,8 +12,12 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
 
     private static final Pattern PATTERN2 = Pattern.compile("^C[a-zA-Z]{4}$");
 
-    public CabinetInventoryIDValidator(String message) {
-        super(message);
+    private boolean manageOldInventoryIDs = false;
+
+    private static final String ERROR_MESSAGE = "Enter Inventory ID";
+
+    public CabinetInventoryIDValidator() {
+        super(ERROR_MESSAGE);
     }
 
     @Override
@@ -25,9 +28,11 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
         }
 
         String v = (String) value;
-        Matcher m = PATTERN.matcher(v);
-        Matcher m2 = PATTERN2.matcher(v);
-        if (m.matches() || m2.matches()) {
+        boolean matches = PATTERN.matcher(v).matches();
+        if (manageOldInventoryIDs) {
+            matches = matches || PATTERN2.matcher(v).matches();
+        }
+        if (matches) {
             controlDecoration.hide();
             return Status.OK_STATUS;
         }
@@ -35,4 +40,7 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
         return ValidationStatus.error(errorMessage);
     }
 
+    public void setManageOldInventoryIDs(boolean manageOldInventoryIDs) {
+        this.manageOldInventoryIDs = manageOldInventoryIDs;
+    }
 }
