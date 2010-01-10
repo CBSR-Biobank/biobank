@@ -11,6 +11,8 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
 
     private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z]{6}$");
 
+    private static final Pattern PATTERN2 = Pattern.compile("^C[a-zA-Z]{4}$");
+
     public CabinetInventoryIDValidator(String message) {
         super(message);
     }
@@ -24,7 +26,8 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
 
         String v = (String) value;
         Matcher m = PATTERN.matcher(v);
-        if (m.matches()) {
+        Matcher m2 = PATTERN2.matcher(v);
+        if (m.matches() || m2.matches()) {
             controlDecoration.hide();
             return Status.OK_STATUS;
         }

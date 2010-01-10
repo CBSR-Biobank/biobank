@@ -234,7 +234,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 if (!radioNew.getSelection()) {
                     // Move Mode
                     try {
-                        retrieveSampleInformations();
+                        retrieveSampleDataForMoving();
                     } catch (Exception ex) {
                         BioBankPlugin.openAsyncError("Move - sample error", ex);
                     }
@@ -424,9 +424,17 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
      * 
      * @throws Exception
      */
-    protected void retrieveSampleInformations() throws Exception {
-        resultShownValue.setValue(false);
+    protected void retrieveSampleDataForMoving() throws Exception {
         String inventoryId = inventoryIdText.getText();
+        if (inventoryId.isEmpty()) {
+            return;
+        }
+        if (inventoryId.length() == 4) {
+            // compatibility with old samples imported
+            // 4 letters samples ares now C+4letters
+            inventoryId = "C" + inventoryId;
+        }
+        resultShownValue.setValue(false);
         reset();
         sampleWrapper.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
