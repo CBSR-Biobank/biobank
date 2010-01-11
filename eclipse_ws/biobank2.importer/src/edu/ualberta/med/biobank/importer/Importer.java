@@ -168,7 +168,8 @@ public class Importer {
             }
 
             String[] reqdTables = { "clinics", "study_list", "patient",
-                "patient_visit", "cabinet", "freezer", "sample_list", "frz_inv_id_cnt" };
+                "patient_visit", "cabinet", "freezer", "sample_list",
+                "frz_inv_id_cnt" };
 
             for (String table : reqdTables) {
                 if (!tableExists(table))
@@ -190,11 +191,11 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
-                importShipments();
-                importPatientVisits();
+                // importShipments();
+                // importPatientVisits();
                 removeAllSamples();
                 importCabinetSamples();
-                importFreezerSamples();
+                // importFreezerSamples();
             }
 
             logger.info("import complete");
@@ -739,7 +740,8 @@ public class Importer {
             + "and cabinet.visit_nr=patient_visit.visit_nr "
             + "and cabinet.patient_nr=patient_visit.patient_nr "
             + "and cabinet.sample_nr=sample_list.sample_nr "
-            + "and patient_visit.patient_nr=patient.patient_nr";
+            + "and patient_visit.patient_nr=patient.patient_nr "
+            + "and cabinet.inventory_id is not NULL";
 
         Statement s = con.createStatement();
         s.execute("select count(*) " + qryPart);
@@ -757,23 +759,24 @@ public class Importer {
             throw new Exception("Database query returned null");
         }
 
-        ContainerWrapper cabinet = null;
+        ContainerWrapper[] cabinets = new ContainerWrapper[] { null, null, null };
 
-        for (ContainerWrapper container : ContainerWrapper.getContainersInSite(
-            appService, cbsrSite, "01")) {
-            if (container.getContainerType().getName().equals(
-                "Cabinet 4 drawer")) {
-                cabinet = container;
-                break;
+        for (ContainerWrapper container : cbsrSite.getTopContainerCollection()) {
+            String label = container.getLabel();
+            String typeNameShort = container.getContainerType().getNameShort();
+            if (label.equals("01") && typeNameShort.equals("Cabinet 4")) {
+                cabinets[1] = container;
+            } else if (label.equals("02") && typeNameShort.equals("Cabinet 4")) {
+                cabinets[2] = container;
             }
         }
 
-        if (cabinet == null) {
+        if ((cabinets[1] == null) || (cabinets[2] == null)) {
             throw new Exception(
-                "Cabinet container not found in biobank database");
+                "Cabinet containers not found in biobank database");
         }
 
-        ContainerTypeWrapper cabinetType = cabinet.getContainerType();
+        ContainerTypeWrapper cabinetType = cabinets[1].getContainerType();
 
         int cabinetNum;
         StudyWrapper study;
@@ -799,13 +802,17 @@ public class Importer {
             ++count;
             visitNr = rs.getInt(1);
             cabinetNum = rs.getInt(6);
-            if (cabinetNum != 1) {
+            if ((cabinetNum != 1) && (cabinetNum != 2)) {
                 logger.error("cabinet number " + cabinetNum
                     + " is invalid for visit number " + visitNr);
                 continue;
             }
 
             inventoryId = rs.getString(13);
+            if (inventoryId == null) {
+                continue;
+            }
+
             if (inventoryId.length() == 4) {
                 inventoryId = "C" + inventoryId;
             }
@@ -824,8 +831,8 @@ public class Importer {
             }
 
             drawerName = rs.getString(7);
-            Integer rowCap = cabinet.getRowCapacity();
-            Integer colCap = cabinet.getColCapacity();
+            Integer rowCap = cabinets[cabinetNum].getRowCapacity();
+            Integer colCap = cabinets[cabinetNum].getColCapacity();
             RowColPos pos = LabelingScheme.cbsrTwoCharToRowCol(drawerName,
                 rowCap, colCap, cabinetType.getName());
             drawerNum = pos.row;
@@ -868,8 +875,16 @@ public class Importer {
             }
 
             sampleTypeNameShort = rs.getString(5);
-            drawer = cabinet.getChild(pos.row, 0);
+            drawer = cabinets[cabinetNum].getChild(pos.row, 0);
             bin = drawer.getChild(binNum, 0);
+
+            if (bin == null) {
+                logger.error("invalid bin number \"" + binNum
+                    + "\" for visit cabinet " + cabinetNum + " and drawer "
+                    + drawerName);
+                continue;
+            }
+
             sampleType = sampleTypeMap.get(sampleTypeNameShort);
 
             SampleWrapper sample = new SampleWrapper(appService);
@@ -886,12 +901,12 @@ public class Importer {
                     + " cannot hold sample of type" + sampleType.getName());
                 continue;
             }
-            sample.persist();
 
             logger.debug("importing Cabinet sample at position "
                 + bin.getLabel() + binPosStr + " (" + count + "/" + numSamples
                 + ")");
             ++importCounts.samples;
+            sample.persist();
         }
     }
 
