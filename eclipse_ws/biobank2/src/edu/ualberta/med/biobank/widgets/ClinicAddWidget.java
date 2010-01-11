@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
@@ -13,7 +10,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -23,7 +19,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -67,17 +62,11 @@ public class ClinicAddWidget extends BiobankWidget {
         contactInfoTable.adaptToToolkit(toolkit, true);
         addTableMenu();
 
-        addClinicButton = toolkit.createButton(parent, "Add Clinic", SWT.PUSH);
+        addClinicButton = toolkit.createButton(parent, "Add Contact", SWT.PUSH);
         addClinicButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (allClinics != null && selectedContacts != null
-                    && allClinics.size() == selectedContacts.size()) {
-                    BioBankPlugin.openInformation("All Clinics Selected",
-                        "No more clinics available.");
-                } else {
-                    createClinicContact();
-                }
+                createClinicContact();
             }
         });
     }
@@ -85,12 +74,14 @@ public class ClinicAddWidget extends BiobankWidget {
     private void createClinicContact() {
         SelectClinicContactDialog dlg = new SelectClinicContactDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            getNonDuplicateClinics());
+            allClinics, selectedContacts);
         if (dlg.open() == Dialog.OK) {
             notifyListeners();
             ContactWrapper contact = dlg.getSelection();
             if (contact != null) {
-                selectedContacts.add(contact);
+                if (!selectedContacts.contains(contact)) {
+                    selectedContacts.add(contact);
+                }
                 contactInfoTable.setCollection(selectedContacts);
             }
         }
@@ -103,7 +94,8 @@ public class ClinicAddWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 IStructuredSelection stSelection = (IStructuredSelection) contactInfoTable
                     .getTableViewer().getSelection();
@@ -114,50 +106,18 @@ public class ClinicAddWidget extends BiobankWidget {
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Clinic",
-                    "Are you sure you want to delete clinic \""
+                    "Delete Contact",
+                    "Are you sure you want to delete contact \""
+                        + contact.getName() + "\" from clinic \""
                         + contact.getClinic().getName() + "\"");
 
                 if (confirm) {
-                    Collection<ContactWrapper> contactToDelete = new HashSet<ContactWrapper>();
-                    for (ContactWrapper c : selectedContacts) {
-                        if (c.getClinic().getName().equals(
-                            contact.getClinic().getName()))
-                            contactToDelete.add(c);
-                    }
-
-                    for (ContactWrapper c : contactToDelete) {
-                        selectedContacts.remove(c);
-                    }
-
+                    selectedContacts.remove(contact);
                     contactInfoTable.setCollection(selectedContacts);
                     notifyListeners();
                 }
             }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
-    }
-
-    // need clinics that have not yet been selected in contactInfoTable
-    private Set<ClinicWrapper> getNonDuplicateClinics() {
-        Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>(allClinics);
-        Set<ClinicWrapper> dupClinics = new HashSet<ClinicWrapper>();
-
-        // get the IDs of the selected clinics
-        List<Integer> clinicIds = new ArrayList<Integer>();
-        for (ContactWrapper contact : contactInfoTable.getCollection()) {
-            clinicIds.add(contact.getClinic().getId());
-        }
-
-        for (ClinicWrapper clinic : allClinics) {
-            if (clinicIds.contains(clinic.getId())) {
-                dupClinics.add(clinic);
-            }
-        }
-        clinics.removeAll(dupClinics);
-        return clinics;
     }
 
     public List<ContactWrapper> getContacts() {

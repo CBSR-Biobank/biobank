@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -192,9 +193,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         } else {
             shipmentWrapper.setShippingCompany((ShippingCompanyWrapper) null);
         }
+        boolean newShipment = shipmentWrapper.isNew();
         shipmentWrapper.persist();
 
-        shipmentAdapter.getParent().performExpand();
+        if (newShipment && ShipmentAdministrationView.currentInstance != null) {
+            ShipmentAdministrationView.currentInstance
+                .showInTree(shipmentWrapper);
+        } else {
+            shipmentAdapter.getParent().performExpand();
+        }
     }
 
     @Override

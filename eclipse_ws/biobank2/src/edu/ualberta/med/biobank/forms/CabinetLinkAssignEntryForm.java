@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -92,6 +93,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private String cabinetNameContains = "";
 
     private Button radioNew;
+
+    private CabinetInventoryIDValidator inventoryIDValidator;
 
     private static final String CHECK_CLICK_MESSAGE = "Click on check";
 
@@ -222,10 +225,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         createVisitCombo(fieldsComposite);
 
+        inventoryIDValidator = new CabinetInventoryIDValidator();
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
             BeansObservables.observeValue(sampleWrapper, "inventoryId"),
-            new NonEmptyStringValidator("Enter Inventory Id"));
+            inventoryIDValidator);
+
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -233,7 +238,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 if (!radioNew.getSelection()) {
                     // Move Mode
                     try {
-                        retrieveSampleInformations();
+                        retrieveSampleDataForMoving();
                     } catch (Exception ex) {
                         BioBankPlugin.openAsyncError("Move - sample error", ex);
                     }
@@ -270,6 +275,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             patientNumberText.setEnabled(!moveMode);
             viewerVisits.getCombo().setEnabled(!moveMode);
             viewerSampleTypes.getCombo().setEnabled(!moveMode);
+            inventoryIDValidator.setManageOldInventoryIDs(moveMode);
+            // Validator has change: we need to re-validate
+            inventoryIDValidator.validate(inventoryId);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error settind move mode " + moveMode,
                 ex);
@@ -322,7 +330,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed();
+                return pv.getFormattedDateProcessed() + " - "
+                    + pv.getShipment().getWaybill();
             }
         });
         comboVisits.addKeyListener(new KeyAdapter() {
@@ -354,7 +363,8 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 return;
 
             appendLog("-----");
-            appendLog("Found patient with number " + currentPatient.getPnumber());
+            appendLog("Found patient with number "
+                + currentPatient.getPnumber());
             // show visits list
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();
@@ -421,9 +431,17 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
      * 
      * @throws Exception
      */
-    protected void retrieveSampleInformations() throws Exception {
-        resultShownValue.setValue(false);
+    protected void retrieveSampleDataForMoving() throws Exception {
         String inventoryId = inventoryIdText.getText();
+        if (inventoryId.isEmpty()) {
+            return;
+        }
+        if (inventoryId.length() == 4) {
+            // compatibility with old samples imported
+            // 4 letters samples ares now C+4letters
+            inventoryId = "C" + inventoryId;
+        }
+        resultShownValue.setValue(false);
         reset();
         sampleWrapper.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);

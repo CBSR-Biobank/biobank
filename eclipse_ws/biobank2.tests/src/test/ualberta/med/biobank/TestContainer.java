@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import junit.framework.Assert;
 
@@ -1093,29 +1094,33 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testDeleteChildrenWithType() throws Exception {
-        ContainerWrapper top, childL1, childL2, childL3;
+        ContainerWrapper top, childL2, childL3;
 
         top = containerMap.get("Top");
         addContainerHierarchy(top);
-        childL1 = containerMap.get("ChildL1");
         childL2 = containerMap.get("ChildL2");
         childL3 = containerMap.get("ChildL3");
 
+        ContainerHelper.addContainer(null, "NewChildL3", childL3, childL3
+            .getSite(), containerTypeMap.get("ChildCtL4"), 0, 1);
+        childL3.reload();
+        Assert.assertEquals(2, childL3.getChildren().size());
         Assert.assertTrue(childL3.deleteChildrenWithType(containerTypeMap
             .get("ChildCtL4"), null));
-        Assert.assertTrue(childL2.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL3"), null));
-        Assert.assertTrue(childL1.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL2"), null));
-        Assert.assertTrue(top.deleteChildrenWithType(containerTypeMap
-            .get("ChildCtL1"), null));
-        Assert.assertFalse(top.deleteChildrenWithType(containerTypeMap
-            .get("TopCT"), null));
-    }
+        // no position list: all children of this type are deleted.
+        Assert.assertEquals(0, childL3.getChildren().size());
 
-    @Test
-    public void testDeleteChildrenWithTypeWithPositionList() throws Exception {
-        Assert.fail("not implemented");
+        ContainerHelper.addContainer(null, "NewChildL2", childL2, childL2
+            .getSite(), containerTypeMap.get("ChildCtL3"), 0, 1);
+        childL2.reload();
+        Assert.assertEquals(2, childL2.getChildren().size());
+        Assert.assertTrue(childL2.deleteChildrenWithType(containerTypeMap
+            .get("ChildCtL3"), new TreeSet<RowColPos>(Arrays
+            .asList(new RowColPos(0, 0)))));
+        // one position: only this one is deleted.
+        Assert.assertEquals(1, childL2.getChildren().size());
+        Assert.assertNotNull(childL2.getChild(0, 1));
+        Assert.assertNull(childL2.getChild(0, 0));
     }
 
     @Test

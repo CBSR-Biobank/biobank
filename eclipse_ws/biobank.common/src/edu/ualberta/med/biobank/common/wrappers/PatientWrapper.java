@@ -47,7 +47,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public void setStudy(Study study) {
-        String oldStudy = getPnumber();
+        Study oldStudy = wrappedObject.getStudy();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
     }

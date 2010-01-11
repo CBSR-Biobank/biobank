@@ -502,7 +502,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed();
+                return pv.getFormattedDateProcessed() + " - "
+                    + pv.getShipment().getWaybill();
             }
         });
         viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
@@ -538,7 +539,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         }
         if (currentPatient != null) {
             appendLog("-----");
-            appendLog("Found patient with number " + currentPatient.getPnumber());
+            appendLog("Found patient with number "
+                + currentPatient.getPnumber());
             // show visits list
             List<PatientVisitWrapper> collection = currentPatient
                 .getPatientVisitCollection();

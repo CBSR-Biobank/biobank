@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -10,7 +10,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -37,9 +36,13 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
     private ContactWrapper selectedContact;
 
+    private List<ContactWrapper> alreadySelectedContacts;
+
     public SelectClinicContactDialog(Shell parent,
-        Collection<ClinicWrapper> clinicCollection) {
+        List<ClinicWrapper> clinicCollection,
+        List<ContactWrapper> alreadySelectedContacts) {
         super(parent);
+        this.alreadySelectedContacts = alreadySelectedContacts;
         clinicMap = new HashMap<String, ClinicWrapper>();
         if (clinicCollection != null) {
             for (ClinicWrapper clinic : clinicCollection) {
@@ -81,13 +84,7 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
         contactInfoTable = new ContactInfoTable(contents, null);
         contactInfoTable.setEnabled(false);
-        contactInfoTable.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-
-            }
-
+        contactInfoTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (contactInfoTable.getSelection() != null)
@@ -104,7 +101,9 @@ public class SelectClinicContactDialog extends BiobankDialog {
         Assert.isNotNull(name, "clinic combo selection error");
         ClinicWrapper clinic = clinicMap.get(name);
         Assert.isNotNull(clinic, "no clinic with name \"" + name + "\"");
-        contactInfoTable.setCollection(clinic.getContactCollection());
+        List<ContactWrapper> clinicContacts = clinic.getContactCollection();
+        clinicContacts.removeAll(alreadySelectedContacts);
+        contactInfoTable.setCollection(clinicContacts);
         contactInfoTable.setEnabled(true);
     }
 

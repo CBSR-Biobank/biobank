@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="BioBank2" id="biobank2.product" application="biobank2.biobank2" version="1.10" useFeatures="false" includeLaunchers="true">
+<product name="Biobank2" uid="biobank2.product" id="biobank2.product" application="biobank2.biobank2" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/biobank2/icons/about.png"/>
       <text>
          Canadian BioSample Repository
-Version 1.1.0
+Version {0}
 by AICML
       </text>
    </aboutInfo>
@@ -35,12 +35,14 @@ by AICML
       </win>
    </launcher>
 
+
    <vm>
       <linux>org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</linux>
       <macos>org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</macos>
       <solaris>org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</solaris>
       <windows>org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/OSGi%Minimum-1.0</windows>
    </vm>
+
 
    <plugins>
       <plugin id="biobank.common"/>
@@ -95,7 +97,7 @@ by AICML
       <plugin id="org.eclipse.ui.forms"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
-      <plugin id="sampleProcessingRobot" fragment=""/>
+      <plugin id="sampleProcessingRobot"/>
       <plugin id="scannerConfig"/>
    </plugins>
 

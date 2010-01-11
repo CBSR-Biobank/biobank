@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="NewPatientCountByStudyClinic" pageWidth="612" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="544" leftMargin="34" rightMargin="34" topMargin="30" bottomMargin="30">
 	<property name="com.jasperassistant.designer.Grid" value="true"/>
 	<property name="com.jasperassistant.designer.SnapToGrid" value="true"/>
@@ -14,7 +13,7 @@
 	<field name="list" class="java.util.List"/>
 	<title>
 		<band height="49">
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="1" y="0" width="543" height="21"/>
 				<textElement textAlignment="Center">
 					<font size="16"/>
@@ -34,12 +33,12 @@
 				<textElement/>
 				<text><![CDATA[end:]]></text>
 			</staticText>
-			<textField pattern="d-MMM-yyyy" hyperlinkType="None">
+			<textField pattern="d-MMM-yyyy">
 				<reportElement x="156" y="24" width="80" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.util.Date"><![CDATA[$P{start}]]></textFieldExpression>
 			</textField>
-			<textField pattern="d-MMM-yyyy" hyperlinkType="None">
+			<textField pattern="d-MMM-yyyy">
 				<reportElement x="312" y="24" width="80" height="20"/>
 				<textElement markup="none"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[$P{end}]]></textFieldExpression>
@@ -118,47 +117,47 @@
 	</columnHeader>
 	<detail>
 		<band height="20">
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="0" y="0" width="96" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(0).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="95" y="0" width="73" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(1).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="168" y="0" width="48" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(2).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="216" y="0" width="48" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(3).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="264" y="0" width="48" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(4).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="312" y="0" width="48" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(5).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="360" y="0" width="48" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(6).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="408" y="0" width="60" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(7).toString()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="467" y="0" width="77" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{list}.get(8).toString()]]></textFieldExpression>
@@ -172,12 +171,12 @@
 				<textElement verticalAlignment="Bottom"/>
 				<text><![CDATA[Printed on ]]></text>
 			</staticText>
-			<textField pattern="dd/MM/yy h:mm:ss a" hyperlinkType="None">
+			<textField pattern="dd/MM/yy h:mm:ss a">
 				<reportElement x="60" y="6" width="217" height="14"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="476" y="6" width="68" height="14"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$V{PAGE_NUMBER}.toString()]]></textFieldExpression>
