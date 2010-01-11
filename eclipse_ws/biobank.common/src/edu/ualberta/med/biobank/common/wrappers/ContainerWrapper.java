@@ -31,6 +31,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerWrapper extends
     AbstractPositionHolder<Container, ContainerPosition> {
 
+    private ContainerPathWrapper containerPath;
+
     private static Logger LOGGER = Logger.getLogger(ContainerWrapper.class
         .getName());
 
@@ -84,6 +86,12 @@ public class ContainerWrapper extends
     }
 
     @Override
+    public void persist() throws Exception {
+        super.persist();
+        persistPath();
+    }
+
+    @Override
     protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
         if (parent != null) {
@@ -121,6 +129,15 @@ public class ContainerWrapper extends
                 container.persist();
             }
         }
+    }
+
+    private void persistPath() throws Exception {
+        getPath();
+        if (containerPath == null) {
+            containerPath = new ContainerPathWrapper(appService);
+            containerPath.setContainer(this);
+        }
+        containerPath.persist();
     }
 
     private void checkProductBarcodeUnique() throws BiobankCheckException,
@@ -205,6 +222,17 @@ public class ContainerWrapper extends
         wrappedObject.setProductBarcode(barcode);
         propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
             barcode);
+    }
+
+    public String getPath() throws Exception {
+        if (containerPath == null) {
+            containerPath = ContainerPathWrapper.getContainerPath(appService,
+                this);
+            if (containerPath == null) {
+                return null;
+            }
+        }
+        return containerPath.getPath();
     }
 
     /**
