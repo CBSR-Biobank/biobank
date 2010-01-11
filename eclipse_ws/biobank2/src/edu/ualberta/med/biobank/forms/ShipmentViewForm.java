@@ -141,7 +141,9 @@ public class ShipmentViewForm extends BiobankViewForm {
     protected void reload() throws Exception {
         retrieveShipment();
         setPartName("Shipment " + shipmentWrapper.getWaybill());
-        form.setText("Shipment waybill: " + shipmentWrapper.getWaybill());
+        if (!form.isDisposed()) {
+            form.setText("Shipment waybill: " + shipmentWrapper.getWaybill());
+        }
         setShipmentValues();
     }
 

@@ -61,7 +61,7 @@ public class BiobankDialog extends Dialog {
         statusLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         bindChangeListener();
-        return contents;
+        return parentComposite;
     }
 
     protected AbstractValidator createValidator(

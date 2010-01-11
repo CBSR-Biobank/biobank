@@ -62,7 +62,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException(
                 "A waybill should be set on this shipment");
         }
-        if (getClinic() != null && !checkWaybillUnique()) {
+        if (getClinic() != null && !checkWaybillUniqueForClinic()) {
             throw new BiobankCheckException("A shipment with waybill "
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
@@ -87,7 +87,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
     }
 
-    private boolean checkWaybillUnique() throws ApplicationException {
+    private boolean checkWaybillUniqueForClinic() throws ApplicationException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
         params.add(getClinic().getId());
@@ -310,13 +310,16 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     @Override
     public String toString() {
-        return getWaybill();
+        if (getDateShipped() == null) {
+            return getWaybill();
+        }
+        return getWaybill() + " (" + getFormattedDateShipped() + ")";
     }
 
     /**
-     * Search for a shipment in the site with the given waybill
+     * Search for shipments in the site with the given waybill
      */
-    public static ShipmentWrapper getShipmentInSite(
+    public static List<ShipmentWrapper> getShipmentsInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -324,27 +327,11 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             + " where clinic.site.id = ? and waybill = ?", Arrays
             .asList(new Object[] { site.getId(), waybill }));
         List<Shipment> shipments = appService.query(criteria);
-        if (shipments.size() == 1) {
-            return new ShipmentWrapper(appService, shipments.get(0));
+        List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
+        for (Shipment s : shipments) {
+            wrappers.add(new ShipmentWrapper(appService, s));
         }
-        return null;
-    }
-
-    /**
-     * Search for a shipment in the site with the given date received.
-     */
-    public static ShipmentWrapper getShipmentInSite(
-        WritableApplicationService appService, Date dateReceived,
-        SiteWrapper site) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName()
-            + " where clinic.site.id = ? and dateReceived = ?", Arrays
-            .asList(new Object[] { site.getId(), dateReceived }));
-        List<Shipment> shipments = appService.query(criteria);
-        if (shipments.size() == 1) {
-            return new ShipmentWrapper(appService, shipments.get(0));
-        }
-        return null;
+        return wrappers;
     }
 
     /**
