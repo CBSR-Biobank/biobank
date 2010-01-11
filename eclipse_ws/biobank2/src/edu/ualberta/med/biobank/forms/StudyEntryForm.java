@@ -146,7 +146,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient("Clinics");
+        Composite client = createSectionWithClient("Clinics / Contacts");
 
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);

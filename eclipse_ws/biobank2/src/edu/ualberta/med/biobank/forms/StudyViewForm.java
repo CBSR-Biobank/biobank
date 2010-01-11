@@ -91,7 +91,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient("Clinics");
+        Composite client = createSectionWithClient("Clinics / Contacts");
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable.adaptToToolkit(toolkit, true);
