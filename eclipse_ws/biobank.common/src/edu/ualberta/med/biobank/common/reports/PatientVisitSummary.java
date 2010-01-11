@@ -17,32 +17,32 @@ public class PatientVisitSummary extends QueryObject {
         + Patient.class.getName()
         + " as p where (select count(*) from "
         + PatientVisit.class.getName()
-        + " as pv where pv.patient = p and pv.shipment.clinic.id = c.clinic.id and p.study.site.id ={2} and pv.dateProcessed >= ? and pv.dateProcessed <= ?) {0} {1})";
+        + " as pv where pv.patient = p and pv.shipment.clinic.id = c.clinic.id and p.study.site.id {3} {2} and pv.dateProcessed >= ? and pv.dateProcessed <= ?) {0} {1})";
 
     private static String QUERY_STRING = "select s.name, c.clinic.name, "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "1", "{0}")
+        + MessageFormat.format(PVCOUNT_STRING, "=", "1", "{0}", "{1}")
         + ", "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "2", "{0}")
+        + MessageFormat.format(PVCOUNT_STRING, "=", "2", "{0}", "{1}")
         + ", "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "3", "{0}")
+        + MessageFormat.format(PVCOUNT_STRING, "=", "3", "{0}", "{1}")
         + ", "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "4", "{0}")
+        + MessageFormat.format(PVCOUNT_STRING, "=", "4", "{0}", "{1}")
         + ", "
-        + MessageFormat.format(PVCOUNT_STRING, ">=", "5", "{0}")
+        + MessageFormat.format(PVCOUNT_STRING, ">=", "5", "{0}", "{1}")
         + ", "
         + "(select count(*) from "
         + PatientVisit.class.getName()
-        + " as pvtotal where pvtotal.shipment.clinic.id=c.clinic.id and pvtotal.patient.study.id = s.id and pvtotal.patient.study.site.id ={0} and pvtotal.dateProcessed >= ? and pvtotal.dateProcessed <= ?), "
+        + " as pvtotal where pvtotal.shipment.clinic.id=c.clinic.id and pvtotal.patient.study.id = s.id and pvtotal.patient.study.site.id {1}{0} and pvtotal.dateProcessed >= ? and pvtotal.dateProcessed <= ?), "
         + "(select count(distinct patients.patient.id) from "
         + PatientVisit.class.getName()
-        + " as patients where patients.shipment.clinic.id=c.clinic.id and patients.patient.study.id = s.id and patients.patient.study.site.id ={0} and patients.dateProcessed >= ? and patients.dateProcessed <= ?)"
+        + " as patients where patients.shipment.clinic.id=c.clinic.id and patients.patient.study.id = s.id and patients.patient.study.site.id {1}{0} and patients.dateProcessed >= ? and patients.dateProcessed <= ?)"
         + " from " + Study.class.getName()
-        + " as s inner join s.contactCollection as c where s.site.id = {0}";
+        + " as s inner join s.contactCollection as c where s.site.id {1} {0}";
 
-    public PatientVisitSummary(String name, Integer siteId) {
+    public PatientVisitSummary(String op, Integer siteId) {
         super(
             "Displays the total number of patients for each of 1-5+ visits, the total number of visits, and the total number of patients per study per clinic for a given date range.",
-            name, MessageFormat.format(QUERY_STRING, siteId), new String[] {
+            MessageFormat.format(QUERY_STRING, siteId, op), new String[] {
                 "Study", "Clinic", "1 Visit", "2 Visit", "3 Visit", "4 Visit",
                 "5+ Visits", "Total Visits", "Total Patients" });
         addOption("Start Date", Date.class, new Date(0));
@@ -56,8 +56,6 @@ public class PatientVisitSummary extends QueryObject {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
                 params.set(i, option.defaultValue);
-            if (option.type.equals(String.class))
-                params.set(i, "%" + params.get(i) + "%");
         }
         int size = params.size();
         for (int j = 0; j < 6; j++) {
@@ -92,6 +90,7 @@ public class PatientVisitSummary extends QueryObject {
             for (int i = 0; i < numSums; i++)
                 sums[i] += (Long) castObj[i + 2];
             totalledResults.add(obj);
+            lastStudy = (String) castObj[0];
         }
         totalledResults.add(new Object[] { lastStudy, "", sums[0], sums[1],
             sums[2], sums[3], sums[4], sums[5], sums[6] });

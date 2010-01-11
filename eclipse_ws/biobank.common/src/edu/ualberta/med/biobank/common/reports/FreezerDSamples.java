@@ -8,18 +8,16 @@ public class FreezerDSamples extends QueryObject {
         Week, Month, Quarter, Year
     }
 
-    public FreezerDSamples(String name, Integer siteId) {
+    public FreezerDSamples(String op, Integer siteId) {
         super(
             "Displays the total number of freezer samples per study per clinic by date range.",
-            name, "Select " + name + "Alias.patientVisit.patient.study.name, "
-                + name
-                + "Alias.patientVisit.shipment.clinic.name, count (*) from "
-                + Sample.class.getName() + " as " + name + "Alias where "
-                + name + "Alias.patientVisit.patient.study.site = " + siteId
-                + " GROUP BY ?(" + name + "Alias.linkDate), " + name
-                + "Alias.patientVisit.patient.study, " + name
-                + "Alias.patientVisit.shipment.clinic, count(*)", new String[] {
-                "week", "Study", "Clinic", "Total" });
+            "Select Alias.patientVisit.patient.study.name, Alias.patientVisit.shipment.clinic.name, count (*) from "
+                + Sample.class.getName()
+                + " as Alias where Alias.patientVisit.patient.study.site "
+                + op
+                + siteId
+                + " GROUP BY ?(Alias.linkDate), Alias.patientVisit.patient.study, Alias.patientVisit.shipment.clinic, count(*)",
+            new String[] { "week", "Study", "Clinic", "Total" });
         addOption("Date Range", DateRange.class, DateRange.Week);
     }
 }

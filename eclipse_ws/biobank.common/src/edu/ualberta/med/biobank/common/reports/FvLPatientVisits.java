@@ -4,15 +4,15 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class FvLPatientVisits extends QueryObject {
 
-    public FvLPatientVisits(String name, Integer siteId) {
-        super("Compares the oldest and most recent activity by clinic.", name,
-            "Select " + name + "Alias.patient.study.name, " + name
-                + "Alias.shipment.clinic.name, MIN(" + name
-                + "Alias.shipment.dateReceived), MAX(" + name
-                + "Alias.shipment.dateReceived) from "
-                + PatientVisit.class.getName() + " as " + name + "Alias where "
-                + name + "Alias.patient.study.site = " + siteId + " GROUP BY "
-                + name + "Alias.shipment.clinic", new String[] { "Study",
+    public FvLPatientVisits(String op, Integer siteId) {
+        super(
+            "Compares the oldest and most recent activity by clinic.",
+            "Select Alias.patient.study.name, Alias.shipment.clinic.name, MIN(Alias.shipment.dateReceived), MAX(Alias.shipment.dateReceived) from "
+                + PatientVisit.class.getName()
+                + " as Alias where Alias.patient.study.site "
+                + op
+                + siteId
+                + " GROUP BY Alias.shipment.clinic", new String[] { "Study",
                 "Clinic", "First Visit", "Last Visit" });
     }
 }

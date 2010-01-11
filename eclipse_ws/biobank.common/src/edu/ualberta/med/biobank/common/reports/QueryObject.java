@@ -15,11 +15,6 @@ public class QueryObject {
     private String description;
 
     /**
-     * Name of this query object
-     */
-    private String name;
-
-    /**
      * Query string of this query object
      */
     protected String queryString;
@@ -51,10 +46,9 @@ public class QueryObject {
         }
     }
 
-    public QueryObject(String description, String name, String queryString,
+    public QueryObject(String description, String queryString,
         String[] columnNames) {
         this.description = description;
-        this.name = name;
         this.queryString = queryString;
         queryOptions = new ArrayList<Option>();
         this.columnNames = columnNames;
@@ -115,12 +109,8 @@ public class QueryObject {
         return queryOptions;
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public String toString() {
-        return name;
+        return this.getClass().getSimpleName();
     }
 }

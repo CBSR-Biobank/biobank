@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.FreezerDSamples.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
@@ -107,11 +108,7 @@ public class ReportsView extends ViewPart {
                     searchData = search();
 
                     if (searchData.size() > 0) {
-                        IStructuredSelection typeSelection = (IStructuredSelection) querySelect
-                            .getSelection();
-                        QueryObject query = (QueryObject) typeSelection
-                            .getFirstElement();
-                        String[] names = query.getColumnNames();
+                        String[] names = currentQuery.getColumnNames();
                         int[] bounds = new int[names.length];
 
                         for (int i = 0; i < names.length; i++) {
@@ -175,9 +172,14 @@ public class ReportsView extends ViewPart {
         try {
             Class<? extends QueryObject> cls = ((Class<? extends QueryObject>) typeSelection
                 .getFirstElement());
-            Constructor<?> c = cls.getConstructor();
-            currentQuery = (QueryObject) c.newInstance(cls.getName(),
-                SessionManager.getInstance().getCurrentSiteWrapper().getId());
+            Constructor<?> c = cls.getConstructor(String.class, Integer.class);
+            SiteWrapper site = SessionManager.getInstance()
+                .getCurrentSiteWrapper();
+            String op = "=";
+            if (site.getName().compareTo("All Sites") == 0)
+                op = "!=";
+            currentQuery = (QueryObject) c.newInstance(new Object[] { op,
+                site.getId() });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -207,10 +209,14 @@ public class ReportsView extends ViewPart {
         try {
             Class<? extends QueryObject> cls = ((Class<? extends QueryObject>) typeSelection
                 .getFirstElement());
-            Constructor<?> c = cls.getConstructor();
-            currentQuery = (QueryObject) c.newInstance(new Object[] {
-                cls.getName(),
-                SessionManager.getInstance().getCurrentSiteWrapper().getId() });
+            Constructor<?> c = cls.getConstructor(String.class, Integer.class);
+            SiteWrapper site = SessionManager.getInstance()
+                .getCurrentSiteWrapper();
+            String op = "=";
+            if (site.getName().compareTo("All Sites") == 0)
+                op = "!=";
+            currentQuery = (QueryObject) c.newInstance(new Object[] { op,
+                site.getId() });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -301,7 +307,7 @@ public class ReportsView extends ViewPart {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return element.toString();
+                return ((Class<? extends QueryObject>) element).getSimpleName();
             }
         });
         comboViewer.setInput(list);
@@ -339,7 +345,7 @@ public class ReportsView extends ViewPart {
                     .asList((Object[]) objects)));
             }
 
-            ReportingUtils.printReport(currentQuery.getName(), map,
+            ReportingUtils.printReport(currentQuery.toString(), map,
                 cbsrCollections);
             return true;
         }
