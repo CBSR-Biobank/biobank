@@ -70,7 +70,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget sampleSourceMultiSelect;
 
-    private List<StudyPvAttrCustom> pvCustomInfoMap;
+    private List<StudyPvAttrCustom> pvCustomInfoList;
 
     private SampleStorageEntryWidget sampleStorageEntryWidget;
 
@@ -88,7 +88,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     public StudyEntryForm() {
         super();
-        pvCustomInfoMap = new ArrayList<StudyPvAttrCustom>();
+        pvCustomInfoList = new ArrayList<StudyPvAttrCustom>();
     }
 
     @Override
@@ -220,7 +220,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
                 studyPvAttrCustom, true);
             studyPvAttrCustom.inStudy = false;
-            pvCustomInfoMap.add(studyPvAttrCustom);
+            pvCustomInfoList.add(studyPvAttrCustom);
         }
         //
         // END KLUDGE
@@ -244,7 +244,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 studyPvAttrCustom, selected);
             studyPvAttrCustom.widget.addSelectionChangedListener(listener);
             studyPvAttrCustom.inStudy = studyPvInfoLabels.contains(label);
-            pvCustomInfoMap.add(studyPvAttrCustom);
+            pvCustomInfoList.add(studyPvAttrCustom);
         }
     }
 
@@ -281,9 +281,9 @@ public class StudyEntryForm extends BiobankEntryForm {
             "problem with sample source selections");
         study.setSampleSourceCollection(selSampleSource);
 
+        // get pv infos
         List<String> newPvInfoLabels = new ArrayList<String>();
-
-        for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoMap) {
+        for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             String label = studyPvAttrCustom.getLabel();
             if (label.equals("Date Processed"))
                 continue;
@@ -299,35 +299,34 @@ public class StudyEntryForm extends BiobankEntryForm {
                             + " from study since it is already in use by patient visits.",
                         e);
                 }
-            }
-
-            newPvInfoLabels.add(studyPvAttrCustom.getLabel());
-            String value = studyPvAttrCustom.widget.getValues();
-            if (studyPvAttrCustom.getType().equals("select_single")
-                || studyPvAttrCustom.getType().equals("select_multiple")) {
-                if (value.length() > 0) {
+            } else if (studyPvAttrCustom.widget.getSelected()) {
+                newPvInfoLabels.add(studyPvAttrCustom.getLabel());
+                String value = studyPvAttrCustom.widget.getValues();
+                if (studyPvAttrCustom.getType().equals("select_single")
+                    || studyPvAttrCustom.getType().equals("select_multiple")) {
+                    if (value.length() > 0) {
+                        study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                            studyPvAttrCustom.getType(), value.split(";"));
+                    }
+                } else {
                     study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
-                        studyPvAttrCustom.getType(), value.split(";"));
+                        studyPvAttrCustom.getType());
                 }
-            } else {
-                study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
-                    studyPvAttrCustom.getType());
             }
         }
 
+        // get sample storages
         study.setSampleStorageCollection(sampleStorageEntryWidget
             .getSampleStorage());
-        saveStudy();
 
-        studyAdapter.getParent().performExpand();
-    }
-
-    private void saveStudy() throws Exception {
         study.setContactCollection(contactEntryWidget.getContacts());
-        study.persist();
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
         study.setSite(siteAdapter.getWrapper());
+
+        study.persist();
+
+        studyAdapter.getParent().performExpand();
     }
 
     @Override
