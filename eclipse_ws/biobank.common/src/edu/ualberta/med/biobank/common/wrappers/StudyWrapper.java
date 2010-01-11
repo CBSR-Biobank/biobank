@@ -540,8 +540,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (permissibleValues != null) {
             studyPvAttr
                 .setPermissible(StringUtils.join(permissibleValues, ';'));
+            studyPvAttrMap.put(label, studyPvAttr);
+            return;
         }
-        studyPvAttrMap.put(label, studyPvAttr);
+
+        // only get here if permissibleValues is null
+        studyPvAttr.delete();
+        studyPvAttrMap.remove(label);
+        return;
     }
 
     /**
