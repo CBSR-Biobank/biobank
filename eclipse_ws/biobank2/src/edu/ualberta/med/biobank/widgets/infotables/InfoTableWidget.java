@@ -44,7 +44,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
         tableViewer = new TableViewer(this, SWT.BORDER // | SWT.MULTI
             | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
-        tableViewer.setLabelProvider(new BiobankLabelProvider());
+        tableViewer.setLabelProvider(getLabelProvider());
         tableViewer.setContentProvider(new ArrayContentProvider());
 
         Table table = tableViewer.getTable();
@@ -86,6 +86,10 @@ public class InfoTableWidget<T> extends BiobankWidget {
             getTableViewer().refresh();
             setCollection(collection);
         }
+    }
+
+    public BiobankLabelProvider getLabelProvider() {
+        return new BiobankLabelProvider();
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {

@@ -7,8 +7,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -67,12 +67,10 @@ public class ContainerAdapter extends AdapterBase {
         if (topLevel == null || !topLevel) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move Container");
-            mi.addSelectionListener(new SelectionListener() {
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
                 public void widgetSelected(SelectionEvent event) {
                     moveAction();
-                }
-
-                public void widgetDefaultSelected(SelectionEvent e) {
                 }
             });
         }

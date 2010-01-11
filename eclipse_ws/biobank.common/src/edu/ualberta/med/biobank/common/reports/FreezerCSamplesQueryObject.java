@@ -7,7 +7,7 @@ public class FreezerCSamplesQueryObject extends QueryObject {
     public FreezerCSamplesQueryObject(String name, Integer siteId) {
         super(
             "Displays the total number of freezer samples per study per clinic.",
-            name, "Select " + name + "Alias.patientVisit.patient.number, "
+            name, "Select " + name + "Alias.patientVisit.patient.pnumber, "
                 + name + "Alias.patientVisit.patient.study.name, " + name
                 + "Alias.patientVisit.shipment.clinic.name, " + name
                 + "Alias.sampleType.name," + name + "Alias.inventoryId, "

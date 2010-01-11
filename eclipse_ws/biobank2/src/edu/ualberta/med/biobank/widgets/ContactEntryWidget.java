@@ -8,7 +8,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,7 +78,8 @@ public class ContactEntryWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 ContactWrapper contactWrapper = contactInfoTable.getSelection();
                 if (contactWrapper == null) {
@@ -88,14 +88,12 @@ public class ContactEntryWidget extends BiobankWidget {
                 }
                 addOrEditContact(false, contactWrapper);
             }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
 
         item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 ContactWrapper contactWrapper = contactInfoTable.getSelection();
                 if (contactWrapper == null) {
@@ -122,9 +120,6 @@ public class ContactEntryWidget extends BiobankWidget {
                     contactInfoTable.setCollection(selectedContacts);
                     notifyListeners();
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

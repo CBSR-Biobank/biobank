@@ -108,7 +108,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
-                patientAdapter.getWrapper(), "number"),
+                patientAdapter.getWrapper(), "pnumber"),
             new NonEmptyStringValidator(MSG_NO_PATIENT_NUMBER));
     }
 
@@ -126,8 +126,10 @@ public class PatientEntryForm extends BiobankEntryForm {
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();
-        PatientAdministrationView.currentInstance.showInTree(patientAdapter
-            .getWrapper());
+        if (PatientAdministrationView.currentInstance != null) {
+            PatientAdministrationView.currentInstance.showInTree(patientAdapter
+                .getWrapper());
+        }
     }
 
     @Override
