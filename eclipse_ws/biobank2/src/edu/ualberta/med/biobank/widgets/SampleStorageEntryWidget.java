@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
@@ -48,9 +47,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private Button addSampleStorageButton;
 
-    private Collection<SampleTypeWrapper> allSampleTypes;
+    private List<SampleTypeWrapper> allSampleTypes;
 
-    private Collection<SampleStorageWrapper> selectedSampleStorages;
+    private List<SampleStorageWrapper> selectedSampleStorages;
 
     /**
      * 
@@ -64,8 +63,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
      *            form this parameter should be null.
      */
     public SampleStorageEntryWidget(Composite parent, int style,
-        SiteWrapper site,
-        Collection<SampleStorageWrapper> sampleStorageCollection,
+        SiteWrapper site, List<SampleStorageWrapper> sampleStorageCollection,
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
@@ -97,15 +95,14 @@ public class SampleStorageEntryWidget extends BiobankWidget {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 addOrEditSampleStorage(true, new SampleStorageWrapper(
-                    SessionManager.getAppService()),
-                    getNonDuplicateSampleTypes());
+                    SessionManager.getAppService()), allSampleTypes);
             }
         });
     }
 
     private void addOrEditSampleStorage(boolean add,
         SampleStorageWrapper sampleStorage,
-        Set<SampleTypeWrapper> availSampleTypes) {
+        List<SampleTypeWrapper> availSampleTypes) {
         SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             sampleStorage, availSampleTypes);
@@ -119,27 +116,6 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         }
     }
 
-    // need sample types that have not yet been selected in sampleStorageTable
-    private Set<SampleTypeWrapper> getNonDuplicateSampleTypes() {
-        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>(
-            allSampleTypes);
-        Set<SampleTypeWrapper> dupSampleTypes = new HashSet<SampleTypeWrapper>();
-
-        // get the IDs of the selected sample types
-        List<Integer> sampleTypeIds = new ArrayList<Integer>();
-        for (SampleStorageWrapper ss : sampleStorageTable.getCollection()) {
-            sampleTypeIds.add(ss.getSampleType().getId());
-        }
-
-        for (SampleTypeWrapper stype : allSampleTypes) {
-            if (sampleTypeIds.contains(stype.getId())) {
-                dupSampleTypes.add(stype);
-            }
-        }
-        sampleTypes.removeAll(dupSampleTypes);
-        return sampleTypes;
-    }
-
     private void addTableMenu() {
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
@@ -151,10 +127,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
             public void widgetSelected(SelectionEvent event) {
                 SampleStorageWrapper sampleStorage = sampleStorageTable
                     .getSelection();
-
-                Set<SampleTypeWrapper> allowedSampleTypes = getNonDuplicateSampleTypes();
-                allowedSampleTypes.add(sampleStorage.getSampleType());
-                addOrEditSampleStorage(false, sampleStorage, allowedSampleTypes);
+                addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
             }
 
             public void widgetDefaultSelected(SelectionEvent e) {
@@ -163,7 +136,8 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
         item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 SampleStorageWrapper sampleStorage = sampleStorageTable
                     .getSelection();
@@ -189,9 +163,6 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                     sampleStorageTable.setCollection(selectedSampleStorages);
                     notifyListeners();
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

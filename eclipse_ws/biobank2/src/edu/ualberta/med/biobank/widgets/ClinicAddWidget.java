@@ -123,26 +123,6 @@ public class ClinicAddWidget extends BiobankWidget {
         });
     }
 
-    // // need clinics that have not yet been selected in contactInfoTable
-    // private Set<ClinicWrapper> getNonDuplicateClinics() {
-    // Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>(allClinics);
-    // Set<ClinicWrapper> dupClinics = new HashSet<ClinicWrapper>();
-    //
-    // // get the IDs of the selected clinics
-    // List<Integer> clinicIds = new ArrayList<Integer>();
-    // for (ContactWrapper contact : contactInfoTable.getCollection()) {
-    // clinicIds.add(contact.getClinic().getId());
-    // }
-    //
-    // for (ClinicWrapper clinic : allClinics) {
-    // if (clinicIds.contains(clinic.getId())) {
-    // dupClinics.add(clinic);
-    // }
-    // }
-    // clinics.removeAll(dupClinics);
-    // return clinics;
-    // }
-
     public List<ContactWrapper> getContacts() {
         return selectedContacts;
     }
