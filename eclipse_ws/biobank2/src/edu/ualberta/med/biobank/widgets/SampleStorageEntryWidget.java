@@ -12,7 +12,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -123,14 +122,12 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 SampleStorageWrapper sampleStorage = sampleStorageTable
                     .getSelection();
                 addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
 

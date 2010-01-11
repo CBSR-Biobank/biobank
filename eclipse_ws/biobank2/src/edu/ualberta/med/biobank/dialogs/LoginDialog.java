@@ -11,8 +11,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -130,19 +130,13 @@ public class LoginDialog extends TitleAreaDialog {
         for (Iterator<String> it = servers.iterator(); it.hasNext();) {
             serverText.add(it.next());
         }
-        serverText.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
-
+        serverText.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 String lastServer = serverText.getText();
                 secureConnectionButton
                     .setSelection(lastServer.contains("8443"));
             }
-
         });
 
         String lastServer = pluginPrefs.get(LAST_SERVER, "");

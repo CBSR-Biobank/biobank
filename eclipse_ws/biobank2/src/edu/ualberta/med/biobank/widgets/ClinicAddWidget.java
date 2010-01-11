@@ -10,7 +10,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -95,7 +94,8 @@ public class ClinicAddWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 IStructuredSelection stSelection = (IStructuredSelection) contactInfoTable
                     .getTableViewer().getSelection();
@@ -116,9 +116,6 @@ public class ClinicAddWidget extends BiobankWidget {
                     contactInfoTable.setCollection(selectedContacts);
                     notifyListeners();
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -142,12 +141,11 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Edit");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
-
                 IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
                     .getTableViewer().getSelection();
-
                 BiobankCollectionModel item = (BiobankCollectionModel) stSelection
                     .getFirstElement();
                 SampleTypeWrapper pvss = ((SampleTypeWrapper) item.o);
@@ -155,14 +153,12 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                 restrictedTypes.remove(pvss);
                 addOrEditSampleType(false, pvss, restrictedTypes);
             }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
-            }
         });
 
         item = new MenuItem(menu, SWT.PUSH);
         item.setText("Delete");
-        item.addSelectionListener(new SelectionListener() {
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent event) {
                 IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
                     .getTableViewer().getSelection();
@@ -191,9 +187,6 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                     sampleTypeTable.setCollection(selectedSampleTypes);
                     notifyListeners();
                 }
-            }
-
-            public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
     }

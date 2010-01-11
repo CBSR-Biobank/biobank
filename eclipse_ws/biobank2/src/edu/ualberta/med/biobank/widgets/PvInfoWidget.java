@@ -73,7 +73,6 @@ public class PvInfoWidget extends BiobankWidget {
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(pvCustomInfo.getLabel());
             checkButton.addSelectionListener(new SelectionListener() {
-
                 @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
                     notifyListeners();
@@ -83,7 +82,6 @@ public class PvInfoWidget extends BiobankWidget {
                 public void widgetSelected(SelectionEvent e) {
                     notifyListeners();
                 }
-
             });
 
             if (pvCustomInfo.getIsDefault()) {
@@ -174,7 +172,8 @@ public class PvInfoWidget extends BiobankWidget {
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move to Top");
-            mi.addSelectionListener(new SelectionListener() {
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
                 public void widgetSelected(SelectionEvent event) {
                     int index = itemList.getSelectionIndex();
                     if (index <= 0)
@@ -191,15 +190,12 @@ public class PvInfoWidget extends BiobankWidget {
                     }
                     itemList.setItems(newList);
                 }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move Up");
-            mi.addSelectionListener(new SelectionListener() {
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
                 public void widgetSelected(SelectionEvent event) {
                     int index = itemList.getSelectionIndex();
                     if (index <= 0)
@@ -217,15 +213,12 @@ public class PvInfoWidget extends BiobankWidget {
                     newList[index] = items[index - 1];
                     itemList.setItems(newList);
                 }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move Down");
-            mi.addSelectionListener(new SelectionListener() {
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
                 public void widgetSelected(SelectionEvent event) {
                     int index = itemList.getSelectionIndex();
                     String[] items = itemList.getItems();
@@ -243,15 +236,12 @@ public class PvInfoWidget extends BiobankWidget {
                     newList[index + 1] = items[index];
                     itemList.setItems(newList);
                 }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                }
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move to Bottom");
-            mi.addSelectionListener(new SelectionListener() {
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
                 public void widgetSelected(SelectionEvent event) {
                     int index = itemList.getSelectionIndex();
                     String[] items = itemList.getItems();
@@ -267,10 +257,6 @@ public class PvInfoWidget extends BiobankWidget {
                     }
                     newList[i] = items[index];
                     itemList.setItems(newList);
-                }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
                 }
             });
 
