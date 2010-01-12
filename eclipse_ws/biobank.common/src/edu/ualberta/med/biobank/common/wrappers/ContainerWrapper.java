@@ -31,8 +31,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerWrapper extends
     AbstractPositionHolder<Container, ContainerPosition> {
 
-    private ContainerPathWrapper containerPath;
-
     private static Logger LOGGER = Logger.getLogger(ContainerWrapper.class
         .getName());
 
@@ -132,11 +130,11 @@ public class ContainerWrapper extends
     }
 
     private void persistPath() throws Exception {
-        getPath();
+        ContainerPathWrapper containerPath = getContainerPath();
         if (containerPath == null) {
             containerPath = new ContainerPathWrapper(appService);
-            containerPath.setContainer(this);
         }
+        containerPath.setContainer(this);
         containerPath.persist();
     }
 
@@ -224,13 +222,14 @@ public class ContainerWrapper extends
             barcode);
     }
 
+    private ContainerPathWrapper getContainerPath() throws Exception {
+        return ContainerPathWrapper.getContainerPath(appService, this);
+    }
+
     public String getPath() throws Exception {
+        ContainerPathWrapper containerPath = getContainerPath();
         if (containerPath == null) {
-            containerPath = ContainerPathWrapper.getContainerPath(appService,
-                this);
-            if (containerPath == null) {
-                return null;
-            }
+            return null;
         }
         return containerPath.getPath();
     }

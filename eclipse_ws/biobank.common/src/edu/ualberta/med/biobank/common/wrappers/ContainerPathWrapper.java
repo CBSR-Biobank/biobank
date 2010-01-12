@@ -50,8 +50,11 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
             if (parent == null) {
                 path = "" + container.getId();
             } else {
-                path = container.getParent().getPath() + "/"
-                    + container.getId();
+                String parentPath = container.getParent().getPath();
+                if (parentPath == null) {
+                    throw new Exception("parent container does not have a path");
+                }
+                path = parentPath + "/" + container.getId();
             }
 
             wrappedObject.setPath(path);
@@ -74,11 +77,11 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
             container);
     }
 
-    public void setContainer(ContainerWrapper site) {
-        if (site == null) {
+    public void setContainer(ContainerWrapper container) {
+        if (container == null) {
             setContainer((Container) null);
         } else {
-            setContainer(site.getWrappedObject());
+            setContainer(container.getWrappedObject());
         }
     }
 
@@ -117,8 +120,9 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         if (container.isNew())
             return null;
 
-        HQLCriteria criteria = new HQLCriteria(ContainerPath.class.getName()
-            + " where container = ?", Arrays.asList(new Object[] { container }));
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ContainerPath.class.getName() + " where container.id = ?", Arrays
+            .asList(new Object[] { container.getId() }));
         List<ContainerPath> paths = appService.query(criteria);
         if (paths.size() > 1) {
             throw new Exception("container should have only 1 path");
