@@ -19,3 +19,12 @@ CABINET
   select cabinet.cnum, cabinet.drawer, cabinet.bin, cabinet.binpos, 
   freezer.fnum, freezer.rack, freezer.box, freezer.cell, freezer.inventory_id 
   from cabinet join freezer on freezer.inventory_id=cabinet.inventory_id
+  
+  CREATE TABLE FRZ_INV_ID_CNT (
+       INVENTORY_ID varchar(255),
+       CNT int unsigned not null,
+       index(INVENTORY_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO FRZ_INV_ID_CNT (INVENTORY_ID, CNT) 
+SELECT inventory_id, count(*) AS cnt FROM freezer GROUP BY inventory_id;

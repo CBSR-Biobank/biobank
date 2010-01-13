@@ -14,6 +14,7 @@ public class CbsrContainers {
         createFreezer04(site);
         createFreezer05(site);
         createCabinet01(site);
+        createCabinet02(site);
     }
 
     private static void createFreezer01(SiteWrapper site) throws Exception {
@@ -106,13 +107,18 @@ public class CbsrContainers {
         ContainerWrapper hotel;
         ContainerWrapper freezer05 = addTopLevelContainer(site, "05",
             CbsrContainerTypes.getContainerType("Freezer 6x12"));
-        ContainerTypeWrapper hotel19Type = CbsrContainerTypes
+        ContainerTypeWrapper h13Type = CbsrContainerTypes
+            .getContainerType("Hotel 13");
+        ContainerTypeWrapper h19Type = CbsrContainerTypes
             .getContainerType("Hotel 19");
         ContainerTypeWrapper palletType = CbsrContainerTypes
             .getContainerType("Pallet 96");
 
         ContainerTypeWrapper[] hotelTypes = new ContainerTypeWrapper[] {
-            hotel19Type, hotel19Type, hotel19Type, hotel19Type };
+            h19Type, h19Type, h19Type, h19Type, h13Type, h13Type, h13Type,
+            h13Type, h19Type, h19Type, h19Type, h19Type, h19Type, h19Type,
+            h19Type, h19Type, h19Type, h19Type, h19Type, h19Type, h13Type,
+            h13Type, h13Type, h13Type };
 
         RowColPos pos = new RowColPos();
         int count = 0;
@@ -185,8 +191,8 @@ public class CbsrContainers {
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             hairBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
-            ftaBinType, ftaBinType, ftaBinType, ftaBinType, hairBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, hairBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
             ftaBinType };
@@ -214,6 +220,93 @@ public class CbsrContainers {
         count = 0;
         for (ContainerTypeWrapper binType : binTypes) {
             addContainer(site, binType, drawer, count, 0);
+            ++count;
+        }
+    }
+
+    private static void createCabinet02(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper ftaBinType = CbsrContainerTypes
+            .getContainerType("FTA Bin");
+        ContainerTypeWrapper hairBinType = CbsrContainerTypes
+            .getContainerType("Hair Bin");
+        ContainerTypeWrapper drawerType = CbsrContainerTypes
+            .getContainerType("Drawer 36");
+        ContainerTypeWrapper cabinetType = CbsrContainerTypes
+            .getContainerType("Cabinet 4 drawer");
+        ContainerWrapper cabinet = addTopLevelContainer(site, "02", cabinetType);
+
+        ContainerTypeWrapper[] binTypes = new ContainerTypeWrapper[] {
+            // drawer AA
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            hairBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            hairBinType, hairBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, hairBinType, ftaBinType,
+            ftaBinType };
+
+        ContainerWrapper drawer = addContainer(site, drawerType, cabinet, 0, 0);
+        int count = 0;
+
+        for (ContainerTypeWrapper binType : binTypes) {
+            addContainer(site, binType, drawer, count, 0);
+            ++count;
+        }
+
+        binTypes = new ContainerTypeWrapper[] {
+            // drawer AB
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, hairBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, hairBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, hairBinType, hairBinType, ftaBinType, ftaBinType,
+            ftaBinType };
+
+        drawer = addContainer(site, drawerType, cabinet, 1, 0);
+        count = 0;
+
+        for (ContainerTypeWrapper binType : binTypes) {
+            addContainer(site, binType, drawer, count, 0);
+            ++count;
+        }
+
+        // drawer AC
+        binTypes = new ContainerTypeWrapper[] {
+            // drawer AC
+            hairBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, hairBinType, hairBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, hairBinType, null, ftaBinType, ftaBinType, ftaBinType };
+
+        drawer = addContainer(site, drawerType, cabinet, 2, 0);
+        count = 0;
+        for (ContainerTypeWrapper binType : binTypes) {
+            if (binType != null) {
+                addContainer(site, binType, drawer, count, 0);
+            }
+            ++count;
+        }
+
+        // drawer AC
+        binTypes = new ContainerTypeWrapper[] {
+            // drawer AC
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, ftaBinType, ftaBinType,
+            ftaBinType, ftaBinType, ftaBinType, null, null, null, null, null,
+            null, null, ftaBinType, ftaBinType, ftaBinType };
+
+        drawer = addContainer(site, drawerType, cabinet, 3, 0);
+        count = 0;
+        for (ContainerTypeWrapper binType : binTypes) {
+            if (binType != null) {
+                addContainer(site, binType, drawer, count, 0);
+            }
             ++count;
         }
     }

@@ -84,6 +84,12 @@ public class ContainerWrapper extends
     }
 
     @Override
+    public void persist() throws Exception {
+        super.persist();
+        persistPath();
+    }
+
+    @Override
     protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
         if (parent != null) {
@@ -121,6 +127,15 @@ public class ContainerWrapper extends
                 container.persist();
             }
         }
+    }
+
+    private void persistPath() throws Exception {
+        ContainerPathWrapper containerPath = getContainerPath();
+        if (containerPath == null) {
+            containerPath = new ContainerPathWrapper(appService);
+        }
+        containerPath.setContainer(this);
+        containerPath.persist();
     }
 
     private void checkProductBarcodeUnique() throws BiobankCheckException,
@@ -205,6 +220,18 @@ public class ContainerWrapper extends
         wrappedObject.setProductBarcode(barcode);
         propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
             barcode);
+    }
+
+    private ContainerPathWrapper getContainerPath() throws Exception {
+        return ContainerPathWrapper.getContainerPath(appService, this);
+    }
+
+    public String getPath() throws Exception {
+        ContainerPathWrapper containerPath = getContainerPath();
+        if (containerPath == null) {
+            return null;
+        }
+        return containerPath.getPath();
     }
 
     /**
