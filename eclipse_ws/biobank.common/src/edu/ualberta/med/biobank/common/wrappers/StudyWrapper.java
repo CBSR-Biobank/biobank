@@ -522,6 +522,18 @@ public class StudyWrapper extends ModelWrapper<Study> {
         String[] permissibleValues) throws Exception {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
+
+        if ((studyPvAttr == null) && (permissibleValues == null)) {
+            // nothing to do
+            return;
+        }
+
+        if ((studyPvAttr != null) && (permissibleValues == null)) {
+            studyPvAttr.delete();
+            studyPvAttrMap.remove(label);
+            return;
+        }
+
         if (studyPvAttr == null) {
             // does not yet exist
             Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
@@ -536,12 +548,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr.setPvAttrType(pvAttrType);
             studyPvAttr.setStudy(wrappedObject);
         }
+
         studyPvAttr.setLocked(false);
         if (permissibleValues != null) {
             studyPvAttr
                 .setPermissible(StringUtils.join(permissibleValues, ';'));
+            studyPvAttrMap.put(label, studyPvAttr);
+            return;
         }
-        studyPvAttrMap.put(label, studyPvAttr);
     }
 
     /**

@@ -48,7 +48,7 @@ public class PvInfoWidget extends BiobankWidget {
         private static final long serialVersionUID = 1L;
         {
             put(
-                "Visit Type",
+                "Visit",
                 new LabelDialogInfo("Visit Type Values",
                     "Please enter a visit type:",
                     "To enter multiple visit type values, separate with semicolon."));
@@ -58,10 +58,11 @@ public class PvInfoWidget extends BiobankWidget {
         }
     };
 
+    private LabelDialogInfo labelDlgInfo;
+
     public PvInfoWidget(Composite parent, int style,
         final PvAttrCustom pvCustomInfo, boolean selected) {
         super(parent, style);
-
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -70,6 +71,10 @@ public class PvInfoWidget extends BiobankWidget {
         selected |= (pvCustomInfo.getAllowedValues() != null);
 
         if (hasListValues) {
+            labelDlgInfo = LABEL_DLG_INFO.get(pvCustomInfo.getLabel());
+            Assert.isNotNull(labelDlgInfo, "no dialog info for label "
+                + pvCustomInfo.getLabel());
+
             checkButton = new Button(this, SWT.CHECK);
             checkButton.setText(pvCustomInfo.getLabel());
             checkButton.addSelectionListener(new SelectionListener() {
@@ -109,8 +114,6 @@ public class PvInfoWidget extends BiobankWidget {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     notifyListeners();
-                    LabelDialogInfo labelDlgInfo = LABEL_DLG_INFO
-                        .get(pvCustomInfo.getLabel());
                     Assert.isNotNull(labelDlgInfo, "no dialog info for label "
                         + pvCustomInfo.getLabel());
 

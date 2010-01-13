@@ -281,7 +281,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             "problem with sample source selections");
         study.setSampleSourceCollection(selSampleSource);
 
-        // get pv infos
+        // get study pv attributes
         List<String> newPvInfoLabels = new ArrayList<String>();
         for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             String label = studyPvAttrCustom.getLabel();
@@ -307,6 +307,9 @@ public class StudyEntryForm extends BiobankEntryForm {
                     if (value.length() > 0) {
                         study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), value.split(";"));
+                    } else if (value.length() == 0) {
+                        study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                            studyPvAttrCustom.getType(), null);
                     }
                 } else {
                     study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
