@@ -37,7 +37,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
-import edu.ualberta.med.biobank.common.reports.FreezerDSamples.DateRange;
+import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -194,8 +194,7 @@ public class ReportsView extends ViewPart {
                 // DateRange range
                 // =tempCombo.getItem(tempCombo.getSelectionIndex());
                 String range = tempCombo.getItem(tempCombo.getSelectionIndex());
-                params.add("week");
-                // params.add(range);
+                params.add(range);
             } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }

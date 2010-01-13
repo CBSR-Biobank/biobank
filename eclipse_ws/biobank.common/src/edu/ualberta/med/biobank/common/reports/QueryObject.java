@@ -9,6 +9,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class QueryObject {
 
+    public enum DateRange {
+        Week, Month, Quarter, Year
+    }
+
     /**
      * Description of this query object
      */
@@ -22,7 +26,7 @@ public class QueryObject {
     /**
      * Column names for the result
      */
-    private String[] columnNames;
+    protected String[] columnNames;
 
     protected List<Option> queryOptions;
 
@@ -67,6 +71,8 @@ public class QueryObject {
         queries.add(FreezerDSamples.class);
         queries.add(FreezerSSamples.class);
         queries.add(FvLPatientVisits.class);
+        queries.add(NewPsByStudyClinicMonth.class);
+        queries.add(NewPVsByStudyClinicMonth.class);
         queries.add(PatientVisitSummary.class);
         queries.add(PatientWBC.class);
         queries.add(SampleCount.class);
@@ -83,7 +89,7 @@ public class QueryObject {
 
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
-        // queryOptions.add(SessionManager.)
+
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
