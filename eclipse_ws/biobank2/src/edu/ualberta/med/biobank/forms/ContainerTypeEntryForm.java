@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.LabelingScheme;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -75,7 +74,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ComboViewer labelingSchemeComboViewer;
 
-    private List<LabelingScheme> labelingSchemeCollection;
+    private Map<Integer, String> labelingSchemeMap;
 
     private Button hasSamples;
 
@@ -187,9 +186,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
 
-        LabelingScheme currentScheme = getCurrentLabelingScheme();
+        String currentScheme = containerType.getChildLabelingSchemeName();
+        labelingSchemeMap = ContainerTypeWrapper
+            .getAllLabelingSchemes(appService);
         labelingSchemeComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Child Labeling Scheme", labelingSchemeCollection,
+            client, "Child Labeling Scheme", labelingSchemeMap.values(),
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
@@ -202,23 +203,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
-    }
-
-    private LabelingScheme getCurrentLabelingScheme() {
-        LabelingScheme currentScheme = null;
-        Integer currentSchemeId = containerType.getChildLabelingScheme();
-        Map<Integer, String> labelingSchemeMap = ContainerTypeWrapper
-            .getAllLabelingSchemes(appService);
-        labelingSchemeCollection = new ArrayList<LabelingScheme>();
-        for (Integer id : labelingSchemeMap.keySet()) {
-            LabelingScheme ls = new LabelingScheme(id, labelingSchemeMap
-                .get(id));
-            labelingSchemeCollection.add(ls);
-            if (id.equals(currentSchemeId)) {
-                currentScheme = ls;
-            }
-        }
-        return currentScheme;
     }
 
     private void createContainsSection() throws Exception {
@@ -355,9 +339,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerType.setSite(site);
 
         // set the labeling scheme
-        LabelingScheme currentScheme = (LabelingScheme) ((StructuredSelection) labelingSchemeComboViewer
+        String currentScheme = (String) ((StructuredSelection) labelingSchemeComboViewer
             .getSelection()).getFirstElement();
-        containerType.setChildLabelingScheme(currentScheme.id);
+        containerType.setChildLabelingSchemeName(currentScheme);
 
         containerType.persist();
         containerTypeAdapter.getParent().performExpand();
@@ -385,7 +369,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         hasSamples.setSelection(containsSamples);
         hasContainers.setSelection(!containsSamples);
 
-        LabelingScheme currentScheme = getCurrentLabelingScheme();
+        String currentScheme = containerType.getChildLabelingSchemeName();
         if (currentScheme == null) {
             labelingSchemeComboViewer.getCombo().deselectAll();
         } else {
