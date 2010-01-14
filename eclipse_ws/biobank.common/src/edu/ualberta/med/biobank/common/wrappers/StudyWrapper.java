@@ -760,7 +760,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCount() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(visits)" + " from "
+        HQLCriteria c = new HQLCriteria("select count(visits) from "
             + Study.class.getName() + " as study"
             + " inner join study.patientCollection as patients"
             + " inner join patients.patientVisitCollection as visits"
