@@ -314,10 +314,11 @@ public class TestShipment extends TestDatabase {
         String waybill = shipmentTest.getWaybill();
 
         site.reload();
-        ShipmentWrapper shipFound = ShipmentWrapper.getShipmentInSite(
+        List<ShipmentWrapper> shipsFound = ShipmentWrapper.getShipmentsInSite(
             appService, waybill, site);
 
-        Assert.assertEquals(shipmentTest, shipFound);
+        Assert.assertEquals(1, shipsFound.size());
+        Assert.assertEquals(shipmentTest, shipsFound.get(0));
     }
 
     @Test
