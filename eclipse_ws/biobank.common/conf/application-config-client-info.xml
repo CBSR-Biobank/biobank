@@ -22,14 +22,14 @@
 		<property name="target">
 			<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
 				<property name="serviceUrl" value="http://localhost:8080/biobank2/http/applicationService"/>
-				<property name="serviceInterface" value="gov.nih.nci.system.applicationservice.WritableApplicationService"/>
+				<property name="serviceInterface" value="edu.ualberta.med.biobank.server.CustomApplicationService"/>
 				<property name="httpInvokerRequestExecutor">
 				<bean class="gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor"/>
 				</property>
 			</bean>
 		</property>
 		<property name="interceptorNames" value="biobank2Interceptor"/>
-		<property name="interfaces" value="gov.nih.nci.system.applicationservice.WritableApplicationService"/>
+		<property name="interfaces" value="edu.ualberta.med.biobank.server.CustomApplicationService"/>
 	</bean>	
 	
 	<bean id="biobank2AuthenticationManager" class="org.acegisecurity.providers.ProviderManager">
@@ -73,14 +73,14 @@
 					&lt;property name=&quot;target&quot;&gt;
 						&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
 							&lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/applicationService&quot;/&gt;
-							&lt;property name=&quot;serviceInterface&quot; value=&quot;gov.nih.nci.system.applicationservice.WritableApplicationService&quot;/&gt;
+							&lt;property name=&quot;serviceInterface&quot; value=&quot;edu.ualberta.med.biobank.server.CustomApplicationService&quot;/&gt;
 							&lt;property name=&quot;httpInvokerRequestExecutor&quot;&gt;
 							&lt;bean class=&quot;gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor&quot;/&gt;
 							&lt;/property&gt;
 						&lt;/bean&gt;
 					&lt;/property&gt;
 					&lt;property name=&quot;interceptorNames&quot; value=&quot;biobank2Interceptor&quot;/&gt;
-					&lt;property name=&quot;interfaces&quot; value=&quot;gov.nih.nci.system.applicationservice.WritableApplicationService&quot;/&gt;
+					&lt;property name=&quot;interfaces&quot; value=&quot;edu.ualberta.med.biobank.server.CustomApplicationService&quot;/&gt;
 				&lt;/bean&gt;	
 				
 				&lt;bean id=&quot;biobank2AuthenticationManager&quot; class=&quot;org.acegisecurity.providers.ProviderManager&quot;&gt;

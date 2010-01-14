@@ -123,12 +123,14 @@
 	<target name="check-cacore-sdk-uptodate">
 		<uptodate property="cacore.sdk.uptodate" targetfile="${cacore.sdk.dir}/output/biobank2">
 			<srcfiles file="sdk_conf/deploy.properties" />
+			<srcfiles file="sdk_conf/build.properties" />
 			<srcfiles file="model/biobank2.uml" />
 		</uptodate>
 	</target>
 
 	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
+		<copy file="sdk_conf/build.properties" tofile="${cacore.sdk.dir}/build.properties" />
                 <copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"/>
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
 	</target>
