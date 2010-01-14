@@ -152,8 +152,8 @@ public class TestClinic extends TestDatabase {
 
         clinic.reload();
 
-        Assert.assertEquals(2, clinic.getStudyCollection(false).size());
-        Assert.assertEquals(1, clinic2.getStudyCollection(false).size());
+        Assert.assertEquals(2, clinic.getStudyCollection().size());
+        Assert.assertEquals(1, clinic2.getStudyCollection().size());
     }
 
     @Test
@@ -176,7 +176,7 @@ public class TestClinic extends TestDatabase {
 
         clinic.reload();
 
-        List<StudyWrapper> studies = clinic.getStudyCollection(true);
+        List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies.size() > 1) {
             for (int i = 0; i < studies.size() - 1; i++) {
                 StudyWrapper s1 = studies.get(i);

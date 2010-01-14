@@ -707,16 +707,16 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     public int compareTo(ModelWrapper<Study> wrapper) {
         if (wrapper instanceof StudyWrapper) {
-            String name1 = wrappedObject.getName();
-            String name2 = wrapper.wrappedObject.getName();
+            String nameShort1 = wrappedObject.getNameShort();
+            String nameShort2 = wrapper.wrappedObject.getNameShort();
 
-            int compare = name1.compareTo(name2);
+            int compare = nameShort1.compareTo(nameShort2);
             if (compare == 0) {
-                String nameShort1 = wrappedObject.getNameShort();
-                String nameShort2 = wrapper.wrappedObject.getNameShort();
+                String name1 = wrappedObject.getName();
+                String name2 = wrapper.wrappedObject.getName();
 
-                return ((nameShort1.compareTo(nameShort2) > 0) ? 1
-                    : (nameShort1.equals(nameShort2) ? 0 : -1));
+                return ((name1.compareTo(name2) > 0) ? 1
+                    : (name1.equals(name2) ? 0 : -1));
             }
             return (compare > 0) ? 1 : -1;
         }
@@ -725,13 +725,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct patient) from "
+        HQLCriteria c = new HQLCriteria("select count(*) from "
             + Study.class.getName() + " as study"
-            + " inner join study.contactCollection as contacts"
-            + " inner join contacts.clinic as clinic"
-            + " inner join clinic.shipmentCollection as shipments"
-            + " inner join shipments.patientVisitCollection as visits"
-            + " inner join visits.patient as patient"
+            + " join study.patientCollection as patients"
+            + " join patients.shipmentCollection as shipments"
+            + " join shipments.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 
@@ -746,10 +744,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         throws ApplicationException, BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(visits) from "
             + Study.class.getName() + " as study"
-            + " inner join study.contactCollection as contacts"
-            + " inner join contacts.clinic as clinic"
-            + " inner join clinic.shipmentCollection as shipments"
-            + " inner join shipments.patientVisitCollection as visits"
+            + " join study.patientCollection as patients"
+            + " join patients.patientVisitCollection as visits"
+            + " join visits.shipment as shipments"
+            + " join shipments.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 

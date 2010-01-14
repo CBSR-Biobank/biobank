@@ -137,7 +137,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     /**
-     * Search for a shipment in the clinic with the given date received.
+     * Search for a patient visit with the given date processed.
      */
     public PatientVisitWrapper getVisit(Date dateProcessed)
         throws ApplicationException {
