@@ -346,7 +346,6 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void openFormFor(ContainerCell cell) {
         ContainerAdapter newAdapter = null;
-        // ContainerAdapter.closeEditor(new FormInput(containerAdapter));
         if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
             ContainerWrapper containerToOpen = cell.getContainer();
             if (containerToOpen == null) {
