@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -16,6 +16,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import test.ualberta.med.biobank.AllTests;
+import test.ualberta.med.biobank.Utils;
 import test.ualberta.med.biobank.internal.SampleSourceHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.ShippingCompanyHelper;

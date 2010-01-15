@@ -192,11 +192,11 @@ public class Importer {
                 getSampleTypeMap();
 
                 // importPatients();
-                // importShipments();
+                importShipments();
                 // importPatientVisits();
-                removeAllSamples();
+                // removeAllSamples();
                 // importCabinetSamples();
-                importFreezerSamples();
+                // importFreezerSamples();
             }
 
             logger.info("import complete");
@@ -243,7 +243,7 @@ public class Importer {
         importShipments();
         importPatientVisits();
 
-        importCabinetSamples();
+        // importCabinetSamples();
         // importFreezerSamples();
 
         logger.info("importing complete.");
@@ -475,6 +475,7 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
+            logger.trace("start");
             String patientNo = cipher.decode(rs.getBytes(1));
             if (patientNo.length() == 6) {
                 if (patientNo.substring(0, 2).equals("CE")) {
@@ -495,9 +496,8 @@ public class Importer {
                 continue;
             }
 
-            clinicName = clinicName.toUpperCase();
             study = getStudyFromOldShortName(studyNameShort);
-            study.reload();
+            clinicName = clinicName.toUpperCase();
             clinic = clinicsMap.get(clinicName);
             if (clinic == null) {
                 logger.error("no clinic \"" + clinicName + "\" for patient "
@@ -505,8 +505,8 @@ public class Importer {
                 ++count;
                 continue;
             }
-            clinic.reload();
 
+            logger.trace("have study and clinic");
             // make sure the clinic and study are linked via a contact
             if (!study.hasClinic(clinicName)) {
                 logger.error("study " + study.getNameShort() + " for patient "
@@ -525,6 +525,7 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateReceived = cal.getTime();
 
+            logger.trace("getting patient");
             patient = study.getPatient(patientNo);
             // make sure patient is in the study
             if (patient == null) {
@@ -532,6 +533,7 @@ public class Importer {
                     + ",  " + studyNameShort);
             }
 
+            logger.trace("getting shipment");
             shipment = clinic.getShipment(dateReceived);
             if (shipment == null) {
                 ++importCounts.shipments;

@@ -2,7 +2,7 @@ package test.ualberta.med.biobank.internal;
 
 import java.util.Random;
 
-import test.ualberta.med.biobank.TestCommon;
+import test.ualberta.med.biobank.wrappers.TestCommon;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;

@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
