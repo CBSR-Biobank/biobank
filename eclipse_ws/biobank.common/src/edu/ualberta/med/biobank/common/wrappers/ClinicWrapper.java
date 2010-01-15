@@ -274,7 +274,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(false);
+        return getContactCollection(true);
     }
 
     public void setContactCollection(Collection<Contact> contacts,
@@ -313,8 +313,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<StudyWrapper> getStudyCollection(boolean sort)
-        throws ApplicationException {
+    public List<StudyWrapper> getStudyCollection() throws ApplicationException {
         List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
             .get("studyCollection");
 
@@ -323,21 +322,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             HQLCriteria c = new HQLCriteria("select distinct studies from "
                 + Contact.class.getName() + " as contacts"
                 + " inner join contacts.studyCollection as studies"
-                + " where contacts.clinic = ?", Arrays
-                .asList(new Object[] { wrappedObject }));
+                + " where contacts.clinic = ? order by studies.nameShort",
+                Arrays.asList(new Object[] { wrappedObject }));
             List<Study> collection = appService.query(c);
             for (Study study : collection) {
                 studyCollection.add(new StudyWrapper(appService, study));
             }
-            if (sort)
-                Collections.sort(studyCollection);
             propertiesMap.put("studyCollection", studyCollection);
         }
         return studyCollection;
-    }
-
-    public List<StudyWrapper> getStudyCollection() throws ApplicationException {
-        return getStudyCollection(false);
     }
 
     @Override
