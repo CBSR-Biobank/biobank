@@ -127,9 +127,23 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        checkNameNotEmpty();
+        checkNameShortNotEmpty();
         checkStudyNameUnique();
         checkContactsFromSameSite();
         checkNoPatientRemoved();
+    }
+
+    private void checkNameNotEmpty() throws BiobankCheckException {
+        if (getName() == null || getName().isEmpty()) {
+            throw new BiobankCheckException("Name can't be empty");
+        }
+    }
+
+    private void checkNameShortNotEmpty() throws BiobankCheckException {
+        if (getNameShort() == null || getNameShort().isEmpty()) {
+            throw new BiobankCheckException("Short Name can't be empty");
+        }
     }
 
     private void checkNoPatientRemoved() throws BiobankCheckException,
@@ -163,32 +177,34 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private void checkStudyNameUnique() throws BiobankCheckException,
         ApplicationException {
         String sameString = "";
-        List<Object> params = new ArrayList<Object>(Arrays.asList(new Object[] {
-            getSite().getId(), getName() }));
-        if (!isNew()) {
-            sameString = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " where site.id = ? and name = ?" + sameString, params);
-        List<Object> results = appService.query(c);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A study with name \"" + getName()
-                + "\" already exists.");
-        }
+        if (getSite() != null) {
+            List<Object> params = new ArrayList<Object>(Arrays
+                .asList(new Object[] { getSite().getId(), getName() }));
+            if (!isNew()) {
+                sameString = " and id <> ?";
+                params.add(getId());
+            }
+            HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+                + " where site.id = ? and name = ?" + sameString, params);
+            List<Object> results = appService.query(c);
+            if (results.size() > 0) {
+                throw new BiobankCheckException("A study with name \""
+                    + getName() + "\" already exists.");
+            }
 
-        params = new ArrayList<Object>(Arrays.asList(new Object[] {
-            getSite().getId(), getNameShort() }));
-        if (!isNew()) {
-            sameString = " and id <> ?";
-            params.add(getId());
-        }
-        c = new HQLCriteria("from " + Study.class.getName()
-            + " where site.id = ? and nameShort = ?" + sameString, params);
-        results = appService.query(c);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A study with short name \""
-                + getNameShort() + "\" already exists.");
+            params = new ArrayList<Object>(Arrays.asList(new Object[] {
+                getSite().getId(), getNameShort() }));
+            if (!isNew()) {
+                sameString = " and id <> ?";
+                params.add(getId());
+            }
+            c = new HQLCriteria("from " + Study.class.getName()
+                + " where site.id = ? and nameShort = ?" + sameString, params);
+            results = appService.query(c);
+            if (results.size() > 0) {
+                throw new BiobankCheckException("A study with short name \""
+                    + getNameShort() + "\" already exists.");
+            }
         }
     }
 
@@ -709,16 +725,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (wrapper instanceof StudyWrapper) {
             String nameShort1 = wrappedObject.getNameShort();
             String nameShort2 = wrapper.wrappedObject.getNameShort();
-
             int compare = nameShort1.compareTo(nameShort2);
             if (compare == 0) {
                 String name1 = wrappedObject.getName();
                 String name2 = wrapper.wrappedObject.getName();
 
-                return ((name1.compareTo(name2) > 0) ? 1
-                    : (name1.equals(name2) ? 0 : -1));
+                return name1.compareTo(name2);
             }
-            return (compare > 0) ? 1 : -1;
+            return compare;
         }
         return 0;
     }

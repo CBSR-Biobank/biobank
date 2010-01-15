@@ -754,7 +754,34 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testCheckStudyShortNameUnique() throws Exception {
+    public void testPersitCheckNameNotEmpty() throws Exception {
+        String name = "testPersitCheckNameNotEmpty" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper s1 = StudyHelper.newStudy(site, null);
+        try {
+            s1.persist();
+            Assert.fail("Should not insert the study : name empty");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testPersitCheckNameShortNotEmpty() throws Exception {
+        String name = "testPersitCheckNameShortNotEmpty" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper s1 = StudyHelper.newStudy(site, name);
+        s1.setNameShort(null);
+        try {
+            s1.persist();
+            Assert.fail("Should not insert the study : name short empty");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testPersitCheckStudyShortNameUnique() throws Exception {
         String name = "testCheckStudyShortNameUnique" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper s1 = StudyHelper.newStudy(site, name);
