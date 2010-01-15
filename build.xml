@@ -13,6 +13,7 @@
 	<property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
 	<property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
 	<property name="eclipse.proj.dir.common" location="eclipse_ws/biobank.common" />
+	<property name="eclipse.proj.dir.server" location="eclipse_ws/biobank.server" />
 	<property name="eclipse.proj.dir.importer" location="eclipse_ws/biobank2.importer" />
 	<property name="eclipse.proj.dir.junit" location="eclipse_ws/biobank2.tests" />
 	<property name="scripts.proj.dir" location="scripts" />
@@ -131,7 +132,7 @@
 	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
 		<copy file="sdk_conf/build.properties" tofile="${cacore.sdk.dir}/build.properties" />
-                <copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"/>
+		<copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" />
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
 	</target>
 
@@ -142,6 +143,14 @@
 
 		<pathconvert pathsep="," property="sdk.jar.files.basename" refid="sdk.jar.files">
 			<map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/" to="" />
+		</pathconvert>
+
+		<fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" id="sdk.local.jar.files">
+			<include name="*.jar" />
+		</fileset>
+
+		<pathconvert pathsep="," property="sdk.local.jar.files.basename" refid="sdk.local.jar.files">
+			<map from="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/" to="" />
 		</pathconvert>
 	</target>
 
@@ -179,6 +188,10 @@
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}" />
 		</dependset>
+		<dependset>
+			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" files="${sdk.local.jar.files.basename}" />
+			<targetfilelist dir="${eclipse.proj.dir.server}/lib" files="${sdk.local.jar.files.basename}" />
+		</dependset>
 		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${req.jars.dir}">
 				<include name="commons-lang-2.4.jar" />
@@ -214,6 +227,9 @@
 		</copy>
 		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+		</copy>
+		<copy todir="${eclipse.proj.dir.server}/lib">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" />
 		</copy>
 		<copy todir="${eclipse.proj.dir.importer}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
@@ -262,7 +278,7 @@
 		</sql>
 		<antcall target="schema" />
 		<sql driver="${mysql.driver.string}" url="jdbc:mysql://${database.host}:${database.port}/${database.name}" userid="${database.username}" password="${database.password}">
-            <transaction src="${data.sql.dir}/createIndices.sql" />
+			<transaction src="${data.sql.dir}/createIndices.sql" />
 			<transaction src="${data.sql.dir}/pvAttrType.sql" />
 			<transaction src="${data.sql.dir}/sampleSources.sql" />
 			<transaction src="${data.sql.dir}/sampleTypes.sql" />
@@ -310,8 +326,13 @@
 		</jar>
 	</target>
 
+
+	<target name="build-server-project">
+		<ant dir="${eclipse.proj.dir.server}" target="build" inheritRefs="false" />
+	</target>
+
 	<!-- copied from sdk build.xml -->
-	<target name="package-webapp-orm" depends="package-codegen-orm">
+	<target name="package-webapp-orm" depends="package-codegen-orm, build-server-project">
 		<war destfile="${cacore.sdk.dir}\${package.system.dir}\${PROJECT_NAME}.war" webxml="${cacore.sdk.dir}\${build.conf.web-inf.dir}\web.xml">
 			<manifest>
 				<attribute name="Generated-By" value="biobank2 caCORE SDK Code Generator" />
@@ -347,6 +368,7 @@
 				<include name="${csm.ehcache.file}" />
 				<include name="${clm.object.state.logger.config}" />
 			</classes>
+			<classes dir="${eclipse.proj.dir.server}/bin" />
 			<webinf dir="${cacore.sdk.dir}\${output.src.dir}">
 				<include name="server-config.wsdd" />
 			</webinf>
@@ -371,14 +393,14 @@
 
 	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
 	<property name="dest.dir.classes" value="${dest.dir}/classes" />
-    <property name="dest.dir.results" value="testing" />
-    <property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
+	<property name="dest.dir.results" value="testing" />
+	<property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
 
-    <path id="common.class.path">
-        <fileset dir="${eclipse.proj.dir.common}/lib">
-            <include name="*.jar" />
-        </fileset>
-    </path>
+	<path id="common.class.path">
+		<fileset dir="${eclipse.proj.dir.common}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 
 	<path id="junit.class.path">
 		<fileset dir="jars">
@@ -420,7 +442,7 @@
 
 	<target name="tests-compile" depends="common-compile">
 		<javac srcdir="${eclipse.proj.dir.junit}/src" destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
-            <classpath refid="common.class.path" />
+			<classpath refid="common.class.path" />
 			<classpath refid="junit.class.path" />
 		</javac>
 	</target>
@@ -443,7 +465,7 @@
 					<include name="**/Test*.java" />
 					<exclude name="**/TestCommon.java" />
 					<exclude name="**/TestDatabase.java" />
-                    <exclude name="**/TestFunctionalities.java" />
+					<exclude name="**/TestFunctionalities.java" />
 					<exclude name="**/AllTests.java" />
 				</fileset>
 				<formatter type="xml" />
