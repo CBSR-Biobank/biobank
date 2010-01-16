@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
 import test.ualberta.med.biobank.internal.DbHelper;
 import test.ualberta.med.biobank.internal.SampleStorageHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;

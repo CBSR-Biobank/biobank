@@ -2,7 +2,6 @@ package test.ualberta.med.biobank;
 
 import org.junit.Test;
 
-import test.ualberta.med.biobank.wrappers.TestDatabase;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 

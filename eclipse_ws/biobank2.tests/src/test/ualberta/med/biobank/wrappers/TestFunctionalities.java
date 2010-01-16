@@ -10,6 +10,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
+
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Capacity;
