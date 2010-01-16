@@ -8,6 +8,7 @@ eclipse_ws/biobank.common/bin
 eclipse_ws/biobank.common/lib/*
 eclipse_ws/biobank.server/bin
 eclipse_ws/biobank.server/lib/*
+eclipse_ws/biobank.server/output
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/test
 eclipse_ws/biobank2.importer/bin
 eclipse_ws/biobank2.importer/conf

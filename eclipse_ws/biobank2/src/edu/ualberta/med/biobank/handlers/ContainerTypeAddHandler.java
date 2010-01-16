@@ -31,4 +31,9 @@ public class ContainerTypeAddHandler extends AbstractHandler {
             ContainerTypeEntryForm.ID);
         return null;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return SessionManager.canCreate(ContainerTypeWrapper.class);
+    }
 }

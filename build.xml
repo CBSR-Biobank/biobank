@@ -228,6 +228,7 @@
 		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
+		<copy todir="${eclipse.proj.dir.common}/lib" file="${eclipse.proj.dir.server}/output/biobank-remote.jar" />
 		<copy todir="${eclipse.proj.dir.server}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" />
 		</copy>
@@ -328,7 +329,7 @@
 
 
 	<target name="build-server-project">
-		<ant dir="${eclipse.proj.dir.server}" target="build" inheritRefs="false" />
+		<ant dir="${eclipse.proj.dir.server}" target="build-remote-lib" inheritRefs="false" />
 	</target>
 
 	<!-- copied from sdk build.xml -->

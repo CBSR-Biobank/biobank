@@ -40,36 +40,39 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add a Container");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                try {
-                    List<ContainerTypeWrapper> top = ContainerTypeWrapper
-                        .getTopContainerTypesInSite(SessionManager
-                            .getAppService(), ((SiteAdapter) parent)
-                            .getWrapper());
-                    if (top.size() == 0) {
-                        MessageDialog
-                            .openError(PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getShell(),
-                                "Unable to create container",
-                                "You must define a top-level container type before initializing storage.");
-                    } else {
-                        ContainerWrapper c = new ContainerWrapper(
-                            SessionManager.getAppService());
-                        c.setSite(getParentFromClass(SiteAdapter.class)
-                            .getWrapper());
-                        ContainerAdapter adapter = new ContainerAdapter(
-                            ContainerGroup.this, c);
-                        openForm(new FormInput(adapter), ContainerEntryForm.ID);
+        if (SessionManager.canCreate(ContainerWrapper.class)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add a Container");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    try {
+                        List<ContainerTypeWrapper> top = ContainerTypeWrapper
+                            .getTopContainerTypesInSite(SessionManager
+                                .getAppService(), ((SiteAdapter) parent)
+                                .getWrapper());
+                        if (top.size() == 0) {
+                            MessageDialog
+                                .openError(PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                    "Unable to create container",
+                                    "You must define a top-level container type before initializing storage.");
+                        } else {
+                            ContainerWrapper c = new ContainerWrapper(
+                                SessionManager.getAppService());
+                            c.setSite(getParentFromClass(SiteAdapter.class)
+                                .getWrapper());
+                            ContainerAdapter adapter = new ContainerAdapter(
+                                ContainerGroup.this, c);
+                            openForm(new FormInput(adapter),
+                                ContainerEntryForm.ID);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Problem executing add container", e);
                     }
-                } catch (Exception e) {
-                    LOGGER.error("Problem executing add container", e);
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

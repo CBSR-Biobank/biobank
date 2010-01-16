@@ -9,6 +9,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 
 /**
@@ -36,6 +37,8 @@ public class PatientAdministrationHandler extends AbstractHandler implements
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.getInstance().getSession() != null);
+        return SessionManager.canView(PatientVisitWrapper.class)
+            && SessionManager.getInstance().getSession() != null;
     }
+
 }
