@@ -366,7 +366,8 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
         study.setStudyPvAttr("Worksheet", "text");
-        study.setStudyPvAttr("Consent", "select_multiple");
+        study.setStudyPvAttr("Consent", "select_multiple", new String[] { "a",
+            "b" });
         Assert.assertEquals(2, study.getStudyPvAttrLabels().length);
 
         // test still ok after persist
@@ -411,22 +412,46 @@ public class TestStudy extends TestDatabase {
 
         study.setStudyPvAttr("Worksheet", "text");
         String pvInfoLabel = "Visit Type";
-        String[] values = new String[] { "toto", "titi", "tata" };
-        study.setStudyPvAttr(pvInfoLabel, "select_single", values);
-        study.persist();
 
-        study.reload();
-        String[] valuesFound = study.getStudyPvAttrPermissible(pvInfoLabel);
-        List<String> valuesList = Arrays.asList(values);
-        Assert.assertTrue(valuesFound.length == values.length);
-        for (String s : valuesFound) {
-            Assert.assertTrue(valuesList.contains(s));
+        for (int i = 0; i < 4; ++i) {
+            String[] values;
+
+            switch (i) {
+            case 0:
+                values = new String[] { "toto", "titi", "tata" };
+                break;
+            case 1:
+                values = new String[] { "toto", "titi" };
+                break;
+            case 2:
+                values = new String[] { "toto" };
+                break;
+            case 3:
+            default:
+                values = null;
+            }
+            study.setStudyPvAttr(pvInfoLabel, "select_single", values);
+            study.persist();
+
+            study.reload();
+            if (values != null) {
+                String[] valuesFound = study
+                    .getStudyPvAttrPermissible(pvInfoLabel);
+                List<String> valuesList = Arrays.asList(values);
+                Assert.assertTrue(valuesFound.length == values.length);
+                for (String s : valuesFound) {
+                    Assert.assertTrue(valuesList.contains(s));
+                }
+            } else {
+                try {
+                    // this label should have been removed
+                    study.getStudyPvAttrPermissible(pvInfoLabel);
+                    Assert.fail("call should generate an exception");
+                } catch (Exception e) {
+                    Assert.assertTrue(true);
+                }
+            }
         }
-
-        // add attribute with no permissible values
-        study.setStudyPvAttr(name + "no_permissble", "select_single");
-        Assert.assertTrue(study.getStudyPvAttrPermissible(name
-            + "no_permissble") == null);
     }
 
     @Test
@@ -492,8 +517,8 @@ public class TestStudy extends TestDatabase {
             Assert.fail("Can't test without PvAttrTypes");
         }
 
-        study.setStudyPvAttr(name, types.get(0));
-        study.setStudyPvAttr(name + "_2", types.get(1));
+        study.setStudyPvAttr(name, "text");
+        study.setStudyPvAttr(name + "_2", "number");
         study.persist();
 
         study.reload();
