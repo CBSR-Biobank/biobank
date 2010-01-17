@@ -1,5 +1,11 @@
 package test.ualberta.med.biobank;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
@@ -7,50 +13,146 @@ import edu.ualberta.med.biobank.common.RowColPos;
 
 public class TestLabelingScheme extends TestDatabase {
 
+    private static final Map<Integer, String> cbsrAlpha;
+    static {
+        Map<Integer, String> aMap = new HashMap<Integer, String>();
+        aMap.put(0, "A");
+        aMap.put(1, "B");
+        aMap.put(2, "C");
+        aMap.put(3, "D");
+        aMap.put(4, "E");
+        aMap.put(5, "F");
+        aMap.put(6, "G");
+        aMap.put(7, "H");
+        aMap.put(8, "J");
+        aMap.put(9, "K");
+        aMap.put(10, "L");
+        aMap.put(11, "M");
+        aMap.put(12, "N");
+        aMap.put(13, "P");
+        aMap.put(14, "Q");
+        aMap.put(15, "R");
+        aMap.put(16, "S");
+        aMap.put(17, "T");
+        aMap.put(18, "U");
+        aMap.put(19, "V");
+        aMap.put(20, "W");
+        aMap.put(21, "X");
+        aMap.put(22, "Y");
+        aMap.put(23, "Z");
+        cbsrAlpha = Collections.unmodifiableMap(aMap);
+    };
+
     @Test
     public void testTwoCharNumeric() throws Exception {
-        int totalRows = 6;
-        RowColPos rcp = new RowColPos(5, 0);
-        System.out.println("Two char numeric: " + rcp.row + ":" + rcp.col
-            + "=>" + LabelingScheme.rowColToTwoCharNumeric(rcp, totalRows));
+        int totalRows = 5 + r.nextInt(5);
+        RowColPos pos = new RowColPos();
 
-        String label = "10";
-        rcp = LabelingScheme.twoCharNumericToRowCol(label, totalRows);
-        System.out.println("Two char numeric: " + label + "=>" + rcp.row + ":"
-            + rcp.col);
+        for (int i = 0; i < totalRows; ++i) {
+            pos.row = i % totalRows;
+            pos.col = i / totalRows;
+            String result = LabelingScheme.rowColToTwoCharNumeric(pos,
+                totalRows);
+            Assert.assertEquals(result.length(), 2);
+            Assert.assertEquals(new Integer(pos.row + 1).toString(), result
+                .substring(1, 2));
+            Assert.assertEquals(pos.col.toString(), result.substring(0, 1));
+        }
+
+        for (int i = 0; i < totalRows; ++i) {
+            Integer row = i % totalRows + 1;
+            Integer col = i / totalRows;
+            String label = col.toString() + row.toString();
+            pos = LabelingScheme.twoCharNumericToRowCol(label, totalRows);
+            Assert.assertEquals(pos.row, new Integer(row - 1));
+            Assert.assertEquals(pos.col, col);
+        }
     }
 
+    @SuppressWarnings("serial")
     @Test
     public void testCBSR() throws Exception {
-        // In a 3*5 container, 1:4=AL
-        int totalRows = 3;
-        int totalCols = 5;
+        int totalRows = 3 + r.nextInt(3);
+        int totalCols = 5 + r.nextInt(5);
 
-        String cbsrString = "AL";
-        RowColPos rcp = LabelingScheme.cbsrTwoCharToRowCol(cbsrString,
-            totalRows, totalCols, "test");
-        System.out.println("CBSR: " + cbsrString + "=>" + rcp.row + ":"
-            + rcp.col + " in a " + totalRows + "*" + totalCols + " container");
+        String cbsrString;
+        RowColPos pos = new RowColPos();
 
-        rcp = new RowColPos(1, 3);
-        System.out.println("CBSR: " + rcp.row + ":" + rcp.col + "=>"
-            + LabelingScheme.rowColToCbsrTwoChar(rcp, totalRows, totalCols)
-            + " in a " + totalRows + "*" + totalCols + " container");
+        for (int col = 0; col < totalCols; ++col) {
+            for (int row = 0; row < totalRows; ++row) {
+                pos.row = row;
+                pos.col = col;
+                cbsrString = LabelingScheme.rowColToCbsrTwoChar(pos, totalRows,
+                    totalCols);
+                Assert.assertTrue((cbsrString.length() == 2)
+                    || (cbsrString.length() == 3));
+                Assert.assertEquals(cbsrAlpha.get((row + col * totalRows)
+                    % cbsrAlpha.size()), cbsrString.substring(1));
+                Assert.assertEquals(cbsrAlpha.get((row + col * totalRows)
+                    / cbsrAlpha.size()), cbsrString.substring(0, 1));
+            }
+        }
+
+        for (int col = 0; col < totalCols; ++col) {
+            for (int row = 0; row < totalRows; ++row) {
+                cbsrString = cbsrAlpha.get((row + col * totalRows)
+                    / cbsrAlpha.size())
+                    + cbsrAlpha.get((row + col * totalRows) % cbsrAlpha.size());
+                pos = LabelingScheme.cbsrTwoCharToRowCol(cbsrString, totalRows,
+                    totalCols, "test");
+                Assert.assertEquals(new Integer(row), pos.row);
+                Assert.assertEquals(new Integer(col), pos.col);
+            }
+        }
     }
 
     @Test
     public void testSbs() throws Exception {
-        String sample = "D12";
-        RowColPos rcp = LabelingScheme.sbsToRowCol(sample);
-        System.out.println("SBS: " + sample + "=>" + rcp.row + ":" + rcp.col
-            + " in pallet");
+        int totalRows;
+        int totalCols;
+        String posString;
+        RowColPos pos = new RowColPos();
 
-        rcp.row = 2;
-        rcp.col = 4;
-        String pos = LabelingScheme.rowColToSbs(rcp);
-        System.out.println("SBS: " + rcp.row + ":" + rcp.col + "=>" + pos
-            + " in pallet");
+        for (int i = 1; i <= 2; ++i) {
+            switch (i) {
+            case 1:
+                totalRows = 9;
+                totalCols = 9;
+                break;
 
+            case 2:
+            default:
+                totalRows = 8;
+                totalCols = 12;
+                break;
+            }
+
+            for (int col = 0; col < totalCols; ++col) {
+                for (int row = 0; row < totalRows; ++row) {
+                    pos.row = row;
+                    pos.col = col;
+                    posString = LabelingScheme.rowColToSbs(pos);
+                    if (col >= 9) {
+                        Assert.assertTrue(posString.length() == 3);
+                    } else {
+                        Assert.assertTrue(posString.length() == 2);
+                    }
+                    Assert.assertEquals(cbsrAlpha.get(row).charAt(0), posString
+                        .charAt(0));
+                    Assert.assertEquals(col + 1, Integer.valueOf(
+                        posString.substring(1)).intValue());
+                }
+            }
+
+            for (int col = 0; col < totalCols; ++col) {
+                for (int row = 0; row < totalRows; ++row) {
+                    pos = LabelingScheme.sbsToRowCol(String.format("%s%02d",
+                        cbsrAlpha.get(row), col + 1));
+                    Assert.assertEquals(row, pos.row.intValue());
+                    Assert.assertEquals(col, pos.col.intValue());
+                }
+            }
+        }
     }
 
 }
