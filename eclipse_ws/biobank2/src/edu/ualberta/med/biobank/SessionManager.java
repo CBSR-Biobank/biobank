@@ -216,4 +216,21 @@ public class SessionManager {
             view.getTreeViewer().expandToLevel(3);
         }
     }
+
+    public static String getUser() {
+        return getInstance().getSession().getUserName();
+    }
+
+    public static boolean canCreate(Class<?> clazz) {
+        return ModelWrapper.canCreate(getAppService(), clazz, getUser());
+    }
+
+    public static boolean canView(Class<?> clazz) {
+        return ModelWrapper.canView(getAppService(), clazz, getUser());
+    }
+
+    public static boolean canEdit(Class<?> clazz) {
+        return ModelWrapper.canEdit(getAppService(), clazz, getUser());
+    }
+
 }

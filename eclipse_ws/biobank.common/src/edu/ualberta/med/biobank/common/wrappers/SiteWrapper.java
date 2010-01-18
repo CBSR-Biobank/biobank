@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.CustomApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -192,6 +193,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         address.setPostalCode(postalCode);
         propertyChangeSupport.firePropertyChange("postalCode", old, postalCode);
+    }
+
+    @Override
+    public void persist() throws Exception {
+        boolean newSite = isNew();
+        super.persist();
+        if (newSite) {
+            ((CustomApplicationService) appService).newSite(getId(), getName());
+        }
     }
 
     @Override
