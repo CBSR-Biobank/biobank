@@ -3,8 +3,8 @@ package test.ualberta.med.biobank.internal;
 import java.util.Arrays;
 import java.util.Date;
 
-import test.ualberta.med.biobank.TestCommon;
 import test.ualberta.med.biobank.Utils;
+import test.ualberta.med.biobank.wrappers.TestCommon;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;

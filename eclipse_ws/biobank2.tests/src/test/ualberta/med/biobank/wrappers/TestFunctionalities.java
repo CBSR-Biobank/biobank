@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
+
+import test.ualberta.med.biobank.TestDatabase;
 
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.Address;

@@ -1,9 +1,11 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import test.ualberta.med.biobank.Utils;
 
 import junit.framework.Assert;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
