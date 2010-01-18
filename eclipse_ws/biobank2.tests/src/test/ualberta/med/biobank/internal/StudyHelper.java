@@ -9,10 +9,12 @@ public class StudyHelper extends DbHelper {
         throws Exception {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name);
-        if (name.length() <= 50) {
-            study.setNameShort(name);
-        } else {
-            study.setNameShort(name.substring(50));
+        if (name != null) {
+            if (name.length() <= 50) {
+                study.setNameShort(name);
+            } else {
+                study.setNameShort(name.substring(50));
+            }
         }
         study.setSite(site);
         return study;

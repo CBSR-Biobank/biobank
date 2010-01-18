@@ -756,6 +756,34 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
+    public void testLinkedToClinic() throws Exception {
+        String name = "testLinkedToClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(Arrays.asList(contact1));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(Arrays.asList(contact2));
+        study2.persist();
+
+        Assert.assertTrue(study1.isLinkedToClinic(clinic1));
+        Assert.assertFalse(study1.isLinkedToClinic(clinic2));
+
+        Assert.assertFalse(study2.isLinkedToClinic(clinic1));
+        Assert.assertTrue(study2.isLinkedToClinic(clinic2));
+    }
+
+    @Test
     public void testPersist() throws Exception {
         int oldTotal = appService.search(Study.class, new Study()).size();
         String name = "testPersist" + r.nextInt();

@@ -804,6 +804,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
+    /**
+     * return true if this study is linked to the given clinic (through
+     * contacts)
+     */
+    public boolean isLinkedToClinic(ClinicWrapper clinic)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(clinics) from "
+            + Contact.class.getName() + " as contacts"
+            + " inner join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ?" + " and clinics.id = ?",
+            Arrays.asList(new Object[] { getId(), clinic.getId() }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) != 0;
+    }
+
     @Override
     public void reload() throws Exception {
         super.reload();
@@ -814,4 +832,5 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public String toString() {
         return getName();
     }
+
 }

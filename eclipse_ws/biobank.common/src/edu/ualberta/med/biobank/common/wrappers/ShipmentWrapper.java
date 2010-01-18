@@ -77,8 +77,17 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
+        if (!isNew()) {
+            // want to check only new patients
+            Shipment ship = new Shipment();
+            ship.setId(getId());
+            ship = (Shipment) appService.search(Shipment.class, ship).get(0);
+            ShipmentWrapper old = new ShipmentWrapper(appService, ship);
+            List<PatientWrapper> oldPatientList = old.getPatientCollection();
+            patients.removeAll(oldPatientList);
+        }
         for (PatientWrapper patient : patients) {
-            if (!patient.getStudy().getClinicCollection().contains(getClinic())) {
+            if (!patient.getStudy().isLinkedToClinic(getClinic())) {
                 throw new BiobankCheckException("Patient "
                     + patient.getPnumber()
                     + " is not part of a study that has contact with clinic "
