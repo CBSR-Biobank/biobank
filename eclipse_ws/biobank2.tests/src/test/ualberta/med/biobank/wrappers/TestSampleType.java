@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;

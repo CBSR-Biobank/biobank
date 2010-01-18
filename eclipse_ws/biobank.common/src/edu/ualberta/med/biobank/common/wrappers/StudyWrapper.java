@@ -536,42 +536,42 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public void setStudyPvAttr(String label, String type,
         String[] permissibleValues) throws Exception {
+        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
+            .getPvAttrTypeMap(appService);
+        PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
+        if (pvAttrType == null) {
+            throw new Exception("the pv attribute type \"" + type
+                + "\" does not exist");
+        }
+
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
 
-        if ((studyPvAttr == null) && (permissibleValues == null)) {
-            // nothing to do
-            return;
-        }
+        if (type.startsWith("select_")) {
+            // type has permissble values
+            if ((studyPvAttr == null) && (permissibleValues == null)) {
+                // nothing to do
+                return;
+            }
 
-        if ((studyPvAttr != null) && (permissibleValues == null)) {
-            studyPvAttr.delete();
-            studyPvAttrMap.remove(label);
-            return;
+            if ((studyPvAttr != null) && (permissibleValues == null)) {
+                studyPvAttr.delete();
+                studyPvAttrMap.remove(label);
+                return;
+            }
         }
 
         if (studyPvAttr == null) {
             // does not yet exist
-            Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
-                .getPvAttrTypeMap(appService);
             studyPvAttr = new StudyPvAttrWrapper(appService);
-            PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
-            if (pvAttrType == null) {
-                throw new Exception("the pv attribute type \"" + type
-                    + "\" does not exist");
-            }
             studyPvAttr.setLabel(label);
             studyPvAttr.setPvAttrType(pvAttrType);
             studyPvAttr.setStudy(wrappedObject);
         }
 
         studyPvAttr.setLocked(false);
-        if (permissibleValues != null) {
-            studyPvAttr
-                .setPermissible(StringUtils.join(permissibleValues, ';'));
-            studyPvAttrMap.put(label, studyPvAttr);
-            return;
-        }
+        studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
+        studyPvAttrMap.put(label, studyPvAttr);
     }
 
     /**
@@ -725,7 +725,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (wrapper instanceof StudyWrapper) {
             String nameShort1 = wrappedObject.getNameShort();
             String nameShort2 = wrapper.wrappedObject.getNameShort();
-            int compare = nameShort1.compareTo(nameShort2);
+
+            int compare = 0;
+            if ((nameShort1 != null) && (nameShort2 != null)) {
+                compare = nameShort1.compareTo(nameShort2);
+            }
             if (compare == 0) {
                 String name1 = wrappedObject.getName();
                 String name2 = wrapper.wrappedObject.getName();
@@ -800,6 +804,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
+    /**
+     * return true if this study is linked to the given clinic (through
+     * contacts)
+     */
+    public boolean isLinkedToClinic(ClinicWrapper clinic)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(clinics) from "
+            + Contact.class.getName() + " as contacts"
+            + " inner join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ?" + " and clinics.id = ?",
+            Arrays.asList(new Object[] { getId(), clinic.getId() }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) != 0;
+    }
+
     @Override
     public void reload() throws Exception {
         super.reload();
@@ -810,4 +832,5 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public String toString() {
         return getName();
     }
+
 }

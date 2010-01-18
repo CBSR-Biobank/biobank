@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
+import test.ualberta.med.biobank.Utils;
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
@@ -365,7 +367,8 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
 
         study.setStudyPvAttr("Worksheet", "text");
-        study.setStudyPvAttr("Consent", "select_multiple");
+        study.setStudyPvAttr("Consent", "select_multiple", new String[] { "a",
+            "b" });
         Assert.assertEquals(2, study.getStudyPvAttrLabels().length);
 
         // test still ok after persist
@@ -410,22 +413,46 @@ public class TestStudy extends TestDatabase {
 
         study.setStudyPvAttr("Worksheet", "text");
         String pvInfoLabel = "Visit Type";
-        String[] values = new String[] { "toto", "titi", "tata" };
-        study.setStudyPvAttr(pvInfoLabel, "select_single", values);
-        study.persist();
 
-        study.reload();
-        String[] valuesFound = study.getStudyPvAttrPermissible(pvInfoLabel);
-        List<String> valuesList = Arrays.asList(values);
-        Assert.assertTrue(valuesFound.length == values.length);
-        for (String s : valuesFound) {
-            Assert.assertTrue(valuesList.contains(s));
+        for (int i = 0; i < 4; ++i) {
+            String[] values;
+
+            switch (i) {
+            case 0:
+                values = new String[] { "toto", "titi", "tata" };
+                break;
+            case 1:
+                values = new String[] { "toto", "titi" };
+                break;
+            case 2:
+                values = new String[] { "toto" };
+                break;
+            case 3:
+            default:
+                values = null;
+            }
+            study.setStudyPvAttr(pvInfoLabel, "select_single", values);
+            study.persist();
+
+            study.reload();
+            if (values != null) {
+                String[] valuesFound = study
+                    .getStudyPvAttrPermissible(pvInfoLabel);
+                List<String> valuesList = Arrays.asList(values);
+                Assert.assertTrue(valuesFound.length == values.length);
+                for (String s : valuesFound) {
+                    Assert.assertTrue(valuesList.contains(s));
+                }
+            } else {
+                try {
+                    // this label should have been removed
+                    study.getStudyPvAttrPermissible(pvInfoLabel);
+                    Assert.fail("call should generate an exception");
+                } catch (Exception e) {
+                    Assert.assertTrue(true);
+                }
+            }
         }
-
-        // add attribute with no permissible values
-        study.setStudyPvAttr(name + "no_permissble", "select_single");
-        Assert.assertTrue(study.getStudyPvAttrPermissible(name
-            + "no_permissble") == null);
     }
 
     @Test
@@ -491,8 +518,8 @@ public class TestStudy extends TestDatabase {
             Assert.fail("Can't test without PvAttrTypes");
         }
 
-        study.setStudyPvAttr(name, types.get(0));
-        study.setStudyPvAttr(name + "_2", types.get(1));
+        study.setStudyPvAttr(name, "text");
+        study.setStudyPvAttr(name + "_2", "number");
         study.persist();
 
         study.reload();
@@ -726,6 +753,34 @@ public class TestStudy extends TestDatabase {
 
         study1.reload();
         Assert.assertEquals(nber + nber2, study1.getPatientVisitCount());
+    }
+
+    @Test
+    public void testLinkedToClinic() throws Exception {
+        String name = "testLinkedToClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(Arrays.asList(contact1));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(Arrays.asList(contact2));
+        study2.persist();
+
+        Assert.assertTrue(study1.isLinkedToClinic(clinic1));
+        Assert.assertFalse(study1.isLinkedToClinic(clinic2));
+
+        Assert.assertFalse(study2.isLinkedToClinic(clinic1));
+        Assert.assertTrue(study2.isLinkedToClinic(clinic2));
     }
 
     @Test

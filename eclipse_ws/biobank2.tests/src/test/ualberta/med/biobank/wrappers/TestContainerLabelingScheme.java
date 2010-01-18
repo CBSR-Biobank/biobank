@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
