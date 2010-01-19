@@ -156,7 +156,7 @@
 
 	<!-- Eclipse -->
 
-	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download">
+	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download, build-server-project">
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${cacore.system.jar.files}" />
@@ -188,10 +188,7 @@
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${sdk.jar.files.basename}" />
 			<targetfilelist dir="${eclipse.proj.dir.importer}/lib" files="${sdk.jar.files.basename}" />
 		</dependset>
-		<dependset>
-			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" files="${sdk.local.jar.files.basename}" />
-			<targetfilelist dir="${eclipse.proj.dir.server}/lib" files="${sdk.local.jar.files.basename}" />
-		</dependset>
+
 		<copy todir="${eclipse.proj.dir.common}/lib">
 			<fileset dir="${req.jars.dir}">
 				<include name="commons-lang-2.4.jar" />
@@ -229,9 +226,6 @@
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
 		<copy todir="${eclipse.proj.dir.common}/lib" file="${eclipse.proj.dir.server}/output/biobank-remote.jar" />
-		<copy todir="${eclipse.proj.dir.server}/lib">
-			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" />
-		</copy>
 		<copy todir="${eclipse.proj.dir.importer}/lib">
 			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
 		</copy>
@@ -329,6 +323,13 @@
 
 
 	<target name="build-server-project">
+		<dependset>
+			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" files="${sdk.local.jar.files.basename}" />
+			<targetfilelist dir="${eclipse.proj.dir.server}/lib" files="${sdk.local.jar.files.basename}" />
+		</dependset>
+		<copy todir="${eclipse.proj.dir.server}/lib">
+			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" />
+		</copy>
 		<ant dir="${eclipse.proj.dir.server}" target="build-remote-lib" inheritRefs="false" />
 	</target>
 

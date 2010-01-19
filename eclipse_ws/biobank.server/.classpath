@@ -29,7 +29,7 @@
 	<classpathentry kind="lib" path="lib/caGrid-sdkQuery4-processor-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/clm-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/cog-axis.jar"/>
-	<classpathentry kind="lib" path="lib/csmapi-4.1.jar" sourcepath="/home/delphine/aicml/sources/CSM_API_4_1_Source/src"/>
+	<classpathentry kind="lib" path="lib/csmapi-4.1.jar" sourcepath="/CSM_API_4_1_Source"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/ehcache-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-commons-annotations.jar"/>

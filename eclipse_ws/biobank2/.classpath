@@ -5,7 +5,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/ini4j-0.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar" sourcepath="/home/delphine/tools/jasperreports-3.7.0/src"/>
 	<classpathentry kind="lib" path="lib/commons-digester-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/iText-2.1.0.jar"/>

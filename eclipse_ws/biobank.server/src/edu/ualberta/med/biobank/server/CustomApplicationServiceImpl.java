@@ -5,18 +5,11 @@ import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
-import gov.nih.nci.security.authorization.domainobjects.ProtectionGroup;
-import gov.nih.nci.security.authorization.domainobjects.ProtectionGroupRoleContext;
-import gov.nih.nci.security.authorization.domainobjects.Role;
-import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.exceptions.CSConfigurationException;
 import gov.nih.nci.security.exceptions.CSException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.util.ClassCache;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class CustomApplicationServiceImpl extends
     WritableApplicationServiceImpl implements CustomApplicationService {
@@ -97,28 +90,8 @@ public class CustomApplicationServiceImpl extends
             pe.setAttribute("id");
             pe.setValue(id.toString());
             upm.createProtectionElement(pe);
-            Set<User> users = upm.getUsers("4");
-            ProtectionGroup pg = upm.getProtectionGroupById("11");
-            pg.addProtectionElements(new ProtectionElement[] { pe });
-            upm.modifyProtectionGroup(pg);
-            for (User user : users) {
-                System.out.println("add protection element for " + name
-                    + " at user " + user.getName());
-                ProtectionGroupRoleContext pgrc = new ProtectionGroupRoleContext();
-                pgrc.setProtectionGroup(pg);
-                Set<Role> roles = new HashSet<Role>();
-                roles.add(upm.getRoleById("1"));
-                roles.add(upm.getRoleById("2"));
-                pgrc.setRoles(roles);
-                Set<ProtectionGroupRoleContext> upgrContexts = user
-                    .getProtectionGroupRoleContexts();
-                if (upgrContexts == null) {
-                    upgrContexts = new HashSet<ProtectionGroupRoleContext>();
-                }
-                upgrContexts.add(pgrc);
-                user.setProtectionGroupRoleContexts(upgrContexts);
-                upm.modifyUser(user);
-            }
+            upm.addProtectionElements("11", new String[] { pe
+                .getProtectionElementId().toString() });
         } catch (CSConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
