@@ -32,9 +32,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     @Override
     public void preWindowOpen() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-        configurer.setInitialSize(new Point(400, 300));
+        configurer.setInitialSize(new Point(800, 700));
         configurer.setShowCoolBar(true);
         configurer.setShowStatusLine(true);
+
+        /*
+         * configurer.setShowPerspectiveBar(true);
+         * PlatformUI.getPreferenceStore().setDefault("DOCK_PERSPECTIVE_BAR",
+         * "left"); PlatformUI.getPreferenceStore().setDefault(
+         * "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
+         */
+
         configurer.setTitle("BioBank2");
         configurer.setShowProgressIndicator(true);
     }

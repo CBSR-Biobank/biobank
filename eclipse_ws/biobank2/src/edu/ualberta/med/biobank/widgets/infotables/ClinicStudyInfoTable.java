@@ -22,7 +22,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         super(parent, null, HEADINGS, BOUNDS);
         this.clinicWrapper = clinicWrapper;
         Collection<StudyWrapper> collection = clinicWrapper
-            .getStudyCollection(true);
+            .getStudyCollection();
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel());
         }

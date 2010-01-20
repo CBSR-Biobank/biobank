@@ -69,18 +69,21 @@
       <perspective
             class="edu.ualberta.med.biobank.rcp.MainPerspective"
             id="edu.ualberta.med.biobank.perspective.main"
-            name="Main Perspective">
+            icon="icons/mainPerspective.png"
+            name="Administration View">
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.ReportsPerspective"
             id="edu.ualberta.med.biobank.perspective.reports"
-            name="Reports Perspective">
+            icon="icons/reportsPerspective.png"
+            name="Reports View">
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
             fixed="true"
+            icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.perspective.patients"
-            name="Patients Perspective">
+            name="Patients View">
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.SampleManagementPerspective"
@@ -90,7 +93,8 @@
       <perspective
             class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.shipments"
-            name="Shipment Perspective">
+            icon="icons/shipmentPerpective.png"
+            name="Shipment View">
       </perspective>
    </extension>
    <extension
@@ -655,7 +659,7 @@
             </command>
             <command
                commandId="edu.ualberta.med.biobank.commands.reports"
-               icon="icons/reports.png"
+               icon="icons/reportsPerspective.png"
                label="Reports View"
                style="push">
                <visibleWhen
@@ -728,7 +732,7 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.mainPerpective">
+               id="edu.ualberta.med.biobank.toolbar.views">
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
@@ -750,6 +754,55 @@
                   </and>
                </visibleWhen>
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+                  icon="icons/patientPerspective.png"
+                  label="Patients View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.shipmentsPerpectiveSelected">
+                     </reference>
+                  </or>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
+                  icon="icons/shipmentPerpective.png"
+                  label="Shipment View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <or>
+                     <reference
+                           definitionId="biobank2.mainPerpectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.patientsPerpectiveSelected">
+                     </reference>
+                  </or>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.reports"
+                  icon="icons/reportsPerspective.png"
+                  label="Reports View"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerpectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+         <toolbar
+               id="edu.ualberta.med.biobank.toolbar.mainPerpective">
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
@@ -798,61 +851,9 @@
                   </reference>
                </visibleWhen>
             </command>
-         </toolbar>
-         <toolbar
-               id="edu.ualberta.med.biobank.toolbar.reportsPerspective">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.reports"
-                  icon="icons/reports.png"
-                  label="Reports View"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerpectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-         </toolbar>
-         <toolbar
-               id="edu.ualberta.med.biobank.toolbar.shipmentPerspective">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/shipmentPerpective.png"
-                  label="Shipment View"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <or>
-                     <reference
-                           definitionId="biobank2.mainPerpectiveSelected">
-                     </reference>
-                     <reference
-                           definitionId="biobank2.patientsPerpectiveSelected">
-                     </reference>
-                  </or>
-               </visibleWhen>
-            </command>
          </toolbar> 
          <toolbar
                id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-                  icon="icons/patientPerspective.png"
-                  label="Patients View"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <or>
-                     <reference
-                           definitionId="biobank2.mainPerpectiveSelected">
-                     </reference>
-                     <reference
-                           definitionId="biobank2.shipmentsPerpectiveSelected">
-                     </reference>
-                  </or>
-               </visibleWhen>
-            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
@@ -1324,7 +1325,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ReportsView"
             id="edu.ualberta.med.biobank.views.ReportsView"
-            icon="icons/reports.png"
+            icon="icons/reportsPerspective.png"
             name="Reports"
             restorable="true">
       </view>

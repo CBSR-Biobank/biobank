@@ -62,7 +62,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException(
                 "A waybill should be set on this shipment");
         }
-        if (getClinic() != null && !checkWaybillUnique()) {
+        if (getClinic() != null && !checkWaybillUniqueForClinic()) {
             throw new BiobankCheckException("A shipment with waybill "
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
@@ -77,8 +77,17 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
+        if (!isNew()) {
+            // want to check only new patients
+            Shipment ship = new Shipment();
+            ship.setId(getId());
+            ship = (Shipment) appService.search(Shipment.class, ship).get(0);
+            ShipmentWrapper old = new ShipmentWrapper(appService, ship);
+            List<PatientWrapper> oldPatientList = old.getPatientCollection();
+            patients.removeAll(oldPatientList);
+        }
         for (PatientWrapper patient : patients) {
-            if (!patient.getStudy().getClinicCollection().contains(getClinic())) {
+            if (!patient.getStudy().isLinkedToClinic(getClinic())) {
                 throw new BiobankCheckException("Patient "
                     + patient.getPnumber()
                     + " is not part of a study that has contact with clinic "
@@ -87,7 +96,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
     }
 
-    private boolean checkWaybillUnique() throws ApplicationException {
+    private boolean checkWaybillUniqueForClinic() throws ApplicationException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
         params.add(getClinic().getId());
@@ -310,13 +319,16 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     @Override
     public String toString() {
-        return getWaybill();
+        if (getDateShipped() == null) {
+            return getWaybill();
+        }
+        return getWaybill() + " (" + getFormattedDateShipped() + ")";
     }
 
     /**
-     * Search for a shipment in the site with the given waybill
+     * Search for shipments in the site with the given waybill
      */
-    public static ShipmentWrapper getShipmentInSite(
+    public static List<ShipmentWrapper> getShipmentsInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -324,27 +336,11 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             + " where clinic.site.id = ? and waybill = ?", Arrays
             .asList(new Object[] { site.getId(), waybill }));
         List<Shipment> shipments = appService.query(criteria);
-        if (shipments.size() == 1) {
-            return new ShipmentWrapper(appService, shipments.get(0));
+        List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
+        for (Shipment s : shipments) {
+            wrappers.add(new ShipmentWrapper(appService, s));
         }
-        return null;
-    }
-
-    /**
-     * Search for a shipment in the site with the given date received.
-     */
-    public static ShipmentWrapper getShipmentInSite(
-        WritableApplicationService appService, Date dateReceived,
-        SiteWrapper site) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName()
-            + " where clinic.site.id = ? and dateReceived = ?", Arrays
-            .asList(new Object[] { site.getId(), dateReceived }));
-        List<Shipment> shipments = appService.query(criteria);
-        if (shipments.size() == 1) {
-            return new ShipmentWrapper(appService, shipments.get(0));
-        }
-        return null;
+        return wrappers;
     }
 
     /**

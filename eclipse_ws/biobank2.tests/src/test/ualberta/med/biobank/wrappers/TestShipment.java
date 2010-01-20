@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
+import test.ualberta.med.biobank.Utils;
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
@@ -314,10 +316,11 @@ public class TestShipment extends TestDatabase {
         String waybill = shipmentTest.getWaybill();
 
         site.reload();
-        ShipmentWrapper shipFound = ShipmentWrapper.getShipmentInSite(
+        List<ShipmentWrapper> shipsFound = ShipmentWrapper.getShipmentsInSite(
             appService, waybill, site);
 
-        Assert.assertEquals(shipmentTest, shipFound);
+        Assert.assertEquals(1, shipsFound.size());
+        Assert.assertEquals(shipmentTest, shipsFound.get(0));
     }
 
     @Test

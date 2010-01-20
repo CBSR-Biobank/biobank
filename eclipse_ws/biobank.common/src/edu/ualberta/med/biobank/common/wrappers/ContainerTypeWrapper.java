@@ -404,6 +404,19 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         setChildLabelingScheme(labelingSchemeMap.get(id));
     }
 
+    public void setChildLabelingSchemeName(String name) throws Exception {
+        if (name == null)
+            return;
+        for (ContainerLabelingSchemeWrapper scheme : labelingSchemeMap.values()) {
+            if (scheme.getName().equals(name)) {
+                setChildLabelingScheme(scheme);
+                return;
+            }
+        }
+        throw new Exception("labeling scheme with name \"" + name
+            + "\" does not exist");
+    }
+
     private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
         if (scheme == null) {
             setChildLabelingScheme((ContainerLabelingScheme) null);
