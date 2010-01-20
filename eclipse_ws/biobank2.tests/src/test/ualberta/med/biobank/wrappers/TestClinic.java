@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +7,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
+import test.ualberta.med.biobank.Utils;
 import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
@@ -152,8 +154,8 @@ public class TestClinic extends TestDatabase {
 
         clinic.reload();
 
-        Assert.assertEquals(2, clinic.getStudyCollection(false).size());
-        Assert.assertEquals(1, clinic2.getStudyCollection(false).size());
+        Assert.assertEquals(2, clinic.getStudyCollection().size());
+        Assert.assertEquals(1, clinic2.getStudyCollection().size());
     }
 
     @Test
@@ -176,7 +178,7 @@ public class TestClinic extends TestDatabase {
 
         clinic.reload();
 
-        List<StudyWrapper> studies = clinic.getStudyCollection(true);
+        List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies.size() > 1) {
             for (int i = 0; i < studies.size() - 1; i++) {
                 StudyWrapper s1 = studies.get(i);

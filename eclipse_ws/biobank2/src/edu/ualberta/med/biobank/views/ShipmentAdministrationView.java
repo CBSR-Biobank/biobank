@@ -1,9 +1,15 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.List;
+
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.ui.PlatformUI;
+
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
@@ -30,9 +36,21 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     @Override
     protected Object search(String text) throws Exception {
-        return ShipmentWrapper.getShipmentInSite(
+        List<ShipmentWrapper> shipments = ShipmentWrapper.getShipmentsInSite(
             SessionManager.getAppService(), text, SessionManager.getInstance()
                 .getCurrentSiteWrapper());
+        if (shipments.size() == 1) {
+            return shipments.get(0);
+        }
+        if (shipments.size() > 1) {
+            SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                shipments);
+            if (dlg.open() == Dialog.OK) {
+                return dlg.getSelectedShipment();
+            }
+        }
+        return null;
     }
 
     @Override

@@ -191,10 +191,12 @@ public class Importer {
                 initTopContainersMap();
                 getSampleTypeMap();
 
-                // importShipments();
+                // importPatients();
+                // removeAllShipments();
+                importShipments();
                 // importPatientVisits();
-                removeAllSamples();
-                importCabinetSamples();
+                // removeAllSamples();
+                // importCabinetSamples();
                 // importFreezerSamples();
             }
 
@@ -242,7 +244,7 @@ public class Importer {
         importShipments();
         importPatientVisits();
 
-        importCabinetSamples();
+        // importCabinetSamples();
         // importFreezerSamples();
 
         logger.info("importing complete.");
@@ -372,7 +374,7 @@ public class Importer {
         removeAllPatients();
         logger.info("importing patients ...");
 
-        String qryPart = "from patient, study_list where patient.study_nr=study_list.study_nr";
+        String qryPart = "from patient join study_list on patient.study_nr=study_list.study_nr";
 
         Statement s = con.createStatement();
         s.execute("select count(*) " + qryPart);
@@ -393,7 +395,7 @@ public class Importer {
             if (patientNo.length() == 6) {
                 studyNameShort = getStudyShortNameFromPatientNr(patientNo);
             } else {
-                studyNameShort = rs.getString(5);
+                studyNameShort = rs.getString(6);
             }
 
             study = getStudyFromOldShortName(studyNameShort);
@@ -412,6 +414,16 @@ public class Importer {
             patient.persist();
             ++importCounts.patients;
             ++count;
+
+            // update the BBPDB with the decoded CHR number
+            String decChrNr = rs.getString(5);
+            if (decChrNr == null) {
+                PreparedStatement ps = con
+                    .prepareStatement("update patient set dec_chr_nr = ? where patient_nr = ?");
+                ps.setString(1, patientNo);
+                ps.setInt(2, rs.getInt(1));
+                ps.executeUpdate();
+            }
         }
     }
 
@@ -484,9 +496,8 @@ public class Importer {
                 continue;
             }
 
-            clinicName = clinicName.toUpperCase();
             study = getStudyFromOldShortName(studyNameShort);
-            study.reload();
+            clinicName = clinicName.toUpperCase();
             clinic = clinicsMap.get(clinicName);
             if (clinic == null) {
                 logger.error("no clinic \"" + clinicName + "\" for patient "
@@ -494,7 +505,6 @@ public class Importer {
                 ++count;
                 continue;
             }
-            clinic.reload();
 
             // make sure the clinic and study are linked via a contact
             if (!study.hasClinic(clinicName)) {
@@ -565,11 +575,9 @@ public class Importer {
         HQLCriteria criteria = new HQLCriteria("from "
             + PatientVisit.class.getName());
         List<PatientVisit> visits = appService.query(criteria);
-        while (visits.size() > 0) {
-            PatientVisitWrapper v = new PatientVisitWrapper(appService, visits
-                .get(0));
+        for (PatientVisit visit : visits) {
+            PatientVisitWrapper v = new PatientVisitWrapper(appService, visit);
             v.delete();
-            visits.remove(0);
         }
     }
 
@@ -666,14 +674,6 @@ public class Importer {
                 logger.error("found 0 shipments for patientNo/" + patientNo
                     + " studyName/" + study.getNameShort() + " clinicName/"
                     + clinicName + " dateReceived/" + dateProcessed);
-                ++count;
-                continue;
-            }
-
-            // check if there is a visit for this date
-            if (patient.getVisit(dateProcessed) != null) {
-                logger.error("patient " + patientNo
-                    + " already has a visit on " + dateProcessed);
                 ++count;
                 continue;
             }
@@ -869,8 +869,8 @@ public class Importer {
             visit = patient.getVisit(dateProcessed);
 
             if (visit == null) {
-                logger.error("patient visit not found for date: "
-                    + dateProcessed.toString());
+                logger.error("patient " + patientNo
+                    + " visit not found for date: " + dateProcessed.toString());
                 continue;
             }
 
@@ -892,7 +892,7 @@ public class Importer {
             sample.setSampleType(sampleType);
             sample.setInventoryId(inventoryId);
             sample.setLinkDate(rs.getDate(14));
-            sample.setQuantity(rs.getDouble(15));
+            sample.setQuantityUsed(rs.getDouble(15));
             sample.setPosition(binPos.row, 0);
             sample.setPatientVisit(visit);
 

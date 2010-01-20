@@ -29,7 +29,8 @@ public class ShipmentAdapter extends AdapterBase {
     public String getName() {
         ShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment.getWrappedObject(), "shipment is null");
-        return shipment.getFormattedDateShipped();
+        return shipment.getWaybill() + " - "
+            + shipment.getFormattedDateShipped();
     }
 
     @Override

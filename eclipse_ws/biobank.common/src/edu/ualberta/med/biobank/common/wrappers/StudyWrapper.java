@@ -127,9 +127,23 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        checkNameNotEmpty();
+        checkNameShortNotEmpty();
         checkStudyNameUnique();
         checkContactsFromSameSite();
         checkNoPatientRemoved();
+    }
+
+    private void checkNameNotEmpty() throws BiobankCheckException {
+        if (getName() == null || getName().isEmpty()) {
+            throw new BiobankCheckException("Name can't be empty");
+        }
+    }
+
+    private void checkNameShortNotEmpty() throws BiobankCheckException {
+        if (getNameShort() == null || getNameShort().isEmpty()) {
+            throw new BiobankCheckException("Short Name can't be empty");
+        }
     }
 
     private void checkNoPatientRemoved() throws BiobankCheckException,
@@ -163,32 +177,34 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private void checkStudyNameUnique() throws BiobankCheckException,
         ApplicationException {
         String sameString = "";
-        List<Object> params = new ArrayList<Object>(Arrays.asList(new Object[] {
-            getSite().getId(), getName() }));
-        if (!isNew()) {
-            sameString = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " where site.id = ? and name = ?" + sameString, params);
-        List<Object> results = appService.query(c);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A study with name \"" + getName()
-                + "\" already exists.");
-        }
+        if (getSite() != null) {
+            List<Object> params = new ArrayList<Object>(Arrays
+                .asList(new Object[] { getSite().getId(), getName() }));
+            if (!isNew()) {
+                sameString = " and id <> ?";
+                params.add(getId());
+            }
+            HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+                + " where site.id = ? and name = ?" + sameString, params);
+            List<Object> results = appService.query(c);
+            if (results.size() > 0) {
+                throw new BiobankCheckException("A study with name \""
+                    + getName() + "\" already exists.");
+            }
 
-        params = new ArrayList<Object>(Arrays.asList(new Object[] {
-            getSite().getId(), getNameShort() }));
-        if (!isNew()) {
-            sameString = " and id <> ?";
-            params.add(getId());
-        }
-        c = new HQLCriteria("from " + Study.class.getName()
-            + " where site.id = ? and nameShort = ?" + sameString, params);
-        results = appService.query(c);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A study with short name \""
-                + getNameShort() + "\" already exists.");
+            params = new ArrayList<Object>(Arrays.asList(new Object[] {
+                getSite().getId(), getNameShort() }));
+            if (!isNew()) {
+                sameString = " and id <> ?";
+                params.add(getId());
+            }
+            c = new HQLCriteria("from " + Study.class.getName()
+                + " where site.id = ? and nameShort = ?" + sameString, params);
+            results = appService.query(c);
+            if (results.size() > 0) {
+                throw new BiobankCheckException("A study with short name \""
+                    + getNameShort() + "\" already exists.");
+            }
         }
     }
 
@@ -520,42 +536,42 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public void setStudyPvAttr(String label, String type,
         String[] permissibleValues) throws Exception {
+        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
+            .getPvAttrTypeMap(appService);
+        PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
+        if (pvAttrType == null) {
+            throw new Exception("the pv attribute type \"" + type
+                + "\" does not exist");
+        }
+
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
 
-        if ((studyPvAttr == null) && (permissibleValues == null)) {
-            // nothing to do
-            return;
-        }
+        if (type.startsWith("select_")) {
+            // type has permissble values
+            if ((studyPvAttr == null) && (permissibleValues == null)) {
+                // nothing to do
+                return;
+            }
 
-        if ((studyPvAttr != null) && (permissibleValues == null)) {
-            studyPvAttr.delete();
-            studyPvAttrMap.remove(label);
-            return;
+            if ((studyPvAttr != null) && (permissibleValues == null)) {
+                studyPvAttr.delete();
+                studyPvAttrMap.remove(label);
+                return;
+            }
         }
 
         if (studyPvAttr == null) {
             // does not yet exist
-            Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
-                .getPvAttrTypeMap(appService);
             studyPvAttr = new StudyPvAttrWrapper(appService);
-            PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
-            if (pvAttrType == null) {
-                throw new Exception("the pv attribute type \"" + type
-                    + "\" does not exist");
-            }
             studyPvAttr.setLabel(label);
             studyPvAttr.setPvAttrType(pvAttrType);
             studyPvAttr.setStudy(wrappedObject);
         }
 
         studyPvAttr.setLocked(false);
-        if (permissibleValues != null) {
-            studyPvAttr
-                .setPermissible(StringUtils.join(permissibleValues, ';'));
-            studyPvAttrMap.put(label, studyPvAttr);
-            return;
-        }
+        studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
+        studyPvAttrMap.put(label, studyPvAttr);
     }
 
     /**
@@ -707,31 +723,31 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     public int compareTo(ModelWrapper<Study> wrapper) {
         if (wrapper instanceof StudyWrapper) {
-            String name1 = wrappedObject.getName();
-            String name2 = wrapper.wrappedObject.getName();
+            String nameShort1 = wrappedObject.getNameShort();
+            String nameShort2 = wrapper.wrappedObject.getNameShort();
 
-            int compare = name1.compareTo(name2);
-            if (compare == 0) {
-                String nameShort1 = wrappedObject.getNameShort();
-                String nameShort2 = wrapper.wrappedObject.getNameShort();
-
-                return ((nameShort1.compareTo(nameShort2) > 0) ? 1
-                    : (nameShort1.equals(nameShort2) ? 0 : -1));
+            int compare = 0;
+            if ((nameShort1 != null) && (nameShort2 != null)) {
+                compare = nameShort1.compareTo(nameShort2);
             }
-            return (compare > 0) ? 1 : -1;
+            if (compare == 0) {
+                String name1 = wrappedObject.getName();
+                String name2 = wrapper.wrappedObject.getName();
+
+                return name1.compareTo(name2);
+            }
+            return compare;
         }
         return 0;
     }
 
     public long getPatientCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct patient) from "
+        HQLCriteria c = new HQLCriteria("select count(*) from "
             + Study.class.getName() + " as study"
-            + " inner join study.contactCollection as contacts"
-            + " inner join contacts.clinic as clinic"
-            + " inner join clinic.shipmentCollection as shipments"
-            + " inner join shipments.patientVisitCollection as visits"
-            + " inner join visits.patient as patient"
+            + " join study.patientCollection as patients"
+            + " join patients.shipmentCollection as shipments"
+            + " join shipments.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 
@@ -746,10 +762,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         throws ApplicationException, BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(visits) from "
             + Study.class.getName() + " as study"
-            + " inner join study.contactCollection as contacts"
-            + " inner join contacts.clinic as clinic"
-            + " inner join clinic.shipmentCollection as shipments"
-            + " inner join shipments.patientVisitCollection as visits"
+            + " join study.patientCollection as patients"
+            + " join patients.patientVisitCollection as visits"
+            + " join visits.shipment as shipments"
+            + " join shipments.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 
@@ -762,7 +778,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCount() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(visits)" + " from "
+        HQLCriteria c = new HQLCriteria("select count(visits) from "
             + Study.class.getName() + " as study"
             + " inner join study.patientCollection as patients"
             + " inner join patients.patientVisitCollection as visits"
@@ -788,6 +804,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
+    /**
+     * return true if this study is linked to the given clinic (through
+     * contacts)
+     */
+    public boolean isLinkedToClinic(ClinicWrapper clinic)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(clinics) from "
+            + Contact.class.getName() + " as contacts"
+            + " join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ? and clinics.id = ?",
+            Arrays.asList(new Object[] { getId(), clinic.getId() }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) != 0;
+    }
+
     @Override
     public void reload() throws Exception {
         super.reload();
@@ -798,4 +832,5 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public String toString() {
         return getName();
     }
+
 }

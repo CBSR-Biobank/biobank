@@ -36,8 +36,11 @@ public class PatientVisitAdapter extends AdapterBase {
         PatientVisitWrapper patientVisitWrapper = getWrapper();
         Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
             "patientVisit is null");
-        return patientVisitWrapper.getFormattedDateProcessed() + " - "
-            + patientVisitWrapper.getShipment().getWaybill();
+        String name = patientVisitWrapper.getFormattedDateProcessed();
+        if (patientVisitWrapper.getShipment() != null) {
+            name += " - " + patientVisitWrapper.getShipment().getWaybill();
+        }
+        return name;
     }
 
     @Override

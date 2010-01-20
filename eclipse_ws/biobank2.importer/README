@@ -4,6 +4,9 @@ CONTACTS
   left join study_contact on contact.id=contact_id
   join study on study.id=study_contact.study_id
   
+PATIENT
+    alter table patient add dec_chr_nr varchar(32);
+  
   
 CABINET
   SELECT distinct(sample_list.sample_name), cabinet.drawer, cabinet.bin
@@ -28,3 +31,19 @@ CABINET
 
 INSERT INTO FRZ_INV_ID_CNT (INVENTORY_ID, CNT) 
 SELECT inventory_id, count(*) AS cnt FROM freezer GROUP BY inventory_id;
+
+QUERY TO GET A SAMPLE COUNT FROM ALL BINS IN CABINETS
+  SELECT cabinet.cnum, cabinet.drawer, cabinet.bin, 
+  sample_list.sample_name, count(*) FROM cabinet 
+  join sample_list on sample_list.sample_nr=cabinet.sample_nr 
+  where sample_list.sample_name like 'DNA%' 
+  group by cabinet.cnum, cabinet.drawer, cabinet.bin, 
+  sample_list.sample_name 
+
+
+QUERY TO COUNT THE NUMBER OF SAMPLES IN CABINET
+
+  SELECT cnum, drawer, bin, count(*) as sample_count
+  FROM `cabinet` where cnum=2 and inventory_id is not null
+  group by drawer, bin
+  order by sample_count desc

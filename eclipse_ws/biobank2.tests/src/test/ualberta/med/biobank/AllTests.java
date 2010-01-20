@@ -10,6 +10,22 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import test.ualberta.med.biobank.internal.DbHelper;
+import test.ualberta.med.biobank.wrappers.TestClinic;
+import test.ualberta.med.biobank.wrappers.TestContact;
+import test.ualberta.med.biobank.wrappers.TestContainer;
+import test.ualberta.med.biobank.wrappers.TestContainerLabelingScheme;
+import test.ualberta.med.biobank.wrappers.TestContainerType;
+import test.ualberta.med.biobank.wrappers.TestPatient;
+import test.ualberta.med.biobank.wrappers.TestPatientVisit;
+import test.ualberta.med.biobank.wrappers.TestPvSampleSource;
+import test.ualberta.med.biobank.wrappers.TestSample;
+import test.ualberta.med.biobank.wrappers.TestSampleSource;
+import test.ualberta.med.biobank.wrappers.TestSampleStorage;
+import test.ualberta.med.biobank.wrappers.TestSampleType;
+import test.ualberta.med.biobank.wrappers.TestShipment;
+import test.ualberta.med.biobank.wrappers.TestShippingCompany;
+import test.ualberta.med.biobank.wrappers.TestSite;
+import test.ualberta.med.biobank.wrappers.TestStudy;
 
 @RunWith(Suite.class)
 @SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
@@ -26,7 +42,6 @@ public class AllTests {
         appService = ServiceConnection.getAppService("https://"
             + System.getProperty("server", "localhost:8443") + "/biobank2",
             "testuser", "test");
-
         DbHelper.setAppService(appService);
     }
 

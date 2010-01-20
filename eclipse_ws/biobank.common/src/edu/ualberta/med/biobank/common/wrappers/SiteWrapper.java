@@ -354,25 +354,25 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection(boolean sort) {
-        List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
+        List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
             .get("studyCollection");
-        if (clinicCollection == null) {
+        if (studyCollection == null) {
             Collection<Study> children = wrappedObject.getStudyCollection();
             if (children != null) {
-                clinicCollection = new ArrayList<StudyWrapper>();
+                studyCollection = new ArrayList<StudyWrapper>();
                 for (Study study : children) {
-                    clinicCollection.add(new StudyWrapper(appService, study));
+                    studyCollection.add(new StudyWrapper(appService, study));
                 }
-                propertiesMap.put("studyCollection", clinicCollection);
+                propertiesMap.put("studyCollection", studyCollection);
             }
         }
-        if ((clinicCollection != null) && sort)
-            Collections.sort(clinicCollection);
-        return clinicCollection;
+        if ((studyCollection != null) && sort)
+            Collections.sort(studyCollection);
+        return studyCollection;
     }
 
     public List<StudyWrapper> getStudyCollection() {
-        return getStudyCollection(false);
+        return getStudyCollection(true);
     }
 
     public void setStudyCollection(Collection<Study> studies, boolean setNull) {

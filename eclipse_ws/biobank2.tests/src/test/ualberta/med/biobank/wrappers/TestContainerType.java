@@ -1,4 +1,4 @@
-package test.ualberta.med.biobank;
+package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +12,8 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import test.ualberta.med.biobank.TestDatabase;
+import test.ualberta.med.biobank.Utils;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
@@ -36,8 +38,8 @@ public class TestContainerType extends TestDatabase {
     private SiteWrapper site;
 
     // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList("getChildLabelingScheme");
+    private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
+        "getChildLabelingScheme", "getChildLabelingSchemeName");
 
     @Override
     @Before

@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
-import edu.ualberta.med.biobank.model.LabelingScheme;
 import edu.ualberta.med.biobank.model.SiteClinicInfo;
 import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
@@ -319,9 +318,6 @@ public class BiobankLabelProvider extends LabelProvider implements
         }
         if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getName();
-        }
-        if (element instanceof LabelingScheme) {
-            return ((LabelingScheme) element).name;
         }
         return element.toString();
     }
