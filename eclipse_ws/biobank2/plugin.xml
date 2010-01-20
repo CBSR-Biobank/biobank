@@ -1328,7 +1328,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ReportsView"
             id="edu.ualberta.med.biobank.views.ReportsView"
-            icon="icons/reports.png"
+            icon="icons/reportsPerspective.png"
             name="Reports"
             restorable="true">
       </view>

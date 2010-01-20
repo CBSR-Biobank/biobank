@@ -402,8 +402,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     /**
-     * Search for a shipment in the clinic with the given date received and
-     * patient number.
+     * Search for a shipment in the clinic with the given date received
      */
     public ShipmentWrapper getShipment(Date dateReceived)
         throws ApplicationException {

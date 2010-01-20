@@ -358,4 +358,20 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         return null;
     }
+
+    /**
+     */
+    public boolean hasPatient(String patientNumber) throws Exception {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(distinct patients.id) from "
+                + Shipment.class.getName()
+                + " as shipment inner join shipment.patientCollection as patients"
+                + " where shipment.id = ? and patients.pnumber = ?", Arrays
+                .asList(new Object[] { getId(), patientNumber }));
+        List<Long> results = appService.query(criteria);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) > 0;
+    }
 }

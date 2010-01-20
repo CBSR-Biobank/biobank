@@ -176,8 +176,8 @@ public class Importer {
                     throw new Exception("Table " + table + " not found");
             }
 
-            appService = ServiceConnection.getAppService("http://"
-                + System.getProperty("server", "localhost:8080") + "/biobank2",
+            appService = ServiceConnection.getAppService("https://"
+                + System.getProperty("server", "localhost:8443") + "/biobank2",
                 "testuser", "test");
 
             cbsrSite = getCbsrSite();
@@ -474,6 +474,8 @@ public class Importer {
         }
 
         int count = 1;
+        double min = 1000000;
+        double max = 0;
         while (rs.next()) {
             logger.trace("start");
             String patientNo = cipher.decode(rs.getBytes(1));
@@ -548,12 +550,11 @@ public class Importer {
                 shipment.setDateReceived(dateReceived);
                 shipment.setPatientCollection(Arrays.asList(patient));
                 shipment.persist();
-            } else if (shipment.getPatient(patientNo) == null) {
+            } else if (!shipment.hasPatient(patientNo)) {
                 logger.debug("adding to shipment: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
-
                 List<PatientWrapper> patients = shipment.getPatientCollection();
                 if (patients == null) {
                     patients = new ArrayList<PatientWrapper>();
@@ -567,7 +568,6 @@ public class Importer {
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
             }
-
             ++count;
         }
     }
