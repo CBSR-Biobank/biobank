@@ -474,8 +474,6 @@ public class Importer {
         }
 
         int count = 1;
-        double min = 1000000;
-        double max = 0;
         while (rs.next()) {
             logger.trace("start");
             String patientNo = cipher.decode(rs.getBytes(1));
@@ -534,7 +532,6 @@ public class Importer {
                 throw new Exception("patient not found in study: " + patientNo
                     + ",  " + studyNameShort);
             }
-
             logger.trace("getting shipment");
             shipment = clinic.getShipment(dateReceived);
             if (shipment == null) {
@@ -548,19 +545,14 @@ public class Importer {
                 shipment.setClinic(clinic);
                 shipment.setWaybill(dateReceivedStr);
                 shipment.setDateReceived(dateReceived);
-                shipment.setPatientCollection(Arrays.asList(patient));
+                shipment.addPatients(patient);
                 shipment.persist();
             } else if (!shipment.hasPatient(patientNo)) {
                 logger.debug("adding to shipment: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
                     + numShipments + ")");
-                List<PatientWrapper> patients = shipment.getPatientCollection();
-                if (patients == null) {
-                    patients = new ArrayList<PatientWrapper>();
-                }
-                patients.add(patient);
-                shipment.setPatientCollection(patients);
+                shipment.addPatients(patient);
                 shipment.persist();
             } else {
                 logger.debug("already in database: patient/"

@@ -168,7 +168,7 @@ public class TestPatient extends TestDatabase {
         addClinic(patient);
         patient.persist();
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
-        shipment.setPatientCollection(Arrays.asList(patient));
+        shipment.addPatients(patient);
         shipment.persist();
         patient.reload();
 
@@ -296,7 +296,7 @@ public class TestPatient extends TestDatabase {
         List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
         for (int i = 0, n = r.nextInt(10); i < n; ++i) {
             ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
-            ship.setPatientCollection(Arrays.asList(patient));
+            ship.addPatients(patient);
             ship.persist();
             shipments.add(ship);
         }

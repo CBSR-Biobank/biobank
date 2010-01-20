@@ -21,6 +21,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
+    private List<PatientWrapper> patientsAdded;
+
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -53,6 +55,12 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     public Class<Shipment> getWrappedClass() {
         return Shipment.class;
+    }
+
+    @Override
+    public void persist() throws Exception {
+        super.persist();
+        patientsAdded.clear();
     }
 
     @Override
@@ -297,7 +305,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return getPatientCollection(false);
     }
 
-    public void setPatientCollection(Collection<Patient> patients,
+    private void setPatientCollection(Collection<Patient> patients,
         boolean setNull) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
         wrappedObject.setPatientCollection(patients);
@@ -308,13 +316,38 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
     }
 
-    public void setPatientCollection(List<PatientWrapper> patients) {
+    private void setPatientCollection(List<PatientWrapper> patients) {
         Collection<Patient> patientsObjects = new HashSet<Patient>();
         for (PatientWrapper p : patients) {
             patientsObjects.add(p.getWrappedObject());
         }
         setPatientCollection(patientsObjects, false);
         propertiesMap.put("patientCollection", patients);
+    }
+
+    public void addPatients(PatientWrapper... patients) {
+        List<PatientWrapper> patientsList = getPatientCollection();
+        if (patientsList == null) {
+            patientsList = new ArrayList<PatientWrapper>();
+        }
+        if (patientsAdded == null) {
+            patientsAdded = new ArrayList<PatientWrapper>();
+        }
+        for (PatientWrapper patient : patients) {
+            patientsAdded.add(patient);
+            patientsList.add(patient);
+        }
+        setPatientCollection(patientsList);
+    }
+
+    public void removePatients(PatientWrapper... patients) {
+        List<PatientWrapper> patientsList = getPatientCollection();
+        if (patientsList != null) {
+            for (PatientWrapper patient : patients) {
+                patientsList.remove(patient);
+            }
+            setPatientCollection(patientsList);
+        }
     }
 
     @Override
