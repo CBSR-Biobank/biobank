@@ -8,13 +8,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class FreezerCSamples extends QueryObject {
+public class CabinetDSamples extends QueryObject {
 
-    public FreezerCSamples(String op, Integer siteId) {
+    public CabinetDSamples(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer samples per study per clinic.",
-
-            "select sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, count(*) from "
+            "Displays the total number of freezer samples per study per clinic by date range.",
+            "select sample.linkDate, sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name from "
                 + Sample.class.getName()
                 + " as sample where sample.samplePosition.container.id in (select path1.container.id from "
                 + ContainerPath.class.getName()
@@ -23,17 +22,33 @@ public class FreezerCSamples extends QueryObject {
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site"
                 + op
                 + siteId
-                + " group by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name",
-            new String[] { "Study", "Clinic", "Total" });
+                + " order by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, sample.linkDate",
+            new String[] { "", "Study", "Clinic", "Total" });
+        addOption("Date Range", DateRange.class, DateRange.Week);
     }
 
     @Override
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
-        params.add("%Freezer%");
+        for (int i = 0; i < queryOptions.size(); i++) {
+            Option option = queryOptions.get(i);
+            if (params.get(i) == null)
+                params.set(i, option.defaultValue);
+            if (option.type.equals(String.class))
+                params.set(i, "%" + params.get(i) + "%");
+        }
+        columnNames[0] = (String) params.get(0);
+        params.set(0, "%Cabinet%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
+        System.out.println(queryString);
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
+
+    @Override
+    public List<Object> postProcess(List<Object> results) {
+        return sumByDate(results);
+    }
+
 }

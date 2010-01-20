@@ -124,8 +124,12 @@ public class ReportsView extends ViewPart {
                         searchLayoutData.minimumHeight = 500;
                         searchTable.setLayoutData(searchLayoutData);
                         searchTable.moveBelow(subSection);
-                    }
-                    searchTable.setCollection(searchData);
+                        printButton.setEnabled(true);
+                    } else
+                        printButton.setEnabled(false);
+                    // searchTable.setCollection(searchData); caused big
+                    // problems... dunno why
+
                     searchTable.redraw();
                     top.layout();
                 } catch (ApplicationException ae) {
@@ -137,6 +141,7 @@ public class ReportsView extends ViewPart {
 
         printButton = new Button(header, SWT.NONE);
         printButton.setText("Print");
+        printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -282,6 +287,7 @@ public class ReportsView extends ViewPart {
 
     public void resetSearch() {
         if (searchTable != null) {
+
             searchTable.setCollection(new ArrayList<Object>());
             TableColumn[] cols = searchTable.getTableViewer().getTable()
                 .getColumns();
@@ -289,7 +295,7 @@ public class ReportsView extends ViewPart {
                 col.setText("");
             }
         }
-
+        printButton.setEnabled(false);
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
