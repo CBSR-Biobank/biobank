@@ -26,7 +26,7 @@ public class CbsrContainerTypes {
     private static String[] cellPallet96SampleTypes = new String[] { "Cells" };
 
     private static String[] ftaBinSampleTypes = new String[] { "DNA(Blood)",
-        "DNA(WBC)" };
+        "DNA (WBC)" };
 
     private static String[] hairBinSampleTypes = new String[] { "Hair" };
 
@@ -52,77 +52,87 @@ public class CbsrContainerTypes {
 
     private static void createFreezerTypes(SiteWrapper site) throws Exception {
         ContainerTypeWrapper biopsyPallet96 = addContainerType(site,
-            "Biopsy Pallet 96", "BP96", false, 1, 8, 12, null,
+            "Biopsy Pallet 96", "BP96", "Active", false, 1, 8, 12, null,
             biopsyPallet96SampleTypes);
 
         ContainerTypeWrapper box81 = addContainerType(site, "Box 81", "B81",
-            false, 1, 9, 9, null, box81SampleTypes);
+            "Active", false, 1, 9, 9, null, box81SampleTypes);
 
         ContainerTypeWrapper cellPallet96 = addContainerType(site,
-            "Cell Pallet 96", "CP96", false, 1, 9, 9, null,
+            "Cell Pallet 96", "CP96", "Active", false, 1, 9, 9, null,
             cellPallet96SampleTypes);
 
         ContainerTypeWrapper pallet96 = addContainerType(site, "Pallet 96",
-            "P96", false, 1, 8, 12, null, pallet96SampleTypes);
+            "P96", "Active", false, 1, 8, 12, null, pallet96SampleTypes);
 
         ContainerTypeWrapper hotel10 = addContainerType(site, "Hotel 10",
-            "H10", false, 3, 10, 1, Arrays
+            "H10", "Closed", false, 3, 10, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { box81 }));
 
         ContainerTypeWrapper hotel13 = addContainerType(site, "Hotel 13",
-            "H13", false, 3, 13, 1, Arrays
+            "H13", "Active", false, 3, 13, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { pallet96 }));
 
         ContainerTypeWrapper hotel17 = addContainerType(site, "Hotel 17",
-            "H17", false, 3, 17, 1, Arrays
+            "H17", "Active", false, 3, 17, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { box81 }));
 
         ContainerTypeWrapper hotel18 = addContainerType(site, "Hotel 18",
-            "H18", false, 3, 18, 1, Arrays
+            "H18", "Active", false, 3, 18, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { box81 }));
 
         ContainerTypeWrapper hotel19 = addContainerType(site, "Hotel 19",
-            "H19", false, 3, 19, 1, Arrays.asList(new ContainerTypeWrapper[] {
-                biopsyPallet96, cellPallet96, pallet96 }));
+            "H19", "Active", false, 3, 19, 1, Arrays
+                .asList(new ContainerTypeWrapper[] { biopsyPallet96,
+                    cellPallet96, pallet96 }));
 
-        addContainerType(site, "Freezer 3x6", "F3x6", true, 2, 3, 6, Arrays
-            .asList(new ContainerTypeWrapper[] { hotel10 }));
+        addContainerType(site, "Freezer 3x6", "F3x6", "Closed", true, 2, 3, 6,
+            Arrays.asList(new ContainerTypeWrapper[] { hotel10 }));
 
-        addContainerType(site, "Freezer 3x10", "F3x10", true, 2, 3, 10, Arrays
-            .asList(new ContainerTypeWrapper[] { hotel17 }));
+        addContainerType(site, "Freezer 3x10", "F3x10", "Active", true, 2, 3,
+            10, Arrays.asList(new ContainerTypeWrapper[] { hotel17 }));
 
-        addContainerType(site, "Freezer 4x12", "F4x12", true, 2, 4, 12, Arrays
-            .asList(new ContainerTypeWrapper[] { hotel18 }));
+        addContainerType(site, "Freezer 4x12", "F4x12", "Active", true, 2, 4,
+            12, Arrays.asList(new ContainerTypeWrapper[] { hotel18 }));
 
-        addContainerType(site, "Freezer 5x9", "F5x9", true, 2, 5, 9, Arrays
-            .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
+        addContainerType(site, "Freezer 5x9", "F5x9", "Active", true, 2, 5, 9,
+            Arrays.asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
 
-        addContainerType(site, "Freezer 6x12", "F6x12", true, 2, 6, 12, Arrays
-            .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
+        addContainerType(site, "Freezer 6x12", "F6x12", "Active", true, 2, 6,
+            12, Arrays.asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
+
+        addContainerType(site, "Freezer 4x6", "F4x6", "Active", true, 2, 4, 6,
+            Arrays.asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
     }
 
     private static void createCabinetTypes(SiteWrapper site) throws Exception {
         ContainerTypeWrapper ftaBin = addContainerType(site, "FTA Bin", "FBin",
-            false, 2, 120, 1, null, ftaBinSampleTypes);
+            "Active", false, 2, 120, 1, null, ftaBinSampleTypes);
 
         ContainerTypeWrapper hairBin = addContainerType(site, "Hair Bin",
-            "HBin", false, 2, 120, 1, null, hairBinSampleTypes);
+            "HBin", "Active", false, 2, 120, 1, null, hairBinSampleTypes);
+
+        ContainerTypeWrapper ftaBinLoersch = addContainerType(site,
+            "FTA Bin Loersch", "FBinL", "Active", false, 2, 68, 1, null,
+            ftaBinSampleTypes);
 
         ContainerTypeWrapper drawer36 = addContainerType(site, "Drawer 36",
-            "D36", false, 3, 36, 1, Arrays.asList(new ContainerTypeWrapper[] {
-                ftaBin, hairBin }));
-        addContainerType(site, "Cabinet 4 drawer", "Cabinet 4", true, 2, 4, 1,
-            Arrays.asList(new ContainerTypeWrapper[] { drawer36 }));
+            "D36", "Active", false, 3, 36, 1, Arrays
+                .asList(new ContainerTypeWrapper[] { ftaBin, ftaBinLoersch,
+                    hairBin }));
+        addContainerType(site, "Cabinet 4 drawer", "Cabinet 4", "Active", true,
+            2, 4, 1, Arrays.asList(new ContainerTypeWrapper[] { drawer36 }));
     }
 
     private static ContainerTypeWrapper addContainerType(SiteWrapper site,
-        String name, String nameShort, boolean topLevel,
+        String name, String nameShort, String activityStatus, boolean topLevel,
         int childLabelingScheme, int rows, int cols,
         List<ContainerTypeWrapper> children, String... sampleTypeNames)
         throws Exception {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(site.getAppService());
         ct.setName(name);
         ct.setNameShort(nameShort);
+        ct.setActivityStatus(activityStatus);
         ct.setTopLevel(topLevel);
         ct.setSite(site);
         ct.setRowCapacity(rows);
