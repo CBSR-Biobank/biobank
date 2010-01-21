@@ -38,5 +38,9 @@ INSERT INTO `SAMPLE_TYPE` (ID, NAME, NAME_SHORT, SITE_ID) VALUES
 (36, "Transverse Colon",             "Colon, T", NULL),
 (37, "Meconium - BABY",              "Meconium", NULL),
 (38, "WB DMSO",                      "WB DMSO", NULL),
-(39, "DNA (WBC)",                    "DNA(WBC)", NULL);
+(39, "Platelet free plasma",         "PF Plasma",NULL),
+(40, "Lithium Heparin Plasma",       "Lith Hep Plasma",NULL),
+(41, "CDPA Plasma",                  "CDPA Plasma",NULL),
+(42, "Tap Water",                    "T Water",NULL),
+(43, "DNA (White blood cells)",      "DNA (WBC)",NULL);
 UNLOCK TABLES;

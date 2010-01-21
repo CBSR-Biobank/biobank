@@ -7,6 +7,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -51,36 +52,37 @@ public class CbsrStudies {
         }
 
         addStudy(site, "Acute Heart Failure-Emergency Management", "AHFEM",
-            null);
+            "Active", null);
         addStudy(site, "Blood Borne Pathogens Surveillance Project", "BBPSP",
-            null);
+            "Active", null);
         addStudy(
             site,
             "Centre of Excellence for Gastrointestinal Inflammation and Immunity Research",
-            "CEGIIR", null);
+            "CEGIIR", "Active", null);
         addStudy(site, "Canadian Health Infant Longitudinal Development Study",
-            "CHILD", null);
+            "CHILD", "Active", null);
         addStudy(site,
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
-            "ERCIN", "Precath visit - only urine is collected");
-        addStudy(site, "Kidney Disease Cohort Study", "KDCS", null);
-        addStudy(site, "Kingston Merger Study", "KMS", null);
-        addStudy(site, "Man-Chui Poon Study", "MPS", null);
-        addStudy(site, "Novartis Hepatitis C Study", "NHS", null);
-        addStudy(site, "Retroviral Study", "RVS", null);
-        addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", null);
-        addStudy(site, "Vascular Access Study", "VAS", null);
-        addStudy(site, "Critical Care Cohort Study", "CCCS", null);
+            "ERCIN", "Active", "Precath visit - only urine is collected");
+        addStudy(site, "Kidney Disease Cohort Study", "KDCS", "Active", null);
+        addStudy(site, "Kingston Merger Study", "KMS", "Active", null);
+        addStudy(site, "Man-Chui Poon Study", "MPS", "Active", null);
+        addStudy(site, "Novartis Hepatitis C Study", "NHS", "Active", null);
+        addStudy(site, "Retroviral Study", "RVS", "Active", null);
+        addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", "Active", null);
+        addStudy(site, "Vascular Access Study", "VAS", "Active", null);
+        addStudy(site, "Critical Care Cohort Study", "CCCS", "Closed", null);
         addStudy(
             site,
             "A phase II randomized blinded controlled trial of the effect of "
                 + "furoSemide in cricially ill Patients with eARly acute Kidney injury",
-            "SPARK", null);
+            "SPARK", "Active", null);
         addStudy(
             site,
             "Laboratory Controls Study",
             "LCS",
+            "Active",
             "Created so that we could give locations/track samples that we "
                 + "use as controls. Also used to store leftover aliquots of staff "
                 + "blood  used in experiments");
@@ -171,6 +173,82 @@ public class CbsrStudies {
         addSampleSource("VAS", "6mL beige top tube");
         addSampleSource("VAS", "10ml orange top PAXgene tube");
 
+        addSampleStorage("AHFEM", "Serum", 5, 0.2);
+        addSampleStorage("AHFEM", "Plasma", 5, 0.2);
+        addSampleStorage("AHFEM", "Lith Hep Plasma", 20, 0.2);
+        addSampleStorage("AHFEM", "PF Plasma", 2, 0.2);
+        addSampleStorage("BBPSP", "Paxgene", 11, 0.8);
+        addSampleStorage("BBPSP", "Plasma", 16, 0.2);
+        addSampleStorage("BBPSP", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("BBPSP", "CDPA Plasma", 3, 1.0);
+        addSampleStorage("CEGIIR", "Z Urine", 6, 0.9);
+        addSampleStorage("CEGIIR", "Cells", 5, 0.5);
+        addSampleStorage("CEGIIR", "Serum B", 6, 0.8);
+        addSampleStorage("CEGIIR", "Plasma", 5, 0.4);
+        addSampleStorage("CEGIIR", "WB DMSO", 2, 0.8);
+        addSampleStorage("CEGIIR", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("CHILD", "WB Serum", null, null);
+        addSampleStorage("CHILD", "WB RNA", null, null);
+        addSampleStorage("CHILD", "WB Plasma", null, null);
+        addSampleStorage("CHILD", "WBlood", null, null);
+        addSampleStorage("CHILD", "Serum Pel", null, null);
+        addSampleStorage("CHILD", "CBMC RNA", null, null);
+        addSampleStorage("CHILD", "Meconium", null, null);
+        addSampleStorage("CHILD", "Plasma SH", null, null);
+        addSampleStorage("CHILD", "CBMC", null, null);
+        addSampleStorage("ERCIN", "Z Urine", 12, 0.9);
+        addSampleStorage("ERCIN", "C Urine", 6, 0.9);
+        addSampleStorage("ERCIN", "Serum B", 12, 0.4);
+        addSampleStorage("KDCS", "S Water", 3, 0.9);
+        addSampleStorage("KDCS", "Cells", 10, 0.4);
+        addSampleStorage("KDCS", "Paxgene", 11, 0.8);
+        addSampleStorage("KDCS", "T Nails", null, null);
+        addSampleStorage("KDCS", "F Nails", null, null);
+        addSampleStorage("KDCS", "Z Urine", 3, 0.4);
+        addSampleStorage("KDCS", "Dialysate", 3, 0.4);
+        addSampleStorage("KDCS", "Hair", null, null);
+        addSampleStorage("KDCS", "Serum B", 8, 0.4);
+        addSampleStorage("KDCS", "Serum", null, null);
+        addSampleStorage("KDCS", "Plasma", 12, 0.4);
+        addSampleStorage("KDCS", "WBE", 4, 0.8);
+        addSampleStorage("KDCS", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("KDCS", "T Water", 3, 0.9);
+        addSampleStorage("KMS", "Plasma", 20, 0.1);
+        addSampleStorage("MPS", "Plasma", 3, 1.0);
+        addSampleStorage("NHS", "Cells", 10, 0.5);
+        addSampleStorage("NHS", "Serum", 16, 0.4);
+        addSampleStorage("NHS", "Plasma", 12, 0.4);
+        addSampleStorage("RVS", "Z Urine", 6, 0.9);
+        addSampleStorage("RVS", "Cells", 10, 0.5);
+        addSampleStorage("RVS", "Paxgene", 22, 0.8);
+        addSampleStorage("RVS", "Serum", 4, 0.4);
+        addSampleStorage("RVS", "Plasma", 16, 0.4);
+        addSampleStorage("TCKS", "Paxgene", 11, 0.8);
+        addSampleStorage("TCKS", "Cells", 10, 0.5);
+        addSampleStorage("TCKS", "T Nails", null, null);
+        addSampleStorage("TCKS", "F Nails", null, null);
+        addSampleStorage("TCKS", "Hair", null, null);
+        addSampleStorage("TCKS", "Z Urine", 3, 0.4);
+        addSampleStorage("TCKS", "Serum B", 8, 0.4);
+        addSampleStorage("TCKS", "Plasma", 12, 0.4);
+        addSampleStorage("TCKS", "WBE", 4, 0.8);
+        addSampleStorage("TCKS", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("VAS", "Cells", 10, 0.5);
+        addSampleStorage("VAS", "Paxgene", 11, 0.8);
+        addSampleStorage("VAS", "Serum B", 8, 0.4);
+        addSampleStorage("VAS", "Serum", null, null);
+        addSampleStorage("VAS", "Plasma", 12, 0.4);
+        addSampleStorage("VAS", "WBE", 4, 0.8);
+        addSampleStorage("VAS", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("CCCS", "WBE", 6, 0.9);
+        addSampleStorage("CCCS", "Z Urine", 6, 0.9);
+        addSampleStorage("CCCS", "C Urine", 6, 0.9);
+        addSampleStorage("CCCS", "Serum B", 6, 0.9);
+        addSampleStorage("CCCS", "Plasma", 6, 0.4);
+        addSampleStorage("SPARK", "Plasma", 5, 0.5);
+        addSampleStorage("SPARK", "C Urine", 5, 0.5);
+        addSampleStorage("SPARK", "WB DMSO", 1, 0.5);
+
         addPvAttr("AHFEM", "PBMC Count", "number");
         addPvAttr("AHFEM", "Worksheet", "text");
         addPvAttr("BBPSP", "Consent", "select_multiple",
@@ -255,11 +333,13 @@ public class CbsrStudies {
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,
-        String nameShort, String comment) throws Exception {
+        String nameShort, String activityStatus, String comment)
+        throws Exception {
         StudyWrapper study = new StudyWrapper(site.getAppService());
         study.setSite(site);
         study.setName(name);
         study.setNameShort(nameShort);
+        study.setActivityStatus(activityStatus);
         study.setComment(comment);
         study.persist();
         study.reload();
@@ -300,6 +380,28 @@ public class CbsrStudies {
         study.setSampleSourceCollection(list);
         study.persist();
         study.reload();
+    }
+
+    private static void addSampleStorage(String studyNameShort,
+        String sampleTypeName, Integer quantity, Double volume)
+        throws Exception {
+        StudyWrapper study = getStudy(studyNameShort);
+
+        SampleStorageWrapper ss = new SampleStorageWrapper(study
+            .getAppService());
+        ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
+        ss.setQuantity(quantity);
+        ss.setVolume(volume);
+
+        List<SampleStorageWrapper> list = study.getSampleStorageCollection();
+        if (list == null) {
+            list = new ArrayList<SampleStorageWrapper>();
+        }
+        list.add(ss);
+        study.setSampleStorageCollection(list);
+        study.persist();
+        study.reload();
+
     }
 
     private static void addPvAttr(String studyNameShort, String label,
