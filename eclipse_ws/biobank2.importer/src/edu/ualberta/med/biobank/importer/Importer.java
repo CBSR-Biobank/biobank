@@ -192,6 +192,7 @@ public class Importer {
                 getSampleTypeMap();
 
                 // importPatients();
+                // removeAllShipments();
                 importShipments();
                 // importPatientVisits();
                 // removeAllSamples();
@@ -475,7 +476,6 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            logger.trace("start");
             String patientNo = cipher.decode(rs.getBytes(1));
             if (patientNo.length() == 6) {
                 if (patientNo.substring(0, 2).equals("CE")) {
@@ -506,7 +506,6 @@ public class Importer {
                 continue;
             }
 
-            logger.trace("have study and clinic");
             // make sure the clinic and study are linked via a contact
             if (!study.hasClinic(clinicName)) {
                 logger.error("study " + study.getNameShort() + " for patient "
@@ -525,13 +524,13 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateReceived = cal.getTime();
 
-            logger.trace("getting patient");
             patient = study.getPatient(patientNo);
             // make sure patient is in the study
             if (patient == null) {
                 throw new Exception("patient not found in study: " + patientNo
                     + ",  " + studyNameShort);
             }
+
             logger.trace("getting shipment");
             shipment = clinic.getShipment(dateReceived);
             if (shipment == null) {
