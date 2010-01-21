@@ -36,12 +36,12 @@ public class QueryObject {
     public class Option {
         protected String name;
         protected Class<?> type;
-        protected Object defaultValue;
+        private Object defaultValue;
 
         public Option(String name, Class<?> type, Object defaultValue) {
             this.name = name;
             this.type = type;
-            this.defaultValue = defaultValue;
+            this.setDefaultValue(defaultValue);
         }
 
         public String getName() {
@@ -50,6 +50,14 @@ public class QueryObject {
 
         public Class<?> getType() {
             return type;
+        }
+
+        public void setDefaultValue(Object defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+
+        public Object getDefaultValue() {
+            return defaultValue;
         }
     }
 
@@ -95,14 +103,6 @@ public class QueryObject {
 
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
-
-        for (int i = 0; i < queryOptions.size(); i++) {
-            Option option = queryOptions.get(i);
-            if (params.get(i) == null)
-                params.set(i, option.defaultValue);
-            if (option.type.equals(String.class))
-                params.set(i, "%" + params.get(i) + "%");
-        }
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);

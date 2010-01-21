@@ -29,7 +29,7 @@ public class NewPVsByStudyClinic extends QueryObject {
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
-                params.set(i, option.defaultValue);
+                params.set(i, option.getDefaultValue());
             if (option.type.equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }

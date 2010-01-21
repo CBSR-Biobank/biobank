@@ -66,6 +66,7 @@ Export-Package: antlr;
  org.acegisecurity,
  org.acegisecurity.providers.rcp,
  org.apache.commons.collections,
+ org.apache.commons.collections.list,
  org.apache.commons.collections.map,
  org.apache.commons.lang,
  org.apache.commons.logging,

@@ -19,7 +19,7 @@ public class PatientVisitSummary extends QueryObject {
         + PatientVisit.class.getName()
         + " as pv where pv.patient = p and pv.shipment.clinic.id = c.clinic.id and p.study.site.id {3} {2} and pv.dateProcessed >= ? and pv.dateProcessed <= ?) {0} {1})";
 
-    private static String QUERY_STRING = "select s.name, c.clinic.name, "
+    private static String QUERY_STRING = "select s.nameShort, c.clinic.name, "
         + MessageFormat.format(PVCOUNT_STRING, "=", "1", "{0}", "{1}")
         + ", "
         + MessageFormat.format(PVCOUNT_STRING, "=", "2", "{0}", "{1}")
@@ -55,7 +55,7 @@ public class PatientVisitSummary extends QueryObject {
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
-                params.set(i, option.defaultValue);
+                params.set(i, option.getDefaultValue());
         }
         int size = params.size();
         for (int j = 0; j < 6; j++) {

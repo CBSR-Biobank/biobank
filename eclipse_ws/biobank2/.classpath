@@ -5,7 +5,8 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar" sourcepath="/home/delphine/tools/jasperreports-3.7.0/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/jdt-compiler-3.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar" sourcepath="C:/Users/aaron/Documents/jasperreports-3.7.0-project/jasperreports-3.7.0/src"/>
 	<classpathentry kind="lib" path="lib/commons-digester-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/iText-2.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.8.0.jar"/>
@@ -17,5 +18,10 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar"/>
 	<classpathentry kind="con" path="org.eclipse.tptp.platform.instrumentation.ui.ContainerInitializer/Build to Manage Libraries"/>
+	<classpathentry kind="lib" path="lib/DynamicJasper-3.0.14.jar" sourcepath="C:/Users/aaron/Favorites/Downloads/DynamicJasper-3.0.14-bundle/DynamicJasper-3.0.14-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/biobank2/lib/commons-lang-2.4.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

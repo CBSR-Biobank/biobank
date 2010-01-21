@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.reporting;
 
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,10 +9,10 @@ import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 
+import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
@@ -22,24 +23,48 @@ import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.ui.PlatformUI;
 
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
+
 public class ReportingUtils {
 
     public static JasperPrint createReport(String reportName,
-        Map<String, Object> parameters, List<?> list) throws Exception {
+        ArrayList<Object[]> params, ArrayList<Object> columnInfo, List<?> list)
+        throws Exception {
 
-        InputStream reportStream = ReportingUtils.class
-            .getResourceAsStream(reportName + ".jasper");
-        if (reportStream == null) {
-            throw new Exception("No report available with name " + reportName);
+        FastReportBuilder drb = new FastReportBuilder();
+        for (int i = 0; i < columnInfo.size(); i++) {
+            drb.addColumn((String) columnInfo.get(i),
+                (String) columnInfo.get(i), String.class, 40, false)
+                .setPrintBackgroundOnOddRows(true).setUseFullPageWidth(true);
         }
-        return JasperFillManager.fillReport(reportStream, parameters,
-            new JRBeanCollectionDataSource(list));
+
+        String paramString = "";
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+
+        for (int i = 0; i < params.size(); i++) {
+            paramString += params.get(i)[0] + " : " + params.get(i)[1] + "\n";
+        }
+        fields.put("title", reportName);
+        fields.put("infos", paramString);
+        drb.setTemplateFile(ReportingUtils.class.getResource(
+            "BasicReport.jrxml").getFile());
+
+        JRDataSource ds = new JRBeanCollectionDataSource(list);
+        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
+            new ClassicLayoutManager(), ds, fields);
+        return jp;
+
     }
 
     public static void printReport(String reportName,
-        Map<String, Object> parameters, List<?> list) throws Exception {
+        ArrayList<Object[]> params, ArrayList<Object> columnInfo, List<?> list)
+        throws Exception {
 
-        JasperPrint jasperPrint = createReport(reportName, parameters, list);
+        JasperPrint jasperPrint = createReport(reportName, params, columnInfo,
+            list);
 
         PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
@@ -91,10 +116,11 @@ public class ReportingUtils {
     }
 
     public static void saveReport(String reportName,
-        Map<String, Object> parameters, List<?> list, String fileName)
-        throws Exception {
+        ArrayList<Object[]> params, ArrayList<Object> columnInfo, List<?> list,
+        String fileName) throws Exception {
 
-        JasperPrint jasperPrint = createReport(reportName, parameters, list);
+        JasperPrint jasperPrint = createReport(reportName, params, columnInfo,
+            list);
         JasperExportManager.exportReportToPdfFile(jasperPrint, fileName);
     }
 }

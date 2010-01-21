@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.views;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -188,6 +187,13 @@ public class ReportsView extends ViewPart {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        ArrayList<Object> params = getParams();
+
+        return currentQuery
+            .executeQuery(SessionManager.getAppService(), params);
+    }
+
+    private ArrayList<Object> getParams() {
         ArrayList<Object> params = new ArrayList<Object>();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof Text)
@@ -203,8 +209,16 @@ public class ReportsView extends ViewPart {
             } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
         }
-        return currentQuery
-            .executeQuery(SessionManager.getAppService(), params);
+        List<Option> queryOptions = currentQuery.getOptions();
+        for (int i = 0; i < queryOptions.size(); i++) {
+            Option option = queryOptions.get(i);
+            if (params.get(i) == null)
+                params.set(i, option.getDefaultValue());
+            if (option.getType().equals(String.class))
+                params.set(i, "%" + params.get(i) + "%");
+        }
+
+        return params;
     }
 
     public void comboChanged() {
@@ -340,21 +354,34 @@ public class ReportsView extends ViewPart {
             .getActiveWorkbenchWindow().getShell(), "Confirm",
             "Print table contents?");
         if (doPrint) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("title", "Patient visit counts by clinic");
-            map.put("start", new Date());
-            map.put("end", new Date());
-            List<CBSRReportCollection> cbsrCollections = new ArrayList<CBSRReportCollection>();
-            for (Object objects : searchTable.getCollection()) {
-                cbsrCollections.add(new CBSRReportCollection(Arrays
-                    .asList((Object[]) objects)));
+            ArrayList<Object[]> params = new ArrayList<Object[]>();
+            ArrayList<Object> paramVals = getParams();
+            List<Option> queryOptions = currentQuery.getOptions();
+            int i = 0;
+            for (Option option : queryOptions) {
+                params.add(new Object[] { option.getName(), paramVals.get(i) });
+                i++;
+            }
+            ArrayList<Object> columnInfo = new ArrayList<Object>();
+            String[] names = currentQuery.getColumnNames();
+            for (int i1 = 0; i1 < names.length; i1++) {
+                columnInfo.add(names[i1]);
             }
 
-            ReportingUtils.printReport(currentQuery.toString(), map,
-                cbsrCollections);
+            List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
+            for (Object object : searchTable.getCollection()) {
+                Map<String, String> map = new HashMap<String, String>();
+                for (int j = 0; j < columnInfo.size(); j++) {
+                    map.put((String) columnInfo.get(j),
+                        (((Object[]) object)[j]).toString());
+                }
+                listData.add(map);
+            }
+
+            ReportingUtils.printReport(currentQuery.toString(), params,
+                columnInfo, listData);
             return true;
         }
         return false;
     }
-
 }
