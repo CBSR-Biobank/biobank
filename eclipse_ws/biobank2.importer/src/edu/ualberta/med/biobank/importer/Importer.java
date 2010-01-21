@@ -193,8 +193,8 @@ public class Importer {
 
                 // importPatients();
                 // removeAllShipments();
-                importShipments();
-                // importPatientVisits();
+                // importShipments();
+                importPatientVisits();
                 // removeAllSamples();
                 // importCabinetSamples();
                 // importFreezerSamples();
@@ -242,8 +242,8 @@ public class Importer {
 
         importPatients();
         importShipments();
-        importPatientVisits();
 
+        // importPatientVisits();
         // importCabinetSamples();
         // importFreezerSamples();
 
@@ -990,7 +990,7 @@ public class Importer {
                     + "and freezer.visit_nr=patient_visit.visit_nr "
                     + "and freezer.patient_nr=patient_visit.patient_nr "
                     + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
-                    + "where frz_inv_id_cnt.cnt=1 and freezer.fnum = ? and freezer.rack= ?"
+                    + "where freezer.fnum = ? and freezer.rack= ?"
                     + "order by freezer.box, freezer.cell");
             ps.setInt(1, bbpdbHotelLabel.freerzerId);
             ps.setString(2, bbpdbHotelLabel.hotelLabel);

@@ -13,9 +13,9 @@ public class CbsrContainers {
         createFreezer03(site);
         createFreezer04(site);
         createFreezer05(site);
-        // createSentSamplesFreezer(site);
+        createSentSamplesFreezer(site);
         createCabinet01(site);
-        // createCabinet02(site);
+        createCabinet02(site);
     }
 
     private static void createFreezer01(SiteWrapper site) throws Exception {

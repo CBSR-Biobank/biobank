@@ -149,7 +149,6 @@ public class CbsrContainerTypes {
         ct.setSite(site);
         ct.setRowCapacity(rows);
         ct.setColCapacity(cols);
-        ct.setActivityStatus("Active");
         ct.setChildLabelingScheme(childLabelingScheme);
 
         if (children != null) {
