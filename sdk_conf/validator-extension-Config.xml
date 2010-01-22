@@ -6,15 +6,9 @@
 	<bean name="ValidatorModelExtension" class="gov.nih.nci.codegen.validator.ValidatorModel">
 		<constructor-arg>
 			<map>
-				<!--
-					The following is provided as an example. Replace with your own
-					validation contraints
-				-->
-				<entry
-					key="edu.ualberta.med.biobank.model.Study">
+				<entry key="edu.ualberta.med.biobank.model.Study">
 					<bean class="gov.nih.nci.codegen.validator.ValidatorClass">
-						<constructor-arg
-							value="edu.ualberta.med.biobank.model.Study" />
+						<constructor-arg value="edu.ualberta.med.biobank.model.Study" />
 						<constructor-arg index="1">
 							<map>
 								<entry key="name">
@@ -24,17 +18,35 @@
 											<list>
 												<bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
 													<constructor-arg value="org.hibernate.validator.NotNull" />
+													<constructor-arg index="1">
+														<map>
+															<entry key="message">
+																<value>"Name of study should not be null"</value>
+															</entry>
+														</map>
+													</constructor-arg>
 												</bean>
 											</list>
 										</constructor-arg>
 									</bean>
 								</entry>
-
+								<entry key="nameShort">
+									<bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+										<constructor-arg value="nameShort" />
+										<constructor-arg index="1">
+											<list>
+												<bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+													<constructor-arg value="org.hibernate.validator.NotNull" />
+												</bean>
+											</list>
+										</constructor-arg>
+									</bean>
+								</entry>
 							</map>
 						</constructor-arg>
 						<constructor-arg index="2">
-							<list/>
-						</constructor-arg>	
+							<list />
+						</constructor-arg>
 					</bean>
 				</entry>
 			</map>
