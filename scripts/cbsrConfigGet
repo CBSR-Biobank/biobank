@@ -7,7 +7,7 @@ E_BADARGS=85
 
 if [ $# -ne $ARGS ]  # Correct number of arguments passed to script?
 then
-  echo "Usage: `basename $0` USER HOST PWD DBNAME OUTFILE"
+  echo "Usage: `basename $0` HOST USER PWD DBNAME OUTFILE"
   exit $E_BADARGS
 fi
 
@@ -19,16 +19,18 @@ PWD=$3
 DBNAME=$4
 OUTPUT=$5
 
-echo "" > $OUTPUT
+echo "$*" > $OUTPUT
+echo "" >> $OUTPUT
+echo "---------------------" >> $OUTPUT
+echo "" >> $OUTPUT
 
 function mysqlCsv {
-    echo "parms: $*"
-    $MYSQL -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $OUTPUT
+    #echo "parms: $*"
+    $MYSQL -h$HOST -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $OUTPUT
 }
 
-QUERIES[0]="select clinic.name, clinic.activity_status, clinic.comment,
-address.street1, address.street2, address.city, address.province,
-address.postal_code from clinic join address on address.id=clinic.address_id
+QUERIES[0]="select name, activity_status, comment, street1, street2, city,
+province, postal_code from clinic join address on address.id=clinic.address_id
 order by clinic.name"
 
 QUERIES[1]="select clinic.name, contact.name, contact.title,

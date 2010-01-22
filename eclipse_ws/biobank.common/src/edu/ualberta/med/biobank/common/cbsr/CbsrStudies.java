@@ -64,7 +64,7 @@ public class CbsrStudies {
         addStudy(site,
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
-            "ERCIN", "Active", "Precath visit - only urine is collected");
+            "ERCIN", "Disabled", "Precath visit - only urine is collected");
         addStudy(site, "Kidney Disease Cohort Study", "KDCS", "Active", null);
         addStudy(site, "Kingston Merger Study", "KMS", "Active", null);
         addStudy(site, "Man-Chui Poon Study", "MPS", "Active", null);

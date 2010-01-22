@@ -13,9 +13,9 @@ public class CbsrContainers {
         createFreezer03(site);
         createFreezer04(site);
         createFreezer05(site);
-        // createSentSamplesFreezer(site);
+        createSentSamplesFreezer(site);
         createCabinet01(site);
-        // createCabinet02(site);
+        createCabinet02(site);
     }
 
     private static void createFreezer01(SiteWrapper site) throws Exception {
@@ -97,7 +97,7 @@ public class CbsrContainers {
             for (int col = 0; col < 6; ++col) {
                 hotel = addContainer(site, hotelType, freezer04, row, col);
 
-                for (int j = 0; j < 10; ++j) {
+                for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
                     addContainer(site, palletType, hotel, j, 0);
                 }
             }
@@ -119,7 +119,8 @@ public class CbsrContainers {
             h19Type, h19Type, h19Type, h19Type, h13Type, h13Type, h13Type,
             h13Type, h19Type, h19Type, h19Type, h19Type, h19Type, h19Type,
             h19Type, h19Type, h19Type, h19Type, h19Type, h19Type, h13Type,
-            h13Type, h13Type, h13Type };
+            h13Type, h13Type, h13Type, h19Type, h19Type, h19Type, h19Type,
+            h13Type, h13Type, h13Type, h13Type };
 
         RowColPos pos = new RowColPos();
         int count = 0;
@@ -129,9 +130,7 @@ public class CbsrContainers {
             hotel = addContainer(site, hotelType, freezer05, pos.row, pos.col);
 
             for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
-                if ((pos.row == 0) && (pos.col == 0)) {
-                    addContainer(site, palletType, hotel, j, 0);
-                }
+                addContainer(site, palletType, hotel, j, 0);
             }
             ++count;
         }
@@ -155,14 +154,12 @@ public class CbsrContainers {
         RowColPos pos = new RowColPos();
         int count = 0;
         for (ContainerTypeWrapper hotelType : hotelTypes) {
-            pos.row = count % 6;
-            pos.col = count / 6;
+            pos.row = count % 4;
+            pos.col = count / 4;
             hotel = addContainer(site, hotelType, freezer05, pos.row, pos.col);
 
             for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
-                if ((pos.row == 0) && (pos.col == 0)) {
-                    addContainer(site, palletType, hotel, j, 0);
-                }
+                addContainer(site, palletType, hotel, j, 0);
             }
             ++count;
         }

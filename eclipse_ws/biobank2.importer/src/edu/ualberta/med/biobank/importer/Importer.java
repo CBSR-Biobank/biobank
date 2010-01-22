@@ -169,7 +169,7 @@ public class Importer {
 
             String[] reqdTables = { "clinics", "study_list", "patient",
                 "patient_visit", "cabinet", "freezer", "sample_list",
-                "frz_inv_id_cnt" };
+                "frz_99_inv_id" };
 
             for (String table : reqdTables) {
                 if (!tableExists(table))
@@ -193,11 +193,11 @@ public class Importer {
 
                 // importPatients();
                 // removeAllShipments();
-                importShipments();
+                // importShipments();
                 // importPatientVisits();
-                // removeAllSamples();
-                // importCabinetSamples();
-                // importFreezerSamples();
+                removeAllSamples();
+                importFreezerSamples();
+                importCabinetSamples();
             }
 
             logger.info("import complete");
@@ -242,8 +242,8 @@ public class Importer {
 
         importPatients();
         importShipments();
-        importPatientVisits();
 
+        // importPatientVisits();
         // importCabinetSamples();
         // importFreezerSamples();
 
@@ -527,8 +527,9 @@ public class Importer {
             patient = study.getPatient(patientNo);
             // make sure patient is in the study
             if (patient == null) {
-                throw new Exception("patient not found in study: " + patientNo
-                    + ",  " + studyNameShort);
+                logger.error("patient not found in study: " + patientNo + ",  "
+                    + studyNameShort);
+                continue;
             }
 
             logger.trace("getting shipment");
@@ -907,20 +908,22 @@ public class Importer {
     private static void importFreezerSamples() throws Exception {
         logger.debug("importing freezer samples ...");
 
-        ContainerWrapper[] freezers = new ContainerWrapper[] { null, null,
-            null, null, null, null };
+        Map<Integer, ContainerWrapper> freezersMap = new HashMap<Integer, ContainerWrapper>();
 
         for (ContainerWrapper container : cbsrSite.getTopContainerCollection()) {
             String label = container.getLabel();
             String typeNameShort = container.getContainerType().getNameShort();
             if (label.equals("01") && typeNameShort.equals("F3x10")) {
-                freezers[1] = container;
+                freezersMap.put(1, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
-                freezers[3] = container;
+                freezersMap.put(3, container);
             } else if (label.equals("04") && typeNameShort.equals("F3x6")) {
-                freezers[4] = container;
+                freezersMap.put(4, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
-                freezers[5] = container;
+                freezersMap.put(5, container);
+            } else if (label.equals("Sent Samples")
+                && typeNameShort.equals("F4x6")) {
+                freezersMap.put(99, container);
             }
         }
 
@@ -966,26 +969,46 @@ public class Importer {
         Set<FreezerHotelLabel> hotelLabels = new LinkedHashSet<FreezerHotelLabel>();
         while (rs.next()) {
             int fId = rs.getInt(1);
-            if ((fId < freezers.length) && (freezers[fId] != null)) {
+            if (freezersMap.get(fId) != null) {
                 hotelLabels.add(new FreezerHotelLabel(fId, rs.getString(2)));
             }
         }
 
         for (FreezerHotelLabel bbpdbHotelLabel : hotelLabels) {
-            PreparedStatement ps = con
-                .prepareStatement("select patient_visit.date_received, "
-                    + "patient_visit.date_taken, study_list.study_name_short, "
-                    + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
-                    + "from freezer "
-                    + "join frz_inv_id_cnt on freezer.inventory_id=frz_inv_id_cnt.inventory_id "
-                    + "join study_list on freezer.study_nr=study_list.study_nr "
-                    + "join patient on patient.patient_nr=freezer.patient_nr "
-                    + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
-                    + "and freezer.visit_nr=patient_visit.visit_nr "
-                    + "and freezer.patient_nr=patient_visit.patient_nr "
-                    + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
-                    + "where frz_inv_id_cnt.cnt=1 and freezer.fnum = ? and freezer.rack= ?"
-                    + "order by freezer.box, freezer.cell");
+            PreparedStatement ps;
+            if (bbpdbHotelLabel.freerzerId != 99) {
+                ps = con
+                    .prepareStatement("select patient_visit.date_received, "
+                        + "patient_visit.date_taken, study_list.study_name_short, "
+                        + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
+                        + "from freezer "
+                        + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
+                        + "join study_list on freezer.study_nr=study_list.study_nr "
+                        + "join patient on patient.patient_nr=freezer.patient_nr "
+                        + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
+                        + "and freezer.visit_nr=patient_visit.visit_nr "
+                        + "and freezer.patient_nr=patient_visit.patient_nr "
+                        + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
+                        + "where freezer.fnum = ? and freezer.rack= ? "
+                        + "and frz_99_inv_id.inventory_id is null "
+                        + "order by freezer.box, freezer.cell");
+            } else {
+                // freezer 99
+                ps = con
+                    .prepareStatement("select patient_visit.date_received, "
+                        + "patient_visit.date_taken, study_list.study_name_short, "
+                        + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
+                        + "from freezer "
+                        + "join study_list on freezer.study_nr=study_list.study_nr "
+                        + "join patient on patient.patient_nr=freezer.patient_nr "
+                        + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
+                        + "and freezer.visit_nr=patient_visit.visit_nr "
+                        + "and freezer.patient_nr=patient_visit.patient_nr "
+                        + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
+                        + "where freezer.fnum = ? and freezer.rack= ? "
+                        + "order by freezer.box, freezer.cell");
+
+            }
             ps.setInt(1, bbpdbHotelLabel.freerzerId);
             ps.setString(2, bbpdbHotelLabel.hotelLabel);
 
@@ -1002,13 +1025,13 @@ public class Importer {
                 freezerNum = rs.getInt(5);
                 hotelLabel = rs.getString(6);
 
-                if (freezers[freezerNum] == null) {
+                freezer = freezersMap.get(freezerNum);
+                if (freezer == null) {
                     logger.debug("Ignoring samples for freezer number "
                         + freezerNum);
                     continue;
                 }
 
-                freezer = freezers[freezerNum];
                 freezerType = freezer.getContainerType();
                 hotelPos = LabelingScheme.cbsrTwoCharToRowCol(hotelLabel,
                     freezer.getRowCapacity(), freezer.getColCapacity(),
@@ -1058,7 +1081,8 @@ public class Importer {
                 visit = patient.getVisit(dateProcessed);
 
                 if (visit == null) {
-                    logger.error("patient visit not found for date: "
+                    logger.error("patient " + patientNo
+                        + ", visit not found for date "
                         + dateProcessed.toString());
                     continue;
                 }
