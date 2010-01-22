@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-dependency-check="none"
+	default-autowire="no">
+
+	<bean name="ValidatorModelExtension" class="gov.nih.nci.codegen.validator.ValidatorModel">
+		<constructor-arg>
+			<map>
+				<!--
+					The following is provided as an example. Replace with your own
+					validation contraints
+				-->
+				<entry
+					key="edu.ualberta.med.biobank.model.Study">
+					<bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+						<constructor-arg
+							value="edu.ualberta.med.biobank.model.Study" />
+						<constructor-arg index="1">
+							<map>
+								<entry key="name">
+									<bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+										<constructor-arg value="name" />
+										<constructor-arg index="1">
+											<list>
+												<bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+													<constructor-arg value="org.hibernate.validator.NotNull" />
+												</bean>
+											</list>
+										</constructor-arg>
+									</bean>
+								</entry>
+
+							</map>
+						</constructor-arg>
+						<constructor-arg index="2">
+							<list/>
+						</constructor-arg>	
+					</bean>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+</beans>
