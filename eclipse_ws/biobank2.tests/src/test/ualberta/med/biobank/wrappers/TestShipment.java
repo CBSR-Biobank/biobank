@@ -193,8 +193,7 @@ public class TestShipment extends TestDatabase {
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.setPatientCollection(Arrays.asList(patient1, patient2,
-            patient3));
+        shipment.addPatients(patient1, patient2, patient3);
         shipment.persist();
 
         shipment.reload();
@@ -231,8 +230,7 @@ public class TestShipment extends TestDatabase {
             study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.setPatientCollection(Arrays.asList(patient1, patient2,
-            patient3));
+        shipment.addPatients(patient1, patient2, patient3);
         shipment.persist();
 
         shipment.reload();
@@ -260,11 +258,9 @@ public class TestShipment extends TestDatabase {
             firstPatient);
         shipment.reload();
 
-        List<PatientWrapper> patients = shipment.getPatientCollection();
         PatientWrapper patient = PatientHelper.addPatient(name + "NewPatient",
             study);
-        patients.add(patient);
-        shipment.setPatientCollection(patients);
+        shipment.addPatients(patient);
         shipment.persist();
 
         shipment.reload();
@@ -287,10 +283,9 @@ public class TestShipment extends TestDatabase {
             patient2);
         shipment.reload();
 
-        List<PatientWrapper> patients = shipment.getPatientCollection();
-        PatientWrapper patient = DbHelper.chooseRandomlyInList(patients);
-        patients.remove(patient);
-        shipment.setPatientCollection(patients);
+        PatientWrapper patient = DbHelper.chooseRandomlyInList(shipment
+            .getPatientCollection());
+        shipment.removePatients(patient);
         shipment.persist();
 
         shipment.reload();

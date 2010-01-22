@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.helpers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -131,8 +130,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             shipment.setDateReceived(DateFormatter.parseToDateTime(dateStr));
             shipment.setWaybill(r.nextInt(2000) + getRandomString(10));
             shipment.setClinic(clinic);
-            shipment.setPatientCollection(Arrays
-                .asList(new PatientWrapper[] { patient }));
+            shipment.addPatients(patient);
             shipment.setShippingCompany(shippingCompaniesList.get(r
                 .nextInt(numShippingCompanies)));
             shipment.persist();
