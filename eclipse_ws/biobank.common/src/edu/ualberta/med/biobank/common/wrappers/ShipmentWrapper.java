@@ -377,22 +377,6 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     /**
-     * Search a patient in patients list with the given patient number
-     */
-    public PatientWrapper getPatient(String patientNumber) throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select patients from "
-            + Shipment.class.getName()
-            + " as shipment inner join shipment.patientCollection as patients"
-            + " where shipment.id = ? and patients.pnumber = ?", Arrays
-            .asList(new Object[] { getId(), patientNumber }));
-        List<Patient> patients = appService.query(criteria);
-        if (patients.size() >= 1) {
-            return new PatientWrapper(appService, patients.get(0));
-        }
-        return null;
-    }
-
-    /**
      */
     public boolean hasPatient(String patientNumber) throws Exception {
         HQLCriteria criteria = new HQLCriteria(

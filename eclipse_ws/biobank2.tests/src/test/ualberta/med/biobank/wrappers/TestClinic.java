@@ -2,6 +2,7 @@ package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -548,4 +549,105 @@ public class TestClinic extends TestDatabase {
         Assert.assertTrue(clinic2.compareTo(clinic1) < 0);
     }
 
+    @Test
+    public void testGetContact() throws Exception {
+        String name = "testGetContact" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact1 = ContactHelper.addContact(clinic, name);
+        String name1 = contact1.getName();
+        ContactWrapper contact2 = ContactHelper.addContact(clinic, name);
+        String name2 = contact2.getName();
+        clinic.reload();
+
+        Assert.assertEquals(contact1, clinic.getContact(name1));
+        Assert.assertEquals(contact2, clinic.getContact(name2));
+        Assert.assertNull(clinic.getContact(name + " **"));
+    }
+
+    @Test
+    public void testGetShipmentWithDate() throws Exception {
+        String name = "testGetShipmentWithDate" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        study.setContactCollection(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+
+        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
+            + "_2");
+        study2.setContactCollection(Arrays.asList(contact));
+        study2.persist();
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
+
+        ShipmentWrapper shipment1 = ShipmentHelper
+            .addShipment(clinic, patient1);
+        Date date1 = shipment1.getDateReceived();
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipment(clinic, patient2);
+        Date date2 = shipment2.getDateReceived();
+
+        clinic.reload();
+
+        ShipmentWrapper shipFound = clinic.getShipment(date1);
+        Assert.assertEquals(shipment1, shipFound);
+        Assert.assertFalse(shipment2.equals(shipFound));
+
+        shipFound = clinic.getShipment(date2);
+        Assert.assertEquals(shipment2, shipFound);
+        Assert.assertFalse(shipment1.equals(shipFound));
+
+        shipFound = clinic.getShipment(new Date());
+        Assert.assertNull(shipFound);
+    }
+
+    @Test
+    public void testGetShipmentWithDateAndPatient() throws Exception {
+        String name = "testGetShipmentWithDateAndPatient" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        study.setContactCollection(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+
+        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
+            + "_2");
+        study2.setContactCollection(Arrays.asList(contact));
+        study2.persist();
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic,
+            patient1, patient2);
+        Date date1 = shipment1.getDateReceived();
+        ShipmentWrapper shipment2 = ShipmentHelper
+            .addShipment(clinic, patient2);
+        Date date2 = shipment2.getDateReceived();
+
+        clinic.reload();
+
+        ShipmentWrapper shipFound = clinic.getShipment(date1, patient1
+            .getPnumber());
+        Assert.assertEquals(shipment1, shipFound);
+        Assert.assertFalse(shipment2.equals(shipFound));
+
+        shipFound = clinic.getShipment(date1, patient2.getPnumber());
+        Assert.assertEquals(shipment1, shipFound);
+        Assert.assertFalse(shipment2.equals(shipFound));
+
+        shipFound = clinic.getShipment(date2, patient2.getPnumber());
+        Assert.assertEquals(shipment2, shipFound);
+        Assert.assertFalse(shipment1.equals(shipFound));
+
+        shipFound = clinic.getShipment(date2, patient1.getPnumber());
+        Assert.assertNull(shipFound);
+
+        shipFound = clinic.getShipment(new Date(), patient1.getPnumber());
+        Assert.assertNull(shipFound);
+    }
 }
