@@ -3,11 +3,10 @@
 
 alter table patient add dec_chr_nr varchar(32);
 
-CREATE TABLE FRZ_INV_ID_CNT (
+CREATE TABLE FRZ_99_INV_ID (
        INVENTORY_ID varchar(255),
-       CNT int unsigned not null,
        index(INVENTORY_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO FRZ_INV_ID_CNT (INVENTORY_ID, CNT)
-SELECT inventory_id, count(*) AS cnt FROM freezer GROUP BY inventory_id;
+INSERT INTO FRZ_99_INV_ID (INVENTORY_ID)
+SELECT distinct inventory_id FROM freezer where fnum=99 and inventory_id is not null;
