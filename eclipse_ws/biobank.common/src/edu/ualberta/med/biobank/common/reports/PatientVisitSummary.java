@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitSummary extends QueryObject {
-    private static String PVCOUNT_STRING = "(select count(p.id) from edu.ualberta.med.biobank.model.Patient p where p.study.site.id {0} {01} and p.patientVisitCollection.dateProcessed >= ? and p.patientVisitCollection.dateProcessed <= ? group by p.id having size(p.patientVisitCollection) {0} {1})";
+    private static String PVCOUNT_STRING = "(select count(*) from "
+        + Patient.class.getName() + " as p where (select count(*) from pv"
+        + " where pv.patient = p) {0} {1})";
 
     private static String QUERY_STRING = "select pv.patient.study.nameShort, pv.shipment.clinic.name, "
         + MessageFormat.format(PVCOUNT_STRING, "=", "1")
