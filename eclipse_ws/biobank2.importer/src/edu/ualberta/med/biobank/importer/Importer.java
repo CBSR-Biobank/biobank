@@ -197,7 +197,7 @@ public class Importer {
                 // importPatientVisits();
                 removeAllSamples();
                 importFreezerSamples();
-                importCabinetSamples();
+                // importCabinetSamples();
             }
 
             logger.info("import complete");
@@ -243,7 +243,7 @@ public class Importer {
         importPatients();
         importShipments();
 
-        // importPatientVisits();
+        importPatientVisits();
         // importCabinetSamples();
         // importFreezerSamples();
 
@@ -393,7 +393,11 @@ public class Importer {
             String patientNo = cipher.decode(rs.getBytes(2));
 
             if (patientNo.length() == 6) {
-                studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+                if (patientNo.substring(0, 2).equals("CE")) {
+                    studyNameShort = "CEGIIR";
+                } else {
+                    studyNameShort = getStudyShortNameFromPatientNr(patientNo);
+                }
             } else {
                 studyNameShort = rs.getString(6);
             }
@@ -651,8 +655,9 @@ public class Importer {
             patient = study.getPatient(patientNo);
             // make sure patient is in the study
             if (patient == null) {
-                throw new Exception("patient not found in study: " + patientNo
-                    + ",  " + studyNameShort);
+                logger.error("patient not found in study: " + patientNo + ",  "
+                    + studyNameShort);
+                continue;
             }
             patient.reload();
 
@@ -780,6 +785,7 @@ public class Importer {
         String studyNameShort;
         PatientWrapper patient;
         PatientVisitWrapper visit;
+        List<PatientVisitWrapper> visits;
         String dateProcessedStr;
         Date dateProcessed;
         SampleTypeWrapper sampleType;
@@ -833,8 +839,9 @@ public class Importer {
             drawerNum = pos.row;
 
             if (drawerNum > 4) {
-                throw new Exception("invalid drawer number \"" + drawerNum
+                logger.error("invalid drawer number \"" + drawerNum
                     + "\" for visit number " + rs.getInt(1));
+                continue;
             }
 
             binNum = rs.getInt(8) - 1;
@@ -849,8 +856,9 @@ public class Importer {
             studyNameShort = rs.getString(4);
             study = getStudyFromOldShortName(studyNameShort);
             if (!patient.getStudy().equals(study)) {
-                throw new Exception("patient and study do not match: "
+                logger.error("patient and study do not match: "
                     + patient.getPnumber() + ",  " + studyNameShort);
+                continue;
             }
 
             dateProcessedStr = rs.getString(2);
@@ -861,13 +869,21 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateProcessed = cal.getTime();
 
-            visit = patient.getVisit(dateProcessed);
+            // always get the first visit
+            visits = patient.getVisit(dateProcessed);
 
-            if (visit == null) {
+            if (visits.size() == 0) {
                 logger.error("patient " + patientNo
-                    + " visit not found for date: " + dateProcessed.toString());
+                    + ", visit not found for date "
+                    + dateTimeFormatter.format(dateProcessed));
                 continue;
+            } else if (visits.size() > 1) {
+                logger.info("patient " + patientNo
+                    + ", multiple visits for date "
+                    + dateTimeFormatter.format(dateProcessed));
             }
+
+            visit = visits.get(0);
 
             sampleTypeNameShort = rs.getString(5);
             drawer = cabinets[cabinetNum].getChild(pos.row, 0);
@@ -914,16 +930,16 @@ public class Importer {
             String label = container.getLabel();
             String typeNameShort = container.getContainerType().getNameShort();
             if (label.equals("01") && typeNameShort.equals("F3x10")) {
-                freezersMap.put(1, container);
+                // freezersMap.put(1, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
-                freezersMap.put(3, container);
+                // freezersMap.put(3, container);
             } else if (label.equals("04") && typeNameShort.equals("F3x6")) {
-                freezersMap.put(4, container);
+                // freezersMap.put(4, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
                 freezersMap.put(5, container);
             } else if (label.equals("Sent Samples")
                 && typeNameShort.equals("F4x6")) {
-                freezersMap.put(99, container);
+                // freezersMap.put(99, container);
             }
         }
 
@@ -934,6 +950,7 @@ public class Importer {
         ContainerWrapper pallet;
         PatientWrapper patient;
         PatientVisitWrapper visit;
+        List<PatientVisitWrapper> visits;
         SampleTypeWrapper sampleType;
         RowColPos hotelPos;
         int palletNum;
@@ -1078,14 +1095,20 @@ public class Importer {
                 cal.set(Calendar.SECOND, 0);
                 dateProcessed = cal.getTime();
 
-                visit = patient.getVisit(dateProcessed);
+                visits = patient.getVisit(dateProcessed);
 
-                if (visit == null) {
+                if (visits.size() == 0) {
                     logger.error("patient " + patientNo
                         + ", visit not found for date "
-                        + dateProcessed.toString());
+                        + dateTimeFormatter.format(dateProcessed));
                     continue;
+                } else if (visits.size() > 1) {
+                    logger.info("patient " + patientNo
+                        + ", multiple visits for date "
+                        + dateTimeFormatter.format(dateProcessed));
                 }
+
+                visit = visits.get(0);
 
                 sampleTypeNameShort = rs.getString(4);
                 if (sampleTypeNameShort.equals("RNA Later")) {
