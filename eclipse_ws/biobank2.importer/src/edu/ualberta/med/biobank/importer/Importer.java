@@ -189,7 +189,7 @@ public class Importer {
                 initStudiesMap();
                 initContainerTypesMap();
                 initTopContainersMap();
-                importSampleTypes();
+                checkSampleTypes();
 
                 // importPatients();
                 // removeAllShipments();
@@ -239,7 +239,7 @@ public class Importer {
         initContainerTypesMap();
         initTopContainersMap();
 
-        importSampleTypes();
+        checkSampleTypes();
         importPatients();
         importShipments();
         importPatientVisits();
@@ -286,7 +286,7 @@ public class Importer {
         }
     }
 
-    public static void importSampleTypes() throws Exception {
+    public static void checkSampleTypes() throws Exception {
         Statement s = con.createStatement();
         s.execute("select sample_name, sample_name_short from sample_list");
         ResultSet rs = s.getResultSet();
@@ -310,18 +310,22 @@ public class Importer {
         }
 
         // add missing sample types
+        int missing = 0;
         for (String nameShort : bbpdbSampleTypeMap.keySet()) {
             if ((sampleTypeMap.get(nameShort) != null)
                 || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
                 || nameShort.equals("CDPA Plas"))
                 continue;
 
-            logger.info("adding sample type: " + nameShort);
-            SampleTypeWrapper sampleType = new SampleTypeWrapper(appService);
-            sampleType.setNameShort(nameShort);
-            sampleType.setName(bbpdbSampleTypeMap.get(nameShort));
-            sampleType.setSite((SiteWrapper) null);
-            sampleType.persist();
+            logger.error("missing sample type: \""
+                + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
+                + "\"");
+            ++missing;
+        }
+
+        if (missing > 0) {
+            throw new Exception("There are missing sample types. "
+                + "Container sample types require adjustments.");
         }
     }
 
@@ -468,6 +472,36 @@ public class Importer {
         }
     }
 
+    private static String getStudyNameShort(String patientNr,
+        String defaultStudyNameShort) throws Exception {
+        String studyNameShort;
+        if (patientNr.length() == 6) {
+            if (patientNr.substring(0, 2).equals("CE")) {
+                studyNameShort = "CEGIIR";
+            } else {
+                studyNameShort = getStudyShortNameFromPatientNr(patientNr);
+            }
+        } else {
+            studyNameShort = defaultStudyNameShort;
+        }
+        return studyNameShort;
+    }
+
+    private static String getClinicName(String patientNr,
+        String defaultClinicName) throws Exception {
+        String clinicName;
+        if (patientNr.length() == 6) {
+            if (patientNr.substring(0, 2).equals("CE")) {
+                clinicName = "ED1";
+            } else {
+                clinicName = getClinicNameFromPatientNr(patientNr);
+            }
+        } else {
+            clinicName = defaultClinicName;
+        }
+        return clinicName;
+    }
+
     private static void importShipments() throws Exception {
         String studyNameShort;
         StudyWrapper study;
@@ -505,22 +539,19 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            String patientNo = cipher.decode(rs.getBytes(1));
-            if (patientNo.length() == 6) {
-                if (patientNo.substring(0, 2).equals("CE")) {
-                    studyNameShort = "CEGIIR";
-                    clinicName = "ED1";
-                } else {
-                    studyNameShort = getStudyShortNameFromPatientNr(patientNo);
-                    clinicName = getClinicNameFromPatientNr(patientNo);
-                }
-            } else {
-                studyNameShort = rs.getString(2);
-                clinicName = rs.getString(3);
+            String patientNr = cipher.decode(rs.getBytes(1));
+            studyNameShort = getStudyNameShort(patientNr, rs.getString(2));
+            clinicName = getClinicName(patientNr, rs.getString(3))
+                .toUpperCase();
+
+            if (studyNameShort == null) {
+                logger.error("no study for patient " + patientNr);
+                ++count;
+                continue;
             }
 
             if (clinicName == null) {
-                logger.error("no clinic for patient " + patientNo);
+                logger.error("no clinic for patient " + patientNr);
                 ++count;
                 continue;
             }
@@ -530,7 +561,7 @@ public class Importer {
             clinic = clinicsMap.get(clinicName);
             if (clinic == null) {
                 logger.error("no clinic \"" + clinicName + "\" for patient "
-                    + patientNo);
+                    + patientNr);
                 ++count;
                 continue;
             }
@@ -538,7 +569,7 @@ public class Importer {
             // make sure the clinic and study are linked via a contact
             if (!study.hasClinic(clinicName)) {
                 logger.error("study " + study.getNameShort() + " for patient "
-                    + patientNo + " is not linked to clinic "
+                    + patientNr + " is not linked to clinic "
                     + clinic.getName() + " via a contact");
                 ++count;
                 continue;
@@ -553,10 +584,10 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateReceived = cal.getTime();
 
-            patient = study.getPatient(patientNo);
+            patient = study.getPatient(patientNr);
             // make sure patient is in the study
             if (patient == null) {
-                logger.error("patient not found in study: " + patientNo + ",  "
+                logger.error("patient not found in study: " + patientNr + ",  "
                     + studyNameShort);
                 continue;
             }
@@ -576,7 +607,7 @@ public class Importer {
                 shipment.setDateReceived(dateReceived);
                 shipment.addPatients(patient);
                 shipment.persist();
-            } else if (!shipment.hasPatient(patientNo)) {
+            } else if (!shipment.hasPatient(patientNr)) {
                 logger.debug("adding to shipment: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateReceivedStr + " (" + count + "/"
@@ -642,24 +673,19 @@ public class Importer {
 
         int count = 1;
         while (rs.next()) {
-            String patientNo = cipher.decode(rs.getBytes(21));
-            if (patientNo.length() == 6) {
-                if (patientNo.substring(0, 2).equals("CE")) {
-                    studyNameShort = "CEGIIR";
-                    clinicName = "ED1";
-                } else {
-                    studyNameShort = getStudyShortNameFromPatientNr(patientNo);
-                    clinicName = getClinicNameFromPatientNr(patientNo);
-                }
-            } else {
-                studyNameShort = rs.getString(20);
-                clinicName = rs.getString(3);
+            String patientNr = cipher.decode(rs.getBytes(21));
+            studyNameShort = getStudyNameShort(patientNr, rs.getString(20));
+            clinicName = getClinicName(patientNr, rs.getString(3))
+                .toUpperCase();
+
+            if (studyNameShort == null) {
+                logger.error("no study for patient " + patientNr);
+                ++count;
+                continue;
             }
 
-            clinicName = clinicName.toUpperCase();
-
             if (clinicName == null) {
-                logger.error("no for patient " + patientNo);
+                logger.error("no for patient " + patientNr);
                 ++count;
                 continue;
             }
@@ -669,7 +695,7 @@ public class Importer {
 
             if (clinic == null) {
                 logger.error("no clinic \"" + clinicName + "\" for patient "
-                    + patientNo);
+                    + patientNr);
                 ++count;
                 continue;
             }
@@ -677,10 +703,10 @@ public class Importer {
             dateProcessedStr = rs.getString(6);
             dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
 
-            patient = study.getPatient(patientNo);
+            patient = study.getPatient(patientNr);
             // make sure patient is in the study
             if (patient == null) {
-                logger.error("patient not found in study: " + patientNo + ",  "
+                logger.error("patient not found in study: " + patientNr + ",  "
                     + studyNameShort);
                 continue;
             }
@@ -692,11 +718,11 @@ public class Importer {
             cal.set(Calendar.SECOND, 0);
             dateProcessed = cal.getTime();
 
-            shipment = clinic.getShipment(dateProcessed, patientNo);
+            shipment = clinic.getShipment(dateProcessed, patientNr);
 
             // check for shipment
             if (shipment == null) {
-                logger.error("found 0 shipments for patientNo/" + patientNo
+                logger.error("found 0 shipments for patientNo/" + patientNr
                     + " studyName/" + study.getNameShort() + " clinicName/"
                     + clinicName + " dateReceived/" + dateProcessed);
                 ++count;
@@ -873,11 +899,16 @@ public class Importer {
                     continue;
                 }
 
-                String patientNo = cipher.decode(rs.getBytes(18));
+                String patientNr = cipher.decode(rs.getBytes(18));
                 patient = PatientWrapper.getPatientInSite(appService,
-                    patientNo, cbsrSite);
+                    patientNr, cbsrSite);
+                studyNameShort = getStudyNameShort(patientNr, rs.getString(4));
 
-                studyNameShort = rs.getString(4);
+                if (studyNameShort == null) {
+                    logger.error("no study for patient " + patientNr);
+                    continue;
+                }
+
                 study = getStudyFromOldShortName(studyNameShort);
                 if (!patient.getStudy().equals(study)) {
                     logger.error("patient and study do not match: "
@@ -897,12 +928,12 @@ public class Importer {
                 visits = patient.getVisit(dateProcessed);
 
                 if (visits.size() == 0) {
-                    logger.error("patient " + patientNo
+                    logger.error("patient " + patientNr
                         + ", visit not found for date "
                         + dateTimeFormatter.format(dateProcessed));
                     continue;
                 } else if (visits.size() > 1) {
-                    logger.info("patient " + patientNo
+                    logger.info("patient " + patientNr
                         + ", multiple visits for date "
                         + dateTimeFormatter.format(dateProcessed));
                 }
@@ -984,6 +1015,8 @@ public class Importer {
         BlowfishCipher cipher = new BlowfishCipher();
         SampleWrapper sample;
         RowColPos pos;
+        String studyNameShort;
+        StudyWrapper study;
 
         Statement s = con.createStatement();
         s.execute("select fnum, rack from freezer group by fnum, rack "
@@ -1101,9 +1134,24 @@ public class Importer {
                     continue;
                 }
 
-                String patientNo = cipher.decode(rs.getBytes(17));
+                String patientNr = cipher.decode(rs.getBytes(17));
                 patient = PatientWrapper.getPatientInSite(appService,
-                    patientNo, cbsrSite);
+                    patientNr, cbsrSite);
+
+                studyNameShort = getStudyNameShort(patientNr, rs.getString(3));
+
+                if (studyNameShort == null) {
+                    logger.error("no study for patient " + patientNr);
+                    continue;
+                }
+
+                study = getStudyFromOldShortName(studyNameShort);
+                if (!patient.getStudy().equals(study)) {
+                    logger.error("patient and study do not match: "
+                        + patient.getPnumber() + ",  " + studyNameShort);
+                    continue;
+                }
+
                 dateProcessedStr = rs.getString(1);
                 dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
                 Calendar cal = new GregorianCalendar();
@@ -1115,12 +1163,12 @@ public class Importer {
                 visits = patient.getVisit(dateProcessed);
 
                 if (visits.size() == 0) {
-                    logger.error("patient " + patientNo
+                    logger.error("patient " + patientNr
                         + ", visit not found for date "
                         + dateTimeFormatter.format(dateProcessed));
                     continue;
                 } else if (visits.size() > 1) {
-                    logger.info("patient " + patientNo
+                    logger.info("patient " + patientNr
                         + ", multiple visits for date "
                         + dateTimeFormatter.format(dateProcessed));
                 }
@@ -1165,8 +1213,10 @@ public class Importer {
                 sample.setPatientVisit(visit);
 
                 if (!pallet.canHoldSample(sample)) {
-                    logger.error("bin " + pallet.getLabel()
-                        + " cannot hold sample of type" + sampleType.getName());
+                    logger
+                        .error("pallet " + pallet.getLabel()
+                            + " cannot hold sample of type "
+                            + sampleType.getName());
                     continue;
                 }
                 sample.persist();
@@ -1190,7 +1240,7 @@ public class Importer {
             labels += samp.getPositionString(true, true) + ", ";
         }
         logger.error("a sample with inventory id " + inventoryId
-            + " already exisits at " + labels);
+            + " already exists at " + labels);
         return false;
     }
 
