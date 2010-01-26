@@ -176,8 +176,8 @@ public class Importer {
                     throw new Exception("Table " + table + " not found");
             }
 
-            appService = ServiceConnection.getAppService("https://"
-                + System.getProperty("server", "localhost:8443") + "/biobank2",
+            appService = ServiceConnection.getAppService("http://"
+                + System.getProperty("server", "localhost:8080") + "/biobank2",
                 "testuser", "test");
 
             cbsrSite = getCbsrSite();
@@ -196,7 +196,7 @@ public class Importer {
                 // importShipments();
                 // importPatientVisits();
                 removeAllSamples();
-                // importFreezerSamples();
+                importFreezerSamples();
                 importCabinetSamples();
             }
 
@@ -763,14 +763,14 @@ public class Importer {
             String label = container.getLabel();
             String typeNameShort = container.getContainerType().getNameShort();
             if (label.equals("01") && typeNameShort.equals("Cabinet 4")) {
-                // cabinetsMap.put(1, container);
+                cabinetsMap.put(1, container);
             } else if (label.equals("02") && typeNameShort.equals("Cabinet 4")) {
                 cabinetsMap.put(2, container);
             }
         }
 
-        ContainerTypeWrapper cabinetType;
         StudyWrapper study;
+        ContainerWrapper cabinet;
         ContainerWrapper drawer;
         ContainerWrapper bin;
         String studyNameShort;
@@ -780,9 +780,8 @@ public class Importer {
         String dateProcessedStr;
         Date dateProcessed;
         SampleTypeWrapper sampleType;
-        int drawerNum;
-        int binNum;
-        String drawerName;
+        String binLabel;
+        String drawerLabel;
         RowColPos binPos;
         String sampleTypeNameShort;
         String inventoryId;
@@ -818,7 +817,7 @@ public class Importer {
             }
 
             logger.info("importing samples from cabinet " + cabinetNum);
-            cabinetType = cabinetsMap.get(cabinetNum).getContainerType();
+            cabinet = cabinetsMap.get(cabinetNum);
             while (rs.next()) {
                 visitNr = rs.getInt(1);
                 cabinetNum = rs.getInt(6);
@@ -838,52 +837,39 @@ public class Importer {
                 }
 
                 // make sure inventory id is unique
-                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
-                    appService, inventoryId, cbsrSite);
-                if (samples.size() > 0) {
-                    String labels = "";
-                    for (SampleWrapper sample : samples) {
-                        labels += sample.getPositionString(true, true) + ", ";
-                    }
-                    logger.error("a sample with inventory id " + inventoryId
-                        + " already exisits at " + labels);
+                if (!inventoryIdUnique(inventoryId)) {
                     continue;
                 }
 
-                drawerName = rs.getString(7);
-                Integer rowCap = cabinetsMap.get(cabinetNum).getRowCapacity();
-                Integer colCap = cabinetsMap.get(cabinetNum).getColCapacity();
-                RowColPos pos = LabelingScheme.cbsrTwoCharToRowCol(drawerName,
-                    rowCap, colCap, cabinetType.getName());
-                drawerNum = pos.row;
+                drawerLabel = rs.getString(7);
+                drawer = cabinet.getChildByLabel(drawerLabel);
 
-                if (drawerNum > 4) {
-                    logger.error("invalid drawer number \"" + drawerNum
+                if (drawer == null) {
+                    logger.error("invalid drawer number \"" + drawerLabel
                         + "\" for visit number " + rs.getInt(1));
                     continue;
                 }
 
-                drawer = cabinetsMap.get(cabinetNum).getChild(pos.row, 0);
-                binNum = rs.getInt(8);
-                bin = drawer.getChild(binNum - 1, 0);
+                binLabel = String.format("%02d", rs.getInt(8));
+                bin = drawer.getChildByLabel(binLabel);
 
                 if (bin == null) {
-                    logger.error("invalid bin number \"" + binNum
+                    logger.error("invalid bin number \"" + binLabel
                         + "\" for cabinet " + cabinetNum + " and drawer "
-                        + drawerName);
+                        + drawerLabel);
                     continue;
                 }
 
-                String binPosStr = rs.getString(9);
+                String binPosLabel = rs.getString(9);
 
                 try {
-                    binPos = LabelingScheme.cbsrTwoCharToRowCol(binPosStr, bin
-                        .getRowCapacity(), bin.getColCapacity(), bin
-                        .getContainerType().getName());
+                    binPos = LabelingScheme.cbsrTwoCharToRowCol(binPosLabel,
+                        bin.getRowCapacity(), bin.getColCapacity(), bin
+                            .getContainerType().getName());
                 } catch (Exception e) {
                     logger.error("invalid sample position in bin \""
-                        + binPosStr + "\" for cabinet " + cabinetNum
-                        + " and drawer " + drawerName);
+                        + binPosLabel + "\" for cabinet " + cabinetNum
+                        + " and drawer " + drawerLabel);
                     continue;
                 }
 
@@ -953,7 +939,7 @@ public class Importer {
                 }
 
                 logger.debug("importing cabinet sample " + bin.getLabel()
-                    + binPosStr);
+                    + binPosLabel);
                 ++importCounts.samples;
                 sample.persist();
             }
@@ -982,15 +968,13 @@ public class Importer {
 
         int freezerNum;
         ContainerWrapper freezer;
-        ContainerTypeWrapper freezerType;
         ContainerWrapper hotel;
         ContainerWrapper pallet;
         PatientWrapper patient;
         PatientVisitWrapper visit;
         List<PatientVisitWrapper> visits;
         SampleTypeWrapper sampleType;
-        RowColPos hotelPos;
-        int palletNum;
+        String palletLabel;
         String dateProcessedStr;
         Date dateProcessed;
         String hotelLabel;
@@ -1095,11 +1079,7 @@ public class Importer {
                     continue;
                 }
 
-                freezerType = freezer.getContainerType();
-                hotelPos = LabelingScheme.cbsrTwoCharToRowCol(hotelLabel,
-                    freezer.getRowCapacity(), freezer.getColCapacity(),
-                    freezerType.getName());
-                hotel = freezer.getChild(hotelPos.row, hotelPos.col);
+                hotel = freezer.getChildByLabel(hotelLabel);
 
                 if (hotel == null) {
                     logger.error("hotel not initialized: " + " freezer/"
@@ -1107,26 +1087,17 @@ public class Importer {
                     continue;
                 }
 
-                palletNum = rs.getInt(7) - 1;
-                palletPos = rs.getString(15);
-                pallet = hotel.getChild(palletNum, 0);
+                palletLabel = String.format("%02d", rs.getInt(7));
+                pallet = hotel.getChildByLabel(palletLabel);
 
                 if (pallet == null) {
                     logger.error("pallet not initialized: " + " hotel/"
-                        + hotel.getLabel() + " pallet/" + palletNum + 1);
+                        + hotel.getLabel() + " pallet/" + palletLabel);
                     continue;
                 }
 
                 // make sure inventory id is unique
-                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
-                    appService, inventoryId, cbsrSite);
-                if (samples.size() > 0) {
-                    String labels = "";
-                    for (SampleWrapper samp : samples) {
-                        labels += samp.getPositionString(true, true) + ", ";
-                    }
-                    logger.error("a sample with inventory id " + inventoryId
-                        + " already exisits at " + labels);
+                if (!inventoryIdUnique(inventoryId)) {
                     continue;
                 }
 
@@ -1172,6 +1143,7 @@ public class Importer {
                     continue;
                 }
 
+                palletPos = rs.getString(15);
                 pos = LabelingScheme.sbsToRowCol(palletPos);
                 sample = pallet.getSample(pos.row, pos.col);
                 if ((sample != null)
@@ -1204,6 +1176,22 @@ public class Importer {
                 ++importCounts.samples;
             }
         }
+    }
+
+    private static boolean inventoryIdUnique(String inventoryId)
+        throws Exception {
+        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+            appService, inventoryId, cbsrSite);
+        if (samples.size() == 0)
+            return true;
+
+        String labels = "";
+        for (SampleWrapper samp : samples) {
+            labels += samp.getPositionString(true, true) + ", ";
+        }
+        logger.error("a sample with inventory id " + inventoryId
+            + " already exisits at " + labels);
+        return false;
     }
 
     @SuppressWarnings("unused")
