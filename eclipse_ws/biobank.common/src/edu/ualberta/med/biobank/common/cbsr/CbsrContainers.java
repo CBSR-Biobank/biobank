@@ -287,20 +287,20 @@ public class CbsrContainers {
             ++count;
         }
 
-        binTypes = new ContainerTypeWrapper[] {
-            // drawer AB
+        // drawer AB
+        binTypes = new ContainerTypeWrapper[] { ftaBinLoerschType,
+            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
+            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
+            ftaBinLoerschType, ftaBinLoerschType, hairBinType,
+            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
             ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
             ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
             ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
             hairBinType, ftaBinLoerschType, ftaBinLoerschType,
             ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
             ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, hairBinType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, hairBinType, hairBinType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType };
+            hairBinType, hairBinType, ftaBinLoerschType, ftaBinLoerschType,
+            ftaBinLoerschType };
 
         drawer = addContainer(site, drawerType, cabinet, 1, 0);
         count = 0;
@@ -311,20 +311,43 @@ public class CbsrContainers {
         }
 
         // drawer AC
-        binTypes = new ContainerTypeWrapper[] {
-            // drawer AC
-            hairBinType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, hairBinType, hairBinType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            hairBinType, null, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType };
+        binTypes = new ContainerTypeWrapper[] { hairBinType, // 01
+            ftaBinLoerschType, // 02
+            ftaBinLoerschType, // 03
+            ftaBinLoerschType, // 04
+            ftaBinLoerschType, // 05
+            ftaBinLoerschType, // 06
+            ftaBinLoerschType, // 07
+            ftaBinLoerschType, // 08
+            ftaBinLoerschType, // 09
+            ftaBinLoerschType, // 10
+            ftaBinLoerschType, // 11
+            ftaBinLoerschType, // 12
+            ftaBinLoerschType, // 13
+            ftaBinLoerschType, // 14
+            ftaBinLoerschType, // 15
+            ftaBinLoerschType, // 16
+            ftaBinLoerschType, // 17
+            ftaBinLoerschType, // 18
+            ftaBinLoerschType, // 19
+            ftaBinLoerschType, // 20
+            ftaBinLoerschType, // 21
+            ftaBinLoerschType, // 22
+            hairBinType, // 23
+            hairBinType, // 24
+            ftaBinLoerschType, // 25
+            ftaBinLoerschType, // 26
+            ftaBinLoerschType, // 27
+            ftaBinLoerschType, // 28
+            ftaBinLoerschType, // 29
+            ftaBinLoerschType, // 30
+            ftaBinLoerschType, // 31
+            hairBinType, // 32
+            hairBinType, // 33
+            ftaBinLoerschType, // 34
+            ftaBinLoerschType, // 35
+            ftaBinLoerschType // 36
+        };
 
         drawer = addContainer(site, drawerType, cabinet, 2, 0);
         count = 0;
@@ -335,15 +358,35 @@ public class CbsrContainers {
             ++count;
         }
 
-        // drawer AC
+        // drawer AD
         binTypes = new ContainerTypeWrapper[] {
-            // drawer AC
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType,
-            ftaBinLoerschType, null, null, null, null, null, null, null,
-            ftaBinLoerschType, ftaBinLoerschType, ftaBinLoerschType };
+        //
+            ftaBinLoerschType, // 01
+            ftaBinLoerschType, // 02
+            ftaBinLoerschType, // 03
+            ftaBinLoerschType, // 04
+            ftaBinLoerschType, // 05
+            ftaBinLoerschType, // 06
+            ftaBinLoerschType, // 07
+            ftaBinLoerschType, // 08
+            ftaBinLoerschType, // 09
+            ftaBinLoerschType, // 10
+            ftaBinLoerschType, // 11
+            ftaBinLoerschType, // 12
+            ftaBinLoerschType, // 13
+            ftaBinLoerschType, // 14
+            ftaBinLoerschType, // 15
+            null, // 16
+            null, // 17
+            null, // 18
+            null, // 19
+            ftaBinLoerschType, // 20
+            ftaBinLoerschType, // 21
+            ftaBinLoerschType, // 22
+            ftaBinLoerschType, // 23
+            ftaBinLoerschType, // 24
+            ftaBinLoerschType // 25
+        };
 
         drawer = addContainer(site, drawerType, cabinet, 3, 0);
         count = 0;

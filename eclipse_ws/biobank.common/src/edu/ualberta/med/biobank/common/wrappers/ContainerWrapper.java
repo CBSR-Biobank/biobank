@@ -584,10 +584,14 @@ public class ContainerWrapper extends
 
     /**
      * Return true if this container can hold the type of sample
+     * 
+     * @throws Exception if the sample type is null.
      */
-    public boolean canHoldSample(SampleWrapper sample)
-        throws ApplicationException {
+    public boolean canHoldSample(SampleWrapper sample) throws Exception {
         SampleTypeWrapper type = sample.getSampleType();
+        if (type == null) {
+            throw new Exception("sample type is null");
+        }
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()
             + " as ct inner join ct.sampleTypeCollection as sampleType"
