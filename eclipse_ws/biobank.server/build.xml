@@ -46,6 +46,15 @@
 			<exclude name="**/*Impl.*" />
 		</jar>
 	</target>
+	
+	<target name="build-validator-lib" depends="build">
+		<jar destfile="output/biobank-validators.jar" basedir="bin">
+			<manifest>
+				<attribute name="Generated-By" value="AICML Ant build file" />
+			</manifest>
+			<include name="**/validator/*.*" />
+		</jar>
+	</target>
 
 
 </project>
