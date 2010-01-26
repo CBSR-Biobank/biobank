@@ -6,16 +6,20 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitSummary extends QueryObject {
-    private static String PVCOUNT_STRING = "(select count(*) from "
-        + Patient.class.getName() + " as p where (select count(*) from pv"
-        + " where pv.patient = p) {0} {1})";
+    private static String PVCOUNT_STRING = "(select count(p.id) from "
+        + Patient.class.getName()
+        + " as p where (select count(pv.id) from "
+        + PatientVisit.class.getName()
+        + " as pv where pv.patient = p and pv.shipment.clinic = c.clinic and s=p.study and pv.dateProcessed >= ? and pv.dateProcessed <= ?) {0} {1})";
 
-    private static String QUERY_STRING = "select pv.patient.study.nameShort, pv.shipment.clinic.name, "
+    private static String QUERY_STRING = "select s.name, c.clinic.name, "
         + MessageFormat.format(PVCOUNT_STRING, "=", "1")
         + ", "
         + MessageFormat.format(PVCOUNT_STRING, "=", "2")
@@ -26,8 +30,14 @@ public class PatientVisitSummary extends QueryObject {
         + ", "
         + MessageFormat.format(PVCOUNT_STRING, ">=", "5")
         + ", "
-        + "count(pv.id), count(distinct pv.patient.id) from edu.ualberta.med.biobank.model.PatientVisit"
-        + " pv where pv.patient.study.site.id {1} {0} and pv.dateProcessed >= ? and pv.dateProcessed <= ? group by pv.patient.study.nameShort, pv.shipment.clinic.name";
+        + "(select count(pvtotal.id) from "
+        + PatientVisit.class.getName()
+        + " as pvtotal where pvtotal.shipment.clinic=c.clinic and pvtotal.patient.study=s and pvtotal.dateProcessed >= ? and pvtotal.dateProcessed <= ?), "
+        + "(select count(distinct patients.patient.id) from "
+        + PatientVisit.class.getName()
+        + " as patients where patients.shipment.clinic=c.clinic and patients.patient.study=s and patients.dateProcessed >= ? and patients.dateProcessed <= ?)"
+        + " from " + Study.class.getName()
+        + " as s inner join s.contactCollection as c where s.site.id {1} {0}";
 
     public PatientVisitSummary(String op, Integer siteId) {
         super(
@@ -48,7 +58,7 @@ public class PatientVisitSummary extends QueryObject {
                 params.set(i, option.getDefaultValue());
         }
         int size = params.size();
-        for (int j = 0; j < 0; j++) {
+        for (int j = 0; j < 6; j++) {
             for (int i = 0; i < size; i++) {
                 params.add(params.get(i));
             }

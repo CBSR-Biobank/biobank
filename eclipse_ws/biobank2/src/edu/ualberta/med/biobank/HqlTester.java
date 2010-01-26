@@ -25,8 +25,8 @@ public class HqlTester {
 
     private void test() throws ApplicationException {
         HQLCriteria c = new HQLCriteria(
-            "select pv.patient.id from edu.ualberta.med.biobank.model.PatientVisit pv inner join (select id from edu.ualberta.med.biobank.model.Patient) p on p.id=pv.patient.id");
-
+            "select count(p.id) from edu.ualberta.med.biobank.model.Patient"
+                + " as p join p.patientVisitCollection where p.patientVisitCollection.dateProcessed <40000 and size(p.patientVisitCollection)=5 ");
         List<Object> results = appService.query(c);
         for (Object o : results) {
             // System.out.println(((Object[]) o)[0] + " " + ((Object[]) o)[1]);

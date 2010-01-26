@@ -92,6 +92,7 @@ public class QueryObject {
         queries.add(SampleCount.class);
         queries.add(SampleInvoiceByClinic.class);
         queries.add(SampleInvoiceByPatient.class);
+        queries.add(SampleRequest.class);
         queries.add(SampleSCount.class);
 
         return queries;
