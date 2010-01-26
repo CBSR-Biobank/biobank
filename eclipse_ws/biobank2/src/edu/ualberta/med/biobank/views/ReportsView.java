@@ -1,12 +1,18 @@
 package edu.ualberta.med.biobank.views;
 
+import java.awt.Color;
 import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -33,6 +39,13 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.Style;
+import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
+import ar.com.fdvs.dj.domain.constants.Border;
+import ar.com.fdvs.dj.domain.constants.Transparency;
+import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
@@ -167,15 +180,13 @@ public class ReportsView extends ViewPart {
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
     }
 
     private Collection<Object> search() throws ApplicationException {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {
-            Class<? extends QueryObject> cls = ((Class<? extends QueryObject>) typeSelection
-                .getFirstElement());
+            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
             SiteWrapper site = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
@@ -225,8 +236,7 @@ public class ReportsView extends ViewPart {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {
-            Class<? extends QueryObject> cls = ((Class<? extends QueryObject>) typeSelection
-                .getFirstElement());
+            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
             SiteWrapper site = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
@@ -326,7 +336,7 @@ public class ReportsView extends ViewPart {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((Class<? extends QueryObject>) element).getSimpleName();
+                return ((Class<?>) element).getSimpleName();
             }
         });
         comboViewer.setInput(list);
@@ -354,15 +364,15 @@ public class ReportsView extends ViewPart {
             .getActiveWorkbenchWindow().getShell(), "Confirm",
             "Print table contents?");
         if (doPrint) {
-            ArrayList<Object[]> params = new ArrayList<Object[]>();
-            ArrayList<Object> paramVals = getParams();
+            List<Object[]> params = new ArrayList<Object[]>();
+            List<Object> paramVals = getParams();
             List<Option> queryOptions = currentQuery.getOptions();
             int i = 0;
             for (Option option : queryOptions) {
                 params.add(new Object[] { option.getName(), paramVals.get(i) });
                 i++;
             }
-            ArrayList<Object> columnInfo = new ArrayList<Object>();
+            List<String> columnInfo = new ArrayList<String>();
             String[] names = currentQuery.getColumnNames();
             for (int i1 = 0; i1 < names.length; i1++) {
                 columnInfo.add(names[i1]);
@@ -372,16 +382,56 @@ public class ReportsView extends ViewPart {
             for (Object object : searchTable.getCollection()) {
                 Map<String, String> map = new HashMap<String, String>();
                 for (int j = 0; j < columnInfo.size(); j++) {
-                    map.put((String) columnInfo.get(j),
-                        (((Object[]) object)[j]).toString());
+                    map.put(columnInfo.get(j), (((Object[]) object)[j])
+                        .toString());
                 }
                 listData.add(map);
             }
 
-            ReportingUtils.printReport(currentQuery.toString(), params,
-                columnInfo, listData);
+            ReportingUtils.printReport(createDynamicReport(currentQuery
+                .toString(), params, columnInfo, listData));
             return true;
         }
         return false;
+    }
+
+    public JasperPrint createDynamicReport(String reportName,
+        List<Object[]> params, List<String> columnInfo, List<?> list)
+        throws Exception {
+
+        FastReportBuilder drb = new FastReportBuilder();
+        for (int i = 0; i < columnInfo.size(); i++) {
+            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
+                40, false).setPrintBackgroundOnOddRows(true)
+                .setUseFullPageWidth(true);
+        }
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+        String paramString = "";
+        for (int i = 0; i < params.size(); i++) {
+            paramString += params.get(i)[0] + " : " + params.get(i)[1] + "\n";
+        }
+        fields.put("title", reportName);
+        fields.put("infos", paramString);
+        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
+        if (reportURL == null) {
+            throw new Exception("No report available with name BasicReport");
+        }
+        drb.setTemplateFile(reportURL.getFile());
+        Style headerStyle = new Style();
+        headerStyle.setFont(ReportingUtils.sansSerifBold);
+        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
+        headerStyle.setBorderBottom(Border.THIN);
+        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
+        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
+        headerStyle.setTransparency(Transparency.OPAQUE);
+        Style detailStyle = new Style();
+        detailStyle.setFont(ReportingUtils.sansSerif);
+        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
+
+        JRDataSource ds = new JRBeanCollectionDataSource(list);
+        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
+            new ClassicLayoutManager(), ds, fields);
+        return jp;
     }
 }

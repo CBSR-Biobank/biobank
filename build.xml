@@ -31,7 +31,7 @@
 	<property name="database.username" value="dummy" />
 	<property name="database.password" value="ozzy498" />
 	<property name="req.jars.dir" value="jars" />
-	<property name="biobank2.jar.files" value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar,org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar,gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar,commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-lang-2.4.jar,iText-2.1.0.jar,jasperreports-3.7.0.jar" />
+	<property name="biobank2.jar.files" value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar,org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar,gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar,commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-lang-2.4.jar,iText-2.1.0.jar,jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar,jdt-compiler-3.1.1.jar" />
 	<property name="biobank.common.jar.files" value="commons-lang-2.4.jar" />
 	<property name="biobank.importer.jar.files" value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
 
@@ -129,7 +129,7 @@
 
 	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
-                <copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"/>
+		<copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" />
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
 	</target>
 
@@ -195,6 +195,8 @@
 				<include name="commons-lang-2.4.jar" />
 				<include name="iText-2.1.0.jar" />
 				<include name="jasperreports-3.7.0.jar" />
+				<include name="DynamicJasper-3.0.14.jar" />
+				<include name="jdt-compiler-3.1.1.jar" />
 			</fileset>
 		</copy>
 		<copy todir="${eclipse.proj.dir.importer}/lib">
@@ -260,7 +262,7 @@
 		</sql>
 		<antcall target="schema" />
 		<sql driver="${mysql.driver.string}" url="jdbc:mysql://${database.host}:${database.port}/${database.name}" userid="${database.username}" password="${database.password}">
-            <transaction src="${data.sql.dir}/createIndices.sql" />
+			<transaction src="${data.sql.dir}/createIndices.sql" />
 			<transaction src="${data.sql.dir}/pvAttrType.sql" />
 			<transaction src="${data.sql.dir}/sampleSources.sql" />
 			<transaction src="${data.sql.dir}/sampleTypes.sql" />
@@ -369,14 +371,14 @@
 
 	<property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
 	<property name="dest.dir.classes" value="${dest.dir}/classes" />
-    <property name="dest.dir.results" value="testing" />
-    <property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
+	<property name="dest.dir.results" value="testing" />
+	<property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
 
-    <path id="common.class.path">
-        <fileset dir="${eclipse.proj.dir.common}/lib">
-            <include name="*.jar" />
-        </fileset>
-    </path>
+	<path id="common.class.path">
+		<fileset dir="${eclipse.proj.dir.common}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
 
 	<path id="junit.class.path">
 		<fileset dir="jars">
@@ -418,7 +420,7 @@
 
 	<target name="tests-compile" depends="common-compile">
 		<javac srcdir="${eclipse.proj.dir.junit}/src" destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
-            <classpath refid="common.class.path" />
+			<classpath refid="common.class.path" />
 			<classpath refid="junit.class.path" />
 		</javac>
 	</target>
@@ -441,7 +443,7 @@
 					<include name="**/Test*.java" />
 					<exclude name="**/TestCommon.java" />
 					<exclude name="**/TestDatabase.java" />
-                    <exclude name="**/TestFunctionalities.java" />
+					<exclude name="**/TestFunctionalities.java" />
 					<exclude name="**/AllTests.java" />
 				</fileset>
 				<formatter type="xml" />

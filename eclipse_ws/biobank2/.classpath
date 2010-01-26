@@ -18,7 +18,7 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar"/>
 	<classpathentry kind="con" path="org.eclipse.tptp.platform.instrumentation.ui.ContainerInitializer/Build to Manage Libraries"/>
-	<classpathentry kind="lib" path="lib/DynamicJasper-3.0.14.jar" sourcepath="C:/Users/aaron/Favorites/Downloads/DynamicJasper-3.0.14-bundle/DynamicJasper-3.0.14-sources.jar">
+	<classpathentry kind="lib" path="lib/DynamicJasper-3.0.14.jar" sourcepath="/home/delphine/projects/sources/dynamicjasper/DynamicJasper-3.0.14-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/biobank2/lib/commons-lang-2.4.jar!/"/>
 		</attributes>
