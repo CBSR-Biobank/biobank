@@ -11,6 +11,7 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -112,7 +113,12 @@ public class ReportingUtils {
                     JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
                     Boolean.FALSE);
 
-                exporter.exportReport();
+                try {
+                    exporter.exportReport();
+                } catch (JRException e) {
+                    throw new Exception(
+                        "Printing failed. Check your printer settings and try again.");
+                }
             }
         }
     }
