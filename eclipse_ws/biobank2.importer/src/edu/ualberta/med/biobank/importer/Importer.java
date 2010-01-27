@@ -310,22 +310,24 @@ public class Importer {
         }
 
         // add missing sample types
-        int missing = 0;
-        for (String nameShort : bbpdbSampleTypeMap.keySet()) {
-            if ((sampleTypeMap.get(nameShort) != null)
-                || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
-                || nameShort.equals("CDPA Plas"))
-                continue;
+        if (false) {
+            int missing = 0;
+            for (String nameShort : bbpdbSampleTypeMap.keySet()) {
+                if ((sampleTypeMap.get(nameShort) != null)
+                    || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
+                    || nameShort.equals("CDPA Plas"))
+                    continue;
 
-            logger.error("missing sample type: \""
-                + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
-                + "\"");
-            ++missing;
-        }
+                logger.error("missing sample type: \""
+                    + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
+                    + "\"");
+                ++missing;
+            }
 
-        if (missing > 0) {
-            throw new Exception("There are missing sample types. "
-                + "Container sample types require adjustments.");
+            if (missing > 0) {
+                throw new Exception("There are missing sample types. "
+                    + "Container sample types require adjustments.");
+            }
         }
     }
 
@@ -395,83 +397,6 @@ public class Importer {
         }
     }
 
-    private static void importPatients() throws Exception {
-        BlowfishCipher cipher = new BlowfishCipher();
-        StudyWrapper study;
-        String studyNameShort;
-        PatientWrapper patient;
-        removeAllPatients();
-        logger.info("importing patients ...");
-
-        String qryPart = "from patient join study_list on patient.study_nr=study_list.study_nr";
-
-        Statement s = con.createStatement();
-        s.execute("select count(*) " + qryPart);
-        ResultSet rs = s.getResultSet();
-        rs.next();
-        int numPatients = rs.getInt(1);
-
-        s.execute("select patient.*, study_list.study_name_short " + qryPart);
-        rs = s.getResultSet();
-        int count = 1;
-        if (rs == null) {
-            throw new Exception("Database query returned null");
-        }
-
-        while (rs.next()) {
-            String patientNo = cipher.decode(rs.getBytes(2));
-
-            if (patientNo.length() == 6) {
-                if (patientNo.substring(0, 2).equals("CE")) {
-                    studyNameShort = "CEGIIR";
-                } else {
-                    studyNameShort = getStudyShortNameFromPatientNr(patientNo);
-                }
-            } else {
-                studyNameShort = rs.getString(6);
-            }
-
-            study = getStudyFromOldShortName(studyNameShort);
-
-            if (study == null) {
-                logger.debug("ERROR: study with short name \"" + studyNameShort
-                    + "\" not found, patient id: " + rs.getInt(1));
-                continue;
-            }
-
-            logger.debug("importing patient number " + patientNo + " (" + count
-                + "/" + numPatients + ")");
-            patient = new PatientWrapper(appService);
-            patient.setPnumber(patientNo);
-            patient.setStudy(study);
-            patient.persist();
-            ++importCounts.patients;
-            ++count;
-
-            // update the BBPDB with the decoded CHR number
-            String decChrNr = rs.getString(5);
-            if (decChrNr == null) {
-                PreparedStatement ps = con
-                    .prepareStatement("update patient set dec_chr_nr = ? where patient_nr = ?");
-                ps.setString(1, patientNo);
-                ps.setInt(2, rs.getInt(1));
-                ps.executeUpdate();
-            }
-        }
-    }
-
-    private static void removeAllShipments() throws Exception {
-        logger.info("removing old shipments ...");
-
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName());
-        List<Shipment> shipments = appService.query(criteria);
-        for (Shipment shipment : shipments) {
-            ShipmentWrapper s = new ShipmentWrapper(appService, shipment);
-            s.delete();
-        }
-    }
-
     private static String getStudyNameShort(String patientNr,
         String defaultStudyNameShort) throws Exception {
         String studyNameShort;
@@ -500,6 +425,79 @@ public class Importer {
             clinicName = defaultClinicName;
         }
         return clinicName;
+    }
+
+    private static void importPatients() throws Exception {
+        BlowfishCipher cipher = new BlowfishCipher();
+        StudyWrapper study;
+        String studyNameShort;
+        PatientWrapper patient;
+        removeAllPatients();
+        logger.info("importing patients ...");
+
+        String qryPart = "from patient join study_list on patient.study_nr=study_list.study_nr";
+
+        Statement s = con.createStatement();
+        s.execute("select count(*) " + qryPart);
+        ResultSet rs = s.getResultSet();
+        rs.next();
+        int numPatients = rs.getInt(1);
+
+        s.execute("select patient.*, study_list.study_name_short " + qryPart);
+        rs = s.getResultSet();
+        int count = 1;
+        if (rs == null) {
+            throw new Exception("Database query returned null");
+        }
+
+        while (rs.next()) {
+            String patientNr = cipher.decode(rs.getBytes(2));
+            studyNameShort = getStudyNameShort(patientNr, rs.getString(6));
+
+            if (studyNameShort == null) {
+                logger.error("no study for patient " + patientNr);
+                continue;
+            }
+
+            study = getStudyFromOldShortName(studyNameShort);
+
+            if (study == null) {
+                logger.debug("ERROR: study with short name \"" + studyNameShort
+                    + "\" not found, patient id: " + rs.getInt(1));
+                continue;
+            }
+
+            logger.debug("importing patient number " + patientNr + " (" + count
+                + "/" + numPatients + ")");
+            patient = new PatientWrapper(appService);
+            patient.setPnumber(patientNr);
+            patient.setStudy(study);
+            patient.persist();
+            ++importCounts.patients;
+            ++count;
+
+            // update the BBPDB with the decoded CHR number
+            String decChrNr = rs.getString(5);
+            if (decChrNr == null) {
+                PreparedStatement ps = con
+                    .prepareStatement("update patient set dec_chr_nr = ? where patient_nr = ?");
+                ps.setString(1, patientNr);
+                ps.setInt(2, rs.getInt(1));
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    private static void removeAllShipments() throws Exception {
+        logger.info("removing old shipments ...");
+
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Shipment.class.getName());
+        List<Shipment> shipments = appService.query(criteria);
+        for (Shipment shipment : shipments) {
+            ShipmentWrapper s = new ShipmentWrapper(appService, shipment);
+            s.delete();
+        }
     }
 
     private static void importShipments() throws Exception {
@@ -1137,6 +1135,11 @@ public class Importer {
                 String patientNr = cipher.decode(rs.getBytes(17));
                 patient = PatientWrapper.getPatientInSite(appService,
                     patientNr, cbsrSite);
+
+                if (patient == null) {
+                    logger.error("no patient with number " + patientNr);
+                    continue;
+                }
 
                 studyNameShort = getStudyNameShort(patientNr, rs.getString(3));
 
