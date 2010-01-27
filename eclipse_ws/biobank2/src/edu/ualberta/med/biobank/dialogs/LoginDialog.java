@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -218,9 +220,11 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
-        if (serverText.getText().equals("")) {
-            MessageDialog.openError(getShell(), "Invalid Server Name",
-                "Server field must not be blank.");
+        try {
+            new URL(serverText.getText());
+        } catch (MalformedURLException e) {
+            MessageDialog.openError(getShell(), "Invalid Server URL",
+                "Please enter a valid server URL.");
             return;
         }
 
