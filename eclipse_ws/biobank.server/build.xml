@@ -47,7 +47,7 @@
 		</jar>
 	</target>
 	
-	<target name="build-validator-lib" depends="build">
+	<target name="build-validator-lib">
 		<jar destfile="output/biobank-validators.jar" basedir="bin">
 			<manifest>
 				<attribute name="Generated-By" value="AICML Ant build file" />

@@ -23,6 +23,6 @@ public interface CustomApplicationService extends WritableApplicationService {
     public boolean hasPrivilege(String userLogin, Class<?> clazz, Integer id,
         String privilege) throws ApplicationException;
 
-    public void newSite(Integer id, String name);
+    public void newSite(Integer id, String name) throws ApplicationException;
 
 }

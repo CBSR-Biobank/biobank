@@ -132,7 +132,7 @@
 		</uptodate>
 	</target>
 
-	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate, build-server-validator-lib" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
+	<target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate, build-server-project" unless="cacore.sdk.uptodate" description="builds the caCORE SDK from the data model">
 		<copy file="sdk_conf/deploy.properties" tofile="${cacore.sdk.dir}/conf/deploy.properties" />
 		<copy file="sdk_conf/build.properties" tofile="${cacore.sdk.dir}/build.properties" />
 		<copy file="sdk_conf/validator-extension-Config.xml" tofile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
@@ -163,7 +163,7 @@
 
 	<!-- Eclipse -->
 
-	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download, build-server-project">
+	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download">
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${cacore.system.jar.files}" />
@@ -330,20 +330,24 @@
 	</target>
 
 
-	<target name="build-server-validator-lib">
-		<ant dir="${eclipse.proj.dir.server}" target="build-validator-lib" inheritRefs="false" />
-	</target>
-
-
 	<target name="build-server-project">
-		<dependset>
-			<srcfilelist dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" files="${sdk.local.jar.files.basename}" />
-			<targetfilelist dir="${eclipse.proj.dir.server}/lib" files="${sdk.local.jar.files.basename}" />
-		</dependset>
 		<copy todir="${eclipse.proj.dir.server}/lib">
-			<fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" />
+			<fileset dir="${cacore.sdk.dir}/system/lib">
+				<include name="csmapi*.*" />
+				<include name="spring*.*" />
+				<include name="hibernate3*.*" />
+				<include name="caGrid-CQL-cql*.*" />
+				<include name="hibernate-validator*.*" />
+			</fileset>
+			<fileset dir="${cacore.sdk.dir}/writable-api/dist" includes="*.jar" />
+
+			<fileset dir="${cacore.sdk.dir}/system/dist">
+				<include name="sdk-core*.*" />
+				<include name="sdk-client*.*" />
+			</fileset>
 		</copy>
 		<ant dir="${eclipse.proj.dir.server}" target="build-remote-lib" inheritRefs="false" />
+		<ant dir="${eclipse.proj.dir.server}" target="build-validator-lib" inheritRefs="false" />
 	</target>
 
 	<!-- copied from sdk build.xml -->
@@ -393,6 +397,7 @@
 	<target name="clean-jars" description="deletes jars from eclipse projects">
 		<delete>
 			<fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+			<fileset dir="${eclipse.proj.dir.server}/lib" includes="**/*.jar" />
 			<fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
 			<fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
 		</delete>

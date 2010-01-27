@@ -1,18 +1,17 @@
 package edu.ualberta.med.biobank.server;
 
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
-import gov.nih.nci.security.exceptions.CSConfigurationException;
-import gov.nih.nci.security.exceptions.CSException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.util.ClassCache;
 
 public class CustomApplicationServiceImpl extends
     WritableApplicationServiceImpl implements CustomApplicationService {
+
+    private static final String SITE_CLASS_NAME = "edu.ualberta.med.biobank.model.Site";
 
     public CustomApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -75,34 +74,28 @@ public class CustomApplicationServiceImpl extends
     // return null;
     // }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void newSite(Integer id, String name) {
+    public void newSite(Integer id, String name) throws ApplicationException {
         try {
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager("biobank2");
+            // Create protection element for the site
             ProtectionElement pe = new ProtectionElement();
             pe.setApplication(upm.getApplication("biobank2"));
-            pe.setProtectionElementName(Site.class.getName() + "/ID=" + id
+            pe.setProtectionElementName(SITE_CLASS_NAME + "/ID=" + id
                 + "/Name=" + name);
             pe.setProtectionElementDescription(name);
-            pe.setObjectId(Site.class.getName());
+            pe.setObjectId(SITE_CLASS_NAME);
             pe.setAttribute("id");
             pe.setValue(id.toString());
             upm.createProtectionElement(pe);
+            // Add the new protection element to the protection group
+            // "Site Admin PG"
             upm.addProtectionElements("11", new String[] { pe
                 .getProtectionElementId().toString() });
-        } catch (CSConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (CSException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new ApplicationException("Error addind new Site " + id + ":"
+                + name + "security");
         }
     }
-
-    public String toString() {
-        return "I am here: " + getClass().getName();
-    }
-
 }

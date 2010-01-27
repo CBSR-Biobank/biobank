@@ -74,7 +74,7 @@ CREATE TABLE `csm_filter_clause` (
   PRIMARY KEY (`FILTER_CLAUSE_ID`),
   KEY `FK_APPLICATION_FILTER_CLAUSE` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_FILTER_CLAUSE` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,6 +83,7 @@ CREATE TABLE `csm_filter_clause` (
 
 LOCK TABLES `csm_filter_clause` WRITE;
 /*!40000 ALTER TABLE `csm_filter_clause` DISABLE KEYS */;
+INSERT INTO `csm_filter_clause` VALUES (1,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site - self','id','java.lang.Integer','','','id in (select s.ID from site s where s.id in ( select pe.attribute_value from csm_protection_group pg, csm_protection_element pe, csm_pg_pe pgpe, csm_user_group_role_pg ugrpg, csm_user u, csm_role_privilege rp, csm_role r, csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.user_id = u.user_id and ugrpg.protection_group_id = any (select pg1.protection_group_id from csm_protection_group pg1 where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id = (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id)) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= \'edu.ualberta.med.biobank.model.Site\' and pe.attribute=\'id\' and p.privilege_name=\'READ\' and u.login_name=:USER_NAME and pe.application_id=:APPLICATION_ID) or s.id in (select distinct pe.attribute_value from csm_protection_group pg, csm_protection_element pe, csm_pg_pe pgpe, csm_user_group_role_pg ugrpg, csm_group g, csm_role_privilege rp, csm_role r, csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.group_id = g.group_id and ugrpg.protection_group_id = any ( select pg1.protection_group_id from csm_protection_group pg1 where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id =  (select pg2.parent_protection_group_id from csm_protection_group pg2  where pg2.protection_group_id = pg.protection_group_id)) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= \'edu.ualberta.med.biobank.model.Site\' and p.privilege_name=\'READ\' and g.group_name in (select grp.group_name from csm_group grp, csm_user_group userGrp, csm_user u where u.user_id = userGrp.user_id and userGrp.group_id = grp.group_id and u.login_name=:USER_NAME) and pe.application_id=:APPLICATION_ID))','id in (select table_name_csm_.id   from site table_name_csm_ where table_name_csm_.id in \r\n( select distinct pe.attribute_value from csm_protection_group pg, 	csm_protection_element pe, 	csm_pg_pe pgpe,	csm_user_group_role_pg ugrpg, 	csm_group g, 	csm_role_privilege rp, 	csm_role r, 	csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.group_id = g.group_id and ugrpg.protection_group_id = any ( select pg1.protection_group_id from csm_protection_group pg1  where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id =  (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id) ) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= \'edu.ualberta.med.biobank.model.Site\' and p.privilege_name=\'READ\' and g.group_name in (:GROUP_NAMES ) and pe.application_id=:APPLICATION_ID))',2,'2010-01-27');
 /*!40000 ALTER TABLE `csm_filter_clause` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -136,7 +137,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -184,9 +185,6 @@ INSERT INTO `csm_pg_pe` VALUES (93,7,33,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (94,9,33,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (95,5,33,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (96,3,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (97,11,35,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (98,12,35,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (99,11,36,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -244,7 +242,7 @@ CREATE TABLE `csm_protection_element` (
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -285,8 +283,6 @@ INSERT INTO `csm_protection_element` VALUES (31,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.ShippingCompany','edu.ualberta.med.biobank.model.ShippingCompany','edu.ualberta.med.biobank.model.ShippingCompany','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (33,'edu.ualberta.med.biobank.model.PvSampleSource','edu.ualberta.med.biobank.model.PvSampleSource','edu.ualberta.med.biobank.model.PvSampleSource','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','','','',2,'2010-01-11');
-INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.Site/ID=5/Name=Canadian BioSample repository','','edu.ualberta.med.biobank.model.Site','id','5','',2,'2010-01-19');
-INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.Site/ID=6/Name=Toto Test','Toto Test','edu.ualberta.med.biobank.model.Site','id','6','',2,'2010-01-19');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -330,7 +326,6 @@ INSERT INTO `csm_protection_group` VALUES (8,'pg-others','',2,0,'2009-07-23',1);
 INSERT INTO `csm_protection_group` VALUES (9,'pg-samples','',2,0,'2009-07-23',1);
 INSERT INTO `csm_protection_group` VALUES (10,'pg-biobank-clm','',3,0,'2009-07-27',NULL);
 INSERT INTO `csm_protection_group` VALUES (11,'Site Admin PG','Administrators Access to Sites',2,0,'2010-01-19',NULL);
-INSERT INTO `csm_protection_group` VALUES (12,'CBSR Access PG','',2,0,'2010-01-19',NULL);
 /*!40000 ALTER TABLE `csm_protection_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -500,7 +495,7 @@ CREATE TABLE `csm_user_group_role_pg` (
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_GROUPS` FOREIGN KEY (`GROUP_ID`) REFERENCES `csm_group` (`GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -520,9 +515,8 @@ INSERT INTO `csm_user_group_role_pg` VALUES (19,NULL,3,1,5,'2009-07-23');
 INSERT INTO `csm_user_group_role_pg` VALUES (20,NULL,2,1,1,'2009-07-23');
 INSERT INTO `csm_user_group_role_pg` VALUES (21,NULL,3,1,1,'2009-07-23');
 INSERT INTO `csm_user_group_role_pg` VALUES (22,7,NULL,3,10,'2009-07-27');
-INSERT INTO `csm_user_group_role_pg` VALUES (23,3,NULL,2,11,'2010-01-19');
-INSERT INTO `csm_user_group_role_pg` VALUES (24,3,NULL,1,11,'2010-01-19');
-INSERT INTO `csm_user_group_role_pg` VALUES (25,5,NULL,1,12,'2010-01-19');
+INSERT INTO `csm_user_group_role_pg` VALUES (28,NULL,4,2,11,'2010-01-27');
+INSERT INTO `csm_user_group_role_pg` VALUES (29,NULL,4,1,11,'2010-01-27');
 /*!40000 ALTER TABLE `csm_user_group_role_pg` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -557,7 +551,6 @@ INSERT INTO `csm_user_pe` VALUES (2,2,2);
 INSERT INTO `csm_user_pe` VALUES (3,28,6);
 /*!40000 ALTER TABLE `csm_user_pe` ENABLE KEYS */;
 UNLOCK TABLES;
-
 
 --
 -- Table structure for table `log_message`
@@ -635,4 +628,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-01-19 11:49:16
+-- Dump completed on 2010-01-27 15:43:46
