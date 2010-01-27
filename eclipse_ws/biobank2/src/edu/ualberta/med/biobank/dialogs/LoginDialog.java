@@ -220,8 +220,9 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
+        String serverName;
         try {
-            new URL(serverText.getText());
+            new URL("http://" + serverText.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(), "Invalid Server URL",
                 "Please enter a valid server URL.");
