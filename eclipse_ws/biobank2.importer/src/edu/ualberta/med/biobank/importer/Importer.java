@@ -994,15 +994,15 @@ public class Importer {
             String typeNameShort = container.getContainerType().getNameShort();
             if (label.equals("01") && typeNameShort.equals("F3x10")) {
                 // freezersMap.put(1, container);
+            } else if (label.equals("02") && typeNameShort.equals("F4x12")) {
+                freezersMap.put(2, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
                 // freezersMap.put(3, container);
-            } else if (label.equals("04") && typeNameShort.equals("F3x6")) {
-                // freezersMap.put(4, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
                 // freezersMap.put(5, container);
             } else if (label.equals("Sent Samples")
                 && typeNameShort.equals("F4x6")) {
-                freezersMap.put(99, container);
+                // freezersMap.put(99, container);
             }
         }
 
@@ -1025,6 +1025,9 @@ public class Importer {
 
             if (freezerNum == 99) {
                 freezerImporter = new Freezer99Importer(appService, con,
+                    cbsrSite, freezersMap.get(freezerNum), freezerNum);
+            } else if (freezerNum == 2) {
+                freezerImporter = new Freezer02Importer(appService, con,
                     cbsrSite, freezersMap.get(freezerNum), freezerNum);
             } else {
                 freezerImporter = new FreezerImporter(appService, con,

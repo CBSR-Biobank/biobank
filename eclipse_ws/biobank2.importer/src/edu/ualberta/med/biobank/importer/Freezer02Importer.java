@@ -31,7 +31,7 @@ public class Freezer02Importer extends FreezerImporter {
 
     @Override
     protected void doImport() throws Exception {
-        super.doImport();
+        // super.doImport();
 
         ResultSet rs;
         PreparedStatement ps;
@@ -91,7 +91,7 @@ public class Freezer02Importer extends FreezerImporter {
                 oldLabel = String.format("02%s%02d", hotelLabel, palletNr);
                 newLabel = getNewLabel(oldLabel);
 
-                newHotel = freezer.getChildByLabel(newLabel.substring(0, 3));
+                newHotel = freezer.getChildByLabel(newLabel.substring(0, 4));
                 newPalletNr = Integer.valueOf(newLabel.substring(newLabel
                     .length() - 2));
 
