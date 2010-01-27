@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -140,18 +139,14 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
     private void addPatient(PatientWrapper patient) {
         List<PatientWrapper> patients = shipment.getPatientCollection();
-        if (patients == null) {
-            patients = new ArrayList<PatientWrapper>();
-        }
-        if (patients.contains(patient)) {
+        if (patients != null && patients.contains(patient)) {
             BioBankPlugin.openAsyncError("Error", "Patient "
                 + patient.getPnumber()
                 + " has already been added to this shipment");
             return;
         }
-        patients.add(patient);
-        shipment.setPatientCollection(patients);
-        patientTable.setCollection(patients);
+        shipment.addPatients(patient);
+        patientTable.setCollection(shipment.getPatientCollection());
         notifyListeners();
     }
 
@@ -174,11 +169,9 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                             + patient.getPnumber() + "\" for this shipment ?");
 
                     if (confirm) {
-                        List<PatientWrapper> patients = shipment
-                            .getPatientCollection();
-                        patients.remove(patient);
-                        shipment.setPatientCollection(patients);
-                        patientTable.setCollection(patients);
+                        shipment.removePatients(patient);
+                        patientTable.setCollection(shipment
+                            .getPatientCollection());
                         notifyListeners();
                     }
                 }

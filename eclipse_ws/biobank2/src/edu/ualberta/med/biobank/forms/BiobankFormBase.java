@@ -236,7 +236,7 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     public static void setTextValue(Label label, String value) {
-        if (value != null) {
+        if (value != null && !label.isDisposed()) {
             label.setText(value);
         }
     }
