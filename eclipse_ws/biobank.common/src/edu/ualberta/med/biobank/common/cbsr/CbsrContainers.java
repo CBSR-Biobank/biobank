@@ -11,7 +11,6 @@ public class CbsrContainers {
         createFreezer01(site);
         createFreezer02(site);
         createFreezer03(site);
-        createFreezer04(site);
         createFreezer05(site);
         createSentSamplesFreezer(site);
         createCabinet01(site);
@@ -40,11 +39,24 @@ public class CbsrContainers {
     }
 
     private static void createFreezer02(SiteWrapper site) throws Exception {
-        // ContainerWrapper freezer02 = addTopLevelContainer(site, "02",
-        // CbsrContainerTypes.getContainerType("Freezer 4x12"));
+        ContainerWrapper freezer02 = addTopLevelContainer(site, "02",
+            CbsrContainerTypes.getContainerType("Freezer 4x12"));
 
-        addTopLevelContainer(site, "02", CbsrContainerTypes
-            .getContainerType("Freezer 4x12"));
+        ContainerWrapper hotel;
+        ContainerTypeWrapper hotelType = CbsrContainerTypes
+            .getContainerType("Hotel 18");
+        ContainerTypeWrapper palletType = CbsrContainerTypes
+            .getContainerType("Box 81");
+
+        for (int row = 0; row < 4; ++row) {
+            for (int col = 0; col < 12; ++col) {
+                hotel = addContainer(site, hotelType, freezer02, row, col);
+
+                for (int j = 0; j < 18; ++j) {
+                    addContainer(site, palletType, hotel, j, 0);
+                }
+            }
+        }
     }
 
     private static void createFreezer03(SiteWrapper site) throws Exception {
@@ -80,27 +92,6 @@ public class CbsrContainers {
                 addContainer(site, palletType, hotel, j, 0);
             }
             ++count;
-        }
-    }
-
-    private static void createFreezer04(SiteWrapper site) throws Exception {
-        ContainerWrapper freezer04 = addTopLevelContainer(site, "04",
-            CbsrContainerTypes.getContainerType("Freezer 3x6"));
-
-        ContainerWrapper hotel;
-        ContainerTypeWrapper hotelType = CbsrContainerTypes
-            .getContainerType("Hotel 10");
-        ContainerTypeWrapper palletType = CbsrContainerTypes
-            .getContainerType("Box 81");
-
-        for (int row = 0; row < 3; ++row) {
-            for (int col = 0; col < 6; ++col) {
-                hotel = addContainer(site, hotelType, freezer04, row, col);
-
-                for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
-                    addContainer(site, palletType, hotel, j, 0);
-                }
-            }
         }
     }
 

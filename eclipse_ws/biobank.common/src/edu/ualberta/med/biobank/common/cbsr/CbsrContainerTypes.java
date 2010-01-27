@@ -93,9 +93,6 @@ public class CbsrContainerTypes {
                 .asList(new ContainerTypeWrapper[] { biopsyPallet96,
                     cellPallet96, pallet96 }));
 
-        addContainerType(site, "Freezer 3x6", "F3x6", -80.0, "Closed", true, 2,
-            3, 6, Arrays.asList(new ContainerTypeWrapper[] { hotel10 }));
-
         addContainerType(site, "Freezer 3x10", "F3x10", -80.0, "Active", true,
             2, 3, 10, Arrays.asList(new ContainerTypeWrapper[] { hotel17 }));
 
