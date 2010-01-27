@@ -92,6 +92,13 @@ public class Freezer02Importer extends FreezerImporter {
                 newLabel = getNewLabel(oldLabel);
 
                 newHotel = freezer.getChildByLabel(newLabel.substring(0, 4));
+
+                if (newHotel == null) {
+                    logger.error("hotel not configured: "
+                        + newLabel.substring(0, 4));
+                    return;
+                }
+
                 newPalletNr = Integer.valueOf(newLabel.substring(newLabel
                     .length() - 2));
 
@@ -142,6 +149,13 @@ public class Freezer02Importer extends FreezerImporter {
                 newLabel = getNewLabel(oldLabel);
 
                 newHotel = freezer.getChildByLabel(newLabel.substring(0, 3));
+
+                if (newHotel == null) {
+                    logger.error("hotel not configured: "
+                        + newLabel.substring(0, 4));
+                    return;
+                }
+
                 newPalletNr = Integer.valueOf(newLabel.substring(newLabel
                     .length() - 2));
 
