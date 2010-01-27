@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -35,12 +36,14 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -208,14 +211,32 @@ public class ReportsView extends ViewPart {
                 params.add(range);
             } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
+            else if (widgetFields.get(i) instanceof FileBrowser) {
+                String csv = ((FileBrowser) widgetFields.get(i)).getText();
+                if (csv != null) {
+                    StringTokenizer st = new StringTokenizer(csv, ", \n");
+                    while (st.hasMoreTokens()) {
+                        String token = st.nextToken();
+                        if (DateFormatter.parseToDate(token) == null)
+                            try {
+                                params.add(Integer.parseInt(token));
+                            } catch (NumberFormatException e) {
+                                params.add("%" + token + "%");
+                            }
+                        else {
+                            // Calendar c = Calendar.getInstance();
+                            // c.setTime();
+                            params.add(DateFormatter.parseToDate(token));
+                        }
+                    }
+                }
+            }
         }
         List<Option> queryOptions = currentQuery.getOptions();
-        for (int i = 0; i < queryOptions.size(); i++) {
+        for (int i = 0; i < queryOptions.size() && i < params.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
                 params.set(i, option.getDefaultValue());
-            if (option.getType().equals(String.class))
-                params.set(i, "%" + params.get(i) + "%");
         }
 
         return params;
@@ -272,9 +293,9 @@ public class ReportsView extends ViewPart {
                 ((Combo) widget).select(0);
             } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
-            else if (option.getType() == String.class)
-                widget = new Text(subSection, SWT.BORDER);
-            else
+            else if (option.getType() == String.class) {
+                widget = new FileBrowser(subSection, SWT.NONE);
+            } else
                 widget = null;
             widgetFields.add(widget);
         }
