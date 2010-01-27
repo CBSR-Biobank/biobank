@@ -9,7 +9,8 @@ Bundle-ClassPath: .,
  lib/commons-beanutils-1.8.0.jar,
  lib/commons-digester-1.7.jar,
  lib/commons-lang-2.4.jar,
- lib/iText-2.1.0.jar
+ lib/iText-2.1.0.jar,
+ lib/jdt-compiler-3.1.1.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2

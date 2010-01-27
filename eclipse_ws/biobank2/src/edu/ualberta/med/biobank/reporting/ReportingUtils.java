@@ -10,9 +10,11 @@ import javax.print.PrintServiceLookup;
 
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
@@ -28,11 +30,12 @@ public class ReportingUtils {
         Map<String, Object> parameters, List<?> list) throws Exception {
 
         InputStream reportStream = ReportingUtils.class
-            .getResourceAsStream(reportName + ".jasper");
+            .getResourceAsStream(reportName + ".jrxml");
         if (reportStream == null) {
             throw new Exception("No report available with name " + reportName);
         }
-        return JasperFillManager.fillReport(reportStream, parameters,
+        JasperReport report = JasperCompileManager.compileReport(reportStream);
+        return JasperFillManager.fillReport(report, parameters,
             new JRBeanCollectionDataSource(list));
     }
 

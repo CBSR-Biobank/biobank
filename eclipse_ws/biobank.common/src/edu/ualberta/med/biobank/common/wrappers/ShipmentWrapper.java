@@ -21,6 +21,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
+    private List<PatientWrapper> patientsAdded;
+
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -53,6 +55,12 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     public Class<Shipment> getWrappedClass() {
         return Shipment.class;
+    }
+
+    @Override
+    public void persist() throws Exception {
+        super.persist();
+        patientsAdded.clear();
     }
 
     @Override
@@ -297,7 +305,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return getPatientCollection(false);
     }
 
-    public void setPatientCollection(Collection<Patient> patients,
+    private void setPatientCollection(Collection<Patient> patients,
         boolean setNull) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
         wrappedObject.setPatientCollection(patients);
@@ -308,13 +316,38 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
     }
 
-    public void setPatientCollection(List<PatientWrapper> patients) {
+    private void setPatientCollection(List<PatientWrapper> patients) {
         Collection<Patient> patientsObjects = new HashSet<Patient>();
         for (PatientWrapper p : patients) {
             patientsObjects.add(p.getWrappedObject());
         }
         setPatientCollection(patientsObjects, false);
         propertiesMap.put("patientCollection", patients);
+    }
+
+    public void addPatients(PatientWrapper... patients) {
+        List<PatientWrapper> patientsList = getPatientCollection();
+        if (patientsList == null) {
+            patientsList = new ArrayList<PatientWrapper>();
+        }
+        if (patientsAdded == null) {
+            patientsAdded = new ArrayList<PatientWrapper>();
+        }
+        for (PatientWrapper patient : patients) {
+            patientsAdded.add(patient);
+            patientsList.add(patient);
+        }
+        setPatientCollection(patientsList);
+    }
+
+    public void removePatients(PatientWrapper... patients) {
+        List<PatientWrapper> patientsList = getPatientCollection();
+        if (patientsList != null) {
+            for (PatientWrapper patient : patients) {
+                patientsList.remove(patient);
+            }
+            setPatientCollection(patientsList);
+        }
     }
 
     @Override
@@ -344,18 +377,18 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     /**
-     * Search a patient in patients list with the given patient number
      */
-    public PatientWrapper getPatient(String patientNumber) throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select patients from "
-            + Shipment.class.getName()
-            + " as shipment inner join shipment.patientCollection as patients"
-            + " where shipment.id = ? and patients.pnumber = ?", Arrays
-            .asList(new Object[] { getId(), patientNumber }));
-        List<Patient> patients = appService.query(criteria);
-        if (patients.size() >= 1) {
-            return new PatientWrapper(appService, patients.get(0));
+    public boolean hasPatient(String patientNumber) throws Exception {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(distinct patients.id) from "
+                + Shipment.class.getName()
+                + " as shipment inner join shipment.patientCollection as patients"
+                + " where shipment.id = ? and patients.pnumber = ?", Arrays
+                .asList(new Object[] { getId(), patientNumber }));
+        List<Long> results = appService.query(criteria);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
         }
-        return null;
+        return results.get(0) > 0;
     }
 }
