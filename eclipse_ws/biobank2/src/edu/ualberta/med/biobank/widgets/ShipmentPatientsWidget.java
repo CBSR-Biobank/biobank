@@ -146,7 +146,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             return;
         }
         shipment.addPatients(patient);
-        patientTable.setCollection(patients);
+        patientTable.setCollection(shipment.getPatientCollection());
         notifyListeners();
     }
 
