@@ -73,7 +73,6 @@ public class ReportsView extends ViewPart {
     private Composite subSection;
 
     private ComboViewer querySelect;
-    private List<Class<? extends QueryObject>> queryObjects;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -179,7 +178,7 @@ public class ReportsView extends ViewPart {
         searchTable.setLayoutData(searchLayoutData);
 
         querySelect.setSelection(new StructuredSelection(QueryObject
-            .getAllQueries().keySet().toArray()[0]));
+            .getQueryObjectNames()[0]));
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -362,7 +361,7 @@ public class ReportsView extends ViewPart {
                 return (String) element;
             }
         });
-        comboViewer.setInput(QueryObject.getAllQueries().keySet().toArray());
+        comboViewer.setInput(QueryObject.getQueryObjectNames());
         return comboViewer;
     }
 

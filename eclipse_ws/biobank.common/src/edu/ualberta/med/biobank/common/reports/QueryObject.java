@@ -19,22 +19,22 @@ public class QueryObject {
 
     static {
         Map<String, Class<? extends QueryObject>> aMap = new TreeMap<String, Class<? extends QueryObject>>();
-        aMap.put(CabinetDSamples.NAME, CabinetDSamples.class);
-        aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
-        aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
-        aMap.put(SampleCount.NAME, SampleCount.class);
-        aMap.put(FreezerCSamples.NAME, FreezerCSamples.class);
-        aMap.put(FreezerSSamples.NAME, FreezerSSamples.class);
-        aMap.put(CabinetSSamples.NAME, CabinetSSamples.class);
-        aMap.put(FvLPatientVisits.NAME, FvLPatientVisits.class);
-        aMap.put(FreezerDSamples.NAME, FreezerDSamples.class);
-        aMap.put(SampleSCount.NAME, SampleSCount.class);
         aMap.put(CabinetCSamples.NAME, CabinetCSamples.class);
-        aMap.put(SampleInvoiceByClinic.NAME, SampleInvoiceByClinic.class);
-        aMap.put(PatientWBC.NAME, PatientWBC.class);
-        aMap.put(SampleRequest.NAME, SampleRequest.class);
+        aMap.put(CabinetDSamples.NAME, CabinetDSamples.class);
+        aMap.put(CabinetSSamples.NAME, CabinetSSamples.class);
+        aMap.put(FreezerCSamples.NAME, FreezerCSamples.class);
+        aMap.put(FreezerDSamples.NAME, FreezerDSamples.class);
+        aMap.put(FreezerSSamples.NAME, FreezerSSamples.class);
+        aMap.put(FvLPatientVisits.NAME, FvLPatientVisits.class);
+        aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
         aMap.put(NewPsByStudyClinic.NAME, NewPsByStudyClinic.class);
+        aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
+        aMap.put(PatientWBC.NAME, PatientWBC.class);
+        aMap.put(SampleCount.NAME, SampleCount.class);
+        aMap.put(SampleInvoiceByClinic.NAME, SampleInvoiceByClinic.class);
         aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
+        aMap.put(SampleRequest.NAME, SampleRequest.class);
+        aMap.put(SampleSCount.NAME, SampleSCount.class);
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
@@ -99,8 +99,8 @@ public class QueryObject {
         queryOptions.add(new Option(name, type, defaultValue));
     }
 
-    public static Map<String, Class<? extends QueryObject>> getAllQueries() {
-        return QUERIES;
+    public static String[] getQueryObjectNames() {
+        return QUERIES.keySet().toArray(new String[] {});
     }
 
     public static Class<? extends QueryObject> getQueryObjectByName(String name)
