@@ -327,6 +327,8 @@ public class TestPatient extends TestDatabase {
         Date date1 = Utils.getRandomDate();
         PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
             patient1, shipment, date1);
+        PatientVisitWrapper visit1_1 = PatientVisitHelper.addPatientVisit(
+            patient1, shipment, date1);
         Date date2 = Utils.getRandomDate();
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient1, shipment, date2);
@@ -337,16 +339,18 @@ public class TestPatient extends TestDatabase {
         patient1.reload();
         patient2.reload();
 
-        PatientVisitWrapper visitFound = patient1.getVisit(date1);
-        Assert.assertEquals(visit1, visitFound);
+        List<PatientVisitWrapper> visitsFound = patient1.getVisit(date1);
+        Assert.assertTrue(visitsFound.size() == 2);
+        Assert.assertEquals(visit1, visitsFound.get(0));
+        Assert.assertEquals(visit1_1, visitsFound.get(1));
 
-        visitFound = patient1.getVisit(date2);
+        PatientVisitWrapper visitFound = patient1.getVisit(date2).get(0);
         Assert.assertEquals(visit2, visitFound);
 
-        visitFound = patient1.getVisit(date3);
+        visitFound = patient1.getVisit(date3).get(0);
         Assert.assertFalse(visit2.equals(visitFound));
 
-        visitFound = patient2.getVisit(date3);
+        visitFound = patient2.getVisit(date3).get(0);
         Assert.assertEquals(visit3, visitFound);
     }
 }

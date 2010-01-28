@@ -531,6 +531,37 @@ public class ContainerWrapper extends
         return children.get(rcp);
     }
 
+    /**
+     * Label can start with parent's label as prefix or without.
+     * 
+     * @param label
+     * @return
+     * @throws Exception
+     */
+    public ContainerWrapper getChildByLabel(String label) throws Exception {
+        ContainerTypeWrapper containerType = getContainerType();
+        if (containerType == null) {
+            throw new Exception("container type is null");
+        }
+        if (label.startsWith(getLabel())) {
+            label = label.substring(getLabel().length());
+        }
+        RowColPos pos;
+        switch (containerType.getChildLabelingScheme()) {
+        case 1:
+            pos = LabelingScheme.sbsToRowCol(label);
+            break;
+        case 2:
+            pos = LabelingScheme.cbsrTwoCharToRowCol(label, getRowCapacity(),
+                getColCapacity(), containerType.getName());
+            break;
+        case 3:
+        default:
+            pos = LabelingScheme.twoCharNumericToRowCol(containerType, label);
+        }
+        return getChild(pos);
+    }
+
     private void checkParentAcceptContainerType() throws BiobankCheckException {
         if (Boolean.TRUE.equals(getContainerType().getTopLevel()))
             return;
@@ -584,10 +615,14 @@ public class ContainerWrapper extends
 
     /**
      * Return true if this container can hold the type of sample
+     * 
+     * @throws Exception if the sample type is null.
      */
-    public boolean canHoldSample(SampleWrapper sample)
-        throws ApplicationException {
+    public boolean canHoldSample(SampleWrapper sample) throws Exception {
         SampleTypeWrapper type = sample.getSampleType();
+        if (type == null) {
+            throw new Exception("sample type is null");
+        }
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()
             + " as ct inner join ct.sampleTypeCollection as sampleType"
