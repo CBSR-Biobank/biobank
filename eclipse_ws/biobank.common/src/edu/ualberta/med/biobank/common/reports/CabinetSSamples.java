@@ -8,29 +8,28 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class FreezerCSamples extends QueryObject {
+public class CabinetSSamples extends QueryObject {
 
-    public FreezerCSamples(String op, Integer siteId) {
+    public CabinetSSamples(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer samples per study per clinic.",
+            "Displays the total number of cabinet samples per study.",
 
-            "select sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, count(*) from "
+            "select sample.patientVisit.patient.study.nameShort, count(*) from "
                 + Sample.class.getName()
                 + " as sample where sample.samplePosition.container.id in (select path1.container.id from "
                 + ContainerPath.class.getName()
                 + " as path1, "
                 + ContainerPath.class.getName()
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site"
-                + op
-                + siteId
-                + " group by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name",
-            new String[] { "Study", "Clinic", "Total" });
+                + op + siteId
+                + " group by sample.patientVisit.patient.study.nameShort",
+            new String[] { "Study", "Total" });
     }
 
     @Override
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
-        params.add("%Freezer%");
+        params.add("%Cabinet%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);

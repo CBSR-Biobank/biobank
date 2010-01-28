@@ -308,9 +308,6 @@
             <reference
                   definitionId="biobank2.loggedIn">
             </reference>
-            <reference
-                  definitionId="biobank2.siteSelected">
-            </reference>
            </and>
          </activeWhen>
       </handler>

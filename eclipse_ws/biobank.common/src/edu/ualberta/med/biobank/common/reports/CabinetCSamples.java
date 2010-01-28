@@ -8,11 +8,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class FreezerCSamples extends QueryObject {
+public class CabinetCSamples extends QueryObject {
 
-    public FreezerCSamples(String op, Integer siteId) {
+    public CabinetCSamples(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer samples per study per clinic.",
+            "Displays the total number of cabinet samples per study per clinic.",
 
             "select sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, count(*) from "
                 + Sample.class.getName()
@@ -30,7 +30,7 @@ public class FreezerCSamples extends QueryObject {
     @Override
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
-        params.add("%Freezer%");
+        params.add("%Cabinet%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);
