@@ -12,7 +12,7 @@ public class SampleRequest extends QueryObject {
 
     protected static final String NAME = "Sample Locations by CSV file";
 
-    public SampleRequest() {
+    public SampleRequest(String op, Integer siteId) {
         super(
             "Given a CSV file detailing a request (Study, Date Drawn, Sample Type, # Requested), generate a list of sample locations.",
             "select s.patientVisit.patient.study.nameShort, s.inventoryId, s.linkDate, s.sampleType.name, s.samplePosition.container.label from "
