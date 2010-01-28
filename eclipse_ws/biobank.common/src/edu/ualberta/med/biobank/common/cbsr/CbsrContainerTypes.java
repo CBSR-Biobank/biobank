@@ -72,10 +72,6 @@ public class CbsrContainerTypes {
         ContainerTypeWrapper pallet96 = addContainerType(site, "Pallet 96",
             "P96", null, "Active", false, 1, 8, 12, null, pallet96SampleTypes);
 
-        ContainerTypeWrapper hotel10 = addContainerType(site, "Hotel 10",
-            "H10", null, "Closed", false, 3, 10, 1, Arrays
-                .asList(new ContainerTypeWrapper[] { box81 }));
-
         ContainerTypeWrapper hotel13 = addContainerType(site, "Hotel 13",
             "H13", null, "Active", false, 3, 13, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { pallet96 }));
