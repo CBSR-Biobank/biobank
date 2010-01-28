@@ -13,6 +13,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitSummary extends QueryObject {
+
+    protected static final String NAME = "Patients grouped by Patient Visits";
+
     private static String PVCOUNT_STRING = "(select count(p.id) from "
         + Patient.class.getName()
         + " as p where (select count(pv.id) from "

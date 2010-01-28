@@ -73,7 +73,6 @@ public class ReportsView extends ViewPart {
     private Composite subSection;
 
     private ComboViewer querySelect;
-    private List<Class<? extends QueryObject>> queryObjects;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -104,8 +103,7 @@ public class ReportsView extends ViewPart {
         header = new Composite(top, SWT.NONE);
         header.setLayout(new GridLayout(3, false));
 
-        queryObjects = QueryObject.getAllQueries();
-        querySelect = createCombo(header, queryObjects);
+        querySelect = createCombo(header);
         querySelect
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -179,7 +177,8 @@ public class ReportsView extends ViewPart {
         GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
         searchTable.setLayoutData(searchLayoutData);
 
-        querySelect.setSelection(new StructuredSelection(queryObjects.get(0)));
+        querySelect.setSelection(new StructuredSelection(QueryObject
+            .getQueryObjectNames()[0]));
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -189,7 +188,8 @@ public class ReportsView extends ViewPart {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {
-            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
+            Class<? extends QueryObject> cls = QueryObject
+                .getQueryObjectByName((String) typeSelection.getFirstElement());
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
             SiteWrapper site = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
@@ -257,7 +257,8 @@ public class ReportsView extends ViewPart {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {
-            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
+            Class<? extends QueryObject> cls = QueryObject
+                .getQueryObjectByName((String) typeSelection.getFirstElement());
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
             SiteWrapper site = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
@@ -343,7 +344,7 @@ public class ReportsView extends ViewPart {
         printButton.setEnabled(false);
     }
 
-    protected static ComboViewer createCombo(Composite parent, List<?> list) {
+    protected static ComboViewer createCombo(Composite parent) {
         // SmartCombo testCombo = new SmartCombo(parent, new String[] { "test1",
         // "test2", "thirdtest", "zzz" });
 
@@ -360,10 +361,10 @@ public class ReportsView extends ViewPart {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((Class<?>) element).getSimpleName();
+                return (String) element;
             }
         });
-        comboViewer.setInput(list);
+        comboViewer.setInput(QueryObject.getQueryObjectNames());
         return comboViewer;
     }
 

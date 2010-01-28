@@ -2,15 +2,41 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class QueryObject {
+
+    private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
+
+    static {
+        Map<String, Class<? extends QueryObject>> aMap = new TreeMap<String, Class<? extends QueryObject>>();
+        aMap.put(CabinetCSamples.NAME, CabinetCSamples.class);
+        aMap.put(CabinetDSamples.NAME, CabinetDSamples.class);
+        aMap.put(CabinetSSamples.NAME, CabinetSSamples.class);
+        aMap.put(FreezerCSamples.NAME, FreezerCSamples.class);
+        aMap.put(FreezerDSamples.NAME, FreezerDSamples.class);
+        aMap.put(FreezerSSamples.NAME, FreezerSSamples.class);
+        aMap.put(FvLPatientVisits.NAME, FvLPatientVisits.class);
+        aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
+        aMap.put(NewPsByStudyClinic.NAME, NewPsByStudyClinic.class);
+        aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
+        aMap.put(PatientWBC.NAME, PatientWBC.class);
+        aMap.put(SampleCount.NAME, SampleCount.class);
+        aMap.put(SampleInvoiceByClinic.NAME, SampleInvoiceByClinic.class);
+        aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
+        aMap.put(SampleRequest.NAME, SampleRequest.class);
+        aMap.put(SampleSCount.NAME, SampleSCount.class);
+        QUERIES = Collections.unmodifiableMap(aMap);
+    };
 
     public enum DateRange {
         Week, Month, Quarter, Year
@@ -73,29 +99,17 @@ public class QueryObject {
         queryOptions.add(new Option(name, type, defaultValue));
     }
 
-    public static List<Class<? extends QueryObject>> getAllQueries() {
-        ArrayList<Class<? extends QueryObject>> queries = new ArrayList<Class<? extends QueryObject>>();
+    public static String[] getQueryObjectNames() {
+        return QUERIES.keySet().toArray(new String[] {});
+    }
 
-        // create all pre-defined queries here
-
-        queries.add(CabinetCSamples.class);
-        queries.add(CabinetDSamples.class);
-        queries.add(CabinetSSamples.class);
-        queries.add(FreezerCSamples.class);
-        queries.add(FreezerDSamples.class);
-        queries.add(FreezerSSamples.class);
-        queries.add(FvLPatientVisits.class);
-        queries.add(NewPsByStudyClinic.class);
-        queries.add(NewPVsByStudyClinic.class);
-        queries.add(PatientVisitSummary.class);
-        queries.add(PatientWBC.class);
-        queries.add(SampleCount.class);
-        queries.add(SampleInvoiceByClinic.class);
-        queries.add(SampleInvoiceByPatient.class);
-        // queries.add(SampleRequest.class);
-        queries.add(SampleSCount.class);
-
-        return queries;
+    public static Class<? extends QueryObject> getQueryObjectByName(String name)
+        throws Exception {
+        Class<? extends QueryObject> queryObject = QUERIES.get(name);
+        if (queryObject == null) {
+            throw new Exception("Query object \"" + name + "\" does not exist");
+        }
+        return queryObject;
     }
 
     public String getDescription() {

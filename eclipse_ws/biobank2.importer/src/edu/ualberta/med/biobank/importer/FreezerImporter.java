@@ -46,6 +46,7 @@ public class FreezerImporter {
     protected int bbpdbFreezerNum;
     protected int sampleImportCount;
     protected String query;
+    protected int currentPalletNr;
 
     public FreezerImporter(WritableApplicationService appService,
         Connection con, final SiteWrapper site, ContainerWrapper container,
@@ -63,6 +64,7 @@ public class FreezerImporter {
         this.bbpdbFreezerNum = bbpdbFreezerNum;
         this.query = query;
         sampleImportCount = 0;
+        currentPalletNr = 0;
 
         doImport();
     }
@@ -220,7 +222,13 @@ public class FreezerImporter {
         }
         sample.persist();
 
-        logger.debug("importing freezer sample " + pallet.getLabel()
+        if (currentPalletNr != palletNr) {
+            logger.debug("importing freezer samples into pallet "
+                + pallet.getLabel());
+            currentPalletNr = palletNr;
+        }
+
+        logger.trace("importing freezer sample " + pallet.getLabel()
             + palletPos);
         ++sampleImportCount;
 

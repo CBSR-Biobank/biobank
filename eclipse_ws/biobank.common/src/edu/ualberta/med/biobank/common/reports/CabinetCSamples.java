@@ -10,6 +10,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class CabinetCSamples extends QueryObject {
 
+    protected static final String NAME = "Cabinet Samples per Study and per Clinic";
+
     public CabinetCSamples(String op, Integer siteId) {
         super(
             "Displays the total number of cabinet samples per study per clinic.",

@@ -4,6 +4,8 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class FvLPatientVisits extends QueryObject {
 
+    protected static final String NAME = "Clinic - Comparison by Activity";
+
     public FvLPatientVisits(String op, Integer siteId) {
         super(
             "Compares the oldest and most recent activity by clinic.",

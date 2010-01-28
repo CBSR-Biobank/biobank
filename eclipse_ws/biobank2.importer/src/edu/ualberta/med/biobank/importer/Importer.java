@@ -791,6 +791,7 @@ public class Importer {
         }
     }
 
+    @SuppressWarnings("unused")
     private static void importCabinetSamples() throws Exception {
         Map<Integer, ContainerWrapper> cabinetsMap = new HashMap<Integer, ContainerWrapper>();
 
