@@ -17,7 +17,10 @@ public class SampleRequest extends QueryObject {
             "Given a CSV file detailing a request (Study, Date Drawn, Sample Type, # Requested), generate a list of sample locations.",
             "select s.patientVisit.patient.study.nameShort, s.inventoryId, s.linkDate, s.sampleType.name, s.samplePosition.container.label from "
                 + Sample.class.getName()
-                + " s where s.patientVisit.patient.study.nameShort like ? and datediff(s.linkDate, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
+                + " s where s.patientVisit.patient.study.site "
+                + op
+                + siteId
+                + " and s.patientVisit.patient.study.nameShort like ? and datediff(s.linkDate, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
             new String[] { "Study", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
