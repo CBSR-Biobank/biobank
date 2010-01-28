@@ -6,32 +6,33 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 
-public class SmartCombo extends Combo {
+public class SmartCombo {
 
     private String[] items;
+    private Combo combo;
 
     public SmartCombo(Composite parent, String[] args) {
-        super(parent, SWT.DROP_DOWN);
-        super.setItems(args);
+        combo = new Combo(parent, SWT.DROP_DOWN);
+        combo.setItems(args);
         items = args;
-        select(0);
-        this.addModifyListener(new ModifyListener() {
+        combo.select(0);
+        combo.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 if (items != null) {
-                    refineList(getText());
-                    setListVisible(true);
+                    refineList(combo.getText());
+                    combo.setListVisible(true);
                 }
             }
         });
     }
 
     protected void refineList(String text) {
-        this.remove(0, getItemCount() - 1);
+        combo.remove(0, combo.getItemCount() - 1);
         for (int i = 0; i < items.length; i++) {
             String item = items[i];
             if (item.startsWith(text))
-                add(item);
+                combo.add(item);
         }
     }
 }
