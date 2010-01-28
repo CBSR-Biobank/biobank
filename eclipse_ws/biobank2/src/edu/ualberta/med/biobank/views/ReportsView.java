@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -117,38 +118,44 @@ public class ReportsView extends ViewPart {
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                try {
-                    searchData = search();
-
-                    if (searchData.size() > 0) {
-                        String[] names = currentQuery.getColumnNames();
-                        int[] bounds = new int[names.length];
-
-                        for (int i = 0; i < names.length; i++) {
-                            bounds[i] = 100 + names[i].length() * 2;
+                BusyIndicator.showWhile(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell().getDisplay(),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                searchData = search();
+                            } catch (ApplicationException ae) {
+                                BioBankPlugin
+                                    .openAsyncError("Search error", ae);
+                            }
                         }
-                        searchTable.dispose();
-                        searchTable = new InfoTableWidget<Object>(top,
-                            searchData, names, bounds);
-                        searchTable.getTableViewer().setLabelProvider(
-                            new ReportsLabelProvider());
-                        GridData searchLayoutData = new GridData(SWT.FILL,
-                            SWT.FILL, true, true);
-                        searchLayoutData.minimumHeight = 500;
-                        searchTable.setLayoutData(searchLayoutData);
-                        searchTable.moveBelow(subSection);
-                        printButton.setEnabled(true);
-                    } else
-                        printButton.setEnabled(false);
-                    // searchTable.setCollection(searchData); caused big
-                    // problems... dunno why
+                    });
+                if (searchData.size() > 0) {
+                    String[] names = currentQuery.getColumnNames();
+                    int[] bounds = new int[names.length];
 
-                    searchTable.redraw();
-                    top.layout();
-                } catch (ApplicationException ae) {
-                    BioBankPlugin.openAsyncError("Search error", ae);
-                }
+                    for (int i = 0; i < names.length; i++) {
+                        bounds[i] = 100 + names[i].length() * 2;
+                    }
+                    searchTable.dispose();
+                    searchTable = new InfoTableWidget<Object>(top, searchData,
+                        names, bounds);
+                    searchTable.getTableViewer().setLabelProvider(
+                        new ReportsLabelProvider());
+                    GridData searchLayoutData = new GridData(SWT.FILL,
+                        SWT.FILL, true, true);
+                    searchLayoutData.minimumHeight = 500;
+                    searchTable.setLayoutData(searchLayoutData);
+                    searchTable.moveBelow(subSection);
+                    printButton.setEnabled(true);
+                } else
+                    printButton.setEnabled(false);
+                // searchTable.setCollection(searchData); caused big
+                // problems... dunno why
 
+                searchTable.redraw();
+                top.layout();
             }
         });
 
