@@ -30,7 +30,7 @@ public class Freezer02Importer extends FreezerImporter {
 
     @Override
     protected void doImport() throws Exception {
-        // super.doImport();
+        super.doImport();
 
         ResultSet rs;
         PreparedStatement ps;
@@ -119,7 +119,7 @@ public class Freezer02Importer extends FreezerImporter {
                 oldLabel = String.format("04%s%02d", hotelLabel, palletNr);
                 newLabel = getNewLabel(oldLabel);
 
-                newHotel = freezer.getChildByLabel(newLabel.substring(0, 3));
+                newHotel = freezer.getChildByLabel(newLabel.substring(0, 4));
 
                 if (newHotel == null) {
                     logger.error("hotel not configured: "
@@ -205,7 +205,7 @@ public class Freezer02Importer extends FreezerImporter {
 
     private static String getNewLabelFromFreezer04(String oldLabel)
         throws Exception {
-        String freezerLabel = "04";
+        String freezerLabel = "02";
         String hotelLabel = oldLabel.substring(2, 4);
         String palletLabel = oldLabel.substring(4, 6);
         int palletNum = Integer.valueOf(palletLabel);
@@ -230,10 +230,6 @@ public class Freezer02Importer extends FreezerImporter {
 
         int group = hotelIndex / 3;
         int withinGroup = hotelIndex % 3;
-
-        if (oldLabel.equals("04AD01")) {
-            System.out.println("here");
-        }
 
         switch (withinGroup) {
         case 0:
