@@ -138,6 +138,7 @@
 		<copy file="sdk_conf/validator-extension-Config.xml" tofile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
 		<copy file="sdk_conf/application-config.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
 		<copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
+		<copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
 		<copy file="security-logs/clm-log4j/log4j.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" />
 		<copy todir="${cacore.sdk.dir}/system/lib/"  file="${eclipse.proj.dir.server}/output/biobank-validators.jar" />
 		<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
