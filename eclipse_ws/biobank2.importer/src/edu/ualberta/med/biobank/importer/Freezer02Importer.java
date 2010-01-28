@@ -25,8 +25,7 @@ public class Freezer02Importer extends FreezerImporter {
     public Freezer02Importer(WritableApplicationService appService,
         Connection con, final SiteWrapper site, ContainerWrapper container,
         int bbpdbFreezerNum) throws Exception {
-        super(appService, con, site, container, bbpdbFreezerNum,
-            FreezerImporter.DEFAULT_QUERY);
+        super(appService, con, site, container, bbpdbFreezerNum, DEFAULT_QUERY);
     }
 
     @Override
@@ -54,21 +53,7 @@ public class Freezer02Importer extends FreezerImporter {
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('J'); h++) {
             hotelLabel = "C" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
-            ps = con
-                .prepareStatement("select patient_visit.date_received, "
-                    + "patient_visit.date_taken, study_list.study_name_short, "
-                    + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
-                    + "from freezer "
-                    + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
-                    + "join study_list on freezer.study_nr=study_list.study_nr "
-                    + "join patient on patient.patient_nr=freezer.patient_nr "
-                    + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
-                    + "and freezer.visit_nr=patient_visit.visit_nr "
-                    + "and freezer.patient_nr=patient_visit.patient_nr "
-                    + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
-                    + "where freezer.fnum = ? and freezer.rack= ? "
-                    + "and frz_99_inv_id.inventory_id is null "
-                    + "order by freezer.box, freezer.cell");
+            ps = con.prepareStatement(DEFAULT_QUERY);
             ps.setInt(1, bbpdbFreezerNum);
             ps.setString(2, hotelLabel);
 
@@ -111,21 +96,7 @@ public class Freezer02Importer extends FreezerImporter {
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('T'); h++) {
             hotelLabel = "A" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
-            ps = con
-                .prepareStatement("select patient_visit.date_received, "
-                    + "patient_visit.date_taken, study_list.study_name_short, "
-                    + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
-                    + "from freezer "
-                    + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
-                    + "join study_list on freezer.study_nr=study_list.study_nr "
-                    + "join patient on patient.patient_nr=freezer.patient_nr "
-                    + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
-                    + "and freezer.visit_nr=patient_visit.visit_nr "
-                    + "and freezer.patient_nr=patient_visit.patient_nr "
-                    + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
-                    + "where freezer.fnum = ? and freezer.rack= ? "
-                    + "and frz_99_inv_id.inventory_id is null "
-                    + "order by freezer.box, freezer.cell");
+            ps = con.prepareStatement(DEFAULT_QUERY);
             ps.setInt(1, 4);
             ps.setString(2, hotelLabel);
 
