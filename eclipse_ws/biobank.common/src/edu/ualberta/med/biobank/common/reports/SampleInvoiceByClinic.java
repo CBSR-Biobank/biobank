@@ -6,6 +6,9 @@ import java.util.Date;
 import edu.ualberta.med.biobank.model.Sample;
 
 public class SampleInvoiceByClinic extends QueryObject {
+
+    protected static final String NAME = "Samples per Clinic by Date";
+
     private static String QUERY_STRING = "Select Alias.patientVisit.shipment.clinic.name, "
         + "Alias.patientVisit.patient.pnumber, "
         + "Alias.linkDate, Alias.sampleType.name  from "

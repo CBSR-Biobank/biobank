@@ -10,6 +10,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleRequest extends QueryObject {
 
+    protected static final String NAME = "Sample Locations by CSV file";
+
     public SampleRequest() {
         super(
             "Given a CSV file detailing a request (Study, Date Drawn, Sample Type, # Requested), generate a list of sample locations.",

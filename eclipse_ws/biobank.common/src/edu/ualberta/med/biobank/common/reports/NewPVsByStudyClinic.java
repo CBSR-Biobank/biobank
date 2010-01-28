@@ -9,6 +9,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class NewPVsByStudyClinic extends QueryObject {
 
+    protected static final String NAME = "Patient Visist per Study per Clinic by Date";
+
     public NewPVsByStudyClinic(String op, Integer siteId) {
         super(
             "Displays the total number of patient visits added per study per clinic by date range.",

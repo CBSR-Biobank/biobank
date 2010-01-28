@@ -4,6 +4,8 @@ import edu.ualberta.med.biobank.model.Sample;
 
 public class SampleCount extends QueryObject {
 
+    protected static final String NAME = "Sample Type Totals";
+
     public SampleCount(String op, Integer siteId) {
         super("Lists the total number of each sample type.",
             "Select Alias.sampleType.name, count(*) from "
