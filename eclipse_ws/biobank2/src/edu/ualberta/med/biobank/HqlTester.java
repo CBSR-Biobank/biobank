@@ -34,6 +34,7 @@ public class HqlTester {
         }
     }
 
+    @SuppressWarnings("unused")
     private void getShipmentsByWeek() throws Exception {
         HQLCriteria c = new HQLCriteria(
             "select week(s.dateReceived) as weeknr, count(*)"

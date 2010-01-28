@@ -345,8 +345,9 @@ public class ReportsView extends ViewPart {
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
-        SmartCombo testCombo = new SmartCombo(parent, new String[] { "test1",
-            "test2", "thirdtest", "zzz" });
+        // SmartCombo testCombo =
+        new SmartCombo(parent, new String[] { "test1", "test2", "thirdtest",
+            "zzz" });
 
         Combo combo;
         ComboViewer comboViewer;

@@ -220,7 +220,6 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
-        String serverName;
         try {
             new URL("http://" + serverText.getText());
         } catch (MalformedURLException e) {
