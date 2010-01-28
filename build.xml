@@ -341,7 +341,7 @@
 				<include name="hibernate-validator*.*" />
 			</fileset>
 			<fileset dir="${cacore.sdk.dir}/writable-api/dist" includes="*.jar" />
-
+			<fileset dir="${cacore.sdk.dir}/system/security/dist" includes="*.jar" />
 			<fileset dir="${cacore.sdk.dir}/system/dist">
 				<include name="sdk-core*.*" />
 				<include name="sdk-client*.*" />

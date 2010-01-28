@@ -5,7 +5,15 @@ import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 
-public class CustomORMDAOImpl extends WritableORMDAOImpl {
+/**
+ * Hibernate calls are made in this server side class. It extends the default
+ * WritableORMDAOImpl class.
+ * 
+ * 
+ * See build.properties of the sdk for the generator configuration +
+ * application-config*.xml for the generated files.
+ */
+public class BiobankORMDAOImpl extends WritableORMDAOImpl {
 
     @Override
     public Response query(Request request) throws DAOException {

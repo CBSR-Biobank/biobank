@@ -9,13 +9,9 @@ application-config.xml :
 add interceptor to bean ApplicationService to intercept validation exceptions.
 
 build.properties = modify the ApplicationService used :
-
-extension.api.interface=edu.ualberta.med.biobank.server.CustomApplicationService
-extension.api.impl=edu.ualberta.med.biobank.server.CustomApplicationServiceImpl
-extension.dao.impl=edu.ualberta.med.biobank.server.CustomORMDAOImpl
-#extension.api.interface=gov.nih.nci.system.applicationservice.WritableApplicationService
-#extension.api.impl=gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl
-#extension.dao.impl=gov.nih.nci.system.dao.orm.WritableORMDAOImpl
+extension.api.interface=edu.ualberta.med.biobank.server.BiobankApplicationService
+extension.api.impl=edu.ualberta.med.biobank.server.BiobankApplicationServiceImpl
+extension.dao.impl=edu.ualberta.med.biobank.server.BiobankORMDAOImpl
 
 
 validator-extension-Config.xml :

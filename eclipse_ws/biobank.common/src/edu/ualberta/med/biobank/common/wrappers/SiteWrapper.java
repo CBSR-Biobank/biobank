@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.CustomApplicationService;
+import edu.ualberta.med.biobank.server.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -200,7 +200,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         boolean newSite = isNew();
         super.persist();
         if (newSite) {
-            ((CustomApplicationService) appService).newSite(getId(), getName());
+            ((BiobankApplicationService) appService)
+                .newSite(getId(), getName());
         }
     }
 

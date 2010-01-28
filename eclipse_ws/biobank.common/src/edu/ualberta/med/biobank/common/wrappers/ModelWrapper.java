@@ -10,7 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.server.CustomApplicationService;
+import edu.ualberta.med.biobank.server.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -288,8 +288,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canView(String user) {
         try {
-            return ((CustomApplicationService) appService).canReadObjects(user,
-                getWrappedClass());
+            return ((BiobankApplicationService) appService).canReadObjects(
+                user, getWrappedClass());
         } catch (ApplicationException e) {
             LOGGER.error("Error testing security authorization on "
                 + getWrappedClass(), e);
@@ -302,69 +302,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canEdit(String user) {
         try {
-            return ((CustomApplicationService) appService).canUpdateObjects(
+            return ((BiobankApplicationService) appService).canUpdateObjects(
                 user, getWrappedClass());
         } catch (ApplicationException e) {
             LOGGER.error("Error testing security authorization on "
                 + getWrappedClass(), e);
-            return false;
-        }
-    }
-
-    /**
-     * return true if the user can create an object of type hold by the
-     * modelWrapperType
-     */
-    public static boolean canCreate(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
-        try {
-            Constructor<?> constructor = modelWrapperType
-                .getConstructor(WritableApplicationService.class);
-            ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
-                .newInstance(appService);
-            return ((CustomApplicationService) appService).canCreateObjects(
-                user, wrapper.getWrappedClass());
-        } catch (Exception e) {
-            LOGGER.error("Error testing security authorization on "
-                + modelWrapperType.getName(), e);
-            return false;
-        }
-    }
-
-    /**
-     * return true if the user can view objects of type hold by the
-     * modelWrapperType
-     */
-    public static boolean canView(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
-        try {
-            Constructor<?> constructor = modelWrapperType
-                .getConstructor(WritableApplicationService.class);
-            ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
-                .newInstance(appService);
-            return wrapper.canView(user);
-        } catch (Exception e) {
-            LOGGER.error("Error testing security authorization on "
-                + modelWrapperType.getName(), e);
-            return false;
-        }
-    }
-
-    /**
-     * return true if the user can view objects of type hold by the
-     * modelWrapperType
-     */
-    public static boolean canEdit(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
-        try {
-            Constructor<?> constructor = modelWrapperType
-                .getConstructor(WritableApplicationService.class);
-            ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
-                .newInstance(appService);
-            return wrapper.canEdit(user);
-        } catch (Exception e) {
-            LOGGER.error("Error testing security authorization on "
-                + modelWrapperType.getName(), e);
             return false;
         }
     }

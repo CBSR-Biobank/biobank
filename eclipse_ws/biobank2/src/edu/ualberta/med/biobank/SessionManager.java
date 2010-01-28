@@ -12,6 +12,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
@@ -222,15 +223,15 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        return ModelWrapper.canCreate(getAppService(), clazz, getUser());
+        return SecurityHelper.canCreate(getAppService(), clazz, getUser());
     }
 
     public static boolean canView(Class<?> clazz) {
-        return ModelWrapper.canView(getAppService(), clazz, getUser());
+        return SecurityHelper.canView(getAppService(), clazz, getUser());
     }
 
     public static boolean canEdit(Class<?> clazz) {
-        return ModelWrapper.canEdit(getAppService(), clazz, getUser());
+        return SecurityHelper.canEdit(getAppService(), clazz, getUser());
     }
 
 }

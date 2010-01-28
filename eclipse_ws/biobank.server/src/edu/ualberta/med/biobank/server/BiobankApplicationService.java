@@ -3,7 +3,16 @@ package edu.ualberta.med.biobank.server;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public interface CustomApplicationService extends WritableApplicationService {
+/**
+ * Application service interface obtained through
+ * "ApplicationServiceProvider.getApplicationServiceFromUrl" method. This
+ * replace the default WritableApplicationService interface to add our own
+ * methods.
+ * 
+ * See build.properties of the sdk for the generator configuration +
+ * application-config*.xml for the generated files.
+ */
+public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean canReadObjects(String userLogin, Class<?> clazz)
         throws ApplicationException;

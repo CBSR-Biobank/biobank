@@ -117,5 +117,5 @@
 
 	@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<bean id="CLMInterceptor" class="gov.nih.nci.system.client.proxy.CLMProxy"/>@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
 
-	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.ValidationExceptionInterceptor"/>
+	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
 </beans>

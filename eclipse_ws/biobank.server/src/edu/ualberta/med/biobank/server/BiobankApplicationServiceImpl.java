@@ -8,12 +8,21 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.util.ClassCache;
 
-public class CustomApplicationServiceImpl extends
-    WritableApplicationServiceImpl implements CustomApplicationService {
+/**
+ * Implementation of the BiobankApplicationService interface. This class will be
+ * only on the server side.
+ * 
+ * See build.properties of the sdk for the generator configuration +
+ * application-config*.xml for the generated files.
+ */
+public class BiobankApplicationServiceImpl extends
+    WritableApplicationServiceImpl implements BiobankApplicationService {
 
-    private static final String SITE_CLASS_NAME = "edu.ualberta.med.biobank.model.Site";
+    public static final String SITE_CLASS_NAME = "edu.ualberta.med.biobank.model.Site";
 
-    public CustomApplicationServiceImpl(ClassCache classCache) {
+    private static final String APPLICATION_CONTEXT_NAME = "biobank2";
+
+    public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
     }
 
@@ -52,7 +61,7 @@ public class CustomApplicationServiceImpl extends
         String privilegeName) throws ApplicationException {
         try {
             AuthorizationManager am = SecurityServiceProvider
-                .getAuthorizationManager("biobank2");
+                .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
             return am
                 .checkPermission(userLogin, clazz.getName(), privilegeName);
         } catch (Exception e) {
@@ -78,10 +87,10 @@ public class CustomApplicationServiceImpl extends
     public void newSite(Integer id, String name) throws ApplicationException {
         try {
             UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager("biobank2");
+                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             // Create protection element for the site
             ProtectionElement pe = new ProtectionElement();
-            pe.setApplication(upm.getApplication("biobank2"));
+            pe.setApplication(upm.getApplication(APPLICATION_CONTEXT_NAME));
             pe.setProtectionElementName(SITE_CLASS_NAME + "/ID=" + id
                 + "/Name=" + name);
             pe.setProtectionElementDescription(name);
@@ -95,7 +104,7 @@ public class CustomApplicationServiceImpl extends
                 .getProtectionElementId().toString() });
         } catch (Exception e) {
             throw new ApplicationException("Error addind new Site " + id + ":"
-                + name + "security");
+                + name + "security: " + e.getMessage());
         }
     }
 }

@@ -35,6 +35,6 @@
 		</property>		
 	</bean>
 
-	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.ValidationExceptionInterceptor"/>
+	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
 
 </beans>

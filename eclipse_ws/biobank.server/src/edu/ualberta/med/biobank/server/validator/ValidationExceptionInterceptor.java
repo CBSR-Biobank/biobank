@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.server;
+package edu.ualberta.med.biobank.server.validator;
 
 import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
