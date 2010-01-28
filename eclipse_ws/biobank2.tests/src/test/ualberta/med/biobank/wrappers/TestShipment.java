@@ -343,7 +343,7 @@ public class TestShipment extends TestDatabase {
         study2.setContactCollection(contacts);
         study2.persist();
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
-        PatientWrapper patient4 = PatientHelper.addPatient(name + "_4", study2);
+        PatientHelper.addPatient(name + "_4", study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
         shipment.addPatients(patient1, patient2, patient3);

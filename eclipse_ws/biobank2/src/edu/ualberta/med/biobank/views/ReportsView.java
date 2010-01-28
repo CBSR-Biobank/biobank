@@ -58,7 +58,6 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
-import edu.ualberta.med.biobank.widgets.SmartCombo;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -345,9 +344,6 @@ public class ReportsView extends ViewPart {
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
-        SmartCombo testCombo = new SmartCombo(parent, new String[] { "test1",
-            "test2", "thirdtest", "zzz" });
-
         Combo combo;
         ComboViewer comboViewer;
         combo = new Combo(parent, SWT.READ_ONLY);
