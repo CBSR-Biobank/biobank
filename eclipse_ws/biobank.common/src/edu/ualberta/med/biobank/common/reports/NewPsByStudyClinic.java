@@ -10,7 +10,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class NewPsByStudyClinic extends QueryObject {
 
-    protected static final String NAME = "Patients per Study per Clinic by Date";
+    protected static final String NAME = "New Patients per Study per Clinic by Date";
 
     public static String sub_query = "(select min(sub_query.dateProcessed) from "
         + PatientVisit.class.getName()
