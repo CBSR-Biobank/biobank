@@ -10,7 +10,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleRequest extends QueryObject {
 
-    protected static final String NAME = "Sample Locations by CSV file";
+    protected static final String NAME = "Sample Request by CSV file";
 
     public SampleRequest(String op, Integer siteId) {
         super(

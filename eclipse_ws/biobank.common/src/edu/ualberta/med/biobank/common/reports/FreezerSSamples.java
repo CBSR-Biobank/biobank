@@ -10,7 +10,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class FreezerSSamples extends QueryObject {
 
-    protected static final String NAME = "Freezer - Total Samples per Study";
+    protected static final String NAME = "Freezer Samples per Study";
 
     public FreezerSSamples(String op, Integer siteId) {
         super(

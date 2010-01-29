@@ -10,7 +10,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class CabinetSSamples extends QueryObject {
 
-    protected static final String NAME = "Cabinet - Total Samples per Study";
+    protected static final String NAME = "Cabinet Samples per Study";
 
     public CabinetSSamples(String op, Integer siteId) {
         super(
