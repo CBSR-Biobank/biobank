@@ -8,39 +8,47 @@ import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.ui.PlatformUI;
 
+import ar.com.fdvs.dj.domain.constants.Font;
+
 public class ReportingUtils {
 
-    public static JasperPrint createReport(String reportName,
-        Map<String, Object> parameters, List<?> list) throws Exception {
+    public static Font sansSerif = new Font(Font.MEDIUM, "SansSerif", false);
 
+    public static Font sansSerifBold = new Font(Font.MEDIUM, "SansSerif", true);
+
+    public static JasperPrint createStandardReport(String reportName,
+        Map<String, Object> parameters, List<?> list) throws Exception {
         InputStream reportStream = ReportingUtils.class
-            .getResourceAsStream(reportName + ".jasper");
+            .getResourceAsStream(reportName + ".jrxml");
         if (reportStream == null) {
             throw new Exception("No report available with name " + reportName);
         }
-        return JasperFillManager.fillReport(reportStream, parameters,
+        JasperDesign jdesign = JRXmlLoader.load(reportStream);
+        JasperReport report = JasperCompileManager.compileReport(jdesign);
+        return JasperFillManager.fillReport(report, parameters,
             new JRBeanCollectionDataSource(list));
     }
 
-    public static void printReport(String reportName,
-        Map<String, Object> parameters, List<?> list) throws Exception {
-
-        JasperPrint jasperPrint = createReport(reportName, parameters, list);
-
+    public static void printReport(JasperPrint jasperPrint) throws Exception {
         PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         PrinterData data = dialog.open();
@@ -85,16 +93,18 @@ public class ReportingUtils {
                     JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
                     Boolean.FALSE);
 
-                exporter.exportReport();
+                try {
+                    exporter.exportReport();
+                } catch (JRException e) {
+                    throw new Exception(
+                        "Printing failed. Check your printer settings and try again.");
+                }
             }
         }
     }
 
-    public static void saveReport(String reportName,
-        Map<String, Object> parameters, List<?> list, String fileName)
+    public static void saveReport(JasperPrint jasperPrint, String fileName)
         throws Exception {
-
-        JasperPrint jasperPrint = createReport(reportName, parameters, list);
         JasperExportManager.exportReportToPdfFile(jasperPrint, fileName);
     }
 }

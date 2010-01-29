@@ -2,6 +2,7 @@ package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +169,7 @@ public class TestPatient extends TestDatabase {
         addClinic(patient);
         patient.persist();
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
-        shipment.setPatientCollection(Arrays.asList(patient));
+        shipment.addPatients(patient);
         shipment.persist();
         patient.reload();
 
@@ -296,7 +297,7 @@ public class TestPatient extends TestDatabase {
         List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
         for (int i = 0, n = r.nextInt(10); i < n; ++i) {
             ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
-            ship.setPatientCollection(Arrays.asList(patient));
+            ship.addPatients(patient);
             ship.persist();
             shipments.add(ship);
         }
@@ -307,5 +308,49 @@ public class TestPatient extends TestDatabase {
         for (ShipmentWrapper shipment : savedShipments) {
             Assert.assertTrue(shipments.contains(shipment));
         }
+    }
+
+    @Test
+    public void testGetVisit() throws Exception {
+        String name = "testGetVisit" + r.nextInt();
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.setContactCollection(Arrays.asList(contact));
+        study.persist();
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient1,
+            patient2);
+
+        Date date1 = Utils.getRandomDate();
+        PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
+            patient1, shipment, date1);
+        PatientVisitWrapper visit1_1 = PatientVisitHelper.addPatientVisit(
+            patient1, shipment, date1);
+        Date date2 = Utils.getRandomDate();
+        PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
+            patient1, shipment, date2);
+        Date date3 = Utils.getRandomDate();
+        PatientVisitWrapper visit3 = PatientVisitHelper.addPatientVisit(
+            patient2, shipment, date3);
+
+        patient1.reload();
+        patient2.reload();
+
+        List<PatientVisitWrapper> visitsFound = patient1.getVisit(date1);
+        Assert.assertTrue(visitsFound.size() == 2);
+        Assert.assertEquals(visit1, visitsFound.get(0));
+        Assert.assertEquals(visit1_1, visitsFound.get(1));
+
+        PatientVisitWrapper visitFound = patient1.getVisit(date2).get(0);
+        Assert.assertEquals(visit2, visitFound);
+
+        visitFound = patient1.getVisit(date3).get(0);
+        Assert.assertFalse(visit2.equals(visitFound));
+
+        visitFound = patient2.getVisit(date3).get(0);
+        Assert.assertEquals(visit3, visitFound);
     }
 }

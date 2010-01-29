@@ -193,8 +193,7 @@ public class TestShipment extends TestDatabase {
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.setPatientCollection(Arrays.asList(patient1, patient2,
-            patient3));
+        shipment.addPatients(patient1, patient2, patient3);
         shipment.persist();
 
         shipment.reload();
@@ -231,8 +230,7 @@ public class TestShipment extends TestDatabase {
             study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.setPatientCollection(Arrays.asList(patient1, patient2,
-            patient3));
+        shipment.addPatients(patient1, patient2, patient3);
         shipment.persist();
 
         shipment.reload();
@@ -260,11 +258,9 @@ public class TestShipment extends TestDatabase {
             firstPatient);
         shipment.reload();
 
-        List<PatientWrapper> patients = shipment.getPatientCollection();
         PatientWrapper patient = PatientHelper.addPatient(name + "NewPatient",
             study);
-        patients.add(patient);
-        shipment.setPatientCollection(patients);
+        shipment.addPatients(patient);
         shipment.persist();
 
         shipment.reload();
@@ -287,10 +283,9 @@ public class TestShipment extends TestDatabase {
             patient2);
         shipment.reload();
 
-        List<PatientWrapper> patients = shipment.getPatientCollection();
-        PatientWrapper patient = DbHelper.chooseRandomlyInList(patients);
-        patients.remove(patient);
-        shipment.setPatientCollection(patients);
+        PatientWrapper patient = DbHelper.chooseRandomlyInList(shipment
+            .getPatientCollection());
+        shipment.removePatients(patient);
         shipment.persist();
 
         shipment.reload();
@@ -321,6 +316,42 @@ public class TestShipment extends TestDatabase {
 
         Assert.assertEquals(1, shipsFound.size());
         Assert.assertEquals(shipmentTest, shipsFound.get(0));
+    }
+
+    @Test
+    public void testHasPatient() throws Exception {
+        String name = "testHasPatient" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact1);
+        contacts.add(contact2);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.setContactCollection(contacts);
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study1);
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(contacts);
+        study2.persist();
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
+        PatientHelper.addPatient(name + "_4", study2);
+
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
+        shipment.addPatients(patient1, patient2, patient3);
+        shipment.persist();
+
+        shipment.reload();
+        Assert.assertTrue(shipment.hasPatient(name + "_2"));
+        Assert.assertFalse(shipment.hasPatient(name + "_4"));
     }
 
     @Test

@@ -677,13 +677,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
         HQLCriteria criteria = new HQLCriteria("select patients from "
             + Study.class.getName()
             + " as study inner join study.patientCollection"
-            + " as patients where patients.pnumber = ?", Arrays
-            .asList(new Object[] { patientNumber }));
+            + " as patients where patients.pnumber = ? and study.id = ?",
+            Arrays.asList(new Object[] { patientNumber, getId() }));
         List<Patient> result = appService.query(criteria);
-        if (result.size() != 1) {
+        if (result.size() > 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
+        } else if (result.size() == 1) {
+            return new PatientWrapper(appService, result.get(0));
         }
-        return new PatientWrapper(appService, result.get(0));
+        return null;
     }
 
     public boolean hasPatients() throws ApplicationException,
@@ -812,8 +814,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
         throws ApplicationException, BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(clinics) from "
             + Contact.class.getName() + " as contacts"
-            + " inner join contacts.clinic as clinics"
-            + " where contacts.studyCollection.id = ?" + " and clinics.id = ?",
+            + " join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ? and clinics.id = ?",
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {

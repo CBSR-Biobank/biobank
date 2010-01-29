@@ -938,4 +938,44 @@ public class TestStudy extends TestDatabase {
         Assert.assertTrue(study.compareTo(study2) > 0);
         Assert.assertTrue(study2.compareTo(study) < 0);
     }
+
+    @Test
+    public void testHasClinic() throws Exception {
+        String name = "testHasClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "_2");
+        ContactHelper.addContact(clinic2, name);
+
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        study.setContactCollection(Arrays.asList(contact1));
+        study.persist();
+
+        study.reload();
+
+        Assert.assertTrue(study.hasClinic(clinic1.getName()));
+        Assert.assertFalse(study.hasClinic(clinic2.getName()));
+    }
+
+    @Test
+    public void testGetPatient() throws Exception {
+        String name = "testGetPatient" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "_2");
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
+
+        study.reload();
+        Assert.assertEquals(patient1, study.getPatient(name + "_1"));
+        Assert.assertEquals(patient2, study.getPatient(name + "_2"));
+        Assert.assertEquals(patient3, study2.getPatient(name + "_3"));
+        Assert.assertNull(study.getPatient(name + "_3"));
+        Assert.assertNull(study2.getPatient(name + "_1"));
+    }
 }

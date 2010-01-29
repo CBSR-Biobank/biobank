@@ -139,7 +139,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     /**
      * Search for a patient visit with the given date processed.
      */
-    public PatientVisitWrapper getVisit(Date dateProcessed)
+    public List<PatientVisitWrapper> getVisit(Date dateProcessed)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select visits from "
             + Patient.class.getName()
@@ -147,10 +147,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             + " where p.id = ? and visits.dateProcessed = ?", Arrays
             .asList(new Object[] { getId(), dateProcessed }));
         List<PatientVisit> visits = appService.query(criteria);
-        if (visits.size() == 1) {
-            return new PatientVisitWrapper(appService, visits.get(0));
+        List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
+        for (PatientVisit visit : visits) {
+            result.add(new PatientVisitWrapper(appService, visit));
         }
-        return null;
+        return result;
     }
 
     /**

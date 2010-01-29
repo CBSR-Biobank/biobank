@@ -84,6 +84,12 @@ Export-Package: antlr;
    org.apache.commons.collections,
    org.apache.commons.collections.set",
  org.apache.commons.lang;uses:="org.apache.commons.lang.exception",
+ org.acegisecurity,
+ org.acegisecurity.providers.rcp,
+ org.apache.commons.collections,
+ org.apache.commons.collections.list,
+ org.apache.commons.collections.map,
+ org.apache.commons.lang,
  org.apache.commons.logging,
  org.apache.commons.logging.impl;
   uses:="javax.servlet,

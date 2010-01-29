@@ -69,7 +69,6 @@ public class TestLabelingScheme extends TestDatabase {
         }
     }
 
-    @SuppressWarnings("serial")
     @Test
     public void testCBSR() throws Exception {
         int totalRows = 3 + r.nextInt(3);

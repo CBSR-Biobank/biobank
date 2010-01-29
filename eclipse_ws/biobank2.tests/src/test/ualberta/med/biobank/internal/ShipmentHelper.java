@@ -24,7 +24,7 @@ public class ShipmentHelper extends DbHelper {
         }
 
         if (patients != null) {
-            shipment.setPatientCollection(Arrays.asList(patients));
+            shipment.addPatients(patients);
         }
 
         return shipment;

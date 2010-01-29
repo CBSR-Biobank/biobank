@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank;
 
 import edu.ualberta.med.biobank.common.ServiceConnection;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -15,13 +16,25 @@ public class HqlTester {
     }
 
     public HqlTester() throws Exception {
-        appService = ServiceConnection.getAppService("http://"
-            + System.getProperty("server", "localhost:8080") + "/biobank2",
+        appService = ServiceConnection.getAppService("https://"
+            + System.getProperty("server", "localhost:8443") + "/biobank2",
             "testuser", "test");
-
-        getShipmentsByWeek();
+        test();
+        // getShipmentsByWeek();
     }
 
+    private void test() throws ApplicationException {
+        HQLCriteria c = new HQLCriteria(
+            "select count(p.id) from edu.ualberta.med.biobank.model.Patient"
+                + " as p join p.patientVisitCollection where p.patientVisitCollection.dateProcessed <40000 and size(p.patientVisitCollection)=5 ");
+        List<Object> results = appService.query(c);
+        for (Object o : results) {
+            // System.out.println(((Object[]) o)[0] + " " + ((Object[]) o)[1]);
+            System.out.println(o);
+        }
+    }
+
+    @SuppressWarnings("unused")
     private void getShipmentsByWeek() throws Exception {
         HQLCriteria c = new HQLCriteria(
             "select week(s.dateReceived) as weeknr, count(*)"

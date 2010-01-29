@@ -23,8 +23,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     @Override
     protected void deleteChecks() throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

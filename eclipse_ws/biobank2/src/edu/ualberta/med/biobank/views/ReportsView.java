@@ -1,12 +1,19 @@
 package edu.ualberta.med.biobank.views;
 
+import java.awt.Color;
+import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -33,12 +40,23 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.Style;
+import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
+import ar.com.fdvs.dj.domain.constants.Border;
+import ar.com.fdvs.dj.domain.constants.Transparency;
+import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -55,7 +73,7 @@ public class ReportsView extends ViewPart {
     private Composite subSection;
 
     private ComboViewer querySelect;
-    private List<QueryObject> queryObjects;
+    private List<Class<? extends QueryObject>> queryObjects;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -86,8 +104,7 @@ public class ReportsView extends ViewPart {
         header = new Composite(top, SWT.NONE);
         header.setLayout(new GridLayout(3, false));
 
-        queryObjects = QueryObject.getAllQueries(SessionManager.getInstance()
-            .getCurrentSiteWrapper().getId());
+        queryObjects = QueryObject.getAllQueries();
         querySelect = createCombo(header, queryObjects);
         querySelect
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -106,11 +123,7 @@ public class ReportsView extends ViewPart {
                     searchData = search();
 
                     if (searchData.size() > 0) {
-                        IStructuredSelection typeSelection = (IStructuredSelection) querySelect
-                            .getSelection();
-                        QueryObject query = (QueryObject) typeSelection
-                            .getFirstElement();
-                        String[] names = query.getColumnNames();
+                        String[] names = currentQuery.getColumnNames();
                         int[] bounds = new int[names.length];
 
                         for (int i = 0; i < names.length; i++) {
@@ -126,8 +139,12 @@ public class ReportsView extends ViewPart {
                         searchLayoutData.minimumHeight = 500;
                         searchTable.setLayoutData(searchLayoutData);
                         searchTable.moveBelow(subSection);
-                    }
-                    searchTable.setCollection(searchData);
+                        printButton.setEnabled(true);
+                    } else
+                        printButton.setEnabled(false);
+                    // searchTable.setCollection(searchData); caused big
+                    // problems... dunno why
+
                     searchTable.redraw();
                     top.layout();
                 } catch (ApplicationException ae) {
@@ -139,6 +156,7 @@ public class ReportsView extends ViewPart {
 
         printButton = new Button(header, SWT.NONE);
         printButton.setText("Print");
+        printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -165,32 +183,94 @@ public class ReportsView extends ViewPart {
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
     }
 
     private Collection<Object> search() throws ApplicationException {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
-        currentQuery = (QueryObject) typeSelection.getFirstElement();
+        try {
+            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
+            Constructor<?> c = cls.getConstructor(String.class, Integer.class);
+            SiteWrapper site = SessionManager.getInstance()
+                .getCurrentSiteWrapper();
+            String op = "=";
+            if (site.getName().compareTo("All Sites") == 0)
+                op = "!=";
+            currentQuery = (QueryObject) c.newInstance(new Object[] { op,
+                site.getId() });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ArrayList<Object> params = getParams();
+
+        return currentQuery
+            .executeQuery(SessionManager.getAppService(), params);
+    }
+
+    private ArrayList<Object> getParams() {
         ArrayList<Object> params = new ArrayList<Object>();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof Text)
                 params.add(((Text) widgetFields.get(i)).getText());
-            else if (widgetFields.get(i) instanceof Combo)
-                params.add(((Combo) widgetFields.get(i)).getSelectionIndex());
-            else if (widgetFields.get(i) instanceof DateTimeWidget)
+            else if (widgetFields.get(i) instanceof Combo) {
+                Combo tempCombo = (Combo) widgetFields.get(i);
+                // would rather return a daterange but basic combo (necessary
+                // since jface comboviewer is not a widget) won't let me
+                // DateRange range
+                // =tempCombo.getItem(tempCombo.getSelectionIndex());
+                String range = tempCombo.getItem(tempCombo.getSelectionIndex());
+                params.add(range);
+            } else if (widgetFields.get(i) instanceof DateTimeWidget)
                 params.add(((DateTimeWidget) widgetFields.get(i)).getDate());
+            else if (widgetFields.get(i) instanceof FileBrowser) {
+                String csv = ((FileBrowser) widgetFields.get(i)).getText();
+                if (csv != null) {
+                    StringTokenizer st = new StringTokenizer(csv, ", \n");
+                    while (st.hasMoreTokens()) {
+                        String token = st.nextToken();
+                        if (DateFormatter.parseToDate(token) == null)
+                            try {
+                                params.add(Integer.parseInt(token));
+                            } catch (NumberFormatException e) {
+                                params.add("%" + token + "%");
+                            }
+                        else {
+                            // Calendar c = Calendar.getInstance();
+                            // c.setTime();
+                            params.add(DateFormatter.parseToDate(token));
+                        }
+                    }
+                }
+            }
         }
-        return currentQuery
-            .executeQuery(SessionManager.getAppService(), params);
+        List<Option> queryOptions = currentQuery.getOptions();
+        for (int i = 0; i < queryOptions.size() && i < params.size(); i++) {
+            Option option = queryOptions.get(i);
+            if (params.get(i) == null)
+                params.set(i, option.getDefaultValue());
+        }
+
+        return params;
     }
 
     public void comboChanged() {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
-        QueryObject query = (QueryObject) typeSelection.getFirstElement();
+        try {
+            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
+            Constructor<?> c = cls.getConstructor(String.class, Integer.class);
+            SiteWrapper site = SessionManager.getInstance()
+                .getCurrentSiteWrapper();
+            String op = "=";
+            if (site.getName().compareTo("All Sites") == 0)
+                op = "!=";
+            currentQuery = (QueryObject) c.newInstance(new Object[] { op,
+                site.getId() });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        List<Option> queryOptions = query.getOptions();
+        List<Option> queryOptions = currentQuery.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
@@ -203,7 +283,7 @@ public class ReportsView extends ViewPart {
         subSection.setLayout(layout);
 
         Label description = new Label(subSection, SWT.NONE);
-        description.setText("Description: " + query.getDescription());
+        description.setText("Description: " + currentQuery.getDescription());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         description.setLayoutData(gd2);
@@ -215,21 +295,17 @@ public class ReportsView extends ViewPart {
             textLabels.add(fieldLabel);
             Widget widget;
 
-            // if (fields.get(i) == Combo.class)
-            // widget = new Combo(subSection, SWT.NONE);
-            // else if (fields.get(i) == DateTimeWidget.class)
-            // widget = new DateTimeWidget(subSection, SWT.NONE, null);
-            // else if (fields.get(i) == Text.class)
-            // widget = new Text(subSection, SWT.BORDER);
-            // else
-            // widget = null;
-            if (option.getType() == List.class)
-                widget = new Combo(subSection, SWT.NONE);
-            else if (option.getType() == Date.class)
+            if (option.getType() == DateRange.class) {
+                widget = new Combo(subSection, SWT.READ_ONLY);
+                Object values[] = DateRange.values();
+                for (int j = 0; j < values.length; j++)
+                    ((Combo) widget).add(values[j].toString());
+                ((Combo) widget).select(0);
+            } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
-            else if (option.getType() == String.class)
-                widget = new Text(subSection, SWT.BORDER);
-            else
+            else if (option.getType() == String.class) {
+                widget = new FileBrowser(subSection, SWT.NONE);
+            } else
                 widget = null;
             widgetFields.add(widget);
         }
@@ -256,6 +332,7 @@ public class ReportsView extends ViewPart {
 
     public void resetSearch() {
         if (searchTable != null) {
+
             searchTable.setCollection(new ArrayList<Object>());
             TableColumn[] cols = searchTable.getTableViewer().getTable()
                 .getColumns();
@@ -263,7 +340,7 @@ public class ReportsView extends ViewPart {
                 col.setText("");
             }
         }
-
+        printButton.setEnabled(false);
     }
 
     protected static ComboViewer createCombo(Composite parent, List<?> list) {
@@ -280,7 +357,7 @@ public class ReportsView extends ViewPart {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return element.toString();
+                return ((Class<?>) element).getSimpleName();
             }
         });
         comboViewer.setInput(list);
@@ -308,21 +385,74 @@ public class ReportsView extends ViewPart {
             .getActiveWorkbenchWindow().getShell(), "Confirm",
             "Print table contents?");
         if (doPrint) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("title", "Patient visit counts by clinic");
-            map.put("start", new Date());
-            map.put("end", new Date());
-            List<CBSRReportCollection> cbsrCollections = new ArrayList<CBSRReportCollection>();
-            for (Object objects : searchTable.getCollection()) {
-                cbsrCollections.add(new CBSRReportCollection(Arrays
-                    .asList((Object[]) objects)));
+            List<Object[]> params = new ArrayList<Object[]>();
+            List<Object> paramVals = getParams();
+            List<Option> queryOptions = currentQuery.getOptions();
+            int i = 0;
+            for (Option option : queryOptions) {
+                params.add(new Object[] { option.getName(), paramVals.get(i) });
+                i++;
+            }
+            List<String> columnInfo = new ArrayList<String>();
+            String[] names = currentQuery.getColumnNames();
+            for (int i1 = 0; i1 < names.length; i1++) {
+                columnInfo.add(names[i1]);
             }
 
-            ReportingUtils.printReport(currentQuery.getName(), map,
-                cbsrCollections);
+            List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
+            for (Object object : searchTable.getCollection()) {
+                Map<String, String> map = new HashMap<String, String>();
+                for (int j = 0; j < columnInfo.size(); j++) {
+                    map.put(columnInfo.get(j), (((Object[]) object)[j])
+                        .toString());
+                }
+                listData.add(map);
+            }
+
+            ReportingUtils.printReport(createDynamicReport(currentQuery
+                .toString(), params, columnInfo, listData));
             return true;
         }
         return false;
     }
 
+    public JasperPrint createDynamicReport(String reportName,
+        List<Object[]> params, List<String> columnInfo, List<?> list)
+        throws Exception {
+
+        FastReportBuilder drb = new FastReportBuilder();
+        for (int i = 0; i < columnInfo.size(); i++) {
+            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
+                40, false).setPrintBackgroundOnOddRows(true)
+                .setUseFullPageWidth(true);
+        }
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+        String paramString = "";
+        for (int i = 0; i < params.size(); i++) {
+            paramString += params.get(i)[0] + " : " + params.get(i)[1] + "\n";
+        }
+        fields.put("title", reportName);
+        fields.put("infos", paramString);
+        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
+        if (reportURL == null) {
+            throw new Exception("No report available with name BasicReport");
+        }
+        drb.setTemplateFile(reportURL.getFile());
+        Style headerStyle = new Style();
+        headerStyle.setFont(ReportingUtils.sansSerifBold);
+        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
+        headerStyle.setBorderBottom(Border.THIN);
+        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
+        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
+        headerStyle.setTransparency(Transparency.OPAQUE);
+        Style detailStyle = new Style();
+        detailStyle.setFont(ReportingUtils.sansSerif);
+        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
+
+        JRDataSource ds = new JRBeanCollectionDataSource(list);
+        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
+            new ClassicLayoutManager(), ds, fields);
+        return jp;
+    }
 }

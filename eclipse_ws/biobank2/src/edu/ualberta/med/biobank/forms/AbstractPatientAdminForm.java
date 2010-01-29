@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.jasperreports.engine.JasperPrint;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -64,7 +66,9 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
                 .getUserName());
             List<LogInfo> logsList = appender.getLogsList();
 
-            ReportingUtils.printReport("ActivityReportForm", map, logsList);
+            JasperPrint jp = ReportingUtils.createStandardReport(
+                "ActivityReportForm", map, logsList);
+            ReportingUtils.printReport(jp);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);
         }
