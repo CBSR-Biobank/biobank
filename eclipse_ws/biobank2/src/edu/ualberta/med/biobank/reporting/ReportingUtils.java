@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.reporting;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
@@ -48,63 +50,68 @@ public class ReportingUtils {
             new JRBeanCollectionDataSource(list));
     }
 
-    public static void printReport(JasperPrint jasperPrint) throws Exception {
-        PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        PrinterData data = dialog.open();
-        if (data != null) {
-            if (data.printToFile == true) {
-                String fileName = data.fileName;
-                if (fileName.endsWith(".pdf")) {
-                    String prefix = "file://";
-                    if (fileName.startsWith(prefix)) {
-                        fileName = fileName.substring(prefix.length());
-                    }
-                    JasperExportManager.exportReportToPdfFile(jasperPrint,
-                        fileName);
-                } else {
-                    throw new Exception("Can't save to file type "
-                        + data.fileName);
-                }
-            } else {
-                PrintService[] services = PrintServiceLookup
-                    .lookupPrintServices(DocFlavor.SERVICE_FORMATTED.PRINTABLE,
-                        null);
-                PrintService service = null;
-                for (PrintService ps : services) {
-                    if (ps.getName().equals(data.name)) {
-                        service = ps;
-                    }
-                }
-                if (service == null) {
-                    throw new Exception("Error with printer");
-                }
-                JRExporter exporter = new JRPrintServiceExporter();
-                exporter.setParameter(JRExporterParameter.JASPER_PRINT,
-                    jasperPrint);
-                exporter
-                    .setParameter(
-                        JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
-                        service.getAttributes());
-                exporter.setParameter(
-                    JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
-                    Boolean.FALSE);
-                exporter.setParameter(
-                    JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
-                    Boolean.FALSE);
+    public static void saveReport(JasperPrint jasperPrint, String path)
+        throws Exception {
+        if (path == null)
+            throw new Exception("Printing Canceled.");
 
-                try {
-                    exporter.exportReport();
-                } catch (JRException e) {
-                    throw new Exception(
-                        "Printing failed. Check your printer settings and try again.");
-                }
-            }
+        String prefix = "file://";
+        if (path.startsWith(prefix)) {
+            path = path.substring(prefix.length());
+        }
+        if (path.endsWith(".pdf")) {
+            JasperExportManager.exportReportToPdfFile(jasperPrint, path);
+        } else if (path.endsWith(".csv")) {
+            JRExporter csvExporter = new JRCsvExporter();
+            csvExporter.setParameter(JRExporterParameter.JASPER_PRINT,
+                jasperPrint);
+            csvExporter.setParameter(JRExporterParameter.OUTPUT_FILE, new File(
+                path));
+            csvExporter.exportReport();
+        } else {
+            throw new Exception(
+                "Not a valid extension. Please use 'pdf' or 'csv'.");
         }
     }
 
-    public static void saveReport(JasperPrint jasperPrint, String fileName)
-        throws Exception {
-        JasperExportManager.exportReportToPdfFile(jasperPrint, fileName);
+    public static void printReport(JasperPrint jasperPrint) throws Exception {
+
+        PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        PrinterData data = dialog.open();
+
+        if (data != null) {
+            PrintService[] services = PrintServiceLookup.lookupPrintServices(
+                DocFlavor.SERVICE_FORMATTED.PRINTABLE, null);
+            PrintService service = null;
+            for (PrintService ps : services) {
+                if (ps.getName().equals(data.name)) {
+                    service = ps;
+                }
+            }
+            if (service == null) {
+                throw new Exception("Error with printer");
+            }
+            JRExporter exporter = new JRPrintServiceExporter();
+            exporter
+                .setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+            exporter.setParameter(
+                JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
+                service.getAttributes());
+            exporter.setParameter(
+                JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
+                Boolean.FALSE);
+            exporter.setParameter(
+                JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
+                Boolean.FALSE);
+
+            try {
+                exporter.exportReport();
+            } catch (JRException e) {
+                throw new Exception(
+                    "Printing Canceled. Check your printer settings and try again.");
+            }
+        }
+
     }
 }
