@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
@@ -157,7 +157,7 @@ public class ContainerViewForm extends BiobankViewForm {
             if (colCap == 0)
                 colCap = 1;
 
-            cells = new HashMap<RowColPos, ContainerCell>();
+            cells = new TreeMap<RowColPos, ContainerCell>();
             Map<RowColPos, ContainerWrapper> childrenMap = container
                 .getChildren();
             for (int i = 0; i < rowCap; i++) {

@@ -3,10 +3,10 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -393,7 +393,7 @@ public class ContainerWrapper extends
             Collection<SamplePosition> positions = wrappedObject
                 .getSamplePositionCollection();
             if (positions != null) {
-                samples = new HashMap<RowColPos, SampleWrapper>();
+                samples = new TreeMap<RowColPos, SampleWrapper>();
                 for (SamplePosition position : positions) {
                     samples.put(new RowColPos(position.getRow(), position
                         .getCol()), new SampleWrapper(appService, position
@@ -434,7 +434,7 @@ public class ContainerWrapper extends
         samplePosition.checkPositionValid(this);
         Map<RowColPos, SampleWrapper> samples = getSamples();
         if (samples == null) {
-            samples = new HashMap<RowColPos, SampleWrapper>();
+            samples = new TreeMap<RowColPos, SampleWrapper>();
             propertiesMap.put("samples", samples);
         } else
             try {
@@ -494,7 +494,7 @@ public class ContainerWrapper extends
             Collection<ContainerPosition> positions = wrappedObject
                 .getChildPositionCollection();
             if (positions != null) {
-                children = new HashMap<RowColPos, ContainerWrapper>();
+                children = new TreeMap<RowColPos, ContainerWrapper>();
                 for (ContainerPosition position : positions) {
                     ContainerWrapper child = new ContainerWrapper(appService,
                         position.getContainer());
@@ -590,7 +590,7 @@ public class ContainerWrapper extends
         containerPosition.checkPositionValid(this);
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
-            children = new HashMap<RowColPos, ContainerWrapper>();
+            children = new TreeMap<RowColPos, ContainerWrapper>();
             propertiesMap.put("children", children);
         } else {
             ContainerWrapper containerAtPosition = getChild(row, col);

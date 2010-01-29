@@ -35,3 +35,11 @@ QUERY TO COUNT THE NUMBER OF SAMPLES IN CABINET
   FROM `cabinet` where cnum=2 and inventory_id is not null
   group by drawer, bin
   order by sample_count desc
+  
+  
+QUERY TO GENERATE THE VISITS WITH WRONG STUDY_NR
+  select fnum, rack, box, cell, freezer.visit_nr, date_received, date_taken, 
+  freezer.study_nr as freezer_study_nr, patient_visit.study_nr as 
+  patient_visit_study_nr from freezer join patient_visit on 
+  freezer.visit_nr=patient_visit.visit_nr 
+  where freezer.study_nr<>patient_visit.study_nr order by fnum, rack, box, cell
