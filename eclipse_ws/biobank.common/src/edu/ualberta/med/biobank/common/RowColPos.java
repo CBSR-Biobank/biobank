@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common;
 
-public class RowColPos {
+public class RowColPos implements Comparable<RowColPos> {
     public Integer row;
     public Integer col;
 
@@ -44,6 +44,14 @@ public class RowColPos {
     @Override
     public String toString() {
         return "(" + row + "," + col + ")";
+    }
+
+    @Override
+    public int compareTo(RowColPos pos) {
+        if (row == pos.row) {
+            return col - pos.col;
+        }
+        return row - pos.row;
     }
 
 }

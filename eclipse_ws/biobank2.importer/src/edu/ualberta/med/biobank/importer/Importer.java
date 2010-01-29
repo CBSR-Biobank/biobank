@@ -285,14 +285,6 @@ public class Importer {
         }
     }
 
-    public static Date parseDate(String dateStr) throws ParseException {
-        return dateTimeFormatter.parse(dateStr);
-    }
-
-    public static String formatDate(Date date) {
-        return dateTimeFormatter.format(date);
-    }
-
     public static SampleTypeWrapper getSampleType(String nameShort) {
         return sampleTypeMap.get(nameShort);
     }
@@ -320,26 +312,24 @@ public class Importer {
             sampleTypeMap.put(sampleType.getNameShort(), sampleType);
         }
 
-        // add missing sample types
-        if (false) {
-            int missing = 0;
-            for (String nameShort : bbpdbSampleTypeMap.keySet()) {
-                if ((sampleTypeMap.get(nameShort) != null)
-                    || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
-                    || nameShort.equals("CDPA Plas"))
-                    continue;
+        // report missing sample types
+        int missing = 0;
+        for (String nameShort : bbpdbSampleTypeMap.keySet()) {
+            if ((sampleTypeMap.get(nameShort) != null)
+                || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
+                || nameShort.equals("CDPA Plas"))
+                continue;
 
-                logger.error("missing sample type: \""
-                    + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
-                    + "\"");
-                ++missing;
-            }
-
-            if (missing > 0) {
-                throw new Exception("There are missing sample types. "
-                    + "Container sample types require adjustments.");
-            }
+            logger.error("missing sample type: \""
+                + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
+                + "\"");
+            ++missing;
         }
+
+        // if (missing > 0) {
+        // throw new Exception("There are missing sample types. "
+        // + "Container sample types require adjustments.");
+        // }
     }
 
     @SuppressWarnings("unused")
@@ -585,13 +575,7 @@ public class Importer {
             }
 
             dateReceivedStr = rs.getString(4);
-            dateReceived = dateTimeFormatter.parse(dateReceivedStr);
-
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(dateReceived);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(Calendar.SECOND, 0);
-            dateReceived = cal.getTime();
+            dateReceived = getDateFromStr(dateReceivedStr);
 
             patient = study.getPatient(patientNr);
             // make sure patient is in the study
@@ -607,8 +591,9 @@ public class Importer {
                 ++importCounts.shipments;
                 logger.debug("new shipment: " + importCounts.shipments
                     + " patient/" + patient.getPnumber() + " clinic/"
-                    + clinic.getName() + " shipment/" + dateReceivedStr + " ("
-                    + count + "/" + numShipments + ")");
+                    + clinic.getName() + " shipment/"
+                    + dateTimeFormatter.format(dateReceived) + " (" + count
+                    + "/" + numShipments + ")");
 
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
@@ -619,15 +604,15 @@ public class Importer {
             } else if (!shipment.hasPatient(patientNr)) {
                 logger.debug("adding to shipment: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
-                    + " shipment/" + dateReceivedStr + " (" + count + "/"
-                    + numShipments + ")");
+                    + " shipment/" + dateTimeFormatter.format(dateReceived)
+                    + " (" + count + "/" + numShipments + ")");
                 shipment.addPatients(patient);
                 shipment.persist();
             } else {
                 logger.debug("already in database: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
-                    + " shipment/" + dateReceivedStr + " (" + count + "/"
-                    + numShipments + ")");
+                    + " shipment/" + dateTimeFormatter.format(dateReceived)
+                    + " (" + count + "/" + numShipments + ")");
             }
             ++count;
         }
@@ -710,7 +695,7 @@ public class Importer {
             }
 
             dateProcessedStr = rs.getString(6);
-            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+            dateProcessed = getDateFromStr(dateProcessedStr);
 
             patient = study.getPatient(patientNr);
             // make sure patient is in the study
@@ -721,19 +706,14 @@ public class Importer {
             }
             patient.reload();
 
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(dateProcessed);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(Calendar.SECOND, 0);
-            dateProcessed = cal.getTime();
-
             shipment = clinic.getShipment(dateProcessed, patientNr);
 
             // check for shipment
             if (shipment == null) {
                 logger.error("found 0 shipments for patientNo/" + patientNr
                     + " studyName/" + study.getNameShort() + " clinicName/"
-                    + clinicName + " dateReceived/" + dateProcessed);
+                    + clinicName + " dateReceived/"
+                    + dateTimeFormatter.format(dateProcessed));
                 ++count;
                 continue;
             }
@@ -747,8 +727,9 @@ public class Importer {
 
             logger.debug("importing patient visit: " + importCounts.visits
                 + " patient/" + patient.getPnumber() + " study/"
-                + study.getNameShort() + " dateProcessed/" + dateProcessed
-                + " (" + count + "/" + numPatientVisits + ")");
+                + study.getNameShort() + " dateProcessed/"
+                + dateTimeFormatter.format(dateProcessed) + " (" + count + "/"
+                + numPatientVisits + ")");
 
             // now set corresponding patient visit info data
             for (String label : study.getStudyPvAttrLabels()) {
@@ -927,12 +908,7 @@ public class Importer {
                 }
 
                 dateProcessedStr = rs.getString(2);
-                dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(dateProcessed);
-                cal.set(Calendar.MILLISECOND, 0);
-                cal.set(Calendar.SECOND, 0);
-                dateProcessed = cal.getTime();
+                dateProcessed = getDateFromStr(dateProcessedStr);
 
                 // always get the first visit
                 visits = patient.getVisit(dateProcessed);
@@ -996,9 +972,9 @@ public class Importer {
             if (label.equals("01") && typeNameShort.equals("F3x10")) {
                 // freezersMap.put(1, container);
             } else if (label.equals("02") && typeNameShort.equals("F4x12")) {
-                freezersMap.put(2, container);
+                // freezersMap.put(2, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
-                // freezersMap.put(3, container);
+                freezersMap.put(3, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
                 // freezersMap.put(5, container);
             } else if (label.equals("Sent Samples")
@@ -1147,8 +1123,16 @@ public class Importer {
         return clinicName;
     }
 
+    public static Date parseDate(String dateStr) throws ParseException {
+        return dateTimeFormatter.parse(dateStr);
+    }
+
+    public static String formatDate(Date date) {
+        return dateTimeFormatter.format(date);
+    }
+
     public static Date getDateFromStr(String str) throws ParseException {
-        Date dateProcessed = parseDate(str);
+        Date dateProcessed = dateTimeFormatter.parse(str);
         Calendar cal = new GregorianCalendar();
         cal.setTime(dateProcessed);
         cal.set(Calendar.MILLISECOND, 0);
