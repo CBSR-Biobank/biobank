@@ -23,9 +23,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class Freezer02Importer extends FreezerImporter {
 
     public Freezer02Importer(WritableApplicationService appService,
-        Connection con, final SiteWrapper site, ContainerWrapper container,
-        int bbpdbFreezerNum) throws Exception {
-        super(appService, con, site, container, bbpdbFreezerNum, DEFAULT_QUERY);
+        Connection con, Configuration configuration, final SiteWrapper site,
+        ContainerWrapper container, int bbpdbFreezerNum) throws Exception {
+        super(appService, con, configuration, site, container, bbpdbFreezerNum,
+            DEFAULT_QUERY);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class Freezer02Importer extends FreezerImporter {
             .indexOf('J'); h++) {
             hotelLabel = "C" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
 
-            if (!Importer.importFreezerHotel(hotelLabel)) {
+            if (!configuration.importFreezerHotel(hotelLabel)) {
                 logger.info("not configured for importing hotel " + hotelLabel);
                 continue;
             }
@@ -103,7 +104,7 @@ public class Freezer02Importer extends FreezerImporter {
             .indexOf('T'); h++) {
             hotelLabel = "A" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
 
-            if (!Importer.importFreezerHotel(hotelLabel)) {
+            if (!configuration.importFreezerHotel(hotelLabel)) {
                 logger.info("not configured for importing hotel " + hotelLabel);
                 continue;
             }
