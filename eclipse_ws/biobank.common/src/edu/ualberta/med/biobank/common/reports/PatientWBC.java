@@ -4,6 +4,8 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientWBC extends QueryObject {
 
+    protected static final String NAME = "Patient WBC Samples";
+
     public PatientWBC(String op, Integer siteId) {
         super(
             "Displays a list of the WBC samples taken from a patient.",

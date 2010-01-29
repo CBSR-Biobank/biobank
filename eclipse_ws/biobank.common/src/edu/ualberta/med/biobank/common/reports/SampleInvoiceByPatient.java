@@ -5,6 +5,9 @@ import java.util.Date;
 import edu.ualberta.med.biobank.model.Sample;
 
 public class SampleInvoiceByPatient extends QueryObject {
+
+    protected static final String NAME = "Samples per Patient by Date";
+
     public SampleInvoiceByPatient(String op, Integer siteId) {
         super(
             "Lists all samples linked in a particular date range, ordered by patient.",

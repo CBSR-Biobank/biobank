@@ -27,9 +27,10 @@ public class Freezer99Importer extends FreezerImporter {
         + "order by freezer.box, freezer.cell";
 
     public Freezer99Importer(WritableApplicationService appService,
-        Connection con, final SiteWrapper site, ContainerWrapper container,
-        int bbpdbFreezerNum) throws Exception {
-        super(appService, con, site, container, bbpdbFreezerNum, DEFAULT_QUERY);
+        Connection con, Configuration configuration, final SiteWrapper site,
+        ContainerWrapper container, int bbpdbFreezerNum) throws Exception {
+        super(appService, con, configuration, site, container, bbpdbFreezerNum,
+            DEFAULT_QUERY);
     }
 
 }

@@ -2,10 +2,10 @@ package edu.ualberta.med.biobank.widgets.grids;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -43,7 +43,7 @@ public class MultiSelectionManager {
 
     public MultiSelectionManager(AbstractContainerDisplayWidget container) {
         this.container = container;
-        selectedCells = new HashMap<RowColPos, Cell>();
+        selectedCells = new TreeMap<RowColPos, Cell>();
         listeners = new ArrayList<MultiSelectionListener>();
     }
 

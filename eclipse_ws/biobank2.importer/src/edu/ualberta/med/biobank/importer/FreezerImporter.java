@@ -46,23 +46,29 @@ public class FreezerImporter {
     protected int bbpdbFreezerNum;
     protected int sampleImportCount;
     protected String query;
+    protected int currentPalletNr;
+    protected Configuration configuration;
 
     public FreezerImporter(WritableApplicationService appService,
-        Connection con, final SiteWrapper site, ContainerWrapper container,
-        int bbpdbFreezerNum) throws Exception {
-        this(appService, con, site, container, bbpdbFreezerNum, DEFAULT_QUERY);
+        Connection con, Configuration configuration, final SiteWrapper site,
+        ContainerWrapper container, int bbpdbFreezerNum) throws Exception {
+        this(appService, con, configuration, site, container, bbpdbFreezerNum,
+            DEFAULT_QUERY);
     }
 
     protected FreezerImporter(WritableApplicationService appService,
-        Connection con, final SiteWrapper site, ContainerWrapper container,
-        int bbpdbFreezerNum, String query) throws Exception {
+        Connection con, Configuration configuration, final SiteWrapper site,
+        ContainerWrapper container, int bbpdbFreezerNum, String query)
+        throws Exception {
         this.appService = appService;
         this.con = con;
+        this.configuration = configuration;
         this.site = site;
         this.freezer = container;
         this.bbpdbFreezerNum = bbpdbFreezerNum;
         this.query = query;
         sampleImportCount = 0;
+        currentPalletNr = 0;
 
         doImport();
     }
@@ -72,6 +78,12 @@ public class FreezerImporter {
         PreparedStatement ps;
 
         for (ContainerWrapper hotel : freezer.getChildren().values()) {
+            if (!configuration.importFreezerHotel(hotel.getLabel())) {
+                logger.debug("not configured for importing hotel "
+                    + hotel.getLabel());
+                continue;
+            }
+
             ps = con.prepareStatement(query);
             ps.setInt(1, bbpdbFreezerNum);
             String hotelLabel = hotel.getLabel();
@@ -220,7 +232,13 @@ public class FreezerImporter {
         }
         sample.persist();
 
-        logger.debug("importing freezer sample " + pallet.getLabel()
+        if (currentPalletNr != palletNr) {
+            logger.debug("importing freezer samples into pallet "
+                + pallet.getLabel());
+            currentPalletNr = palletNr;
+        }
+
+        logger.trace("importing freezer sample " + pallet.getLabel()
             + palletPos);
         ++sampleImportCount;
 

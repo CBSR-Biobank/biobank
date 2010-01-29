@@ -10,9 +10,11 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class CabinetDSamples extends QueryObject {
 
+    protected static final String NAME = "Cabinet Samples per Study per Clinic by Date";
+
     public CabinetDSamples(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer samples per study per clinic by date range.",
+            "Displays the total number of cabinet samples per study per clinic by date range.",
             "select sample.linkDate, sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name from "
                 + Sample.class.getName()
                 + " as sample where sample.samplePosition.container.id in (select path1.container.id from "

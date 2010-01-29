@@ -147,7 +147,10 @@ public class Importer {
 
     private static ImportCounts importCounts;
 
+    private static Configuration configuration;
+
     public static void main(String[] args) throws Exception {
+        configuration = new Configuration("config.properties");
         dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
         tables = new ArrayList<String>();
         PropertyConfigurator.configure("conf/log4j.properties");
@@ -184,19 +187,7 @@ public class Importer {
             if (cbsrSite == null) {
                 importAll();
             } else {
-                initClinicsMap();
-                initStudiesMap();
-                initContainerTypesMap();
-                initTopContainersMap();
-                checkSampleTypes();
-
-                // importPatients();
-                // removeAllShipments();
-                // importShipments();
-                // importPatientVisits();
-                removeAllSamples();
-                importFreezerSamples();
-                // importCabinetSamples();
+                doImport();
             }
 
             logger.info("import complete");
@@ -232,20 +223,53 @@ public class Importer {
 
         logger.info("creating containers...");
         CbsrContainers.createContainers(cbsrSite);
+        doImport();
+    }
 
+    private static void doImport() throws Exception {
         initClinicsMap();
         initStudiesMap();
         initContainerTypesMap();
         initTopContainersMap();
 
         checkSampleTypes();
-        importPatients();
-        importShipments();
-        importPatientVisits();
-        // importCabinetSamples();
-        // importFreezerSamples();
 
-        logger.info("importing complete.");
+        if (configuration.importPatients()) {
+            importPatients();
+        } else if (getPatientCount() == 0) {
+            throw new Exception(
+                "cannot run importer without patients in biobank2 database");
+        } else {
+            logger.info("not configured for importing patients");
+        }
+
+        if (configuration.importShipments()) {
+            removeAllShipments();
+            importShipments();
+        } else if (getShipmentCount() == 0) {
+            throw new Exception(
+                "cannot run importer without shipments in biobank2 database");
+        } else {
+            logger.info("not configured for importing shipments");
+        }
+
+        if (configuration.importPatientVisits()) {
+            importPatientVisits();
+        } else if (getPatientVisitCount() == 0) {
+            throw new Exception(
+                "cannot run importer without patient visits in biobank2 database");
+        } else {
+            logger.info("not configured for importing patient visits");
+        }
+
+        if (configuration.importCabinets() || configuration.importFreezers()) {
+            removeAllSamples();
+            importFreezerSamples();
+            importCabinetSamples();
+
+        } else {
+            logger.info("not configured for importing samples from containers");
+        }
     }
 
     private static SiteWrapper getCbsrSite() throws Exception {
@@ -285,14 +309,6 @@ public class Importer {
         }
     }
 
-    public static Date parseDate(String dateStr) throws ParseException {
-        return dateTimeFormatter.parse(dateStr);
-    }
-
-    public static String formatDate(Date date) {
-        return dateTimeFormatter.format(date);
-    }
-
     public static SampleTypeWrapper getSampleType(String nameShort) {
         return sampleTypeMap.get(nameShort);
     }
@@ -320,26 +336,24 @@ public class Importer {
             sampleTypeMap.put(sampleType.getNameShort(), sampleType);
         }
 
-        // add missing sample types
-        if (false) {
-            int missing = 0;
-            for (String nameShort : bbpdbSampleTypeMap.keySet()) {
-                if ((sampleTypeMap.get(nameShort) != null)
-                    || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
-                    || nameShort.equals("CDPA Plas"))
-                    continue;
+        // report missing sample types
+        int missing = 0;
+        for (String nameShort : bbpdbSampleTypeMap.keySet()) {
+            if ((sampleTypeMap.get(nameShort) != null)
+                || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
+                || nameShort.equals("CDPA Plas"))
+                continue;
 
-                logger.error("missing sample type: \""
-                    + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
-                    + "\"");
-                ++missing;
-            }
-
-            if (missing > 0) {
-                throw new Exception("There are missing sample types. "
-                    + "Container sample types require adjustments.");
-            }
+            logger.error("missing sample type: \""
+                + bbpdbSampleTypeMap.get(nameShort) + "\" \"" + nameShort
+                + "\"");
+            ++missing;
         }
+
+        // if (missing > 0) {
+        // throw new Exception("There are missing sample types. "
+        // + "Container sample types require adjustments.");
+        // }
     }
 
     @SuppressWarnings("unused")
@@ -585,13 +599,7 @@ public class Importer {
             }
 
             dateReceivedStr = rs.getString(4);
-            dateReceived = dateTimeFormatter.parse(dateReceivedStr);
-
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(dateReceived);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(Calendar.SECOND, 0);
-            dateReceived = cal.getTime();
+            dateReceived = getDateFromStr(dateReceivedStr);
 
             patient = study.getPatient(patientNr);
             // make sure patient is in the study
@@ -607,8 +615,9 @@ public class Importer {
                 ++importCounts.shipments;
                 logger.debug("new shipment: " + importCounts.shipments
                     + " patient/" + patient.getPnumber() + " clinic/"
-                    + clinic.getName() + " shipment/" + dateReceivedStr + " ("
-                    + count + "/" + numShipments + ")");
+                    + clinic.getName() + " shipment/"
+                    + dateTimeFormatter.format(dateReceived) + " (" + count
+                    + "/" + numShipments + ")");
 
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
@@ -619,15 +628,15 @@ public class Importer {
             } else if (!shipment.hasPatient(patientNr)) {
                 logger.debug("adding to shipment: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
-                    + " shipment/" + dateReceivedStr + " (" + count + "/"
-                    + numShipments + ")");
+                    + " shipment/" + dateTimeFormatter.format(dateReceived)
+                    + " (" + count + "/" + numShipments + ")");
                 shipment.addPatients(patient);
                 shipment.persist();
             } else {
                 logger.debug("already in database: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
-                    + " shipment/" + dateReceivedStr + " (" + count + "/"
-                    + numShipments + ")");
+                    + " shipment/" + dateTimeFormatter.format(dateReceived)
+                    + " (" + count + "/" + numShipments + ")");
             }
             ++count;
         }
@@ -710,7 +719,7 @@ public class Importer {
             }
 
             dateProcessedStr = rs.getString(6);
-            dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
+            dateProcessed = getDateFromStr(dateProcessedStr);
 
             patient = study.getPatient(patientNr);
             // make sure patient is in the study
@@ -721,19 +730,14 @@ public class Importer {
             }
             patient.reload();
 
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(dateProcessed);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(Calendar.SECOND, 0);
-            dateProcessed = cal.getTime();
-
             shipment = clinic.getShipment(dateProcessed, patientNr);
 
             // check for shipment
             if (shipment == null) {
                 logger.error("found 0 shipments for patientNo/" + patientNr
                     + " studyName/" + study.getNameShort() + " clinicName/"
-                    + clinicName + " dateReceived/" + dateProcessed);
+                    + clinicName + " dateReceived/"
+                    + dateTimeFormatter.format(dateProcessed));
                 ++count;
                 continue;
             }
@@ -747,8 +751,9 @@ public class Importer {
 
             logger.debug("importing patient visit: " + importCounts.visits
                 + " patient/" + patient.getPnumber() + " study/"
-                + study.getNameShort() + " dateProcessed/" + dateProcessed
-                + " (" + count + "/" + numPatientVisits + ")");
+                + study.getNameShort() + " dateProcessed/"
+                + dateTimeFormatter.format(dateProcessed) + " (" + count + "/"
+                + numPatientVisits + ")");
 
             // now set corresponding patient visit info data
             for (String label : study.getStudyPvAttrLabels()) {
@@ -791,7 +796,6 @@ public class Importer {
         }
     }
 
-    @SuppressWarnings("unused")
     private static void importCabinetSamples() throws Exception {
         Map<Integer, ContainerWrapper> cabinetsMap = new HashMap<Integer, ContainerWrapper>();
 
@@ -827,6 +831,11 @@ public class Importer {
         ResultSet rs;
 
         for (Integer cabinetNum : cabinetsMap.keySet()) {
+            if (!configuration.importCabinet(cabinetNum.intValue())) {
+                logger.info("not configured to import cabinet " + cabinetNum);
+                continue;
+            }
+
             if (cabinetsMap.get(cabinetNum) == null) {
                 throw new Exception("Cabinet " + cabinetNum
                     + " container not found in biobank database");
@@ -927,12 +936,7 @@ public class Importer {
                 }
 
                 dateProcessedStr = rs.getString(2);
-                dateProcessed = dateTimeFormatter.parse(dateProcessedStr);
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(dateProcessed);
-                cal.set(Calendar.MILLISECOND, 0);
-                cal.set(Calendar.SECOND, 0);
-                dateProcessed = cal.getTime();
+                dateProcessed = getDateFromStr(dateProcessedStr);
 
                 // always get the first visit
                 visits = patient.getVisit(dateProcessed);
@@ -994,16 +998,16 @@ public class Importer {
             String label = container.getLabel();
             String typeNameShort = container.getContainerType().getNameShort();
             if (label.equals("01") && typeNameShort.equals("F3x10")) {
-                // freezersMap.put(1, container);
+                freezersMap.put(1, container);
             } else if (label.equals("02") && typeNameShort.equals("F4x12")) {
                 freezersMap.put(2, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
-                // freezersMap.put(3, container);
+                freezersMap.put(3, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
-                // freezersMap.put(5, container);
+                freezersMap.put(5, container);
             } else if (label.equals("Sent Samples")
                 && typeNameShort.equals("F4x6")) {
-                // freezersMap.put(99, container);
+                freezersMap.put(99, container);
             }
         }
 
@@ -1017,6 +1021,11 @@ public class Importer {
         while (rs.next()) {
             int freezerNum = rs.getInt(1);
 
+            if (!configuration.importFreezer(freezerNum)) {
+                logger.info("not configured to import freezer " + freezerNum);
+                continue;
+            }
+
             if (freezersMap.get(freezerNum) == null)
                 continue;
 
@@ -1026,13 +1035,16 @@ public class Importer {
 
             if (freezerNum == 99) {
                 freezerImporter = new Freezer99Importer(appService, con,
-                    cbsrSite, freezersMap.get(freezerNum), freezerNum);
+                    configuration, cbsrSite, freezersMap.get(freezerNum),
+                    freezerNum);
             } else if (freezerNum == 2) {
                 freezerImporter = new Freezer02Importer(appService, con,
-                    cbsrSite, freezersMap.get(freezerNum), freezerNum);
+                    configuration, cbsrSite, freezersMap.get(freezerNum),
+                    freezerNum);
             } else {
                 freezerImporter = new FreezerImporter(appService, con,
-                    cbsrSite, freezersMap.get(freezerNum), freezerNum);
+                    configuration, cbsrSite, freezersMap.get(freezerNum),
+                    freezerNum);
             }
 
             importCounts.samples += freezerImporter.getSamplesImported();
@@ -1053,6 +1065,30 @@ public class Importer {
         logger.error("a sample with inventory id " + inventoryId
             + " already exists at " + labels);
         return false;
+    }
+
+    @SuppressWarnings("unused")
+    private static Long getPatientCount() throws Exception {
+        HQLCriteria c = new HQLCriteria("select count(*) from "
+            + Patient.class.getName());
+        List<Long> result = appService.query(c);
+        return result.get(0);
+    }
+
+    @SuppressWarnings("unused")
+    private static Long getShipmentCount() throws Exception {
+        HQLCriteria c = new HQLCriteria("select count(*) from "
+            + Shipment.class.getName());
+        List<Long> result = appService.query(c);
+        return result.get(0);
+    }
+
+    @SuppressWarnings("unused")
+    private static Long getPatientVisitCount() throws Exception {
+        HQLCriteria c = new HQLCriteria("select count(*) from "
+            + PatientVisit.class.getName());
+        List<Long> result = appService.query(c);
+        return result.get(0);
     }
 
     @SuppressWarnings("unused")
@@ -1147,8 +1183,16 @@ public class Importer {
         return clinicName;
     }
 
+    public static Date parseDate(String dateStr) throws ParseException {
+        return dateTimeFormatter.parse(dateStr);
+    }
+
+    public static String formatDate(Date date) {
+        return dateTimeFormatter.format(date);
+    }
+
     public static Date getDateFromStr(String str) throws ParseException {
-        Date dateProcessed = parseDate(str);
+        Date dateProcessed = dateTimeFormatter.parse(str);
         Calendar cal = new GregorianCalendar();
         cal.setTime(dateProcessed);
         cal.set(Calendar.MILLISECOND, 0);
@@ -1162,4 +1206,4 @@ class ImportCounts {
     int shipments;
     int visits;
     int samples;
-};
+}

@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,6 +34,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
@@ -73,7 +75,6 @@ public class ReportsView extends ViewPart {
     private Composite subSection;
 
     private ComboViewer querySelect;
-    private List<Class<? extends QueryObject>> queryObjects;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -82,6 +83,7 @@ public class ReportsView extends ViewPart {
     private InfoTableWidget<Object> searchTable;
 
     private Button printButton;
+    private Button exportButton;
 
     private QueryObject currentQuery;
 
@@ -102,10 +104,9 @@ public class ReportsView extends ViewPart {
         top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         header = new Composite(top, SWT.NONE);
-        header.setLayout(new GridLayout(3, false));
+        header.setLayout(new GridLayout(4, false));
 
-        queryObjects = QueryObject.getAllQueries();
-        querySelect = createCombo(header, queryObjects);
+        querySelect = createCombo(header);
         querySelect
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -119,52 +120,78 @@ public class ReportsView extends ViewPart {
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                try {
-                    searchData = search();
-
-                    if (searchData.size() > 0) {
-                        String[] names = currentQuery.getColumnNames();
-                        int[] bounds = new int[names.length];
-
-                        for (int i = 0; i < names.length; i++) {
-                            bounds[i] = 100 + names[i].length() * 2;
+                BusyIndicator.showWhile(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell().getDisplay(),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                searchData = search();
+                            } catch (ApplicationException ae) {
+                                BioBankPlugin
+                                    .openAsyncError("Search error", ae);
+                            }
                         }
-                        searchTable.dispose();
-                        searchTable = new InfoTableWidget<Object>(top,
-                            searchData, names, bounds);
-                        searchTable.getTableViewer().setLabelProvider(
-                            new ReportsLabelProvider());
-                        GridData searchLayoutData = new GridData(SWT.FILL,
-                            SWT.FILL, true, true);
-                        searchLayoutData.minimumHeight = 500;
-                        searchTable.setLayoutData(searchLayoutData);
-                        searchTable.moveBelow(subSection);
-                        printButton.setEnabled(true);
-                    } else
-                        printButton.setEnabled(false);
-                    // searchTable.setCollection(searchData); caused big
-                    // problems... dunno why
+                    });
+                if (searchData.size() > 0) {
+                    String[] names = currentQuery.getColumnNames();
+                    int[] bounds = new int[names.length];
 
-                    searchTable.redraw();
-                    top.layout();
-                } catch (ApplicationException ae) {
-                    BioBankPlugin.openAsyncError("Search error", ae);
+                    for (int i = 0; i < names.length; i++) {
+                        bounds[i] = 100 + names[i].length() * 2;
+                    }
+                    searchTable.dispose();
+                    searchTable = new InfoTableWidget<Object>(top, searchData,
+                        names, bounds);
+                    searchTable.getTableViewer().setLabelProvider(
+                        new ReportsLabelProvider());
+                    GridData searchLayoutData = new GridData(SWT.FILL,
+                        SWT.FILL, true, true);
+                    searchLayoutData.minimumHeight = 500;
+                    searchTable.setLayoutData(searchLayoutData);
+                    searchTable.moveBelow(subSection);
+                    printButton.setEnabled(true);
+                    exportButton.setEnabled(true);
+                } else {
+                    printButton.setEnabled(false);
+                    exportButton.setEnabled(false);
                 }
+                // searchTable.setCollection(searchData); caused big
+                // problems... dunno why
 
+                searchTable.redraw();
+                top.layout();
             }
         });
 
         printButton = new Button(header, SWT.NONE);
+        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PRINTER));
         printButton.setText("Print");
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
-                    printTable();
+                    printTable(false);
                 } catch (Exception ex) {
                     BioBankPlugin.openAsyncError(
                         "Error while printing the results", ex);
+                }
+            }
+        });
+
+        exportButton = new Button(header, SWT.NONE);
+        exportButton.setText("Export");
+        exportButton.setEnabled(false);
+        exportButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                try {
+                    printTable(true);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError(
+                        "Error while exporting the results", ex);
                 }
             }
         });
@@ -179,7 +206,8 @@ public class ReportsView extends ViewPart {
         GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
         searchTable.setLayoutData(searchLayoutData);
 
-        querySelect.setSelection(new StructuredSelection(queryObjects.get(0)));
+        querySelect.setSelection(new StructuredSelection(QueryObject
+            .getQueryObjectNames()[0]));
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -189,7 +217,8 @@ public class ReportsView extends ViewPart {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {
-            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
+            Class<? extends QueryObject> cls = QueryObject
+                .getQueryObjectByName((String) typeSelection.getFirstElement());
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
             SiteWrapper site = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
@@ -257,7 +286,8 @@ public class ReportsView extends ViewPart {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {
-            Class<?> cls = ((Class<?>) typeSelection.getFirstElement());
+            Class<? extends QueryObject> cls = QueryObject
+                .getQueryObjectByName((String) typeSelection.getFirstElement());
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
             SiteWrapper site = SessionManager.getInstance()
                 .getCurrentSiteWrapper();
@@ -341,9 +371,13 @@ public class ReportsView extends ViewPart {
             }
         }
         printButton.setEnabled(false);
+        exportButton.setEnabled(false);
     }
 
-    protected static ComboViewer createCombo(Composite parent, List<?> list) {
+    protected static ComboViewer createCombo(Composite parent) {
+        // SmartCombo testCombo = new SmartCombo(parent, new String[] { "test1",
+        // "test2", "thirdtest", "zzz" });
+
         Combo combo;
         ComboViewer comboViewer;
         combo = new Combo(parent, SWT.READ_ONLY);
@@ -357,10 +391,10 @@ public class ReportsView extends ViewPart {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((Class<?>) element).getSimpleName();
+                return (String) element;
             }
         });
-        comboViewer.setInput(list);
+        comboViewer.setInput(QueryObject.getQueryObjectNames());
         return comboViewer;
     }
 
@@ -380,10 +414,16 @@ public class ReportsView extends ViewPart {
         }
     }
 
-    public boolean printTable() throws Exception {
-        boolean doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), "Confirm",
-            "Print table contents?");
+    public boolean printTable(Boolean export) throws Exception {
+        boolean doPrint;
+        if (export)
+            doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Export table contents?");
+        else
+            doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Print table contents?");
         if (doPrint) {
             List<Object[]> params = new ArrayList<Object[]>();
             List<Object> paramVals = getParams();
@@ -408,9 +448,20 @@ public class ReportsView extends ViewPart {
                 }
                 listData.add(map);
             }
+            if (export) {
+                FileDialog fd = new FileDialog(exportButton.getShell(),
+                    SWT.SAVE);
+                fd.setOverwrite(true);
+                fd.setText("Export as");
+                String[] filterExt = { "*.csv", "*.pdf" };
+                fd.setFilterExtensions(filterExt);
+                String path = fd.open();
+                ReportingUtils.saveReport(createDynamicReport(currentQuery
+                    .toString(), params, columnInfo, listData), path);
+            } else
+                ReportingUtils.printReport(createDynamicReport(currentQuery
+                    .toString(), params, columnInfo, listData));
 
-            ReportingUtils.printReport(createDynamicReport(currentQuery
-                .toString(), params, columnInfo, listData));
             return true;
         }
         return false;

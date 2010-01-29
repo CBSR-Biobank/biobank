@@ -10,6 +10,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class FreezerDSamples extends QueryObject {
 
+    protected static final String NAME = "Freezer Samples per Study per Clinic by Date";
+
     public FreezerDSamples(String op, Integer siteId) {
         super(
             "Displays the total number of freezer samples per study per clinic by date range.",

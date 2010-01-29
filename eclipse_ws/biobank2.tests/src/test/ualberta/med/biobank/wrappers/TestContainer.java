@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import junit.framework.Assert;
@@ -843,7 +844,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
 
-        Map<RowColPos, SampleTypeWrapper> samplesTypesMap = new HashMap<RowColPos, SampleTypeWrapper>();
+        Map<RowColPos, SampleTypeWrapper> samplesTypesMap = new TreeMap<RowColPos, SampleTypeWrapper>();
         SampleTypeWrapper sampleType;
 
         ContainerWrapper childL3 = containerMap.get("ChildL3");

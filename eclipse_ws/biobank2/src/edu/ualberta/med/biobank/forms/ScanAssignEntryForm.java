@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -373,7 +373,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 scanLaunchedValue.setValue(true);
                 setDirty(true);
             } else {
-                palletWidget.setCells(new HashMap<RowColPos, PalletCell>());
+                palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
                 showOnlyPallet(true);
                 scanValidValue.setValue(false);
             }

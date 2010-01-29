@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -32,7 +32,7 @@ public class PalletCell extends Cell {
     }
 
     public static Map<RowColPos, PalletCell> convertArray(ScanCell[][] scancells) {
-        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             for (int j = 0; j < ScanCell.COL_MAX; j++) {
                 palletScanned.put(new RowColPos(i, j), new PalletCell(
@@ -100,7 +100,7 @@ public class PalletCell extends Cell {
     }
 
     private static Map<RowColPos, PalletCell> initArray() {
-        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         for (int indexRow = 0; indexRow < ScanCell.ROW_MAX; indexRow++) {
             for (int indexCol = 0; indexCol < ScanCell.COL_MAX; indexCol++) {
                 palletScanned.put(new RowColPos(indexRow, indexCol),
