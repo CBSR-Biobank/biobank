@@ -75,41 +75,65 @@ public class ReportingUtils {
     }
 
     public static void printReport(JasperPrint jasperPrint) throws Exception {
-
+        // Use SWT PrintDialog instead of the JasperReport method that use java
+        // swing gui.
         PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         PrinterData data = dialog.open();
-
         if (data != null) {
+            // use the standard java method to retrieve print services
             PrintService[] services = PrintServiceLookup.lookupPrintServices(
                 DocFlavor.SERVICE_FORMATTED.PRINTABLE, null);
             PrintService service = null;
+            // try to find the correct PrintService using the Swt PrinterData
+            // information
             for (PrintService ps : services) {
                 if (ps.getName().equals(data.name)) {
                     service = ps;
                 }
             }
             if (service == null) {
-                throw new Exception("Error with printer");
-            }
-            JRExporter exporter = new JRPrintServiceExporter();
-            exporter
-                .setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-            exporter.setParameter(
-                JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
-                service.getAttributes());
-            exporter.setParameter(
-                JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
-                Boolean.FALSE);
-            exporter.setParameter(
-                JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
-                Boolean.FALSE);
+                // corresponding PrintService not found
+                if (data.printToFile == true) {
+                    // if printToFile asked, can print to a pdf file only
+                    String fileName = data.fileName;
+                    if (fileName.endsWith(".pdf")) {
+                        String prefix = "file://";
+                        if (fileName.startsWith(prefix)) {
+                            fileName = fileName.substring(prefix.length());
+                        }
+                        JasperExportManager.exportReportToPdfFile(jasperPrint,
+                            fileName);
+                    } else {
+                        throw new Exception("Can't save to file type "
+                            + data.fileName);
+                    }
+                } else {
+                    throw new Exception(
+                        "Error with printer - No Print Service found with name "
+                            + data.name);
+                }
+            } else {
+                JRExporter exporter = new JRPrintServiceExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT,
+                    jasperPrint);
+                exporter
+                    .setParameter(
+                        JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
+                        service.getAttributes());
+                exporter.setParameter(
+                    JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
+                    Boolean.FALSE);
+                exporter.setParameter(
+                    JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
+                    Boolean.FALSE);
 
-            try {
-                exporter.exportReport();
-            } catch (JRException e) {
-                throw new Exception(
-                    "Printing Canceled. Check your printer settings and try again.");
+                try {
+                    exporter.exportReport();
+                } catch (JRException e) {
+                    throw new Exception(
+                        "Printing Canceled. Check your printer settings and try again.");
+                }
             }
         }
 
