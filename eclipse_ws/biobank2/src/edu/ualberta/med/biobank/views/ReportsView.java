@@ -153,6 +153,8 @@ public class ReportsView extends ViewPart {
         });
 
         printButton = new Button(header, SWT.NONE);
+        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PRINTER));
         printButton.setText("Print");
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
