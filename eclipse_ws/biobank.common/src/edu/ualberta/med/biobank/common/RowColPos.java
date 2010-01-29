@@ -48,7 +48,7 @@ public class RowColPos implements Comparable<RowColPos> {
 
     @Override
     public int compareTo(RowColPos pos) {
-        if (row == pos.row) {
+        if (row.equals(pos.row)) {
             return col - pos.col;
         }
         return row - pos.row;
