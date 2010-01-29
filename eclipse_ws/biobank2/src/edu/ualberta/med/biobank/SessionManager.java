@@ -230,12 +230,16 @@ public class SessionManager {
         return SecurityHelper.canCreate(getAppService(), clazz, getUser());
     }
 
+    public static boolean canDelete(Class<?> clazz) {
+        return SecurityHelper.canCreate(getAppService(), clazz, getUser());
+    }
+
     public static boolean canView(Class<?> clazz) {
         return SecurityHelper.canView(getAppService(), clazz, getUser());
     }
 
-    public static boolean canEdit(Class<?> clazz) {
-        return SecurityHelper.canEdit(getAppService(), clazz, getUser());
+    public static boolean canUpdate(Class<?> clazz) {
+        return SecurityHelper.canUpdate(getAppService(), clazz, getUser());
     }
 
 }

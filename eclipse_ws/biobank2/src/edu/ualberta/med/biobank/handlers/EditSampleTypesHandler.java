@@ -31,7 +31,7 @@ public class EditSampleTypesHandler extends AbstractHandler {
     @Override
     public boolean isEnabled() {
         return (SessionManager.canCreate(SampleTypeWrapper.class) || SessionManager
-            .canEdit(SampleTypeWrapper.class))
+            .canUpdate(SampleTypeWrapper.class))
             && SessionManager.getInstance().getSession() != null;
     }
 }

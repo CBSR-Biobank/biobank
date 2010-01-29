@@ -84,6 +84,10 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private Composite childrenActionSection;
 
+    private boolean canCreate;
+
+    private boolean canDelete;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
@@ -96,6 +100,8 @@ public class ContainerViewForm extends BiobankViewForm {
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getName() + ")");
         initCells();
+        canCreate = SessionManager.canCreate(ContainerWrapper.class);
+        canDelete = SessionManager.canCreate(ContainerWrapper.class);
     }
 
     @Override
@@ -236,51 +242,61 @@ public class ContainerViewForm extends BiobankViewForm {
         childrenActionSection = toolkit.createComposite(client);
         childrenActionSection.setLayout(new GridLayout(3, false));
 
-        List<ContainerTypeWrapper> containerTypes = container
-            .getContainerType().getChildContainerTypeCollection();
+        if (canCreate || canDelete) {
+            List<ContainerTypeWrapper> containerTypes = container
+                .getContainerType().getChildContainerTypeCollection();
 
-        // Initialisation action for selection
-        final ComboViewer initSelectionCv = createComboViewer(
-            childrenActionSection, "Initialize selection to", containerTypes,
-            containerTypes.get(0));
-        Button initializeSelectionButton = toolkit.createButton(
-            childrenActionSection, "Initialize", SWT.PUSH);
-        initializeSelectionButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) initSelectionCv
-                    .getSelection()).getFirstElement();
-                initSelection(type);
+            if (canCreate) {
+                // Initialisation action for selection
+                final ComboViewer initSelectionCv = createComboViewer(
+                    childrenActionSection, "Initialize selection to",
+                    containerTypes, containerTypes.get(0));
+                Button initializeSelectionButton = toolkit.createButton(
+                    childrenActionSection, "Initialize", SWT.PUSH);
+                initializeSelectionButton
+                    .addSelectionListener(new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent e) {
+                            ContainerTypeWrapper type = (ContainerTypeWrapper) ((IStructuredSelection) initSelectionCv
+                                .getSelection()).getFirstElement();
+                            initSelection(type);
+                        }
+                    });
             }
-        });
 
-        // Delete action for selection
-        List<Object> deleteComboList = new ArrayList<Object>();
-        deleteComboList.add("All");
-        deleteComboList.addAll(containerTypes);
-        final ComboViewer deleteCv = createComboViewer(childrenActionSection,
-            "Delete selected containers of type", deleteComboList, "All");
-        Button deleteButton = toolkit.createButton(childrenActionSection,
-            "Delete", SWT.PUSH);
-        deleteButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                Boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Confirm Delete",
-                    "Are you sure you want to delete these containers?");
-                if (confirm) {
-                    Object selection = ((IStructuredSelection) deleteCv
-                        .getSelection()).getFirstElement();
-                    if (selection instanceof ContainerTypeWrapper) {
-                        deleteSelection((ContainerTypeWrapper) selection);
-                    } else {
-                        deleteSelection(null);
+            if (canDelete) {
+                // Delete action for selection
+                List<Object> deleteComboList = new ArrayList<Object>();
+                deleteComboList.add("All");
+                deleteComboList.addAll(containerTypes);
+                final ComboViewer deleteCv = createComboViewer(
+                    childrenActionSection,
+                    "Delete selected containers of type", deleteComboList,
+                    "All");
+                Button deleteButton = toolkit.createButton(
+                    childrenActionSection, "Delete", SWT.PUSH);
+                deleteButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        Boolean confirm = MessageDialog
+                            .openConfirm(PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getShell(),
+                                "Confirm Delete",
+                                "Are you sure you want to delete these containers?");
+                        if (confirm) {
+                            Object selection = ((IStructuredSelection) deleteCv
+                                .getSelection()).getFirstElement();
+                            if (selection instanceof ContainerTypeWrapper) {
+                                deleteSelection((ContainerTypeWrapper) selection);
+                            } else {
+                                deleteSelection(null);
+                            }
+                        }
                     }
-                }
+                });
             }
-        });
-        setChildrenActionSectionEnabled(false);
+            setChildrenActionSectionEnabled(false);
+        }
     }
 
     private void setChildrenActionSectionEnabled(boolean enable) {
@@ -347,18 +363,21 @@ public class ContainerViewForm extends BiobankViewForm {
     private void openFormFor(ContainerCell cell) {
         ContainerAdapter newAdapter = null;
         if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
-            ContainerWrapper containerToOpen = cell.getContainer();
-            if (containerToOpen == null) {
-                containerToOpen = new ContainerWrapper(appService);
+            if (canCreate) {
+                ContainerWrapper containerToOpen = cell.getContainer();
+                if (containerToOpen == null) {
+                    containerToOpen = new ContainerWrapper(appService);
+                }
+                containerToOpen.setSite(containerAdapter.getParentFromClass(
+                    SiteAdapter.class).getWrapper());
+                containerToOpen.setParent(container);
+                containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
+                    .getCol()));
+                newAdapter = new ContainerAdapter(containerAdapter,
+                    containerToOpen);
+                AdapterBase.openForm(new FormInput(newAdapter),
+                    ContainerEntryForm.ID);
             }
-            containerToOpen.setSite(containerAdapter.getParentFromClass(
-                SiteAdapter.class).getWrapper());
-            containerToOpen.setParent(container);
-            containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
-                .getCol()));
-            newAdapter = new ContainerAdapter(containerAdapter, containerToOpen);
-            AdapterBase.openForm(new FormInput(newAdapter),
-                ContainerEntryForm.ID);
         } else {
             ContainerWrapper child = cell.getContainer();
             Assert.isNotNull(child);

@@ -33,6 +33,26 @@ public class SecurityHelper {
     }
 
     /**
+     * return true if the user can delete an object of type hold by the
+     * modelWrapperType
+     */
+    public static boolean canDelete(WritableApplicationService appService,
+        Class<?> modelWrapperType, String user) {
+        try {
+            Constructor<?> constructor = modelWrapperType
+                .getConstructor(WritableApplicationService.class);
+            ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
+                .newInstance(appService);
+            return ((BiobankApplicationService) appService).canCreateObjects(
+                user, wrapper.getWrappedClass());
+        } catch (Exception e) {
+            LOGGER.error("Error testing security authorization on "
+                + modelWrapperType.getName(), e);
+            return false;
+        }
+    }
+
+    /**
      * return true if the user can view objects of type hold by the
      * modelWrapperType
      */
@@ -55,7 +75,7 @@ public class SecurityHelper {
      * return true if the user can view objects of type hold by the
      * modelWrapperType
      */
-    public static boolean canEdit(WritableApplicationService appService,
+    public static boolean canUpdate(WritableApplicationService appService,
         Class<?> modelWrapperType, String user) {
         try {
             Constructor<?> constructor = modelWrapperType

@@ -45,6 +45,12 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
+    public boolean canDeleteObjects(String userLogin, Class<?> clazz)
+        throws ApplicationException {
+        return hasPrivilege(userLogin, clazz, null, "DELETE");
+    }
+
+    @Override
     public boolean canUpdateObjects(String userLogin, Class<?> clazz)
         throws ApplicationException {
         return hasPrivilege(userLogin, clazz, null, "UPDATE");
