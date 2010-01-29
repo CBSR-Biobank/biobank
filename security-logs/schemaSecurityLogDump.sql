@@ -106,7 +106,7 @@ CREATE TABLE `csm_group` (
   UNIQUE KEY `UQ_GROUP_GROUP_NAME` (`APPLICATION_ID`,`GROUP_NAME`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_GROUP` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -118,6 +118,9 @@ LOCK TABLES `csm_group` WRITE;
 INSERT INTO `csm_group` VALUES (2,'Viewers','','2009-07-22',2);
 INSERT INTO `csm_group` VALUES (3,'Technicians','','2009-07-22',2);
 INSERT INTO `csm_group` VALUES (4,'Administrators','Can access and modify everything','2009-07-23',2);
+INSERT INTO `csm_group` VALUES (5,'Website Administrator','','2010-01-28',2);
+INSERT INTO `csm_group` VALUES (6,'CBSR Technician Level 1','','2010-01-28',2);
+INSERT INTO `csm_group` VALUES (7,'CBSR Technician Level 2','','2010-01-28',2);
 /*!40000 ALTER TABLE `csm_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -351,7 +354,7 @@ CREATE TABLE `csm_role` (
   UNIQUE KEY `UQ_ROLE_ROLE_NAME` (`APPLICATION_ID`,`ROLE_NAME`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_ROLE` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -363,6 +366,9 @@ LOCK TABLES `csm_role` WRITE;
 INSERT INTO `csm_role` VALUES (1,'read','',2,1,'2009-07-22');
 INSERT INTO `csm_role` VALUES (2,'create-delete-update','',2,1,'2009-07-22');
 INSERT INTO `csm_role` VALUES (3,'READ','',3,1,'2009-07-27');
+INSERT INTO `csm_role` VALUES (4,'create','',2,1,'2010-01-28');
+INSERT INTO `csm_role` VALUES (5,'delete','',2,1,'2010-01-28');
+INSERT INTO `csm_role` VALUES (6,'update','',2,1,'2010-01-28');
 /*!40000 ALTER TABLE `csm_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -383,7 +389,7 @@ CREATE TABLE `csm_role_privilege` (
   KEY `idx_ROLE_ID` (`ROLE_ID`),
   CONSTRAINT `FK_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PRIVILEGE_ROLE` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `csm_privilege` (`PRIVILEGE_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -393,10 +399,13 @@ CREATE TABLE `csm_role_privilege` (
 LOCK TABLES `csm_role_privilege` WRITE;
 /*!40000 ALTER TABLE `csm_role_privilege` DISABLE KEYS */;
 INSERT INTO `csm_role_privilege` VALUES (10,2,1);
+INSERT INTO `csm_role_privilege` VALUES (13,4,1);
 INSERT INTO `csm_role_privilege` VALUES (8,1,3);
 INSERT INTO `csm_role_privilege` VALUES (12,3,3);
 INSERT INTO `csm_role_privilege` VALUES (11,2,5);
+INSERT INTO `csm_role_privilege` VALUES (15,6,5);
 INSERT INTO `csm_role_privilege` VALUES (9,2,6);
+INSERT INTO `csm_role_privilege` VALUES (14,5,6);
 /*!40000 ALTER TABLE `csm_role_privilege` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -425,7 +434,7 @@ CREATE TABLE `csm_user` (
   `PREMGRT_LOGIN_NAME` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`USER_ID`),
   UNIQUE KEY `UQ_LOGIN_NAME` (`LOGIN_NAME`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -441,6 +450,9 @@ INSERT INTO `csm_user` VALUES (4,'visitor',0,'visitor','visitor','','','','','xe
 INSERT INTO `csm_user` VALUES (5,'tech1',0,'tech1','tech1','','','','','XrqZ9qCiTTo=','',NULL,NULL,'2009-07-23','');
 INSERT INTO `csm_user` VALUES (6,'clmadmin',0,'clmadmin','clmadmin','','','','','tBGnppnJRZW8j2uyHEABIQ==','',NULL,NULL,'2009-07-27','');
 INSERT INTO `csm_user` VALUES (7,'clm',0,'clm','clm','','','','','nGNTxuVEogo=','',NULL,NULL,'2009-07-27','');
+INSERT INTO `csm_user` VALUES (8,'etaylor',0,'Elizabeth','Taylor','','','','','a54er9Cu3+K8j2uyHEABIQ==','',NULL,NULL,'2010-01-28','');
+INSERT INTO `csm_user` VALUES (9,'jminiaci',0,'Jessica','Miniaci','','','','','62Hts12YT6/ewXfEM4HTIg==','',NULL,NULL,'2010-01-28','');
+INSERT INTO `csm_user` VALUES (10,'apeck',0,'Aaron','Peck','','','','','O2HclZiz3BM=','',NULL,NULL,'2010-01-28','');
 /*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -460,7 +472,7 @@ CREATE TABLE `csm_user_group` (
   KEY `idx_GROUP_ID` (`GROUP_ID`),
   CONSTRAINT `FK_UG_GROUP` FOREIGN KEY (`GROUP_ID`) REFERENCES `csm_group` (`GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -473,6 +485,9 @@ INSERT INTO `csm_user_group` VALUES (13,3,4);
 INSERT INTO `csm_user_group` VALUES (14,2,4);
 INSERT INTO `csm_user_group` VALUES (15,4,2);
 INSERT INTO `csm_user_group` VALUES (16,5,3);
+INSERT INTO `csm_user_group` VALUES (17,8,5);
+INSERT INTO `csm_user_group` VALUES (18,9,6);
+INSERT INTO `csm_user_group` VALUES (19,10,7);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -499,7 +514,7 @@ CREATE TABLE `csm_user_group_role_pg` (
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_GROUPS` FOREIGN KEY (`GROUP_ID`) REFERENCES `csm_group` (`GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -521,6 +536,26 @@ INSERT INTO `csm_user_group_role_pg` VALUES (21,NULL,3,1,1,'2009-07-23');
 INSERT INTO `csm_user_group_role_pg` VALUES (22,7,NULL,3,10,'2009-07-27');
 INSERT INTO `csm_user_group_role_pg` VALUES (28,NULL,4,2,11,'2010-01-27');
 INSERT INTO `csm_user_group_role_pg` VALUES (29,NULL,4,1,11,'2010-01-27');
+INSERT INTO `csm_user_group_role_pg` VALUES (32,NULL,5,2,1,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (33,NULL,5,1,1,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (34,NULL,5,2,11,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (35,NULL,5,1,11,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (36,NULL,6,1,1,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (37,NULL,6,1,11,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (38,NULL,6,2,5,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (39,NULL,6,1,5,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (40,NULL,6,2,9,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (41,NULL,6,1,9,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (42,NULL,6,2,3,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (43,NULL,6,1,3,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (44,NULL,6,2,2,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (45,NULL,6,1,2,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (46,NULL,7,1,1,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (47,NULL,7,2,5,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (48,NULL,7,1,5,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (49,NULL,7,2,9,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (50,NULL,7,1,9,'2010-01-28');
+INSERT INTO `csm_user_group_role_pg` VALUES (51,NULL,7,1,11,'2010-01-28');
 /*!40000 ALTER TABLE `csm_user_group_role_pg` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -633,4 +668,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-01-27 15:43:46
+-- Dump completed on 2010-01-28 17:07:44
