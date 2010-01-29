@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.importer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -20,6 +22,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -147,7 +150,10 @@ public class Importer {
 
     private static ImportCounts importCounts;
 
+    private static ImportConfig importConfig;
+
     public static void main(String[] args) throws Exception {
+        loadConfigProperties();
         dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
         tables = new ArrayList<String>();
         PropertyConfigurator.configure("conf/log4j.properties");
@@ -184,19 +190,7 @@ public class Importer {
             if (cbsrSite == null) {
                 importAll();
             } else {
-                initClinicsMap();
-                initStudiesMap();
-                initContainerTypesMap();
-                initTopContainersMap();
-                checkSampleTypes();
-
-                // importPatients();
-                // removeAllShipments();
-                // importShipments();
-                // importPatientVisits();
-                removeAllSamples();
-                importFreezerSamples();
-                // importCabinetSamples();
+                doImport();
             }
 
             logger.info("import complete");
@@ -210,6 +204,93 @@ public class Importer {
         logger.info("shipments imported: " + importCounts.shipments);
         logger.info("visits imported: " + importCounts.visits);
         logger.info("samples imported: " + importCounts.samples);
+    }
+
+    public static void loadConfigProperties() throws IOException {
+        Properties configProps = new Properties();
+        InputStream in = Thread.currentThread().getContextClassLoader()
+            .getResourceAsStream("config.properties");
+        configProps.load(in);
+
+        String property;
+        importConfig = new ImportConfig();
+
+        property = configProps.getProperty("cbsr.import.patients");
+        if (property != null) {
+            importConfig.importPatients = property.equals("yes");
+        }
+
+        property = configProps.getProperty("cbsr.import.shipments");
+        if (property != null) {
+            importConfig.importShipments = property.equals("yes");
+        }
+
+        property = configProps.getProperty("cbsr.import.patient_visits");
+        if (property != null) {
+            importConfig.importPatientVisits = property.equals("yes");
+        }
+
+        for (int i = 1; i <= 2; ++i) {
+            property = configProps.getProperty("cbsr.import.cabinet.0" + i);
+            if (property != null) {
+                importConfig.importCabinets.put(i, property);
+            }
+        }
+
+        String[] freezerNrs = new String[] { "01", "02", "03", "05", "99" };
+        for (String nr : freezerNrs) {
+            property = configProps.getProperty("cbsr.import.freezer." + nr);
+            if (property != null) {
+                importConfig.importFreezers.put(Integer.valueOf(nr), property);
+            }
+        }
+    }
+
+    private static boolean importCabinets() {
+        boolean result = false;
+        for (String configValue : importConfig.importCabinets.values()) {
+            if (!configValue.equals("no")) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    private static boolean importCabinet(int cabinetId) {
+        String configValue = importConfig.importCabinets.get(cabinetId);
+        if (configValue == null)
+            return false;
+        return !configValue.equals("no");
+    }
+
+    private static boolean importFreezers() {
+        boolean result = false;
+        for (String configValue : importConfig.importFreezers.values()) {
+            if (!configValue.equals("no")) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    public static boolean importFreezer(int freezerId) {
+        String configValue = importConfig.importFreezers.get(freezerId);
+        if (configValue == null)
+            return false;
+        return !configValue.equals("no");
+    }
+
+    public static boolean importFreezerHotel(String hotelLabel)
+        throws Exception {
+        if (hotelLabel.length() != 4) {
+            throw new Exception(
+                "invalid length for hotel label. should be 4 characters.");
+        }
+
+        String configValue = importConfig.importFreezers.get(Integer
+            .valueOf(hotelLabel.substring(0, 2)));
+        return (configValue.equals("yes") || configValue.contains(hotelLabel
+            .subSequence(2, 4)));
     }
 
     private static void importAll() throws Exception {
@@ -232,20 +313,44 @@ public class Importer {
 
         logger.info("creating containers...");
         CbsrContainers.createContainers(cbsrSite);
+        doImport();
+    }
 
+    private static void doImport() throws Exception {
         initClinicsMap();
         initStudiesMap();
         initContainerTypesMap();
         initTopContainersMap();
 
         checkSampleTypes();
-        importPatients();
-        importShipments();
-        importPatientVisits();
-        // importCabinetSamples();
-        // importFreezerSamples();
 
-        logger.info("importing complete.");
+        if (importConfig.importPatients) {
+            importPatients();
+        } else {
+            logger.info("not configured for importing patients");
+        }
+
+        if (importConfig.importShipments) {
+            removeAllShipments();
+            importShipments();
+        } else {
+            logger.info("not configured for importing shipments");
+        }
+
+        if (importConfig.importPatientVisits) {
+            importPatientVisits();
+        } else {
+            logger.info("not configured for importing patient visits");
+        }
+
+        if (importCabinets() || importFreezers()) {
+            removeAllSamples();
+            importFreezerSamples();
+            importCabinetSamples();
+
+        } else {
+            logger.info("not configured for importing samples from containers");
+        }
     }
 
     private static SiteWrapper getCbsrSite() throws Exception {
@@ -772,7 +877,6 @@ public class Importer {
         }
     }
 
-    @SuppressWarnings("unused")
     private static void importCabinetSamples() throws Exception {
         Map<Integer, ContainerWrapper> cabinetsMap = new HashMap<Integer, ContainerWrapper>();
 
@@ -808,6 +912,11 @@ public class Importer {
         ResultSet rs;
 
         for (Integer cabinetNum : cabinetsMap.keySet()) {
+            if (!importCabinet(cabinetNum.intValue())) {
+                logger.info("not configured to import cabinet " + cabinetNum);
+                continue;
+            }
+
             if (cabinetsMap.get(cabinetNum) == null) {
                 throw new Exception("Cabinet " + cabinetNum
                     + " container not found in biobank database");
@@ -970,16 +1079,16 @@ public class Importer {
             String label = container.getLabel();
             String typeNameShort = container.getContainerType().getNameShort();
             if (label.equals("01") && typeNameShort.equals("F3x10")) {
-                // freezersMap.put(1, container);
+                freezersMap.put(1, container);
             } else if (label.equals("02") && typeNameShort.equals("F4x12")) {
-                // freezersMap.put(2, container);
+                freezersMap.put(2, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
                 freezersMap.put(3, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
-                // freezersMap.put(5, container);
+                freezersMap.put(5, container);
             } else if (label.equals("Sent Samples")
                 && typeNameShort.equals("F4x6")) {
-                // freezersMap.put(99, container);
+                freezersMap.put(99, container);
             }
         }
 
@@ -992,6 +1101,11 @@ public class Importer {
 
         while (rs.next()) {
             int freezerNum = rs.getInt(1);
+
+            if (!importFreezer(freezerNum)) {
+                logger.info("not configured to import freezer " + freezerNum);
+                continue;
+            }
 
             if (freezersMap.get(freezerNum) == null)
                 continue;
@@ -1147,3 +1261,19 @@ class ImportCounts {
     int visits;
     int samples;
 };
+
+class ImportConfig {
+    boolean importPatients;
+    boolean importShipments;
+    boolean importPatientVisits;
+    Map<Integer, String> importCabinets;
+    Map<Integer, String> importFreezers;
+
+    ImportConfig() {
+        importPatients = false;
+        importShipments = false;
+        importPatientVisits = false;
+        importCabinets = new HashMap<Integer, String>();
+        importFreezers = new HashMap<Integer, String>();
+    }
+}

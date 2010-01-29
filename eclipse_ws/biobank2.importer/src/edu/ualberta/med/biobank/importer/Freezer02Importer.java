@@ -53,6 +53,12 @@ public class Freezer02Importer extends FreezerImporter {
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('J'); h++) {
             hotelLabel = "C" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
+
+            if (!Importer.importFreezerHotel(hotelLabel)) {
+                logger.info("not configured for importing hotel " + hotelLabel);
+                continue;
+            }
+
             ps = con.prepareStatement(DEFAULT_QUERY);
             ps.setInt(1, bbpdbFreezerNum);
             ps.setString(2, hotelLabel);
@@ -96,6 +102,12 @@ public class Freezer02Importer extends FreezerImporter {
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('T'); h++) {
             hotelLabel = "A" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
+
+            if (!Importer.importFreezerHotel(hotelLabel)) {
+                logger.info("not configured for importing hotel " + hotelLabel);
+                continue;
+            }
+
             ps = con.prepareStatement(DEFAULT_QUERY);
             ps.setInt(1, 4);
             ps.setString(2, hotelLabel);

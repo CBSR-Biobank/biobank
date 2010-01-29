@@ -74,6 +74,12 @@ public class FreezerImporter {
         PreparedStatement ps;
 
         for (ContainerWrapper hotel : freezer.getChildren().values()) {
+            if (!Importer.importFreezerHotel(hotel.getLabel())) {
+                logger.info("not configured for importing hotel "
+                    + hotel.getLabel());
+                continue;
+            }
+
             ps = con.prepareStatement(query);
             ps.setInt(1, bbpdbFreezerNum);
             String hotelLabel = hotel.getLabel();
