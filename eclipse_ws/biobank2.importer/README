@@ -30,12 +30,17 @@ QUERY TO GET A SAMPLE COUNT FROM ALL BINS IN CABINETS
 
 
 QUERY TO COUNT THE NUMBER OF SAMPLES IN CABINET
-
   SELECT cnum, drawer, bin, count(*) as sample_count
   FROM `cabinet` where cnum=2 and inventory_id is not null
   group by drawer, bin
   order by sample_count desc
   
+QUERY TO GENERATE THE VISITS WITH WRONG PATIENT_NR
+  select fnum, rack, box, cell, freezer.visit_nr, date_received, date_taken, 
+  freezer.study_nr as freezer_study_nr, patient_visit.study_nr as 
+  patient_visit_study_nr from freezer join patient_visit on 
+  freezer.visit_nr=patient_visit.visit_nr 
+  where freezer.patient_nr<>patient_visit.patient_nr order by fnum, rack, box, cell
   
 QUERY TO GENERATE THE VISITS WITH WRONG STUDY_NR
   select fnum, rack, box, cell, freezer.visit_nr, date_received, date_taken, 

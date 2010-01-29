@@ -75,7 +75,7 @@ public class FreezerImporter {
 
         for (ContainerWrapper hotel : freezer.getChildren().values()) {
             if (!Importer.importFreezerHotel(hotel.getLabel())) {
-                logger.info("not configured for importing hotel "
+                logger.debug("not configured for importing hotel "
                     + hotel.getLabel());
                 continue;
             }
