@@ -149,58 +149,63 @@ public class Importer {
 
     private static Configuration configuration;
 
-    public static void main(String[] args) throws Exception {
-        configuration = new Configuration("config.properties");
-        dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
-        tables = new ArrayList<String>();
-        PropertyConfigurator.configure("conf/log4j.properties");
-
-        importCounts = new ImportCounts();
-        importCounts.patients = 0;
-        importCounts.shipments = 0;
-        importCounts.visits = 0;
-        importCounts.samples = 0;
-
+    public static void main(String[] args) {
         try {
-            con = getMysqlConnection();
+            configuration = new Configuration("config.properties");
+            dateTimeFormatter = new SimpleDateFormat(DATE_TIME_FORMAT);
+            tables = new ArrayList<String>();
+            PropertyConfigurator.configure("conf/log4j.properties");
 
-            getTables();
-            if (tables.size() == 0) {
-                throw new Exception("No tables found in export database");
+            importCounts = new ImportCounts();
+            importCounts.patients = 0;
+            importCounts.shipments = 0;
+            importCounts.visits = 0;
+            importCounts.samples = 0;
+
+            try {
+                con = getMysqlConnection();
+
+                getTables();
+                if (tables.size() == 0) {
+                    throw new Exception("No tables found in export database");
+                }
+
+                String[] reqdTables = { "clinics", "study_list", "patient",
+                    "patient_visit", "cabinet", "freezer", "sample_list",
+                    "frz_99_inv_id" };
+
+                for (String table : reqdTables) {
+                    if (!tableExists(table))
+                        throw new Exception("Table " + table + " not found");
+                }
+
+                appService = ServiceConnection.getAppService("http://"
+                    + System.getProperty("server", "localhost:8080")
+                    + "/biobank2", "testuser", "test");
+
+                cbsrSite = getCbsrSite();
+
+                if (cbsrSite == null) {
+                    importAll();
+                } else {
+                    doImport();
+                }
+
+                logger.info("import complete");
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                con.close();
             }
 
-            String[] reqdTables = { "clinics", "study_list", "patient",
-                "patient_visit", "cabinet", "freezer", "sample_list",
-                "frz_99_inv_id" };
-
-            for (String table : reqdTables) {
-                if (!tableExists(table))
-                    throw new Exception("Table " + table + " not found");
-            }
-
-            appService = ServiceConnection.getAppService("http://"
-                + System.getProperty("server", "localhost:8080") + "/biobank2",
-                "testuser", "test");
-
-            cbsrSite = getCbsrSite();
-
-            if (cbsrSite == null) {
-                importAll();
-            } else {
-                doImport();
-            }
-
-            logger.info("import complete");
+            logger.info("patients imported: " + importCounts.patients);
+            logger.info("shipments imported: " + importCounts.shipments);
+            logger.info("visits imported: " + importCounts.visits);
+            logger.info("samples imported: " + importCounts.samples);
         } catch (Exception e) {
+            logger.error(e);
             e.printStackTrace();
-        } finally {
-            con.close();
         }
-
-        logger.info("patients imported: " + importCounts.patients);
-        logger.info("shipments imported: " + importCounts.shipments);
-        logger.info("visits imported: " + importCounts.visits);
-        logger.info("samples imported: " + importCounts.samples);
     }
 
     private static void importAll() throws Exception {
