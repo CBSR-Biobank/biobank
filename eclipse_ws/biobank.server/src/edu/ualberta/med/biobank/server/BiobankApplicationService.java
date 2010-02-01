@@ -26,6 +26,9 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public boolean canDeleteObjects(String userLogin, Class<?> clazz)
         throws ApplicationException;
 
+    public boolean canDeleteObject(String userLogin, Class<?> clazz, Integer id)
+        throws ApplicationException;
+
     public boolean canUpdateObjects(String userLogin, Class<?> clazz)
         throws ApplicationException;
 

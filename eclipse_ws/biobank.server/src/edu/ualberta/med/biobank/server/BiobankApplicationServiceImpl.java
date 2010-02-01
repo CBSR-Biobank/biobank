@@ -51,6 +51,12 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
+    public boolean canDeleteObject(String userLogin, Class<?> clazz, Integer id)
+        throws ApplicationException {
+        return hasPrivilege(userLogin, clazz, id, "CREATE");
+    }
+
+    @Override
     public boolean canUpdateObjects(String userLogin, Class<?> clazz)
         throws ApplicationException {
         return hasPrivilege(userLogin, clazz, null, "UPDATE");
@@ -68,8 +74,12 @@ public class BiobankApplicationServiceImpl extends
         try {
             AuthorizationManager am = SecurityServiceProvider
                 .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
-            return am
-                .checkPermission(userLogin, clazz.getName(), privilegeName);
+            if (id == null) {
+                return am.checkPermission(userLogin, clazz.getName(),
+                    privilegeName);
+            }
+            return am.checkPermission(userLogin, clazz.getName(), "id", id
+                .toString(), privilegeName);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
@@ -89,6 +99,10 @@ public class BiobankApplicationServiceImpl extends
     // return null;
     // }
 
+    /**
+     * @see BiobankApiApplicationServiceMethodHelper#getDomainObjectName(org.aopalliance.intercept.MethodInvocation)
+     *      for limitation access to this method
+     */
     @Override
     public void newSite(Integer id, String name) throws ApplicationException {
         try {
