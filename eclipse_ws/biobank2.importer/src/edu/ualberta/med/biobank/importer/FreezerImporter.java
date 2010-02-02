@@ -177,7 +177,7 @@ public class FreezerImporter {
 
         Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
 
-        List<PatientVisitWrapper> visits = patient.getVisit(dateProcessed);
+        List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed);
 
         if (visits.size() == 0) {
             logger.error("patient " + patientNr + ", visit not found for date "
