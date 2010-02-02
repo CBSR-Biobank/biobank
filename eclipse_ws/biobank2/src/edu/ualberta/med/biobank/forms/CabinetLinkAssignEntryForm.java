@@ -342,15 +342,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 }
             }
         });
-        comboVisits.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                PatientVisitWrapper pv = getSelectedPatientVisit();
-                sampleWrapper.setPatientVisit(pv);
-                appendLog("Visit selected " + pv.getFormattedDateProcessed()
-                    + " - " + pv.getShipment().getClinic().getName());
-            }
-        });
     }
 
     protected void setVisitsList() {
@@ -381,6 +372,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             public void run() {
                 try {
                     appendLog("----");
+                    PatientVisitWrapper pv = getSelectedPatientVisit();
+                    sampleWrapper.setPatientVisit(pv);
+                    appendLog("Visit selected "
+                        + pv.getFormattedDateProcessed() + " - "
+                        + pv.getShipment().getClinic().getName());
                     if (radioNew.getSelection()) {
                         appendLog("Checking inventoryID "
                             + sampleWrapper.getInventoryId());
@@ -558,7 +554,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void saveForm() throws Exception {
         if (radioNew.getSelection()) {
             sampleWrapper.setLinkDate(new Date());
-            sampleWrapper.setPatientVisit(getSelectedPatientVisit());
             sampleWrapper.setQuantityFromType();
         }
         sampleWrapper.persist();
