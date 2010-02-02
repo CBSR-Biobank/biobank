@@ -14,7 +14,7 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
 
     private boolean manageOldInventoryIDs = false;
 
-    private static final String ERROR_MESSAGE = "Enter Inventory ID";
+    private static final String ERROR_MESSAGE = "Enter Inventory ID (6 letters for new samples, 4 allowed for old samples)";
 
     public CabinetInventoryIDValidator() {
         super(ERROR_MESSAGE);

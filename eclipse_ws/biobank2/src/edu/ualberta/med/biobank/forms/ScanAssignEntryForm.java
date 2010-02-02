@@ -55,7 +55,6 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
@@ -416,8 +415,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         }
     }
 
-    protected boolean setStatus(PalletCell scanCell)
-        throws ApplicationException {
+    protected boolean setStatus(PalletCell scanCell) throws Exception {
         SampleWrapper expectedSample = scanCell.getExpectedSample();
         String value = scanCell.getValue();
         String positionString = LabelingScheme.rowColToSbs(new RowColPos(
@@ -492,20 +490,15 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     setStatusWithLogMessage(scanCell, SampleCellStatus.MOVED,
                         info, null, positionString, logMsg);
                 }
-                try {
-                    if (!currentPalletWrapper.canHoldSample(foundSample)) {
-                        // pallet can't hold this sample type
-                        String logMsg = "This pallet type "
-                            + currentPalletWrapper.getContainerType().getName()
-                            + " can't hold this sample of type "
-                            + foundSample.getSampleType().getName();
-                        setStatusWithLogMessage(scanCell,
-                            SampleCellStatus.ERROR, logMsg, null,
-                            positionString, logMsg);
-                        return false;
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+                if (!currentPalletWrapper.canHoldSample(foundSample)) {
+                    // pallet can't hold this sample type
+                    String logMsg = "This pallet type "
+                        + currentPalletWrapper.getContainerType().getName()
+                        + " can't hold this sample of type "
+                        + foundSample.getSampleType().getName();
+                    setStatusWithLogMessage(scanCell, SampleCellStatus.ERROR,
+                        logMsg, null, positionString, logMsg);
+                    return false;
                 }
             }
             return true;
