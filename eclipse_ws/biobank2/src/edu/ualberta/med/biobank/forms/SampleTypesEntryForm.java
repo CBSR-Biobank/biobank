@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -43,6 +44,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             siteWrapper = ((SiteAdapter) adapter).getWrapper();
             siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
+        } else {
+            siteSampleTypes = new ArrayList<SampleTypeWrapper>();
         }
         globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
             true);
@@ -91,11 +94,11 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
         if (siteWrapper != null) {
-        siteWrapper.reload();
-        List<SampleTypeWrapper> ssCollection = siteSampleWidget
-            .getTableSampleTypes();
-        siteWrapper.setSampleTypeCollection(ssCollection);
-        siteWrapper.persist();
+            siteWrapper.reload();
+            List<SampleTypeWrapper> ssCollection = siteSampleWidget
+                .getTableSampleTypes();
+            siteWrapper.setSampleTypeCollection(ssCollection);
+            siteWrapper.persist();
         }
         SampleTypeWrapper.persistGlobalSampleTypes(appService,
             globalSampleWidget.getTableSampleTypes());
