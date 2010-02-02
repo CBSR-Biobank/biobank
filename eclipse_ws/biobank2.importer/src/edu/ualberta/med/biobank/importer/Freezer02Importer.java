@@ -55,7 +55,7 @@ public class Freezer02Importer extends FreezerImporter {
             .indexOf('J'); h++) {
             hotelLabel = "C" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
 
-            if (!configuration.importFreezerHotel(hotelLabel)) {
+            if (!configuration.importFreezerHotel("02" + hotelLabel)) {
                 logger.info("not configured for importing hotel " + hotelLabel);
                 continue;
             }
@@ -104,7 +104,7 @@ public class Freezer02Importer extends FreezerImporter {
             .indexOf('T'); h++) {
             hotelLabel = "A" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
 
-            if (!configuration.importFreezerHotel(hotelLabel)) {
+            if (!configuration.importFreezerHotel("02" + hotelLabel)) {
                 logger.info("not configured for importing hotel " + hotelLabel);
                 continue;
             }

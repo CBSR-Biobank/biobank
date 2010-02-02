@@ -926,6 +926,12 @@ public class Importer {
                 String patientNr = cipher.decode(rs.getBytes(18));
                 patient = PatientWrapper.getPatientInSite(appService,
                     patientNr, cbsrSite);
+
+                if (patient == null) {
+                    logger.error("no patient with number " + patientNr);
+                    return;
+                }
+
                 studyNameShort = getStudyNameShort(patientNr, rs.getString(4));
 
                 if (studyNameShort == null) {
@@ -1072,7 +1078,6 @@ public class Importer {
         return false;
     }
 
-    @SuppressWarnings("unused")
     private static Long getPatientCount() throws Exception {
         HQLCriteria c = new HQLCriteria("select count(*) from "
             + Patient.class.getName());
@@ -1080,7 +1085,6 @@ public class Importer {
         return result.get(0);
     }
 
-    @SuppressWarnings("unused")
     private static Long getShipmentCount() throws Exception {
         HQLCriteria c = new HQLCriteria("select count(*) from "
             + Shipment.class.getName());
@@ -1088,7 +1092,6 @@ public class Importer {
         return result.get(0);
     }
 
-    @SuppressWarnings("unused")
     private static Long getPatientVisitCount() throws Exception {
         HQLCriteria c = new HQLCriteria("select count(*) from "
             + PatientVisit.class.getName());
