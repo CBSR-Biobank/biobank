@@ -311,8 +311,8 @@ public class TestPatient extends TestDatabase {
     }
 
     @Test
-    public void testGetVisit() throws Exception {
-        String name = "testGetVisit" + r.nextInt();
+    public void testGetVisits() throws Exception {
+        String name = "testGetVisits" + r.nextInt();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
 
@@ -339,18 +339,20 @@ public class TestPatient extends TestDatabase {
         patient1.reload();
         patient2.reload();
 
-        List<PatientVisitWrapper> visitsFound = patient1.getVisit(date1);
+        List<PatientVisitWrapper> visitsFound = patient1.getVisits(date1);
         Assert.assertTrue(visitsFound.size() == 2);
-        Assert.assertEquals(visit1, visitsFound.get(0));
-        Assert.assertEquals(visit1_1, visitsFound.get(1));
+        Assert.assertTrue(visitsFound.contains(visit1));
+        Assert.assertTrue(visitsFound.contains(visit1_1));
 
-        PatientVisitWrapper visitFound = patient1.getVisit(date2).get(0);
-        Assert.assertEquals(visit2, visitFound);
+        visitsFound = patient1.getVisits(date2);
+        Assert.assertTrue(visitsFound.size() == 1);
+        Assert.assertEquals(visit2, visitsFound.get(0));
 
-        visitFound = patient1.getVisit(date3).get(0);
-        Assert.assertFalse(visit2.equals(visitFound));
+        visitsFound = patient1.getVisits(date3);
+        Assert.assertEquals(0, visitsFound.size());
 
-        visitFound = patient2.getVisit(date3).get(0);
-        Assert.assertEquals(visit3, visitFound);
+        visitsFound = patient2.getVisits(date3);
+        Assert.assertTrue(visitsFound.size() == 1);
+        Assert.assertEquals(visit3, visitsFound.get(0));
     }
 }

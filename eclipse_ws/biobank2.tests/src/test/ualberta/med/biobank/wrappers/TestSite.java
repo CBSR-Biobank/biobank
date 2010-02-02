@@ -1,6 +1,5 @@
 package test.ualberta.med.biobank.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -72,16 +71,14 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetStudyCollectionAdd() throws Exception {
-        String name = "testSetStudyCollectionAdd" + r.nextInt();
+    public void testAddStudies() throws Exception {
+        String name = "testAddStudies" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
         StudyHelper.addStudies(site, name, studiesNber);
 
-        List<StudyWrapper> studies = site.getStudyCollection();
         StudyWrapper study = StudyHelper.newStudy(site, name + "newStudy");
-        studies.add(study);
-        site.setStudyCollection(studies);
+        site.addStudies(study);
         site.persist();
 
         site.reload();
@@ -89,39 +86,39 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
     }
 
-    @Test
-    public void testSetStudyCollectionRemove() throws Exception {
-        String name = "testSetStudyCollectionRemove" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int studiesNber = r.nextInt(15) + 1;
-        StudyHelper.addStudies(site, name, studiesNber);
-
-        List<StudyWrapper> studies = site.getStudyCollection();
-        StudyWrapper study = DbHelper.chooseRandomlyInList(studies);
-        int idStudy = study.getId();
-        studies.remove(study);
-        site.setStudyCollection(studies);
-
-        try {
-            site.persist();
-            Assert.fail("a study is missing and is not deleted");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        study.delete();
-        site.persist();
-
-        site.reload();
-        // one study removed
-        Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
-
-        // study should not be anymore in the study collection (removed the
-        // good one)
-        for (StudyWrapper s : site.getStudyCollection()) {
-            Assert.assertFalse(s.getId().equals(idStudy));
-        }
-    }
+    // @Test
+    // public void testSetStudyCollectionRemove() throws Exception {
+    // String name = "testSetStudyCollectionRemove" + r.nextInt();
+    // SiteWrapper site = SiteHelper.addSite(name);
+    // int studiesNber = r.nextInt(15) + 1;
+    // StudyHelper.addStudies(site, name, studiesNber);
+    //
+    // List<StudyWrapper> studies = site.getStudyCollection();
+    // StudyWrapper study = DbHelper.chooseRandomlyInList(studies);
+    // int idStudy = study.getId();
+    // studies.remove(study);
+    // site.setStudyCollection(studies);
+    //
+    // try {
+    // site.persist();
+    // Assert.fail("a study is missing and is not deleted");
+    // } catch (BiobankCheckException bce) {
+    // Assert.assertTrue(true);
+    // }
+    //
+    // study.delete();
+    // site.persist();
+    //
+    // site.reload();
+    // // one study removed
+    // Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
+    //
+    // // study should not be anymore in the study collection (removed the
+    // // good one)
+    // for (StudyWrapper s : site.getStudyCollection()) {
+    // Assert.assertFalse(s.getId().equals(idStudy));
+    // }
+    // }
 
     @Test
     public void testGetClinicCollection() throws Exception {
@@ -154,54 +151,19 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetClinicCollectionAdd() throws Exception {
-        String name = "testSetClinicCollectionAdd" + r.nextInt();
+    public void testAddClinics() throws Exception {
+        String name = "testAddClinics" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ClinicHelper.addClinics(site, name, nber);
 
-        List<ClinicWrapper> clinics = site.getClinicCollection();
         ClinicWrapper clinic = ClinicHelper.newClinic(site, name + "newClinic");
-        clinics.add(clinic);
-        site.setClinicCollection(clinics);
+        site.addClinics(clinic);
         site.persist();
 
         site.reload();
         // one clinic added
         Assert.assertEquals(nber + 1, site.getClinicCollection().size());
-    }
-
-    @Test
-    public void testSetClinicCollectionRemove() throws Exception {
-        String name = "testSetClinicCollectionRemove" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = r.nextInt(15) + 1;
-        ClinicHelper.addClinics(site, name, nber);
-
-        List<ClinicWrapper> clinics = site.getClinicCollection();
-        ClinicWrapper clinic = DbHelper.chooseRandomlyInList(clinics);
-        int idClinic = clinic.getId();
-        clinics.remove(clinic);
-        site.setClinicCollection(clinics);
-
-        try {
-            site.persist();
-            Assert.fail("a clinic is missing and is not deleted");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        clinic.delete();
-        site.persist();
-        site.reload();
-        // one clinic removed
-        Assert.assertEquals(nber - 1, site.getClinicCollection().size());
-
-        // clinic should not be anymore in the clinic collection (removed
-        // the good one)
-        for (ClinicWrapper c : site.getClinicCollection()) {
-            Assert.assertFalse(c.getId().equals(idClinic));
-        }
     }
 
     @Test
@@ -236,56 +198,20 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetContainerTypeCollectionAdd() throws Exception {
-        String name = "testSetContainerTypeCollectionAdd" + r.nextInt();
+    public void testAddContainerTypes() throws Exception {
+        String name = "testAddContainerTypes" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
 
-        List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
         ContainerTypeWrapper type = ContainerTypeHelper.newContainerType(site,
             name + "newType", name, null, 5, 4, false);
-        types.add(type);
-        site.setContainerTypeCollection(types);
+        site.addContainerTypes(type);
         site.persist();
 
         site.reload();
         // one type added
         Assert.assertEquals(nber + 1, site.getContainerTypeCollection().size());
-    }
-
-    @Test
-    public void testSetContainerTypeCollectionRemove() throws Exception {
-        String name = "testSetContainerTypeCollectionRemove" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = r.nextInt(15) + 1;
-        ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
-
-        List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
-        ContainerTypeWrapper type = DbHelper.chooseRandomlyInList(types);
-        int idType = type.getId();
-        types.remove(type);
-        site.setContainerTypeCollection(types);
-
-        try {
-            site.persist();
-            Assert.fail("a containertype is missing and is not deleted");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        type.delete();
-        site.persist();
-
-        site.reload();
-        // one type removed
-        Assert.assertEquals(nber - 1, site.getContainerTypeCollection().size());
-
-        // type should not be anymore in the type collection (removed
-        // the good one)
-        for (ContainerTypeWrapper t : site.getContainerTypeCollection()) {
-            Assert.assertFalse(t.getId().equals(idType));
-        }
     }
 
     @Test
@@ -302,64 +228,23 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetContainerCollectionAdd() throws Exception {
-        String name = "testSetContainerCollectionAdd" + r.nextInt();
+    public void testAddContainer() throws Exception {
+        String name = "testAddContainer" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int totalContainers = ContainerHelper.addTopContainersWithChildren(
             site, name, r.nextInt(3) + 1);
 
-        List<ContainerWrapper> containers = site.getContainerCollection();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             site, name);
         ContainerWrapper container = ContainerHelper.newContainer(null, name
             + "newContainer", null, site, type);
-        containers.add(container);
-        site.setContainerCollection(containers);
+        site.addContainers(container);
         site.persist();
 
         site.reload();
         // one container added
         Assert.assertEquals(totalContainers + 1, site.getContainerCollection()
             .size());
-    }
-
-    @Test
-    public void testSetContainerCollectionRemove() throws Exception {
-        String name = "testSetContainerCollectionRemove" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int totalNber = ContainerHelper.addTopContainersWithChildren(site,
-            name, r.nextInt(3) + 1);
-
-        List<ContainerWrapper> containers = site.getContainerCollection();
-        List<ContainerWrapper> containersToChoose = new ArrayList<ContainerWrapper>(
-            containers);
-        containersToChoose.removeAll(site.getTopContainerCollection());
-        ContainerWrapper container = DbHelper
-            .chooseRandomlyInList(containersToChoose);
-        int idContainer = container.getId();
-        containers.remove(container);
-        site.setContainerCollection(containers);
-
-        try {
-            site.persist();
-            Assert.fail("a container is missing and is not deleted");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        container.delete();
-        site.persist();
-
-        site.reload();
-        // one container removed
-        Assert
-            .assertEquals(totalNber - 1, site.getContainerCollection().size());
-
-        // container should not be anymore in the container collection
-        // (removed the good one)
-        for (ContainerWrapper c : site.getContainerCollection()) {
-            Assert.assertFalse(c.getId().equals(idContainer));
-        }
     }
 
     @Test

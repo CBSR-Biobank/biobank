@@ -939,7 +939,7 @@ public class Importer {
                 dateProcessed = getDateFromStr(dateProcessedStr);
 
                 // always get the first visit
-                visits = patient.getVisit(dateProcessed);
+                visits = patient.getVisits(dateProcessed);
 
                 if (visits.size() == 0) {
                     logger.error("patient " + patientNr

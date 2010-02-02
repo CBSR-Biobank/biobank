@@ -216,15 +216,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new BiobankCheckException("A site with name \"" + getName()
                 + "\" already exists.");
         }
-        if (!isNew()) {
-            Site origSite = new Site();
-            origSite.setId(getId());
-            origSite = (Site) appService.search(Site.class, origSite).get(0);
-            checkNoStudyRemoved(origSite);
-            checkNoClinicRemoved(origSite);
-            checkNoContainerTypeRemoved(origSite);
-            checkNoContainerRemoved(origSite);
-        }
     }
 
     private boolean checkSiteNameUnique() throws ApplicationException {
@@ -240,105 +231,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
         List<Object> results = appService.query(c);
         return (results.size() == 0);
-    }
-
-    private void checkNoStudyRemoved(Site origSite)
-        throws BiobankCheckException, ApplicationException {
-        if (!isNew()) {
-            List<StudyWrapper> newStudies = getStudyCollection();
-            List<StudyWrapper> oldStudies = new SiteWrapper(appService,
-                origSite).getStudyCollection();
-            if (newStudies != null) {
-                for (StudyWrapper s : oldStudies) {
-                    if ((newStudies == null) || !newStudies.contains(s)) {
-                        Study dbStudy = new Study();
-                        dbStudy.setId(s.getId());
-                        // check if still in database
-                        if (appService.search(Study.class, dbStudy).size() == 1) {
-                            throw new BiobankCheckException(
-                                "Study "
-                                    + s.getName()
-                                    + " has been remove from the studies list: this study should be deleted first.");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkNoClinicRemoved(Site origSite)
-        throws BiobankCheckException, ApplicationException {
-        if (!isNew()) {
-            List<ClinicWrapper> newClinics = getClinicCollection();
-            List<ClinicWrapper> oldClinics = new SiteWrapper(appService,
-                origSite).getClinicCollection();
-            if (newClinics != null) {
-                for (ClinicWrapper c : oldClinics) {
-                    if ((newClinics == null) || !newClinics.contains(c)) {
-                        Clinic dbClinic = new Clinic();
-                        dbClinic.setId(c.getId());
-                        // check if still in database
-                        if (appService.search(Clinic.class, dbClinic).size() == 1) {
-                            throw new BiobankCheckException(
-                                "Clinic "
-                                    + c.getName()
-                                    + " has been remove from the clinics list: this clinic should be deleted first.");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkNoContainerTypeRemoved(Site origSite)
-        throws BiobankCheckException, ApplicationException {
-        if (!isNew()) {
-            List<ContainerTypeWrapper> newContainerTypes = getContainerTypeCollection();
-            List<ContainerTypeWrapper> oldContainerTypes = new SiteWrapper(
-                appService, origSite).getContainerTypeCollection();
-            if (newContainerTypes != null) {
-                for (ContainerTypeWrapper c : oldContainerTypes) {
-                    if ((newContainerTypes == null)
-                        || !newContainerTypes.contains(c)) {
-                        ContainerType dbContainerType = new ContainerType();
-                        dbContainerType.setId(c.getId());
-                        // check if still in database
-                        if (appService.search(ContainerType.class,
-                            dbContainerType).size() == 1) {
-                            throw new BiobankCheckException(
-                                "ContainerType "
-                                    + c.getName()
-                                    + " has been remove from the container types list: this type should be deleted first.");
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkNoContainerRemoved(Site origSite)
-        throws BiobankCheckException, ApplicationException {
-        if (!isNew()) {
-            List<ContainerWrapper> newContainers = getContainerCollection();
-            List<ContainerWrapper> oldContainers = new SiteWrapper(appService,
-                origSite).getContainerCollection();
-            if (newContainers != null) {
-                for (ContainerWrapper c : oldContainers) {
-                    if ((newContainers == null) || !newContainers.contains(c)) {
-                        Container dbContainer = new Container();
-                        dbContainer.setId(c.getId());
-                        // check if still in database
-                        if (appService.search(Container.class, dbContainer)
-                            .size() == 1) {
-                            throw new BiobankCheckException(
-                                "Container "
-                                    + c.getFullInfoLabel()
-                                    + " has been remove from the containers list: this container should be deleted first.");
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -386,7 +278,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    public void setStudyCollection(Collection<Study> studies, boolean setNull) {
+    private void setStudyCollection(Collection<Study> studies, boolean setNull) {
         Collection<Study> oldStudies = wrappedObject.getStudyCollection();
         wrappedObject.setStudyCollection(studies);
         propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
@@ -396,13 +288,21 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setStudyCollection(List<StudyWrapper> studies) {
-        Collection<Study> studyObjects = new HashSet<Study>();
-        for (StudyWrapper study : studies) {
-            studyObjects.add(study.getWrappedObject());
+    public void addStudies(StudyWrapper... studies) {
+        Collection<Study> allStudyObjects = new HashSet<Study>();
+        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+        // already added studies
+        for (StudyWrapper study : getStudyCollection()) {
+            allStudyObjects.add(study.getWrappedObject());
+            allStudyWrappers.add(study);
         }
-        setStudyCollection(studyObjects, false);
-        propertiesMap.put("studyCollection", studies);
+        // new studies added
+        for (StudyWrapper study : studies) {
+            allStudyObjects.add(study.getWrappedObject());
+            allStudyWrappers.add(study);
+        }
+        setStudyCollection(allStudyObjects, false);
+        propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -428,7 +328,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getClinicCollection(false);
     }
 
-    public void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
+    private void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
         Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
         wrappedObject.setClinicCollection(clinics);
         propertyChangeSupport.firePropertyChange("clinicCollection",
@@ -438,13 +338,21 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setClinicCollection(List<ClinicWrapper> clinics) {
-        Collection<Clinic> clinicObjects = new HashSet<Clinic>();
-        for (ClinicWrapper clinic : clinics) {
-            clinicObjects.add(clinic.getWrappedObject());
+    public void addClinics(ClinicWrapper... clinics) {
+        Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
+        List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
+        // already added clinics
+        for (ClinicWrapper clinic : getClinicCollection()) {
+            allClinicObjects.add(clinic.getWrappedObject());
+            allClinicWrappers.add(clinic);
         }
-        setClinicCollection(clinicObjects, false);
-        propertiesMap.put("clinicCollection", clinics);
+        // new clinics
+        for (ClinicWrapper clinic : clinics) {
+            allClinicObjects.add(clinic.getWrappedObject());
+            allClinicWrappers.add(clinic);
+        }
+        setClinicCollection(allClinicObjects, false);
+        propertiesMap.put("clinicCollection", allClinicWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -473,7 +381,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getContainerTypeCollection(false);
     }
 
-    public void setContainerTypeCollection(Collection<ContainerType> types,
+    private void setContainerTypeCollection(Collection<ContainerType> types,
         boolean setNull) {
         Collection<ContainerType> oldTypes = wrappedObject
             .getContainerTypeCollection();
@@ -485,13 +393,21 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setContainerTypeCollection(List<ContainerTypeWrapper> types) {
-        Collection<ContainerType> typeObjects = new HashSet<ContainerType>();
-        for (ContainerTypeWrapper type : types) {
-            typeObjects.add(type.getWrappedObject());
+    public void addContainerTypes(ContainerTypeWrapper... types) {
+        Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
+        List<ContainerTypeWrapper> allTypeWrappers = new ArrayList<ContainerTypeWrapper>();
+        // already added types
+        for (ContainerTypeWrapper type : getContainerTypeCollection()) {
+            allTypeObjects.add(type.getWrappedObject());
+            allTypeWrappers.add(type);
         }
-        setContainerTypeCollection(typeObjects, false);
-        propertiesMap.put("containerTypeCollection", types);
+        // new types
+        for (ContainerTypeWrapper type : types) {
+            allTypeObjects.add(type.getWrappedObject());
+            allTypeWrappers.add(type);
+        }
+        setContainerTypeCollection(allTypeObjects, false);
+        propertiesMap.put("containerTypeCollection", allTypeWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -513,7 +429,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return containerCollection;
     }
 
-    public void setContainerCollection(Collection<Container> containers,
+    private void setContainerCollection(Collection<Container> containers,
         boolean setNull) {
         Collection<Container> oldContainers = wrappedObject
             .getContainerCollection();
@@ -525,13 +441,21 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public void setContainerCollection(List<ContainerWrapper> containers) {
-        Collection<Container> containerObjects = new HashSet<Container>();
-        for (ContainerWrapper container : containers) {
-            containerObjects.add(container.getWrappedObject());
+    public void addContainers(ContainerWrapper... containers) {
+        Collection<Container> allContainerObjects = new HashSet<Container>();
+        List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
+        // already added containers
+        for (ContainerWrapper container : getContainerCollection()) {
+            allContainerObjects.add(container.getWrappedObject());
+            allContainerWrappers.add(container);
         }
-        setContainerCollection(containerObjects, false);
-        propertiesMap.put("containerCollection", containers);
+        // new containers
+        for (ContainerWrapper container : containers) {
+            allContainerObjects.add(container.getWrappedObject());
+            allContainerWrappers.add(container);
+        }
+        setContainerCollection(allContainerObjects, false);
+        propertiesMap.put("containerCollection", allContainerWrappers);
     }
 
     @SuppressWarnings("unchecked")

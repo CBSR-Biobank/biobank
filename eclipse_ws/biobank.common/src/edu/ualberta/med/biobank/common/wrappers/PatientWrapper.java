@@ -137,9 +137,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     /**
-     * Search for a patient visit with the given date processed.
+     * Search patient visits with the given date processed.
      */
-    public List<PatientVisitWrapper> getVisit(Date dateProcessed)
+    public List<PatientVisitWrapper> getVisits(Date dateProcessed)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select visits from "
             + Patient.class.getName()
