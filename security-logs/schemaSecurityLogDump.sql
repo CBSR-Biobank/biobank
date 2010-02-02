@@ -378,7 +378,7 @@ INSERT INTO `csm_protection_group` VALUES (21,'pg-samples-parent','Children= pg-
 INSERT INTO `csm_protection_group` VALUES (22,'pg-sample-position','',2,0,'2010-01-29',21);
 INSERT INTO `csm_protection_group` VALUES (23,'pg-sample-type','',2,0,'2010-01-29',21);
 INSERT INTO `csm_protection_group` VALUES (24,'pg-site','',2,0,'2010-01-29',33);
-INSERT INTO `csm_protection_group` VALUES (25,'pg-studies-parent','Children= pg-study, pg-sampleStorage, pg-StudyPvAttr, pg-study-samplesource ',2,0,'2010-01-29',NULL);
+INSERT INTO `csm_protection_group` VALUES (25,'pg-studies-parent','Children= pg-study, pg-sampleStorage, pg-StudyPvAttr, pg-study-samplesource?',2,0,'2010-01-29',NULL);
 INSERT INTO `csm_protection_group` VALUES (26,'pg-sampleStorage','',2,0,'2010-01-29',25);
 INSERT INTO `csm_protection_group` VALUES (27,'pg-clinics-parent','Children=pg-shipments, pg-shippingCompany, pg-clinics',2,0,'2010-01-29',NULL);
 INSERT INTO `csm_protection_group` VALUES (29,'pg-shipment','',2,0,'2010-01-29',27);
@@ -600,8 +600,6 @@ INSERT INTO `csm_user_group_role_pg` VALUES (36,NULL,6,1,1,'2010-01-28');
 INSERT INTO `csm_user_group_role_pg` VALUES (37,NULL,6,1,11,'2010-01-28');
 INSERT INTO `csm_user_group_role_pg` VALUES (46,NULL,7,1,1,'2010-01-28');
 INSERT INTO `csm_user_group_role_pg` VALUES (51,NULL,7,1,11,'2010-01-28');
-INSERT INTO `csm_user_group_role_pg` VALUES (52,NULL,4,2,13,'2010-01-29');
-INSERT INTO `csm_user_group_role_pg` VALUES (53,NULL,4,1,13,'2010-01-29');
 INSERT INTO `csm_user_group_role_pg` VALUES (54,NULL,6,2,13,'2010-01-29');
 INSERT INTO `csm_user_group_role_pg` VALUES (55,NULL,6,2,29,'2010-01-29');
 INSERT INTO `csm_user_group_role_pg` VALUES (56,NULL,6,2,16,'2010-01-29');
@@ -721,4 +719,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-01-29 15:21:02
+-- Dump completed on 2010-02-02 13:56:28

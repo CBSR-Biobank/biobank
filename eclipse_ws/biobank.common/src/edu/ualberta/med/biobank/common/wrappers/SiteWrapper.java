@@ -811,4 +811,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getName();
     }
 
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canEdit(String user) {
+        try {
+            return ((BiobankApplicationService) appService).canUpdateObject(
+                user, getWrappedClass(), getId());
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
