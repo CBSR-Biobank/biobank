@@ -26,7 +26,7 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         performExpand();
     }
 

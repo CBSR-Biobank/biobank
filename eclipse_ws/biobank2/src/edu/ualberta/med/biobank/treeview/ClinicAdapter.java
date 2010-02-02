@@ -21,7 +21,7 @@ public class ClinicAdapter extends AdapterBase {
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper,
         boolean enableActions) {
-        super(parent, clinicWrapper, enableActions);
+        super(parent, clinicWrapper, enableActions, false);
     }
 
     public ClinicWrapper getWrapper() {
@@ -44,7 +44,7 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), ClinicViewForm.ID);
     }
 

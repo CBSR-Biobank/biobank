@@ -29,7 +29,7 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
     }
 
     @Override

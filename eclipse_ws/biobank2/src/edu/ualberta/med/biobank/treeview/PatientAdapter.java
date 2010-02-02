@@ -27,7 +27,7 @@ public class PatientAdapter extends AdapterBase {
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper,
         boolean enableActions) {
-        super(parent, patientWrapper, enableActions);
+        super(parent, patientWrapper, enableActions, true);
         setHasChildren(true);
     }
 
@@ -48,7 +48,7 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         performExpand();
         openForm(new FormInput(this), PatientViewForm.ID);
     }

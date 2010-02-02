@@ -39,7 +39,7 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), ShipmentViewForm.ID);
     }
 

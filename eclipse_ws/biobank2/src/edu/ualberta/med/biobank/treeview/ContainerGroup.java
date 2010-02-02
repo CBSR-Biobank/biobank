@@ -34,7 +34,7 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         performExpand();
     }
 

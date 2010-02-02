@@ -128,7 +128,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         AdapterBase noPatientFoundAdapter = new AdapterBase(rootNode, 0,
             getNoFoundText()) {
             @Override
-            public void performDoubleClick() {
+            public void executeDoubleClick() {
             }
 
             @Override

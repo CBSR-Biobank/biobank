@@ -25,7 +25,7 @@ public class ClinicGroup extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         performExpand();
     }
 

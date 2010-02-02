@@ -50,7 +50,7 @@ public class StudyAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         if (enableActions) {
             openForm(new FormInput(this), StudyViewForm.ID);
         }

@@ -28,7 +28,7 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
-        super(parent, null);
+        super(parent, null, true, false);
         this.appService = appService;
         setId(sessionId);
         setName(name);
@@ -46,7 +46,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
     }
 
     @Override

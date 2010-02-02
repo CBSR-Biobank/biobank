@@ -64,16 +64,19 @@ public abstract class AdapterBase {
      */
     private boolean editable = true;
 
+    private boolean loadChildrenInBackground;
+
     private Thread childUpdateThread;
 
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
-        boolean enableActions) {
+        boolean enableActions, boolean loadChildrenInBackground) {
         this.modelObject = object;
         this.parent = parent;
         this.enableActions = enableActions;
+        this.loadChildrenInBackground = loadChildrenInBackground;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
             addListener(parent.deltaListener);
@@ -83,7 +86,7 @@ public abstract class AdapterBase {
     }
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
-        this(parent, object, true);
+        this(parent, object, true, true);
     }
 
     public AdapterBase(AdapterBase parent, int id, String name) {
@@ -184,7 +187,16 @@ public abstract class AdapterBase {
         return null;
     }
 
+    public boolean hasChild(int id) {
+        for (AdapterBase child : children) {
+            if (child.getId() == id)
+                return true;
+        }
+        return false;
+    }
+
     public void addChild(AdapterBase child) {
+        System.out.println("adding child " + child.getName());
         hasChildren = true;
         AdapterBase existingNode = contains(child);
         if (existingNode != null) {
@@ -192,12 +204,15 @@ public abstract class AdapterBase {
             return;
         }
 
-        AdapterBase namedChild = getChildByName(child.getName());
-        if (namedChild != null) {
-            // may have inserted a new object into database
-            // replace current object with new one
-            int index = children.indexOf(namedChild);
-            children.remove(index);
+        String name = child.getName();
+        if (!name.equals("loading...")) {
+            AdapterBase namedChild = getChildByName(child.getName());
+            if (namedChild != null) {
+                // may have inserted a new object into database
+                // replace current object with new one
+                int index = children.indexOf(namedChild);
+                children.remove(index);
+            }
         }
 
         child.setParent(this);
@@ -307,67 +322,125 @@ public abstract class AdapterBase {
         deltaListener.remove(new DeltaEvent(removed));
     }
 
-    public abstract void performDoubleClick();
+    public abstract void executeDoubleClick();
 
-    public void performExpand() {
-        loadChildrenBackground();
+    public void performDoubleClick() {
+        if (!getName().equals("loading...")) {
+            executeDoubleClick();
+        }
     }
 
-    public void loadChildrenBackground() {
-        if ((childUpdateThread != null) && childUpdateThread.isAlive())
-            return;
-
+    public void performExpand() {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                try {
-                    Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
-                    if (children != null) {
-                        for (int i = 0, n = children.size(); i < n; ++i) {
-                            addChild(createChildNode(i));
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Error while expanding children of node "
-                        + modelObject.toString(), e);
+                if (loadChildrenInBackground) {
+                    loadChildrenBackground(true);
+                } else {
+                    loadChildren(true);
+                    getRootNode().expandChild(AdapterBase.this);
                 }
             }
         });
+    }
 
-        childUpdateThread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
-                    if (children != null) {
-                        int id = 0;
-                        for (ModelWrapper<?> child : children) {
-                            final AdapterBase node = getChild(id);
-                            if (node != null) {
+    /**
+     * Called to load it's children;
+     * 
+     * @param updateNode If not null, the node in the treeview to update.
+     */
+    public void loadChildren(boolean updateNode) {
+        try {
+            Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
+            if (children != null) {
+                for (ModelWrapper<?> child : children) {
+                    AdapterBase node = getChild(child.getId());
+                    if (node == null) {
+                        node = createChildNode(child);
+                        addChild(node);
+                    }
+                    if (updateNode) {
+                        SessionManager.updateTreeNode(node);
+                    }
+                }
+                notifyListeners();
+            }
+        } catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage();
+        } catch (Exception e) {
+            LOGGER.error("Error while loading children of node "
+                + modelObject.toString(), e);
+        }
+    }
+
+    public void loadChildrenBackground(final boolean updateNode) {
+        if ((childUpdateThread != null) && childUpdateThread.isAlive())
+            return;
+
+        try {
+            Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
+            if (childObjects == null)
+                return;
+            for (int i = 0, n = childObjects.size() - children.size(); i < n; ++i) {
+                final AdapterBase node = createChildNode(i);
+                addChild(node);
+                if (updateNode) {
+                    SessionManager.updateTreeNode(node);
+                }
+                System.out.println("child stub added");
+            }
+            notifyListeners();
+            getRootNode().expandChild(AdapterBase.this);
+
+            childUpdateThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        System.out.println("child load thread started");
+                        Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
+                        if (childObjects != null) {
+                            int count = 0;
+                            int id = 0;
+                            for (ModelWrapper<?> child : childObjects) {
+                                // first see if this object is among the
+                                // children, if not then it is being loaded
+                                // for the first time
+                                if (hasChild(child.getId())) {
+                                    id = child.getId();
+                                } else {
+                                    id = count;
+                                    count++;
+                                }
+                                final AdapterBase node = getChild(id);
+                                Assert.isNotNull(node);
                                 node.setModelObject(child);
+                                System.out.println("child model object added");
                                 Display.getDefault().asyncExec(new Runnable() {
                                     public void run() {
-                                        SessionManager.updateTreeNode(node);
+                                        SessionManager.refreshTreeNode(node);
                                     }
                                 });
                             }
-                            ++id;
+                            Display.getDefault().asyncExec(new Runnable() {
+                                public void run() {
+                                    notifyListeners();
+                                }
+                            });
                         }
-                        Display.getDefault().asyncExec(new Runnable() {
-                            public void run() {
-                                notifyListeners();
-                                getRootNode().expandChild(AdapterBase.this);
-                            }
-                        });
+                        System.out.println("child load thread finished");
+                    } catch (final RemoteAccessException exp) {
+                        BioBankPlugin.openRemoteAccessErrorMessage();
+                    } catch (Exception e) {
+                        LOGGER.error("Error while loading children of node "
+                            + modelObject.toString() + " in background", e);
+                        System.out.println(e);
                     }
-                } catch (final RemoteAccessException exp) {
-                    BioBankPlugin.openRemoteAccessErrorMessage();
-                } catch (Exception e) {
-                    LOGGER.error("Error while loading children of node "
-                        + modelObject.toString() + " in background", e);
                 }
-            }
-        };
-        childUpdateThread.start();
+            };
+            childUpdateThread.start();
+        } catch (Exception e) {
+            LOGGER.error("Error while expanding children of node "
+                + modelObject.toString(), e);
+        }
     }
 
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
@@ -411,35 +484,6 @@ public abstract class AdapterBase {
                     delete(question);
                 }
             });
-        }
-    }
-
-    /**
-     * Called to load it's children;
-     * 
-     * @param updateNode If not null, the node in the treeview to update.
-     */
-    public void loadChildren(boolean updateNode) {
-        try {
-            Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
-            if (children != null) {
-                for (ModelWrapper<?> child : children) {
-                    AdapterBase node = getChild(child.getId());
-                    if (node == null) {
-                        node = createChildNode(child);
-                        addChild(node);
-                    }
-                    if (updateNode) {
-                        SessionManager.updateTreeNode(node);
-                    }
-                }
-                notifyListeners();
-            }
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
-        } catch (Exception e) {
-            LOGGER.error("Error while loading children of node "
-                + modelObject.toString(), e);
         }
     }
 

@@ -414,7 +414,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public List<ClinicWrapper> getClinicCollection() {
-        return getClinicCollection(false);
+        return getClinicCollection(true);
     }
 
     public void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
