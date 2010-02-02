@@ -197,6 +197,11 @@ public class SessionManager {
         siteManager.unlockSite();
     }
 
+    public boolean isAllSitesSelected() {
+        Assert.isNotNull(siteManager, "site manager is null");
+        return siteManager.isAllSitesSelected();
+    }
+
     public void setSiteCombo(SiteCombo siteCombo) {
         this.siteCombo = siteCombo;
     }
