@@ -454,7 +454,7 @@ public class ContainerWrapper extends
                     }
                 }
             } catch (ApplicationException e) {
-                LOGGER.error("Adding sample failed. " + "\n" + e.toString());
+                LOGGER.error("Adding sample failed.", e);
             }
         sample.setPosition(row, col);
         sample.setParent(this);
@@ -621,7 +621,7 @@ public class ContainerWrapper extends
     public boolean canHoldSample(SampleWrapper sample) throws Exception {
         SampleTypeWrapper type = sample.getSampleType();
         if (type == null) {
-            throw new Exception("sample type is null");
+            throw new WrapperException("sample type is null");
         }
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()

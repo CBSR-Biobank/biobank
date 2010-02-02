@@ -108,7 +108,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Site");
         setTextValue(siteLabel, containerWrapper.getSite().getName());
 
-        if (containerWrapper.isNew()
+        if ((containerWrapper.isNew() && containerWrapper.getParent() == null)
             || (containerWrapper.getContainerType() != null && Boolean.TRUE
                 .equals(containerWrapper.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
