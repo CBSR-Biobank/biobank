@@ -7,7 +7,6 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SampleTypesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -21,9 +20,8 @@ public class EditSampleTypesHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        SiteWrapper siteWrapper = SessionManager.getInstance()
-            .getCurrentSiteWrapper();
-        SiteAdapter sa = new SiteAdapter(sessionAdapter, siteWrapper);
+        SiteAdapter sa = new SiteAdapter(sessionAdapter, SessionManager
+            .getInstance().getCurrentSiteWrapper());
         AdapterBase.openForm(new FormInput(sa), SampleTypesEntryForm.ID);
         return null;
     }
