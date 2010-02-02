@@ -32,6 +32,7 @@
 	<property name="database.username" value="dummy" />
 	<property name="database.password" value="ozzy498" />
 	<property name="req.jars.dir" value="jars" />
+	<property name="lib-sources.dir" value="lib-sources" />
 	<property name="biobank2.jar.files" value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar,org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar,gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar,commons-beanutils-1.8.0.jar,commons-digester-1.7.jar,commons-lang-2.4.jar,iText-2.1.0.jar,jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar,jdt-compiler-3.1.1.jar" />
 	<property name="biobank.common.jar.files" value="commons-lang-2.4.jar" />
 	<property name="biobank.importer.jar.files" value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
@@ -103,6 +104,22 @@
 		<untar src="biobank_jars.tar.bz2" compression="bzip2" dest="." />
 	</target>
 
+
+	<target name="check-lib-sources-available">
+		<available file="${lib-sources.dir}" type="dir" property="lib-sources.available" />
+	</target>
+
+	<target name="lib-sources-download" depends="check-lib-sources-available" unless="lib-sources.available" description="downloads lib sources from the host machine">
+		<mkdir dir="${lib-sources.dir}" />
+		<echo message="downloading lib sources..." />
+		<exec executable="curl">
+			<arg value="--silent" />
+			<arg value="-olib-sources.tar.bz2" />
+			<arg value="http://${host}/lib-sources.tar.bz2" />
+		</exec>
+		<untar src="lib-sources.tar.bz2" compression="bzip2" dest="." />
+	</target>
+
 	<target name="check-cacore-sdk-available">
 		<available file="${cacore.sdk.dir}/build.xml" property="cacore.sdk.available" />
 	</target>
@@ -164,7 +181,7 @@
 
 	<!-- Eclipse -->
 
-	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download">
+	<target name="deploy-eclipse" description="deploys the caCORE SDK beans to the eclipse project" depends="sdk-files,jars-download, lib-sources-download">
 		<dependset>
 			<srcfilelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
 			<targetfilelist dir="${eclipse.proj.dir.common}/lib" files="${cacore.system.jar.files}" />
@@ -265,6 +282,7 @@
 
 	<target name="deploy" description="deploys to JBoss and Eclipse project">
 		<antcall target="jars-download" />
+		<antcall target="lib-sources-download" />
 		<antcall target="deploy-eclipse" />
 		<antcall target="deploy-jboss" />
 	</target>
