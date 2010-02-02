@@ -58,6 +58,11 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
+    protected AdapterBase createChildNode() {
+        return new ContainerTypeAdapter(this, null);
+    }
+
+    @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ContainerTypeWrapper);
         return new ContainerTypeAdapter(this, (ContainerTypeWrapper) child);

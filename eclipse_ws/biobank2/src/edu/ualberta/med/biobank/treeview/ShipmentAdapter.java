@@ -55,6 +55,11 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
+    protected AdapterBase createChildNode() {
+        return new PatientVisitAdapter(this, null);
+    }
+
+    @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof PatientVisitWrapper);
         return new PatientVisitAdapter(this, (PatientVisitWrapper) child);

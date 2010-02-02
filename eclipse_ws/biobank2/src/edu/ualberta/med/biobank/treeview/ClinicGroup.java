@@ -58,6 +58,11 @@ public class ClinicGroup extends AdapterBase {
     }
 
     @Override
+    protected AdapterBase createChildNode() {
+        return new ClinicAdapter(this, null);
+    }
+
+    @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ClinicWrapper);
         return new ClinicAdapter(this, (ClinicWrapper) child);

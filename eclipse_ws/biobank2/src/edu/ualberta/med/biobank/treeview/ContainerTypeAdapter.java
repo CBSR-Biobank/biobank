@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -27,7 +26,9 @@ public class ContainerTypeAdapter extends AdapterBase {
     @Override
     public String getName() {
         ContainerTypeWrapper containerType = getContainerType();
-        Assert.isNotNull(containerType, "storage type is null");
+        if (containerType == null) {
+            return "loading...";
+        }
         return containerType.getName();
     }
 
@@ -51,6 +52,11 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
         return null;
     }
 

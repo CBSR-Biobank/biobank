@@ -108,6 +108,11 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
+    protected AdapterBase createChildNode() {
+        return new SiteAdapter(this, null);
+    }
+
+    @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof SiteWrapper);
         return new SiteAdapter(this, (SiteWrapper) child);

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
@@ -22,7 +21,7 @@ public class StudyAdapter extends AdapterBase {
         super(parent, studyWrapper);
         this.enableActions = enabledActions;
 
-        if (studyWrapper.getId() != null) {
+        if (studyWrapper != null) {
             setId(studyWrapper.getId());
             setName(studyWrapper.getName());
         }
@@ -39,7 +38,9 @@ public class StudyAdapter extends AdapterBase {
     @Override
     public String getName() {
         StudyWrapper study = getWrapper();
-        Assert.isNotNull(study, "study is null");
+        if (study == null) {
+            return "loading...";
+        }
         return study.getNameShort();
     }
 
@@ -66,6 +67,11 @@ public class StudyAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return null;
     }
 
     @Override

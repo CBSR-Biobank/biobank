@@ -60,6 +60,11 @@ public class StudyGroup extends AdapterBase {
     }
 
     @Override
+    protected AdapterBase createChildNode() {
+        return new StudyAdapter(this, null);
+    }
+
+    @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof StudyWrapper);
         return new StudyAdapter(this, (StudyWrapper) child);

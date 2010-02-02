@@ -31,6 +31,9 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     public String getName() {
         ClinicWrapper wrapper = getWrapper();
+        if (wrapper == null) {
+            return "loading...";
+        }
         Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
         return wrapper.getName();
     }
@@ -55,6 +58,11 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
         return null;
     }
 

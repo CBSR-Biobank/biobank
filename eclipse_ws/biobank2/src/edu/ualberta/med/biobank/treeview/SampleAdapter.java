@@ -61,6 +61,11 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
+    protected AdapterBase createChildNode() {
+        return null;
+    }
+
+    @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         return null;
     }

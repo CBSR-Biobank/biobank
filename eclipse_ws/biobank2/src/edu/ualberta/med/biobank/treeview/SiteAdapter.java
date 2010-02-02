@@ -59,6 +59,9 @@ public class SiteAdapter extends AdapterBase {
     @Override
     public String getName() {
         SiteWrapper site = getWrapper();
+        if (site == null) {
+            return "loading...";
+        }
         Assert.isNotNull(site, "site is null");
         return site.getName();
     }
@@ -86,6 +89,11 @@ public class SiteAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return null;
     }
 
     @Override

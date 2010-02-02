@@ -64,12 +64,10 @@ public abstract class AdapterBase {
      */
     private boolean editable = true;
 
+    private Thread childUpdateThread;
+
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
-
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
-        this(parent, object, true);
-    }
 
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean enableActions) {
@@ -82,6 +80,10 @@ public abstract class AdapterBase {
         }
         listeners = new ArrayList<AdapterChangedListener>();
         Assert.isTrue(checkIntegrity(), "integrity checks failed");
+    }
+
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
+        this(parent, object, true);
     }
 
     public AdapterBase(AdapterBase parent, int id, String name) {
@@ -98,6 +100,15 @@ public abstract class AdapterBase {
 
     public ModelWrapper<?> getModelObject() {
         return modelObject;
+    }
+
+    /**
+     * Used when updating tree nodes from a background thread.
+     * 
+     * @param modelObject the object to be displayed by the tree node.
+     */
+    public void setModelObject(ModelWrapper<?> modelObject) {
+        this.modelObject = modelObject;
     }
 
     /**
@@ -299,12 +310,64 @@ public abstract class AdapterBase {
     public abstract void performDoubleClick();
 
     public void performExpand() {
+        loadChildrenBackground();
+    }
+
+    public void loadChildrenBackground() {
+        if ((childUpdateThread != null) && childUpdateThread.isAlive())
+            return;
+
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                loadChildren(true);
-                getRootNode().expandChild(AdapterBase.this);
+                try {
+                    Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
+                    if (children != null) {
+                        for (int i = 0, n = children.size(); i < n; ++i) {
+                            addChild(createChildNode(i));
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Error while expanding children of node "
+                        + modelObject.toString(), e);
+                }
             }
         });
+
+        childUpdateThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
+                    if (children != null) {
+                        int id = 0;
+                        for (ModelWrapper<?> child : children) {
+                            final AdapterBase node = getChild(id);
+                            if (node != null) {
+                                node.setModelObject(child);
+                                Display.getDefault().asyncExec(new Runnable() {
+                                    public void run() {
+                                        SessionManager.updateTreeNode(node);
+                                    }
+                                });
+                            }
+                            ++id;
+                        }
+                        Display.getDefault().asyncExec(new Runnable() {
+                            public void run() {
+                                notifyListeners();
+                                getRootNode().expandChild(AdapterBase.this);
+                            }
+                        });
+                    }
+                } catch (final RemoteAccessException exp) {
+                    BioBankPlugin.openRemoteAccessErrorMessage();
+                } catch (Exception e) {
+                    LOGGER.error("Error while loading children of node "
+                        + modelObject.toString() + " in background", e);
+                }
+            }
+        };
+        childUpdateThread.start();
     }
 
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
@@ -381,7 +444,20 @@ public abstract class AdapterBase {
     }
 
     /**
-     * Create a adequat node child for this node
+     * Create a adequate child node for this node
+     * 
+     * @param child the child model object
+     */
+    protected abstract AdapterBase createChildNode();
+
+    protected AdapterBase createChildNode(int id) {
+        AdapterBase adapter = createChildNode();
+        adapter.setId(id);
+        return adapter;
+    }
+
+    /**
+     * Create a adequate child node for this node
      * 
      * @param child the child model object
      */
