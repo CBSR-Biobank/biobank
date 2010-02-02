@@ -422,6 +422,8 @@ public abstract class AdapterBase {
                             }
                             Display.getDefault().asyncExec(new Runnable() {
                                 public void run() {
+                                    SessionManager
+                                        .refreshTreeNode(AdapterBase.this);
                                     notifyListeners();
                                 }
                             });
