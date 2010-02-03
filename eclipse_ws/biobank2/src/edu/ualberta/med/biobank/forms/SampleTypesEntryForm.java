@@ -57,8 +57,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        if (siteWrapper != null
-            && siteWrapper.canEdit(SessionManager.getUser())) {
+        if (siteWrapper != null && siteWrapper.canEdit()) {
             createSiteSampleTypeSection();
             firstControl = siteSampleWidget;
         }

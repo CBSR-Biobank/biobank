@@ -17,14 +17,14 @@ public class SecurityHelper {
      * modelWrapperType
      */
     public static boolean canCreate(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
+        Class<?> modelWrapperType) {
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
             ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
                 .newInstance(appService);
-            return ((BiobankApplicationService) appService).canCreateObjects(
-                user, wrapper.getWrappedClass());
+            return ((BiobankApplicationService) appService)
+                .canCreateObjects(wrapper.getWrappedClass());
         } catch (Exception e) {
             LOGGER.error("Error testing security authorization on "
                 + modelWrapperType.getName(), e);
@@ -37,14 +37,14 @@ public class SecurityHelper {
      * modelWrapperType
      */
     public static boolean canDelete(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
+        Class<?> modelWrapperType) {
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
             ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
                 .newInstance(appService);
-            return ((BiobankApplicationService) appService).canCreateObjects(
-                user, wrapper.getWrappedClass());
+            return ((BiobankApplicationService) appService)
+                .canCreateObjects(wrapper.getWrappedClass());
         } catch (Exception e) {
             LOGGER.error("Error testing security authorization on "
                 + modelWrapperType.getName(), e);
@@ -57,13 +57,13 @@ public class SecurityHelper {
      * modelWrapperType
      */
     public static boolean canView(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
+        Class<?> modelWrapperType) {
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
             ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
                 .newInstance(appService);
-            return wrapper.canView(user);
+            return wrapper.canView();
         } catch (Exception e) {
             LOGGER.error("Error testing security authorization on "
                 + modelWrapperType.getName(), e);
@@ -76,13 +76,13 @@ public class SecurityHelper {
      * modelWrapperType
      */
     public static boolean canUpdate(WritableApplicationService appService,
-        Class<?> modelWrapperType, String user) {
+        Class<?> modelWrapperType) {
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
             ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
                 .newInstance(appService);
-            return wrapper.canEdit(user);
+            return wrapper.canEdit();
         } catch (Exception e) {
             LOGGER.error("Error testing security authorization on "
                 + modelWrapperType.getName(), e);

@@ -815,10 +815,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canEdit(String user) {
+    public boolean canEdit() {
         try {
             return ((BiobankApplicationService) appService).canUpdateObject(
-                user, getWrappedClass(), getId());
+                getWrappedClass(), getId());
         } catch (ApplicationException e) {
             e.printStackTrace();
             return false;

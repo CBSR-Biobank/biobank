@@ -359,6 +359,7 @@
 				<include name="hibernate3*.*" />
 				<include name="caGrid-CQL-cql*.*" />
 				<include name="hibernate-validator*.*" />
+				<include name="acegi-security*.*" />
 			</fileset>
 			<fileset dir="${cacore.sdk.dir}/writable-api/dist" includes="*.jar" />
 			<fileset dir="${cacore.sdk.dir}/system/security/dist" includes="*.jar" />

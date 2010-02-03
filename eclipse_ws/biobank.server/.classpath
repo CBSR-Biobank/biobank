@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-validator.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
+	<classpathentry kind="lib" path="lib/acegi-security-1.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -286,10 +286,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canView(String user) {
+    public boolean canView() {
         try {
-            return ((BiobankApplicationService) appService).canReadObjects(
-                user, getWrappedClass());
+            return ((BiobankApplicationService) appService)
+                .canReadObjects(getWrappedClass());
         } catch (ApplicationException e) {
             LOGGER.error("Error testing security authorization on "
                 + getWrappedClass(), e);
@@ -300,10 +300,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can edit this object
      */
-    public boolean canEdit(String user) {
+    public boolean canEdit() {
         try {
-            return ((BiobankApplicationService) appService).canUpdateObjects(
-                user, getWrappedClass());
+            return ((BiobankApplicationService) appService)
+                .canUpdateObjects(getWrappedClass());
         } catch (ApplicationException e) {
             LOGGER.error("Error testing security authorization on "
                 + getWrappedClass(), e);

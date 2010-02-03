@@ -14,29 +14,25 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public interface BiobankApplicationService extends WritableApplicationService {
 
-    public boolean canReadObjects(String userLogin, Class<?> clazz)
+    public boolean canReadObjects(Class<?> clazz) throws ApplicationException;
+
+    public boolean canReadObject(Class<?> clazz, Integer id)
         throws ApplicationException;
 
-    public boolean canReadObject(String userLogin, Class<?> clazz, Integer id)
+    public boolean canCreateObjects(Class<?> clazz) throws ApplicationException;
+
+    public boolean canDeleteObjects(Class<?> clazz) throws ApplicationException;
+
+    public boolean canDeleteObject(Class<?> clazz, Integer id)
         throws ApplicationException;
 
-    public boolean canCreateObjects(String userLogin, Class<?> clazz)
+    public boolean canUpdateObjects(Class<?> clazz) throws ApplicationException;
+
+    public boolean canUpdateObject(Class<?> clazz, Integer id)
         throws ApplicationException;
 
-    public boolean canDeleteObjects(String userLogin, Class<?> clazz)
+    public boolean hasPrivilege(Class<?> clazz, Integer id, String privilege)
         throws ApplicationException;
-
-    public boolean canDeleteObject(String userLogin, Class<?> clazz, Integer id)
-        throws ApplicationException;
-
-    public boolean canUpdateObjects(String userLogin, Class<?> clazz)
-        throws ApplicationException;
-
-    public boolean canUpdateObject(String userLogin, Class<?> clazz, Integer id)
-        throws ApplicationException;
-
-    public boolean hasPrivilege(String userLogin, Class<?> clazz, Integer id,
-        String privilege) throws ApplicationException;
 
     public void newSite(Integer id, String name) throws ApplicationException;
 
