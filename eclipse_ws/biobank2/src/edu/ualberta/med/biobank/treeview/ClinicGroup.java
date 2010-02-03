@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ClinicGroup extends AdapterBase {
 
     public ClinicGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Clinics", true);
+        super(parent, id, "Clinics", true, true);
     }
 
     @Override

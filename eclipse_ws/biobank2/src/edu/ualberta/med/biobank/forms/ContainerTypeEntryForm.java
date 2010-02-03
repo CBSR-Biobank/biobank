@@ -152,7 +152,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+            "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(containerType, "name"),

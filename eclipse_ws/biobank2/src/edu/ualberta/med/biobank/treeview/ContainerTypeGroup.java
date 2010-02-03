@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ContainerTypeGroup extends AdapterBase {
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Container Types", true);
+        super(parent, id, "Container Types", true, true);
     }
 
     @Override

@@ -61,8 +61,8 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public void executeDoubleClick() {
-        openForm(new FormInput(this), ContainerViewForm.ID);
         performExpand();
+        openForm(new FormInput(this), ContainerViewForm.ID);
     }
 
     @Override

@@ -124,7 +124,8 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Repository Site");
         containerLabelLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Label");
         productBarcodeLabel = (Label) createWidget(client, Label.class,

@@ -126,7 +126,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+            "Repository Site");
         setTextValue(siteLabel, study.getSite().getName());
 
         createBoundWidgetsFromMap(FIELDS, study, client);

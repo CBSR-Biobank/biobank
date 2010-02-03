@@ -15,7 +15,7 @@ public class RootNode extends AdapterBase {
     private TreeViewer treeViewer;
 
     public RootNode() {
-        super(null, 1, "root");
+        super(null, 1, "root", true, false);
     }
 
     public void setTreeViewer(TreeViewer treeViewer) {

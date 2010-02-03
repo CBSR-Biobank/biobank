@@ -91,15 +91,18 @@ public abstract class AdapterBase {
         this(parent, object, true, true);
     }
 
-    public AdapterBase(AdapterBase parent, int id, String name) {
-        this(parent, null);
-        setId(id);
-        setName(name);
-    }
+    // public AdapterBase(AdapterBase parent, int id, String name,
+    // boolean loadChildrenInBackground) {
+    // this(parent, null, true, loadChildrenInBackground);
+    // setId(id);
+    // setName(name);
+    // }
 
     public AdapterBase(AdapterBase parent, int id, String name,
-        boolean hasChildren) {
-        this(parent, id, name);
+        boolean hasChildren, boolean loadChildrenInBackground) {
+        this(parent, null, true, loadChildrenInBackground);
+        setId(id);
+        setName(name);
         setHasChildren(hasChildren);
     }
 
@@ -107,12 +110,10 @@ public abstract class AdapterBase {
         return modelObject;
     }
 
-    /**
+    /*
      * Used when updating tree nodes from a background thread.
-     * 
-     * @param modelObject the object to be displayed by the tree node.
      */
-    public void setModelObject(ModelWrapper<?> modelObject) {
+    protected void setModelObject(ModelWrapper<?> modelObject) {
         this.modelObject = modelObject;
     }
 
@@ -134,7 +135,7 @@ public abstract class AdapterBase {
         return parent;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -392,8 +393,11 @@ public abstract class AdapterBase {
 
         try {
             Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
-            if (childObjects == null)
+            if ((childObjects == null) || (childObjects.size() == 0)) {
+                setHasChildren(false);
                 return;
+            }
+            setHasChildren(true);
             final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
             for (int i = 0, n = childObjects.size() - children.size(); i < n; ++i) {
                 final AdapterBase node = createChildNode(i);

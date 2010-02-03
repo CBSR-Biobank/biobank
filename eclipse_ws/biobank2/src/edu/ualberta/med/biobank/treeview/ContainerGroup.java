@@ -30,7 +30,7 @@ public class ContainerGroup extends AdapterBase {
         .getName());
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Containers", true);
+        super(parent, id, "Containers", true, true);
     }
 
     @Override

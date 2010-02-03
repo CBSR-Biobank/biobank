@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class StudyGroup extends AdapterBase {
 
     public StudyGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Studies", true);
+        super(parent, id, "Studies", true, true);
     }
 
     public void openViewForm() {

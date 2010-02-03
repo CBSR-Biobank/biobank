@@ -126,7 +126,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected AdapterBase getNotFoundAdapter() {
         AdapterBase noPatientFoundAdapter = new AdapterBase(rootNode, 0,
-            getNoFoundText()) {
+            getNoFoundText(), false, false) {
 
             @Override
             protected String getNameInternal() {
