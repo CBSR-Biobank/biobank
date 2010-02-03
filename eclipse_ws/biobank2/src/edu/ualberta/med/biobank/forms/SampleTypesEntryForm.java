@@ -8,6 +8,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -56,7 +57,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        if (siteWrapper != null) {
+        if (siteWrapper != null
+            && siteWrapper.canEdit(SessionManager.getUser())) {
             createSiteSampleTypeSection();
             firstControl = siteSampleWidget;
         }
@@ -127,6 +129,17 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         if (siteWrapper != null) {
             siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
             siteSampleWidget.setLists(siteSampleTypes, globalSampleTypes);
+        }
+    }
+
+    @Override
+    protected void checkEditAccess() {
+        if (!SessionManager.canUpdate(SampleTypeWrapper.class)
+            && !SessionManager.canCreate(SampleTypeWrapper.class)
+            && !SessionManager.canDelete(SampleTypeWrapper.class)) {
+            BioBankPlugin.openAccessDeniedErrorMessage();
+            throw new RuntimeException(
+                "Cannot access Sample Type editor. Access Denied.");
         }
     }
 }

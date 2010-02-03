@@ -162,6 +162,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         throws PartInitException {
         super.init(editorSite, input);
         setDirty(false);
+        checkEditAccess();
+    }
+
+    protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
             && !adapter.getModelObject().canEdit(SessionManager.getUser())) {
             BioBankPlugin.openAccessDeniedErrorMessage();

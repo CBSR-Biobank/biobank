@@ -90,15 +90,17 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                 }
             });
 
-        addSampleTypeButton = toolkit.createButton(parent, buttonLabel,
-            SWT.PUSH);
-        addSampleTypeButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                addOrEditSampleType(true, new SampleTypeWrapper(SessionManager
-                    .getAppService()), getRestrictedTypes());
-            }
-        });
+        if (SessionManager.canCreate(SampleTypeWrapper.class)) {
+            addSampleTypeButton = toolkit.createButton(parent, buttonLabel,
+                SWT.PUSH);
+            addSampleTypeButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    addOrEditSampleType(true, new SampleTypeWrapper(
+                        SessionManager.getAppService()), getRestrictedTypes());
+                }
+            });
+        }
     }
 
     private boolean addOrEditSampleType(boolean add,
@@ -139,56 +141,60 @@ public class SampleTypeEntryWidget extends BiobankWidget {
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         sampleTypeTable.getTableViewer().getTable().setMenu(menu);
 
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
-                    .getTableViewer().getSelection();
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                SampleTypeWrapper pvss = ((SampleTypeWrapper) item.o);
-                Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
-                restrictedTypes.remove(pvss);
-                addOrEditSampleType(false, pvss, restrictedTypes);
-            }
-        });
-
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
-                    .getTableViewer().getSelection();
-
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                SampleTypeWrapper sampleType = (SampleTypeWrapper) item.o;
-
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Sample Type",
-                    "Are you sure you want to delete sample type \""
-                        + sampleType.getName() + "\"?");
-
-                if (confirm) {
-                    Collection<SampleTypeWrapper> stToDelete = new HashSet<SampleTypeWrapper>();
-                    for (SampleTypeWrapper st : selectedSampleTypes) {
-                        if (st.getName().equals(sampleType.getName()))
-                            stToDelete.add(st);
-                    }
-
-                    for (SampleTypeWrapper st : stToDelete) {
-                        selectedSampleTypes.remove(st);
-                    }
-
-                    sampleTypeTable.setCollection(selectedSampleTypes);
-                    notifyListeners();
+        if (SessionManager.canUpdate(SampleTypeWrapper.class)) {
+            MenuItem item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Edit");
+            item.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
+                        .getTableViewer().getSelection();
+                    BiobankCollectionModel item = (BiobankCollectionModel) stSelection
+                        .getFirstElement();
+                    SampleTypeWrapper pvss = ((SampleTypeWrapper) item.o);
+                    Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
+                    restrictedTypes.remove(pvss);
+                    addOrEditSampleType(false, pvss, restrictedTypes);
                 }
-            }
-        });
+            });
+        }
+
+        if (SessionManager.canDelete(SampleTypeWrapper.class)) {
+            MenuItem item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Delete");
+            item.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
+                        .getTableViewer().getSelection();
+
+                    BiobankCollectionModel item = (BiobankCollectionModel) stSelection
+                        .getFirstElement();
+                    SampleTypeWrapper sampleType = (SampleTypeWrapper) item.o;
+
+                    boolean confirm = MessageDialog.openConfirm(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        "Delete Sample Type",
+                        "Are you sure you want to delete sample type \""
+                            + sampleType.getName() + "\"?");
+
+                    if (confirm) {
+                        Collection<SampleTypeWrapper> stToDelete = new HashSet<SampleTypeWrapper>();
+                        for (SampleTypeWrapper st : selectedSampleTypes) {
+                            if (st.getName().equals(sampleType.getName()))
+                                stToDelete.add(st);
+                        }
+
+                        for (SampleTypeWrapper st : stToDelete) {
+                            selectedSampleTypes.remove(st);
+                        }
+
+                        sampleTypeTable.setCollection(selectedSampleTypes);
+                        notifyListeners();
+                    }
+                }
+            });
+        }
     }
 
     private boolean addEditOk(SampleTypeWrapper type,
@@ -208,7 +214,10 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
     @Override
     public boolean setFocus() {
-        return addSampleTypeButton.setFocus();
+        if (addSampleTypeButton != null) {
+            return addSampleTypeButton.setFocus();
+        }
+        return super.setFocus();
     }
 
     public void setLists(Collection<SampleTypeWrapper> sampleTypeCollection,
