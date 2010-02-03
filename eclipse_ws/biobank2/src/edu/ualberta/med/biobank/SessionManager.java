@@ -198,6 +198,11 @@ public class SessionManager {
         siteManager.unlockSite();
     }
 
+    public boolean isAllSitesSelected() {
+        Assert.isNotNull(siteManager, "site manager is null");
+        return siteManager.isAllSitesSelected();
+    }
+
     public void setSiteCombo(SiteCombo siteCombo) {
         this.siteCombo = siteCombo;
     }
@@ -227,19 +232,18 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        return SecurityHelper.canCreate(getAppService(), clazz, getUser());
+        return SecurityHelper.canCreate(getAppService(), clazz);
     }
 
     public static boolean canDelete(Class<?> clazz) {
-        return SecurityHelper.canCreate(getAppService(), clazz, getUser());
+        return SecurityHelper.canCreate(getAppService(), clazz);
     }
 
     public static boolean canView(Class<?> clazz) {
-        return SecurityHelper.canView(getAppService(), clazz, getUser());
+        return SecurityHelper.canView(getAppService(), clazz);
     }
 
     public static boolean canUpdate(Class<?> clazz) {
-        return SecurityHelper.canUpdate(getAppService(), clazz, getUser());
+        return SecurityHelper.canUpdate(getAppService(), clazz);
     }
-
 }

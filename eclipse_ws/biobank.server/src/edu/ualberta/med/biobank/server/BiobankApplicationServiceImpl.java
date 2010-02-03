@@ -8,6 +8,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.util.ClassCache;
 
+import org.acegisecurity.context.SecurityContextHolder;
+
 /**
  * Implementation of the BiobankApplicationService interface. This class will be
  * only on the server side.
@@ -27,51 +29,49 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public boolean canReadObjects(String userLogin, Class<?> clazz)
-        throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, null, "READ");
+    public boolean canReadObjects(Class<?> clazz) throws ApplicationException {
+        return hasPrivilege(clazz, null, "READ");
     }
 
     @Override
-    public boolean canReadObject(String userLogin, Class<?> clazz, Integer id)
+    public boolean canReadObject(Class<?> clazz, Integer id)
         throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, id, "READ");
+        return hasPrivilege(clazz, id, "READ");
     }
 
     @Override
-    public boolean canCreateObjects(String userLogin, Class<?> clazz)
-        throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, null, "CREATE");
+    public boolean canCreateObjects(Class<?> clazz) throws ApplicationException {
+        return hasPrivilege(clazz, null, "CREATE");
     }
 
     @Override
-    public boolean canDeleteObjects(String userLogin, Class<?> clazz)
-        throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, null, "DELETE");
+    public boolean canDeleteObjects(Class<?> clazz) throws ApplicationException {
+        return hasPrivilege(clazz, null, "DELETE");
     }
 
     @Override
-    public boolean canDeleteObject(String userLogin, Class<?> clazz, Integer id)
+    public boolean canDeleteObject(Class<?> clazz, Integer id)
         throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, id, "CREATE");
+        return hasPrivilege(clazz, id, "CREATE");
     }
 
     @Override
-    public boolean canUpdateObjects(String userLogin, Class<?> clazz)
-        throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, null, "UPDATE");
+    public boolean canUpdateObjects(Class<?> clazz) throws ApplicationException {
+        return hasPrivilege(clazz, null, "UPDATE");
     }
 
     @Override
-    public boolean canUpdateObject(String userLogin, Class<?> clazz, Integer id)
+    public boolean canUpdateObject(Class<?> clazz, Integer id)
         throws ApplicationException {
-        return hasPrivilege(userLogin, clazz, id, "UPDATE");
+        return hasPrivilege(clazz, id, "UPDATE");
     }
 
     @Override
-    public boolean hasPrivilege(String userLogin, Class<?> clazz, Integer id,
-        String privilegeName) throws ApplicationException {
+    public boolean hasPrivilege(Class<?> clazz, Integer id, String privilegeName)
+        throws ApplicationException {
         try {
+            String userLogin = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
             AuthorizationManager am = SecurityServiceProvider
                 .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
             if (id == null) {
