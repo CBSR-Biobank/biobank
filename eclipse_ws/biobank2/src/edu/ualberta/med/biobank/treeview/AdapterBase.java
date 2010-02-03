@@ -149,6 +149,12 @@ public abstract class AdapterBase {
         this.name = name;
     }
 
+    /**
+     * Derived classes should not override this method. Instead they should
+     * implement getNameInternal().
+     * 
+     * @return the name for the node.
+     */
     public String getName() {
         if (modelObject != null) {
             return getNameInternal();
@@ -158,6 +164,13 @@ public abstract class AdapterBase {
         return name;
     }
 
+    /**
+     * Derived classses should implement this method instead of overriding
+     * getName().
+     * 
+     * @return the name of the node. The name is the label displayed in the
+     *         treeview.
+     */
     protected abstract String getNameInternal();
 
     public abstract String getTitle();
