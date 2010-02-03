@@ -32,7 +32,7 @@ public class PatientVisitAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         PatientVisitWrapper patientVisitWrapper = getWrapper();
         Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
             "patientVisit is null");

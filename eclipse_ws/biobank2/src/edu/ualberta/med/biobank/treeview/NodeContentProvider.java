@@ -42,8 +42,6 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     public boolean hasChildren(Object element) {
         Assert.isTrue(element instanceof AdapterBase, "Invalid object");
-        System.out.println("has children: " + ((AdapterBase) element).getName()
-            + " " + ((AdapterBase) element).hasChildren());
         return ((AdapterBase) element).hasChildren();
     }
 

@@ -57,11 +57,8 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         SiteWrapper site = getWrapper();
-        if (site == null) {
-            return "loading...";
-        }
         Assert.isNotNull(site, "site is null");
         return site.getName();
     }

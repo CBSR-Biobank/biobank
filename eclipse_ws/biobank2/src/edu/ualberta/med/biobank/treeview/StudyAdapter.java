@@ -36,11 +36,8 @@ public class StudyAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         StudyWrapper study = getWrapper();
-        if (study == null) {
-            return "loading...";
-        }
         return study.getNameShort();
     }
 

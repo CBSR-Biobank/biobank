@@ -39,6 +39,8 @@ public abstract class AdapterBase {
     private static Logger LOGGER = Logger
         .getLogger(AdapterBase.class.getName());
 
+    protected static final String BGR_LOADING_LABEL = "loading...";
+
     protected IDeltaListener deltaListener = NullDeltaListener
         .getSoleInstance();
 
@@ -148,8 +150,15 @@ public abstract class AdapterBase {
     }
 
     public String getName() {
+        if (modelObject != null) {
+            return getNameInternal();
+        } else if (parent.loadChildrenInBackground) {
+            return BGR_LOADING_LABEL;
+        }
         return name;
     }
+
+    protected abstract String getNameInternal();
 
     public abstract String getTitle();
 
@@ -187,14 +196,6 @@ public abstract class AdapterBase {
         return null;
     }
 
-    public boolean hasChild(int id) {
-        for (AdapterBase child : children) {
-            if (child.getId() == id)
-                return true;
-        }
-        return false;
-    }
-
     public void addChild(AdapterBase child) {
         System.out.println("adding child " + child.getName());
         hasChildren = true;
@@ -204,8 +205,7 @@ public abstract class AdapterBase {
             return;
         }
 
-        String name = child.getName();
-        if (!name.equals("loading...")) {
+        if (child.modelObject != null) {
             AdapterBase namedChild = getChildByName(child.getName());
             if (namedChild != null) {
                 // may have inserted a new object into database
@@ -325,7 +325,7 @@ public abstract class AdapterBase {
     public abstract void executeDoubleClick();
 
     public void performDoubleClick() {
-        if (!getName().equals("loading...")) {
+        if (modelObject != null) {
             executeDoubleClick();
         }
     }
@@ -333,12 +333,7 @@ public abstract class AdapterBase {
     public void performExpand() {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                if (loadChildrenInBackground) {
-                    loadChildrenBackground(true);
-                } else {
-                    loadChildren(true);
-                    getRootNode().expandChild(AdapterBase.this);
-                }
+                loadChildren(true);
             }
         });
     }
@@ -349,6 +344,11 @@ public abstract class AdapterBase {
      * @param updateNode If not null, the node in the treeview to update.
      */
     public void loadChildren(boolean updateNode) {
+        if (loadChildrenInBackground) {
+            loadChildrenBackground(true);
+            return;
+        }
+
         try {
             Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
             if (children != null) {
@@ -363,6 +363,7 @@ public abstract class AdapterBase {
                     }
                 }
                 notifyListeners();
+                SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
@@ -380,9 +381,11 @@ public abstract class AdapterBase {
             Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
             if (childObjects == null)
                 return;
+            final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
             for (int i = 0, n = childObjects.size() - children.size(); i < n; ++i) {
                 final AdapterBase node = createChildNode(i);
                 addChild(node);
+                newNodes.add(node);
                 if (updateNode) {
                     SessionManager.updateTreeNode(node);
                 }
@@ -398,25 +401,25 @@ public abstract class AdapterBase {
                         System.out.println("child load thread started");
                         Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
                         if (childObjects != null) {
-                            int count = 0;
-                            int id = 0;
                             for (ModelWrapper<?> child : childObjects) {
                                 // first see if this object is among the
                                 // children, if not then it is being loaded
                                 // for the first time
-                                if (hasChild(child.getId())) {
-                                    id = child.getId();
-                                } else {
-                                    id = count;
-                                    count++;
+                                AdapterBase node = getChild(child.getId());
+                                if (node == null) {
+                                    Assert.isTrue(newNodes.size() > 0);
+                                    node = newNodes.get(0);
+                                    newNodes.remove(0);
+                                    System.out
+                                        .println("child model object added");
                                 }
-                                final AdapterBase node = getChild(id);
                                 Assert.isNotNull(node);
                                 node.setModelObject(child);
-                                System.out.println("child model object added");
+                                final AdapterBase nodeToUpdate = node;
                                 Display.getDefault().asyncExec(new Runnable() {
                                     public void run() {
-                                        SessionManager.refreshTreeNode(node);
+                                        SessionManager
+                                            .refreshTreeNode(nodeToUpdate);
                                     }
                                 });
                             }

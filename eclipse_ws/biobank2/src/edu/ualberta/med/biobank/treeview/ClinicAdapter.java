@@ -29,11 +29,8 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         ClinicWrapper wrapper = getWrapper();
-        if (wrapper == null) {
-            return "loading...";
-        }
         Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
         return wrapper.getName();
     }

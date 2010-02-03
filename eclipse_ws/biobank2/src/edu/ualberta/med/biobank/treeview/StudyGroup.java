@@ -29,6 +29,11 @@ public class StudyGroup extends AdapterBase {
     }
 
     @Override
+    protected String getNameInternal() {
+        return null;
+    }
+
+    @Override
     public void executeDoubleClick() {
         performExpand();
     }

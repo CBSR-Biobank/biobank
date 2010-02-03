@@ -45,11 +45,8 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         ContainerWrapper container = getContainer();
-        if (container == null) {
-            return "loading...";
-        }
         if (container.getContainerType() == null) {
             return container.getLabel();
         }

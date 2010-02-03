@@ -30,6 +30,11 @@ public class ClinicGroup extends AdapterBase {
     }
 
     @Override
+    protected String getNameInternal() {
+        return null;
+    }
+
+    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Add Clinic");

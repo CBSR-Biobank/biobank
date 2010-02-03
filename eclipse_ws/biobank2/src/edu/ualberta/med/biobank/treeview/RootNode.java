@@ -28,6 +28,11 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
+    protected String getNameInternal() {
+        return null;
+    }
+
+    @Override
     public void executeDoubleClick() {
     }
 

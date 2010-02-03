@@ -26,6 +26,11 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
+    protected String getNameInternal() {
+        return null;
+    }
+
+    @Override
     public void executeDoubleClick() {
         performExpand();
     }

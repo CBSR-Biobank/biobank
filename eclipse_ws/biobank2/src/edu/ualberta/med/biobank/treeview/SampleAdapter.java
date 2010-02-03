@@ -29,9 +29,9 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         SampleWrapper sample = getSample();
-        Assert.isNotNull(sample, "Clinic is null");
+        Assert.isNotNull(sample, "sample is null");
         return sample.getInventoryId();
     }
 

@@ -41,6 +41,11 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
+    protected String getNameInternal() {
+        return null;
+    }
+
+    @Override
     public String getTitle() {
         return "";
     }

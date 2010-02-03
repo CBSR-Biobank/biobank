@@ -22,9 +22,9 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         SampleTypeWrapper sampleType = getSampleType();
-        Assert.isNotNull(sampleType, "storage type is null");
+        Assert.isNotNull(sampleType, "sample type is null");
         return sampleType.getNameShort();
     }
 

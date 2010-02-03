@@ -26,7 +26,7 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getNameInternal() {
         ShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment.getWrappedObject(), "shipment is null");
         return shipment.getWaybill() + " - "
