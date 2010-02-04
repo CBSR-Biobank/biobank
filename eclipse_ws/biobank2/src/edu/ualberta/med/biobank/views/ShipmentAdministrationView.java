@@ -91,16 +91,14 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     }
 
     public void displayPatient(PatientWrapper patient) {
-        if (currentSiteAdapter != null) {
-            PatientAdapter patientAdapter = new PatientAdapter(
-                currentInstance.rootNode, patient, false);
-            FormInput input = new FormInput(patientAdapter);
-            if (patient.isNew()) {
-                AdapterBase.openForm(input, PatientEntryForm.ID);
-            } else {
-                patientAdapter.setEditable(false);
-                AdapterBase.openForm(input, PatientViewForm.ID);
-            }
+        PatientAdapter patientAdapter = new PatientAdapter(
+            currentInstance.rootNode, patient, false);
+        FormInput input = new FormInput(patientAdapter);
+        if (patient.isNew()) {
+            AdapterBase.openForm(input, PatientEntryForm.ID);
+        } else {
+            patientAdapter.setEditable(false);
+            AdapterBase.openForm(input, PatientViewForm.ID);
         }
     }
 
