@@ -89,9 +89,14 @@ public class BiobankApplicationServiceImpl extends
         }
     }
 
+    /**
+     * How can we manage security using sql ??
+     */
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException {
-        return privateQuery(sqlCriteria, targetClassName);
+        throw new ApplicationException(
+            "This functionnality is not available until further notice");
+        // return privateQuery(sqlCriteria, targetClassName);
     }
 
     /**
