@@ -764,7 +764,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         throws ApplicationException, BiobankCheckException {
         // even though this query states that we are counting patients it
         // actually counts patient visits since it is not counting distinct
-        // patients
+        // patients. Also see getPatientCountForClinic().
         HQLCriteria c = new HQLCriteria("select count(patients) from "
             + Study.class.getName() + " as study"
             + " join study.patientCollection as patients"
