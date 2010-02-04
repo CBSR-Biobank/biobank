@@ -1,5 +1,6 @@
-package edu.ualberta.med.biobank.server;
+package edu.ualberta.med.biobank.server.applicationservice.helper;
 
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.security.SecurityConstants;
 import gov.nih.nci.system.util.WritableApiApplicationServiceMethodHelper;

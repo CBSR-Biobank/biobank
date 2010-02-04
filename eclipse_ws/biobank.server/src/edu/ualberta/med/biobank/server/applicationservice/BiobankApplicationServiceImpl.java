@@ -1,5 +1,7 @@
-package edu.ualberta.med.biobank.server;
+package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.server.applicationservice.helper.BiobankApiApplicationServiceMethodHelper;
+import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
@@ -7,6 +9,8 @@ import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.util.ClassCache;
+
+import java.util.List;
 
 import org.acegisecurity.context.SecurityContextHolder;
 
@@ -85,19 +89,10 @@ public class BiobankApplicationServiceImpl extends
         }
     }
 
-    // public <E> List<E> query(HQLCriteria hqlCriteria, String targetClassName)
-    // throws ApplicationException {
-    // return query(hqlCriteria);
-    // }
-    //
-    // public List querySQL(HQLCriteria criteria) throws ApplicationException {
-    // Request request = new Request(criteria);
-    // request.setIsCount(Boolean.FALSE);
-    // request.setFirstRow(0);
-    // // request.setDomainObjectName(targetClassName);
-    //
-    // return null;
-    // }
+    public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
+        String targetClassName) throws ApplicationException {
+        return privateQuery(sqlCriteria, targetClassName);
+    }
 
     /**
      * @see BiobankApiApplicationServiceMethodHelper#getDomainObjectName(org.aopalliance.intercept.MethodInvocation)

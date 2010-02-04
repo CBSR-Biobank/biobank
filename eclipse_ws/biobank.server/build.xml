@@ -43,6 +43,8 @@
 			<manifest>
 				<attribute name="Generated-By" value="AICML Ant build file" />
 			</manifest>
+			<include name="**/applicationservice/*.*" />
+			<include name="**/query/*.*" />
 			<exclude name="**/*Impl.*" />
 		</jar>
 	</target>

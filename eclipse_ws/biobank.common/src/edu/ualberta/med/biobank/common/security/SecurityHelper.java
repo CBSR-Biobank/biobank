@@ -5,7 +5,7 @@ import java.lang.reflect.Constructor;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.server.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SecurityHelper {

@@ -1,7 +1,10 @@
-package edu.ualberta.med.biobank.server;
+package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+import java.util.List;
 
 /**
  * Application service interface obtained through
@@ -35,5 +38,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
         throws ApplicationException;
 
     public void newSite(Integer id, String name) throws ApplicationException;
+
+    public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
+        String targetClassName) throws ApplicationException;
 
 }
