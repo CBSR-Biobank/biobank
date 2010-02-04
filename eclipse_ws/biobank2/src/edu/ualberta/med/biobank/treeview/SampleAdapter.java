@@ -29,15 +29,15 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         SampleWrapper sample = getSample();
         Assert.isNotNull(sample, "sample is null");
         return sample.getInventoryId();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Sample");
+    public String getTooltipText() {
+        return getTooltipText("Sample");
     }
 
     @Override

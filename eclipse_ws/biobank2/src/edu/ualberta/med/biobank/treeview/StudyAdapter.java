@@ -36,14 +36,14 @@ public class StudyAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         StudyWrapper study = getWrapper();
         return study.getNameShort();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Study");
+    public String getTooltipText() {
+        return parent.getParent().getLabel() + " - " + getTooltipText("Study");
     }
 
     @Override

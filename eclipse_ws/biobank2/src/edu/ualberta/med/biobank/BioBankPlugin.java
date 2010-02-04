@@ -369,7 +369,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
                     return null;
                 ctName = container.getContainerType().getName();
             } else {
-                ctName = ((ContainerTypeAdapter) element).getName();
+                ctName = ((ContainerTypeAdapter) element).getLabel();
             }
             return getIconForTypeName(ctName);
         }

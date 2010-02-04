@@ -25,15 +25,16 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         ContainerTypeWrapper containerType = getContainerType();
         Assert.isNotNull(containerType, "container type is null");
         return containerType.getName();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Container Type");
+    public String getTooltipText() {
+        return parent.getParent().getLabel() + " - "
+            + getTooltipText("Container Type");
     }
 
     @Override

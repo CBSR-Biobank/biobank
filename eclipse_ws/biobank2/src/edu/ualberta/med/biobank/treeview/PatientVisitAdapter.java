@@ -9,7 +9,10 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -32,34 +35,30 @@ public class PatientVisitAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
-        PatientVisitWrapper patientVisitWrapper = getWrapper();
-        Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
-            "patientVisit is null");
-        String name = patientVisitWrapper.getFormattedDateProcessed();
-        if (patientVisitWrapper.getShipment() != null) {
-            name += " - " + patientVisitWrapper.getShipment().getWaybill();
-        }
-        return name;
-    }
-
-    @Override
-    public String getTreeText() {
+    protected String getLabelInternal() {
         PatientVisitWrapper wrapper = getWrapper();
-        if (wrapper == null) {
-            return getName();
+        Assert.isNotNull(wrapper, "patientVisit is null");
+        String name = wrapper.getFormattedDateProcessed();
+        if (wrapper.getShipment() != null) {
+            name += " - " + wrapper.getShipment().getWaybill();
         }
-        Collection<SampleWrapper> samples = getWrapper().getSampleCollection();
+        Collection<SampleWrapper> samples = wrapper.getSampleCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
         }
-        return getName() + " [" + total + "]";
+        return name + " [" + total + "]";
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Patient Visit");
+    public String getTooltipText() {
+        PatientVisitWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper, "patientVisit is null");
+        PatientWrapper patient = wrapper.getPatient();
+        StudyWrapper study = patient.getStudy();
+        SiteWrapper site = study.getSite();
+        return site.getName() + " - " + study.getNameShort() + " - Patient "
+            + patient.getPnumber() + " - " + getTooltipText("Patient Visit");
     }
 
     @Override

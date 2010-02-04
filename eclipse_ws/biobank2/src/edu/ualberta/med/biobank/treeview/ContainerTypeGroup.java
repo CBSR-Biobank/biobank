@@ -26,7 +26,7 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         return null;
     }
 
@@ -53,7 +53,7 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 

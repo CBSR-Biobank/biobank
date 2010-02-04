@@ -129,7 +129,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             getNoFoundText(), false, false) {
 
             @Override
-            protected String getNameInternal() {
+            protected String getLabelInternal() {
                 return null;
             }
 
@@ -138,7 +138,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             }
 
             @Override
-            public String getTitle() {
+            public String getTooltipText() {
                 return null;
             }
 

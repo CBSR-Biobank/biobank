@@ -41,12 +41,16 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
-        return null;
+    protected String getLabelInternal() {
+        if (userName.isEmpty()) {
+            return super.getLabel();
+        } else {
+            return super.getLabel() + " [" + userName + "]";
+        }
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return "";
     }
 
@@ -91,16 +95,6 @@ public class SessionAdapter extends AdapterBase {
                 }
             }
         });
-    }
-
-    @Override
-    public String getTreeText() {
-        if (userName.isEmpty()) {
-            return super.getTreeText();
-        } else {
-            return super.getTreeText() + " [" + userName + "]";
-        }
-
     }
 
     public String getUserName() {

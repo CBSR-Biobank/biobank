@@ -26,7 +26,7 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         ShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment.getWrappedObject(), "shipment is null");
         return shipment.getWaybill() + " - "
@@ -34,8 +34,10 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Shipment");
+    public String getTooltipText() {
+        return getParentFromClass(SiteAdapter.class).getLabel() + " - Clinic "
+            + getParentFromClass(ClinicAdapter.class).getLabel() + " - "
+            + getTooltipText("Shipment");
     }
 
     @Override

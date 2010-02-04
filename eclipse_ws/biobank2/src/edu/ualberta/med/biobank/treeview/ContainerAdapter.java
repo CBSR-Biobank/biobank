@@ -45,7 +45,7 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         ContainerWrapper container = getContainer();
         if (container.getContainerType() == null) {
             return container.getLabel();
@@ -55,8 +55,9 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Container");
+    public String getTooltipText() {
+        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
+            + getTooltipText("Container");
     }
 
     @Override

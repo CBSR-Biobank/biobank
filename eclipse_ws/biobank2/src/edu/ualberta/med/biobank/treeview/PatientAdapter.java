@@ -36,15 +36,17 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         PatientWrapper patientWrapper = getWrapper();
         Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
         return patientWrapper.getPnumber();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Patient");
+    public String getTooltipText() {
+        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
+            + getParentFromClass(StudyAdapter.class).getLabel() + " - "
+            + getTooltipText("Patient");
     }
 
     @Override

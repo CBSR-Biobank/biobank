@@ -22,7 +22,7 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         SampleTypeWrapper sampleType = getSampleType();
         Assert.isNotNull(sampleType, "sample type is null");
         return sampleType.getNameShort();
@@ -38,8 +38,8 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Sample Type");
+    public String getTooltipText() {
+        return getTooltipText("Sample Type");
     }
 
     @Override

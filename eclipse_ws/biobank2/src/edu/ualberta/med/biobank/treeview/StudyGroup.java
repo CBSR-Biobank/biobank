@@ -29,7 +29,7 @@ public class StudyGroup extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         return null;
     }
 
@@ -55,7 +55,7 @@ public class StudyGroup extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 

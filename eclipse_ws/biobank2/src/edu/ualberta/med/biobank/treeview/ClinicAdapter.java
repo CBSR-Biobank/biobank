@@ -29,15 +29,15 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         ClinicWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
         return wrapper.getName();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Patient");
+    public String getTooltipText() {
+        return parent.getParent().getLabel() + " - " + getTooltipText("Clinic");
     }
 
     @Override

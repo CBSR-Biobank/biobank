@@ -40,7 +40,7 @@ public class FormInput implements IEditorInput {
     public String getName() {
         if (node == null)
             return null;
-        return node.getTitle();
+        return node.getTooltipText();
     }
 
     @Override

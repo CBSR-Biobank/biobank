@@ -57,15 +57,15 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected String getNameInternal() {
+    protected String getLabelInternal() {
         SiteWrapper site = getWrapper();
         Assert.isNotNull(site, "site is null");
         return site.getName();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Site");
+    public String getTooltipText() {
+        return getTooltipText("Repository Site");
     }
 
     @Override

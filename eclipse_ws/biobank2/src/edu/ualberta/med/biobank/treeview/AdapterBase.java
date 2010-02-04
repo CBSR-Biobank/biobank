@@ -48,7 +48,7 @@ public abstract class AdapterBase {
 
     private Integer id;
 
-    private String name;
+    private String label;
 
     protected AdapterBase parent;
 
@@ -147,7 +147,7 @@ public abstract class AdapterBase {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.label = name;
     }
 
     /**
@@ -156,13 +156,13 @@ public abstract class AdapterBase {
      * 
      * @return the name for the node.
      */
-    public String getName() {
+    public String getLabel() {
         if (modelObject != null) {
-            return getNameInternal();
+            return getLabelInternal();
         } else if (parent.loadChildrenInBackground) {
             return BGR_LOADING_LABEL;
         }
-        return name;
+        return label;
     }
 
     /**
@@ -172,12 +172,15 @@ public abstract class AdapterBase {
      * @return the name of the node. The name is the label displayed in the
      *         treeview.
      */
-    protected abstract String getNameInternal();
+    protected abstract String getLabelInternal();
 
-    public abstract String getTitle();
+    /**
+     * The string to display in the tooltip for the form.
+     */
+    public abstract String getTooltipText();
 
-    protected String getTitle(String string) {
-        String name = getName();
+    protected String getTooltipText(String string) {
+        String name = getLabel();
         if (name == null) {
             return "New " + string;
         }
@@ -211,22 +214,11 @@ public abstract class AdapterBase {
     }
 
     public void addChild(AdapterBase child) {
-        System.out.println("adding child " + child.getName());
         hasChildren = true;
         AdapterBase existingNode = contains(child);
         if (existingNode != null) {
             // don't add - assume our model is up to date
             return;
-        }
-
-        if (child.modelObject != null) {
-            AdapterBase namedChild = getChildByName(child.getName());
-            if (namedChild != null) {
-                // may have inserted a new object into database
-                // replace current object with new one
-                int index = children.indexOf(namedChild);
-                children.remove(index);
-            }
         }
 
         child.setParent(this);
@@ -238,7 +230,7 @@ public abstract class AdapterBase {
     public void insertAfter(AdapterBase existingNode, AdapterBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0, "existing node not found: "
-            + existingNode.getName());
+            + existingNode.getLabel());
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -251,7 +243,7 @@ public abstract class AdapterBase {
         AdapterBase itemToRemove = null;
         for (AdapterBase child : children) {
             if ((child.getId() == item.getId())
-                && child.getName().equals(item.getName()))
+                && child.getLabel().equals(item.getLabel()))
                 itemToRemove = child;
         }
         if (itemToRemove != null) {
@@ -266,7 +258,7 @@ public abstract class AdapterBase {
             return;
         AdapterBase itemToRemove = null;
         for (AdapterBase child : children) {
-            if (child.getName().equals(name))
+            if (child.getLabel().equals(name))
                 itemToRemove = child;
         }
         if (itemToRemove != null) {
@@ -288,18 +280,7 @@ public abstract class AdapterBase {
 
         for (AdapterBase child : children) {
             if ((child.getId() == item.getId())
-                && child.getName().equals(item.getName()))
-                return child;
-        }
-        return null;
-    }
-
-    public AdapterBase getChildByName(String name) {
-        if (children.size() == 0)
-            return null;
-
-        for (AdapterBase child : children) {
-            if ((child.getName() != null) && child.getName().equals(name))
+                && child.getLabel().equals(item.getLabel()))
                 return child;
         }
         return null;
@@ -400,13 +381,12 @@ public abstract class AdapterBase {
             setHasChildren(true);
             final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
             for (int i = 0, n = childObjects.size() - children.size(); i < n; ++i) {
-                final AdapterBase node = createChildNode(i);
+                final AdapterBase node = createChildNode(-i);
                 addChild(node);
                 newNodes.add(node);
                 if (updateNode) {
                     SessionManager.updateTreeNode(node);
                 }
-                System.out.println("child stub added");
             }
             notifyListeners();
             getRootNode().expandChild(AdapterBase.this);
@@ -415,7 +395,6 @@ public abstract class AdapterBase {
                 @Override
                 public void run() {
                     try {
-                        System.out.println("child load thread started");
                         Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
                         if (childObjects != null) {
                             for (ModelWrapper<?> child : childObjects) {
@@ -427,8 +406,6 @@ public abstract class AdapterBase {
                                     Assert.isTrue(newNodes.size() > 0);
                                     node = newNodes.get(0);
                                     newNodes.remove(0);
-                                    System.out
-                                        .println("child model object added");
                                 }
                                 Assert.isNotNull(node);
                                 node.setModelObject(child);
@@ -448,13 +425,11 @@ public abstract class AdapterBase {
                                 }
                             });
                         }
-                        System.out.println("child load thread finished");
                     } catch (final RemoteAccessException exp) {
                         BioBankPlugin.openRemoteAccessErrorMessage();
                     } catch (Exception e) {
                         LOGGER.error("Error while loading children of node "
                             + modelObject.toString() + " in background", e);
-                        System.out.println(e);
                     }
                 }
             };
@@ -571,10 +546,6 @@ public abstract class AdapterBase {
     }
 
     public abstract AdapterBase accept(NodeSearchVisitor visitor);
-
-    public String getTreeText() {
-        return getName();
-    }
 
     public RootNode getRootNode() {
         return getParentFromClass(RootNode.class);
