@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -149,6 +150,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     @SuppressWarnings("unchecked")
     public void persist() throws Exception {
+        long start = System.currentTimeMillis();
         persistChecks();
         SDKQuery query;
         E origObject = null;
@@ -160,9 +162,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         }
         persistDependencies(origObject);
+        long start2 = System.currentTimeMillis();
         SDKQueryResult result = appService.executeQuery(query);
+        long end2 = System.currentTimeMillis();
+        System.out.println("execute**" + (end2 - start2) / 1000.0);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
+        long end = System.currentTimeMillis();
+        System.out.println("**" + (end - start) / 1000.0);
     }
 
     /**
@@ -221,16 +228,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void loadAttributes() throws Exception {
         Class<E> classType = getWrappedClass();
-
         if (classType == null) {
             throw new Exception("wrapped class is null");
         }
-
         Method[] methods = classType.getMethods();
         for (Method method : methods) {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
-                && !method.getReturnType().getName().equals("java.util.Set")) {
+                && !Collection.class.isAssignableFrom(method.getReturnType())) {
                 method.invoke(wrappedObject, (Object[]) null);
             }
         }

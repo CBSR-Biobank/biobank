@@ -247,4 +247,5 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public String toString() {
         return getName();
     }
+
 }
