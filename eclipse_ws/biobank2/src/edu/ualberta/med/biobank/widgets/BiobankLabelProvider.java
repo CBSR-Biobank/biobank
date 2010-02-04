@@ -317,7 +317,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SiteWrapper) element).getName();
         }
         if (element instanceof AdapterBase) {
-            return ((AdapterBase) element).getName();
+            return ((AdapterBase) element).getLabel();
         }
         return element.toString();
     }

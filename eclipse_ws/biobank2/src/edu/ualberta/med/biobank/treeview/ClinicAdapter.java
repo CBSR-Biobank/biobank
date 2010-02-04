@@ -21,7 +21,7 @@ public class ClinicAdapter extends AdapterBase {
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper,
         boolean enableActions) {
-        super(parent, clinicWrapper, enableActions);
+        super(parent, clinicWrapper, enableActions, false);
     }
 
     public ClinicWrapper getWrapper() {
@@ -29,19 +29,19 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         ClinicWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
         return wrapper.getName();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Patient");
+    public String getTooltipText() {
+        return parent.getParent().getLabel() + " - " + getTooltipText("Clinic");
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), ClinicViewForm.ID);
     }
 
@@ -55,6 +55,11 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
         return null;
     }
 

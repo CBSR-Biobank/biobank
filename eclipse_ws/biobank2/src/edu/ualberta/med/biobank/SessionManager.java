@@ -135,6 +135,13 @@ public class SessionManager {
         }
     }
 
+    public static void refreshTreeNode(AdapterBase node) {
+        AbstractViewWithTree view = getCurrentViewWithTree();
+        if (view != null) {
+            view.getTreeViewer().refresh(node, true);
+        }
+    }
+
     public static void setSelectedNode(AdapterBase node) {
         AbstractViewWithTree view = getCurrentViewWithTree();
         if (view != null) {

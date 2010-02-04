@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class StudyGroup extends AdapterBase {
 
     public StudyGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Studies", true);
+        super(parent, id, "Studies", true, true);
     }
 
     public void openViewForm() {
@@ -29,7 +29,12 @@ public class StudyGroup extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    protected String getLabelInternal() {
+        return null;
+    }
+
+    @Override
+    public void executeDoubleClick() {
         performExpand();
     }
 
@@ -50,13 +55,18 @@ public class StudyGroup extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new StudyAdapter(this, null);
     }
 
     @Override

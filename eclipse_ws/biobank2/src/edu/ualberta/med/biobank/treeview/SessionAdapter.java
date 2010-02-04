@@ -28,7 +28,7 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
-        super(parent, null);
+        super(parent, null, true, false);
         this.appService = appService;
         setId(sessionId);
         setName(name);
@@ -41,12 +41,21 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    protected String getLabelInternal() {
+        if (userName.isEmpty()) {
+            return super.getLabel();
+        } else {
+            return super.getLabel() + " [" + userName + "]";
+        }
+    }
+
+    @Override
+    public String getTooltipText() {
         return "";
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
     }
 
     @Override
@@ -88,16 +97,6 @@ public class SessionAdapter extends AdapterBase {
         });
     }
 
-    @Override
-    public String getTreeText() {
-        if (userName.isEmpty()) {
-            return super.getTreeText();
-        } else {
-            return super.getTreeText() + " [" + userName + "]";
-        }
-
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -105,6 +104,11 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new SiteAdapter(this, null);
     }
 
     @Override

@@ -15,7 +15,7 @@ public class RootNode extends AdapterBase {
     private TreeViewer treeViewer;
 
     public RootNode() {
-        super(null, 1, "root");
+        super(null, 1, "root", true, false);
     }
 
     public void setTreeViewer(TreeViewer treeViewer) {
@@ -28,7 +28,12 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    protected String getLabelInternal() {
+        return null;
+    }
+
+    @Override
+    public void executeDoubleClick() {
     }
 
     @Override
@@ -36,7 +41,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 
@@ -49,6 +54,11 @@ public class RootNode extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return null;
     }
 
     @Override

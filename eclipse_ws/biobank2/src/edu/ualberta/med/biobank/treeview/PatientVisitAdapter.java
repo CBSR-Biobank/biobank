@@ -9,7 +9,10 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -32,34 +35,34 @@ public class PatientVisitAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
-        PatientVisitWrapper patientVisitWrapper = getWrapper();
-        Assert.isNotNull(patientVisitWrapper.getWrappedObject(),
-            "patientVisit is null");
-        String name = patientVisitWrapper.getFormattedDateProcessed();
-        if (patientVisitWrapper.getShipment() != null) {
-            name += " - " + patientVisitWrapper.getShipment().getWaybill();
+    protected String getLabelInternal() {
+        PatientVisitWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper, "patientVisit is null");
+        String name = wrapper.getFormattedDateProcessed();
+        if (wrapper.getShipment() != null) {
+            name += " - " + wrapper.getShipment().getWaybill();
         }
-        return name;
-    }
-
-    @Override
-    public String getTreeText() {
-        Collection<SampleWrapper> samples = getWrapper().getSampleCollection();
+        Collection<SampleWrapper> samples = wrapper.getSampleCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
         }
-        return getName() + " [" + total + "]";
+        return name + " [" + total + "]";
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Patient Visit");
+    public String getTooltipText() {
+        PatientVisitWrapper wrapper = getWrapper();
+        Assert.isNotNull(wrapper, "patientVisit is null");
+        PatientWrapper patient = wrapper.getPatient();
+        StudyWrapper study = patient.getStudy();
+        SiteWrapper site = study.getSite();
+        return site.getName() + " - " + study.getNameShort() + " - Patient "
+            + patient.getPnumber() + " - " + getTooltipText("Patient Visit");
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), PatientVisitViewForm.ID);
     }
 
@@ -79,6 +82,11 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
         return null;
     }
 

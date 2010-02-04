@@ -99,7 +99,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+            "Repository Site");
         setTextValue(siteLabel, clinicWrapper.getSite().getName());
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,

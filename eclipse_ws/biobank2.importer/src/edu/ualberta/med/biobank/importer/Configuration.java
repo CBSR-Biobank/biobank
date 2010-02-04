@@ -105,13 +105,22 @@ public class Configuration {
     }
 
     public boolean importFreezerHotel(String hotelLabel) throws Exception {
-        if (hotelLabel.length() != 4) {
+        if (hotelLabel.length() < 4) {
             throw new Exception(
-                "invalid length for hotel label. should be 4 characters.");
+                "invalid length for hotel label. should be 4 characters: "
+                    + hotelLabel);
         }
 
-        String configValue = importFreezers.get(Integer.valueOf(hotelLabel
-            .substring(0, 2)));
+        String configValue;
+        if (hotelLabel.length() == 4) {
+            configValue = importFreezers.get(Integer.valueOf(hotelLabel
+                .substring(0, 2)));
+        } else if (hotelLabel.startsWith("Sent Samples")) {
+            configValue = importFreezers.get(99);
+        } else {
+            throw new Exception("invalid hotel label: " + hotelLabel);
+        }
+
         return (configValue.equals("yes") || configValue.contains(hotelLabel
             .subSequence(2, 4)));
     }

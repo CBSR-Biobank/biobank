@@ -68,7 +68,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Repository Site");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,

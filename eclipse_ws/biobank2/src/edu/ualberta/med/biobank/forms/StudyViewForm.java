@@ -31,6 +31,8 @@ public class StudyViewForm extends BiobankViewForm {
     private Label nameShortLabel;
     private Label activityStatusLabel;
     private Label commentLabel;
+    private Label patientTotal;
+    private Label visitTotal;
 
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
@@ -74,13 +76,18 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
+        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Repository Site");
         nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
             "Short Name");
         activityStatusLabel = (Label) createWidget(client, Label.class,
             SWT.NONE, "Activity Status");
         commentLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
             "Comments");
+        patientTotal = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Total Patients");
+        visitTotal = (Label) createWidget(client, Label.class, SWT.NONE,
+            "Total Patient Visits");
 
         createClinicSection();
         createSampleStorageSection();
@@ -91,7 +98,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient("Clinics / Contacts");
+        Composite client = createSectionWithClient("Clinic Information");
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable.adaptToToolkit(toolkit, true);
@@ -101,11 +108,13 @@ public class StudyViewForm extends BiobankViewForm {
             collectionDoubleClickListener);
     }
 
-    private void setStudySectionValues() {
+    private void setStudySectionValues() throws Exception {
         setTextValue(siteLabel, study.getSite().getName());
         setTextValue(nameShortLabel, study.getNameShort());
         setTextValue(activityStatusLabel, study.getActivityStatus());
         setTextValue(commentLabel, study.getComment());
+        setTextValue(patientTotal, study.getPatientCollection().size());
+        setTextValue(visitTotal, study.getPatientVisitCount());
     }
 
     private void createSampleStorageSection() {
@@ -189,7 +198,7 @@ public class StudyViewForm extends BiobankViewForm {
         form.setText("Study: " + study.getName());
         setStudySectionValues();
         setPvDataSectionValues();
-        contactsTable.getTableViewer().setInput(study.getContactCollection());
+        contactsTable.setCollection(study.getContactCollection());
     }
 
     @Override

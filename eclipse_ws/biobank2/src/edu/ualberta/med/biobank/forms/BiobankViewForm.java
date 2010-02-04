@@ -5,6 +5,7 @@ import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -45,11 +46,13 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_EDIT_FORM));
 
+    private AdapterChangedListener adapterChangedListener;
+
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         super.init(editorSite, input);
-        adapter.addChangedListener(new AdapterChangedListener() {
+        adapterChangedListener = new AdapterChangedListener() {
             @Override
             public void changed(AdapterChangedEvent event) {
                 try {
@@ -58,7 +61,14 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     LOGGER.error("Error sending event", e);
                 }
             }
-        });
+        };
+        adapter.addChangedListener(adapterChangedListener);
+    }
+
+    @Override
+    public void dispose() {
+        Assert.isNotNull(adapterChangedListener);
+        adapter.removeChangedListener(adapterChangedListener);
     }
 
     @Override

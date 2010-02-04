@@ -105,7 +105,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+            "Repository Site");
         setTextValue(siteLabel, containerWrapper.getSite().getName());
 
         if ((containerWrapper.isNew() && containerWrapper.getParent() == null)

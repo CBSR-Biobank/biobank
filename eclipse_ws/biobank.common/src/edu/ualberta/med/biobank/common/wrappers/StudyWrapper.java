@@ -745,7 +745,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(*) from "
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
             + Study.class.getName() + " as study"
             + " join study.patientCollection as patients"
             + " join patients.shipmentCollection as shipments"
@@ -762,11 +762,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(visits) from "
+        // even though this query states that we are counting patients it
+        // actually counts patient visits since it is not counting distinct
+        // patients. Also see getPatientCountForClinic().
+        HQLCriteria c = new HQLCriteria("select count(patients) from "
             + Study.class.getName() + " as study"
             + " join study.patientCollection as patients"
-            + " join patients.patientVisitCollection as visits"
-            + " join visits.shipment as shipments"
+            + " join patients.shipmentCollection as shipments"
             + " join shipments.clinic as clinic"
             + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
