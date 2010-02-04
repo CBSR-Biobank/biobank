@@ -49,9 +49,10 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         }
         globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
             true);
-
+        if (globalSampleTypes == null) {
+            globalSampleTypes = new ArrayList<SampleTypeWrapper>();
+        }
         setPartName("Sample Types Entry");
-
     }
 
     @Override
@@ -102,8 +103,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             siteWrapper.setSampleTypeCollection(ssCollection);
             siteWrapper.persist();
         }
-        SampleTypeWrapper.persistGlobalSampleTypes(appService,
-            globalSampleWidget.getTableSampleTypes());
+        SampleTypeWrapper.persistGlobalSampleTypes(globalSampleWidget
+            .getAddedOrModifiedSampleTypes(), globalSampleWidget
+            .getDeletedSampleTypes());
     }
 
     @Override

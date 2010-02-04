@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -178,16 +179,13 @@ public class TestSampleType extends TestDatabase {
 
         String name = "testPersistGlobalSampleTypes" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(null, name);
-        types.add(type);
-        SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
+        SampleTypeWrapper.persistGlobalSampleTypes(Arrays.asList(type), null);
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
             .getGlobalSampleTypes(appService, false).size());
 
-        types.remove(type);
-        SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
+        SampleTypeWrapper.persistGlobalSampleTypes(null, Arrays.asList(type));
         Assert.assertEquals(startSize, SampleTypeWrapper.getGlobalSampleTypes(
             appService, false).size());
-
     }
 
     @Test

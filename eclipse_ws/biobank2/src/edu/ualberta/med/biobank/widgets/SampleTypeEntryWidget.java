@@ -44,7 +44,11 @@ public class SampleTypeEntryWidget extends BiobankWidget {
 
     private List<SampleTypeWrapper> selectedSampleTypes;
 
-    private Collection<SampleTypeWrapper> conflictTypes;
+    private List<SampleTypeWrapper> conflictTypes;
+
+    private List<SampleTypeWrapper> addedOrModifiedSampleTypes;
+
+    private List<SampleTypeWrapper> deletedSampleTypes;
 
     /**
      * 
@@ -58,24 +62,16 @@ public class SampleTypeEntryWidget extends BiobankWidget {
      *            form this parameter should be null.
      */
     public SampleTypeEntryWidget(Composite parent, int style,
-        Collection<SampleTypeWrapper> sampleTypeCollection,
-        Collection<SampleTypeWrapper> conflictTypes, String buttonLabel,
+        List<SampleTypeWrapper> sampleTypeCollection,
+        List<SampleTypeWrapper> conflictTypes, String buttonLabel,
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
 
-        this.conflictTypes = conflictTypes;
+        setLists(sampleTypeCollection, conflictTypes);
 
-        if (sampleTypeCollection == null) {
-            selectedSampleTypes = new ArrayList<SampleTypeWrapper>();
-        } else {
-            selectedSampleTypes = new ArrayList<SampleTypeWrapper>(
-                sampleTypeCollection);
-        }
-        Collections.sort(selectedSampleTypes);
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
         sampleTypeTable = new SampleTypeInfoTable(parent, selectedSampleTypes);
         sampleTypeTable.adaptToToolkit(toolkit, true);
         GridData gd = (GridData) sampleTypeTable.getLayoutData();
@@ -112,6 +108,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                     selectedSampleTypes.add(dlg.getSampleType());
                 }
                 sampleTypeTable.setCollection(selectedSampleTypes);
+                addedOrModifiedSampleTypes.add(dlg.getSampleType());
                 notifyListeners();
                 return true;
             }
@@ -127,10 +124,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
             conflictTypes);
         Collection<SampleTypeWrapper> currentSampleTypes = sampleTypeTable
             .getCollection();
-
-        for (SampleTypeWrapper ss : currentSampleTypes) {
-            restrictedTypes.add(ss);
-        }
+        restrictedTypes.addAll(currentSampleTypes);
         return restrictedTypes;
     }
 
@@ -174,17 +168,19 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                         + sampleType.getName() + "\"?");
 
                 if (confirm) {
-                    Collection<SampleTypeWrapper> stToDelete = new HashSet<SampleTypeWrapper>();
-                    for (SampleTypeWrapper st : selectedSampleTypes) {
-                        if (st.getName().equals(sampleType.getName()))
-                            stToDelete.add(st);
-                    }
+                    // Collection<SampleTypeWrapper> stToDelete = new
+                    // HashSet<SampleTypeWrapper>();
+                    // for (SampleTypeWrapper st : selectedSampleTypes) {
+                    // if (st.getName().equals(sampleType.getName()))
+                    // stToDelete.add(st);
+                    // }
 
-                    for (SampleTypeWrapper st : stToDelete) {
-                        selectedSampleTypes.remove(st);
-                    }
+                    // for (SampleTypeWrapper st : stToDelete) {
+                    selectedSampleTypes.remove(sampleType);
+                    // }
 
                     sampleTypeTable.setCollection(selectedSampleTypes);
+                    deletedSampleTypes.add(sampleType);
                     notifyListeners();
                 }
             }
@@ -206,14 +202,37 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         return sampleTypeTable.getCollection();
     }
 
+    public List<SampleTypeWrapper> getAddedOrModifiedSampleTypes() {
+        return addedOrModifiedSampleTypes;
+    }
+
+    public List<SampleTypeWrapper> getDeletedSampleTypes() {
+        return deletedSampleTypes;
+    }
+
     @Override
     public boolean setFocus() {
         return addSampleTypeButton.setFocus();
     }
 
-    public void setLists(Collection<SampleTypeWrapper> sampleTypeCollection,
-        Collection<SampleTypeWrapper> conflictTypes) {
+    public void setLists(List<SampleTypeWrapper> sampleTypeCollection,
+        List<SampleTypeWrapper> conflictTypes) {
         this.conflictTypes = conflictTypes;
-        sampleTypeTable.setCollection(sampleTypeCollection);
+        if (conflictTypes == null) {
+            conflictTypes = new ArrayList<SampleTypeWrapper>();
+        }
+
+        if (sampleTypeCollection == null) {
+            selectedSampleTypes = new ArrayList<SampleTypeWrapper>();
+        } else {
+            selectedSampleTypes = new ArrayList<SampleTypeWrapper>(
+                sampleTypeCollection);
+        }
+        Collections.sort(selectedSampleTypes);
+        if (sampleTypeTable != null) {
+            sampleTypeTable.setCollection(sampleTypeCollection);
+        }
+        addedOrModifiedSampleTypes = new ArrayList<SampleTypeWrapper>();
+        deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
     }
 }

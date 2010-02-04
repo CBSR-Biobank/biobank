@@ -203,36 +203,29 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     /**
-     * This method should only be called to save the new sample type list. The
-     * differences between the old list and the new list will be deleted and the
-     * new list written to the database.
-     * 
-     * @param appService
-     * @param newGlobalSampleTypes
-     * 
-     * @throws BiobankCheckException
-     * @throws Exception
+     * This method should only be called to save the new sample type list.
      */
     public static void persistGlobalSampleTypes(
-        WritableApplicationService appService,
-        List<SampleTypeWrapper> newGlobalSampleTypes)
-        throws BiobankCheckException, Exception {
-        SampleTypeWrapper
-            .deleteOldSampleTypes(appService, newGlobalSampleTypes);
-        for (SampleTypeWrapper ss : newGlobalSampleTypes) {
-            ss.persist();
+        List<SampleTypeWrapper> addedOrModifiedTypes,
+        List<SampleTypeWrapper> typesToDelete) throws BiobankCheckException,
+        Exception {
+        if (addedOrModifiedTypes != null) {
+            for (SampleTypeWrapper ss : addedOrModifiedTypes) {
+                if (ss.getSite() == null) {
+                    ss.persist();
+                } else {
+                    throw new WrapperException(
+                        "Trying to add/modify a non global sample type");
+                }
+            }
         }
-    }
-
-    private static void deleteOldSampleTypes(
-        WritableApplicationService appService, List<SampleTypeWrapper> newTypes)
-        throws BiobankCheckException, Exception {
-        List<SampleTypeWrapper> oldTypes = getGlobalSampleTypes(appService,
-            false);
-        if (oldTypes != null) {
-            for (SampleTypeWrapper ss : oldTypes) {
-                if ((newTypes == null) || !newTypes.contains(ss)) {
+        if (typesToDelete != null) {
+            for (SampleTypeWrapper ss : typesToDelete) {
+                if (ss.getSite() == null) {
                     ss.delete();
+                } else {
+                    throw new WrapperException(
+                        "Trying to delete a non global sample type");
                 }
             }
         }
