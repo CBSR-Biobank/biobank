@@ -45,6 +45,10 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getTreeText() {
+        PatientVisitWrapper wrapper = getWrapper();
+        if (wrapper == null) {
+            return getName();
+        }
         Collection<SampleWrapper> samples = getWrapper().getSampleCollection();
         int total = 0;
         if (samples != null) {
