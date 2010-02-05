@@ -33,6 +33,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private List<SampleTypeWrapper> deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
 
+    private List<SitePvAttrWrapper> deletedSitePvAttr = new ArrayList<SitePvAttrWrapper>();
+
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
         sitePvAttrMap = null;
@@ -549,20 +551,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertiesMap.put("sampleTypeCollection", allTypeWrappers);
     }
 
-    /**
-     * Removes the sample type objects that are not contained in the collection.
-     * 
-     * @throws Exception
-     */
-    private void deleteSampleTypeDifference() throws Exception {
-        for (SampleTypeWrapper st : deletedSampleTypes) {
-            if (!st.isNew()) {
-                st.delete();
-            }
-        }
-        deletedSampleTypes.clear();
-    }
-
     @SuppressWarnings("unchecked")
     protected List<SitePvAttrWrapper> getSitePvAttrCollection() {
         List<SitePvAttrWrapper> sitePvAttrCollection = (List<SitePvAttrWrapper>) propertiesMap
@@ -582,59 +570,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return sitePvAttrCollection;
     }
 
-    protected void setSitePvAttrCollection(Collection<SitePvAttr> collection,
-        boolean setNull) {
-        Collection<SitePvAttr> oldCollection = wrappedObject
-            .getSitePvAttrCollection();
-        wrappedObject.setSitePvAttrCollection(collection);
-        propertyChangeSupport.firePropertyChange("SitePvAttrCollection",
-            oldCollection, collection);
-        if (setNull) {
-            propertiesMap.put("SitePvAttrCollection", null);
-        }
-    }
-
-    protected void setSitePvAttrCollection(List<SitePvAttrWrapper> collection) {
-        Collection<SitePvAttr> pipObjects = new HashSet<SitePvAttr>();
-        for (SitePvAttrWrapper pip : collection) {
-            pip.setSite(this);
-            pipObjects.add(pip.getWrappedObject());
-        }
-        setSitePvAttrCollection(pipObjects, false);
-        propertiesMap.put("SitePvAttrCollection", collection);
-    }
-
-    /**
-     * Removes the sample type objects that are not contained in the collection.
-     * 
-     * @param oldCollection
-     * @throws BiobankCheckException
-     * @throws Exception
-     */
-    private void deleteSitePvAttrDifference(Site origSite) throws Exception {
-        List<SitePvAttrWrapper> oldSitePvAttr = new SiteWrapper(appService,
-            origSite).getSitePvAttrCollection();
-        if (oldSitePvAttr == null)
-            return;
-        getSitePvAttrMap();
-        int newSitePvAttrCount = sitePvAttrMap.size();
-        for (SitePvAttrWrapper pip : oldSitePvAttr) {
-            if ((pip.getSite() != null)
-                && ((newSitePvAttrCount == 0) || (sitePvAttrMap.get(pip
-                    .getLabel()) == null))) {
-                pip.delete();
-            }
-        }
-    }
-
     protected static Map<String, PvAttrTypeWrapper> getPvAttrTypeMap(
         WritableApplicationService appService) throws ApplicationException {
         if (pvAttrTypeMap == null) {
-            pvAttrTypeMap = new HashMap<String, PvAttrTypeWrapper>();
-            for (PvAttrTypeWrapper pit : PvAttrTypeWrapper
-                .getAllWrappers(appService)) {
-                pvAttrTypeMap.put(pit.getName(), pit);
-            }
+            pvAttrTypeMap = PvAttrTypeWrapper.getAllPvAttrTypesMap(appService);
         }
         return pvAttrTypeMap;
     }
@@ -712,23 +651,48 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void deleteSitePvAttr(String label) throws Exception {
         getSitePvAttrMap();
         // this call generates exception if label does not exist
-        getSitePvAttr(label);
+        SitePvAttrWrapper sitePvAttr = getSitePvAttr(label);
         sitePvAttrMap.remove(label);
-        setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(sitePvAttrMap
-            .values()));
+        deletedSitePvAttr.add(sitePvAttr);
     }
 
     @Override
     protected void persistDependencies(Site origObject) throws Exception {
-        if (sitePvAttrMap != null) {
-            setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(
-                sitePvAttrMap.values()));
-        }
-        deleteSampleTypeDifference();
-        if (origObject != null) {
+        persistSampleTypes();
+        persistSitePvAttr();
+    }
 
-            deleteSitePvAttrDifference(origObject);
+    private void persistSitePvAttr() throws Exception {
+        if (sitePvAttrMap != null) {
+            Collection<SitePvAttr> sitePvAttrObjects = new HashSet<SitePvAttr>();
+            Collection<SitePvAttrWrapper> sitePvAttrWrapperList = sitePvAttrMap
+                .values();
+            for (SitePvAttrWrapper spa : sitePvAttrWrapperList) {
+                spa.setSite(this);
+                sitePvAttrObjects.add(spa.getWrappedObject());
+            }
+            Collection<SitePvAttr> oldCollection = wrappedObject
+                .getSitePvAttrCollection();
+            wrappedObject.setSitePvAttrCollection(sitePvAttrObjects);
+            propertyChangeSupport.firePropertyChange("SitePvAttrCollection",
+                oldCollection, sitePvAttrObjects);
+            propertiesMap.put("SitePvAttrCollection", sitePvAttrWrapperList);
         }
+        for (SitePvAttrWrapper sitePvAttr : deletedSitePvAttr) {
+            if (!sitePvAttr.isNew()) {
+                sitePvAttr.delete();
+            }
+        }
+        deletedSitePvAttr.clear();
+    }
+
+    private void persistSampleTypes() throws Exception {
+        for (SampleTypeWrapper st : deletedSampleTypes) {
+            if (!st.isNew()) {
+                st.delete();
+            }
+        }
+        deletedSampleTypes.clear();
     }
 
     @Override
@@ -775,15 +739,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
-        sitePvAttrMap = null;
-        pvAttrTypeMap = null;
+    public String toString() {
+        return getName();
     }
 
     @Override
-    public String toString() {
-        return getName();
+    public void reset() throws Exception {
+        super.reset();
+        sitePvAttrMap = null;
+        pvAttrTypeMap = null;
+        deletedSampleTypes.clear();
+        deletedSitePvAttr.clear();
     }
 
 }

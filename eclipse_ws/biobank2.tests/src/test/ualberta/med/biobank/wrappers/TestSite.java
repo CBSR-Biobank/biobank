@@ -1,5 +1,6 @@
 package test.ualberta.med.biobank.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -599,8 +600,8 @@ public class TestSite extends TestDatabase {
         String name = "testGetSitePvAttrType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
-        List<PvAttrTypeWrapper> types = PvAttrTypeWrapper
-            .getAllWrappers(appService);
+        List<PvAttrTypeWrapper> types = new ArrayList<PvAttrTypeWrapper>(
+            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService).values());
         if (types.size() == 0) {
             Assert.fail("Can't test without PvAttrTypes");
         }
@@ -630,8 +631,8 @@ public class TestSite extends TestDatabase {
         String name = "testGetSitePvAttrTypeName" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
-        List<PvAttrTypeWrapper> types = PvAttrTypeWrapper
-            .getAllWrappers(appService);
+        List<PvAttrTypeWrapper> types = new ArrayList<PvAttrTypeWrapper>(
+            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService).values());
         if (types.size() == 0) {
             Assert.fail("Can't test without PvAttrTypes");
         }
