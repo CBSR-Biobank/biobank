@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
@@ -23,7 +23,7 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
      */
     public static final Map<String, FieldInfo> ADDRESS_FIELDS;
     static {
-        Map<String, FieldInfo> aMap = new TreeMap<String, FieldInfo>();
+        Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
         aMap.put("street1", new FieldInfo("Street 1", Text.class, SWT.NONE,
             null, null, null));
         aMap.put("street2", new FieldInfo("Street 2", Text.class, SWT.NONE,

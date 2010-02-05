@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.apache.commons.collections.MapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -87,15 +87,14 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         return false;
     }
 
-    protected void setWidgetsValues(ListOrderedMap fieldsMap, Object bean) {
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            FieldInfo fi = (FieldInfo) it.getValue();
-            IObservableValue ov = BeansObservables.observeValue(bean, key);
+    protected void setWidgetsValues(Map<String, FieldInfo> fieldsMap,
+        Object bean) {
+        for (String label : fieldsMap.keySet()) {
+            FieldInfo fi = fieldsMap.get(label);
+            IObservableValue ov = BeansObservables.observeValue(bean, label);
             Object value = ov.getValue();
             if (value != null) {
-                Control control = controls.get(key);
+                Control control = controls.get(label);
                 if ((fi.widgetClass == Combo.class)
                     || (fi.widgetClass == Text.class)
                     || (fi.widgetClass == Label.class)) {

@@ -3,7 +3,10 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
@@ -34,7 +37,6 @@ import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
-@SuppressWarnings("serial")
 public class StudyEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm";
 
@@ -45,18 +47,19 @@ public class StudyEntryForm extends BiobankEntryForm {
     public static final String[] ORDERED_FIELDS = new String[] { "name",
         "nameShort", "activityStatus", "comment" };
 
-    public static final ListOrderedMap FIELDS = new ListOrderedMap() {
-        {
-            put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
-                NonEmptyStringValidator.class, "Study name cannot be blank"));
-            put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
-                null, NonEmptyStringValidator.class,
-                "Study short name cannot be blank"));
-            put("activityStatus", new FieldInfo("Activity Status", Combo.class,
-                SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
-            put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
-                null, null, null));
-        }
+    public static final Map<String, FieldInfo> FIELDS;
+    static {
+        Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
+        aMap.put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
+            NonEmptyStringValidator.class, "Study name cannot be blank"));
+        aMap.put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
+            null, NonEmptyStringValidator.class,
+            "Study short name cannot be blank"));
+        aMap.put("activityStatus", new FieldInfo("Activity Status",
+            Combo.class, SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
+        aMap.put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
+            null, null, null));
+        FIELDS = Collections.unmodifiableMap(aMap);
     };
 
     private StudyAdapter studyAdapter;

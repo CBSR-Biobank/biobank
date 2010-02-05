@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.MapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -441,17 +439,16 @@ public class WidgetCreator {
         return comboViewer;
     }
 
-    public void createWidgetsFromMap(ListOrderedMap fieldsMap, Composite parent) {
+    public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
+        Composite parent) {
         FieldInfo fi;
 
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            fi = (FieldInfo) it.getValue();
+        for (String label : fieldsMap.keySet()) {
+            fi = fieldsMap.get(label);
 
             Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
                 fi.label, null);
-            controls.put(key, control);
+            controls.put(label, control);
         }
     }
 

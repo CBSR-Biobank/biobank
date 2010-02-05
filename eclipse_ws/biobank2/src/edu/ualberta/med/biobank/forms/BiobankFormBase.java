@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -236,7 +236,7 @@ public abstract class BiobankFormBase extends EditorPart {
             null);
     }
 
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
+    protected void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
