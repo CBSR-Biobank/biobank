@@ -21,7 +21,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
-    private List<PatientWrapper> patientsAdded;
+    private List<PatientWrapper> patientsAdded = new ArrayList<PatientWrapper>();
 
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -85,16 +85,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
-        if (!isNew()) {
-            // want to check only new patients
-            Shipment ship = new Shipment();
-            ship.setId(getId());
-            ship = (Shipment) appService.search(Shipment.class, ship).get(0);
-            ShipmentWrapper old = new ShipmentWrapper(appService, ship);
-            List<PatientWrapper> oldPatientList = old.getPatientCollection();
-            patients.removeAll(oldPatientList);
-        }
-        for (PatientWrapper patient : patients) {
+        for (PatientWrapper patient : patientsAdded) {
             if (!patient.getStudy().isLinkedToClinic(getClinic())) {
                 throw new BiobankCheckException("Patient "
                     + patient.getPnumber()
@@ -330,9 +321,6 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         if (patientsList == null) {
             patientsList = new ArrayList<PatientWrapper>();
         }
-        if (patientsAdded == null) {
-            patientsAdded = new ArrayList<PatientWrapper>();
-        }
         for (PatientWrapper patient : patients) {
             patientsAdded.add(patient);
             patientsList.add(patient);
@@ -344,6 +332,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         List<PatientWrapper> patientsList = getPatientCollection();
         if (patientsList != null) {
             for (PatientWrapper patient : patients) {
+                patientsAdded.remove(patient);
                 patientsList.remove(patient);
             }
             setPatientCollection(patientsList);
@@ -390,5 +379,11 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
         return results.get(0) > 0;
+    }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        patientsAdded.clear();
     }
 }

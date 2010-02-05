@@ -150,7 +150,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     @SuppressWarnings("unchecked")
     public void persist() throws Exception {
-        long start = System.currentTimeMillis();
         persistChecks();
         SDKQuery query;
         E origObject = null;
@@ -162,14 +161,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         }
         persistDependencies(origObject);
-        long start2 = System.currentTimeMillis();
         SDKQueryResult result = appService.executeQuery(query);
-        long end2 = System.currentTimeMillis();
-        System.out.println("execute**" + (end2 - start2) / 1000.0);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
-        long end = System.currentTimeMillis();
-        System.out.println("**" + (end - start) / 1000.0);
     }
 
     /**

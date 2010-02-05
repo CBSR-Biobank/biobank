@@ -178,4 +178,8 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             });
         }
     }
+
+    public void reloadList() {
+        patientTable.setCollection(shipment.getPatientCollection());
+    }
 }

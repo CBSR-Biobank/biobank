@@ -359,6 +359,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public void cancel() {
         try {
+            adapter.resetObject();
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().closeEditor(this, false);
         } catch (Exception e) {

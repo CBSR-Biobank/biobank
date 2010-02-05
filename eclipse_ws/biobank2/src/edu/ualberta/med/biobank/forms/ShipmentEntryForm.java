@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -50,6 +51,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private ComboViewer companyComboViewer;
 
     private SiteWrapper site;
+
+    private ShipmentPatientsWidget shipmentPatientsWidget;
 
     @Override
     protected void init() throws Exception {
@@ -150,8 +153,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        ShipmentPatientsWidget shipmentPatientsWidget = new ShipmentPatientsWidget(
-            client, SWT.NONE, shipmentWrapper, site, toolkit, true);
+        shipmentPatientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,
+            shipmentWrapper, site, toolkit, true);
         shipmentPatientsWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -210,6 +213,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (shipmentWrapper.isNew()
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
+        }
+        shipmentPatientsWidget.reloadList();
+        ShippingCompanyWrapper shipCompany = shipmentWrapper
+            .getShippingCompany();
+        if (shipCompany != null) {
+            companyComboViewer
+                .setSelection(new StructuredSelection(shipCompany));
+        } else if (companyComboViewer.getCombo().getItemCount() > 1) {
+            companyComboViewer.getCombo().deselectAll();
         }
     }
 
