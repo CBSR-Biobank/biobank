@@ -99,7 +99,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 if ((fi.widgetClass == Combo.class)
                     || (fi.widgetClass == Text.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((Label) control).setText((String) value);
+                    ((Text) control).setText((String) value);
                 }
             }
         }

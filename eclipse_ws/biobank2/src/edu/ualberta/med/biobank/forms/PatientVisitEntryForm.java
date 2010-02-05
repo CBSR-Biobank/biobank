@@ -123,8 +123,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
 
         List<ShipmentWrapper> patientShipments = patient
@@ -183,8 +182,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
             pvCustomInfo.setType(study.getStudyPvAttrType(label));
-            pvCustomInfo.setPermissible(study
-                .getStudyPvAttrPermissible(label));
+            pvCustomInfo.setPermissible(study.getStudyPvAttrPermissible(label));
             pvCustomInfo.setValue(patientVisit.getPvAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);

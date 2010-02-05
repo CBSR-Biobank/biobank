@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.Section;
@@ -46,9 +46,9 @@ public class SiteViewForm extends AddressViewFormCommon {
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable sContainersTable;
 
-    private Label activityStatusLabel;
+    private Text activityStatusLabel;
 
-    private Label commentLabel;
+    private Text commentLabel;
 
     private SelectionListener addStudySelectionListener = new SelectionAdapter() {
         @Override
@@ -97,10 +97,9 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Comments");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
+        commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
         setSiteSectionValues();
     }
 

@@ -9,7 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -27,19 +27,19 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyAdapter studyAdapter;
     private StudyWrapper study;
 
-    private Label siteLabel;
-    private Label nameShortLabel;
-    private Label activityStatusLabel;
-    private Label commentLabel;
-    private Label patientTotal;
-    private Label visitTotal;
+    private Text siteLabel;
+    private Text nameShortLabel;
+    private Text activityStatusLabel;
+    private Text commentLabel;
+    private Text patientTotal;
+    private Text visitTotal;
 
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private SampleSourceInfoTable sampleSourceTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
-        public Label wiget;
+        public Text wiget;
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;
@@ -76,17 +76,14 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        siteLabel = createReadOnlyField(client, SWT.READ_ONLY,
             "Repository Site");
-        nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Short Name");
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
-            "Comments");
-        patientTotal = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Total Patients");
-        visitTotal = (Label) createWidget(client, Label.class, SWT.NONE,
+        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
+        commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
+        patientTotal = createReadOnlyField(client, SWT.NONE, "Total Patients");
+        visitTotal = createReadOnlyField(client, SWT.NONE,
             "Total Patient Visits");
 
         createClinicSection();
@@ -170,8 +167,8 @@ public class StudyViewForm extends BiobankViewForm {
             if (pvCustomInfo.getAllowedValues() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
-                pvCustomInfo.wiget = (Label) createWidget(subcomp, Label.class,
-                    SWT.NONE, pvCustomInfo.getLabel());
+                pvCustomInfo.wiget = createReadOnlyField(subcomp, SWT.NONE,
+                    pvCustomInfo.getLabel());
             } else {
                 subcomp.setLayout(new GridLayout(1, false));
                 toolkit.createLabel(subcomp, pvCustomInfo.getLabel());

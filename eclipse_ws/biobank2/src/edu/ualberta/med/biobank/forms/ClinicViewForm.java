@@ -5,7 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -25,11 +25,11 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
-    private Label siteLabel;
+    private Text siteLabel;
 
-    private Label activityStatusLabel;
+    private Text activityStatusLabel;
 
-    private Label commentLabel;
+    private Text commentLabel;
 
     private ShipmentInfoTable shipmentsTable;
 
@@ -68,12 +68,11 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        siteLabel = createReadOnlyField(client, SWT.READ_ONLY,
             "Repository Site");
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Comments");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
+        commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
 
         setClinicValues();
     }

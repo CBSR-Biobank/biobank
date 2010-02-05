@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -21,25 +22,25 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private ContainerTypeWrapper containerType;
 
-    private Label siteLabel;
+    private Text siteLabel;
 
-    private Label nameLabel;
+    private Text nameLabel;
 
-    private Label nameShortLabel;
+    private Text nameShortLabel;
 
     private Button isTopLevelButton;
 
-    private Label dimOneCapacityLabel;
+    private Text rowCapacityLabel;
 
-    private Label dimTwoCapacityLabel;
+    private Text colCapacityLabel;
 
-    private Label defaultTempLabel;
+    private Text defaultTempLabel;
 
-    private Label numSchemeLabel;
+    private Text numSchemeLabel;
 
-    private Label activityStatusLabel;
+    private Text activityStatusLabel;
 
-    private Label commentLabel;
+    private Text commentLabel;
 
     private org.eclipse.swt.widgets.List sampleTypesList;
 
@@ -93,25 +94,21 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Repository Site");
-        nameLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Name");
-        nameShortLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Short Name");
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
+        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
         isTopLevelButton = (Button) createWidget(client, Button.class,
             SWT.NONE, "Top Level Container");
-        dimOneCapacityLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Maximum Rows");
-        dimTwoCapacityLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Maximum Columns");
-        defaultTempLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        rowCapacityLabel = createReadOnlyField(client, SWT.NONE, "Maximum Rows");
+        colCapacityLabel = createReadOnlyField(client, SWT.NONE,
+            "Maximum Columns");
+        defaultTempLabel = createReadOnlyField(client, SWT.NONE,
             "Default Temperature\n(Celcius)");
-        numSchemeLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        numSchemeLabel = createReadOnlyField(client, SWT.NONE,
             "Child Labeling Scheme");
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Comments");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
+        commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
 
         setContainerTypeValues();
     }
@@ -121,8 +118,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(nameLabel, containerType.getName());
         setTextValue(nameShortLabel, containerType.getNameShort());
         setCheckBoxValue(isTopLevelButton, containerType.getTopLevel());
-        setTextValue(dimOneCapacityLabel, containerType.getRowCapacity());
-        setTextValue(dimTwoCapacityLabel, containerType.getColCapacity());
+        setTextValue(rowCapacityLabel, containerType.getRowCapacity());
+        setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
         setTextValue(numSchemeLabel,
             containerType.getChildLabelingScheme() == null ? "" : containerType

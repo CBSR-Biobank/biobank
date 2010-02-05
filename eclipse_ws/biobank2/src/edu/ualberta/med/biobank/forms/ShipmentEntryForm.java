@@ -12,7 +12,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -93,8 +92,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, site.getName());
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Waybill",
@@ -112,8 +110,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 client, "Clinic", siteClinics, selectedClinic,
                 "A clinic should be selected");
         } else {
-            Label clinicLabel = (Label) createWidget(client, Label.class,
-                SWT.NONE, "Clinic");
+            Text clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
             if (shipmentWrapper.getClinic() != null) {
                 clinicLabel.setText(shipmentWrapper.getClinic().getName());
             }

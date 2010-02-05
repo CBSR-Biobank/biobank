@@ -16,7 +16,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -104,7 +103,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        Text siteLabel = createReadOnlyField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, containerWrapper.getSite().getName());
 
@@ -117,8 +116,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     containerWrapper, "label"), new NonEmptyStringValidator(
                     MSG_CONTAINER_NAME_EMPTY));
         } else {
-            Label l = (Label) createWidget(client, Label.class, SWT.NONE,
-                "Label");
+            Text l = createReadOnlyField(client, SWT.NONE, "Label");
             setTextValue(l, containerWrapper.getLabel());
         }
 

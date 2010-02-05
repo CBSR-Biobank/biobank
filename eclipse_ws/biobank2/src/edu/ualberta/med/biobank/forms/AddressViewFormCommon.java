@@ -16,6 +16,7 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
 
     protected void createAddressArea(Composite parent,
         ModelWrapper<?> wrapperObject) {
+        for ()
         createWidgetsFromMap(AddressEntryFormCommon.ADDRESS_FIELDS, parent);
         setAdressValues(wrapperObject);
     }
