@@ -22,14 +22,14 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         SampleTypeWrapper sampleType = getSampleType();
-        Assert.isNotNull(sampleType, "storage type is null");
+        Assert.isNotNull(sampleType, "sample type is null");
         return sampleType.getNameShort();
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
     }
 
     @Override
@@ -38,13 +38,18 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Sample Type");
+    public String getTooltipText() {
+        return getTooltipText("Sample Type");
     }
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return null;
     }
 
     @Override

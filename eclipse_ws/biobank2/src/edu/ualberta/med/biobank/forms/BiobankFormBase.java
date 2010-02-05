@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -11,13 +11,16 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -53,6 +56,9 @@ public abstract class BiobankFormBase extends EditorPart {
     private static Logger LOGGER = Logger.getLogger(BiobankFormBase.class
         .getName());
 
+    private static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
+        .getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+
     protected WritableApplicationService appService;
 
     protected AdapterBase adapter;
@@ -63,7 +69,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected ScrolledForm form;
 
-    protected HashMap<String, Control> controls = new HashMap<String, Control>();
+    private Map<String, Control> widgets;
 
     protected WidgetCreator widgetCreator;
 
@@ -91,7 +97,16 @@ public abstract class BiobankFormBase extends EditorPart {
     };
 
     public BiobankFormBase() {
-        widgetCreator = new WidgetCreator(controls);
+        widgets = new HashMap<String, Control>();
+        widgetCreator = new WidgetCreator(widgets);
+    }
+
+    protected void addWidget(String widgetName, Control widget) {
+        widgets.put(widgetName, widget);
+    }
+
+    protected Control getWidget(String widgetName) {
+        return widgets.get(widgetName);
     }
 
     @Override
@@ -230,18 +245,32 @@ public abstract class BiobankFormBase extends EditorPart {
             null);
     }
 
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
+    protected void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
 
-    public static void setTextValue(Label label, String value) {
+    protected Text createReadOnlyField(Composite parent, int widgetOptions,
+        String fieldLabel, String value) {
+        Text result = (Text) createWidget(parent, Text.class, SWT.READ_ONLY
+            | widgetOptions, fieldLabel, value);
+
+        result.setBackground(READ_ONLY_TEXT_BGR);
+        return result;
+    }
+
+    protected Text createReadOnlyField(Composite parent, int widgetOptions,
+        String fieldLabel) {
+        return createReadOnlyField(parent, widgetOptions, fieldLabel, null);
+    }
+
+    public static void setTextValue(Text label, String value) {
         if (value != null && !label.isDisposed()) {
             label.setText(value);
         }
     }
 
-    public static void setTextValue(Label label, Object value) {
+    public static void setTextValue(Text label, Object value) {
         if (value != null) {
             setTextValue(label, value.toString());
         }

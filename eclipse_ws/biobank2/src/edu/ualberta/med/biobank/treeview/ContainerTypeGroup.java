@@ -22,11 +22,16 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ContainerTypeGroup extends AdapterBase {
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Container Types", true);
+        super(parent, id, "Container Types", true, true);
     }
 
     @Override
-    public void performDoubleClick() {
+    protected String getLabelInternal() {
+        return null;
+    }
+
+    @Override
+    public void executeDoubleClick() {
         performExpand();
     }
 
@@ -48,13 +53,18 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new ContainerTypeAdapter(this, null);
     }
 
     @Override

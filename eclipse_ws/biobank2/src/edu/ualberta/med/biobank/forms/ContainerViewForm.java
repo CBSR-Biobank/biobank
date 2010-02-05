@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -58,23 +59,23 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private SamplesListInfoTable samplesWidget;
 
-    private Label siteLabel;
+    private Text siteLabel;
 
-    private Label containerLabelLabel;
+    private Text containerLabelLabel;
 
-    private Label productBarcodeLabel;
+    private Text productBarcodeLabel;
 
-    private Label activityStatusLabel;
+    private Text activityStatusLabel;
 
-    private Label commentsLabel;
+    private Text commentsLabel;
 
-    private Label containerTypeLabel;
+    private Text containerTypeLabel;
 
-    private Label temperatureLabel;
+    private Text temperatureLabel;
 
-    private Label positionDimOneLabel = null;
+    private Text rowLabel = null;
 
-    private Label positionDimTwoLabel;
+    private Text colLabel;
 
     private AbstractContainerDisplayWidget containerWidget;
 
@@ -124,19 +125,16 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
-        containerLabelLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Label");
-        productBarcodeLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Product Bar Code");
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentsLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Comments");
-        containerTypeLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Container Type");
-        temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Temperature");
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
+        containerLabelLabel = createReadOnlyField(client, SWT.NONE, "Label");
+        productBarcodeLabel = createReadOnlyField(client, SWT.NONE,
+            "Product Bar Code");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
+        commentsLabel = createReadOnlyField(client, SWT.NONE, "Comments");
+        containerTypeLabel = createReadOnlyField(client, SWT.NONE,
+            "Container Type");
+        temperatureLabel = createReadOnlyField(client, SWT.NONE, "Temperature");
 
         setContainerValues();
 
@@ -376,12 +374,12 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(containerTypeLabel, container.getContainerType().getName());
         setTextValue(temperatureLabel, container.getTemperature());
         if (container.hasParent()) {
-            if (positionDimOneLabel != null) {
-                setTextValue(positionDimOneLabel, container.getPosition().row);
+            if (rowLabel != null) {
+                setTextValue(rowLabel, container.getPosition().row);
             }
 
-            if (positionDimTwoLabel != null) {
-                setTextValue(positionDimTwoLabel, container.getPosition().col);
+            if (colLabel != null) {
+                setTextValue(colLabel, container.getPosition().col);
             }
         }
     }

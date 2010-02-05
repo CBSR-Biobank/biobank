@@ -27,7 +27,7 @@ public class PatientAdapter extends AdapterBase {
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper,
         boolean enableActions) {
-        super(parent, patientWrapper, enableActions);
+        super(parent, patientWrapper, enableActions, true);
         setHasChildren(true);
     }
 
@@ -36,19 +36,21 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         PatientWrapper patientWrapper = getWrapper();
         Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
         return patientWrapper.getPnumber();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Patient");
+    public String getTooltipText() {
+        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
+            + getParentFromClass(StudyAdapter.class).getLabel() + " - "
+            + getTooltipText("Patient");
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         performExpand();
         openForm(new FormInput(this), PatientViewForm.ID);
     }
@@ -77,6 +79,11 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new PatientVisitAdapter(this, null);
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -22,21 +22,21 @@ public class ShipmentViewForm extends BiobankViewForm {
     private ShipmentAdapter shipmentAdapter;
     private ShipmentWrapper shipmentWrapper;
 
-    private Label siteLabel;
+    private Text siteLabel;
 
-    private Label clinicLabel;
+    private Text clinicLabel;
 
-    private Label waybillLabel;
+    private Text waybillLabel;
 
-    private Label dateShippedLabel;
+    private Text dateShippedLabel;
 
-    private Label dateReceivedLabel;
+    private Text dateReceivedLabel;
 
-    private Label commentLabel;
+    private Text commentLabel;
 
-    private Label companyLabel;
+    private Text companyLabel;
 
-    private Label boxNumberLabel;
+    private Text boxNumberLabel;
 
     @Override
     protected void init() throws Exception {
@@ -89,28 +89,15 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
-
-        waybillLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Waybill");
-
-        clinicLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Clinic");
-
-        dateShippedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Date Shipped");
-
-        companyLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Shipping company");
-
-        boxNumberLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Box number");
-
-        dateReceivedLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
+        waybillLabel = createReadOnlyField(client, SWT.NONE, "Waybill");
+        clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
+        dateShippedLabel = createReadOnlyField(client, SWT.NONE, "Date Shipped");
+        companyLabel = createReadOnlyField(client, SWT.NONE, "Shipping company");
+        boxNumberLabel = createReadOnlyField(client, SWT.NONE, "Box number");
+        dateReceivedLabel = createReadOnlyField(client, SWT.NONE,
             "Date received");
-
-        commentLabel = (Label) createWidget(client, Label.class, SWT.WRAP,
-            "Comments");
+        commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
 
         setShipmentValues();
 

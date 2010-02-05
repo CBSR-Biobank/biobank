@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import org.acegisecurity.AccessDeniedException;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
@@ -205,7 +205,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             errorMsg);
     }
 
-    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
+    protected void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
         widgetCreator.createBoundWidgetsFromMap(fieldsMap, bean, client);
     }

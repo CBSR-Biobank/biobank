@@ -20,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
@@ -362,10 +363,13 @@ public class BioBankPlugin extends AbstractUIPlugin {
             && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
             String ctName;
             if (element instanceof ContainerAdapter) {
-                ctName = ((ContainerAdapter) element).getContainer()
-                    .getContainerType().getName();
+                ContainerWrapper container = ((ContainerAdapter) element)
+                    .getContainer();
+                if (container == null)
+                    return null;
+                ctName = container.getContainerType().getName();
             } else {
-                ctName = ((ContainerTypeAdapter) element).getName();
+                ctName = ((ContainerTypeAdapter) element).getLabel();
             }
             return getIconForTypeName(ctName);
         }

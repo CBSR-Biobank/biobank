@@ -25,19 +25,20 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         ContainerTypeWrapper containerType = getContainerType();
-        Assert.isNotNull(containerType, "storage type is null");
+        Assert.isNotNull(containerType, "container type is null");
         return containerType.getName();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Container Type");
+    public String getTooltipText() {
+        return parent.getParent().getLabel() + " - "
+            + getTooltipText("Container Type");
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), ContainerTypeViewForm.ID);
     }
 
@@ -51,6 +52,11 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
         return null;
     }
 

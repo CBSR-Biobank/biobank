@@ -5,7 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -20,7 +20,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     private PatientWrapper patientWrapper;
 
-    private Label siteLabel;
+    private Text siteLabel;
 
     private PatientVisitInfoTable visitsTable;
 
@@ -61,7 +61,7 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
     }
 
     private void createPatientVisitSection() {

@@ -30,11 +30,16 @@ public class ContainerGroup extends AdapterBase {
         .getName());
 
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Containers", true);
+        super(parent, id, "Containers", true, true);
     }
 
     @Override
-    public void performDoubleClick() {
+    protected String getLabelInternal() {
+        return null;
+    }
+
+    @Override
+    public void executeDoubleClick() {
         performExpand();
     }
 
@@ -73,13 +78,18 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new ContainerAdapter(this, null);
     }
 
     @Override

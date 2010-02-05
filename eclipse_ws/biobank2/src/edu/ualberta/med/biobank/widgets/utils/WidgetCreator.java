@@ -4,10 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.collections.MapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -56,7 +54,7 @@ public class WidgetCreator {
 
     protected DataBindingContext dbc;
 
-    protected HashMap<String, Control> controls;
+    protected Map<String, Control> controls;
 
     private FormToolkit toolkit;
 
@@ -66,7 +64,7 @@ public class WidgetCreator {
 
     private SelectionListener selectionListener;
 
-    public WidgetCreator(HashMap<String, Control> controls) {
+    public WidgetCreator(Map<String, Control> controls) {
         this.controls = controls;
     }
 
@@ -78,20 +76,18 @@ public class WidgetCreator {
         this.toolkit = toolkit;
     }
 
-    public void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
+    public void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
         FieldInfo fi;
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            fi = (FieldInfo) it.getValue();
+        for (String label : fieldsMap.keySet()) {
+            fi = fieldsMap.get(label);
 
             Control control = createBoundWidgetWithLabel(client,
                 fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
-                BeansObservables.observeValue(bean, key), fi.validatorClass,
+                BeansObservables.observeValue(bean, label), fi.validatorClass,
                 fi.errMsg);
             if (controls != null) {
-                controls.put(key, control);
+                controls.put(label, control);
             }
         }
     }
@@ -442,17 +438,16 @@ public class WidgetCreator {
         return comboViewer;
     }
 
-    public void createWidgetsFromMap(ListOrderedMap fieldsMap, Composite parent) {
+    public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
+        Composite parent) {
         FieldInfo fi;
 
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            fi = (FieldInfo) it.getValue();
+        for (String label : fieldsMap.keySet()) {
+            fi = fieldsMap.get(label);
 
             Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
                 fi.label, null);
-            controls.put(key, control);
+            controls.put(label, control);
         }
     }
 
@@ -465,8 +460,12 @@ public class WidgetCreator {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
-            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
-                | SWT.BORDER, false);
+
+            Text field = createText(parent, widgetOptions | SWT.LEFT, null,
+                null);
+
+            // Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
+            // | SWT.BORDER, false);
             field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
             if (value != null) {
                 field.setText(value);

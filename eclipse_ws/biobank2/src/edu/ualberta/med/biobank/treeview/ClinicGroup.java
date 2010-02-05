@@ -21,12 +21,17 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class ClinicGroup extends AdapterBase {
 
     public ClinicGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Clinics", true);
+        super(parent, id, "Clinics", true, true);
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         performExpand();
+    }
+
+    @Override
+    protected String getLabelInternal() {
+        return null;
     }
 
     @Override
@@ -48,13 +53,18 @@ public class ClinicGroup extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
+    public String getTooltipText() {
         return null;
     }
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new ClinicAdapter(this, null);
     }
 
     @Override
