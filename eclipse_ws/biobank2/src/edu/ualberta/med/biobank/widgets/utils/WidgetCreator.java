@@ -4,7 +4,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -55,7 +54,7 @@ public class WidgetCreator {
 
     protected DataBindingContext dbc;
 
-    protected HashMap<String, Control> controls;
+    protected Map<String, Control> controls;
 
     private FormToolkit toolkit;
 
@@ -65,7 +64,7 @@ public class WidgetCreator {
 
     private SelectionListener selectionListener;
 
-    public WidgetCreator(HashMap<String, Control> controls) {
+    public WidgetCreator(Map<String, Control> controls) {
         this.controls = controls;
     }
 

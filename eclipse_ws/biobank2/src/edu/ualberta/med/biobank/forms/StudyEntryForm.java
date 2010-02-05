@@ -133,10 +133,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         createBoundWidgetsFromMap(FIELDS, study, client);
 
-        firstControl = controls.get("name");
+        firstControl = getWidget("name");
         Assert.isNotNull(firstControl, "name field does not exist");
 
-        Text comments = (Text) controls.get("comment");
+        Text comments = (Text) getWidget("comment");
         GridData gd = (GridData) comments.getLayoutData();
         gd.heightHint = 40;
 

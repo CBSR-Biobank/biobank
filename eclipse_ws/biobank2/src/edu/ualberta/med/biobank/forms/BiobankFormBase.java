@@ -69,7 +69,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected ScrolledForm form;
 
-    protected HashMap<String, Control> controls = new HashMap<String, Control>();
+    private Map<String, Control> widgets;
 
     protected WidgetCreator widgetCreator;
 
@@ -97,7 +97,16 @@ public abstract class BiobankFormBase extends EditorPart {
     };
 
     public BiobankFormBase() {
-        widgetCreator = new WidgetCreator(controls);
+        widgets = new HashMap<String, Control>();
+        widgetCreator = new WidgetCreator(widgets);
+    }
+
+    protected void addWidget(String widgetName, Control widget) {
+        widgets.put(widgetName, widget);
+    }
+
+    protected Control getWidget(String widgetName) {
+        return widgets.get(widgetName);
     }
 
     @Override

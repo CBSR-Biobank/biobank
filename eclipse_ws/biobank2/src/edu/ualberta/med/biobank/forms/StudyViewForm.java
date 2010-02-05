@@ -76,8 +76,7 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.READ_ONLY,
-            "Repository Site");
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
         nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");

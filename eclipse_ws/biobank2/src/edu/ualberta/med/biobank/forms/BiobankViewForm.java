@@ -87,18 +87,17 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         return false;
     }
 
-    protected void setWidgetsValues(Map<String, FieldInfo> fieldsMap,
-        Object bean) {
+    protected void setWidgetValues(Map<String, FieldInfo> fieldsMap, Object bean) {
         for (String label : fieldsMap.keySet()) {
             FieldInfo fi = fieldsMap.get(label);
             IObservableValue ov = BeansObservables.observeValue(bean, label);
             Object value = ov.getValue();
             if (value != null) {
-                Control control = controls.get(label);
+                Control widget = getWidget(label);
                 if ((fi.widgetClass == Combo.class)
                     || (fi.widgetClass == Text.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((Text) control).setText((String) value);
+                    ((Text) widget).setText((String) value);
                 }
             }
         }
