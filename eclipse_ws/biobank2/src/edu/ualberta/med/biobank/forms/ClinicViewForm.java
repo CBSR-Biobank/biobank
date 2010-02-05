@@ -31,6 +31,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private Text commentLabel;
 
+    private Text patientTotal;
+
+    private Text visitTotal;
+
     private ShipmentInfoTable shipmentsTable;
 
     @Override
@@ -62,7 +66,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createButtonsSection();
     }
 
-    private void createClinicSection() {
+    private void createClinicSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -73,14 +77,20 @@ public class ClinicViewForm extends AddressViewFormCommon {
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
+        patientTotal = createReadOnlyField(client, SWT.NONE, "Total Patients");
+        visitTotal = createReadOnlyField(client, SWT.NONE,
+            "Total Patient Visits");
 
         setClinicValues();
     }
 
-    private void setClinicValues() {
+    private void setClinicValues() throws Exception {
         setTextValue(siteLabel, clinicWrapper.getSite().getName());
         setTextValue(activityStatusLabel, clinicWrapper.getActivityStatus());
         setTextValue(commentLabel, clinicWrapper.getComment());
+        setTextValue(patientTotal, clinicWrapper.getPatientCount());
+        setTextValue(visitTotal, clinicWrapper.getPatientVisitCollection()
+            .size());
     }
 
     private void createContactsSection() {
