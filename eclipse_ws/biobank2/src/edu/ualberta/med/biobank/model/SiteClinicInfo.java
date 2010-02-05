@@ -9,7 +9,7 @@ public class SiteClinicInfo implements ITableInfo {
 
     public int studies;
 
-    public int patients;
+    public Long patients;
 
     public int patientVisits;
 
