@@ -173,13 +173,13 @@ public class Importer {
                 "patient_visit", "cabinet", "freezer", "sample_list",
                 "frz_99_inv_id" };
 
-            for (String table : reqdTables) {
-                if (!tableExists(table))
-                    throw new Exception("Table " + table + " not found");
-            }
+            // for (String table : reqdTables) {
+            // if (!tableExists(table))
+            // throw new Exception("Table " + table + " not found");
+            // }
 
-            appService = ServiceConnection.getAppService("http://"
-                + System.getProperty("server", "localhost:8080") + "/biobank2",
+            appService = ServiceConnection.getAppService("https://"
+                + System.getProperty("server", "localhost:8443") + "/biobank2",
                 "testuser", "test");
 
             cbsrSite = getCbsrSite();
@@ -538,6 +538,8 @@ public class Importer {
 
         removeAllShipments();
 
+        long start = System.currentTimeMillis();
+
         logger.info("importing shipments ...");
 
         String qryPart = "from patient_visit, study_list, patient "
@@ -640,6 +642,8 @@ public class Importer {
             }
             ++count;
         }
+        long end = System.currentTimeMillis();
+        System.out.println("shipments:" + (end - start) / 1000.0);
     }
 
     private static void removeAllPatientVisits() throws Exception {

@@ -334,6 +334,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             for (PatientWrapper patient : patients) {
                 patientsAdded.remove(patient);
                 patientsList.remove(patient);
+                patientsAdded.remove(patient);
             }
             setPatientCollection(patientsList);
         }

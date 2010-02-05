@@ -168,16 +168,9 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                         + sampleType.getName() + "\"?");
 
                 if (confirm) {
-                    // Collection<SampleTypeWrapper> stToDelete = new
-                    // HashSet<SampleTypeWrapper>();
-                    // for (SampleTypeWrapper st : selectedSampleTypes) {
-                    // if (st.getName().equals(sampleType.getName()))
-                    // stToDelete.add(st);
-                    // }
-
-                    // for (SampleTypeWrapper st : stToDelete) {
+                    // equals method now compare toString() results if both ids
+                    // are null.
                     selectedSampleTypes.remove(sampleType);
-                    // }
 
                     sampleTypeTable.setCollection(selectedSampleTypes);
                     deletedSampleTypes.add(sampleType);
@@ -196,10 +189,6 @@ public class SampleTypeEntryWidget extends BiobankWidget {
             }
         }
         return true;
-    }
-
-    public List<SampleTypeWrapper> getTableSampleTypes() {
-        return sampleTypeTable.getCollection();
     }
 
     public List<SampleTypeWrapper> getAddedOrModifiedSampleTypes() {

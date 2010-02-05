@@ -252,8 +252,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
         Integer id = getId();
         Integer id2 = ((ModelWrapper<?>) object).getId();
-        return (id == null && id2 == null)
-            || (id != null && id2 != null && id.equals(id2));
+        if (id == null && id2 == null) {
+            return toString().equals(object.toString());
+        }
+        return id != null && id2 != null && id.equals(id2);
     }
 
     /**

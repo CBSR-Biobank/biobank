@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -276,15 +275,13 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetSampleTypeCollectionAdd() throws Exception {
-        String name = "testSetSampleTypeCollectionAdd" + r.nextInt();
+    public void testAddSampleTypes() throws Exception {
+        String name = "testAddSampleTypes" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = SampleTypeHelper.addSampleTypes(site, name);
 
-        List<SampleTypeWrapper> types = site.getSampleTypeCollection();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
-        types.add(type);
-        site.setSampleTypeCollection(types);
+        site.addSampleTypes(Arrays.asList(type));
         site.persist();
 
         site.reload();
@@ -293,16 +290,15 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testSetSampleTypeCollectionRemove() throws Exception {
-        String name = "testSetSampleTypeCollectionRemove" + r.nextInt();
+    public void testRemoveSampleTypes() throws Exception {
+        String name = "testRemoveSampleTypes" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = SampleTypeHelper.addSampleTypes(site, name);
 
-        List<SampleTypeWrapper> types = site.getSampleTypeCollection();
-        SampleTypeWrapper type = DbHelper.chooseRandomlyInList(types);
+        SampleTypeWrapper type = DbHelper.chooseRandomlyInList(site
+            .getSampleTypeCollection());
         int idContainer = type.getId();
-        types.remove(type);
-        site.setSampleTypeCollection(types);
+        site.removeSampleTypes(Arrays.asList(type));
         // don't need to delete the type, thanks to method
         // deleteSampleTypeDifference of persistDependencies
         SampleTypeHelper.removeFromCreated(type);
@@ -322,10 +318,11 @@ public class TestSite extends TestDatabase {
     @Test
     public void testGetAllSampleTypeCollection() throws Exception {
         String name = "testGetAllSampleTypeCollection" + r.nextInt();
-        List<SampleType> types = appService.search(SampleType.class,
-            new SampleType());
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, false);
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = SampleTypeHelper.addSampleTypes(site, name);
+        site.persist();
 
         site.reload();
         List<SampleTypeWrapper> all = site.getAllSampleTypeCollection();

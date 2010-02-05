@@ -31,6 +31,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private Map<String, SitePvAttrWrapper> sitePvAttrMap;
 
+    private List<SampleTypeWrapper> deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
+
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
         sitePvAttrMap = null;
@@ -267,16 +269,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    private void setStudyCollection(Collection<Study> studies, boolean setNull) {
-        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-        wrappedObject.setStudyCollection(studies);
-        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
-            studies);
-        if (setNull) {
-            propertiesMap.put("studyCollection", null);
-        }
-    }
-
     public void addStudies(StudyWrapper... studies) {
         Collection<Study> allStudyObjects = new HashSet<Study>();
         List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
@@ -290,7 +282,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             allStudyObjects.add(study.getWrappedObject());
             allStudyWrappers.add(study);
         }
-        setStudyCollection(allStudyObjects, false);
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(allStudyObjects);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            allStudyObjects);
         propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
@@ -317,16 +312,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getClinicCollection(false);
     }
 
-    private void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
-        Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
-        wrappedObject.setClinicCollection(clinics);
-        propertyChangeSupport.firePropertyChange("clinicCollection",
-            oldClinics, clinics);
-        if (setNull) {
-            propertiesMap.put("clinicCollection", null);
-        }
-    }
-
     public void addClinics(ClinicWrapper... clinics) {
         Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
         List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
@@ -340,7 +325,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             allClinicObjects.add(clinic.getWrappedObject());
             allClinicWrappers.add(clinic);
         }
-        setClinicCollection(allClinicObjects, false);
+        Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
+        wrappedObject.setClinicCollection(allClinicObjects);
+        propertyChangeSupport.firePropertyChange("clinicCollection",
+            oldClinics, allClinicObjects);
         propertiesMap.put("clinicCollection", allClinicWrappers);
     }
 
@@ -370,18 +358,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getContainerTypeCollection(false);
     }
 
-    private void setContainerTypeCollection(Collection<ContainerType> types,
-        boolean setNull) {
-        Collection<ContainerType> oldTypes = wrappedObject
-            .getContainerTypeCollection();
-        wrappedObject.setContainerTypeCollection(types);
-        propertyChangeSupport.firePropertyChange("containerTypeCollection",
-            oldTypes, types);
-        if (setNull) {
-            propertiesMap.put("containerTypeCollection", null);
-        }
-    }
-
     public void addContainerTypes(ContainerTypeWrapper... types) {
         Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
         List<ContainerTypeWrapper> allTypeWrappers = new ArrayList<ContainerTypeWrapper>();
@@ -395,7 +371,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
             allTypeObjects.add(type.getWrappedObject());
             allTypeWrappers.add(type);
         }
-        setContainerTypeCollection(allTypeObjects, false);
+        Collection<ContainerType> oldTypes = wrappedObject
+            .getContainerTypeCollection();
+        wrappedObject.setContainerTypeCollection(allTypeObjects);
+        propertyChangeSupport.firePropertyChange("containerTypeCollection",
+            oldTypes, allTypeObjects);
         propertiesMap.put("containerTypeCollection", allTypeWrappers);
     }
 
@@ -418,18 +398,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return containerCollection;
     }
 
-    private void setContainerCollection(Collection<Container> containers,
-        boolean setNull) {
-        Collection<Container> oldContainers = wrappedObject
-            .getContainerCollection();
-        wrappedObject.setContainerCollection(containers);
-        propertyChangeSupport.firePropertyChange("containerCollection",
-            oldContainers, containers);
-        if (setNull) {
-            propertiesMap.put("containerCollection", null);
-        }
-    }
-
     public void addContainers(ContainerWrapper... containers) {
         Collection<Container> allContainerObjects = new HashSet<Container>();
         List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
@@ -443,7 +411,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
             allContainerObjects.add(container.getWrappedObject());
             allContainerWrappers.add(container);
         }
-        setContainerCollection(allContainerObjects, false);
+        Collection<Container> oldContainers = wrappedObject
+            .getContainerCollection();
+        wrappedObject.setContainerCollection(allContainerObjects);
+        propertyChangeSupport.firePropertyChange("containerCollection",
+            oldContainers, allContainerObjects);
         propertiesMap.put("containerCollection", allContainerWrappers);
     }
 
@@ -536,46 +508,59 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getAllSampleTypeCollection(false);
     }
 
-    public void setSampleTypeCollection(Collection<SampleType> types,
-        boolean setNull) {
-        Collection<SampleType> oldTypes = wrappedObject
-            .getSampleTypeCollection();
-        wrappedObject.setSampleTypeCollection(types);
-        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldTypes, types);
-        if (setNull) {
-            propertiesMap.put("sampleTypeCollection", null);
+    public void addSampleTypes(List<SampleTypeWrapper> types) {
+        Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
+        Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+        // already added types
+        for (SampleTypeWrapper type : getSampleTypeCollection()) {
+            allTypeObjects.add(type.getWrappedObject());
+            allTypeWrappers.add(type);
         }
-    }
-
-    public void setSampleTypeCollection(List<SampleTypeWrapper> types) {
-        Collection<SampleType> typeObjects = new HashSet<SampleType>();
+        // new types
         for (SampleTypeWrapper type : types) {
             type.setSite(wrappedObject);
-            typeObjects.add(type.getWrappedObject());
+            allTypeObjects.add(type.getWrappedObject());
+            allTypeWrappers.add(type);
         }
-        setSampleTypeCollection(typeObjects, false);
-        propertiesMap.put("sampleTypeCollection", types);
+        Collection<SampleType> oldTypes = wrappedObject
+            .getSampleTypeCollection();
+        wrappedObject.setSampleTypeCollection(allTypeObjects);
+        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
+            oldTypes, allTypeObjects);
+        propertiesMap.put("sampleTypeCollection", allTypeWrappers);
+    }
+
+    public void removeSampleTypes(List<SampleTypeWrapper> types) {
+        deletedSampleTypes.addAll(types);
+        Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
+        Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+        // already added types
+        for (SampleTypeWrapper type : getSampleTypeCollection()) {
+            if (!deletedSampleTypes.contains(type)) {
+                allTypeObjects.add(type.getWrappedObject());
+                allTypeWrappers.add(type);
+            }
+        }
+        Collection<SampleType> oldTypes = wrappedObject
+            .getSampleTypeCollection();
+        wrappedObject.setSampleTypeCollection(allTypeObjects);
+        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
+            oldTypes, allTypeObjects);
+        propertiesMap.put("sampleTypeCollection", allTypeWrappers);
     }
 
     /**
      * Removes the sample type objects that are not contained in the collection.
      * 
-     * @param oldCollection
-     * @throws BiobankCheckException
      * @throws Exception
      */
-    private void deleteSampleTypeDifference(Site origSite) throws Exception {
-        List<SampleTypeWrapper> newSampleType = getSampleTypeCollection();
-        List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
-            origSite).getSampleTypeCollection();
-        if (oldSampleSources != null) {
-            for (SampleTypeWrapper st : oldSampleSources) {
-                if ((newSampleType == null) || !newSampleType.contains(st)) {
-                    st.delete();
-                }
+    private void deleteSampleTypeDifference() throws Exception {
+        for (SampleTypeWrapper st : deletedSampleTypes) {
+            if (!st.isNew()) {
+                st.delete();
             }
         }
+        deletedSampleTypes.clear();
     }
 
     @SuppressWarnings("unchecked")
@@ -739,8 +724,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(
                 sitePvAttrMap.values()));
         }
+        deleteSampleTypeDifference();
         if (origObject != null) {
-            deleteSampleTypeDifference(origObject);
+
             deleteSitePvAttrDifference(origObject);
         }
     }
