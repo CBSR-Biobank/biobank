@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,12 +394,7 @@ public class CbsrStudies {
         ss.setQuantity(quantity);
         ss.setVolume(volume);
 
-        List<SampleStorageWrapper> list = study.getSampleStorageCollection();
-        if (list == null) {
-            list = new ArrayList<SampleStorageWrapper>();
-        }
-        list.add(ss);
-        study.setSampleStorageCollection(list);
+        study.addSampleStorages(Arrays.asList(ss));
         study.persist();
         study.reload();
 

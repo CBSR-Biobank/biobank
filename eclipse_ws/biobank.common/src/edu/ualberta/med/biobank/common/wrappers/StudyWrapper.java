@@ -30,6 +30,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
+    private List<SampleStorageWrapper> deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
+
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -289,27 +291,52 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getSampleStorageCollection(false);
     }
 
-    public void setSampleStorageCollection(
-        Collection<SampleStorage> collection, boolean setNull) {
-        Collection<SampleStorage> oldSampleStorage = wrappedObject
-            .getSampleStorageCollection();
-        wrappedObject.setSampleStorageCollection(collection);
-        propertyChangeSupport.firePropertyChange("sampleStorageCollection",
-            oldSampleStorage, collection);
-        if (setNull) {
-            propertiesMap.put("sampleStorageCollection", null);
+    public void addSampleStorages(List<SampleStorageWrapper> newSampleStorages) {
+        Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+        List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
+        // already in list
+        List<SampleStorageWrapper> currentList = getSampleStorageCollection();
+        if (currentList != null) {
+            for (SampleStorageWrapper ss : currentList) {
+                allSsObjects.add(ss.getWrappedObject());
+                allSsWrappers.add(ss);
+            }
         }
+        // new
+        for (SampleStorageWrapper ss : newSampleStorages) {
+            ss.setStudy(wrappedObject);
+            allSsObjects.add(ss.getWrappedObject());
+            allSsWrappers.add(ss);
+        }
+        setSampleStorages(allSsObjects, allSsWrappers);
     }
 
-    public void setSampleStorageCollection(
-        List<SampleStorageWrapper> ssCollection) {
-        Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
-        for (SampleStorageWrapper ss : ssCollection) {
-            ss.setStudy(wrappedObject);
-            ssObjects.add(ss.getWrappedObject());
+    public void removeSampleStorages(
+        List<SampleStorageWrapper> sampleStoragesToRemove) {
+        deletedSampleStorages.addAll(sampleStoragesToRemove);
+        Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+        List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
+        // already in list
+        List<SampleStorageWrapper> currentList = getSampleStorageCollection();
+        if (currentList != null) {
+            for (SampleStorageWrapper ss : currentList) {
+                if (!sampleStoragesToRemove.contains(ss)) {
+                    allSsObjects.add(ss.getWrappedObject());
+                    allSsWrappers.add(ss);
+                }
+            }
         }
-        setSampleStorageCollection(ssObjects, false);
-        propertiesMap.put("sampleStorageCollection", ssCollection);
+        setSampleStorages(allSsObjects, allSsWrappers);
+    }
+
+    private void setSampleStorages(Collection<SampleStorage> allSsObjects,
+        List<SampleStorageWrapper> allSsWrappers) {
+        Collection<SampleStorage> oldSampleStorage = wrappedObject
+            .getSampleStorageCollection();
+        wrappedObject.setSampleStorageCollection(allSsObjects);
+        propertyChangeSupport.firePropertyChange("sampleStorageCollection",
+            oldSampleStorage, allSsObjects);
+        propertiesMap.put("sampleStorageCollection", allSsWrappers);
     }
 
     /*
@@ -334,24 +361,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
     /**
      * Removes the sample storage objects that are not contained in the
      * collection.
-     * 
-     * @param ssCollection
-     * @throws BiobankCheckException
-     * @throws Exception
      */
-    private void deleteSampleStorageDifference(Study origStudy)
-        throws Exception {
-        List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
-        List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
-            appService, origStudy).getSampleStorageCollection();
-        if (oldSampleStorage != null) {
-            for (SampleStorageWrapper st : oldSampleStorage) {
-                if ((newSampleStorage == null)
-                    || !newSampleStorage.contains(st)) {
-                    st.delete();
-                }
+    private void deleteSampleStorages() throws Exception {
+        for (SampleStorageWrapper st : deletedSampleStorages) {
+            if (!st.isNew()) {
+                st.delete();
             }
         }
+        deletedSampleStorages.clear();
     }
 
     @SuppressWarnings("unchecked")
@@ -801,8 +818,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
             setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
                 studyPvAttrMap.values()));
         }
+        deleteSampleStorages();
         if (origObject != null) {
-            deleteSampleStorageDifference(origObject);
             deleteSampleSourceDifference(origObject);
             deleteStudyPvAttrDifference(origObject);
         }
@@ -827,9 +844,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalField() {
         studyPvAttrMap = null;
+        deletedSampleStorages.clear();
     }
 
     @Override

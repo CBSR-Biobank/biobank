@@ -320,9 +320,11 @@ public class StudyEntryForm extends BiobankEntryForm {
             }
         }
 
-        // get sample storages
-        study.setSampleStorageCollection(sampleStorageEntryWidget
-            .getSampleStorage());
+        // sample storages
+        study.addSampleStorages(sampleStorageEntryWidget
+            .getAddedOrModifiedSampleStorages());
+        study.removeSampleStorages(sampleStorageEntryWidget
+            .getDeletedSampleStorages());
 
         study.setContactCollection(contactEntryWidget.getContacts());
         SiteAdapter siteAdapter = studyAdapter
@@ -350,7 +352,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         List<SampleStorageWrapper> sampleStorages = study
             .getSampleStorageCollection();
         if (sampleStorages != null) {
-            sampleStorageEntryWidget.setSampleStorage(sampleStorages);
+            sampleStorageEntryWidget.setSampleStorages(sampleStorages);
         }
 
         setSampleSourceWidgetSelections();

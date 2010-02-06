@@ -333,7 +333,6 @@ public class TestSample extends TestDatabase {
         sample.setQuantityFromType();
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
-        List<SampleStorageWrapper> ssCollection = new ArrayList<SampleStorageWrapper>();
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
         ss1.setSampleType(SampleTypeHelper.addSampleType(sample.getSite(),
             "ss1"));
@@ -351,11 +350,8 @@ public class TestSample extends TestDatabase {
         ss3.setVolume(3.0);
         ss3.setStudy(sample.getPatientVisit().getPatient().getStudy());
         ss3.persist();
-        ssCollection.add(ss1);
-        ssCollection.add(ss2);
-        ssCollection.add(ss3);
-        sample.getPatientVisit().getPatient().getStudy()
-            .setSampleStorageCollection(ssCollection);
+        sample.getPatientVisit().getPatient().getStudy().addSampleStorages(
+            Arrays.asList(ss1, ss2, ss3));
         // should be 3
         sample.setQuantityFromType();
         Assert.assertTrue(sample.getQuantity().equals(3.0));

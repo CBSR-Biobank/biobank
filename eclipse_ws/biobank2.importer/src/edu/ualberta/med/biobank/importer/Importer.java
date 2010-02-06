@@ -630,14 +630,14 @@ public class Importer {
                 shipment.setClinic(clinic);
                 shipment.setWaybill(dateReceivedStr);
                 shipment.setDateReceived(dateReceived);
-                shipment.addPatients(patient);
+                shipment.addPatients(Arrays.asList(patient));
                 shipment.persist();
             } else if (!shipment.hasPatient(patientNr)) {
                 logger.debug("adding to shipment: patient/"
                     + patient.getPnumber() + " clinic/" + clinic.getName()
                     + " shipment/" + dateTimeFormatter.format(dateReceived)
                     + " (" + count + "/" + numShipments + ")");
-                shipment.addPatients(patient);
+                shipment.addPatients(Arrays.asList(patient));
                 shipment.persist();
             } else {
                 logger.debug("already in database: patient/"

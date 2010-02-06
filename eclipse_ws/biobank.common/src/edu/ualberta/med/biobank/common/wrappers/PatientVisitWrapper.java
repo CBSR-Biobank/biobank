@@ -491,8 +491,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalField() {
         pvAttrMap = null;
         studyPvAttrMap = null;
     }

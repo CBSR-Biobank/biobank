@@ -271,13 +271,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    public void addStudies(StudyWrapper... studies) {
+    public void addStudies(List<StudyWrapper> studies) {
         Collection<Study> allStudyObjects = new HashSet<Study>();
         List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
         // already added studies
-        for (StudyWrapper study : getStudyCollection()) {
-            allStudyObjects.add(study.getWrappedObject());
-            allStudyWrappers.add(study);
+        List<StudyWrapper> currentList = getStudyCollection();
+        if (currentList != null) {
+            for (StudyWrapper study : currentList) {
+                allStudyObjects.add(study.getWrappedObject());
+                allStudyWrappers.add(study);
+            }
         }
         // new studies added
         for (StudyWrapper study : studies) {
@@ -314,13 +317,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getClinicCollection(true);
     }
 
-    public void addClinics(ClinicWrapper... clinics) {
+    public void addClinics(List<ClinicWrapper> clinics) {
         Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
         List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
         // already added clinics
-        for (ClinicWrapper clinic : getClinicCollection()) {
-            allClinicObjects.add(clinic.getWrappedObject());
-            allClinicWrappers.add(clinic);
+        List<ClinicWrapper> currentList = getClinicCollection();
+        if (currentList != null) {
+            for (ClinicWrapper clinic : currentList) {
+                allClinicObjects.add(clinic.getWrappedObject());
+                allClinicWrappers.add(clinic);
+            }
         }
         // new clinics
         for (ClinicWrapper clinic : clinics) {
@@ -360,13 +366,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getContainerTypeCollection(false);
     }
 
-    public void addContainerTypes(ContainerTypeWrapper... types) {
+    public void addContainerTypes(List<ContainerTypeWrapper> types) {
         Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
         List<ContainerTypeWrapper> allTypeWrappers = new ArrayList<ContainerTypeWrapper>();
         // already added types
-        for (ContainerTypeWrapper type : getContainerTypeCollection()) {
-            allTypeObjects.add(type.getWrappedObject());
-            allTypeWrappers.add(type);
+        List<ContainerTypeWrapper> currentList = getContainerTypeCollection();
+        if (currentList != null) {
+            for (ContainerTypeWrapper type : currentList) {
+                allTypeObjects.add(type.getWrappedObject());
+                allTypeWrappers.add(type);
+            }
         }
         // new types
         for (ContainerTypeWrapper type : types) {
@@ -400,13 +409,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return containerCollection;
     }
 
-    public void addContainers(ContainerWrapper... containers) {
+    public void addContainers(List<ContainerWrapper> containers) {
         Collection<Container> allContainerObjects = new HashSet<Container>();
         List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
         // already added containers
-        for (ContainerWrapper container : getContainerCollection()) {
-            allContainerObjects.add(container.getWrappedObject());
-            allContainerWrappers.add(container);
+        List<ContainerWrapper> currentList = getContainerCollection();
+        if (currentList != null) {
+            for (ContainerWrapper container : currentList) {
+                allContainerObjects.add(container.getWrappedObject());
+                allContainerWrappers.add(container);
+            }
         }
         // new containers
         for (ContainerWrapper container : containers) {
@@ -514,9 +526,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
         Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
         Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
         // already added types
-        for (SampleTypeWrapper type : getSampleTypeCollection()) {
-            allTypeObjects.add(type.getWrappedObject());
-            allTypeWrappers.add(type);
+        List<SampleTypeWrapper> currentList = getSampleTypeCollection();
+        if (currentList != null) {
+            for (SampleTypeWrapper type : currentList) {
+                allTypeObjects.add(type.getWrappedObject());
+                allTypeWrappers.add(type);
+            }
         }
         // new types
         for (SampleTypeWrapper type : types) {
@@ -524,12 +539,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             allTypeObjects.add(type.getWrappedObject());
             allTypeWrappers.add(type);
         }
-        Collection<SampleType> oldTypes = wrappedObject
-            .getSampleTypeCollection();
-        wrappedObject.setSampleTypeCollection(allTypeObjects);
-        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldTypes, allTypeObjects);
-        propertiesMap.put("sampleTypeCollection", allTypeWrappers);
+        setSampleTypes(allTypeObjects, allTypeWrappers);
     }
 
     public void removeSampleTypes(List<SampleTypeWrapper> types) {
@@ -537,12 +547,20 @@ public class SiteWrapper extends ModelWrapper<Site> {
         Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
         Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
         // already added types
-        for (SampleTypeWrapper type : getSampleTypeCollection()) {
-            if (!deletedSampleTypes.contains(type)) {
-                allTypeObjects.add(type.getWrappedObject());
-                allTypeWrappers.add(type);
+        List<SampleTypeWrapper> currentList = getSampleTypeCollection();
+        if (currentList != null) {
+            for (SampleTypeWrapper type : currentList) {
+                if (!deletedSampleTypes.contains(type)) {
+                    allTypeObjects.add(type.getWrappedObject());
+                    allTypeWrappers.add(type);
+                }
             }
         }
+        setSampleTypes(allTypeObjects, allTypeWrappers);
+    }
+
+    private void setSampleTypes(Collection<SampleType> allTypeObjects,
+        Collection<SampleTypeWrapper> allTypeWrappers) {
         Collection<SampleType> oldTypes = wrappedObject
             .getSampleTypeCollection();
         wrappedObject.setSampleTypeCollection(allTypeObjects);
@@ -744,8 +762,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    protected void resetInternalField() {
         sitePvAttrMap = null;
         pvAttrTypeMap = null;
         deletedSampleTypes.clear();

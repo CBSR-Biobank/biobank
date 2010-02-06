@@ -78,7 +78,7 @@ public class TestSite extends TestDatabase {
         StudyHelper.addStudies(site, name, studiesNber);
 
         StudyWrapper study = StudyHelper.newStudy(site, name + "newStudy");
-        site.addStudies(study);
+        site.addStudies(Arrays.asList(study));
         site.persist();
 
         site.reload();
@@ -158,7 +158,7 @@ public class TestSite extends TestDatabase {
         ClinicHelper.addClinics(site, name, nber);
 
         ClinicWrapper clinic = ClinicHelper.newClinic(site, name + "newClinic");
-        site.addClinics(clinic);
+        site.addClinics(Arrays.asList(clinic));
         site.persist();
 
         site.reload();
@@ -206,7 +206,7 @@ public class TestSite extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.newContainerType(site,
             name + "newType", name, null, 5, 4, false);
-        site.addContainerTypes(type);
+        site.addContainerTypes(Arrays.asList(type));
         site.persist();
 
         site.reload();
@@ -238,7 +238,7 @@ public class TestSite extends TestDatabase {
             site, name);
         ContainerWrapper container = ContainerHelper.newContainer(null, name
             + "newContainer", null, site, type);
-        site.addContainers(container);
+        site.addContainers(Arrays.asList(container));
         site.persist();
 
         site.reload();

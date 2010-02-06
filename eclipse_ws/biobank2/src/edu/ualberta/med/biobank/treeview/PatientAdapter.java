@@ -44,9 +44,17 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
-            + getParentFromClass(StudyAdapter.class).getLabel() + " - "
-            + getTooltipText("Patient");
+        SiteAdapter siteAdapter = getParentFromClass(SiteAdapter.class);
+        StudyAdapter studyAdapter = getParentFromClass(StudyAdapter.class);
+        StringBuffer text = new StringBuffer();
+        if (siteAdapter != null) {
+            text.append(siteAdapter.getLabel()).append(" - ");
+        }
+        if (studyAdapter != null) {
+            text.append(studyAdapter.getLabel()).append(" - ");
+        }
+        text.append(getTooltipText("Patient"));
+        return text.toString();
     }
 
     @Override

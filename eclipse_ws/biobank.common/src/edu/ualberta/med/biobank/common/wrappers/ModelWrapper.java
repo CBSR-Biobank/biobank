@@ -91,6 +91,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             firePropertyChanges(oldValue, wrappedObject);
         }
         propertiesMap.clear();
+        resetInternalField();
     }
 
     /**
@@ -201,6 +202,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             reload();
         }
         propertiesMap.clear();
+        resetInternalField();
     }
 
     /**
@@ -278,4 +280,47 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return appService.search(classType, instance);
     }
 
+    /**
+     * If we want to reset internal fields when reload or reset is called (even
+     * if the object is new).
+     */
+    protected void resetInternalField() {
+        // default do nothing
+    }
+
+    /**
+     * this method is used in the equals method. If it is not redefined in
+     * subclasses, we want it to return something better than the default
+     * toString
+     */
+    @Override
+    public String toString() {
+        Class<E> classType = getWrappedClass();
+        if (classType != null) {
+            StringBuffer sb = new StringBuffer();
+            Method[] methods = classType.getMethods();
+            for (Method method : methods) {
+                String name = method.getName();
+                Class<?> returnType = method.getReturnType();
+                if (name.startsWith("get")
+                    && !name.equals("getClass")
+                    && (String.class.isAssignableFrom(returnType) || Number.class
+                        .isAssignableFrom(returnType))) {
+                    try {
+                        Object res = method.invoke(wrappedObject,
+                            (Object[]) null);
+                        if (res != null) {
+                            sb.append(name).append(":").append(res.toString())
+                                .append("/");
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error in toString method",
+                            e);
+                    }
+                }
+            }
+            return sb.toString();
+        }
+        return super.toString();
+    }
 }

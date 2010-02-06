@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -50,6 +48,10 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private List<SampleStorageWrapper> selectedSampleStorages;
 
+    private List<SampleStorageWrapper> addedOrModifiedSampleStorages;
+
+    private List<SampleStorageWrapper> deletedSampleStorages;
+
     /**
      * 
      * @param parent a composite control which will be the parent of the new
@@ -66,12 +68,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
+
         getSampleTypes(site);
-        if (sampleStorageCollection == null) {
-            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
-        } else {
-            selectedSampleStorages = sampleStorageCollection;
-        }
+        setSampleStorages(sampleStorageCollection);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -111,6 +110,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 selectedSampleStorages.add(dlg.getSampleStorage());
             }
             sampleStorageTable.setCollection(selectedSampleStorages);
+            addedOrModifiedSampleStorages.add(dlg.getSampleStorage());
             notifyListeners();
         }
     }
@@ -146,18 +146,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                         + sampleStorage.getSampleType().getName() + "\"?");
 
                 if (confirm) {
-                    Collection<SampleStorageWrapper> ssToDelete = new HashSet<SampleStorageWrapper>();
-                    for (SampleStorageWrapper ss : selectedSampleStorages) {
-                        if (ss.getSampleType().getName().equals(
-                            sampleStorage.getSampleType().getName()))
-                            ssToDelete.add(ss);
-                    }
-
-                    for (SampleStorageWrapper ss : ssToDelete) {
-                        selectedSampleStorages.remove(ss);
-                    }
-
+                    selectedSampleStorages.remove(sampleStorage);
                     sampleStorageTable.setCollection(selectedSampleStorages);
+                    deletedSampleStorages.add(sampleStorage);
                     notifyListeners();
                 }
             }
@@ -174,13 +165,25 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         }
     }
 
-    public List<SampleStorageWrapper> getSampleStorage() {
-        return sampleStorageTable.getCollection();
+    public List<SampleStorageWrapper> getAddedOrModifiedSampleStorages() {
+        return addedOrModifiedSampleStorages;
     }
 
-    public void setSampleStorage(List<SampleStorageWrapper> sampleStorage) {
-        selectedSampleStorages = sampleStorage;
-        sampleStorageTable.setCollection(sampleStorage);
+    public List<SampleStorageWrapper> getDeletedSampleStorages() {
+        return deletedSampleStorages;
+    }
+
+    public void setSampleStorages(List<SampleStorageWrapper> sampleStorages) {
+        if (sampleStorages == null) {
+            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        } else {
+            selectedSampleStorages = sampleStorages;
+        }
+        if (sampleStorageTable != null) {
+            sampleStorageTable.setCollection(selectedSampleStorages);
+        }
+        addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
     }
 
     @Override

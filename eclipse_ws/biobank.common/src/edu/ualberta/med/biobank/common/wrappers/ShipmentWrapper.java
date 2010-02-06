@@ -296,48 +296,50 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return getPatientCollection(false);
     }
 
-    private void setPatientCollection(Collection<Patient> patients,
-        boolean setNull) {
+    private void setPatients(Collection<Patient> allPatientObjects,
+        List<PatientWrapper> allPatientWrappers) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
-        wrappedObject.setPatientCollection(patients);
+        wrappedObject.setPatientCollection(allPatientObjects);
         propertyChangeSupport.firePropertyChange("patientCollection",
-            oldPatients, patients);
-        if (setNull) {
-            propertiesMap.put("patientCollection", null);
-        }
+            oldPatients, allPatientObjects);
+        propertiesMap.put("patientCollection", allPatientWrappers);
     }
 
-    private void setPatientCollection(List<PatientWrapper> patients) {
-        Collection<Patient> patientsObjects = new HashSet<Patient>();
-        for (PatientWrapper p : patients) {
-            patientsObjects.add(p.getWrappedObject());
-        }
-        setPatientCollection(patientsObjects, false);
-        propertiesMap.put("patientCollection", patients);
-    }
-
-    public void addPatients(PatientWrapper... patients) {
-        List<PatientWrapper> patientsList = getPatientCollection();
-        if (patientsList == null) {
-            patientsList = new ArrayList<PatientWrapper>();
-        }
-        for (PatientWrapper patient : patients) {
-            patientsAdded.add(patient);
-            patientsList.add(patient);
-        }
-        setPatientCollection(patientsList);
-    }
-
-    public void removePatients(PatientWrapper... patients) {
+    public void addPatients(List<PatientWrapper> newPatients) {
+        Collection<Patient> allPatientsObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
+        // already in list
         List<PatientWrapper> patientsList = getPatientCollection();
         if (patientsList != null) {
-            for (PatientWrapper patient : patients) {
-                patientsAdded.remove(patient);
-                patientsList.remove(patient);
-                patientsAdded.remove(patient);
+            for (PatientWrapper patient : patientsList) {
+                allPatientsObjects.add(patient.getWrappedObject());
+                allPatientsWrappers.add(patient);
             }
-            setPatientCollection(patientsList);
         }
+        // new patients
+        for (PatientWrapper patient : newPatients) {
+            patientsAdded.add(patient);
+            allPatientsObjects.add(patient.getWrappedObject());
+            allPatientsWrappers.add(patient);
+        }
+        setPatients(allPatientsObjects, allPatientsWrappers);
+    }
+
+    public void removePatients(List<PatientWrapper> patientsToRemove) {
+        patientsAdded.removeAll(patientsToRemove);
+        Collection<Patient> allPatientsObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
+        // already in list
+        List<PatientWrapper> patientsList = getPatientCollection();
+        if (patientsList != null) {
+            for (PatientWrapper patient : patientsList) {
+                if (!patientsToRemove.contains(patient)) {
+                    allPatientsObjects.add(patient.getWrappedObject());
+                    allPatientsWrappers.add(patient);
+                }
+            }
+        }
+        setPatients(allPatientsObjects, allPatientsWrappers);
     }
 
     @Override
@@ -383,8 +385,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    public void reset() throws Exception {
-        super.reset();
+    public void resetInternalField() {
         patientsAdded.clear();
     }
 }

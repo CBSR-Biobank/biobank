@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -145,7 +146,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                 + " has already been added to this shipment");
             return;
         }
-        shipment.addPatients(patient);
+        shipment.addPatients(Arrays.asList(patient));
         patientTable.setCollection(shipment.getPatientCollection());
         notifyListeners();
     }
@@ -169,7 +170,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                             + patient.getPnumber() + "\" for this shipment ?");
 
                     if (confirm) {
-                        shipment.removePatients(patient);
+                        shipment.removePatients(Arrays.asList(patient));
                         patientTable.setCollection(shipment
                             .getPatientCollection());
                         notifyListeners();

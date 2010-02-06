@@ -194,19 +194,16 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetSampleStorageCollectionAdd() throws Exception {
-        String name = "testSetSampleStorageCollectionAdd" + r.nextInt();
+    public void testAddSampleStorages() throws Exception {
+        String name = "testAddSampleStorages" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleStorageHelper.addSampleStorages(study, name);
 
-        List<SampleStorageWrapper> storages = study
-            .getSampleStorageCollection();
         SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
         SampleStorageWrapper newStorage = SampleStorageHelper.newSampleStorage(
             study, type);
-        storages.add(newStorage);
-        study.setSampleStorageCollection(storages);
+        study.addSampleStorages(Arrays.asList(newStorage));
         study.persist();
 
         study.reload();
@@ -216,8 +213,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetSampleStorageCollectionRemove() throws Exception {
-        String name = "testSetSampleStorageCollectionRemove" + r.nextInt();
+    public void testRemoveSampleStorages() throws Exception {
+        String name = "testRemoveSampleStorages" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleStorageHelper.addSampleStorages(study, name);
@@ -225,10 +222,7 @@ public class TestStudy extends TestDatabase {
         List<SampleStorageWrapper> storages = study
             .getSampleStorageCollection();
         SampleStorageWrapper storage = DbHelper.chooseRandomlyInList(storages);
-        storages.remove(storage);
-        // don't have to delete the storage thanks to
-        // deleteSampleStorageDifference method
-        study.setSampleStorageCollection(storages);
+        study.removeSampleStorages(Arrays.asList(storage));
         study.persist();
 
         study.reload();
