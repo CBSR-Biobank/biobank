@@ -687,29 +687,46 @@ public class TestStudy extends TestDatabase {
         ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
             + "CONTACT2");
 
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact1);
-        contacts.add(contact2);
-
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.setContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.setContactCollection(Arrays.asList(contact2));
+        study2.persist();
+
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        PatientWrapper patient2 = PatientHelper
+            .addPatient(name + "_p2", study2);
+        PatientWrapper patient3 = PatientHelper
+            .addPatient(name + "_p3", study1);
+
         ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
-            patient1);
+            patient1, patient3);
         ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
-            patient1);
+            patient1, patient2);
+
+        // shipment1 has patient visits for patient1 and patient3
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();
-        int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
+        int nber2 = PatientVisitHelper.addPatientVisits(patient3, shipment1)
+            .size();
+
+        // shipment 2 has patient visits for patient1 and patient2
+        int nber3 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
+            .size();
+        int nber4 = PatientVisitHelper.addPatientVisits(patient2, shipment2)
             .size();
 
         study1.reload();
         clinic1.reload();
         clinic2.reload();
-        Assert
-            .assertEquals(nber, study1.getPatientVisitCountForClinic(clinic1));
-        Assert.assertEquals(nber2, study1
+
+        Assert.assertEquals(nber + nber2, study1
+            .getPatientVisitCountForClinic(clinic1));
+        Assert.assertEquals(nber3, study1
+            .getPatientVisitCountForClinic(clinic2));
+        Assert.assertEquals(nber4, study2
             .getPatientVisitCountForClinic(clinic2));
     }
 
