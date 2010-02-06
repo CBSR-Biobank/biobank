@@ -19,7 +19,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicAdapter clinicAdapter;
 
-    private ClinicWrapper clinicWrapper;
+    private ClinicWrapper clinic;
 
     private ContactInfoTable contactsTable;
 
@@ -35,6 +35,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private Text visitTotal;
 
+    private Text shipmentTotal;
+
     private ShipmentInfoTable shipmentsTable;
 
     @Override
@@ -44,14 +46,14 @@ public class ClinicViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         clinicAdapter = (ClinicAdapter) adapter;
-        clinicWrapper = clinicAdapter.getWrapper();
-        clinicWrapper.reload();
-        setPartName("Clinic: " + clinicWrapper.getName());
+        clinic = clinicAdapter.getWrapper();
+        clinic.reload();
+        setPartName("Clinic: " + clinic.getName());
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Clinic: " + clinicWrapper.getName());
+        form.setText("Clinic: " + clinic.getName());
 
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
@@ -59,7 +61,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CLINIC));
         createClinicSection();
-        createAddressSection(clinicWrapper);
+        createAddressSection(clinic);
         createContactsSection();
         createStudiesSection();
         createShipmentsSection();
@@ -77,6 +79,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
+        shipmentTotal = createReadOnlyField(client, SWT.NONE, "Total Shipments");
         patientTotal = createReadOnlyField(client, SWT.NONE, "Total Patients");
         visitTotal = createReadOnlyField(client, SWT.NONE,
             "Total Patient Visits");
@@ -85,18 +88,18 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void setClinicValues() throws Exception {
-        setTextValue(siteLabel, clinicWrapper.getSite().getName());
-        setTextValue(activityStatusLabel, clinicWrapper.getActivityStatus());
-        setTextValue(commentLabel, clinicWrapper.getComment());
-        setTextValue(patientTotal, clinicWrapper.getPatientCount());
-        setTextValue(visitTotal, clinicWrapper.getPatientVisitCollection()
-            .size());
+        setTextValue(siteLabel, clinic.getSite().getName());
+        setTextValue(activityStatusLabel, clinic.getActivityStatus());
+        setTextValue(commentLabel, clinic.getComment());
+        setTextValue(shipmentTotal, clinic.getShipmentCollection().size());
+        setTextValue(patientTotal, clinic.getPatientCount());
+        setTextValue(visitTotal, clinic.getPatientVisitCollection().size());
     }
 
     private void createContactsSection() {
         Composite client = createSectionWithClient("Contacts");
 
-        contactsTable = new ContactInfoTable(client, clinicWrapper
+        contactsTable = new ContactInfoTable(client, clinic
             .getContactCollection());
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
@@ -108,7 +111,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createStudiesSection() throws Exception {
         Composite client = createSectionWithClient("Studies");
 
-        studiesTable = new ClinicStudyInfoTable(client, clinicWrapper);
+        studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
@@ -119,7 +122,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     protected void createShipmentsSection() {
         Composite client = createSectionWithClient("Shipments");
 
-        shipmentsTable = new ShipmentInfoTable(client, clinicWrapper);
+        shipmentsTable = new ShipmentInfoTable(client, clinic);
         shipmentsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(shipmentsTable);
 
@@ -135,12 +138,12 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     @Override
     protected void reload() throws Exception {
-        clinicWrapper.reload();
-        setPartName("Clinic: " + clinicWrapper.getName());
-        form.setText("Clinic: " + clinicWrapper.getName());
+        clinic.reload();
+        setPartName("Clinic: " + clinic.getName());
+        form.setText("Clinic: " + clinic.getName());
         setClinicValues();
-        setAdressValues(clinicWrapper);
-        studiesTable.setCollection(clinicWrapper.getStudyCollection());
+        setAdressValues(clinic);
+        studiesTable.setCollection(clinic.getStudyCollection());
     }
 
     @Override
