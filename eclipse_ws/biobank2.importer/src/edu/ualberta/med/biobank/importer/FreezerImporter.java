@@ -190,13 +190,6 @@ public class FreezerImporter {
 
         PatientVisitWrapper visit = visits.get(0);
 
-        if (sampleTypeNameShort.equals("RNA Later")) {
-            sampleTypeNameShort = "RNA Biopsy";
-        } else if (sampleTypeNameShort.equals("Plasma LH")) {
-            sampleTypeNameShort = "Lith Hep Plasma";
-        } else if (sampleTypeNameShort.equals("PFP")) {
-            sampleTypeNameShort = "PF Plasma";
-        }
         SampleTypeWrapper sampleType = Importer
             .getSampleType(sampleTypeNameShort);
 
