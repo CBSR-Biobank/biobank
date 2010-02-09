@@ -28,12 +28,14 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class InfoTableWidget<T> extends BiobankWidget {
 
-    private TableViewer tableViewer;
-
     private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
         .getName());
 
+    protected TableViewer tableViewer;
+
     protected List<BiobankCollectionModel> model;
+
+    protected List<TableViewerColumn> tableViewColumns;
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
         String[] headings, int[] bounds) {
@@ -54,6 +56,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
+        tableViewColumns = new ArrayList<TableViewerColumn>();
+
         int index = 0;
         for (String name : headings) {
             final TableViewerColumn col = new TableViewerColumn(tableViewer,
@@ -71,6 +75,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
                     col.getColumn().pack();
                 }
             });
+            tableViewColumns.add(col);
             index++;
         }
         tableViewer.setColumnProperties(headings);
