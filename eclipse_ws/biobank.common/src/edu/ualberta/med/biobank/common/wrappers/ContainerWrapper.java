@@ -24,8 +24,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends
@@ -832,32 +830,28 @@ public class ContainerWrapper extends
      */
     public boolean deleteChildrenWithType(ContainerTypeWrapper type,
         Set<RowColPos> positions) throws BiobankCheckException, Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        boolean oneChildrenDeleted = false;
         if (positions == null) {
             for (ContainerWrapper child : getChildren().values()) {
-                addToDeleteList(queries, child, type);
+                oneChildrenDeleted = deleteChild(type, child);
             }
         } else {
             for (RowColPos rcp : positions) {
                 ContainerWrapper child = getChild(rcp);
-                addToDeleteList(queries, child, type);
+                oneChildrenDeleted = deleteChild(type, child);
             }
         }
-        if (queries.size() > 0) {
-            appService.executeBatchQuery(queries);
-            reload();
+        reload();
+        return oneChildrenDeleted;
+    }
+
+    private boolean deleteChild(ContainerTypeWrapper type,
+        ContainerWrapper child) throws Exception {
+        if (type == null || child.getContainerType().equals(type)) {
+            child.delete();
             return true;
         }
         return false;
-    }
-
-    private void addToDeleteList(List<SDKQuery> queries,
-        ContainerWrapper child, ContainerTypeWrapper type)
-        throws BiobankCheckException, ApplicationException {
-        if (type == null || child.getContainerType().equals(type)) {
-            child.deleteChecks();
-            queries.add(new DeleteExampleQuery(child.getWrappedObject()));
-        }
     }
 
     @Override
