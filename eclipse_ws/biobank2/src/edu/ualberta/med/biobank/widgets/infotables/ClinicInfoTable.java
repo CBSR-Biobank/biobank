@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
@@ -31,11 +30,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         info.patientVisits = pvs.size();
         info.activityStatus = clinic.getActivityStatus();
         info.studies = clinic.getStudyCollection().size();
-        HashSet<Integer> patients = new HashSet<Integer>();
-        for (int i = 0; i < pvs.size(); i++) {
-            patients.add(pvs.get(i).getPatient().getId());
-        }
-        info.patients = patients.size();
+        info.patients = clinic.getPatientCount();
         return info;
     }
 }

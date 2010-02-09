@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -20,7 +21,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -28,12 +28,14 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class InfoTableWidget<T> extends BiobankWidget {
 
-    private TableViewer tableViewer;
-
     private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
         .getName());
 
+    protected TableViewer tableViewer;
+
     protected List<BiobankCollectionModel> model;
+
+    protected List<TableViewerColumn> tableViewColumns;
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
         String[] headings, int[] bounds) {
@@ -44,8 +46,6 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
         tableViewer = new TableViewer(this, SWT.BORDER // | SWT.MULTI
             | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
-        tableViewer.setLabelProvider(getLabelProvider());
-        tableViewer.setContentProvider(new ArrayContentProvider());
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());
@@ -56,28 +56,35 @@ public class InfoTableWidget<T> extends BiobankWidget {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
+        tableViewColumns = new ArrayList<TableViewerColumn>();
+
         int index = 0;
         for (String name : headings) {
-            final TableColumn col = new TableColumn(table, SWT.NONE);
-            col.setText(name);
+            final TableViewerColumn col = new TableViewerColumn(tableViewer,
+                SWT.NONE);
+            col.getColumn().setText(name);
             if (bounds == null || bounds[index] == -1) {
-                col.pack();
+                col.getColumn().pack();
             } else {
-                col.setWidth(bounds[index]);
+                col.getColumn().setWidth(bounds[index]);
             }
-            col.setResizable(true);
-            col.addListener(SWT.SELECTED, new Listener() {
+            col.getColumn().setResizable(true);
+            col.getColumn().setMoveable(true);
+            col.getColumn().addListener(SWT.SELECTED, new Listener() {
                 public void handleEvent(Event event) {
-                    col.pack();
+                    col.getColumn().pack();
                 }
             });
+            tableViewColumns.add(col);
             index++;
         }
         tableViewer.setColumnProperties(headings);
         tableViewer.setUseHashlookup(true);
+        tableViewer.setLabelProvider(getLabelProvider());
+        tableViewer.setContentProvider(new ArrayContentProvider());
 
         model = new ArrayList<BiobankCollectionModel>();
-        getTableViewer().setInput(model);
+        tableViewer.setInput(model);
 
         if (collection != null) {
             for (int i = 0, n = collection.size(); i < n; ++i) {
@@ -94,6 +101,12 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
         tableViewer.addDoubleClickListener(listener);
+    }
+
+    @Override
+    public boolean setFocus() {
+        tableViewer.getControl().setFocus();
+        return true;
     }
 
     public void addSelectionListener(SelectionListener listener) {

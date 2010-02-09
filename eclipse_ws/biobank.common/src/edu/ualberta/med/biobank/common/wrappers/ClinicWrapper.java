@@ -472,6 +472,21 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getName();
     }
 
+    public long getPatientCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
+            + Clinic.class.getName() + " as clinic"
+            + " join clinic.shipmentCollection as shipments"
+            + " join shipments.patientCollection as patients"
+            + " where clinic.id=?", Arrays.asList(new Object[] { getId() }));
+
+        List<Long> result = appService.query(c);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
+    }
+
     @SuppressWarnings("unchecked")
     public List<PatientVisitWrapper> getPatientVisitCollection()
         throws ApplicationException {

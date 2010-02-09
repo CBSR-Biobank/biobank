@@ -19,8 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
@@ -272,26 +270,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return String.valueOf(siteClinicInfo.patients);
             case 4:
                 return String.valueOf(siteClinicInfo.patientVisits);
-            }
-        } else if (element instanceof ShipmentWrapper) {
-            ShipmentWrapper ship = (ShipmentWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return ship.getFormattedDateReceived();
-            case 1:
-                return ship.getWaybill();
-            case 2:
-                ShippingCompanyWrapper company = ship.getShippingCompany();
-                if (company != null) {
-                    return company.getName();
-                }
-                return "";
-            case 3:
-                List<PatientWrapper> patients = ship.getPatientCollection();
-                if (patients == null) {
-                    return "0";
-                }
-                return new Integer(patients.size()).toString();
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());

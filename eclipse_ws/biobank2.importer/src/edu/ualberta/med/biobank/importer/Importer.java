@@ -72,6 +72,16 @@ public class Importer {
 
     private static ArrayList<String> tables;
 
+    public static final Map<String, String> newSampleTypeName;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("DNA(WBC)", "DNA (WBC)");
+        aMap.put("PFP", "PF Plasma");
+        aMap.put("Plasma LH", "Lith Hep Plasma");
+        aMap.put("RNA Later", "RNA Biopsy");
+        newSampleTypeName = Collections.unmodifiableMap(aMap);
+    }
+
     private static final Map<String, String> newStudyShortNameMap;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
@@ -238,12 +248,14 @@ public class Importer {
         initTopContainersMap();
 
         checkSampleTypes();
+        checkContainerConfiguration();
 
         if (configuration.importPatients()) {
             importPatients();
         } else if (getPatientCount() == 0) {
-            throw new Exception(
-                "cannot run importer without patients in biobank2 database");
+            logger
+                .error("cannot run importer without patients in biobank2 database");
+            System.exit(2);
         } else {
             logger.info("not configured for importing patients");
         }
@@ -315,6 +327,10 @@ public class Importer {
     }
 
     public static SampleTypeWrapper getSampleType(String nameShort) {
+        String newName = newSampleTypeName.get(nameShort);
+        if (newName != null) {
+            nameShort = newName;
+        }
         return sampleTypeMap.get(nameShort);
     }
 
@@ -342,10 +358,12 @@ public class Importer {
         }
 
         // report missing sample types
+        //
+        // "CDPA Plas" is not being used in BioBank2
         int missing = 0;
         for (String nameShort : bbpdbSampleTypeMap.keySet()) {
             if ((sampleTypeMap.get(nameShort) != null)
-                || nameShort.equals("PFP") || nameShort.equals("Plasma LH")
+                || (newSampleTypeName.get(nameShort) != null)
                 || nameShort.equals("CDPA Plas"))
                 continue;
 
@@ -359,6 +377,108 @@ public class Importer {
         // throw new Exception("There are missing sample types. "
         // + "Container sample types require adjustments.");
         // }
+    }
+
+    private static void checkContainerConfiguration() throws Exception {
+        if (!checkCabinetConfiguration() || !checkFreezerConfiguration()) {
+            logger.error("container configuration failed");
+            System.exit(1);
+        }
+    }
+
+    private static boolean checkCabinetConfiguration() throws Exception {
+        Statement s = con.createStatement();
+        s.execute("select cnum, drawer, bin from cabinet "
+            + "where inventory_id is not null "
+            + "group by cnum, drawer, bin order by cnum, drawer, bin");
+        ResultSet rs = s.getResultSet();
+        if (rs == null) {
+            throw new Exception("Database query returned null");
+        }
+
+        int errorCount = 0;
+        while (rs.next()) {
+            int cabinetNr = rs.getInt(1);
+            String drawerNr = rs.getString(2);
+            int binNr = rs.getInt(3);
+            String label = String.format("%02d%s%02d", new Object[] {
+                Integer.valueOf(cabinetNr), drawerNr, Integer.valueOf(binNr) });
+            List<ContainerWrapper> binList = ContainerWrapper
+                .getContainersInSite(appService, cbsrSite, label);
+            if (binList.size() == 0) {
+                logger.error("bin " + label
+                    + " not present in biobank configuration");
+                ++errorCount;
+            } else if ((cabinetNr == 1) || (cabinetNr == 2)) {
+                boolean binFound = false;
+                for (ContainerWrapper bin : binList) {
+                    if (bin.getContainerType().getName().contains("Bin")) {
+                        binFound = true;
+                    }
+                }
+                if (!binFound) {
+                    logger.error("bin " + label
+                        + " not present in biobank configuration");
+                    ++errorCount;
+                }
+            } else if (binList.size() > 1) {
+                logger.error("more than 1 pallet with label " + label);
+                ++errorCount;
+            }
+        }
+        return (errorCount == 0);
+    }
+
+    private static boolean checkFreezerConfiguration() throws Exception {
+        Statement s = con.createStatement();
+        s.execute("select fnum, rack, box from freezer "
+            + "where inventory_id is not null group by fnum, rack, box "
+            + "order by fnum, rack, box");
+        ResultSet rs = s.getResultSet();
+        if (rs == null)
+            throw new Exception("Database query returned null");
+
+        int errorCount = 0;
+        while (rs.next()) {
+            int freezerNr = rs.getInt(1);
+            String hotelNr = rs.getString(2);
+            int palletNr = rs.getInt(3);
+            if ((freezerNr != 2 || !hotelNr.startsWith("C")) && freezerNr != 4) {
+                String label;
+                if (freezerNr == 99)
+                    label = String.format("Sent Samples%s%02d", new Object[] {
+                        hotelNr, Integer.valueOf(palletNr) });
+                else
+                    label = String.format("%02d%s%02d", new Object[] {
+                        Integer.valueOf(freezerNr), hotelNr,
+                        Integer.valueOf(palletNr) });
+                List<ContainerWrapper> palletList = ContainerWrapper
+                    .getContainersInSite(appService, cbsrSite, label);
+                if (palletList.size() == 0) {
+                    logger.error("pallet " + label
+                        + " not present in biobank configuration");
+                    ++errorCount;
+                } else if ((freezerNr == 1) || (freezerNr == 2)) {
+                    boolean palletFound = false;
+                    for (ContainerWrapper bin : palletList) {
+                        if (bin.getContainerType().getName().contains("Box")
+                            || bin.getContainerType().getName().contains(
+                                "Pallet")) {
+                            palletFound = true;
+                        }
+                    }
+                    if (!palletFound) {
+                        logger.error("pallet " + label
+                            + " not present in biobank configuration");
+                        ++errorCount;
+                    }
+                } else if (palletList.size() > 1) {
+                    logger.error("more than 1 pallet with label " + label);
+                    ++errorCount;
+                }
+            }
+        }
+        return (errorCount == 0);
     }
 
     @SuppressWarnings("unused")
