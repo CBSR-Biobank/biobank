@@ -89,8 +89,8 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testSetContactCollectionAdd() throws Exception {
-        String name = "testSetContactCollectionAdd" + r.nextInt();
+    public void testAddContacts() throws Exception {
+        String name = "testAddContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         int nber = r.nextInt(5) + 1;
@@ -98,10 +98,8 @@ public class TestClinic extends TestDatabase {
             ContactHelper.addContact(clinic, name + i);
         }
         clinic.reload();
-        List<ContactWrapper> contacts = clinic.getContactCollection();
         ContactWrapper contact = ContactHelper.newContact(clinic, name + "NEW");
-        contacts.add(contact);
-        clinic.setContactCollection(contacts);
+        clinic.addContacts(Arrays.asList(contact));
         clinic.persist();
 
         clinic.reload();
@@ -110,8 +108,8 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testSetContactCollectionRemove() throws Exception {
-        String name = "testSetContactCollectionRemove" + r.nextInt();
+    public void testRemoveContacts() throws Exception {
+        String name = "testRemoveContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         int nber = r.nextInt(5) + 1;
@@ -121,8 +119,7 @@ public class TestClinic extends TestDatabase {
         clinic.reload();
         List<ContactWrapper> contacts = clinic.getContactCollection();
         ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
-        contacts.remove(contact);
-        clinic.setContactCollection(contacts);
+        clinic.removeContacts(Arrays.asList(contact));
         clinic.persist();
 
         clinic.reload();

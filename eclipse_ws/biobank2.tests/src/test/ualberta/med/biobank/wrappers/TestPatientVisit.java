@@ -589,7 +589,7 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testSetPvSampleSourceCollection() throws Exception {
+    public void testAddPvSampleSources() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 
@@ -600,7 +600,7 @@ public class TestPatientVisit extends TestDatabase {
         ss2 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
             .getAllSampleSources(appService).get(1).getName(), visit);
 
-        visit.setPvSampleSourceCollection(Arrays.asList(ss1, ss2));
+        visit.addPvSampleSources(Arrays.asList(ss1, ss2));
         visit.persist();
 
         visit.reload();
@@ -613,9 +613,10 @@ public class TestPatientVisit extends TestDatabase {
         ss3 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
             .getAllSampleSources(appService).get(1).getName(), visit);
 
-        list.remove(0);
-        list.add(ss3);
-        visit.setPvSampleSourceCollection(list);
+        PvSampleSourceWrapper pvss = list.get(0);
+        visit.removePvSampleSources(Arrays.asList(pvss));
+        visit.addPvSampleSources(Arrays.asList(ss3));
+
         visit.persist();
 
         list = visit.getPvSampleSourceCollection();

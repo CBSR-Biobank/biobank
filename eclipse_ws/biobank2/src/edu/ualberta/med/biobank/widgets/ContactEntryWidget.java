@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
@@ -30,6 +32,10 @@ public class ContactEntryWidget extends BiobankWidget {
 
     private Collection<ContactWrapper> selectedContacts;
 
+    private List<ContactWrapper> addedOrModifiedContacts;
+
+    private List<ContactWrapper> deletedContacts;
+
     private ContactInfoTable contactInfoTable;
 
     private Button addClinicButton;
@@ -42,10 +48,7 @@ public class ContactEntryWidget extends BiobankWidget {
         this.clinic = clinic;
         Assert.isNotNull(toolkit, "toolkit is null");
 
-        selectedContacts = clinic.getContactCollection();
-        if (selectedContacts == null) {
-            selectedContacts = new HashSet<ContactWrapper>();
-        }
+        setContacts(clinic);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -69,6 +72,15 @@ public class ContactEntryWidget extends BiobankWidget {
                     .getAppService()));
             }
         });
+    }
+
+    private void setContacts(ClinicWrapper clinic) {
+        selectedContacts = clinic.getContactCollection();
+        if (selectedContacts == null) {
+            selectedContacts = new HashSet<ContactWrapper>();
+        }
+        addedOrModifiedContacts = new ArrayList<ContactWrapper>();
+        deletedContacts = new ArrayList<ContactWrapper>();
     }
 
     private void addTableMenu() {
@@ -107,16 +119,8 @@ public class ContactEntryWidget extends BiobankWidget {
                         + contactWrapper.getClinic().getName() + "\"");
 
                 if (confirm) {
-                    Collection<ContactWrapper> contactToDelete = new HashSet<ContactWrapper>();
-                    for (ContactWrapper cw : selectedContacts) {
-                        if (cw.getName().equals(contactWrapper.getName()))
-                            contactToDelete.add(cw);
-                    }
-
-                    for (ContactWrapper c : contactToDelete) {
-                        selectedContacts.remove(c);
-                    }
-
+                    deletedContacts.add(contactWrapper);
+                    selectedContacts.remove(contactWrapper);
                     contactInfoTable.setCollection(selectedContacts);
                     notifyListeners();
                 }
@@ -133,13 +137,22 @@ public class ContactEntryWidget extends BiobankWidget {
                 ContactWrapper contact = dlg.getContactWrapper();
                 contact.setClinic(clinic);
                 selectedContacts.add(contact);
+                addedOrModifiedContacts.add(contact);
             }
             contactInfoTable.setCollection(selectedContacts);
             notifyListeners();
         }
     }
 
-    public Collection<ContactWrapper> getContacts() {
-        return contactInfoTable.getCollection();
+    // public Collection<ContactWrapper> getContacts() {
+    // return contactInfoTable.getCollection();
+    // }
+
+    public List<ContactWrapper> getAddedOrModifedContacts() {
+        return addedOrModifiedContacts;
+    }
+
+    public List<ContactWrapper> getDeletedContacts() {
+        return deletedContacts;
     }
 }

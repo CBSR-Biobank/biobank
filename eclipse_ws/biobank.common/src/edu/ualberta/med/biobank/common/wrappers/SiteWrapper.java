@@ -538,6 +538,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             type.setSite(wrappedObject);
             allTypeObjects.add(type.getWrappedObject());
             allTypeWrappers.add(type);
+            deletedSampleTypes.remove(type);
         }
         setSampleTypes(allTypeObjects, allTypeWrappers);
     }
@@ -569,25 +570,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertiesMap.put("sampleTypeCollection", allTypeWrappers);
     }
 
-    @SuppressWarnings("unchecked")
-    protected List<SitePvAttrWrapper> getSitePvAttrCollection() {
-        List<SitePvAttrWrapper> sitePvAttrCollection = (List<SitePvAttrWrapper>) propertiesMap
-            .get("SitePvAttrCollection");
-        if (sitePvAttrCollection == null) {
-            Collection<SitePvAttr> possibleCollection = wrappedObject
-                .getSitePvAttrCollection();
-            if (possibleCollection != null) {
-                sitePvAttrCollection = new ArrayList<SitePvAttrWrapper>();
-                for (SitePvAttr possible : possibleCollection) {
-                    sitePvAttrCollection.add(new SitePvAttrWrapper(appService,
-                        possible));
-                }
-                propertiesMap.put("SitePvAttrCollection", sitePvAttrCollection);
-            }
-        }
-        return sitePvAttrCollection;
-    }
-
     protected static Map<String, PvAttrTypeWrapper> getPvAttrTypeMap(
         WritableApplicationService appService) throws ApplicationException {
         if (pvAttrTypeMap == null) {
@@ -601,10 +583,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
             return sitePvAttrMap;
 
         sitePvAttrMap = new HashMap<String, SitePvAttrWrapper>();
-        List<SitePvAttrWrapper> sitePvAttrCollection = getSitePvAttrCollection();
+        Collection<SitePvAttr> sitePvAttrCollection = wrappedObject
+            .getSitePvAttrCollection();
         if (sitePvAttrCollection != null) {
-            for (SitePvAttrWrapper pip : sitePvAttrCollection) {
-                sitePvAttrMap.put(pip.getLabel(), pip);
+            for (SitePvAttr spa : sitePvAttrCollection) {
+                sitePvAttrMap.put(spa.getLabel(), new SitePvAttrWrapper(
+                    appService, spa));
             }
         }
         return sitePvAttrMap;
@@ -662,6 +646,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             sitePvAttr.setLabel(label);
             sitePvAttr.setSite(this);
             sitePvAttrMap.put(label, sitePvAttr);
+            deletedSitePvAttr.remove(sitePvAttr);
         }
         sitePvAttr.setPvAttrType(pvAttrType);
     }
@@ -676,7 +661,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected void persistDependencies(Site origObject) throws Exception {
-        persistSampleTypes();
+        deleteSampleTypes();
         persistSitePvAttr();
     }
 
@@ -692,25 +677,22 @@ public class SiteWrapper extends ModelWrapper<Site> {
             Collection<SitePvAttr> oldCollection = wrappedObject
                 .getSitePvAttrCollection();
             wrappedObject.setSitePvAttrCollection(sitePvAttrObjects);
-            propertyChangeSupport.firePropertyChange("SitePvAttrCollection",
+            propertyChangeSupport.firePropertyChange("sitePvAttrCollection",
                 oldCollection, sitePvAttrObjects);
-            propertiesMap.put("SitePvAttrCollection", sitePvAttrWrapperList);
         }
         for (SitePvAttrWrapper sitePvAttr : deletedSitePvAttr) {
             if (!sitePvAttr.isNew()) {
                 sitePvAttr.delete();
             }
         }
-        deletedSitePvAttr.clear();
     }
 
-    private void persistSampleTypes() throws Exception {
+    private void deleteSampleTypes() throws Exception {
         for (SampleTypeWrapper st : deletedSampleTypes) {
             if (!st.isNew()) {
                 st.delete();
             }
         }
-        deletedSampleTypes.clear();
     }
 
     @Override

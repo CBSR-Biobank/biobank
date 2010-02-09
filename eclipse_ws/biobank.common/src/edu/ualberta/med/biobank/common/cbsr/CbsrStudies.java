@@ -372,13 +372,7 @@ public class CbsrStudies {
             throw new Exception("invalid sample source name: "
                 + sampleSourceName);
         }
-
-        List<SampleSourceWrapper> list = study.getSampleSourceCollection();
-        if (list == null) {
-            list = new ArrayList<SampleSourceWrapper>();
-        }
-        list.add(ss);
-        study.setSampleSourceCollection(list);
+        study.addSampleSources(Arrays.asList(ss));
         study.persist();
         study.reload();
     }

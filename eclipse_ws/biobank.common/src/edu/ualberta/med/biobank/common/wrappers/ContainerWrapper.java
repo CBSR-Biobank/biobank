@@ -671,6 +671,15 @@ public class ContainerWrapper extends
         }
     }
 
+    @Override
+    protected void deleteDependencies() throws Exception {
+        ContainerPathWrapper path = ContainerPathWrapper.getContainerPath(
+            appService, this);
+        if (path != null) {
+            path.delete();
+        }
+    }
+
     /**
      * Get containers with a given label that can hold this type of container
      * (in this container site)

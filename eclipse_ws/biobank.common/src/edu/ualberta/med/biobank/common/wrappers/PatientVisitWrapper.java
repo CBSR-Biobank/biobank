@@ -30,6 +30,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private Map<String, PvAttrWrapper> pvAttrMap;
 
+    private List<PvSampleSourceWrapper> deletedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
+
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
@@ -138,7 +140,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        List<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
+        Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
             .getStudy().getStudyPvAttrCollection();
         if (studyPvAttrCollection != null) {
             for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
@@ -350,22 +352,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (pvAttrMap != null) {
             setPvAttrCollection(pvAttrMap.values());
         }
-        if (origObject != null) {
-            removeDeletedPvSampleSources(origObject);
-        }
+        deletedPvSampleSources();
     }
 
-    private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
-        throws Exception {
-        List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
-        List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
-            appService, pvDatabase).getPvSampleSourceCollection();
-        if (oldSampleSources != null) {
-            for (PvSampleSourceWrapper ss : oldSampleSources) {
-                if ((newSampleSources == null)
-                    || !newSampleSources.contains(ss)) {
-                    ss.delete();
-                }
+    private void deletedPvSampleSources() throws Exception {
+        for (PvSampleSourceWrapper ss : deletedPvSampleSources) {
+            if (!ss.isNew()) {
+                ss.delete();
             }
         }
     }
@@ -425,26 +418,52 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return getPvSampleSourceCollection(false);
     }
 
-    public void setPvSampleSourceCollection(
-        Collection<PvSampleSource> pvSampleSources, boolean setNull) {
-        Collection<PvSampleSource> oldCollection = wrappedObject
-            .getPvSampleSourceCollection();
-        wrappedObject.setPvSampleSourceCollection(pvSampleSources);
-        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
-            oldCollection, pvSampleSources);
-        if (setNull) {
-            propertiesMap.put("pvSampleSourceCollection", null);
+    public void addPvSampleSources(
+        Collection<PvSampleSourceWrapper> newPvSampleSources) {
+        Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
+        List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
+        // already added
+        List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
+        if (currentList != null) {
+            for (PvSampleSourceWrapper pvss : currentList) {
+                allPvObjects.add(pvss.getWrappedObject());
+                allPvWrappers.add(pvss);
+            }
         }
+        // new added
+        for (PvSampleSourceWrapper pvss : newPvSampleSources) {
+            allPvObjects.add(pvss.getWrappedObject());
+            allPvWrappers.add(pvss);
+        }
+        setPvSamplSources(allPvObjects, allPvWrappers);
     }
 
-    public void setPvSampleSourceCollection(
-        Collection<PvSampleSourceWrapper> pvSampleSources) {
-        Collection<PvSampleSource> pvCollection = new HashSet<PvSampleSource>();
-        for (PvSampleSourceWrapper pv : pvSampleSources) {
-            pvCollection.add(pv.getWrappedObject());
+    private void setPvSamplSources(Collection<PvSampleSource> allPvObjects,
+        List<PvSampleSourceWrapper> allPvWrappers) {
+        Collection<PvSampleSource> oldCollection = wrappedObject
+            .getPvSampleSourceCollection();
+        wrappedObject.setPvSampleSourceCollection(allPvObjects);
+        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
+            oldCollection, allPvObjects);
+        propertiesMap.put("pvSampleSourceCollection", allPvWrappers);
+    }
+
+    public void removePvSampleSources(
+        Collection<PvSampleSourceWrapper> pvSampleSourcesToRemove) {
+        deletedPvSampleSources.addAll(pvSampleSourcesToRemove);
+        Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
+        List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
+        // already added
+        List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
+        if (currentList != null) {
+            for (PvSampleSourceWrapper pvss : currentList) {
+                if (!deletedPvSampleSources.contains(pvss)) {
+                    allPvObjects.add(pvss.getWrappedObject());
+                    allPvWrappers.add(pvss);
+                }
+            }
         }
-        setPvSampleSourceCollection(pvCollection, false);
-        propertiesMap.put("pvSampleSourceCollection", pvSampleSources);
+        setPvSamplSources(allPvObjects, allPvWrappers);
     }
 
     @Override
@@ -494,6 +513,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void resetInternalField() {
         pvAttrMap = null;
         studyPvAttrMap = null;
+        deletedPvSampleSources.clear();
     }
 
     @Override

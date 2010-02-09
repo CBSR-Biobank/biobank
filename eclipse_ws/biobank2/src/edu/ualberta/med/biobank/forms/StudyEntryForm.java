@@ -270,18 +270,26 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         // get the selected sample sources from widget
-        List<Integer> selSampleSourceIds = sampleSourceMultiSelect
-            .getSelected();
-        List<SampleSourceWrapper> selSampleSource = new ArrayList<SampleSourceWrapper>();
+        List<Integer> addedSampleSourceIds = sampleSourceMultiSelect
+            .getAddedToSelection();
+        List<Integer> removedSampleSourceIds = sampleSourceMultiSelect
+            .getRemovedToSelection();
+        List<SampleSourceWrapper> addedSampleSources = new ArrayList<SampleSourceWrapper>();
+        List<SampleSourceWrapper> removedSampleSources = new ArrayList<SampleSourceWrapper>();
         for (SampleSourceWrapper ss : allSampleSources) {
             int id = ss.getId();
-            if (selSampleSourceIds.indexOf(id) >= 0) {
-                selSampleSource.add(ss);
+            if (addedSampleSourceIds.indexOf(id) >= 0) {
+                addedSampleSources.add(ss);
+            } else if (removedSampleSourceIds.indexOf(id) >= 0) {
+                removedSampleSources.add(ss);
             }
         }
-        Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
-            "problem with sample source selections");
-        study.setSampleSourceCollection(selSampleSource);
+        Assert.isTrue(addedSampleSources.size() == addedSampleSourceIds.size(),
+            "problem with added sample source selections");
+        study.addSampleSources(addedSampleSources);
+        Assert.isTrue(removedSampleSources.size() == removedSampleSourceIds
+            .size(), "problem with removed sample source selections");
+        study.removeSampleSources(removedSampleSources);
 
         // get study pv attributes
         List<String> newPvInfoLabels = new ArrayList<String>();

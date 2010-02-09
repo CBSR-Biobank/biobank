@@ -35,9 +35,17 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getParentFromClass(SiteAdapter.class).getLabel() + " - Clinic "
-            + getParentFromClass(ClinicAdapter.class).getLabel() + " - "
-            + getTooltipText("Shipment");
+        SiteAdapter site = getParentFromClass(SiteAdapter.class);
+        StringBuffer sb = new StringBuffer();
+        if (site != null) {
+            sb.append(site.getLabel()).append(" - ");
+        }
+        ClinicAdapter clinic = getParentFromClass(ClinicAdapter.class);
+        if (clinic != null) {
+            sb.append("Clinic ").append(clinic.getLabel()).append(" - ");
+        }
+        sb.append(getTooltipText("Shipment"));
+        return sb.toString();
     }
 
     @Override

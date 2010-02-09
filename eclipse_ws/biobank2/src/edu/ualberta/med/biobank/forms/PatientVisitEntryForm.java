@@ -255,8 +255,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setShipment((ShipmentWrapper) null);
         }
 
-        patientVisit.setPvSampleSourceCollection(pvSampleSourceEntryWidget
-            .getPvSampleSources());
+        patientVisit.addPvSampleSources(pvSampleSourceEntryWidget
+            .getAddedPvSampleSources());
+        patientVisit.removePvSampleSources(pvSampleSourceEntryWidget
+            .getRemovedPvSampleSources());
 
         setPvCustomInfo();
 

@@ -263,16 +263,14 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetSampleSourceCollectionAdd() throws Exception {
-        String name = "testSetSampleSourceCollectionAdd" + r.nextInt();
+    public void testAddSampleSources() throws Exception {
+        String name = "testAddSampleSources" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleSourceHelper.addSampleSources(study, name);
 
-        List<SampleSourceWrapper> sources = study.getSampleSourceCollection();
         SampleSourceWrapper source = SampleSourceHelper.addSampleSource(name);
-        sources.add(source);
-        study.setSampleSourceCollection(sources);
+        study.addSampleSources(Arrays.asList(source));
         study.persist();
 
         study.reload();
@@ -281,19 +279,18 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetSampleSourceCollectionRemove() throws Exception {
-        String name = "testSetSampleSourceCollectionRemove" + r.nextInt();
+    public void testRemoveSampleSources() throws Exception {
+        String name = "testRemoveSampleSources" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleSourceHelper.addSampleSources(study, name);
 
         List<SampleSourceWrapper> sources = study.getSampleSourceCollection();
         SampleSourceWrapper source = DbHelper.chooseRandomlyInList(sources);
-        sources.remove(source);
         // don't have to delete the storage thanks to
         // deleteSampleSourceDifference method
         SampleSourceHelper.createdSampleSources.remove(source);
-        study.setSampleSourceCollection(sources);
+        study.removeSampleSources(Arrays.asList(source));
         study.persist();
 
         study.reload();
@@ -303,7 +300,7 @@ public class TestStudy extends TestDatabase {
 
     @Test
     public void testSetStudyPvAttr() throws Exception {
-        String name = "testGetSetStudyPvAttrLabels" + r.nextInt();
+        String name = "testSetStudyPvAttr" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
 

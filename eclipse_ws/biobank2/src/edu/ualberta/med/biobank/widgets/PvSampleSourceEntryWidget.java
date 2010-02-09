@@ -56,6 +56,10 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     private List<PvSampleSourceWrapper> selectedPvSampleSources;
 
+    private List<PvSampleSourceWrapper> addedPvSampleSources;
+
+    private List<PvSampleSourceWrapper> removedPvSampleSources;
+
     private IObservableValue sampleSourcesAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
@@ -76,15 +80,10 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         PatientVisitWrapper visit, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
+
         getSampleSources();
         this.patientVisit = visit;
-        List<PvSampleSourceWrapper> pvSampleSourceCollection = patientVisit
-            .getPvSampleSourceCollection();
-        if (pvSampleSourceCollection == null) {
-            selectedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
-        } else {
-            selectedPvSampleSources = pvSampleSourceCollection;
-        }
+        setLists();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -113,6 +112,18 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                     getNonDuplicateSampleSources());
             }
         });
+    }
+
+    private void setLists() {
+        List<PvSampleSourceWrapper> pvSampleSourceCollection = patientVisit
+            .getPvSampleSourceCollection();
+        if (pvSampleSourceCollection == null) {
+            selectedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
+        } else {
+            selectedPvSampleSources = pvSampleSourceCollection;
+        }
+        addedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
+        removedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -147,6 +158,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
             if (add) {
                 // only add to the collection when adding and not editing
                 selectedPvSampleSources.add(dlg.getPvSampleSource());
+                addedPvSampleSources.add(dlg.getPvSampleSource());
             }
             updateCollection();
             notifyListeners();
@@ -197,14 +209,10 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                         + svss.getSampleSource().getName() + "\"?");
 
                 if (confirm) {
-                    Collection<PvSampleSourceWrapper> ssToDelete = new HashSet<PvSampleSourceWrapper>();
-                    for (PvSampleSourceWrapper ss : selectedPvSampleSources) {
-                        if (ss.getSampleSource().getId().equals(
-                            svss.getSampleSource().getId())) {
-                            ssToDelete.add(ss);
-                        }
-                    }
-                    selectedPvSampleSources.removeAll(ssToDelete);
+                    selectedPvSampleSources.remove(svss);
+                    addedPvSampleSources.remove(svss);
+                    removedPvSampleSources.add(svss);
+
                     updateCollection();
                     notifyListeners();
                 }
@@ -230,6 +238,14 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
 
     public Collection<PvSampleSourceWrapper> getPvSampleSources() {
         return pvSampleSourceTable.getCollection();
+    }
+
+    public List<PvSampleSourceWrapper> getAddedPvSampleSources() {
+        return addedPvSampleSources;
+    }
+
+    public List<PvSampleSourceWrapper> getRemovedPvSampleSources() {
+        return removedPvSampleSources;
     }
 
     public void setSelectedPvSampleSources(

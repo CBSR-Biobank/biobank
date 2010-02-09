@@ -36,7 +36,7 @@ public class TestSampleSource extends TestDatabase {
         for (int i = 0; i < 3; i++) {
             StudyWrapper newStudy = StudyHelper.newStudy(defaultSite,
                 "newStudy" + i);
-            newStudy.setSampleSourceCollection(Arrays.asList(ssw));
+            newStudy.addSampleSources(Arrays.asList(ssw));
             newStudy.persist();
             studies.add(newStudy);
         }

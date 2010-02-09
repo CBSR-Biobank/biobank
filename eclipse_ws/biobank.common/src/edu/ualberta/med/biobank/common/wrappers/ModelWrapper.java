@@ -165,6 +165,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         SDKQueryResult result = appService.executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
+        resetInternalField();
     }
 
     /**
@@ -190,7 +191,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
         reload();
         deleteChecks();
+        deleteDependencies();
         appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+    }
+
+    @SuppressWarnings("unused")
+    protected void deleteDependencies() throws Exception {
+
     }
 
     protected abstract void deleteChecks() throws Exception;
