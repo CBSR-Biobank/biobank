@@ -102,6 +102,8 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     @Override
     public Object getCollectionModelObject(ContactWrapper contact)
         throws Exception {
+        if (contact == null)
+            return null;
         TableRowData info = new TableRowData();
         info.name = contact.getName();
         info.title = contact.getTitle();

@@ -230,9 +230,11 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
                         final BiobankCollectionModel modelItem = model
                             .get(count);
-                        modelItem.o = getCollectionModelObject(item);
                         if (item instanceof ModelWrapper<?>) {
                             ((ModelWrapper<?>) item).loadAttributes();
+                        }
+                        if (item != null) {
+                            modelItem.o = getCollectionModelObject(item);
                         }
 
                         if (!isDisposed()) {

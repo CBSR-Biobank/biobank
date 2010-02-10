@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
@@ -73,49 +72,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "0";
                 }
                 return String.valueOf(samples.size());
-            }
-        } else if (element instanceof ContainerTypeWrapper) {
-            final ContainerTypeWrapper ct = (ContainerTypeWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return ct.getName();
-            case 1:
-                return String
-                    .valueOf(ct.getColCapacity() * ct.getRowCapacity());
-
-            case 2:
-                return ct.getActivityStatus();
-
-            case 3:
-                try {
-                    return String.valueOf(ct.getContainersCount());
-                } catch (Exception e) {
-                    return "";
-                }
-            case 4:
-                Double temp = ct.getDefaultTemperature();
-                if (temp == null) {
-                    return "";
-                }
-                return temp.toString();
-            }
-        } else if (element instanceof ContainerWrapper) {
-            final ContainerWrapper container = (ContainerWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return container.getLabel();
-            case 1:
-                return container.getContainerType().getName();
-            case 2:
-                return container.getActivityStatus();
-            case 3:
-                return container.getProductBarcode();
-            case 4:
-                Double temp = container.getTemperature();
-                if (temp == null) {
-                    return "";
-                }
-                return temp.toString();
             }
         } else if (element instanceof SampleWrapper) {
             final SampleWrapper sample = (SampleWrapper) element;
