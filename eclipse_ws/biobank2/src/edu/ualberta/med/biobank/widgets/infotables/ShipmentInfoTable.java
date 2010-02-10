@@ -13,14 +13,14 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
-    public class ShipmentItem {
+    private class ShipmentItem {
         String dateReceived;
         String waybill;
         String shippingCompany;
         Integer numPatients;
     }
 
-    class TableSorter extends BiobankTableSorter {
+    private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
             ShipmentItem s1 = (ShipmentItem) ((BiobankCollectionModel) e1).o;

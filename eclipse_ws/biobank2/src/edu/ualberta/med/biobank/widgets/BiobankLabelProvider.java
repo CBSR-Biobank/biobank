@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.ClinicStudyInfo;
 import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
@@ -175,18 +174,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return getColumnText(m.o, columnIndex);
             } else if (columnIndex == 0) {
                 return "loading ...";
-            }
-        } else if (element instanceof ClinicStudyInfo) {
-            ClinicStudyInfo info = (ClinicStudyInfo) element;
-            switch (columnIndex) {
-            case 0:
-                if (info.studyShortName != null)
-                    return info.studyShortName;
-                return "";
-            case 1:
-                return String.valueOf(info.patients);
-            case 2:
-                return String.valueOf(info.patientVisits);
             }
         } else if (element instanceof StudyContactAndPatientInfo) {
             StudyContactAndPatientInfo info = (StudyContactAndPatientInfo) element;
