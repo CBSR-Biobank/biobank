@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ClinicStudyInfo;
-import edu.ualberta.med.biobank.model.SiteClinicInfo;
 import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
@@ -256,20 +255,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                     .getPatientCollection().size());
             case 4:
                 return String.valueOf(siteStudyInfo.patientVisits);
-            }
-        } else if (element instanceof SiteClinicInfo) {
-            SiteClinicInfo siteClinicInfo = (SiteClinicInfo) element;
-            switch (columnIndex) {
-            case 0:
-                return siteClinicInfo.clinicWrapper.getName();
-            case 1:
-                return String.valueOf(siteClinicInfo.studies);
-            case 2:
-                return siteClinicInfo.activityStatus;
-            case 3:
-                return String.valueOf(siteClinicInfo.patients);
-            case 4:
-                return String.valueOf(siteClinicInfo.patientVisits);
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());

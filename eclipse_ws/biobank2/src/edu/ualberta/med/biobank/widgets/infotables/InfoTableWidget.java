@@ -13,6 +13,8 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -35,7 +37,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
     protected List<BiobankCollectionModel> model;
 
-    protected List<TableViewerColumn> tableViewColumns;
+    private List<TableViewerColumn> tableViewColumns;
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
         String[] headings, int[] bounds) {
@@ -92,6 +94,31 @@ public class InfoTableWidget<T> extends BiobankWidget {
             }
             getTableViewer().refresh();
             setCollection(collection);
+        }
+    }
+
+    protected void setSorter(final BiobankTableSorter tableSorter) {
+        tableViewer.setSorter(tableSorter);
+        final Table table = tableViewer.getTable();
+        int count = 0;
+        for (final TableViewerColumn col : tableViewColumns) {
+            final int index = count;
+            col.getColumn().addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    tableSorter.setColumn(index);
+                    int dir = table.getSortDirection();
+                    if (table.getSortColumn() == col.getColumn()) {
+                        dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+                    } else {
+                        dir = SWT.DOWN;
+                    }
+                    table.setSortDirection(dir);
+                    table.setSortColumn(col.getColumn());
+                    tableViewer.refresh();
+                }
+            });
+            ++count;
         }
     }
 
@@ -172,6 +199,15 @@ public class InfoTableWidget<T> extends BiobankWidget {
         t.start();
     }
 
+    /**
+     * This method is used to load object model data in background thread.
+     * 
+     * @param item the model object representing the base object to get
+     *            information from.
+     * @return an non-object model object with the table data.
+     * 
+     * @throws Exception
+     */
     @SuppressWarnings("unused")
     public Object getCollectionModelObject(T item) throws Exception {
         return item;
