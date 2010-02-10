@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -19,6 +20,13 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         public String activityStatus;
         public Long patientCount;
         public Integer patientVisitCount;
+
+        @Override
+        public String toString() {
+            return StringUtils.join(new String[] { clinicName,
+                studyCount.toString(), activityStatus, patientCount.toString(),
+                patientVisitCount.toString() }, "\t");
+        }
     }
 
     class TableSorter extends BiobankTableSorter {
@@ -64,8 +72,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     public ClinicInfoTable(Composite parent,
         Collection<ClinicWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS);
+        super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
+        addClipboadCopySupport();
     }
 
     @Override
@@ -114,5 +123,12 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
             info.patientVisitCount = pvs.size();
         }
         return info;
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        if (o == null)
+            return null;
+        return ((TableRowData) o).toString();
     }
 }

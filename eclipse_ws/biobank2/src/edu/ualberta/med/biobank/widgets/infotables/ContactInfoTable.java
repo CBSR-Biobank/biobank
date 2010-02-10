@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -16,6 +17,12 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         String emailAddress;
         String phoneNumber;
         String faxNumber;
+
+        @Override
+        public String toString() {
+            return StringUtils.join(new String[] { name, title, emailAddress,
+                phoneNumber, faxNumber }, "\t");
+        }
     }
 
     class TableSorter extends BiobankTableSorter {
@@ -61,8 +68,9 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     public ContactInfoTable(Composite parent,
         Collection<ContactWrapper> contacts) {
-        super(parent, contacts, HEADINGS, BOUNDS);
+        super(parent, true, contacts, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
+        addClipboadCopySupport();
     }
 
     @Override
@@ -113,5 +121,12 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             info.faxNumber = new String();
         }
         return info;
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        if (o == null)
+            return null;
+        return ((TableRowData) o).toString();
     }
 }

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -13,6 +14,9 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -22,7 +26,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -39,15 +46,20 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
     private List<TableViewerColumn> tableViewColumns;
 
-    public InfoTableWidget(Composite parent, Collection<T> collection,
-        String[] headings, int[] bounds) {
+    public InfoTableWidget(Composite parent, boolean multilineSelection,
+        Collection<T> collection, String[] headings, int[] bounds) {
         super(parent, SWT.NONE);
 
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         setLayout(new GridLayout(1, false));
 
-        tableViewer = new TableViewer(this, SWT.BORDER // | SWT.MULTI
-            | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.VIRTUAL);
+        int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
+            | SWT.FULL_SELECTION | SWT.VIRTUAL;
+        if (multilineSelection) {
+            style |= SWT.MULTI;
+        }
+
+        tableViewer = new TableViewer(this, style);
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());
@@ -95,6 +107,49 @@ public class InfoTableWidget<T> extends BiobankWidget {
             getTableViewer().refresh();
             setCollection(collection);
         }
+    }
+
+    public InfoTableWidget(Composite parent, Collection<T> collection,
+        String[] headings, int[] bounds) {
+        this(parent, false, collection, headings, bounds);
+    }
+
+    protected void addClipboadCopySupport() {
+        Menu menu = new Menu(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        tableViewer.getTable().setMenu(menu);
+
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Copy");
+        item.addSelectionListener(new SelectionAdapter() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                List<BiobankCollectionModel> selectedRows = new ArrayList<BiobankCollectionModel>();
+                IStructuredSelection sel = (IStructuredSelection) tableViewer
+                    .getSelection();
+                for (Iterator<BiobankCollectionModel> iterator = sel.iterator(); iterator
+                    .hasNext();) {
+                    selectedRows.add(iterator.next());
+                }
+                StringBuilder sb = new StringBuilder();
+                for (BiobankCollectionModel row : selectedRows) {
+                    if (sb.length() != 0) {
+                        sb.append(System.getProperty("line.separator"));
+                    }
+                    sb.append(getCollectionModelObjectToString(row.o));
+                }
+                TextTransfer textTransfer = TextTransfer.getInstance();
+                Clipboard cb = new Clipboard(Display.getDefault());
+                cb.setContents(new Object[] { sb.toString() },
+                    new Transfer[] { textTransfer });
+            }
+        });
+    }
+
+    protected String getCollectionModelObjectToString(
+        @SuppressWarnings("unused") Object o) {
+        return null;
     }
 
     protected void setSorter(final BiobankTableSorter tableSorter) {
