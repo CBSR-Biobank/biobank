@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
-    class ClinicInfo {
+    class TableRowData {
         public String clinicName;
         public Integer studyCount;
         public String activityStatus;
@@ -24,8 +24,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            ClinicInfo c1 = (ClinicInfo) ((BiobankCollectionModel) e1).o;
-            ClinicInfo c2 = (ClinicInfo) ((BiobankCollectionModel) e2).o;
+            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
             if ((c1 == null) || (c2 == null)) {
                 return -1;
             }
@@ -73,7 +73,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                ClinicInfo item = (ClinicInfo) ((BiobankCollectionModel) element).o;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null)
                     return null;
                 switch (columnIndex) {
@@ -97,7 +97,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     @Override
     public Object getCollectionModelObject(ClinicWrapper clinic)
         throws Exception {
-        ClinicInfo info = new ClinicInfo();
+        TableRowData info = new TableRowData();
         info.clinicName = clinic.getName();
         List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies == null) {
