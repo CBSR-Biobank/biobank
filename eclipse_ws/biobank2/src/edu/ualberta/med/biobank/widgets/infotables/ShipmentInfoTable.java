@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -13,18 +14,24 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
-    private class ShipmentItem {
+    private class TableRowData {
         String dateReceived;
         String waybill;
         String shippingCompany;
         Integer numPatients;
+
+        @Override
+        public String toString() {
+            return StringUtils.join(new String[] { dateReceived, waybill,
+                shippingCompany, numPatients.toString() }, "\t");
+        }
     }
 
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            ShipmentItem s1 = (ShipmentItem) ((BiobankCollectionModel) e1).o;
-            ShipmentItem s2 = (ShipmentItem) ((BiobankCollectionModel) e2).o;
+            TableRowData s1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData s2 = (TableRowData) ((BiobankCollectionModel) e2).o;
             if ((s1 == null) || (s2 == null)) {
                 return -1;
             }
@@ -59,8 +66,9 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     private static final int[] BOUNDS = new int[] { 180, 140, 140, 100, -1 };
 
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getShipmentCollection(), HEADINGS, BOUNDS);
+        super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS);
         setSorter(new TableSorter());
+        addClipboadCopySupport();
     }
 
     @Override
@@ -68,7 +76,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                ShipmentItem item = (ShipmentItem) ((BiobankCollectionModel) element).o;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null)
                     return null;
                 switch (columnIndex) {
@@ -94,7 +102,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     @Override
     public Object getCollectionModelObject(ShipmentWrapper shipment)
         throws Exception {
-        ShipmentItem info = new ShipmentItem();
+        TableRowData info = new TableRowData();
         info.dateReceived = shipment.getFormattedDateReceived();
         info.waybill = shipment.getWaybill();
         ShippingCompanyWrapper company = shipment.getShippingCompany();
@@ -110,5 +118,12 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
             info.numPatients = patients.size();
         }
         return info;
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        if (o == null)
+            return null;
+        return ((TableRowData) o).toString();
     }
 }

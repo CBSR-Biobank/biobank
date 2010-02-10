@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -74,14 +73,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return "0";
                 }
                 return String.valueOf(samples.size());
-            }
-        } else if (element instanceof PatientWrapper) {
-            PatientWrapper patient = (PatientWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return patient.getPnumber();
-            case 1:
-                return patient.getStudy().getName();
             }
         } else if (element instanceof ContainerTypeWrapper) {
             final ContainerTypeWrapper ct = (ContainerTypeWrapper) element;
