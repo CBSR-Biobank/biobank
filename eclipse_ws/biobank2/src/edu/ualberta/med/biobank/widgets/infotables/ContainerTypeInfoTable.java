@@ -20,11 +20,20 @@ public class ContainerTypeInfoTable extends
         Long inUseCount;
         Double temperature;
 
+        TableRowData(String name, String nameShort, Integer capacity,
+            String status, Long inUseCount, Double temperature) {
+            this.name = (name != null) ? name : "";
+            this.nameShort = (nameShort != null) ? nameShort : "";
+            this.status = (status == null) ? status : "";
+            this.capacity = capacity;
+            this.inUseCount = inUseCount;
+            this.temperature = temperature;
+        }
+
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort,
-                (capacity != null) ? capacity.toString() : "",
-                (status != null) ? status : "",
+                (capacity != null) ? capacity.toString() : "", status,
                 (inUseCount != null) ? inUseCount.toString() : "",
                 (temperature != null) ? temperature.toString() : "" }, "\t");
         }
@@ -47,13 +56,25 @@ public class ContainerTypeInfoTable extends
                 rc = c1.nameShort.compareTo(c2.nameShort);
                 break;
             case 2:
-                rc = c1.capacity.compareTo(c2.capacity);
+                if (c1.capacity == null) {
+                    rc = -1;
+                } else if (c2.capacity == null) {
+                    rc = 1;
+                } else {
+                    rc = c1.capacity.compareTo(c2.capacity);
+                }
                 break;
             case 3:
                 rc = c1.status.compareTo(c2.status);
                 break;
             case 4:
-                rc = c1.inUseCount.compareTo(c2.inUseCount);
+                if (c1.inUseCount == null) {
+                    rc = -1;
+                } else if (c2.inUseCount == null) {
+                    rc = 1;
+                } else {
+                    rc = c1.inUseCount.compareTo(c2.inUseCount);
+                }
                 break;
             case 5:
                 if (c1.temperature == null) {
@@ -102,15 +123,16 @@ public class ContainerTypeInfoTable extends
                 case 1:
                     return ct.nameShort;
                 case 2:
-                    return (ct.capacity != null) ? ct.capacity.toString() : "";
+                    return (ct.capacity != null) ? ct.capacity.toString()
+                        : null;
                 case 3:
-                    return (ct.status != null) ? ct.status : "";
+                    return ct.status;
                 case 4:
                     return (ct.inUseCount != null) ? ct.inUseCount.toString()
-                        : "";
+                        : null;
                 case 5:
                     return (ct.temperature != null) ? ct.temperature.toString()
-                        : "";
+                        : null;
                 default:
                     return "";
                 }
@@ -121,13 +143,23 @@ public class ContainerTypeInfoTable extends
     @Override
     public Object getCollectionModelObject(ContainerTypeWrapper type)
         throws Exception {
-        TableRowData info = new TableRowData();
-        info.name = type.getName();
-        info.nameShort = type.getNameShort();
-        info.capacity = type.getColCapacity() * type.getRowCapacity();
-        info.status = type.getActivityStatus();
-        info.inUseCount = type.getContainersCount();
-        info.temperature = type.getDefaultTemperature();
-        return info;
+        Integer rowCapacity = type.getRowCapacity();
+        Integer colCapacity = type.getColCapacity();
+
+        if ((rowCapacity != null) && (colCapacity != null)) {
+            return new TableRowData(type.getName(), type.getNameShort(),
+                rowCapacity * colCapacity, type.getActivityStatus(), type
+                    .getContainersCount(), type.getDefaultTemperature());
+        }
+        return new TableRowData(type.getName(), type.getNameShort(), null, type
+            .getActivityStatus(), type.getContainersCount(), type
+            .getDefaultTemperature());
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        if (o == null)
+            return null;
+        return ((TableRowData) o).toString();
     }
 }

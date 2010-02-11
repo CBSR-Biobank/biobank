@@ -48,14 +48,6 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         });
     }
 
-    @Override
-    public Object getCollectionModelObject(SampleWrapper sample)
-        throws Exception {
-        sample.loadAttributes();
-        return sample;
-
-    }
-
     public void setSelection(SampleWrapper selectedSample) {
         if (selectedSample == null)
             return;

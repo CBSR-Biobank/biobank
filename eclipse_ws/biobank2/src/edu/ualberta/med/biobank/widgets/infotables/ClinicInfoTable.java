@@ -24,8 +24,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicName,
-                studyCount.toString(), activityStatus, patientCount.toString(),
-                patientVisitCount.toString() }, "\t");
+                studyCount.toString(),
+                (activityStatus != null) ? activityStatus : "",
+                patientCount.toString(), patientVisitCount.toString() }, "\t");
         }
     }
 
@@ -46,7 +47,13 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 rc = c1.studyCount.compareTo(c2.studyCount);
                 break;
             case 2:
-                rc = c1.activityStatus.compareTo(c2.activityStatus);
+                if (c1.activityStatus == null) {
+                    rc = -1;
+                } else if (c2.activityStatus == null) {
+                    rc = 1;
+                } else {
+                    rc = c1.activityStatus.compareTo(c2.activityStatus);
+                }
                 break;
             case 3:
                 rc = c1.patientCount.compareTo(c2.patientCount);

@@ -19,6 +19,16 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         String barcode;
         Double temperature;
 
+        TableRowData(String label, String containerTypeNameShort,
+            String status, String barcode, Double temperature) {
+            this.label = (label != null) ? label : "";
+            this.containerTypeNameShort = (containerTypeNameShort != null) ? containerTypeNameShort
+                : "";
+            this.status = (status != null) ? status : "";
+            this.barcode = (barcode != null) ? barcode : "";
+            this.temperature = temperature;
+        }
+
         @Override
         public String toString() {
             return StringUtils.join(new String[] { label,
@@ -51,7 +61,13 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                 rc = c1.barcode.compareTo(c2.barcode);
                 break;
             case 4:
-                rc = c1.temperature.compareTo(c2.temperature);
+                if (c1.temperature == null) {
+                    rc = -1;
+                } else if (c2.temperature == null) {
+                    rc = 1;
+                } else {
+                    rc = c1.temperature.compareTo(c2.temperature);
+                }
                 break;
             default:
                 rc = 0;
@@ -106,18 +122,15 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     @Override
     public Object getCollectionModelObject(ContainerWrapper container)
         throws Exception {
-        TableRowData info = new TableRowData();
-        info.label = container.getLabel();
         ContainerTypeWrapper type = container.getContainerType();
         if (type != null) {
-            info.containerTypeNameShort = type.getNameShort();
-        } else {
-            info.containerTypeNameShort = new String();
+            return new TableRowData(container.getLabel(), type.getNameShort(),
+                container.getActivityStatus(), container.getProductBarcode(),
+                container.getTemperature());
         }
-        info.status = container.getActivityStatus();
-        info.barcode = container.getProductBarcode();
-        info.temperature = container.getTemperature();
-        return info;
+        return new TableRowData(container.getLabel(), null, container
+            .getActivityStatus(), container.getProductBarcode(), container
+            .getTemperature());
     }
 
     @Override
