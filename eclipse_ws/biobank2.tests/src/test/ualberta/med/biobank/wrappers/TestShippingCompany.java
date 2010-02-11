@@ -183,7 +183,7 @@ public class TestShippingCompany extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        shipment1.setShippingCompany((ShippingCompany) null);
+        shipment1.setShippingCompany(null);
         shipment1.persist();
         company.reload();
         company.delete();

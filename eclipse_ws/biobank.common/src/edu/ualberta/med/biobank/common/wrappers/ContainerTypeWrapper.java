@@ -434,14 +434,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return childContainerTypeCollection;
     }
 
-    public void setSite(Site site) {
-        Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
     public void setSite(SiteWrapper site) {
-        setSite(site.getWrappedObject());
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = site.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     public SiteWrapper getSite() {
@@ -460,15 +457,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return new CapacityWrapper(appService, capacity);
     }
 
-    private void setCapacity(Capacity capacity) {
-        Capacity oldCapacity = wrappedObject.getCapacity();
-        wrappedObject.setCapacity(capacity);
-        propertyChangeSupport.firePropertyChange("capacity", oldCapacity,
-            capacity);
-    }
-
     private void setCapacity(CapacityWrapper capacity) {
-        setCapacity(capacity.wrappedObject);
+        Capacity oldCapacity = wrappedObject.getCapacity();
+        Capacity newCapacity = capacity.wrappedObject;
+        wrappedObject.setCapacity(newCapacity);
+        propertyChangeSupport.firePropertyChange("capacity", oldCapacity,
+            newCapacity);
     }
 
     public Integer getRowCapacity() {

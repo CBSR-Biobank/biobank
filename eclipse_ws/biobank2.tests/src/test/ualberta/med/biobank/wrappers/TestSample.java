@@ -170,7 +170,7 @@ public class TestSample extends TestDatabase {
     @Test
     public void testCheckPatientVisitNotNull() throws BiobankCheckException,
         Exception {
-        sample.setPatientVisit((PatientVisit) null);
+        sample.setPatientVisit(null);
         try {
             sample.persist();
             Assert.fail("Patient visit should be set!");
@@ -229,7 +229,7 @@ public class TestSample extends TestDatabase {
     public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
-        sample.setPatientVisit(pvw.getWrappedObject());
+        sample.setPatientVisit(pvw);
         Assert.assertTrue(sample.getPatientVisit().getId() == pvw.getId());
     }
 

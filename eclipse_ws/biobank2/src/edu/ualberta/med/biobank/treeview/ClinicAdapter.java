@@ -31,7 +31,7 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         ClinicWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
+        Assert.isNotNull(wrapper, "client is null");
         return wrapper.getName();
     }
 

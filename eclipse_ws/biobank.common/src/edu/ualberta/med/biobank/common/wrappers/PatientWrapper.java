@@ -46,14 +46,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return new StudyWrapper(appService, study);
     }
 
-    public void setStudy(Study study) {
-        Study oldStudy = wrappedObject.getStudy();
-        wrappedObject.setStudy(study);
-        propertyChangeSupport.firePropertyChange("study", oldStudy, study);
-    }
-
     public void setStudy(StudyWrapper study) {
-        setStudy(study.wrappedObject);
+        Study oldStudy = wrappedObject.getStudy();
+        Study newStudy = study.wrappedObject;
+        wrappedObject.setStudy(newStudy);
+        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {

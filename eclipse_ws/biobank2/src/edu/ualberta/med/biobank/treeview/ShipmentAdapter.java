@@ -28,7 +28,7 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         ShipmentWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment.getWrappedObject(), "shipment is null");
+        Assert.isNotNull(shipment, "shipment is null");
         return shipment.getWaybill() + " - "
             + shipment.getFormattedDateShipped();
     }

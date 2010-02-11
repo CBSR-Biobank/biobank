@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -31,9 +30,6 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
-
-    private static final Logger LOGGER = Logger.getLogger(SiteViewForm.class
-        .getName());
 
     private SiteAdapter siteAdapter;
 

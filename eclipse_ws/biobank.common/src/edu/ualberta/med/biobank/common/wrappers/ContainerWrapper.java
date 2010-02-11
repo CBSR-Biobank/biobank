@@ -337,7 +337,7 @@ public class ContainerWrapper extends
         }
     }
 
-    public void setContainerType(ContainerType containerType) {
+    protected void setContainerType(ContainerType containerType) {
         ContainerType oldType = wrappedObject.getContainerType();
         wrappedObject.setContainerType(containerType);
         propertyChangeSupport.firePropertyChange("containerType", oldType,
@@ -363,7 +363,7 @@ public class ContainerWrapper extends
         return wrappedObject.getActivityStatus();
     }
 
-    public void setSite(Site site) {
+    protected void setSite(Site site) {
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -883,6 +883,20 @@ public class ContainerWrapper extends
             return posWrapper;
         }
         return null;
+    }
+
+    /**
+     * init this wrapper with the given containerWrapper.
+     * 
+     * @throws WrapperException
+     */
+    public void initObjectWith(ContainerWrapper containerWrapper)
+        throws WrapperException {
+        if (containerWrapper == null) {
+            throw new WrapperException(
+                "Cannot init internal object with a null container");
+        }
+        setWrappedObject(containerWrapper.wrappedObject);
     }
 
 }

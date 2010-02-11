@@ -68,7 +68,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         return new ContainerWrapper(appService, container);
     }
 
-    public void setContainer(Container container) {
+    protected void setContainer(Container container) {
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,

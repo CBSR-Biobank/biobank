@@ -99,14 +99,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return new SiteWrapper(appService, site);
     }
 
-    public void setSite(Site site) {
-        Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
     public void setSite(SiteWrapper site) {
-        setSite(site.getWrappedObject());
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = site.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     @Override
@@ -309,7 +306,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
         // new
         for (SampleStorageWrapper ss : newSampleStorages) {
-            ss.setStudy(wrappedObject);
+            ss.setStudy(this);
             allSsObjects.add(ss.getWrappedObject());
             allSsWrappers.add(ss);
             deletedSampleStorages.remove(ss);

@@ -26,14 +26,11 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         return new StudyWrapper(appService, study);
     }
 
-    public void setStudy(Study study) {
-        Study oldStudy = wrappedObject.getStudy();
-        wrappedObject.setStudy(study);
-        propertyChangeSupport.firePropertyChange("study", oldStudy, study);
-    }
-
     public void setStudy(StudyWrapper study) {
-        setStudy(study.wrappedObject);
+        Study oldStudy = wrappedObject.getStudy();
+        Study newStudy = study.wrappedObject;
+        wrappedObject.setStudy(newStudy);
+        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
     }
 
     public SampleTypeWrapper getSampleType() {
@@ -44,19 +41,15 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         return new SampleTypeWrapper(appService, type);
     }
 
-    public void setSampleType(SampleType sampleType) {
-        SampleType oldSampleType = wrappedObject.getSampleType();
-        wrappedObject.setSampleType(sampleType);
-        propertyChangeSupport.firePropertyChange("sampleType", oldSampleType,
-            sampleType);
-    }
-
     public void setSampleType(SampleTypeWrapper sampleType) {
-        SampleType type = null;
+        SampleType oldSampleType = wrappedObject.getSampleType();
+        SampleType newSampleType = null;
         if (sampleType != null) {
-            type = sampleType.getWrappedObject();
+            newSampleType = sampleType.getWrappedObject();
         }
-        setSampleType(type);
+        wrappedObject.setSampleType(newSampleType);
+        propertyChangeSupport.firePropertyChange("sampleType", oldSampleType,
+            newSampleType);
     }
 
     public Integer getQuantity() {

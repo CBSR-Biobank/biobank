@@ -160,7 +160,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return new ClinicWrapper(appService, clinic);
     }
 
-    public void setClinic(Clinic clinic) {
+    protected void setClinic(Clinic clinic) {
         Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
@@ -259,7 +259,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return new ShippingCompanyWrapper(appService, sc);
     }
 
-    public void setShippingCompany(ShippingCompany sc) {
+    protected void setShippingCompany(ShippingCompany sc) {
         ShippingCompany old = wrappedObject.getShippingCompany();
         wrappedObject.setShippingCompany(sc);
         propertyChangeSupport.firePropertyChange("shippingCompany", old, sc);
