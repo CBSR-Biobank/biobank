@@ -143,7 +143,7 @@ public class CbsrContainerTypes {
         ct.setChildLabelingScheme(childLabelingScheme);
 
         if (children != null) {
-            ct.setChildContainerTypeCollection(children);
+            ct.addChildContainerTypes(children);
         }
 
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -152,7 +152,7 @@ public class CbsrContainerTypes {
                 .getSampleType(sampleTypeName);
             list.add(sampleType);
         }
-        ct.setSampleTypeCollection(list);
+        ct.addSampleTypes(list);
         ct.persist();
         ct.reload();
         containerTypeMap.put(name, ct);

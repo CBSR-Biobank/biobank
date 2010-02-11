@@ -94,13 +94,13 @@ public class TestPatientVisit extends TestDatabase {
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
-        childType.setSampleTypeCollection(allSampleTypes);
+        childType.addSampleTypes(allSampleTypes);
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, 3, 10, true);
-        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+        topType.addChildContainerTypes(Arrays.asList(containerTypeMap
             .get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);

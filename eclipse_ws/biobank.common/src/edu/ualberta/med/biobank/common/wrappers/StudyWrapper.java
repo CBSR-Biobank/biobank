@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -30,11 +31,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
-    private List<SampleStorageWrapper> deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
+    private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
 
-    private List<SampleSourceWrapper> deletedSampleSources = new ArrayList<SampleSourceWrapper>();
+    private Set<SampleSourceWrapper> deletedSampleSources = new HashSet<SampleSourceWrapper>();
 
-    private List<StudyPvAttrWrapper> deletedStudyPvAttr = new ArrayList<StudyPvAttrWrapper>();
+    private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {

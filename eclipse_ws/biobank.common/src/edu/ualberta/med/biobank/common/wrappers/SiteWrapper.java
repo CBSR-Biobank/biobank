@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -31,9 +32,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private Map<String, SitePvAttrWrapper> sitePvAttrMap;
 
-    private List<SampleTypeWrapper> deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
+    private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
 
-    private List<SitePvAttrWrapper> deletedSitePvAttr = new ArrayList<SitePvAttrWrapper>();
+    private Set<SitePvAttrWrapper> deletedSitePvAttr = new HashSet<SitePvAttrWrapper>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);

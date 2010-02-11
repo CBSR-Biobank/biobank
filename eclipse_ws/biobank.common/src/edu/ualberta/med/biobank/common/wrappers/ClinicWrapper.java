@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -23,7 +24,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ModelWrapper<Clinic> {
 
-    private List<ContactWrapper> deletedContacts = new ArrayList<ContactWrapper>();
+    private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);

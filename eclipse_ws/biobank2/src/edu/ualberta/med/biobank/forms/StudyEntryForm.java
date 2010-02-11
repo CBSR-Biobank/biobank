@@ -269,29 +269,27 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        // get the selected sample sources from widget
-        List<Integer> addedSampleSourceIds = sampleSourceMultiSelect
-            .getAddedToSelection();
-        List<Integer> removedSampleSourceIds = sampleSourceMultiSelect
-            .getRemovedToSelection();
-        List<SampleSourceWrapper> addedSampleSources = new ArrayList<SampleSourceWrapper>();
-        List<SampleSourceWrapper> removedSampleSources = new ArrayList<SampleSourceWrapper>();
-        for (SampleSourceWrapper ss : allSampleSources) {
-            int id = ss.getId();
-            if (addedSampleSourceIds.indexOf(id) >= 0) {
-                addedSampleSources.add(ss);
-            } else if (removedSampleSourceIds.indexOf(id) >= 0) {
-                removedSampleSources.add(ss);
-            }
-        }
-        Assert.isTrue(addedSampleSources.size() == addedSampleSourceIds.size(),
-            "problem with added sample source selections");
-        study.addSampleSources(addedSampleSources);
-        Assert.isTrue(removedSampleSources.size() == removedSampleSourceIds
-            .size(), "problem with removed sample source selections");
-        study.removeSampleSources(removedSampleSources);
+        setSampleSources();
 
-        // get study pv attributes
+        setStudyPvAttr();
+
+        // sample storages
+        study.addSampleStorages(sampleStorageEntryWidget
+            .getAddedOrModifiedSampleStorages());
+        study.removeSampleStorages(sampleStorageEntryWidget
+            .getDeletedSampleStorages());
+
+        study.setContactCollection(contactEntryWidget.getContacts());
+        SiteAdapter siteAdapter = studyAdapter
+            .getParentFromClass(SiteAdapter.class);
+        study.setSite(siteAdapter.getWrapper());
+
+        study.persist();
+
+        studyAdapter.getParent().performExpand();
+    }
+
+    private void setStudyPvAttr() throws Exception, UserUIException {
         List<String> newPvInfoLabels = new ArrayList<String>();
         for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             String label = studyPvAttrCustom.getLabel();
@@ -327,21 +325,31 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             }
         }
+    }
 
-        // sample storages
-        study.addSampleStorages(sampleStorageEntryWidget
-            .getAddedOrModifiedSampleStorages());
-        study.removeSampleStorages(sampleStorageEntryWidget
-            .getDeletedSampleStorages());
-
-        study.setContactCollection(contactEntryWidget.getContacts());
-        SiteAdapter siteAdapter = studyAdapter
-            .getParentFromClass(SiteAdapter.class);
-        study.setSite(siteAdapter.getWrapper());
-
-        study.persist();
-
-        studyAdapter.getParent().performExpand();
+    private void setSampleSources() {
+        List<Integer> addedSampleSourceIds = sampleSourceMultiSelect
+            .getAddedToSelection();
+        List<Integer> removedSampleSourceIds = sampleSourceMultiSelect
+            .getRemovedToSelection();
+        List<SampleSourceWrapper> addedSampleSources = new ArrayList<SampleSourceWrapper>();
+        List<SampleSourceWrapper> removedSampleSources = new ArrayList<SampleSourceWrapper>();
+        if (allSampleSources != null) {
+            for (SampleSourceWrapper ss : allSampleSources) {
+                int id = ss.getId();
+                if (addedSampleSourceIds.indexOf(id) >= 0) {
+                    addedSampleSources.add(ss);
+                } else if (removedSampleSourceIds.indexOf(id) >= 0) {
+                    removedSampleSources.add(ss);
+                }
+            }
+        }
+        Assert.isTrue(addedSampleSources.size() == addedSampleSourceIds.size(),
+            "problem with added sample source selections");
+        study.addSampleSources(addedSampleSources);
+        Assert.isTrue(removedSampleSources.size() == removedSampleSourceIds
+            .size(), "problem with removed sample source selections");
+        study.removeSampleSources(removedSampleSources);
     }
 
     @Override

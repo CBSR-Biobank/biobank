@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -21,7 +22,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
-    private List<PatientWrapper> patientsAdded = new ArrayList<PatientWrapper>();
+    private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
 
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
