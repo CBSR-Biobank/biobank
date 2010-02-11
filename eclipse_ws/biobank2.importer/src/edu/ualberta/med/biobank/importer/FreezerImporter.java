@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -29,11 +30,9 @@ public class FreezerImporter {
         + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
         + "from freezer "
         + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
-        + "join study_list on freezer.study_nr=study_list.study_nr "
-        + "join patient on patient.patient_nr=freezer.patient_nr "
-        + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
-        + "and freezer.visit_nr=patient_visit.visit_nr "
-        + "and freezer.patient_nr=patient_visit.patient_nr "
+        + "join patient_visit on patient_visit.visit_nr=freezer.visit_nr "
+        + "join patient on patient.patient_nr=patient_visit.patient_nr "
+        + "join study_list on study_list.study_nr=patient_visit.study_nr "
         + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
         + "where freezer.fnum = ? and freezer.rack= ? "
         + "and frz_99_inv_id.inventory_id is null "
@@ -79,7 +78,7 @@ public class FreezerImporter {
 
         for (ContainerWrapper hotel : freezer.getChildren().values()) {
             if (!configuration.importFreezerHotel(hotel.getLabel())) {
-                logger.debug("not configured for importing hotel "
+                logger.debug("not configured to import hotel "
                     + hotel.getLabel());
                 continue;
             }
@@ -181,11 +180,11 @@ public class FreezerImporter {
 
         if (visits.size() == 0) {
             logger.error("patient " + patientNr + ", visit not found for date "
-                + Importer.formatDate(dateProcessed));
+                + DateFormatter.formatAsDateTime(dateProcessed));
             return;
         } else if (visits.size() > 1) {
             logger.info("patient " + patientNr + ", multiple visits for date "
-                + Importer.formatDate(dateProcessed));
+                + DateFormatter.formatAsDateTime(dateProcessed));
         }
 
         PatientVisitWrapper visit = visits.get(0);
