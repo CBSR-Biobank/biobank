@@ -421,12 +421,7 @@ public class CbsrStudies {
         }
         StudyWrapper study = getStudy(studyNameShort);
 
-        List<ContactWrapper> contacts = study.getContactCollection();
-        if (contacts == null) {
-            contacts = new ArrayList<ContactWrapper>();
-        }
-        contacts.add(contact);
-        study.setContactCollection(contacts);
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         study.reload();
     }

@@ -175,14 +175,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection()
-        throws Exception {
+    public List<PatientVisitWrapper> getPatientVisitCollection() {
         List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
             .get("patientVisitCollection");
         if (patientVisitCollection == null) {
-            if (wrappedObject == null) {
-                throw new Exception("wrapped object is null");
-            }
             Collection<PatientVisit> children = wrappedObject
                 .getPatientVisitCollection();
             if (children != null) {
@@ -198,26 +194,34 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return patientVisitCollection;
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
+    private void setPatientVisitCollection(
+        Collection<PatientVisit> allVisitObjects,
+        List<PatientVisitWrapper> allVisitWrappers) {
         Collection<PatientVisit> oldCollection = wrappedObject
             .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(patientVisitCollection);
+        wrappedObject.setPatientVisitCollection(allVisitObjects);
         propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, patientVisitCollection);
-        if (setNull) {
-            propertiesMap.put("patientVisitCollection", null);
-        }
+            oldCollection, allVisitObjects);
+        propertiesMap.put("patientVisitCollection", allVisitWrappers);
     }
 
-    public void setPatientVisitCollection(
-        List<PatientVisitWrapper> patientVisitCollection) {
-        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
-        for (PatientVisitWrapper pv : patientVisitCollection) {
-            pvCollection.add(pv.getWrappedObject());
+    public void addPatientVisits(List<PatientVisitWrapper> newPatientVisits) {
+        Collection<PatientVisit> allVisitObjects = new HashSet<PatientVisit>();
+        List<PatientVisitWrapper> allVisitWrappers = new ArrayList<PatientVisitWrapper>();
+        // already added visits
+        List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+        if (currentList != null) {
+            for (PatientVisitWrapper visit : currentList) {
+                allVisitObjects.add(visit.getWrappedObject());
+                allVisitWrappers.add(visit);
+            }
         }
-        setPatientVisitCollection(pvCollection, false);
-        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+        // new
+        for (PatientVisitWrapper visit : newPatientVisits) {
+            allVisitObjects.add(visit.getWrappedObject());
+            allVisitWrappers.add(visit);
+        }
+        setPatientVisitCollection(allVisitObjects, allVisitWrappers);
     }
 
     public String getComment() {

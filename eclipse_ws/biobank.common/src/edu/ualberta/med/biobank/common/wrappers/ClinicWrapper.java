@@ -400,26 +400,27 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return shipmentCollection;
     }
 
-    public void setShipmentCollection(Collection<Shipment> shipmentCollection,
-        boolean setNull) {
+    public void addShipments(Collection<ShipmentWrapper> newShipments) {
+        Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
+        List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
+        // already added shipments
+        List<ShipmentWrapper> currentList = getShipmentCollection();
+        if (currentList != null) {
+            for (ShipmentWrapper ship : currentList) {
+                allShipmentObjects.add(ship.getWrappedObject());
+                allShipmentWrappers.add(ship);
+            }
+        }
+        for (ShipmentWrapper ship : newShipments) {
+            allShipmentObjects.add(ship.getWrappedObject());
+            allShipmentWrappers.add(ship);
+        }
         Collection<Shipment> oldCollection = wrappedObject
             .getShipmentCollection();
-        wrappedObject.setShipmentCollection(shipmentCollection);
+        wrappedObject.setShipmentCollection(allShipmentObjects);
         propertyChangeSupport.firePropertyChange("shipmentCollection",
-            oldCollection, shipmentCollection);
-        if (setNull) {
-            propertiesMap.put("shipmentCollection", null);
-        }
-    }
-
-    public void setShipmentCollection(
-        Collection<ShipmentWrapper> shipmentCollection) {
-        Collection<Shipment> sCollection = new HashSet<Shipment>();
-        for (ShipmentWrapper s : shipmentCollection) {
-            sCollection.add(s.getWrappedObject());
-        }
-        setShipmentCollection(sCollection, false);
-        propertiesMap.put("shipmentCollection", shipmentCollection);
+            oldCollection, allShipmentObjects);
+        propertiesMap.put("shipmentCollection", allShipmentWrappers);
     }
 
     /**

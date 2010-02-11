@@ -111,26 +111,29 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patientVisitCollection;
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
+    public void addPatientVisits(
+        Collection<PatientVisitWrapper> newPatientVisits) {
+        Collection<PatientVisit> allPvObjects = new HashSet<PatientVisit>();
+        List<PatientVisitWrapper> allPvWrappers = new ArrayList<PatientVisitWrapper>();
+        // already added visits
+        List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+        if (currentList != null) {
+            for (PatientVisitWrapper visit : currentList) {
+                allPvObjects.add(visit.getWrappedObject());
+                allPvWrappers.add(visit);
+            }
+        }
+        // new
+        for (PatientVisitWrapper visit : newPatientVisits) {
+            allPvObjects.add(visit.getWrappedObject());
+            allPvWrappers.add(visit);
+        }
         Collection<PatientVisit> oldCollection = wrappedObject
             .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(patientVisitCollection);
+        wrappedObject.setPatientVisitCollection(allPvObjects);
         propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, patientVisitCollection);
-        if (setNull) {
-            propertiesMap.put("patientVisitCollection", null);
-        }
-    }
-
-    public void setPatientVisitCollection(
-        Collection<PatientVisitWrapper> patientVisitCollection) {
-        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
-        for (PatientVisitWrapper pv : patientVisitCollection) {
-            pvCollection.add(pv.getWrappedObject());
-        }
-        setPatientVisitCollection(pvCollection, false);
-        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+            oldCollection, allPvObjects);
+        propertiesMap.put("patientVisitCollection", allPvWrappers);
     }
 
     /**

@@ -42,7 +42,7 @@ public class TestShippingCompany extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
@@ -77,7 +77,7 @@ public class TestShippingCompany extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
@@ -167,7 +167,7 @@ public class TestShippingCompany extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment1 = ShipmentHelper

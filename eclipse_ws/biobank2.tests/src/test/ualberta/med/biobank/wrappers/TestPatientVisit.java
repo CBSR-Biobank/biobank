@@ -78,7 +78,7 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Visit Test");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);

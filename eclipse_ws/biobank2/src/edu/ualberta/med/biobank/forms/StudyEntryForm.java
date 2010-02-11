@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -279,7 +278,9 @@ public class StudyEntryForm extends BiobankEntryForm {
         study.removeSampleStorages(sampleStorageEntryWidget
             .getDeletedSampleStorages());
 
-        study.setContactCollection(contactEntryWidget.getContacts());
+        study.addContacts(contactEntryWidget.getAddedContacts());
+        study.removeContacts(contactEntryWidget.getRemovedContacts());
+
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
         study.setSite(siteAdapter.getWrapper());
@@ -360,10 +361,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        List<ContactWrapper> contacts = study.getContactCollection();
-        if (contacts != null) {
-            contactEntryWidget.setContacts(contacts);
-        }
+        contactEntryWidget.loadContacts(study);
 
         List<SampleStorageWrapper> sampleStorages = study
             .getSampleStorageCollection();

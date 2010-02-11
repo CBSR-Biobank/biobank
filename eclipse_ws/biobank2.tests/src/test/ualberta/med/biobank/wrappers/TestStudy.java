@@ -44,7 +44,7 @@ public class TestStudy extends TestDatabase {
             + "CONTACT1");
         List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
         contacts.add(contact);
-        study.setContactCollection(contacts);
+        study.addContacts(contacts);
         study.persist();
         study.reload();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
@@ -115,8 +115,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetContactCollectionAdd() throws Exception {
-        String name = "testSetContactCollectionAdd" + r.nextInt();
+    public void testAddContacts() throws Exception {
+        String name = "testAddContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = ContactHelper.addContactsToStudy(study, name);
@@ -131,8 +131,7 @@ public class TestStudy extends TestDatabase {
         ClinicWrapper clinicNotAdded = DbHelper.chooseRandomlyInList(clinics);
         ContactWrapper contactToAdd = DbHelper
             .chooseRandomlyInList(clinicNotAdded.getContactCollection());
-        contacts.add(contactToAdd);
-        study.setContactCollection(contacts);
+        study.addContacts(Arrays.asList(contactToAdd));
         study.persist();
 
         study.reload();
@@ -141,8 +140,8 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetContactCollectionRemove() throws Exception {
-        String name = "testSetContactCollectionRemove" + r.nextInt();
+    public void testRemoveContacts() throws Exception {
+        String name = "testRemoveContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = ContactHelper.addContactsToStudy(study, name);
@@ -151,9 +150,8 @@ public class TestStudy extends TestDatabase {
         // get a clinic not yet added
         List<ContactWrapper> contacts = study.getContactCollection();
         ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
-        contacts.remove(contact);
         // don't have to delete contact because this is a *..* relation
-        study.setContactCollection(contacts);
+        study.removeContacts(Arrays.asList(contact));
         study.persist();
 
         study.reload();
@@ -567,18 +565,16 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetPatientCollectionAdd() throws Exception {
-        String name = "testSetPatientCollectionAdd" + r.nextInt();
+    public void testAddPatients() throws Exception {
+        String name = "testAddPatients" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = PatientHelper.addPatients(name, study);
 
-        List<PatientWrapper> patients = study.getPatientCollection();
         PatientWrapper newPatient = PatientHelper.newPatient(name
             + "newPatient");
         newPatient.setStudy(study);
-        patients.add(newPatient);
-        study.setPatientCollection(patients);
+        study.addPatients(Arrays.asList(newPatient));
         study.persist();
 
         study.reload();
@@ -587,16 +583,15 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testSetPatientCollectionRemove() throws Exception {
-        String name = "testSetPatientCollectionRemove" + r.nextInt();
+    public void testRemovePatients() throws Exception {
+        String name = "testRemovePatients" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = PatientHelper.addPatients(name, study);
 
         List<PatientWrapper> patients = study.getPatientCollection();
         PatientWrapper patient = DbHelper.chooseRandomlyInList(patients);
-        patients.remove(patient);
-        study.setPatientCollection(patients);
+        study.removePatients(Arrays.asList(patient));
         try {
             study.persist();
             Assert.fail("a patient is missing and is not deleted");
@@ -642,7 +637,7 @@ public class TestStudy extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.addContacts(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
@@ -679,11 +674,11 @@ public class TestStudy extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(Arrays.asList(contact1, contact2));
+        study1.addContacts(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(Arrays.asList(contact2));
+        study2.addContacts(Arrays.asList(contact2));
         study2.persist();
 
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
@@ -739,12 +734,12 @@ public class TestStudy extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.addContacts(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
+        study2.addContacts(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
 
@@ -777,11 +772,11 @@ public class TestStudy extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(Arrays.asList(contact1));
+        study1.addContacts(Arrays.asList(contact1));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(Arrays.asList(contact2));
+        study2.addContacts(Arrays.asList(contact2));
         study2.persist();
 
         Assert.assertTrue(study1.isLinkedToClinic(clinic1));
@@ -872,7 +867,7 @@ public class TestStudy extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site2, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         try {
             study.persist();
             Assert.fail("Contact should be in same site");
@@ -958,7 +953,7 @@ public class TestStudy extends TestDatabase {
         ContactHelper.addContact(clinic2, name);
 
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        study.setContactCollection(Arrays.asList(contact1));
+        study.addContacts(Arrays.asList(contact1));
         study.persist();
 
         study.reload();

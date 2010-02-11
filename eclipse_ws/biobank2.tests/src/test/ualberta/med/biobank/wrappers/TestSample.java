@@ -79,7 +79,7 @@ public class TestSample extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
@@ -188,7 +188,7 @@ public class TestSample extends TestDatabase {
         PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
         ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        newStudy.setContactCollection(Arrays.asList(contact));
+        newStudy.addContacts(Arrays.asList(contact));
         newStudy.persist();
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
             newPatient);
