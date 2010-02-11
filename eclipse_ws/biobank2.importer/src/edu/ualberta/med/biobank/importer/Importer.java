@@ -662,8 +662,6 @@ public class Importer {
 
         removeAllShipments();
 
-        long start = System.currentTimeMillis();
-
         logger.info("importing shipments ...");
 
         String qryPart = "from patient_visit, study_list, patient "
@@ -768,8 +766,6 @@ public class Importer {
             }
             ++count;
         }
-        long end = System.currentTimeMillis();
-        System.out.println("shipments:" + (end - start) / 1000.0);
     }
 
     private static void removeAllPatientVisits() throws Exception {
