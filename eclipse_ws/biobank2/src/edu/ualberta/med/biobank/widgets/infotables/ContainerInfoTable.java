@@ -82,6 +82,8 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData container = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (container == null)
+                    return null;
                 switch (columnIndex) {
                 case 0:
                     return container.label;
