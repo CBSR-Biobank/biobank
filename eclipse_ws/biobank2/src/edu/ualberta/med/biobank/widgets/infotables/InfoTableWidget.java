@@ -46,6 +46,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
     private List<TableViewerColumn> tableViewColumns;
 
+    private Thread backgroundThread;
+
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         Collection<T> collection, String[] headings, int[] bounds) {
         super(parent, SWT.NONE);
@@ -200,10 +202,11 @@ public class InfoTableWidget<T> extends BiobankWidget {
     }
 
     public void setCollection(final Collection<T> collection) {
-        if (collection == null)
+        if ((collection == null)
+            || ((backgroundThread != null) && backgroundThread.isAlive()))
             return;
 
-        Thread t = new Thread() {
+        backgroundThread = new Thread() {
             @Override
             public void run() {
                 final TableViewer viewer = getTableViewer();
@@ -253,7 +256,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
             }
 
         };
-        t.start();
+        backgroundThread.start();
     }
 
     /**
