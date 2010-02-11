@@ -387,6 +387,7 @@ public class Importer {
     }
 
     private static boolean checkCabinetConfiguration() throws Exception {
+        logger.info("checking cabinet configuration");
         Statement s = con.createStatement();
         s.execute("select cnum, drawer, bin from cabinet "
             + "where inventory_id is not null "
@@ -430,6 +431,7 @@ public class Importer {
     }
 
     private static boolean checkFreezerConfiguration() throws Exception {
+        logger.info("checking freezer configuration");
         Statement s = con.createStatement();
         s.execute("select fnum, rack, box from freezer "
             + "where inventory_id is not null group by fnum, rack, box "

@@ -343,8 +343,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             HQLCriteria c = new HQLCriteria("select distinct studies from "
                 + Contact.class.getName() + " as contacts"
                 + " inner join contacts.studyCollection as studies"
-                + " where contacts.clinic = ? order by studies.nameShort",
-                Arrays.asList(new Object[] { wrappedObject }));
+                + " where contacts.clinic.id = ? order by studies.nameShort",
+                Arrays.asList(new Object[] { getId() }));
             List<Study> collection = appService.query(c);
             for (Study study : collection) {
                 studyCollection.add(new StudyWrapper(appService, study));
