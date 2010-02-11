@@ -707,6 +707,39 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return 0;
     }
 
+    public Long getPatientCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(patients) from "
+            + Site.class.getName() + " as site "
+            + "join site.studyCollection as studies "
+            + "join studies.patientCollection as patients "
+            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        return result.get(0);
+    }
+
+    public Long getPatientVisitCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(visits) from "
+            + Site.class.getName() + " as site "
+            + "join site.studyCollection as studies "
+            + "join studies.patientCollection as patients "
+            + "join patients.patientVisitCollection as visits "
+            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        return result.get(0);
+    }
+
+    public Long getSampleCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(samples) from "
+            + Site.class.getName() + " as site "
+            + "join site.studyCollection as studies "
+            + "join studies.patientCollection as patients "
+            + "join patients.patientVisitCollection as visits "
+            + "join visits.sampleCollection as samples where site.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        return result.get(0);
+    }
+
     /**
      * get all site existing
      */
