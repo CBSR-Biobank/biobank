@@ -205,6 +205,27 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
+    public void testDelete() throws Exception {
+        sample.persist();
+        SampleTypeWrapper type1 = sample.getSampleType();
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(sample
+            .getSite(), "sampletype_2");
+        SampleTypeHelper.removeFromCreated(type2);
+        type2.delete();
+
+        try {
+            type1.delete();
+            Assert.fail("cannot delete a type use by a sample");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        sample.delete();
+        SampleTypeHelper.removeFromCreated(type1);
+        type1.delete();
+    }
+
+    @Test
     public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
