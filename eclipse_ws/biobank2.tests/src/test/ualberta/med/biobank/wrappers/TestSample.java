@@ -59,12 +59,12 @@ public class TestSample extends TestDatabase {
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
-        typeChild.setSampleTypeCollection(Arrays.asList(sampleTypeWrapper));
+        typeChild.addSampleTypes(Arrays.asList(sampleTypeWrapper));
         typeChild.persist();
 
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
             site, "topType" + r.nextInt(), "ct", 1, 4, 5, true);
-        topType.setChildContainerTypeCollection(Arrays.asList(typeChild));
+        topType.addChildContainerTypes(Arrays.asList(typeChild));
         topType.persist();
 
         topContainer = ContainerHelper.addContainer("newcontainer"
@@ -205,6 +205,27 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
+    public void testDelete() throws Exception {
+        sample.persist();
+        SampleTypeWrapper type1 = sample.getSampleType();
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(sample
+            .getSite(), "sampletype_2");
+        SampleTypeHelper.removeFromCreated(type2);
+        type2.delete();
+
+        try {
+            type1.delete();
+            Assert.fail("cannot delete a type use by a sample");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        sample.delete();
+        SampleTypeHelper.removeFromCreated(type1);
+        type1.delete();
+    }
+
+    @Test
     public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
@@ -261,7 +282,7 @@ public class TestSample extends TestDatabase {
         ContainerWrapper oldParent = sample.getParent();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(sample
             .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
-        type.setSampleTypeCollection(Arrays.asList(sample.getSampleType()));
+        type.addSampleTypes(Arrays.asList(sample.getSampleType()));
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, sample.getSite(), type);
 
@@ -390,7 +411,7 @@ public class TestSample extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
-        type.setSampleTypeCollection(Arrays.asList(sampleType));
+        type.addSampleTypes(Arrays.asList(sampleType));
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);
@@ -453,7 +474,7 @@ public class TestSample extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
-        type.setSampleTypeCollection(Arrays.asList(sampleType));
+        type.addSampleTypes(Arrays.asList(sampleType));
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);

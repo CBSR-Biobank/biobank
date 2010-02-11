@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,15 +26,14 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
-import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentPatientsWidget extends BiobankWidget {
 
     private ShipmentWrapper shipment;
 
-    private InfoTableWidget<PatientWrapper> patientTable;
+    private PatientInfoTable patientTable;
 
     private Text newPatientText;
 
@@ -80,32 +76,14 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             });
         }
 
-        String[] headings = new String[] { "Patient Number", "Study Name", };
-        int[] bounds = new int[] { 150, 150, -1, -1, -1, -1 };
-        patientTable = new InfoTableWidget<PatientWrapper>(this, shipment
-            .getPatientCollection(), headings, bounds);
+        patientTable = new PatientInfoTable(this, shipment
+            .getPatientCollection());
         patientTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         patientTable.setLayoutData(gd);
-
-        patientTable.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                Object selection = event.getSelection();
-                BiobankCollectionModel item = (BiobankCollectionModel) ((StructuredSelection) selection)
-                    .getFirstElement();
-                Assert.isTrue(item.o instanceof PatientWrapper,
-                    "Invalid class where patient expected: "
-                        + item.o.getClass());
-
-                PatientWrapper patient = (PatientWrapper) item.o;
-                ShipmentAdministrationView.currentInstance
-                    .displayPatient(patient);
-            }
-        });
         addTableMenu();
     }
 

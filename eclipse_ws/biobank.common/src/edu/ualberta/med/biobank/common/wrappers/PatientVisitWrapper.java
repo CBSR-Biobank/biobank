@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -30,7 +31,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private Map<String, PvAttrWrapper> pvAttrMap;
 
-    private List<PvSampleSourceWrapper> deletedPvSampleSources = new ArrayList<PvSampleSourceWrapper>();
+    private Set<PvSampleSourceWrapper> deletedPvSampleSources = new HashSet<PvSampleSourceWrapper>();
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {

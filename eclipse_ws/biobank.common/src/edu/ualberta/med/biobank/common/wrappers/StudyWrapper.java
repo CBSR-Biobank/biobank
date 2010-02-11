@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -30,11 +31,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
-    private List<SampleStorageWrapper> deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
+    private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
 
-    private List<SampleSourceWrapper> deletedSampleSources = new ArrayList<SampleSourceWrapper>();
+    private Set<SampleSourceWrapper> deletedSampleSources = new HashSet<SampleSourceWrapper>();
 
-    private List<StudyPvAttrWrapper> deletedStudyPvAttr = new ArrayList<StudyPvAttrWrapper>();
+    private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
@@ -762,15 +763,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        // even though this query states that we are counting patients it
-        // actually counts patient visits since it is not counting distinct
-        // patients. Also see getPatientCountForClinic().
-        HQLCriteria c = new HQLCriteria("select count(patients) from "
+        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
             + Study.class.getName() + " as study"
             + " join study.patientCollection as patients"
             + " join patients.shipmentCollection as shipments"
             + " join shipments.clinic as clinic"
-            + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
+            + " join shipments.patientVisitCollection as visits"
+            + " where study.id=? and clinic.id=?"
+            + " and visits.patient.study=study", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 
         List<Long> results = appService.query(c);

@@ -5,9 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import test.ualberta.med.biobank.Utils;
-
 import junit.framework.Assert;
+import test.ualberta.med.biobank.Utils;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
@@ -25,7 +24,7 @@ public class TestCommon {
         List<SampleTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test", (sampleTypes
             .size() > 10));
-        ct.setSampleTypeCollection(sampleTypes);
+        ct.addSampleTypes(sampleTypes);
         ct.persist();
         ct.reload();
         return ct;

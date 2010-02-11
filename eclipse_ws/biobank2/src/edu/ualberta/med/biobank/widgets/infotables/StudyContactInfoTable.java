@@ -20,11 +20,11 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     private static final int[] BOUNDS = new int[] { 100, 80, 100, 150, 150 };
 
-    private StudyWrapper studyWrapper;
+    private StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper studyWrapper) {
         super(parent, null, HEADINGS, BOUNDS);
-        this.studyWrapper = studyWrapper;
+        this.study = studyWrapper;
         Collection<ContactWrapper> collection = studyWrapper
             .getContactCollection();
         if (collection == null)
@@ -44,8 +44,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         info.contact = contact;
         ClinicWrapper clinic = contact.getClinic();
         info.clinicName = clinic.getName();
-        info.patients = studyWrapper.getPatientCountForClinic(clinic);
-        info.patientVisits = studyWrapper.getPatientVisitCountForClinic(clinic);
+        info.patients = study.getPatientCountForClinic(clinic);
+        info.patientVisits = study.getPatientVisitCountForClinic(clinic);
         return info;
     }
 }
