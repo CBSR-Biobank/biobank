@@ -1399,4 +1399,78 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(top, child.getParent());
         Assert.assertEquals(newLabel, child.getLabel());
     }
+
+    /**
+     * Check the sub children are renamed too
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMoveRenamingSubbChildren() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        ContainerWrapper child = ContainerHelper.newContainer(null, TestCommon
+            .getNewBarcode(r), top, site, containerTypeMap.get("ChildCtL1"));
+        top.addChild(0, 0, child);
+        ContainerWrapper child2 = ContainerHelper.newContainer(null, TestCommon
+            .getNewBarcode(r), child, site, containerTypeMap.get("ChildCtL2"));
+        top.persist();
+        top.reload();
+
+        child.addChild(0, 0, child2);
+        child.persist();
+        child.reload();
+        String child2Label = child2.getLabel();
+        String childLabel = child.getLabel();
+        Assert.assertTrue(child2Label.startsWith(childLabel));
+        String endChild2Label = child2Label.substring(childLabel.length());
+
+        Assert.assertEquals(1, top.getChildren().size());
+
+        top.addChild(0, 2, child);
+        top.persist();
+        top.reload();
+        child.reload();
+        child2.reload();
+        Assert.assertEquals(1, top.getChildren().size());
+        Assert.assertFalse(childLabel.equals(child.getLabel()));
+        Assert.assertEquals(child.getLabel() + endChild2Label, child2
+            .getLabel());
+    }
+
+    @Test
+    public void testRenameParent() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        ContainerWrapper child = ContainerHelper.newContainer(null, TestCommon
+            .getNewBarcode(r), top, site, containerTypeMap.get("ChildCtL1"));
+        top.addChild(0, 0, child);
+        top.persist();
+        top.reload();
+        String childLabel = child.getLabel();
+        Assert.assertTrue(childLabel.startsWith(top.getLabel()));
+        String endChildLabel = childLabel.substring(top.getLabel().length());
+
+        ContainerWrapper child2 = ContainerHelper.newContainer(null, TestCommon
+            .getNewBarcode(r), child, site, containerTypeMap.get("ChildCtL2"));
+        child.addChild(0, 0, child2);
+        child.persist();
+        child.reload();
+        String child2Label = child2.getLabel();
+        Assert.assertTrue(child2Label.startsWith(childLabel));
+        String endChild2Label = child2Label.substring(childLabel.length());
+
+        Assert.assertEquals(1, top.getChildren().size());
+
+        top.setLabel("15");
+        top.persist();
+        top.reload();
+        child.reload();
+        child2.reload();
+        Assert.assertFalse(childLabel.equals(child.getLabel()));
+        Assert.assertEquals(top.getLabel() + endChildLabel, child.getLabel());
+        Assert.assertFalse(child2Label.equals(child2.getLabel()));
+        Assert.assertEquals(child.getLabel() + endChild2Label, child2
+            .getLabel());
+    }
 }

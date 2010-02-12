@@ -32,6 +32,10 @@ public class ContainerWrapper extends
     private static Logger LOGGER = Logger.getLogger(ContainerWrapper.class
         .getName());
 
+    private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
+
+    private List<SampleWrapper> addedSamples = new ArrayList<SampleWrapper>();
+
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -90,7 +94,13 @@ public class ContainerWrapper extends
     @Override
     protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
-        if (parent != null) {
+        boolean labelChanged = false;
+        if (parent == null) {
+            if (origObject != null && origObject.getLabel() != null
+                && !origObject.getLabel().equals(getLabel())) {
+                labelChanged = true;
+            }
+        } else {
             if (isNew()
                 || ((origObject != null && origObject.getPosition() != null) && (((origObject
                     .getPosition().getParentContainer() != null) && (origObject
@@ -101,26 +111,32 @@ public class ContainerWrapper extends
                 String label = parent.getLabel()
                     + LabelingScheme.getPositionString(this);
                 setLabel(label);
+                labelChanged = true;
             }
         }
-        persistChildren();
+        persistChildren(labelChanged);
         persistSamples();
     }
 
     private void persistSamples() throws Exception {
-        Map<RowColPos, SampleWrapper> samples = getSamples();
-        if (samples != null) {
-            for (SampleWrapper sample : samples.values()) {
-                sample.setParent(this);
-                sample.persist();
-            }
+        for (SampleWrapper sample : addedSamples) {
+            sample.setParent(this);
+            sample.persist();
         }
     }
 
-    private void persistChildren() throws Exception {
-        Map<RowColPos, ContainerWrapper> children = getChildren();
-        if (children != null) {
-            for (ContainerWrapper container : children.values()) {
+    private void persistChildren(boolean labelChanged) throws Exception {
+        Collection<ContainerWrapper> childrenToUpdate = null;
+        if (labelChanged) {
+            Map<RowColPos, ContainerWrapper> map = getChildren();
+            if (map != null) {
+                childrenToUpdate = map.values();
+            }
+        } else {
+            childrenToUpdate = addedChildren;
+        }
+        if (childrenToUpdate != null) {
+            for (ContainerWrapper container : childrenToUpdate) {
                 container.setParent(this);
                 container.persist();
             }
@@ -581,11 +597,11 @@ public class ContainerWrapper extends
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)
         throws BiobankCheckException {
-        ContainerPositionWrapper containerPosition = new ContainerPositionWrapper(
+        ContainerPositionWrapper tempPosition = new ContainerPositionWrapper(
             appService);
-        containerPosition.setRow(row);
-        containerPosition.setCol(col);
-        containerPosition.checkPositionValid(this);
+        tempPosition.setRow(row);
+        tempPosition.setCol(col);
+        tempPosition.checkPositionValid(this);
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             children = new TreeMap<RowColPos, ContainerWrapper>();
@@ -603,12 +619,20 @@ public class ContainerWrapper extends
         child.setPosition(row, col);
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
+        addedChildren.add(child);
     }
 
-    public void addChild(String string, ContainerWrapper container)
+    /**
+     * Add a child in this container
+     * 
+     * @param positionString position where the child should be added. e.g. AA
+     * @param child
+     * @throws Exception
+     */
+    public void addChild(String positionString, ContainerWrapper child)
         throws Exception {
-        RowColPos position = getPositionFromLabelingScheme(string);
-        addChild(position.row, position.col, container);
+        RowColPos position = getPositionFromLabelingScheme(positionString);
+        addChild(position.row, position.col, child);
     }
 
     /**
@@ -897,6 +921,13 @@ public class ContainerWrapper extends
                 "Cannot init internal object with a null container");
         }
         setWrappedObject(containerWrapper.wrappedObject);
+    }
+
+    @Override
+    protected void resetInternalField() {
+        super.resetInternalField();
+        addedChildren.clear();
+        addedSamples.clear();
     }
 
 }
