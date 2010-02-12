@@ -125,8 +125,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                SampleStorageWrapper sampleStorage = sampleStorageTable
-                    .getSelection();
+                SampleStorageWrapper sampleStorage = null; // sampleStorageTable.getSelection();
                 addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
             }
         });
@@ -136,8 +135,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                SampleStorageWrapper sampleStorage = sampleStorageTable
-                    .getSelection();
+                SampleStorageWrapper sampleStorage = null; // sampleStorageTable.getSelection();
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),

@@ -14,15 +14,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
-import edu.ualberta.med.biobank.widgets.infotables.ContactEditInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.IEditInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -36,7 +36,7 @@ public class ContactEntryWidget extends BiobankWidget implements
 
     private List<ContactWrapper> deletedContacts;
 
-    private ContactEditInfoTable contactInfoTable;
+    private ContactInfoTable contactInfoTable;
 
     private Button addClinicButton;
 
@@ -53,10 +53,9 @@ public class ContactEntryWidget extends BiobankWidget implements
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactInfoTable = new ContactEditInfoTable(parent, selectedContacts,
-            this);
+        contactInfoTable = new ContactInfoTable(parent, selectedContacts);
+        contactInfoTable.addEditSupport(this);
         contactInfoTable.adaptToToolkit(toolkit, true);
-        addTableMenu();
         contactInfoTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -84,12 +83,6 @@ public class ContactEntryWidget extends BiobankWidget implements
         deletedContacts = new ArrayList<ContactWrapper>();
     }
 
-    private void addTableMenu() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        contactInfoTable.getTableViewer().getTable().setMenu(menu);
-    }
-
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {
         ContactAddDialog dlg = new ContactAddDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), contactWrapper);
@@ -110,22 +103,35 @@ public class ContactEntryWidget extends BiobankWidget implements
     // return contactInfoTable.getCollection();
     // }
 
-    public void editItem(ContactWrapper contact) {
-        addOrEditContact(false, contact);
-    }
-
-    public void deleteItem(ContactWrapper contact) {
-        deletedContacts.add(contact);
-        selectedContacts.remove(contact);
-        contactInfoTable.setCollection(selectedContacts);
-        notifyListeners();
-    }
-
     public List<ContactWrapper> getAddedOrModifedContacts() {
         return addedOrModifiedContacts;
     }
 
     public List<ContactWrapper> getDeletedContacts() {
         return deletedContacts;
+    }
+
+    public void editItem(ContactWrapper contact) {
+        addOrEditContact(false, contact);
+    }
+
+    public void deleteItem(ContactWrapper contact) {
+        if (!contact.deleteAllowed()) {
+            BioBankPlugin.openError("Contact Delete Error",
+                "Cannot delete contact \"" + contact.getName()
+                    + "\" since it is associated with one or more studies");
+            return;
+        }
+
+        if (!BioBankPlugin.openConfirm("Delete Contact",
+            "Are you sure you want to delete contact \"" + contact.getName()
+                + "\"")) {
+            return;
+        }
+
+        deletedContacts.add(contact);
+        selectedContacts.remove(contact);
+        contactInfoTable.setCollection(selectedContacts);
+        notifyListeners();
     }
 }

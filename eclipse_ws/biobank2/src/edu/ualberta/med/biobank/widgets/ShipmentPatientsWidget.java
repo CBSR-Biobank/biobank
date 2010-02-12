@@ -140,7 +140,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             item.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    PatientWrapper patient = patientTable.getSelection();
+                    PatientWrapper patient = null; // patientTable.getSelection();
                     boolean confirm = MessageDialog.openConfirm(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
                         "Delete Patient",

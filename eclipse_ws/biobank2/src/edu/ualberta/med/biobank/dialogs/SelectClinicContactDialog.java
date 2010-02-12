@@ -109,7 +109,7 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        selectedContact = contactInfoTable.getSelection();
+        // selectedContact = contactInfoTable.getSelection();
         super.okPressed();
     }
 

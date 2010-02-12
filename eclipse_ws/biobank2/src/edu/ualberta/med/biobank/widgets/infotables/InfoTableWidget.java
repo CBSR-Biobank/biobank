@@ -50,6 +50,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
     protected Menu menu;
 
+    protected IEditInfoTable<T> editor;
+
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         Collection<T> collection, String[] headings, int[] bounds) {
         super(parent, SWT.NONE);
@@ -101,6 +103,10 @@ public class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.setLabelProvider(getLabelProvider());
         tableViewer.setContentProvider(new ArrayContentProvider());
 
+        menu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getShell(), SWT.NONE);
+        tableViewer.getTable().setMenu(menu);
+
         model = new ArrayList<BiobankCollectionModel>();
         tableViewer.setInput(model);
 
@@ -119,10 +125,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
     }
 
     protected void addClipboadCopySupport() {
-        menu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getShell(), SWT.NONE);
-        tableViewer.getTable().setMenu(menu);
-
+        Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Copy");
         item.addSelectionListener(new SelectionAdapter() {
@@ -149,6 +152,39 @@ public class InfoTableWidget<T> extends BiobankWidget {
                     new Transfer[] { textTransfer });
             }
         });
+    }
+
+    public void addEditSupport() {
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Edit");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                editItem(getSelection().o);
+            }
+        });
+
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Delete");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                deleteItem(getSelection().o);
+            }
+        });
+    }
+
+    // should be made abstract after refactoring is complete
+    public void addEditSupport(IEditInfoTable<T> editor) {
+    }
+
+    // should be made abstract after refactoring is complete
+    protected void editItem(Object o) {
+    }
+
+    // should be made abstract after refactoring is complete
+    protected void deleteItem(Object o) {
     }
 
     protected String getCollectionModelObjectToString(
@@ -289,8 +325,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.getTable().setEnabled(enabled);
     }
 
-    @SuppressWarnings("unchecked")
-    protected BiobankCollectionModel getSelection() {
+    public BiobankCollectionModel getSelection() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
             "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer

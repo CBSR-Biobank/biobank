@@ -188,7 +188,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                PvSampleSourceWrapper svss = pvSampleSourceTable.getSelection();
+                PvSampleSourceWrapper svss = null; // pvSampleSourceTable.getSelection();
                 Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
                 allowedSampleSources.add(svss.getSampleSource());
                 addOrEditPvSampleSource(false, svss, allowedSampleSources);
@@ -200,7 +200,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                PvSampleSourceWrapper svss = pvSampleSourceTable.getSelection();
+                PvSampleSourceWrapper svss = null; // pvSampleSourceTable.getSelection();
 
                 boolean confirm = MessageDialog.openConfirm(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell(),
