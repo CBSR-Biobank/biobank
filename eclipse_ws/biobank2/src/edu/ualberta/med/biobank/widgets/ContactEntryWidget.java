@@ -23,12 +23,13 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.IEditInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
-public class ContactEntryWidget extends BiobankWidget implements
-    IEditInfoTable<ContactWrapper> {
+public class ContactEntryWidget extends BiobankWidget {
 
     private Collection<ContactWrapper> selectedContacts;
 
@@ -54,13 +55,48 @@ public class ContactEntryWidget extends BiobankWidget implements
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         contactInfoTable = new ContactInfoTable(parent, selectedContacts);
-        contactInfoTable.addEditSupport(this);
         contactInfoTable.adaptToToolkit(toolkit, true);
         contactInfoTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     ContactEntryWidget.this.notifyListeners();
+                }
+            });
+
+        contactInfoTable.addEditItemListener(new IInfoTableEditItemListener() {
+            @Override
+            public void editItem(IInfoTableEvent event) {
+                addOrEditContact(false, (ContactWrapper) event.getSelection());
+            }
+        });
+
+        contactInfoTable
+            .addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(IInfoTableEvent event) {
+                    ContactWrapper contact = (ContactWrapper) event
+                        .getSelection();
+                    if (!contact.deleteAllowed()) {
+                        BioBankPlugin
+                            .openError(
+                                "Contact Delete Error",
+                                "Cannot delete contact \""
+                                    + contact.getName()
+                                    + "\" since it is associated with one or more studies");
+                        return;
+                    }
+
+                    if (!BioBankPlugin.openConfirm("Delete Contact",
+                        "Are you sure you want to delete contact \""
+                            + contact.getName() + "\"")) {
+                        return;
+                    }
+
+                    deletedContacts.add(contact);
+                    selectedContacts.remove(contact);
+                    contactInfoTable.setCollection(selectedContacts);
+                    notifyListeners();
                 }
             });
 
@@ -109,29 +145,5 @@ public class ContactEntryWidget extends BiobankWidget implements
 
     public List<ContactWrapper> getDeletedContacts() {
         return deletedContacts;
-    }
-
-    public void editItem(ContactWrapper contact) {
-        addOrEditContact(false, contact);
-    }
-
-    public void deleteItem(ContactWrapper contact) {
-        if (!contact.deleteAllowed()) {
-            BioBankPlugin.openError("Contact Delete Error",
-                "Cannot delete contact \"" + contact.getName()
-                    + "\" since it is associated with one or more studies");
-            return;
-        }
-
-        if (!BioBankPlugin.openConfirm("Delete Contact",
-            "Are you sure you want to delete contact \"" + contact.getName()
-                + "\"")) {
-            return;
-        }
-
-        deletedContacts.add(contact);
-        selectedContacts.remove(contact);
-        contactInfoTable.setCollection(selectedContacts);
-        notifyListeners();
     }
 }

@@ -74,8 +74,7 @@ public class PatientViewForm extends BiobankViewForm {
             .getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
-        visitsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        visitsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     private void setValues() {

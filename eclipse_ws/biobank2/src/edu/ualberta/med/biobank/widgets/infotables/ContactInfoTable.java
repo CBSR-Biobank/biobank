@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -75,6 +74,12 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final int[] BOUNDS = new int[] { 120, 120, 200, 120, 120,
         100 };
 
+    /**
+     * Use this constructor when edit support is not desired.
+     * 
+     * @param parent
+     * @param contacts
+     */
     public ContactInfoTable(Composite parent,
         Collection<ContactWrapper> contacts) {
         super(parent, true, contacts, HEADINGS, BOUNDS);
@@ -158,28 +163,13 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     }
 
     @Override
-    public void addEditSupport(IEditInfoTable<ContactWrapper> editor) {
-        this.editor = editor;
-        addEditSupport();
+    public ContactWrapper getSelection() {
+        return ((TableRowData) getSelectionInternal().o).contact;
     }
 
     @Override
-    protected void editItem(Object obj) {
-        ContactWrapper contact = ((TableRowData) obj).contact;
-        if (contact == null) {
-            BioBankPlugin.openError("Edit Clinic", "Invalid selection");
-            return;
-        }
-        editor.editItem(contact);
-    }
-
-    @Override
-    protected void deleteItem(Object obj) {
-        ContactWrapper contact = ((TableRowData) obj).contact;
-        if (contact == null) {
-            BioBankPlugin.openError("Delete Clinic", "Invalid selection");
-            return;
-        }
-        editor.deleteItem(contact);
+    public List<ContactWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

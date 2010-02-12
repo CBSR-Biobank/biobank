@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -8,6 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
  * Used to display clinic and contact information. Meant to be used by
@@ -47,5 +49,23 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         info.patients = study.getPatientCountForClinic(clinic);
         info.patientVisits = study.getPatientVisitCountForClinic(clinic);
         return info;
+    }
+
+    @Override
+    public List<ContactWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BiobankLabelProvider getLabelProvider() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ContactWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

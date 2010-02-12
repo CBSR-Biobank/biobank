@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
@@ -140,6 +141,18 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<ContainerWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ContainerWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

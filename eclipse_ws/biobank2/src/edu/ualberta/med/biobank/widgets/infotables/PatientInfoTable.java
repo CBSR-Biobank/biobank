@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
@@ -127,5 +128,17 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<PatientWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public PatientWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

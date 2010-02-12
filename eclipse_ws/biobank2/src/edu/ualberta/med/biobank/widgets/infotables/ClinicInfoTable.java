@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     class TableRowData {
+        public ClinicWrapper clinic;
         public String clinicName;
         public Integer studyCount;
         public String activityStatus;
@@ -137,5 +139,19 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<ClinicWrapper> getCollection() {
+        List<ClinicWrapper> result = new ArrayList<ClinicWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).clinic);
+        }
+        return result;
+    }
+
+    @Override
+    public ClinicWrapper getSelection() {
+        return ((TableRowData) getSelectionInternal().o).clinic;
     }
 }

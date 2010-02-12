@@ -1,6 +1,10 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -11,6 +15,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     private class TableRowData {
+        public StudyWrapper study;
         public String studyShortName;
         public Long patientCount;
         public Long patientVisitCount;
@@ -93,6 +98,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     @Override
     public Object getCollectionModelObject(StudyWrapper study) throws Exception {
         TableRowData info = new TableRowData();
+        info.study = study;
         info.studyShortName = study.getNameShort();
         if (info.studyShortName == null) {
             info.studyShortName = new String();
@@ -107,5 +113,21 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<StudyWrapper> getCollection() {
+        List<StudyWrapper> result = new ArrayList<StudyWrapper>();
+        for (BiobankCollectionModel item : model) {
+            TableRowData row = (TableRowData) item.o;
+            Assert.isNotNull(row.study);
+            result.add(row.study);
+        }
+        return null;
+    }
+
+    @Override
+    public StudyWrapper getSelection() {
+        return ((TableRowData) getSelectionInternal().o).study;
     }
 }

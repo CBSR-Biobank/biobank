@@ -1,11 +1,13 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SiteStudyInfo;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
@@ -24,6 +26,24 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.studyWrapper = study;
         info.patientVisits = study.getPatientVisitCount();
         return info;
+    }
+
+    @Override
+    public List<StudyWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BiobankLabelProvider getLabelProvider() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public StudyWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

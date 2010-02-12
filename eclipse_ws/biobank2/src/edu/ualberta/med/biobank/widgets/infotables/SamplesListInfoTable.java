@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -11,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
 
@@ -53,5 +55,23 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
             return;
         getTableViewer().setSelection(new StructuredSelection(selectedSample),
             true);
+    }
+
+    @Override
+    public List<SampleWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BiobankLabelProvider getLabelProvider() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SampleWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

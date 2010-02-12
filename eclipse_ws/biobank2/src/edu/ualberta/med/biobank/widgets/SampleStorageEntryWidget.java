@@ -14,8 +14,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -26,6 +24,9 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -78,7 +79,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         sampleStorageTable = new SampleStorageInfoTable(parent,
             selectedSampleStorages);
         sampleStorageTable.adaptToToolkit(toolkit, true);
-        addTableMenu();
+        addEditSupport();
         sampleStorageTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -115,42 +116,37 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         }
     }
 
-    private void addTableMenu() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        sampleStorageTable.getTableViewer().getTable().setMenu(menu);
+    private void addEditSupport() {
+        sampleStorageTable
+            .addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(IInfoTableEvent event) {
+                    SampleStorageWrapper sampleStorage = null; // sampleStorageTable.getSelection();
+                    addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
+                }
+            });
 
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                SampleStorageWrapper sampleStorage = null; // sampleStorageTable.getSelection();
-                addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
-            }
-        });
+        sampleStorageTable
+            .addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(IInfoTableEvent event) {
+                    SampleStorageWrapper sampleStorage = sampleStorageTable
+                        .getSelection();
 
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                SampleStorageWrapper sampleStorage = null; // sampleStorageTable.getSelection();
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        "Delete Sample Storage",
+                        "Are you sure you want to delete sample storage \""
+                            + sampleStorage.getSampleType().getName() + "\"?")) {
+                        return;
+                    }
 
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Sample Storage",
-                    "Are you sure you want to delete sample storage \""
-                        + sampleStorage.getSampleType().getName() + "\"?");
-
-                if (confirm) {
                     selectedSampleStorages.remove(sampleStorage);
                     sampleStorageTable.setCollection(selectedSampleStorages);
                     deletedSampleStorages.add(sampleStorage);
                     notifyListeners();
                 }
-            }
-        });
+            });
     }
 
     private void getSampleTypes(SiteWrapper site) {

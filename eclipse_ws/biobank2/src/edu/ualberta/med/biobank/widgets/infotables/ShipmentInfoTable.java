@@ -126,4 +126,16 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
             return null;
         return ((TableRowData) o).toString();
     }
+
+    @Override
+    public List<ShipmentWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ShipmentWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -24,8 +24,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -36,6 +34,9 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -91,7 +92,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         pvSampleSourceTable = new PvSampleSourceInfoTable(parent, null);
         updateCollection();
         pvSampleSourceTable.adaptToToolkit(toolkit, true);
-        addTableMenu();
+        addEditSupport();
         pvSampleSourceTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -178,46 +179,41 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         return nonDupSampleSources;
     }
 
-    private void addTableMenu() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        pvSampleSourceTable.getTableViewer().getTable().setMenu(menu);
-
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                PvSampleSourceWrapper svss = null; // pvSampleSourceTable.getSelection();
-                Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
-                allowedSampleSources.add(svss.getSampleSource());
-                addOrEditPvSampleSource(false, svss, allowedSampleSources);
-            }
-        });
-
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                PvSampleSourceWrapper svss = null; // pvSampleSourceTable.getSelection();
-
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Sample Storage",
-                    "Are you sure you want to delete sample source \""
-                        + svss.getSampleSource().getName() + "\"?");
-
-                if (confirm) {
-                    selectedPvSampleSources.remove(svss);
-                    addedPvSampleSources.remove(svss);
-                    removedPvSampleSources.add(svss);
-
-                    updateCollection();
-                    notifyListeners();
+    private void addEditSupport() {
+        pvSampleSourceTable
+            .addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(IInfoTableEvent event) {
+                    PvSampleSourceWrapper svss = pvSampleSourceTable
+                        .getSelection();
+                    Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
+                    allowedSampleSources.add(svss.getSampleSource());
+                    addOrEditPvSampleSource(false, svss, allowedSampleSources);
                 }
-            }
-        });
+            });
+        pvSampleSourceTable
+            .addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(IInfoTableEvent event) {
+                    PvSampleSourceWrapper svss = pvSampleSourceTable
+                        .getSelection();
+
+                    boolean confirm = MessageDialog.openConfirm(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        "Delete Sample Storage",
+                        "Are you sure you want to delete sample source \""
+                            + svss.getSampleSource().getName() + "\"?");
+
+                    if (confirm) {
+                        selectedPvSampleSources.remove(svss);
+                        addedPvSampleSources.remove(svss);
+                        removedPvSampleSources.add(svss);
+
+                        updateCollection();
+                        notifyListeners();
+                    }
+                }
+            });
     }
 
     private void updateCollection() {

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
@@ -9,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
 
@@ -61,6 +63,24 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
     public PatientVisitInfoTable(Composite parent,
         Collection<PatientVisitWrapper> collection) {
         super(parent, collection, HEADINGS, BOUNDS);
+    }
+
+    @Override
+    public List<PatientVisitWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BiobankLabelProvider getLabelProvider() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public PatientVisitWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

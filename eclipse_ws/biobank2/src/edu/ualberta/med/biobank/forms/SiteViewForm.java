@@ -169,8 +169,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         clinicsTable = new ClinicInfoTable(section, clinics);
         section.setClient(clinicsTable);
         clinicsTable.adaptToToolkit(toolkit, true);
-        clinicsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        clinicsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     private void createContainerTypesSection() {

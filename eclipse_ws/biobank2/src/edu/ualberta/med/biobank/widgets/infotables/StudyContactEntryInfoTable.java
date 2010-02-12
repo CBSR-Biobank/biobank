@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -45,5 +46,17 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 return super.getColumnText(element, columnIndex);
             }
         };
+    }
+
+    @Override
+    public List<ContactWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ContactWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
