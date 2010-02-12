@@ -15,20 +15,20 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
-import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ContactEditInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.IEditInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
-public class ContactEntryWidget extends BiobankWidget {
+public class ContactEntryWidget extends BiobankWidget implements
+    IEditInfoTable<ContactWrapper> {
 
     private Collection<ContactWrapper> selectedContacts;
 
@@ -36,7 +36,7 @@ public class ContactEntryWidget extends BiobankWidget {
 
     private List<ContactWrapper> deletedContacts;
 
-    private ContactInfoTable contactInfoTable;
+    private ContactEditInfoTable contactInfoTable;
 
     private Button addClinicButton;
 
@@ -53,7 +53,8 @@ public class ContactEntryWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactInfoTable = new ContactInfoTable(parent, selectedContacts);
+        contactInfoTable = new ContactEditInfoTable(parent, selectedContacts,
+            this);
         contactInfoTable.adaptToToolkit(toolkit, true);
         addTableMenu();
         contactInfoTable
@@ -87,45 +88,6 @@ public class ContactEntryWidget extends BiobankWidget {
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         contactInfoTable.getTableViewer().getTable().setMenu(menu);
-
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                ContactWrapper contactWrapper = contactInfoTable.getSelection();
-                if (contactWrapper == null) {
-                    BioBankPlugin.openError("Edit Clinic", "Invalid selection");
-                    return;
-                }
-                addOrEditContact(false, contactWrapper);
-            }
-        });
-
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                ContactWrapper contactWrapper = contactInfoTable.getSelection();
-                if (contactWrapper == null) {
-                    BioBankPlugin.openError("Delete Clinic",
-                        "Invalid selection");
-                    return;
-                }
-
-                boolean confirm = BioBankPlugin.openConfirm("Delete Clinic",
-                    "Are you sure you want to delete clinic \""
-                        + contactWrapper.getClinic().getName() + "\"");
-
-                if (confirm) {
-                    deletedContacts.add(contactWrapper);
-                    selectedContacts.remove(contactWrapper);
-                    contactInfoTable.setCollection(selectedContacts);
-                    notifyListeners();
-                }
-            }
-        });
     }
 
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {
@@ -147,6 +109,17 @@ public class ContactEntryWidget extends BiobankWidget {
     // public Collection<ContactWrapper> getContacts() {
     // return contactInfoTable.getCollection();
     // }
+
+    public void editItem(ContactWrapper contact) {
+        addOrEditContact(false, contact);
+    }
+
+    public void deleteItem(ContactWrapper contact) {
+        deletedContacts.add(contact);
+        selectedContacts.remove(contact);
+        contactInfoTable.setCollection(selectedContacts);
+        notifyListeners();
+    }
 
     public List<ContactWrapper> getAddedOrModifedContacts() {
         return addedOrModifiedContacts;

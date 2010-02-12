@@ -48,6 +48,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
 
     private Thread backgroundThread;
 
+    protected Menu menu;
+
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         Collection<T> collection, String[] headings, int[] bounds) {
         super(parent, SWT.NONE);
@@ -117,8 +119,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
     }
 
     protected void addClipboadCopySupport() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        menu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getShell(), SWT.NONE);
         tableViewer.getTable().setMenu(menu);
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
@@ -288,17 +290,13 @@ public class InfoTableWidget<T> extends BiobankWidget {
     }
 
     @SuppressWarnings("unchecked")
-    public T getSelection() {
+    protected BiobankCollectionModel getSelection() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
             "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
 
-        BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-            .getFirstElement();
-        if (item == null)
-            return null;
-        return (T) item.o;
+        return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
 }

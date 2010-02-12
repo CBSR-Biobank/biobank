@@ -11,7 +11,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
-    class TableRowData {
+    protected class TableRowData {
+        ContactWrapper contact;
         String name;
         String title;
         String emailAddress;
@@ -25,7 +26,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         }
     }
 
-    class TableSorter extends BiobankTableSorter {
+    private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
             TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
@@ -105,6 +106,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         if (contact == null)
             return null;
         TableRowData info = new TableRowData();
+        info.contact = contact;
         info.name = contact.getName();
         info.title = contact.getTitle();
         if (info.title == null) {
