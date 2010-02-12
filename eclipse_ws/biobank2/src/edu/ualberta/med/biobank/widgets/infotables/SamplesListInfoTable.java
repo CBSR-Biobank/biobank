@@ -74,4 +74,10 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

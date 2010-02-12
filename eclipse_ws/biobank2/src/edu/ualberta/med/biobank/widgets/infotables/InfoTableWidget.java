@@ -12,7 +12,6 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
@@ -173,10 +172,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         });
     }
 
-    protected String getCollectionModelObjectToString(
-        @SuppressWarnings("unused") Object o) {
-        return null;
-    }
+    protected abstract String getCollectionModelObjectToString(Object o);
 
     protected void setSorter(final BiobankTableSorter tableSorter) {
         tableViewer.setSorter(tableSorter);
@@ -327,7 +323,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         T selection = getSelection();
 
         final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
-            (ISelection) selection);
+            new InfoTableSelection(selection));
         Object[] listeners = doubleClickListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
@@ -368,32 +364,24 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     protected void editItem() {
-        T selection = getSelection();
-
-        final IInfoTableEvent event = new IInfoTableEvent(tableViewer,
-            (ISelection) selection);
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 public void run() {
-                    l.editItem(event);
+                    l.editItem();
                 }
             });
         }
     }
 
     protected void deleteItem() {
-        T selection = getSelection();
-
-        final IInfoTableEvent event = new IInfoTableEvent(tableViewer,
-            (ISelection) selection);
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 public void run() {
-                    l.deleteItem(event);
+                    l.deleteItem();
                 }
             });
         }

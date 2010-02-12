@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
 
     class TableRowData {
+        PatientVisitWrapper visit;
         Date dateProcessed;
         Integer sampleCount;
 
@@ -79,6 +80,12 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     @Override
     public PatientVisitWrapper getSelection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
         // TODO Auto-generated method stub
         return null;
     }

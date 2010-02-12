@@ -36,4 +36,10 @@ public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> 
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

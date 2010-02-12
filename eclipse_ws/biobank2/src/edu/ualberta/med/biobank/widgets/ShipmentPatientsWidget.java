@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -135,7 +134,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
         patientTable.addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
-            public void deleteItem(IInfoTableEvent event) {
+            public void deleteItem() {
                 PatientWrapper patient = patientTable.getSelection();
                 if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), "Delete Patient",

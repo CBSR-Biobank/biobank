@@ -48,4 +48,10 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
     public Object getSelection() {
         return getSelectionInternal();
     }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

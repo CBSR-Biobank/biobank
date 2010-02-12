@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -183,7 +182,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         pvSampleSourceTable
             .addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
-                public void editItem(IInfoTableEvent event) {
+                public void editItem() {
                     PvSampleSourceWrapper svss = pvSampleSourceTable
                         .getSelection();
                     Set<SampleSourceWrapper> allowedSampleSources = getNonDuplicateSampleSources();
@@ -194,7 +193,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         pvSampleSourceTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
-                public void deleteItem(IInfoTableEvent event) {
+                public void deleteItem() {
                     PvSampleSourceWrapper svss = pvSampleSourceTable
                         .getSelection();
 

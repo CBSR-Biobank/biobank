@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -120,8 +119,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         sampleStorageTable
             .addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
-                public void editItem(IInfoTableEvent event) {
-                    SampleStorageWrapper sampleStorage = null; // sampleStorageTable.getSelection();
+                public void editItem() {
+                    SampleStorageWrapper sampleStorage = sampleStorageTable
+                        .getSelection();
                     addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
                 }
             });
@@ -129,7 +129,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         sampleStorageTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
-                public void deleteItem(IInfoTableEvent event) {
+                public void deleteItem() {
                     SampleStorageWrapper sampleStorage = sampleStorageTable
                         .getSelection();
 

@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEvent;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -66,17 +65,16 @@ public class ContactEntryWidget extends BiobankWidget {
 
         contactInfoTable.addEditItemListener(new IInfoTableEditItemListener() {
             @Override
-            public void editItem(IInfoTableEvent event) {
-                addOrEditContact(false, (ContactWrapper) event.getSelection());
+            public void editItem() {
+                addOrEditContact(false, contactInfoTable.getSelection());
             }
         });
 
         contactInfoTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
-                public void deleteItem(IInfoTableEvent event) {
-                    ContactWrapper contact = (ContactWrapper) event
-                        .getSelection();
+                public void deleteItem() {
+                    ContactWrapper contact = contactInfoTable.getSelection();
                     if (!contact.deleteAllowed()) {
                         BioBankPlugin
                             .openError(

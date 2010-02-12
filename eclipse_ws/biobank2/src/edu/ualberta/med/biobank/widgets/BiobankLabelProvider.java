@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -174,21 +173,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getPhoneNumber();
             case 4:
                 return contact.getFaxNumber();
-            }
-        } else if (element instanceof SiteStudyInfo) {
-            SiteStudyInfo siteStudyInfo = (SiteStudyInfo) element;
-            switch (columnIndex) {
-            case 0:
-                return siteStudyInfo.studyWrapper.getName();
-            case 1:
-                return siteStudyInfo.studyWrapper.getNameShort();
-            case 2:
-                return siteStudyInfo.studyWrapper.getActivityStatus();
-            case 3:
-                return String.valueOf(siteStudyInfo.studyWrapper
-                    .getPatientCollection().size());
-            case 4:
-                return String.valueOf(siteStudyInfo.patientVisits);
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());

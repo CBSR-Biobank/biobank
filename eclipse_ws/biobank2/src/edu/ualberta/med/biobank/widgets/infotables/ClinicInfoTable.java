@@ -92,8 +92,12 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null)
-                    return null;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
                     return item.clinicName;

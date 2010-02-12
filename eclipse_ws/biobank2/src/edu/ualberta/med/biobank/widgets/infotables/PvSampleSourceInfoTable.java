@@ -39,4 +39,10 @@ public class PvSampleSourceInfoTable extends
         return null;
     }
 
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
