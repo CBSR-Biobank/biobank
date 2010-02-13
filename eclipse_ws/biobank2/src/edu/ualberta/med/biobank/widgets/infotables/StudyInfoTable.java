@@ -76,7 +76,6 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     public StudyInfoTable(Composite parent, Collection<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

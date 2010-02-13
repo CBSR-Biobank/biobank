@@ -90,7 +90,6 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         Collection<ContainerWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

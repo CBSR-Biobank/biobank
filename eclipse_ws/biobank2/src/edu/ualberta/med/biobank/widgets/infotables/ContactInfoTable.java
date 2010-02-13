@@ -88,7 +88,6 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         Collection<ContactWrapper> contacts) {
         super(parent, true, contacts, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

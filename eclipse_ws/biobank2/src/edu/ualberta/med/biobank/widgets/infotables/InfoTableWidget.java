@@ -135,6 +135,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 }
             }
         });
+        addClipboadCopySupport();
     }
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
@@ -142,7 +143,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         this(parent, false, collection, headings, bounds);
     }
 
-    protected void addClipboadCopySupport() {
+    private void addClipboadCopySupport() {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Copy");

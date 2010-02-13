@@ -77,7 +77,6 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         Collection<ClinicWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

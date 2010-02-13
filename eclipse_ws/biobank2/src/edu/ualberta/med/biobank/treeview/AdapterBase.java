@@ -46,6 +46,8 @@ public abstract class AdapterBase {
 
     protected ModelWrapper<?> modelObject;
 
+    protected boolean haveModelObject;
+
     private Integer id;
 
     private String label;
@@ -73,11 +75,13 @@ public abstract class AdapterBase {
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
-        boolean enableActions, boolean loadChildrenInBackground) {
+    public AdapterBase(AdapterBase parent, boolean haveModelObject,
+        ModelWrapper<?> object, boolean enableActions,
+        boolean loadChildrenInBackground) {
         this.modelObject = object;
         this.parent = parent;
         this.enableActions = enableActions;
+        this.haveModelObject = haveModelObject;
         this.loadChildrenInBackground = loadChildrenInBackground;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
@@ -87,20 +91,18 @@ public abstract class AdapterBase {
         Assert.isTrue(checkIntegrity(), "integrity checks failed");
     }
 
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
+        boolean enableActions, boolean loadChildrenInBackground) {
+        this(parent, true, object, enableActions, loadChildrenInBackground);
+    }
+
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         this(parent, object, true, true);
     }
 
-    // public AdapterBase(AdapterBase parent, int id, String name,
-    // boolean loadChildrenInBackground) {
-    // this(parent, null, true, loadChildrenInBackground);
-    // setId(id);
-    // setName(name);
-    // }
-
     public AdapterBase(AdapterBase parent, int id, String name,
         boolean hasChildren, boolean loadChildrenInBackground) {
-        this(parent, null, true, loadChildrenInBackground);
+        this(parent, false, null, true, loadChildrenInBackground);
         setId(id);
         setName(name);
         setHasChildren(hasChildren);
@@ -320,7 +322,7 @@ public abstract class AdapterBase {
     public abstract void executeDoubleClick();
 
     public void performDoubleClick() {
-        if (modelObject != null) {
+        if (!haveModelObject || (modelObject != null)) {
             executeDoubleClick();
         }
     }

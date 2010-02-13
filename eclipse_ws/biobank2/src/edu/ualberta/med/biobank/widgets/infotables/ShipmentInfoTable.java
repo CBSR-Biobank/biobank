@@ -69,7 +69,6 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

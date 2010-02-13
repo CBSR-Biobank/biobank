@@ -107,7 +107,6 @@ public class ContainerTypeInfoTable extends
         Collection<ContainerTypeWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

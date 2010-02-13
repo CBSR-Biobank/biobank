@@ -73,7 +73,6 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         super(parent, true, clinic.getStudyCollection(), HEADINGS, BOUNDS);
         this.clinic = clinic;
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override

@@ -12,7 +12,6 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
     public SearchResultsInfoTable(Composite parent,
         Collection<Object> collection, String[] headings, int[] bounds) {
         super(parent, false, collection, headings, bounds);
-        addClipboadCopySupport();
     }
 
     @Override

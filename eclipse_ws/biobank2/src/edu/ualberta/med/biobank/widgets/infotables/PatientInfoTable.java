@@ -67,7 +67,6 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         Collection<PatientWrapper> patients) {
         super(parent, true, patients, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
 
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override

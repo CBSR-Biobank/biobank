@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -93,16 +92,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                     .getQuantityUsed().toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
-            }
-        } else if (element instanceof SampleStorageWrapper) {
-            final SampleStorageWrapper ss = (SampleStorageWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return ss.getSampleType().getName();
-            case 1:
-                return String.valueOf(ss.getVolume());
-            case 2:
-                return String.valueOf(ss.getQuantity());
             }
         } else if (element instanceof SampleTypeWrapper) {
             final SampleTypeWrapper st = (SampleTypeWrapper) element;
