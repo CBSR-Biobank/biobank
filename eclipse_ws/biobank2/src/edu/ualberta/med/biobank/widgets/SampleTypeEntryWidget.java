@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -129,7 +130,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
     private void addEditSupport() {
         sampleTypeTable.addEditItemListener(new IInfoTableEditItemListener() {
             @Override
-            public void editItem() {
+            public void editItem(InfoTableEvent event) {
                 SampleTypeWrapper pvss = sampleTypeTable.getSelection();
                 Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
                 restrictedTypes.remove(pvss);
@@ -140,7 +141,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         sampleTypeTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
-                public void deleteItem() {
+                public void deleteItem(InfoTableEvent event) {
                     SampleTypeWrapper sampleType = sampleTypeTable
                         .getSelection();
 

@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
 /**
@@ -88,7 +89,7 @@ public class ClinicAddWidget extends BiobankWidget {
         contactInfoTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
-                public void deleteItem() {
+                public void deleteItem(InfoTableEvent event) {
                     ContactWrapper contact = contactInfoTable.getSelection();
                     if (!contact.deleteAllowed()) {
                         BioBankPlugin

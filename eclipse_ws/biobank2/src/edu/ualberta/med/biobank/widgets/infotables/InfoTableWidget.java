@@ -364,24 +364,28 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     protected void editItem() {
+        InfoTableSelection selection = new InfoTableSelection(getSelection());
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
         Object[] listeners = editItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 public void run() {
-                    l.editItem();
+                    l.editItem(event);
                 }
             });
         }
     }
 
     protected void deleteItem() {
+        InfoTableSelection selection = new InfoTableSelection(getSelection());
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
         Object[] listeners = deleteItemListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 public void run() {
-                    l.deleteItem();
+                    l.deleteItem(event);
                 }
             });
         }

@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -31,39 +32,30 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((c1 == null) || (c2 == null)) {
+            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+            if (i1 == null) {
                 return -1;
+            } else if (i2 == null) {
+                return 1;
             }
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.name.compareTo(c2.name);
+                rc = compare(i1.name, i2.name);
                 break;
             case 1:
-                rc = c1.nameShort.compareTo(c2.nameShort);
+                rc = compare(i1.nameShort, i2.nameShort);
                 break;
             case 2:
-                rc = c1.status.compareTo(c2.status);
+                rc = compare(i1.status, i2.status);
                 break;
             case 3:
-                if (c1.patientCount == null) {
-                    rc = -1;
-                } else if (c2.patientCount == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.patientCount.compareTo(c2.patientCount);
-                }
+                rc = compare(i1.patientCount, i2.patientCount);
                 break;
             case 4:
-                if (c1.visitCount == null) {
-                    rc = -1;
-                } else if (c2.visitCount == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.visitCount.compareTo(c2.visitCount);
-                }
+                rc = compare(i1.visitCount, i2.visitCount);
+                break;
             default:
                 rc = 0;
             }
@@ -96,7 +88,10 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         if (info.status == null) {
             info.status = new String();
         }
-        info.patientCount = study.getPatientCollection().size();
+        List<PatientWrapper> patients = study.getPatientCollection();
+        if (patients != null) {
+            info.patientCount = patients.size();
+        }
         info.visitCount = study.getPatientVisitCount();
         return info;
     }
@@ -119,11 +114,13 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 1:
                     return item.nameShort;
                 case 2:
-                    return item.status;
+                    return (item.status != null) ? item.status : "";
                 case 3:
-                    return item.patientCount.toString();
+                    return (item.patientCount != null) ? item.patientCount
+                        .toString() : "";
                 case 4:
-                    return item.visitCount.toString();
+                    return (item.visitCount != null) ? item.visitCount
+                        .toString() : "";
                 default:
                     return "";
                 }
