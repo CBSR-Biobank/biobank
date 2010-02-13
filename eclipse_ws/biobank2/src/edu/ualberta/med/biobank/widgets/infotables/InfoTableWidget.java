@@ -7,7 +7,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
@@ -35,7 +38,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
-public class InfoTableWidget<T> extends BiobankWidget {
+public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
         .getName());
@@ -47,6 +50,14 @@ public class InfoTableWidget<T> extends BiobankWidget {
     private List<TableViewerColumn> tableViewColumns;
 
     private Thread backgroundThread;
+
+    protected Menu menu;
+
+    protected ListenerList editItemListeners = new ListenerList();
+
+    protected ListenerList deleteItemListeners = new ListenerList();
+
+    protected ListenerList doubleClickListeners = new ListenerList();
 
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         Collection<T> collection, String[] headings, int[] bounds) {
@@ -75,29 +86,35 @@ public class InfoTableWidget<T> extends BiobankWidget {
         tableViewColumns = new ArrayList<TableViewerColumn>();
 
         int index = 0;
-        for (String name : headings) {
-            final TableViewerColumn col = new TableViewerColumn(tableViewer,
-                SWT.NONE);
-            col.getColumn().setText(name);
-            if (bounds == null || bounds[index] == -1) {
-                col.getColumn().pack();
-            } else {
-                col.getColumn().setWidth(bounds[index]);
-            }
-            col.getColumn().setResizable(true);
-            col.getColumn().setMoveable(true);
-            col.getColumn().addListener(SWT.SELECTED, new Listener() {
-                public void handleEvent(Event event) {
+        if (headings != null) {
+            for (String name : headings) {
+                final TableViewerColumn col = new TableViewerColumn(
+                    tableViewer, SWT.NONE);
+                col.getColumn().setText(name);
+                if (bounds == null || bounds[index] == -1) {
                     col.getColumn().pack();
+                } else {
+                    col.getColumn().setWidth(bounds[index]);
                 }
-            });
-            tableViewColumns.add(col);
-            index++;
+                col.getColumn().setResizable(true);
+                col.getColumn().setMoveable(true);
+                col.getColumn().addListener(SWT.SELECTED, new Listener() {
+                    public void handleEvent(Event event) {
+                        col.getColumn().pack();
+                    }
+                });
+                tableViewColumns.add(col);
+                index++;
+            }
+            tableViewer.setColumnProperties(headings);
         }
-        tableViewer.setColumnProperties(headings);
         tableViewer.setUseHashlookup(true);
         tableViewer.setLabelProvider(getLabelProvider());
         tableViewer.setContentProvider(new ArrayContentProvider());
+
+        menu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getShell(), SWT.NONE);
+        tableViewer.getTable().setMenu(menu);
 
         model = new ArrayList<BiobankCollectionModel>();
         tableViewer.setInput(model);
@@ -109,6 +126,16 @@ public class InfoTableWidget<T> extends BiobankWidget {
             getTableViewer().refresh();
             setCollection(collection);
         }
+
+        tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                if (doubleClickListeners.size() > 0) {
+                    InfoTableWidget.this.doubleClick();
+                }
+            }
+        });
+        addClipboadCopySupport();
     }
 
     public InfoTableWidget(Composite parent, Collection<T> collection,
@@ -116,11 +143,8 @@ public class InfoTableWidget<T> extends BiobankWidget {
         this(parent, false, collection, headings, bounds);
     }
 
-    protected void addClipboadCopySupport() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        tableViewer.getTable().setMenu(menu);
-
+    private void addClipboadCopySupport() {
+        Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Copy");
         item.addSelectionListener(new SelectionAdapter() {
@@ -149,10 +173,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
         });
     }
 
-    protected String getCollectionModelObjectToString(
-        @SuppressWarnings("unused") Object o) {
-        return null;
-    }
+    protected abstract String getCollectionModelObjectToString(Object o);
 
     protected void setSorter(final BiobankTableSorter tableSorter) {
         tableViewer.setSorter(tableSorter);
@@ -179,13 +200,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
         }
     }
 
-    public BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider();
-    }
-
-    public void addDoubleClickListener(IDoubleClickListener listener) {
-        tableViewer.addDoubleClickListener(listener);
-    }
+    public abstract BiobankLabelProvider getLabelProvider();
 
     @Override
     public boolean setFocus() {
@@ -197,7 +212,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.getTable().addSelectionListener(listener);
     }
 
-    public TableViewer getTableViewer() {
+    protected TableViewer getTableViewer() {
         return tableViewer;
     }
 
@@ -274,7 +289,7 @@ public class InfoTableWidget<T> extends BiobankWidget {
     }
 
     @SuppressWarnings("unchecked")
-    public List<T> getCollection() {
+    protected List<T> getCollectionInternal() {
         List<T> collection = new ArrayList<T>();
         for (BiobankCollectionModel item : model) {
             collection.add((T) item.o);
@@ -282,23 +297,98 @@ public class InfoTableWidget<T> extends BiobankWidget {
         return collection;
     }
 
+    public abstract List<T> getCollection();
+
     @Override
     public void setEnabled(boolean enabled) {
         tableViewer.getTable().setEnabled(enabled);
     }
 
-    @SuppressWarnings("unchecked")
-    public T getSelection() {
+    public abstract T getSelection();
+
+    protected BiobankCollectionModel getSelectionInternal() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
             "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
 
-        BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-            .getFirstElement();
-        if (item == null)
-            return null;
-        return (T) item.o;
+        return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
+    public void addDoubleClickListener(IDoubleClickListener listener) {
+        doubleClickListeners.add(listener);
+    }
+
+    public void doubleClick() {
+        // get selection as derived class object
+        T selection = getSelection();
+
+        final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
+            new InfoTableSelection(selection));
+        Object[] listeners = doubleClickListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.doubleClick(event);
+                }
+            });
+        }
+    }
+
+    public void addEditItemListener(IInfoTableEditItemListener listener) {
+        editItemListeners.add(listener);
+
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Edit");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                editItem();
+            }
+        });
+    }
+
+    public void addDeleteItemListener(IInfoTableDeleteItemListener listener) {
+        deleteItemListeners.add(listener);
+
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Delete");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                deleteItem();
+            }
+        });
+    }
+
+    protected void editItem() {
+        InfoTableSelection selection = new InfoTableSelection(getSelection());
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        Object[] listeners = editItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.editItem(event);
+                }
+            });
+        }
+    }
+
+    protected void deleteItem() {
+        InfoTableSelection selection = new InfoTableSelection(getSelection());
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        Object[] listeners = deleteItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.deleteItem(event);
+                }
+            });
+        }
+    }
 }

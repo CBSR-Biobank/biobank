@@ -745,7 +745,8 @@ public class Importer {
 
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
-                shipment.setWaybill(dateReceivedStr);
+                shipment.setWaybill(String.format("W-CBSR-%s-%05d", clinicName,
+                    count));
                 shipment.setDateReceived(dateReceived);
                 shipment.addPatients(Arrays.asList(patient));
                 shipment.persist();

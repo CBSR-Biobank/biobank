@@ -14,8 +14,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -26,6 +24,8 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -84,7 +84,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         patientTable.setLayoutData(gd);
-        addTableMenu();
+        addDeleteSupport();
     }
 
     private boolean addPatient() {
@@ -129,33 +129,26 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         notifyListeners();
     }
 
-    private void addTableMenu() {
-        if (editable) {
-            Menu menu = new Menu(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-            patientTable.getTableViewer().getTable().setMenu(menu);
+    private void addDeleteSupport() {
+        if (!editable)
+            return;
 
-            MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Delete");
-            item.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    PatientWrapper patient = patientTable.getSelection();
-                    boolean confirm = MessageDialog.openConfirm(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        "Delete Patient",
-                        "Are you sure you want to remove patient \""
-                            + patient.getPnumber() + "\" for this shipment ?");
-
-                    if (confirm) {
-                        shipment.removePatients(Arrays.asList(patient));
-                        patientTable.setCollection(shipment
-                            .getPatientCollection());
-                        notifyListeners();
-                    }
+        patientTable.addDeleteItemListener(new IInfoTableDeleteItemListener() {
+            @Override
+            public void deleteItem(InfoTableEvent event) {
+                PatientWrapper patient = patientTable.getSelection();
+                if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), "Delete Patient",
+                    "Are you sure you want to remove patient \""
+                        + patient.getPnumber() + "\" for this shipment ?")) {
+                    return;
                 }
-            });
-        }
+
+                shipment.removePatients(Arrays.asList(patient));
+                patientTable.setCollection(shipment.getPatientCollection());
+                notifyListeners();
+            }
+        });
     }
 
     public void reloadList() {

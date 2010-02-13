@@ -14,12 +14,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.SiteStudyInfo;
 import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -95,16 +93,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
             }
-        } else if (element instanceof SampleStorageWrapper) {
-            final SampleStorageWrapper ss = (SampleStorageWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return ss.getSampleType().getName();
-            case 1:
-                return String.valueOf(ss.getVolume());
-            case 2:
-                return String.valueOf(ss.getQuantity());
-            }
         } else if (element instanceof SampleTypeWrapper) {
             final SampleTypeWrapper st = (SampleTypeWrapper) element;
             switch (columnIndex) {
@@ -174,21 +162,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getPhoneNumber();
             case 4:
                 return contact.getFaxNumber();
-            }
-        } else if (element instanceof SiteStudyInfo) {
-            SiteStudyInfo siteStudyInfo = (SiteStudyInfo) element;
-            switch (columnIndex) {
-            case 0:
-                return siteStudyInfo.studyWrapper.getName();
-            case 1:
-                return siteStudyInfo.studyWrapper.getNameShort();
-            case 2:
-                return siteStudyInfo.studyWrapper.getActivityStatus();
-            case 3:
-                return String.valueOf(siteStudyInfo.studyWrapper
-                    .getPatientCollection().size());
-            case 4:
-                return String.valueOf(siteStudyInfo.patientVisits);
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());

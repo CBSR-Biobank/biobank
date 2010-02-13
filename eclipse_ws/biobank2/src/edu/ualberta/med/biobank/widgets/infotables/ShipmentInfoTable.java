@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     private class TableRowData {
+        ShipmentWrapper shipment;
         String dateReceived;
         String waybill;
         String shippingCompany;
@@ -68,7 +69,6 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override
@@ -125,5 +125,16 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<ShipmentWrapper> getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ShipmentWrapper getSelection() {
+        return ((TableRowData) getSelectionInternal().o).shipment;
     }
 }
