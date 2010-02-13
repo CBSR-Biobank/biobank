@@ -1,30 +1,28 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
 
     class TableRowData {
         PatientVisitWrapper visit;
-        Date dateProcessed;
+        String dateProcessed;
         Integer sampleCount;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] {
-                (dateProcessed != null) ? DateFormatter
-                    .formatAsDateTime(dateProcessed) : "",
-                (sampleCount != null) ? sampleCount.toString() : "" }, "\t");
+            return StringUtils.join(new String[] { dateProcessed,
+                (sampleCount != null) ? sampleCount.toString() : "0" }, "\t");
         }
     }
 
@@ -39,10 +37,10 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.dateProcessed.compareTo(c2.dateProcessed);
+                rc = compare(c1.dateProcessed, c2.dateProcessed);
                 break;
             case 1:
-                rc = c1.sampleCount.compareTo(c2.sampleCount);
+                rc = compare(c1.sampleCount, c2.sampleCount);
                 break;
             default:
                 rc = 0;
@@ -64,30 +62,67 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
     public PatientVisitInfoTable(Composite parent,
         Collection<PatientVisitWrapper> collection) {
         super(parent, collection, HEADINGS, BOUNDS);
-    }
-
-    @Override
-    public List<PatientVisitWrapper> getCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        setSorter(new TableSorter());
     }
 
     @Override
     public BiobankLabelProvider getLabelProvider() {
-        // TODO Auto-generated method stub
-        return null;
+        return new BiobankLabelProvider() {
+            @Override
+            public String getColumnText(Object element, int columnIndex) {
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (info == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
+                switch (columnIndex) {
+                case 0:
+                    return info.dateProcessed;
+                case 1:
+                    return (info.sampleCount != null) ? info.sampleCount
+                        .toString() : "0";
+
+                default:
+                    return "";
+                }
+            }
+        };
     }
 
     @Override
-    public PatientVisitWrapper getSelection() {
-        // TODO Auto-generated method stub
-        return null;
+    public Object getCollectionModelObject(PatientVisitWrapper visit)
+        throws Exception {
+        TableRowData info = new TableRowData();
+        info.visit = visit;
+        info.dateProcessed = visit.getFormattedDateProcessed();
+        List<SampleWrapper> samples = visit.getSampleCollection();
+        if (samples != null) {
+            info.sampleCount = samples.size();
+        }
+        return info;
     }
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        // TODO Auto-generated method stub
-        return null;
+        if (o == null)
+            return null;
+        return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<PatientVisitWrapper> getCollection() {
+        List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).visit);
+        }
+        return result;
+    }
+
+    @Override
+    public PatientVisitWrapper getSelection() {
+        return ((TableRowData) getSelectionInternal().o).visit;
     }
 
 }

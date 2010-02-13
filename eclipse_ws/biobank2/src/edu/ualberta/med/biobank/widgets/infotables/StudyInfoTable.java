@@ -79,6 +79,38 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
+    public BiobankLabelProvider getLabelProvider() {
+        return new BiobankLabelProvider() {
+            @Override
+            public String getColumnText(Object element, int columnIndex) {
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (info == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
+                switch (columnIndex) {
+                case 0:
+                    return info.name;
+                case 1:
+                    return info.nameShort;
+                case 2:
+                    return (info.status != null) ? info.status : "";
+                case 3:
+                    return (info.patientCount != null) ? info.patientCount
+                        .toString() : "";
+                case 4:
+                    return (info.visitCount != null) ? info.visitCount
+                        .toString() : "";
+                default:
+                    return "";
+                }
+            }
+        };
+    }
+
+    @Override
     public Object getCollectionModelObject(StudyWrapper study) throws Exception {
         TableRowData info = new TableRowData();
         info.study = study;
@@ -94,38 +126,6 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         }
         info.visitCount = study.getPatientVisitCount();
         return info;
-    }
-
-    @Override
-    public BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
-            @Override
-            public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null) {
-                    if (columnIndex == 0) {
-                        return "loading...";
-                    }
-                    return "";
-                }
-                switch (columnIndex) {
-                case 0:
-                    return item.name;
-                case 1:
-                    return item.nameShort;
-                case 2:
-                    return (item.status != null) ? item.status : "";
-                case 3:
-                    return (item.patientCount != null) ? item.patientCount
-                        .toString() : "";
-                case 4:
-                    return (item.visitCount != null) ? item.visitCount
-                        .toString() : "";
-                default:
-                    return "";
-                }
-            }
-        };
     }
 
     @Override

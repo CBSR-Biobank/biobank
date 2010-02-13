@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,10 +42,10 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.pnumber.compareTo(c2.pnumber);
+                rc = compare(c1.pnumber, c2.pnumber);
                 break;
             case 1:
-                rc = c1.studyNameShort.compareTo(c2.studyNameShort);
+                rc = compare(c1.studyNameShort, c2.studyNameShort);
                 break;
             default:
                 rc = 0;
@@ -131,13 +132,15 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     @Override
     public List<PatientWrapper> getCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        List<PatientWrapper> result = new ArrayList<PatientWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).patient);
+        }
+        return result;
     }
 
     @Override
     public PatientWrapper getSelection() {
-        // TODO Auto-generated method stub
-        return null;
+        return ((TableRowData) getSelectionInternal().o).patient;
     }
 }

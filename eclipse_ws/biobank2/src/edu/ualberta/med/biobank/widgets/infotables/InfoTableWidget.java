@@ -38,6 +38,40 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
+/**
+ * Used to display tabular information for an object in the object model or
+ * combined information from several objects in the object model.
+ * 
+ * The information in the table is loaded in a background thread. By loading
+ * object model data in a background thread, the main UI thread is not blocked
+ * when displaying the cells of the table.
+ * 
+ * This widget supports the following listeners: double click listener, edit
+ * listener, and delete listener. The double click listener is invoked when the
+ * user double clicks on a row in the table. The edit and delete listeners are
+ * invoked via the table's context menu. When one of these listeners is
+ * registered, the widget adds an "Edit" and / or "Delete" item to the context
+ * menu. The corresponding listener is then invoked when the user selects either
+ * one of the two menu choices. The event passed to the listener contains the
+ * current selection for the table.
+ * 
+ * This widget also allows for a row of information to be copied to the
+ * clipboard. The "Copy" command is made available in the context menu. When
+ * this command is selected by the user the rows that are currently selected are
+ * copied to the clipboard.
+ * 
+ * If neither the edit or delete listeners are registered, then the table is
+ * configured to be in multi select mode and the selection of multiple lines is
+ * available to the user.
+ * 
+ * NOTE:
+ * 
+ * Care should be taken in the label provider so that blocking calls are not
+ * made to the object model. All calls to the object model should be done in
+ * abstract method getCollectionModelObject().
+ * 
+ * @param <T> The model object wrapper the table is based on.
+ */
 public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
@@ -275,7 +309,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     /**
-     * This method is used to load object model data in background thread.
+     * This method is used to load object model data in the background thread.
      * 
      * @param item the model object representing the base object to get
      *            information from.

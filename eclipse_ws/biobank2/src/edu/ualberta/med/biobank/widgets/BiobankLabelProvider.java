@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.widgets;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -11,8 +9,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -58,18 +54,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return study.getNameShort();
             case 2:
                 return String.valueOf(study.getPatientCollection().size());
-            }
-        } else if (element instanceof PatientVisitWrapper) {
-            PatientVisitWrapper visit = (PatientVisitWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return visit.getFormattedDateProcessed();
-            case 1:
-                List<SampleWrapper> samples = visit.getSampleCollection();
-                if (samples == null) {
-                    return "0";
-                }
-                return String.valueOf(samples.size());
             }
         } else if (element instanceof SampleWrapper) {
             final SampleWrapper sample = (SampleWrapper) element;
@@ -138,30 +122,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return source.getName();
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
-            }
-        } else if (element instanceof PvSampleSourceWrapper) {
-            PvSampleSourceWrapper info = (PvSampleSourceWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return info.getSampleSource().getName();
-            case 1:
-                return info.getQuantity().toString();
-            case 2:
-                return info.getFormattedDateDrawn();
-            }
-        } else if (element instanceof ContactWrapper) {
-            ContactWrapper contact = (ContactWrapper) element;
-            switch (columnIndex) {
-            case 0:
-                return contact.getName();
-            case 1:
-                return contact.getTitle();
-            case 2:
-                return contact.getEmailAddress();
-            case 3:
-                return contact.getPhoneNumber();
-            case 4:
-                return contact.getFaxNumber();
             }
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
