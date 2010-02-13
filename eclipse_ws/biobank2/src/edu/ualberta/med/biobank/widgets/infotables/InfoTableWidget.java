@@ -41,11 +41,11 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 /**
  * Used to display tabular information for an object in the object model or
  * combined information from several objects in the object model.
- * 
+ * <p>
  * The information in the table is loaded in a background thread. By loading
  * object model data in a background thread, the main UI thread is not blocked
  * when displaying the cells of the table.
- * 
+ * <p>
  * This widget supports the following listeners: double click listener, edit
  * listener, and delete listener. The double click listener is invoked when the
  * user double clicks on a row in the table. The edit and delete listeners are
@@ -54,18 +54,18 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
  * menu. The corresponding listener is then invoked when the user selects either
  * one of the two menu choices. The event passed to the listener contains the
  * current selection for the table.
- * 
+ * <p>
  * This widget also allows for a row of information to be copied to the
  * clipboard. The "Copy" command is made available in the context menu. When
  * this command is selected by the user the rows that are currently selected are
  * copied to the clipboard.
- * 
+ * <p>
  * If neither the edit or delete listeners are registered, then the table is
  * configured to be in multi select mode and the selection of multiple lines is
  * available to the user.
- * 
+ * <p>
  * NOTE:
- * 
+ * <p>
  * Care should be taken in the label provider so that blocking calls are not
  * made to the object model. All calls to the object model should be done in
  * abstract method getCollectionModelObject().
