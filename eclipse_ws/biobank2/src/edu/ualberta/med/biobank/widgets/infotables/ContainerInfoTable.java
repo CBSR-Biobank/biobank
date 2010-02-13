@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,26 +15,29 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     class TableRowData {
+        ContainerWrapper container;
         String label;
-        String containerTypeNameShort;
+        String typeNameShort;
         String status;
         String barcode;
         Double temperature;
 
-        TableRowData(String label, String containerTypeNameShort,
-            String status, String barcode, Double temperature) {
-            this.label = (label != null) ? label : "";
-            this.containerTypeNameShort = (containerTypeNameShort != null) ? containerTypeNameShort
-                : "";
-            this.status = (status != null) ? status : "";
-            this.barcode = (barcode != null) ? barcode : "";
-            this.temperature = temperature;
+        TableRowData(ContainerWrapper container) {
+            this.container = container;
+            ContainerTypeWrapper type = container.getContainerType();
+            this.label = container.getLabel();
+            if (type != null) {
+                this.typeNameShort = type.getNameShort();
+            }
+            this.status = container.getActivityStatus();
+            this.barcode = container.getProductBarcode();
+            this.temperature = container.getTemperature();
         }
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { label,
-                containerTypeNameShort, status, barcode,
+            return StringUtils.join(new String[] { label, typeNameShort,
+                status, barcode,
                 (temperature != null) ? temperature.toString() : "" }, "\t");
         }
     }
@@ -41,34 +45,30 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((c1 == null) || (c2 == null)) {
+            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+            if (i1 == null) {
                 return -1;
+            } else if (i2 == null) {
+                return 1;
             }
+
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.label.compareTo(c2.label);
+                rc = compare(i1.label, i2.label);
                 break;
             case 1:
-                rc = c1.containerTypeNameShort
-                    .compareTo(c2.containerTypeNameShort);
+                rc = compare(i1.typeNameShort, i2.typeNameShort);
                 break;
             case 2:
-                rc = c1.status.compareTo(c2.status);
+                rc = compare(i1.status, i2.status);
                 break;
             case 3:
-                rc = c1.barcode.compareTo(c2.barcode);
+                rc = compare(i1.barcode, i2.barcode);
                 break;
             case 4:
-                if (c1.temperature == null) {
-                    rc = -1;
-                } else if (c2.temperature == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.temperature.compareTo(c2.temperature);
-                }
+                rc = compare(i1.temperature, i2.temperature);
                 break;
             default:
                 rc = 0;
@@ -105,7 +105,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                 case 0:
                     return container.label;
                 case 1:
-                    return container.containerTypeNameShort;
+                    return container.typeNameShort;
                 case 2:
                     return container.status;
                 case 3:
@@ -125,15 +125,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     @Override
     public Object getCollectionModelObject(ContainerWrapper container)
         throws Exception {
-        ContainerTypeWrapper type = container.getContainerType();
-        if (type != null) {
-            return new TableRowData(container.getLabel(), type.getNameShort(),
-                container.getActivityStatus(), container.getProductBarcode(),
-                container.getTemperature());
-        }
-        return new TableRowData(container.getLabel(), null, container
-            .getActivityStatus(), container.getProductBarcode(), container
-            .getTemperature());
+        return new TableRowData(container);
     }
 
     @Override
@@ -145,14 +137,16 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     @Override
     public List<ContainerWrapper> getCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).container);
+        }
+        return result;
     }
 
     @Override
     public ContainerWrapper getSelection() {
-        // TODO Auto-generated method stub
-        return null;
+        return ((TableRowData) getSelectionInternal().o).container;
     }
 
 }

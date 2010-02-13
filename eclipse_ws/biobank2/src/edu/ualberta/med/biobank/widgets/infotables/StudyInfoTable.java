@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -137,7 +138,11 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     public List<StudyWrapper> getCollection() {
-        return null;
+        List<StudyWrapper> result = new ArrayList<StudyWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).study);
+        }
+        return result;
     }
 
     @Override

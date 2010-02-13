@@ -27,7 +27,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { clinicName,
                 studyCount.toString(), (status != null) ? status : "",
-                patientCount.toString(), visitCount.toString() }, "\t");
+                (patientCount != null) ? patientCount.toString() : "",
+                (visitCount != null) ? visitCount.toString() : "" }, "\t");
         }
     }
 

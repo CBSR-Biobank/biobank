@@ -18,33 +18,37 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         public StudyWrapper study;
         public String studyShortName;
         public Long patientCount;
-        public Long patientVisitCount;
+        public Long visitCount;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                patientCount.toString(), patientVisitCount.toString() }, "\t");
+                (patientCount != null) ? patientCount.toString() : "",
+                (visitCount != null) ? visitCount.toString() : "" }, "\t");
         }
     }
 
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData s1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData s2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((s1 == null) || (s2 == null)) {
+            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+            if (i1 == null) {
                 return -1;
+            } else if (i2 == null) {
+                return 1;
             }
+
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = s1.studyShortName.compareTo(s2.studyShortName);
+                rc = compare(i1.studyShortName, i2.studyShortName);
                 break;
             case 1:
-                rc = s1.patientCount.compareTo(s2.patientCount);
+                rc = compare(i1.patientCount, i2.patientCount);
                 break;
             case 2:
-                rc = s1.patientVisitCount.compareTo(s2.patientVisitCount);
+                rc = compare(i1.visitCount, i2.visitCount);
                 break;
             default:
                 rc = 0;
@@ -79,15 +83,17 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null)
-                    return null;
+                    return "";
 
                 switch (columnIndex) {
                 case 0:
                     return item.studyShortName;
                 case 1:
-                    return item.patientCount.toString();
+                    return (item.patientCount != null) ? item.patientCount
+                        .toString() : "";
                 case 2:
-                    return item.patientVisitCount.toString();
+                    return (item.visitCount != null) ? item.visitCount
+                        .toString() : "";
                 default:
                     return "";
                 }
@@ -104,7 +110,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
             info.studyShortName = new String();
         }
         info.patientCount = study.getPatientCountForClinic(clinic);
-        info.patientVisitCount = study.getPatientVisitCountForClinic(clinic);
+        info.visitCount = study.getPatientVisitCountForClinic(clinic);
         return info;
     }
 

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,30 +33,33 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((c1 == null) || (c2 == null)) {
+            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+            if (i1 == null) {
                 return -1;
+            } else if (i2 == null) {
+                return 1;
             }
+
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.name.compareTo(c2.name);
+                rc = compare(i1.name, i2.name);
                 break;
             case 1:
-                rc = c1.title.compareTo(c2.title);
+                rc = compare(i1.title, i2.title);
                 break;
             case 2:
-                rc = c1.studies.compareTo(c2.studies);
+                rc = compare(i1.studies, i2.studies);
                 break;
             case 3:
-                rc = c1.emailAddress.compareTo(c2.emailAddress);
+                rc = compare(i1.emailAddress, i2.emailAddress);
                 break;
             case 4:
-                rc = c1.phoneNumber.compareTo(c2.phoneNumber);
+                rc = compare(i1.phoneNumber, i2.phoneNumber);
                 break;
             case 5:
-                rc = c1.faxNumber.compareTo(c2.faxNumber);
+                rc = compare(i1.faxNumber, i2.faxNumber);
                 break;
             default:
                 rc = 0;
@@ -169,7 +173,10 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     @Override
     public List<ContactWrapper> getCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        List<ContactWrapper> result = new ArrayList<ContactWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).contact);
+        }
+        return result;
     }
 }
