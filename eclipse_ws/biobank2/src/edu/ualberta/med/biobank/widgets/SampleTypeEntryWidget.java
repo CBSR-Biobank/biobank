@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -19,6 +20,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -36,6 +38,9 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
  * additional sample storage to the collection.
  */
 public class SampleTypeEntryWidget extends BiobankWidget {
+
+    private static Logger LOGGER = Logger.getLogger(SampleTypeEntryWidget.class
+        .getName());
 
     private SampleTypeInfoTable sampleTypeTable;
 
@@ -145,21 +150,37 @@ public class SampleTypeEntryWidget extends BiobankWidget {
                     SampleTypeWrapper sampleType = sampleTypeTable
                         .getSelection();
 
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Sample Type",
-                        "Are you sure you want to delete sample type \""
-                            + sampleType.getName() + "\"?")) {
-                        return;
+                    try {
+                        if (sampleType.isUsedBySamples()) {
+                            BioBankPlugin.openError("Sample Type Delete Error",
+                                "Cannot delete sample type \""
+                                    + sampleType.getName()
+                                    + "\" since there are samples of this "
+                                    + "type already in the database.");
+                            return;
+                        }
+
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Sample Type",
+                            "Are you sure you want to delete sample type \""
+                                + sampleType.getName() + "\"?")) {
+                            return;
+                        }
+
+                        // equals method now compare toString() results if both
+                        // ids are null.
+                        selectedSampleTypes.remove(sampleType);
+
+                        sampleTypeTable.setCollection(selectedSampleTypes);
+                        deletedSampleTypes.add(sampleType);
+                        notifyListeners();
+                    } catch (final RemoteConnectFailureException exp) {
+                        BioBankPlugin.openRemoteConnectErrorMessage();
+                    } catch (Exception e) {
+                        LOGGER.error("BioBankFormBase.createPartControl Error",
+                            e);
                     }
-
-                    // equals method now compare toString() results if both
-                    // ids are null.
-                    selectedSampleTypes.remove(sampleType);
-
-                    sampleTypeTable.setCollection(selectedSampleTypes);
-                    deletedSampleTypes.add(sampleType);
-                    notifyListeners();
                 }
             });
     }
