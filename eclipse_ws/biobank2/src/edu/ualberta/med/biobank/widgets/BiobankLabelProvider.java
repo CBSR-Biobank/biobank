@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.StudyContactAndPatientInfo;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
@@ -94,20 +93,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             } else if (columnIndex == 0) {
                 return "loading ...";
             }
-        } else if (element instanceof StudyContactAndPatientInfo) {
-            StudyContactAndPatientInfo info = (StudyContactAndPatientInfo) element;
-            switch (columnIndex) {
-            case 0:
-                if (info.clinicName != null)
-                    return info.clinicName;
-                return "";
-            case 1:
-                return String.valueOf(info.patients);
-            case 2:
-                return String.valueOf(info.patientVisits);
-            default:
-            }
-            return getContactWrapperColumnIndex(info.contact, columnIndex - 2);
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
