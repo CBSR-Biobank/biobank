@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -134,8 +135,11 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     @Override
     public List<ShipmentWrapper> getCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        List<ShipmentWrapper> result = new ArrayList<ShipmentWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).shipment);
+        }
+        return result;
     }
 
     @Override

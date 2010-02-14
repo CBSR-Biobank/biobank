@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -14,6 +16,7 @@ public class ContainerTypeInfoTable extends
     InfoTableWidget<ContainerTypeWrapper> {
 
     class TableRowData {
+        ContainerTypeWrapper containerType;
         String name;
         String nameShort;
         Integer capacity;
@@ -169,13 +172,17 @@ public class ContainerTypeInfoTable extends
 
     @Override
     public List<ContainerTypeWrapper> getCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        List<ContainerTypeWrapper> result = new ArrayList<ContainerTypeWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).containerType);
+        }
+        return result;
     }
 
     @Override
     public ContainerTypeWrapper getSelection() {
-        // TODO Auto-generated method stub
-        return null;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.containerType;
     }
 }
