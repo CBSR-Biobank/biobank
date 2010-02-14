@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -122,7 +123,9 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     @Override
     public PatientVisitWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).visit;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.visit;
     }
 
 }

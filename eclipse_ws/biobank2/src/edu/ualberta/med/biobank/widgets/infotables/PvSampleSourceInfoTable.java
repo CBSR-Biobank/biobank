@@ -130,7 +130,9 @@ public class PvSampleSourceInfoTable extends
 
     @Override
     public PvSampleSourceWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).pvSampleSource;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.pvSampleSource;
     }
 
 }

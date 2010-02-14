@@ -114,25 +114,29 @@ public class ContainerTypeInfoTable extends
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData ct = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (ct == null)
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
                     return "";
+                }
                 switch (columnIndex) {
                 case 0:
-                    return ct.name;
+                    return item.name;
                 case 1:
-                    return ct.nameShort;
+                    return item.nameShort;
                 case 2:
-                    return (ct.capacity != null) ? ct.capacity.toString()
+                    return (item.capacity != null) ? item.capacity.toString()
                         : null;
                 case 3:
-                    return ct.status;
+                    return item.status;
                 case 4:
-                    return (ct.inUseCount != null) ? ct.inUseCount.toString()
-                        : null;
+                    return (item.inUseCount != null) ? item.inUseCount
+                        .toString() : null;
                 case 5:
-                    return (ct.temperature != null) ? ct.temperature.toString()
-                        : null;
+                    return (item.temperature != null) ? item.temperature
+                        .toString() : null;
                 default:
                     return "";
                 }

@@ -132,6 +132,8 @@ public class SampleStorageInfoTable extends
 
     @Override
     public SampleStorageWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).sampleStorage;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.sampleStorage;
     }
 }

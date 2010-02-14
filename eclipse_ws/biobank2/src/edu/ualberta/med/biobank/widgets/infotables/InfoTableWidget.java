@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -84,6 +83,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     private List<TableViewerColumn> tableViewColumns;
 
     private Thread backgroundThread;
+
+    private boolean exitBrackgroundThread;
 
     protected Menu menu;
 
@@ -146,8 +147,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.setLabelProvider(getLabelProvider());
         tableViewer.setContentProvider(new ArrayContentProvider());
 
-        menu = new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getShell(), SWT.NONE);
+        menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
 
         model = new ArrayList<BiobankCollectionModel>();
@@ -251,10 +251,15 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     public void setCollection(final Collection<T> collection) {
-        if ((collection == null)
-            || ((backgroundThread != null) && backgroundThread.isAlive()))
+        if (collection == null)
             return;
 
+        if ((backgroundThread != null) && backgroundThread.isAlive()) {
+            exitBrackgroundThread = true;
+            return;
+        }
+
+        exitBrackgroundThread = false;
         backgroundThread = new Thread() {
             @Override
             public void run() {
@@ -266,6 +271,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                     model.clear();
                     for (int i = 0, n = collection.size(); i < n; ++i) {
                         model.add(new BiobankCollectionModel());
+                        if (exitBrackgroundThread)
+                            return;
                     }
                     display.asyncExec(new Runnable() {
                         public void run() {
@@ -288,6 +295,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         if (item != null) {
                             modelItem.o = getCollectionModelObject(item);
                         }
+                        if (exitBrackgroundThread)
+                            return;
 
                         if (!isDisposed()) {
                             display.asyncExec(new Runnable() {

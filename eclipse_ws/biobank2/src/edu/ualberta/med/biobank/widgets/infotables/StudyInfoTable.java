@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -146,7 +147,9 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     public StudyWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).study;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.study;
     }
 
 }

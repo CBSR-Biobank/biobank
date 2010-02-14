@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -78,12 +79,6 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final int[] BOUNDS = new int[] { 120, 120, 200, 120, 120,
         100 };
 
-    /**
-     * Use this constructor when edit support is not desired.
-     * 
-     * @param parent
-     * @param contacts
-     */
     public ContactInfoTable(Composite parent,
         Collection<ContactWrapper> contacts) {
         super(parent, true, contacts, HEADINGS, BOUNDS);
@@ -95,22 +90,26 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData contact = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (contact == null)
-                    return null;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
-                    return contact.name;
+                    return item.name;
                 case 1:
-                    return contact.title;
+                    return item.title;
                 case 2:
-                    return contact.studies;
+                    return item.studies;
                 case 3:
-                    return contact.emailAddress;
+                    return item.emailAddress;
                 case 4:
-                    return contact.phoneNumber;
+                    return item.phoneNumber;
                 case 5:
-                    return contact.faxNumber;
+                    return item.faxNumber;
                 default:
                     return "";
                 }
@@ -127,9 +126,6 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         info.contact = contact;
         info.name = contact.getName();
         info.title = contact.getTitle();
-        if (info.title == null) {
-            info.title = new String();
-        }
         List<StudyWrapper> studies = contact.getStudyCollection(true);
         if (studies != null) {
             StringBuilder sb = new StringBuilder();
@@ -144,17 +140,8 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             info.studies = sb.toString();
         }
         info.emailAddress = contact.getEmailAddress();
-        if (info.emailAddress == null) {
-            info.emailAddress = new String();
-        }
         info.phoneNumber = contact.getPhoneNumber();
-        if (info.phoneNumber == null) {
-            info.phoneNumber = new String();
-        }
         info.faxNumber = contact.getFaxNumber();
-        if (info.faxNumber == null) {
-            info.faxNumber = new String();
-        }
         return info;
     }
 
@@ -167,7 +154,9 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     @Override
     public ContactWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).contact;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.contact;
     }
 
     @Override

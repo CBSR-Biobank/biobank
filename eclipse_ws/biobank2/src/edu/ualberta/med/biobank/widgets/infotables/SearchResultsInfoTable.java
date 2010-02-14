@@ -50,7 +50,6 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        // TODO Auto-generated method stub
-        return null;
+        return o.toString();
     }
 }

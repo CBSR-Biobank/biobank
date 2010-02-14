@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -77,8 +78,12 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null)
-                    return null;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
                     return item.dateReceived;
@@ -135,6 +140,8 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     @Override
     public ShipmentWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).shipment;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.shipment;
     }
 }

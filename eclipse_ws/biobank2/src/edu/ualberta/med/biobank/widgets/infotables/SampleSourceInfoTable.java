@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -88,6 +89,8 @@ public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> 
 
     @Override
     public SampleSourceWrapper getSelection() {
-        return (SampleSourceWrapper) getSelectionInternal().o;
+        SampleSourceWrapper item = (SampleSourceWrapper) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item;
     }
 }

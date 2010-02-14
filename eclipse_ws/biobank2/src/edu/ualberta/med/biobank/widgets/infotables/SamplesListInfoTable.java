@@ -180,6 +180,8 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
 
     @Override
     public SampleWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).sample;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.sample;
     }
 }

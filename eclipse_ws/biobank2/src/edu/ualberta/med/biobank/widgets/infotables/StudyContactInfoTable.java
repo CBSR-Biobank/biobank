@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -146,7 +147,9 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     @Override
     public ContactWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).contact;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.contact;
     }
 
     @Override

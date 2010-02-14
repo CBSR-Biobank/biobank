@@ -92,14 +92,18 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData contact = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (contact == null)
-                    return null;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
-                    return contact.pnumber;
+                    return item.pnumber;
                 case 1:
-                    return contact.studyNameShort;
+                    return item.studyNameShort;
                 case 3:
                 default:
                     return "";
@@ -141,6 +145,8 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     @Override
     public PatientWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).patient;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.patient;
     }
 }

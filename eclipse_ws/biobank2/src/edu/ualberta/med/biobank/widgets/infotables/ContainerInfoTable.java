@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -97,23 +98,27 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData container = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (container == null)
-                    return null;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
-                    return container.label;
+                    return item.label;
                 case 1:
-                    return container.typeNameShort;
+                    return item.typeNameShort;
                 case 2:
-                    return container.status;
+                    return item.status;
                 case 3:
-                    return container.barcode;
+                    return item.barcode;
                 case 4:
-                    if (container.temperature == null) {
+                    if (item.temperature == null) {
                         return "";
                     }
-                    return container.temperature.toString();
+                    return item.temperature.toString();
                 default:
                     return "";
                 }
@@ -145,7 +150,9 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     @Override
     public ContainerWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).container;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.container;
     }
 
 }

@@ -81,8 +81,12 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null)
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
                     return "";
+                }
 
                 switch (columnIndex) {
                 case 0:
@@ -133,6 +137,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     public StudyWrapper getSelection() {
-        return ((TableRowData) getSelectionInternal().o).study;
+        TableRowData item = (TableRowData) getSelectionInternal().o;
+        Assert.isNotNull(item);
+        return item.study;
     }
 }
