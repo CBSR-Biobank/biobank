@@ -59,7 +59,7 @@ public class ClinicAddWidget extends BiobankWidget {
         contactInfoTable = new StudyContactEntryInfoTable(parent, studyWrapper
             .getContactCollection());
         contactInfoTable.adaptToToolkit(toolkit, true);
-        addDeleteSupprt();
+        addDeleteSupport();
 
         addClinicButton = toolkit.createButton(parent, "Add Contact", SWT.PUSH);
         addClinicButton.addSelectionListener(new SelectionAdapter() {
@@ -88,7 +88,7 @@ public class ClinicAddWidget extends BiobankWidget {
         }
     }
 
-    private void addDeleteSupprt() {
+    private void addDeleteSupport() {
         contactInfoTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override

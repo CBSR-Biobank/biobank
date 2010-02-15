@@ -198,20 +198,20 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                     PvSampleSourceWrapper svss = pvSampleSourceTable
                         .getSelection();
 
-                    boolean confirm = MessageDialog.openConfirm(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
                         "Delete Sample Storage",
                         "Are you sure you want to delete sample source \""
-                            + svss.getSampleSource().getName() + "\"?");
-
-                    if (confirm) {
-                        selectedPvSampleSources.remove(svss);
-                        addedPvSampleSources.remove(svss);
-                        removedPvSampleSources.add(svss);
-
-                        updateCollection();
-                        notifyListeners();
+                            + svss.getSampleSource().getName() + "\"?")) {
+                        return;
                     }
+
+                    selectedPvSampleSources.remove(svss);
+                    addedPvSampleSources.remove(svss);
+                    removedPvSampleSources.add(svss);
+
+                    updateCollection();
+                    notifyListeners();
                 }
             });
     }
