@@ -50,6 +50,16 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        return o.toString();
+        Object[] row = (Object[]) o;
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (Object field : row) {
+            if (count > 0) {
+                sb.append("\t");
+            }
+            sb.append(field.toString());
+            ++count;
+        }
+        return sb.toString();
     }
 }

@@ -358,6 +358,7 @@ public class ReportsView extends ViewPart {
 
     public void resetSearch() {
         if (searchTable != null) {
+            searchTable.dispose();
             searchTable = new SearchResultsInfoTable(top, null, null, null);
         }
         printButton.setEnabled(false);
