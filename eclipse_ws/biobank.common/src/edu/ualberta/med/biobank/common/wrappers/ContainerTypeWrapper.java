@@ -625,11 +625,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public static List<ContainerTypeWrapper> transformToWrapperList(
         WritableApplicationService appService,
         Collection<ContainerType> containerTypes) {
-        Set<ContainerTypeWrapper> set = new HashSet<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>();
         for (ContainerType type : containerTypes) {
-            set.add(new ContainerTypeWrapper(appService, type));
+            list.add(new ContainerTypeWrapper(appService, type));
         }
-        return new ArrayList<ContainerTypeWrapper>(set);
+        return new ArrayList<ContainerTypeWrapper>(list);
     }
 
     /**

@@ -34,6 +34,10 @@ public class ContainerWrapper extends
     private static Logger LOGGER = Logger.getLogger(ContainerWrapper.class
         .getName());
 
+    private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
+
+    private List<SampleWrapper> addedSamples = new ArrayList<SampleWrapper>();
+
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -92,37 +96,49 @@ public class ContainerWrapper extends
     @Override
     protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
-        if (parent != null) {
+        boolean labelChanged = true;
+        if (parent == null) {
+            if (origObject != null && getLabel() != null
+                && !getLabel().equals(origObject.getLabel())) {
+                labelChanged = true;
+            }
+        } else {
             if (isNew()
                 || ((origObject != null && origObject.getPosition() != null) && (((origObject
-                    .getPosition().getParentContainer() != null) && (origObject
-                    .getPosition().getParentContainer().getId() != parent
-                    .getId())) || (!new RowColPos(origObject.getPosition()
-                    .getRow(), origObject.getPosition().getCol())
+                    .getPosition().getParentContainer() != null) && (!origObject
+                    .getPosition().getParentContainer().getId().equals(
+                        parent.getId()))) || (!new RowColPos(origObject
+                    .getPosition().getRow(), origObject.getPosition().getCol())
                     .equals(getPosition()))))) {
                 String label = parent.getLabel()
                     + LabelingScheme.getPositionString(this);
                 setLabel(label);
+                labelChanged = true;
             }
         }
-        persistChildren();
+        persistChildren(labelChanged);
         persistSamples();
     }
 
     private void persistSamples() throws Exception {
-        Map<RowColPos, SampleWrapper> samples = getSamples();
-        if (samples != null) {
-            for (SampleWrapper sample : samples.values()) {
-                sample.setParent(this);
-                sample.persist();
-            }
+        for (SampleWrapper sample : addedSamples) {
+            sample.setParent(this);
+            sample.persist();
         }
     }
 
-    private void persistChildren() throws Exception {
-        Map<RowColPos, ContainerWrapper> children = getChildren();
-        if (children != null) {
-            for (ContainerWrapper container : children.values()) {
+    private void persistChildren(boolean labelChanged) throws Exception {
+        Collection<ContainerWrapper> childrenToPersist = null;
+        if (labelChanged) {
+            Map<RowColPos, ContainerWrapper> children = getChildren();
+            if (children != null) {
+                childrenToPersist = children.values();
+            }
+        } else {
+            childrenToPersist = addedChildren;
+        }
+        if (childrenToPersist != null) {
+            for (ContainerWrapper container : childrenToPersist) {
                 container.setParent(this);
                 container.persist();
             }
@@ -459,6 +475,7 @@ public class ContainerWrapper extends
         sample.setPosition(row, col);
         sample.setParent(this);
         samples.put(new RowColPos(row, col), sample);
+        addedSamples.add(sample);
     }
 
     /**
@@ -570,8 +587,17 @@ public class ContainerWrapper extends
         if (parent == null)
             throw new BiobankCheckException("Container " + this
                 + " does not have a parent container");
-
-        List<ContainerTypeWrapper> types = getParent().getContainerType()
+        ContainerTypeWrapper parentType = getParent().getContainerType();
+        try {
+            // need to reload the type to avoid loop problems (?) from the
+            // spring server side in specific cases. (on
+            // getChildContainerTypeCollection).
+            // Ok if nothing linked to the type.
+            parentType.reload();
+        } catch (Exception e) {
+            throw new BiobankCheckException(e);
+        }
+        List<ContainerTypeWrapper> types = parentType
             .getChildContainerTypeCollection();
         if (types == null || !types.contains(getContainerType())) {
             throw new BiobankCheckException("Container "
@@ -605,6 +631,7 @@ public class ContainerWrapper extends
         child.setPosition(row, col);
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
+        addedChildren.add(child);
     }
 
     public void addChild(String string, ContainerWrapper container)
@@ -889,6 +916,13 @@ public class ContainerWrapper extends
             return posWrapper;
         }
         return null;
+    }
+
+    @Override
+    protected void resetInternalField() {
+        super.resetInternalField();
+        addedChildren.clear();
+        addedSamples.clear();
     }
 
 }

@@ -56,7 +56,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     public abstract SiteWrapper getSite();
 
     @Override
-    public void resetInternalField() {
+    protected void resetInternalField() {
         rowColPosition = null;
         positionWrapper = null;
     }
