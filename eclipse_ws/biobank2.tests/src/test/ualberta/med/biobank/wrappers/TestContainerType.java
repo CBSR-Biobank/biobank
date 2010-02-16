@@ -558,7 +558,7 @@ public class TestContainerType extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,

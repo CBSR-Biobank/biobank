@@ -42,7 +42,7 @@ public class TestShippingCompany extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
@@ -77,7 +77,7 @@ public class TestShippingCompany extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
@@ -167,7 +167,7 @@ public class TestShippingCompany extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment1 = ShipmentHelper
@@ -183,7 +183,7 @@ public class TestShippingCompany extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        shipment1.setShippingCompany((ShippingCompany) null);
+        shipment1.setShippingCompany(null);
         shipment1.persist();
         company.reload();
         company.delete();

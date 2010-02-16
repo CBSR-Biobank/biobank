@@ -24,8 +24,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends
@@ -355,7 +353,7 @@ public class ContainerWrapper extends
         }
     }
 
-    public void setContainerType(ContainerType containerType) {
+    protected void setContainerType(ContainerType containerType) {
         ContainerType oldType = wrappedObject.getContainerType();
         wrappedObject.setContainerType(containerType);
         propertyChangeSupport.firePropertyChange("containerType", oldType,
@@ -381,7 +379,7 @@ public class ContainerWrapper extends
         return wrappedObject.getActivityStatus();
     }
 
-    public void setSite(Site site) {
+    protected void setSite(Site site) {
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -859,32 +857,28 @@ public class ContainerWrapper extends
      */
     public boolean deleteChildrenWithType(ContainerTypeWrapper type,
         Set<RowColPos> positions) throws BiobankCheckException, Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        boolean oneChildrenDeleted = false;
         if (positions == null) {
             for (ContainerWrapper child : getChildren().values()) {
-                addToDeleteList(queries, child, type);
+                oneChildrenDeleted = deleteChild(type, child);
             }
         } else {
             for (RowColPos rcp : positions) {
                 ContainerWrapper child = getChild(rcp);
-                addToDeleteList(queries, child, type);
+                oneChildrenDeleted = deleteChild(type, child);
             }
         }
-        if (queries.size() > 0) {
-            appService.executeBatchQuery(queries);
-            reload();
+        reload();
+        return oneChildrenDeleted;
+    }
+
+    private boolean deleteChild(ContainerTypeWrapper type,
+        ContainerWrapper child) throws Exception {
+        if (type == null || child.getContainerType().equals(type)) {
+            child.delete();
             return true;
         }
         return false;
-    }
-
-    private void addToDeleteList(List<SDKQuery> queries,
-        ContainerWrapper child, ContainerTypeWrapper type)
-        throws BiobankCheckException, ApplicationException {
-        if (type == null || child.getContainerType().equals(type)) {
-            child.deleteChecks();
-            queries.add(new DeleteExampleQuery(child.getWrappedObject()));
-        }
     }
 
     @Override
@@ -923,6 +917,20 @@ public class ContainerWrapper extends
         super.resetInternalField();
         addedChildren.clear();
         addedSamples.clear();
+    }
+
+    /**
+     * init this wrapper with the given containerWrapper.
+     * 
+     * @throws WrapperException
+     */
+    public void initObjectWith(ContainerWrapper containerWrapper)
+        throws WrapperException {
+        if (containerWrapper == null) {
+            throw new WrapperException(
+                "Cannot init internal object with a null container");
+        }
+        setWrappedObject(containerWrapper.wrappedObject);
     }
 
 }

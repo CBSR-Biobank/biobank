@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -10,7 +9,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -23,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
@@ -34,17 +31,28 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
 
-    private static final Logger LOGGER = Logger.getLogger(SiteViewForm.class
-        .getName());
-
     private SiteAdapter siteAdapter;
 
-    private SiteWrapper siteWrapper;
+    private SiteWrapper site;
 
     private StudyInfoTable studiesTable;
     private ClinicInfoTable clinicsTable;
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable sContainersTable;
+
+    private Text clinicCountLabel;
+
+    private Text studyCountLabel;
+
+    private Text containerTypeCountLabel;
+
+    private Text topContainerCountLabel;
+
+    private Text patientCountLabel;
+
+    private Text patientVisitCountLabel;
+
+    private Text sampleCountLabel;
 
     private Text activityStatusLabel;
 
@@ -68,14 +76,14 @@ public class SiteViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        siteWrapper = siteAdapter.getWrapper();
+        site = siteAdapter.getWrapper();
         retrieveSite();
-        setPartName("Repository Site " + siteWrapper.getName());
+        setPartName("Repository Site " + site.getName());
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Repository Site: " + siteWrapper.getName());
+        form.setText("Repository Site: " + site.getName());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -83,29 +91,50 @@ public class SiteViewForm extends AddressViewFormCommon {
             BioBankPlugin.IMG_SITE));
 
         createSiteSection();
-        createAddressSection(siteWrapper);
+        createAddressSection(site);
         createStudySection();
         createClinicSection();
         createContainerTypesSection();
         createContainerSection();
-        createButtons();
     }
 
-    private void createSiteSection() {
+    private void createSiteSection() throws Exception {
         Composite client = toolkit.createComposite(form.getBody());
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        clinicCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Clinics");
+        studyCountLabel = createReadOnlyField(client, SWT.NONE, "Total Studies");
+        containerTypeCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Container Types");
+        topContainerCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Top Level Containers");
+        patientCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Patients");
+        patientVisitCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Patient Visits");
+        sampleCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Samples");
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
         setSiteSectionValues();
     }
 
-    private void setSiteSectionValues() {
-        setTextValue(activityStatusLabel, siteWrapper.getActivityStatus());
-        setTextValue(commentLabel, siteWrapper.getComment());
+    private void setSiteSectionValues() throws Exception {
+        setTextValue(clinicCountLabel, site.getClinicCollection().size());
+        setTextValue(studyCountLabel, site.getStudyCollection().size());
+        setTextValue(containerTypeCountLabel, site.getContainerTypeCollection()
+            .size());
+        setTextValue(topContainerCountLabel, site.getTopContainerCollection()
+            .size());
+        setTextValue(patientCountLabel, site.getPatientCount());
+        setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
+        setTextValue(sampleCountLabel, site.getSampleCount());
+        setTextValue(activityStatusLabel, site.getActivityStatus());
+        setTextValue(commentLabel, site.getComment());
     }
 
     private void createStudySection() {
@@ -120,15 +149,13 @@ public class SiteViewForm extends AddressViewFormCommon {
         titem.addSelectionListener(addStudySelectionListener);
         section.setTextClient(tbar);
 
-        studiesTable = new StudyInfoTable(client, siteWrapper
-            .getStudyCollection());
+        studiesTable = new StudyInfoTable(client, site.getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     public void createClinicSection() {
-        Collection<ClinicWrapper> clinics = siteWrapper
-            .getClinicCollection(true);
+        Collection<ClinicWrapper> clinics = site.getClinicCollection(true);
         Section section = toolkit.createSection(form.getBody(), Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         section.setText("Clinics");
@@ -138,14 +165,13 @@ public class SiteViewForm extends AddressViewFormCommon {
         clinicsTable = new ClinicInfoTable(section, clinics);
         section.setClient(clinicsTable);
         clinicsTable.adaptToToolkit(toolkit, true);
-        clinicsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        clinicsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     private void createContainerTypesSection() {
         Composite client = createSectionWithClient("Container Types");
 
-        containerTypesTable = new ContainerTypeInfoTable(client, siteWrapper
+        containerTypesTable = new ContainerTypeInfoTable(client, site
             .getContainerTypeCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
@@ -153,70 +179,34 @@ public class SiteViewForm extends AddressViewFormCommon {
             .addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void createContainerSection() {
+    private void createContainerSection() throws Exception {
         Section section = createSection("Top Level Containers");
+        sContainersTable = new ContainerInfoTable(section, siteAdapter
+            .getWrapper().getTopContainerCollection());
+        section.setClient(sContainersTable);
+        sContainersTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sContainersTable);
 
-        try {
-            sContainersTable = new ContainerInfoTable(section, siteAdapter
-                .getWrapper().getTopContainerCollection());
-            section.setClient(sContainersTable);
-            sContainersTable.adaptToToolkit(toolkit, true);
-            toolkit.paintBordersFor(sContainersTable);
-
-            sContainersTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-        } catch (Exception e) {
-            LOGGER.error("Problem while queriyng top level containers", e);
-        }
-    }
-
-    private void createButtons() {
-        Composite client = toolkit.createComposite(form.getBody());
-        client.setLayout(new GridLayout(4, false));
-        toolkit.paintBordersFor(client);
-
-        final Button study = toolkit
-            .createButton(client, "Add Study", SWT.PUSH);
-        study.addSelectionListener(addStudySelectionListener);
-
-        final Button clinic = toolkit.createButton(client, "Add Clinic",
-            SWT.PUSH);
-        clinic.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ClinicAdapter clinicAdapter = new ClinicAdapter(siteAdapter
-                    .getClinicGroupNode(), new ClinicWrapper(appService));
-                AdapterBase.openForm(new FormInput(clinicAdapter),
-                    ClinicEntryForm.ID);
-            }
-        });
-
-        final Button containerType = toolkit.createButton(client,
-            "Add Container Type", SWT.PUSH);
-        containerType.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-            }
-        });
+        sContainersTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
-    protected void reload() {
+    protected void reload() throws Exception {
         retrieveSite();
-        setPartName("Repository Site " + siteWrapper.getName());
-        form.setText("Repository Site: " + siteWrapper.getName());
+        setPartName("Repository Site " + site.getName());
+        form.setText("Repository Site: " + site.getName());
         setSiteSectionValues();
-        setAdressValues(siteWrapper);
-        studiesTable.setCollection(siteWrapper.getStudyCollection());
-        clinicsTable.setCollection(siteWrapper.getClinicCollection(true));
-        containerTypesTable.setCollection(siteWrapper
-            .getContainerTypeCollection(true));
-        sContainersTable.setCollection(siteWrapper.getContainerCollection());
+        setAdressValues(site);
+        studiesTable.setCollection(site.getStudyCollection());
+        clinicsTable.setCollection(site.getClinicCollection(true));
+        containerTypesTable
+            .setCollection(site.getContainerTypeCollection(true));
+        sContainersTable.setCollection(site.getContainerCollection());
     }
 
     private void retrieveSite() {
         try {
-            siteWrapper.reload();
+            site.reload();
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Can't reload site", e);
         }

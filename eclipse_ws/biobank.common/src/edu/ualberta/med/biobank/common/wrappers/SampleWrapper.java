@@ -112,7 +112,7 @@ public class SampleWrapper extends
         return null;
     }
 
-    public void setPatientVisit(PatientVisit patientVisit) {
+    protected void setPatientVisit(PatientVisit patientVisit) {
         PatientVisit oldPV = patientVisit;
         wrappedObject.setPatientVisit(patientVisit);
         propertyChangeSupport.firePropertyChange("patientVisit", oldPV,
@@ -169,7 +169,7 @@ public class SampleWrapper extends
         return true;
     }
 
-    public void setSampleType(SampleType type) {
+    protected void setSampleType(SampleType type) {
         SampleType oldType = wrappedObject.getSampleType();
         wrappedObject.setSampleType(type);
         propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
@@ -346,8 +346,14 @@ public class SampleWrapper extends
             .asList(new Object[] { siteId }));
         List<Sample> samples = appService.query(criteria);
         List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        int i = 0;
         for (Sample sample : samples) {
+            // return a list of 10 maximum
+            if (i == 10) {
+                return list;
+            }
             list.add(new SampleWrapper(appService, sample));
+            i++;
         }
         return list;
     }
@@ -362,8 +368,14 @@ public class SampleWrapper extends
             .asList(new Object[] { siteId }));
         List<Sample> samples = appService.query(criteria);
         List<SampleWrapper> list = new ArrayList<SampleWrapper>();
+        int i = 0;
         for (Sample sample : samples) {
+            // return a list of 10 maximum
+            if (i == 10) {
+                return list;
+            }
             list.add(new SampleWrapper(appService, sample));
+            i++;
         }
         return list;
     }

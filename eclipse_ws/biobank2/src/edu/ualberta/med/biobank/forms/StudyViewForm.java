@@ -100,8 +100,7 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
-        contactsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        contactsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     private void setStudySectionValues() throws Exception {

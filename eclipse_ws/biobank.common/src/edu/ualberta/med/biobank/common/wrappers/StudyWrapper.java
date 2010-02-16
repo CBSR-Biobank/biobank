@@ -99,14 +99,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return new SiteWrapper(appService, site);
     }
 
-    public void setSite(Site site) {
-        Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
     public void setSite(SiteWrapper site) {
-        setSite(site.getWrappedObject());
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = site.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     @Override
@@ -249,26 +246,48 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getContactCollection(false);
     }
 
-    public void setContactCollection(Collection<Contact> contacts,
-        boolean setNull) {
+    private void setContactCollection(Collection<Contact> allContactObjects,
+        List<ContactWrapper> allContactWrappers) {
         Collection<Contact> oldContacts = wrappedObject.getContactCollection();
-        wrappedObject.setContactCollection(contacts);
+        wrappedObject.setContactCollection(allContactObjects);
         propertyChangeSupport.firePropertyChange("contactCollection",
-            oldContacts, contacts);
-        if (setNull) {
-            propertiesMap.put("contactCollection", null);
-        }
+            oldContacts, allContactObjects);
+        propertiesMap.put("contactCollection", allContactWrappers);
     }
 
-    public void setContactCollection(List<ContactWrapper> contacts) {
-        Collection<Contact> contactObjects = new HashSet<Contact>();
-        if (contacts != null) {
-            for (ContactWrapper contact : contacts) {
-                contactObjects.add(contact.getWrappedObject());
+    public void addContacts(List<ContactWrapper> newContacts) {
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                allContactObjects.add(contact.getWrappedObject());
+                allContactWrappers.add(contact);
             }
         }
-        setContactCollection(contactObjects, false);
-        propertiesMap.put("contactCollection", contacts);
+        // new contacts added
+        for (ContactWrapper contact : newContacts) {
+            allContactObjects.add(contact.getWrappedObject());
+            allContactWrappers.add(contact);
+        }
+        setContactCollection(allContactObjects, allContactWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToRemove) {
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                if (!contactsToRemove.contains(contact)) {
+                    allContactObjects.add(contact.getWrappedObject());
+                    allContactWrappers.add(contact);
+                }
+            }
+        }
+        setContactCollection(allContactObjects, allContactWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -309,7 +328,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
         // new
         for (SampleStorageWrapper ss : newSampleStorages) {
-            ss.setStudy(wrappedObject);
+            ss.setStudy(this);
             allSsObjects.add(ss.getWrappedObject());
             allSsWrappers.add(ss);
             deletedSampleStorages.remove(ss);
@@ -703,24 +722,47 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return result.get(0) > 0;
     }
 
-    public void setPatientCollection(Collection<Patient> patients,
-        boolean setNull) {
+    private void setPatientCollection(Collection<Patient> allPatientObjects,
+        List<PatientWrapper> allPatientWrappers) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
-        wrappedObject.setPatientCollection(patients);
+        wrappedObject.setPatientCollection(allPatientObjects);
         propertyChangeSupport.firePropertyChange("patientCollection",
-            oldPatients, patients);
-        if (setNull) {
-            propertiesMap.put("patientCollection", null);
-        }
+            oldPatients, allPatientObjects);
+        propertiesMap.put("patientCollection", allPatientWrappers);
     }
 
-    public void setPatientCollection(List<PatientWrapper> patients) {
-        Collection<Patient> patientsObjects = new HashSet<Patient>();
-        for (PatientWrapper p : patients) {
-            patientsObjects.add(p.getWrappedObject());
+    public void addPatients(List<PatientWrapper> newPatients) {
+        Collection<Patient> allPatientObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
+        // already added patients
+        List<PatientWrapper> currentList = getPatientCollection();
+        if (currentList != null) {
+            for (PatientWrapper patient : currentList) {
+                allPatientObjects.add(patient.getWrappedObject());
+                allPatientWrappers.add(patient);
+            }
         }
-        setPatientCollection(patientsObjects, false);
-        propertiesMap.put("patientCollection", patients);
+        // new patients added
+        for (PatientWrapper patient : newPatients) {
+            allPatientObjects.add(patient.getWrappedObject());
+            allPatientWrappers.add(patient);
+        }
+        setPatientCollection(allPatientObjects, allPatientWrappers);
+    }
+
+    public void removePatients(List<PatientWrapper> patientsToRemove) {
+        Collection<Patient> allPatientObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
+        List<PatientWrapper> currentList = getPatientCollection();
+        if (currentList != null) {
+            for (PatientWrapper patient : currentList) {
+                if (!patientsToRemove.contains(patient)) {
+                    allPatientObjects.add(patient.getWrappedObject());
+                    allPatientWrappers.add(patient);
+                }
+            }
+        }
+        setPatientCollection(allPatientObjects, allPatientWrappers);
     }
 
     @Override

@@ -38,7 +38,7 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         PatientWrapper patientWrapper = getWrapper();
-        Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
+        Assert.isNotNull(patientWrapper, "patient is null");
         return patientWrapper.getPnumber();
     }
 

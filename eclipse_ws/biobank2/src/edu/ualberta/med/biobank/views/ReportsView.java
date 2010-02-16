@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
@@ -59,8 +58,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportsView extends ViewPart {
@@ -80,7 +78,7 @@ public class ReportsView extends ViewPart {
 
     private Button searchButton;
     private Collection<Object> searchData;
-    private InfoTableWidget<Object> searchTable;
+    private SearchResultsInfoTable searchTable;
 
     private Button printButton;
     private Button exportButton;
@@ -141,10 +139,8 @@ public class ReportsView extends ViewPart {
                         bounds[i] = 100 + names[i].length() * 2;
                     }
                     searchTable.dispose();
-                    searchTable = new InfoTableWidget<Object>(top, searchData,
+                    searchTable = new SearchResultsInfoTable(top, searchData,
                         names, bounds);
-                    searchTable.getTableViewer().setLabelProvider(
-                        new ReportsLabelProvider());
                     GridData searchLayoutData = new GridData(SWT.FILL,
                         SWT.FILL, true, true);
                     searchLayoutData.minimumHeight = 500;
@@ -201,7 +197,7 @@ public class ReportsView extends ViewPart {
         Label resultsLabel = new Label(top, SWT.NONE);
         resultsLabel.setText("Results:");
 
-        searchTable = new InfoTableWidget<Object>(top, searchData,
+        searchTable = new SearchResultsInfoTable(top, searchData,
             new String[] {}, null);
         GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
         searchTable.setLayoutData(searchLayoutData);
@@ -362,13 +358,8 @@ public class ReportsView extends ViewPart {
 
     public void resetSearch() {
         if (searchTable != null) {
-
-            searchTable.setCollection(new ArrayList<Object>());
-            TableColumn[] cols = searchTable.getTableViewer().getTable()
-                .getColumns();
-            for (TableColumn col : cols) {
-                col.setText("");
-            }
+            searchTable.dispose();
+            searchTable = new SearchResultsInfoTable(top, null, null, null);
         }
         printButton.setEnabled(false);
         exportButton.setEnabled(false);

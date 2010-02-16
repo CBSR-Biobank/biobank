@@ -71,15 +71,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return new PatientWrapper(appService, patient);
     }
 
-    public void setPatient(PatientWrapper patientWrapper) {
-        setPatient(patientWrapper.getWrappedObject());
-    }
-
-    public void setPatient(Patient patient) {
+    public void setPatient(PatientWrapper patient) {
         Patient oldPatient = wrappedObject.getPatient();
-        wrappedObject.setPatient(patient);
-        propertyChangeSupport
-            .firePropertyChange("patient", oldPatient, patient);
+        Patient newPatient = patient.getWrappedObject();
+        wrappedObject.setPatient(newPatient);
+        propertyChangeSupport.firePropertyChange("patient", oldPatient,
+            newPatient);
     }
 
     @SuppressWarnings("unchecked")
@@ -383,14 +380,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return new ShipmentWrapper(appService, s);
     }
 
-    public void setShipment(Shipment s) {
-        ShipmentWrapper oldShipment = getShipment();
-        wrappedObject.setShipment(s);
-        propertyChangeSupport.firePropertyChange("shipment", oldShipment, s);
-    }
-
     public void setShipment(ShipmentWrapper s) {
-        setShipment(s.wrappedObject);
+        Shipment oldShipment = wrappedObject.getShipment();
+        Shipment newShipment = s.getWrappedObject();
+        wrappedObject.setShipment(newShipment);
+        propertyChangeSupport.firePropertyChange("shipment", oldShipment,
+            newShipment);
     }
 
     @SuppressWarnings("unchecked")

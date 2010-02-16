@@ -20,7 +20,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
     private ShipmentAdapter shipmentAdapter;
-    private ShipmentWrapper shipmentWrapper;
+    private ShipmentWrapper shipment;
 
     private Text siteLabel;
 
@@ -38,6 +38,10 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private Text boxNumberLabel;
 
+    private Text patientCountLabel;
+
+    private Text patientVisitCountLabel;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
@@ -45,24 +49,24 @@ public class ShipmentViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        shipmentWrapper = shipmentAdapter.getWrapper();
+        shipment = shipmentAdapter.getWrapper();
         retrieveShipment();
 
-        setPartName("Shipment " + shipmentWrapper.getWaybill());
+        setPartName("Shipment " + shipment.getWaybill());
     }
 
     private void retrieveShipment() {
         try {
-            shipmentWrapper.reload();
+            shipment.reload();
         } catch (Exception ex) {
             LOGGER.error("Error while retrieving shipment "
-                + shipmentWrapper.getWaybill(), ex);
+                + shipment.getWaybill(), ex);
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment waybill: " + shipmentWrapper.getWaybill());
+        form.setText("Shipment waybill: " + shipment.getWaybill());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -77,8 +81,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        new ShipmentPatientsWidget(client, SWT.NONE, shipmentWrapper, null,
-            toolkit, false);
+        new ShipmentPatientsWidget(client, SWT.NONE, shipment, null, toolkit,
+            false);
     }
 
     private void createMainSection() {
@@ -98,25 +102,27 @@ public class ShipmentViewForm extends BiobankViewForm {
         dateReceivedLabel = createReadOnlyField(client, SWT.NONE,
             "Date received");
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
+        patientCountLabel = createReadOnlyField(client, SWT.WRAP, "Patients");
+        patientVisitCountLabel = createReadOnlyField(client, SWT.WRAP,
+            "Patient Visits");
 
         setShipmentValues();
-
     }
 
     private void setShipmentValues() {
-        setTextValue(siteLabel, shipmentWrapper.getClinic().getSite().getName());
-        setTextValue(waybillLabel, shipmentWrapper.getWaybill());
-        setTextValue(clinicLabel, shipmentWrapper.getClinic() == null ? ""
-            : shipmentWrapper.getClinic().getName());
-        setTextValue(dateShippedLabel, shipmentWrapper
-            .getFormattedDateShipped());
-        setTextValue(companyLabel,
-            shipmentWrapper.getShippingCompany() == null ? "" : shipmentWrapper
-                .getShippingCompany().getName());
-        setTextValue(boxNumberLabel, shipmentWrapper.getBoxNumber());
-        setTextValue(dateReceivedLabel, shipmentWrapper
-            .getFormattedDateReceived());
-        setTextValue(commentLabel, shipmentWrapper.getComment());
+        setTextValue(siteLabel, shipment.getClinic().getSite().getName());
+        setTextValue(waybillLabel, shipment.getWaybill());
+        setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment
+            .getClinic().getName());
+        setTextValue(dateShippedLabel, shipment.getFormattedDateShipped());
+        setTextValue(companyLabel, shipment.getShippingCompany() == null ? ""
+            : shipment.getShippingCompany().getName());
+        setTextValue(boxNumberLabel, shipment.getBoxNumber());
+        setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
+        setTextValue(commentLabel, shipment.getComment());
+        setTextValue(patientCountLabel, shipment.getPatientCollection().size());
+        setTextValue(patientVisitCountLabel, shipment
+            .getPatientVisitCollection().size());
     }
 
     @Override
@@ -127,9 +133,9 @@ public class ShipmentViewForm extends BiobankViewForm {
     @Override
     protected void reload() throws Exception {
         retrieveShipment();
-        setPartName("Shipment " + shipmentWrapper.getWaybill());
+        setPartName("Shipment " + shipment.getWaybill());
         if (!form.isDisposed()) {
-            form.setText("Shipment waybill: " + shipmentWrapper.getWaybill());
+            form.setText("Shipment waybill: " + shipment.getWaybill());
         }
         setShipmentValues();
     }

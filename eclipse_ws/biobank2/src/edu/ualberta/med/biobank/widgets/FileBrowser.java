@@ -52,7 +52,6 @@ public class FileBrowser extends BiobankWidget {
                             while (br.ready())
                                 contents += br.readLine() + "\n";
                         } catch (Exception e1) {
-                            // TODO Auto-generated catch block
                             BioBankPlugin.openError("IO Error",
                                 "Unable to read file.");
                         }

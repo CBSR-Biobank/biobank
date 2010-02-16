@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -13,9 +15,11 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.SampleAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PvSampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
 
@@ -160,6 +164,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
             .getSampleCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
+
+        samplesWidget.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                SampleWrapper sample = samplesWidget.getSelection();
+                SampleAdapter node = new SampleAdapter(null, sample);
+                node.performDoubleClick();
+            }
+        });
     }
 
     @Override

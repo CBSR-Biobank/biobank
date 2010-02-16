@@ -1,6 +1,5 @@
 package test.ualberta.med.biobank.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class TestContact extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         contact.reload();
 
@@ -49,9 +48,9 @@ public class TestContact extends TestDatabase {
         StudyWrapper study2 = StudyHelper.addStudy(site, "ASDFG" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
-        study2.setContactCollection(Arrays.asList(contact));
+        study2.addContacts(Arrays.asList(contact));
         study2.persist();
         contact.reload();
 
@@ -150,7 +149,7 @@ public class TestContact extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         contact.reload();
 
@@ -161,7 +160,7 @@ public class TestContact extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        study.setContactCollection(new ArrayList<ContactWrapper>());
+        study.removeContacts(Arrays.asList(contact));
         study.persist();
         contact.reload();
         contact.delete();

@@ -682,8 +682,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 // need to use the container object retrieved from the
                 // database !
                 currentPalletWrapper
-                    .setWrappedObject(palletFoundWithProductBarcode
-                        .getWrappedObject());
+                    .initObjectWith(palletFoundWithProductBarcode);
                 currentPalletWrapper.reset();
                 needToCheckPosition = false;
                 newPallet = false;

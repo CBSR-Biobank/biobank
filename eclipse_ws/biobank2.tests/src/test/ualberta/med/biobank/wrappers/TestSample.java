@@ -79,7 +79,7 @@ public class TestSample extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
@@ -170,7 +170,7 @@ public class TestSample extends TestDatabase {
     @Test
     public void testCheckPatientVisitNotNull() throws BiobankCheckException,
         Exception {
-        sample.setPatientVisit((PatientVisit) null);
+        sample.setPatientVisit(null);
         try {
             sample.persist();
             Assert.fail("Patient visit should be set!");
@@ -188,7 +188,7 @@ public class TestSample extends TestDatabase {
         PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
         ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        newStudy.setContactCollection(Arrays.asList(contact));
+        newStudy.addContacts(Arrays.asList(contact));
         newStudy.persist();
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
             newPatient);
@@ -205,10 +205,31 @@ public class TestSample extends TestDatabase {
     }
 
     @Test
+    public void testDelete() throws Exception {
+        sample.persist();
+        SampleTypeWrapper type1 = sample.getSampleType();
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(sample
+            .getSite(), "sampletype_2");
+        SampleTypeHelper.removeFromCreated(type2);
+        type2.delete();
+
+        try {
+            type1.delete();
+            Assert.fail("cannot delete a type use by a sample");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        sample.delete();
+        SampleTypeHelper.removeFromCreated(type1);
+        type1.delete();
+    }
+
+    @Test
     public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
-        sample.setPatientVisit(pvw.getWrappedObject());
+        sample.setPatientVisit(pvw);
         Assert.assertTrue(sample.getPatientVisit().getId() == pvw.getId());
     }
 

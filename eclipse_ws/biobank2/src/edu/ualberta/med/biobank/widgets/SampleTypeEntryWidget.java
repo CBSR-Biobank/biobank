@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -18,16 +18,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
-import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -37,6 +38,9 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
  * additional sample storage to the collection.
  */
 public class SampleTypeEntryWidget extends BiobankWidget {
+
+    private static Logger LOGGER = Logger.getLogger(SampleTypeEntryWidget.class
+        .getName());
 
     private SampleTypeInfoTable sampleTypeTable;
 
@@ -77,7 +81,7 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         GridData gd = (GridData) sampleTypeTable.getLayoutData();
         gd.heightHint = 230;
 
-        addTableMenu();
+        addEditSupport();
         sampleTypeTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -128,56 +132,57 @@ public class SampleTypeEntryWidget extends BiobankWidget {
         return restrictedTypes;
     }
 
-    private void addTableMenu() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        sampleTypeTable.getTableViewer().getTable().setMenu(menu);
-
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
+    private void addEditSupport() {
+        sampleTypeTable.addEditItemListener(new IInfoTableEditItemListener() {
             @Override
-            public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
-                    .getTableViewer().getSelection();
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                SampleTypeWrapper pvss = ((SampleTypeWrapper) item.o);
+            public void editItem(InfoTableEvent event) {
+                SampleTypeWrapper pvss = sampleTypeTable.getSelection();
                 Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
                 restrictedTypes.remove(pvss);
                 addOrEditSampleType(false, pvss, restrictedTypes);
             }
         });
 
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                IStructuredSelection stSelection = (IStructuredSelection) sampleTypeTable
-                    .getTableViewer().getSelection();
+        sampleTypeTable
+            .addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    SampleTypeWrapper sampleType = sampleTypeTable
+                        .getSelection();
 
-                BiobankCollectionModel item = (BiobankCollectionModel) stSelection
-                    .getFirstElement();
-                SampleTypeWrapper sampleType = (SampleTypeWrapper) item.o;
+                    try {
+                        if (sampleType.isUsedBySamples()) {
+                            BioBankPlugin.openError("Sample Type Delete Error",
+                                "Cannot delete sample type \""
+                                    + sampleType.getName()
+                                    + "\" since there are samples of this "
+                                    + "type already in the database.");
+                            return;
+                        }
 
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Sample Type",
-                    "Are you sure you want to delete sample type \""
-                        + sampleType.getName() + "\"?");
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Sample Type",
+                            "Are you sure you want to delete sample type \""
+                                + sampleType.getName() + "\"?")) {
+                            return;
+                        }
 
-                if (confirm) {
-                    // equals method now compare toString() results if both ids
-                    // are null.
-                    selectedSampleTypes.remove(sampleType);
+                        // equals method now compare toString() results if both
+                        // ids are null.
+                        selectedSampleTypes.remove(sampleType);
 
-                    sampleTypeTable.setCollection(selectedSampleTypes);
-                    deletedSampleTypes.add(sampleType);
-                    notifyListeners();
+                        sampleTypeTable.setCollection(selectedSampleTypes);
+                        deletedSampleTypes.add(sampleType);
+                        notifyListeners();
+                    } catch (final RemoteConnectFailureException exp) {
+                        BioBankPlugin.openRemoteConnectErrorMessage();
+                    } catch (Exception e) {
+                        LOGGER.error("BioBankFormBase.createPartControl Error",
+                            e);
+                    }
                 }
-            }
-        });
+            });
     }
 
     private boolean addEditOk(SampleTypeWrapper type,

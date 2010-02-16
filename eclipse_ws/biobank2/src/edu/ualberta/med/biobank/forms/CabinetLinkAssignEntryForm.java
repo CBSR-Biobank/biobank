@@ -310,7 +310,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             });
         if (sampleTypes.size() == 1) {
             viewerSampleTypes.getCombo().select(0);
-            sampleWrapper.setSampleType(sampleTypes.get(0).getWrappedObject());
+            sampleWrapper.setSampleType(sampleTypes.get(0));
         }
     }
 

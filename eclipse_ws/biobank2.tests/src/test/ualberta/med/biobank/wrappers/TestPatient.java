@@ -67,7 +67,7 @@ public class TestPatient extends TestDatabase {
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
     }
 
@@ -182,7 +182,7 @@ public class TestPatient extends TestDatabase {
             visits.add(PatientVisitHelper.newPatientVisit(patient, shipment,
                 Utils.getRandomDate()));
         }
-        patient.setPatientVisitCollection(visits);
+        patient.addPatientVisits(visits);
         patient.persist();
         patient.reload();
 
@@ -239,7 +239,7 @@ public class TestPatient extends TestDatabase {
             "Clinic - Patient Test " + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
@@ -276,6 +276,26 @@ public class TestPatient extends TestDatabase {
         patient.reload();
         visits = patient.getPatientVisitCollection();
         Assert.assertEquals(0, visits.size());
+    }
+
+    @Test
+    public void testAddPatientVisits() throws Exception {
+        String name = "testAddPatientVisits" + r.nextInt();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name
+            + Utils.getRandomString(10));
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+
+        PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+        patient.addPatientVisits(Arrays.asList(visit));
+        patient.persist();
+
+        patient.reload();
+        Assert.assertEquals(1, patient.getPatientVisitCollection().size());
     }
 
     @Test
@@ -318,7 +338,7 @@ public class TestPatient extends TestDatabase {
 
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient1,

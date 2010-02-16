@@ -35,9 +35,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.ITableInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -71,21 +70,20 @@ public abstract class BiobankFormBase extends EditorPart {
     protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
         public void doubleClick(DoubleClickEvent event) {
             Object selection = event.getSelection();
-            Object element = ((StructuredSelection) selection)
-                .getFirstElement();
-            if (element instanceof AdapterBase) {
-                ((AdapterBase) element).performDoubleClick();
-            } else if (element instanceof BiobankCollectionModel) {
-                BiobankCollectionModel item = (BiobankCollectionModel) element;
-                if (item.o != null) {
-                    if (item.o instanceof AdapterBase) {
-                        ((AdapterBase) item.o).performDoubleClick();
-                    } else if (item.o instanceof ModelWrapper<?>) {
-                        SessionManager.openViewForm((ModelWrapper<?>) item.o);
-                    } else if (item.o instanceof ITableInfo) {
-                        SessionManager.openViewForm(((ITableInfo) item.o)
-                            .getDisplayedWrapper());
-                    }
+            if (selection instanceof StructuredSelection) {
+                Object element = ((StructuredSelection) selection)
+                    .getFirstElement();
+                if (element instanceof AdapterBase) {
+                    ((AdapterBase) element).performDoubleClick();
+                }
+            } else if (selection instanceof InfoTableSelection) {
+                InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                System.out.println("double click selection: "
+                    + tableSelection.getObject().getClass().getName());
+                if (tableSelection.getObject() instanceof ModelWrapper<?>) {
+                    SessionManager
+                        .openViewForm((ModelWrapper<?>) tableSelection
+                            .getObject());
                 }
             }
         }
