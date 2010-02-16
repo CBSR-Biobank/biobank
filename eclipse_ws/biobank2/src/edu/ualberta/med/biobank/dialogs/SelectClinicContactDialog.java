@@ -1,54 +1,40 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.eclipse.core.runtime.Assert;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends BiobankDialog {
+
+    private static Logger LOGGER = Logger
+        .getLogger(SelectClinicContactDialog.class.getName());
 
     public static final int ADD_BTN_ID = 100;
 
     private static final String TITLE = "Clinic Contacts";
 
-    private HashMap<String, ClinicWrapper> clinicMap;
-
-    private Combo clinicCombo;
-
-    private ContactInfoTable contactInfoTable;
+    private StudyContactEntryInfoTable contactInfoTable;
 
     private ContactWrapper selectedContact;
 
-    private List<ContactWrapper> alreadySelectedContacts;
+    private StudyWrapper study;
 
-    public SelectClinicContactDialog(Shell parent,
-        List<ClinicWrapper> clinicCollection,
-        List<ContactWrapper> alreadySelectedContacts) {
+    public SelectClinicContactDialog(Shell parent, StudyWrapper study) {
         super(parent);
-        this.alreadySelectedContacts = alreadySelectedContacts;
-        clinicMap = new HashMap<String, ClinicWrapper>();
-        if (clinicCollection != null) {
-            for (ClinicWrapper clinic : clinicCollection) {
-                clinicMap.put(clinic.getName(), clinic);
-            }
-        }
+        this.study = study;
     }
 
     @Override
@@ -60,29 +46,12 @@ public class SelectClinicContactDialog extends BiobankDialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
-        setStatusMessage("Select a clinic and then a contact");
+        setStatusMessage("Select a contact:");
         Composite contents = new Composite(parentComposite, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Label label = new Label(contents, SWT.NONE);
-        label.setText("Clinic:");
-        clinicCombo = new Combo(contents, SWT.BORDER | SWT.READ_ONLY);
-        GridData gd = new GridData(SWT.LEFT, SWT.FILL, true, true);
-        gd.widthHint = 250;
-        clinicCombo.setLayoutData(gd);
-        Set<String> sortedKeys = new TreeSet<String>(clinicMap.keySet());
-        for (String stName : sortedKeys) {
-            clinicCombo.add(stName);
-        }
-        clinicCombo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                updateTable();
-            }
-        });
-
-        contactInfoTable = new ContactInfoTable(contents, null);
+        contactInfoTable = new StudyContactEntryInfoTable(contents, null);
         contactInfoTable.setEnabled(false);
         contactInfoTable.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -93,23 +62,22 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
             }
         });
-        return contents;
-    }
 
-    private void updateTable() {
-        String name = clinicCombo.getText();
-        Assert.isNotNull(name, "clinic combo selection error");
-        ClinicWrapper clinic = clinicMap.get(name);
-        Assert.isNotNull(clinic, "no clinic with name \"" + name + "\"");
-        List<ContactWrapper> clinicContacts = clinic.getContactCollection();
-        clinicContacts.removeAll(alreadySelectedContacts);
-        contactInfoTable.setCollection(clinicContacts);
+        try {
+            contactInfoTable.setCollection(study.getContactsNotAssoc());
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+        }
+
         contactInfoTable.setEnabled(true);
+        return contents;
     }
 
     @Override
     protected void okPressed() {
-        // selectedContact = contactInfoTable.getSelection();
+        selectedContact = contactInfoTable.getSelection();
         super.okPressed();
     }
 

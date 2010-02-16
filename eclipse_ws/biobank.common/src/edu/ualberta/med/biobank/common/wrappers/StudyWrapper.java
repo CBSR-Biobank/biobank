@@ -246,6 +246,26 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getContactCollection(false);
     }
 
+    /**
+     * Returns a list of contacts that have not yet been associated with this
+     * study.
+     */
+    public List<ContactWrapper> getContactsNotAssoc() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select distinct contacts from "
+            + Contact.class.getName()
+            + " as contacts left join contacts.studyCollection as studies "
+            + "where (studies.id <> ?  or studies is null)"
+            + "and contacts.clinic.site.id = ? "
+            + "order by contacts.clinic.name", Arrays.asList(new Object[] {
+            getId(), getSite().getId() }));
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        List<Contact> rawContacts = appService.query(criteria);
+        for (Contact rawContact : rawContacts) {
+            contacts.add(new ContactWrapper(appService, rawContact));
+        }
+        return contacts;
+    }
+
     private void setContactCollection(Collection<Contact> allContactObjects,
         List<ContactWrapper> allContactWrappers) {
         Collection<Contact> oldContacts = wrappedObject.getContactCollection();

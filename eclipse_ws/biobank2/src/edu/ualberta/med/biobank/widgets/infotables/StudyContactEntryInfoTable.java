@@ -20,7 +20,6 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         String clinicName;
         String name;
         String title;
-        String studies;
         String emailAddress;
         String phoneNumber;
         String faxNumber;
@@ -28,7 +27,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicName, name, title,
-                studies, emailAddress, phoneNumber, faxNumber }, "\t");
+                emailAddress, phoneNumber, faxNumber }, "\t");
         }
     }
 
@@ -53,17 +52,13 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 break;
             case 2:
                 rc = compare(i1.title, i2.title);
-                break;
             case 3:
-                rc = compare(i1.studies, i2.studies);
-                break;
-            case 4:
                 rc = compare(i1.emailAddress, i2.emailAddress);
                 break;
-            case 5:
+            case 4:
                 rc = compare(i1.phoneNumber, i2.phoneNumber);
                 break;
-            case 6:
+            case 5:
                 rc = compare(i1.faxNumber, i2.faxNumber);
                 break;
             default:
@@ -109,12 +104,10 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 case 2:
                     return item.title;
                 case 3:
-                    return item.studies;
-                case 4:
                     return item.emailAddress;
-                case 5:
+                case 4:
                     return item.phoneNumber;
-                case 6:
+                case 5:
                     return item.faxNumber;
                 default:
                     return "";
@@ -153,9 +146,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     @Override
     public ContactWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.contact;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.contact;
     }
 
     @Override
