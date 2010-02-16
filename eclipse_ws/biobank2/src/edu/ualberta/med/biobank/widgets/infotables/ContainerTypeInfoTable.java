@@ -24,16 +24,6 @@ public class ContainerTypeInfoTable extends
         Long inUseCount;
         Double temperature;
 
-        TableRowData(String name, String nameShort, Integer capacity,
-            String status, Long inUseCount, Double temperature) {
-            this.name = (name != null) ? name : "";
-            this.nameShort = (nameShort != null) ? nameShort : "";
-            this.status = (status == null) ? status : "";
-            this.capacity = capacity;
-            this.inUseCount = inUseCount;
-            this.temperature = temperature;
-        }
-
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort,
@@ -150,17 +140,20 @@ public class ContainerTypeInfoTable extends
     @Override
     public Object getCollectionModelObject(ContainerTypeWrapper type)
         throws Exception {
+        TableRowData info = new TableRowData();
         Integer rowCapacity = type.getRowCapacity();
         Integer colCapacity = type.getColCapacity();
 
+        info.containerType = type;
+        info.name = type.getName();
+        info.nameShort = type.getNameShort();
+        info.status = type.getActivityStatus();
         if ((rowCapacity != null) && (colCapacity != null)) {
-            return new TableRowData(type.getName(), type.getNameShort(),
-                rowCapacity * colCapacity, type.getActivityStatus(), type
-                    .getContainersCount(), type.getDefaultTemperature());
+            info.capacity = rowCapacity * colCapacity;
         }
-        return new TableRowData(type.getName(), type.getNameShort(), null, type
-            .getActivityStatus(), type.getContainersCount(), type
-            .getDefaultTemperature());
+        info.inUseCount = type.getContainersCount();
+        info.temperature = type.getDefaultTemperature();
+        return info;
     }
 
     @Override

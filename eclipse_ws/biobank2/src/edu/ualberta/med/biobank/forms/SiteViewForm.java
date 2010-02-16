@@ -38,7 +38,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     private StudyInfoTable studiesTable;
     private ClinicInfoTable clinicsTable;
     private ContainerTypeInfoTable containerTypesTable;
-    private ContainerInfoTable sContainersTable;
+    private ContainerInfoTable topContainersTable;
 
     private Text clinicCountLabel;
 
@@ -181,13 +181,14 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private void createContainerSection() throws Exception {
         Section section = createSection("Top Level Containers");
-        sContainersTable = new ContainerInfoTable(section, siteAdapter
+        topContainersTable = new ContainerInfoTable(section, siteAdapter
             .getWrapper().getTopContainerCollection());
-        section.setClient(sContainersTable);
-        sContainersTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sContainersTable);
+        section.setClient(topContainersTable);
+        topContainersTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(topContainersTable);
 
-        sContainersTable.addDoubleClickListener(collectionDoubleClickListener);
+        topContainersTable
+            .addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
@@ -201,7 +202,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         clinicsTable.setCollection(site.getClinicCollection(true));
         containerTypesTable
             .setCollection(site.getContainerTypeCollection(true));
-        sContainersTable.setCollection(site.getContainerCollection());
+        topContainersTable.setCollection(site.getTopContainerCollection());
     }
 
     private void retrieveSite() {

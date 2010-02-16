@@ -375,4 +375,93 @@ public class TestPatient extends TestDatabase {
         Assert.assertTrue(visitsFound.size() == 1);
         Assert.assertEquals(visit3, visitsFound.get(0));
     }
+
+    @Test
+    public void testGetSampleCount() throws Exception {
+        String patientName = Utils.getRandomNumericString(20);
+        PatientWrapper patient1 = PatientHelper.addPatient(patientName, study);
+        PatientWrapper patient2 = PatientHelper.addPatient(patientName + "_2",
+            study);
+        patient1.delete();
+        study.reload();
+
+        // create new patient with patient visits
+        patient1 = PatientHelper.addPatient(Utils.getRandomNumericString(20),
+            study);
+        addContainerTypes();
+        addContainers();
+        addClinic(patient1);
+        patient1.persist();
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
+        shipment.addPatients(Arrays.asList(patient1));
+        shipment.persist();
+        patient1.reload();
+
+        shipment = patient1.getShipmentCollection().get(0);
+        Assert.assertNotNull(shipment);
+
+        ContainerWrapper childL1 = containerMap.get("ChildL1");
+        int maxCols = childL1.getColCapacity();
+        int count = r.nextInt(5) + 1;
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+            for (int i = 0; i < count; i++) {
+                visits.add(PatientVisitHelper.newPatientVisit(patient,
+                    shipment, Utils.getRandomDate()));
+            }
+            patient.addPatientVisits(visits);
+            patient.persist();
+            patient.reload();
+        }
+
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+
+        int sampleTypeCount = allSampleTypes.size();
+        List<SampleWrapper> samples = new ArrayList<SampleWrapper>();
+        Map<PatientWrapper, Integer> patientSampleCount = new HashMap<PatientWrapper, Integer>();
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            patientSampleCount.put(patient, 0);
+        }
+
+        // 2 samples per visit
+        int sampleCount = 0;
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            for (PatientVisitWrapper visit : patient
+                .getPatientVisitCollection()) {
+                for (int i = 0; i < 2; ++i) {
+                    samples.add(SampleHelper.addSample(allSampleTypes.get(r
+                        .nextInt(sampleTypeCount)), childL1, visit, sampleCount
+                        / maxCols, sampleCount % maxCols));
+                    patient1.reload();
+                    patientSampleCount.put(patient, patientSampleCount
+                        .get(patient) + 1);
+                    ++sampleCount;
+                    Assert.assertEquals(patientSampleCount.get(patient)
+                        .intValue(), visit.getPatient().getSampleCount());
+                }
+            }
+        }
+
+        // now delete samples
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            for (PatientVisitWrapper visit : patient
+                .getPatientVisitCollection()) {
+                samples = visit.getSampleCollection();
+                while (samples.size() > 0) {
+                    SampleWrapper sample = samples.get(0);
+                    sample.delete();
+                    visit.reload();
+                    patient.reload();
+                    samples = visit.getSampleCollection();
+                    patientSampleCount.put(patient, patientSampleCount
+                        .get(patient) - 1);
+                    Assert.assertEquals(patientSampleCount.get(patient1)
+                        .intValue(), patient1.getSampleCount());
+                    Assert.assertEquals(patientSampleCount.get(patient2)
+                        .intValue(), patient2.getSampleCount());
+                }
+            }
+        }
+    }
 }

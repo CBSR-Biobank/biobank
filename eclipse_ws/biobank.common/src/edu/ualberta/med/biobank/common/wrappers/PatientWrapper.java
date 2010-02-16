@@ -232,19 +232,23 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public boolean hasSamples() throws ApplicationException,
+    public long getSampleCount() throws ApplicationException,
         BiobankCheckException {
-        String queryString = "select count(samples) from "
+        HQLCriteria c = new HQLCriteria("select count(samples) from "
             + Patient.class.getName() + " as p"
-            + " left join p.patientVisitCollection as visits"
-            + " left join visits.sampleCollection as samples where p = ?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            + " join p.patientVisitCollection as visits"
+            + " join visits.sampleCollection as samples where p = ?", Arrays
             .asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
-        return results.get(0) > 0;
+        return results.get(0);
+    }
+
+    public boolean hasSamples() throws ApplicationException,
+        BiobankCheckException {
+        return (getSampleCount() > 0);
     }
 
     @Override

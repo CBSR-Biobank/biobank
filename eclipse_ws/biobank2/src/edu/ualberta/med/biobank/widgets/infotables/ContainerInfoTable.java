@@ -23,18 +23,6 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         String barcode;
         Double temperature;
 
-        TableRowData(ContainerWrapper container) {
-            this.container = container;
-            ContainerTypeWrapper type = container.getContainerType();
-            this.label = container.getLabel();
-            if (type != null) {
-                this.typeNameShort = type.getNameShort();
-            }
-            this.status = container.getActivityStatus();
-            this.barcode = container.getProductBarcode();
-            this.temperature = container.getTemperature();
-        }
-
         @Override
         public String toString() {
             return StringUtils.join(new String[] { label, typeNameShort,
@@ -129,7 +117,18 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     @Override
     public Object getCollectionModelObject(ContainerWrapper container)
         throws Exception {
-        return new TableRowData(container);
+        TableRowData info = new TableRowData();
+
+        info.container = container;
+        info.label = container.getLabel();
+        ContainerTypeWrapper type = container.getContainerType();
+        if (type != null) {
+            info.typeNameShort = type.getNameShort();
+        }
+        info.status = container.getActivityStatus();
+        info.barcode = container.getProductBarcode();
+        info.temperature = container.getTemperature();
+        return info;
     }
 
     @Override

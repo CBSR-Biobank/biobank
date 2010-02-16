@@ -109,6 +109,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     public Object getCollectionModelObject(ShipmentWrapper shipment)
         throws Exception {
         TableRowData info = new TableRowData();
+        info.shipment = shipment;
         info.dateReceived = shipment.getFormattedDateReceived();
         info.waybill = shipment.getWaybill();
         ShippingCompanyWrapper company = shipment.getShippingCompany();

@@ -114,6 +114,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     public Object getCollectionModelObject(ClinicWrapper clinic)
         throws Exception {
         TableRowData info = new TableRowData();
+        info.clinic = clinic;
         info.clinicName = clinic.getName();
         List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies == null) {
