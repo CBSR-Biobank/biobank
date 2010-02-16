@@ -89,8 +89,11 @@ public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> 
 
     @Override
     public SampleSourceWrapper getSelection() {
-        SampleSourceWrapper item = (SampleSourceWrapper) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        SampleSourceWrapper source = (SampleSourceWrapper) item.o;
+        Assert.isNotNull(source);
+        return source;
     }
 }

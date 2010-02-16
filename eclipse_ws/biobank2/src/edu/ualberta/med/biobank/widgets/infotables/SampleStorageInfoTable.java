@@ -132,8 +132,11 @@ public class SampleStorageInfoTable extends
 
     @Override
     public SampleStorageWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.sampleStorage;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.sampleStorage;
     }
 }

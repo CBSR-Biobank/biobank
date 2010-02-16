@@ -130,9 +130,12 @@ public class PvSampleSourceInfoTable extends
 
     @Override
     public PvSampleSourceWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.pvSampleSource;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.pvSampleSource;
     }
 
 }

@@ -123,9 +123,12 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     @Override
     public PatientVisitWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.visit;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.visit;
     }
 
 }

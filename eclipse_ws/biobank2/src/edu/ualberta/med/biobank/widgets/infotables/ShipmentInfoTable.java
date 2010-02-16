@@ -144,8 +144,11 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     @Override
     public ShipmentWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.shipment;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.shipment;
     }
 }

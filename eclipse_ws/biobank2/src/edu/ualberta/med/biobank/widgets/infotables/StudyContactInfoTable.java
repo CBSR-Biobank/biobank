@@ -147,9 +147,12 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     @Override
     public ContactWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.contact;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.contact;
     }
 
     @Override

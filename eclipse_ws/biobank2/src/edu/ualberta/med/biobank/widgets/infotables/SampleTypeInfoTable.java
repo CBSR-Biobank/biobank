@@ -94,8 +94,11 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
 
     @Override
     public SampleTypeWrapper getSelection() {
-        SampleTypeWrapper item = (SampleTypeWrapper) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        SampleTypeWrapper type = (SampleTypeWrapper) item.o;
+        Assert.isNotNull(type);
+        return type;
     }
 }

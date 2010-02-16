@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -80,8 +81,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected List<BiobankCollectionModel> model;
 
-    private List<TableViewerColumn> tableViewColumns;
-
     private Thread backgroundThread;
 
     private boolean exitBrackgroundThread;
@@ -118,8 +117,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
-        tableViewColumns = new ArrayList<TableViewerColumn>();
-
         int index = 0;
         if (headings != null) {
             for (String name : headings) {
@@ -138,7 +135,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         col.getColumn().pack();
                     }
                 });
-                tableViewColumns.add(col);
                 index++;
             }
             tableViewer.setColumnProperties(headings);
@@ -212,26 +208,32 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     protected void setSorter(final BiobankTableSorter tableSorter) {
         tableViewer.setSorter(tableSorter);
         final Table table = tableViewer.getTable();
-        int count = 0;
-        for (final TableViewerColumn col : tableViewColumns) {
-            final int index = count;
-            col.getColumn().addSelectionListener(new SelectionAdapter() {
+        for (int i = 0, n = table.getColumnCount(); i < n; ++i) {
+            final TableColumn col = table.getColumn(i);
+            final int index = i;
+            col.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     tableSorter.setColumn(index);
                     int dir = table.getSortDirection();
-                    if (table.getSortColumn() == col.getColumn()) {
+                    if (table.getSortColumn() == col) {
                         dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
                     } else {
                         dir = SWT.DOWN;
                     }
                     table.setSortDirection(dir);
-                    table.setSortColumn(col.getColumn());
+                    table.setSortColumn(col);
                     tableViewer.refresh();
                 }
             });
-            ++count;
         }
+    }
+
+    protected void sortOnFirstColumn() {
+        Table table = tableViewer.getTable();
+        table.setSortDirection(SWT.DOWN);
+        table.setSortColumn(table.getColumn(0));
+        tableViewer.refresh();
     }
 
     public abstract BiobankLabelProvider getLabelProvider();
@@ -274,7 +276,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         if (exitBrackgroundThread)
                             return;
                     }
-                    display.asyncExec(new Runnable() {
+                    display.syncExec(new Runnable() {
                         public void run() {
                             if (!viewer.getTable().isDisposed())
                                 getTableViewer().refresh();
@@ -299,10 +301,11 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                             return;
 
                         if (!isDisposed()) {
-                            display.asyncExec(new Runnable() {
+                            display.syncExec(new Runnable() {
                                 public void run() {
-                                    if (!viewer.getTable().isDisposed())
+                                    if (!viewer.getTable().isDisposed()) {
                                         viewer.refresh(modelItem, false);
+                                    }
                                 }
                             });
                         }

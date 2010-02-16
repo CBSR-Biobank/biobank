@@ -137,8 +137,11 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     public StudyWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.study;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.study;
     }
 }

@@ -150,8 +150,11 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     @Override
     public ClinicWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.clinic;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.clinic;
     }
 }

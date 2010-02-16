@@ -150,9 +150,12 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     @Override
     public ContainerWrapper getSelection() {
-        TableRowData item = (TableRowData) getSelectionInternal().o;
-        Assert.isNotNull(item);
-        return item.container;
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.container;
     }
 
 }

@@ -16,7 +16,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -37,26 +36,26 @@ public class ClinicAddWidget extends BiobankWidget {
 
     private List<ContactWrapper> removedContacts;
 
-    private List<ClinicWrapper> allClinics;
+    private StudyWrapper study;
 
     private StudyContactEntryInfoTable contactInfoTable;
 
     private Button addClinicButton;
 
-    public ClinicAddWidget(Composite parent, int style,
-        StudyWrapper studyWrapper, FormToolkit toolkit) {
+    public ClinicAddWidget(Composite parent, int style, StudyWrapper study,
+        FormToolkit toolkit) {
         super(parent, style);
+        this.study = study;
         Assert.isNotNull(toolkit, "toolkit is null");
-        SiteWrapper site = studyWrapper.getSite();
+        SiteWrapper site = study.getSite();
         Assert.isNotNull(site, "site is null");
-        allClinics = site.getClinicCollection(true);
 
-        loadContacts(studyWrapper);
+        loadContacts(study);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        contactInfoTable = new StudyContactEntryInfoTable(parent, studyWrapper
+        contactInfoTable = new StudyContactEntryInfoTable(parent, study
             .getContactCollection());
         contactInfoTable.adaptToToolkit(toolkit, true);
         addDeleteSupport();
@@ -73,7 +72,7 @@ public class ClinicAddWidget extends BiobankWidget {
     private void createClinicContact() {
         SelectClinicContactDialog dlg = new SelectClinicContactDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            allClinics, selectedContacts);
+            study);
         if (dlg.open() == Dialog.OK) {
             notifyListeners();
             ContactWrapper contact = dlg.getSelection();
@@ -94,16 +93,6 @@ public class ClinicAddWidget extends BiobankWidget {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     ContactWrapper contact = contactInfoTable.getSelection();
-                    if (!contact.deleteAllowed()) {
-                        BioBankPlugin
-                            .openError(
-                                "Contact Delete Error",
-                                "Cannot delete contact \""
-                                    + contact.getName()
-                                    + "\" since it is associated with one or more studies");
-                        return;
-                    }
-
                     if (!BioBankPlugin.openConfirm("Delete Contact",
                         "Are you sure you want to delete contact \""
                             + contact.getName() + "\"")) {
