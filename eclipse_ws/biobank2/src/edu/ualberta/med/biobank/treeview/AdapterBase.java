@@ -390,7 +390,6 @@ public abstract class AdapterBase {
                     SessionManager.updateTreeNode(node);
                 }
             }
-            notifyListeners();
             getRootNode().expandChild(AdapterBase.this);
 
             childUpdateThread = new Thread() {

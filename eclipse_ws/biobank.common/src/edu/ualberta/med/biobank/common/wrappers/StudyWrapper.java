@@ -135,7 +135,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         checkNameShortNotEmpty();
         checkStudyNameUnique();
         checkContactsFromSameSite();
-        checkNoPatientRemoved();
+        // checkNoPatientRemoved();
     }
 
     private void checkNameNotEmpty() throws BiobankCheckException {
