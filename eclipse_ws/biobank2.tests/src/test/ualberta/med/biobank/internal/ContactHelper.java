@@ -45,7 +45,7 @@ public class ContactHelper extends DbHelper {
 
     public static int addContactsToClinic(ClinicWrapper clinic, String name,
         int min, int max) throws Exception {
-        int nber = r.nextInt(max) + min;
+        int nber = r.nextInt(max - min + 1) + min;
         for (int i = 0; i < nber; i++) {
             ContactHelper.addContact(clinic, name + i);
         }
