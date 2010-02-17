@@ -261,8 +261,8 @@ public class TestSample extends TestDatabase {
         Assert.assertTrue(sample.getPositionString(true, false).equals(
             parentLabel + "A1"));
         Assert.assertTrue(sample.getPositionString().equals(
-            topContainer.getContainerType().getNameShort() + "-" + parentLabel
-                + "A1"));
+            parentLabel + "A1 ("
+                + topContainer.getContainerType().getNameShort() + ")"));
 
     }
 
