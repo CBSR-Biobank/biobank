@@ -160,6 +160,58 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
+    public void testContactsNotAssoc() throws Exception {
+        String name = "testContactsNotAssoc" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study1 = StudyHelper.addStudy(site, name);
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "_2");
+        site.reload();
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, "CL1");
+        int contactCount = ContactHelper.addContactsToClinic(clinic, "CL1-CT",
+            5, 10);
+
+        Assert.assertEquals(contactCount, study1.getContactsNotAssoc().size());
+
+        List<ContactWrapper> contacts = clinic.getContactCollection();
+        Assert.assertNotNull(contacts);
+
+        // associate all contacts with study1
+        for (int i = 0; i < contactCount; ++i) {
+            study1.addContacts(Arrays.asList(contacts.get(i)));
+            study1.persist();
+            study1.reload();
+            Assert.assertEquals(contactCount - i - 1, study1
+                .getContactsNotAssoc().size());
+        }
+
+        // move all contacts to study2
+        for (int i = 0; i < contactCount; ++i) {
+            study1.removeContacts(Arrays.asList(contacts.get(i)));
+            study1.persist();
+            study1.reload();
+            study2.addContacts(Arrays.asList(contacts.get(i)));
+            study2.persist();
+            study2.reload();
+            Assert.assertEquals(i + 1, study1.getContactsNotAssoc().size());
+        }
+
+        // remove contacts one by one
+        while (contacts.size() > 0) {
+            ContactWrapper contact = contacts.get(0);
+            contact.reload();
+            study2.removeContacts(Arrays.asList(contact));
+            study2.persist();
+            study2.reload();
+            contact.delete();
+            contacts.remove(0);
+            Assert.assertEquals(contacts.size(), study1.getContactsNotAssoc()
+                .size());
+            contacts = clinic.getContactCollection();
+        }
+    }
+
+    @Test
     public void testGetSampleStorageCollection() throws Exception {
         String name = "testGetSampleStorageCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);

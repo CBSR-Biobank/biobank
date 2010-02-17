@@ -259,8 +259,9 @@ public class SampleWrapper extends
         }
         String nameShort = topContainer.getContainerType().getNameShort();
         if (addTopParentShortName && nameShort != null)
-            return nameShort + "-" + directParent.getLabel()
-                + LabelingScheme.getPositionString(position, directParent);
+            return directParent.getLabel()
+                + LabelingScheme.getPositionString(position, directParent)
+                + " (" + nameShort + ")";
         return directParent.getLabel()
             + LabelingScheme.getPositionString(position, directParent);
     }

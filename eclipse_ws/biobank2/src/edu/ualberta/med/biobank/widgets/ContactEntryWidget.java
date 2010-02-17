@@ -14,8 +14,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -25,6 +23,9 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -55,12 +56,46 @@ public class ContactEntryWidget extends BiobankWidget {
 
         contactInfoTable = new ContactInfoTable(parent, selectedContacts);
         contactInfoTable.adaptToToolkit(toolkit, true);
-        addTableMenu();
         contactInfoTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     ContactEntryWidget.this.notifyListeners();
+                }
+            });
+
+        contactInfoTable.addEditItemListener(new IInfoTableEditItemListener() {
+            @Override
+            public void editItem(InfoTableEvent event) {
+                addOrEditContact(false, contactInfoTable.getSelection());
+            }
+        });
+
+        contactInfoTable
+            .addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    ContactWrapper contact = contactInfoTable.getSelection();
+                    if (!contact.deleteAllowed()) {
+                        BioBankPlugin
+                            .openError(
+                                "Contact Delete Error",
+                                "Cannot delete contact \""
+                                    + contact.getName()
+                                    + "\" since it is associated with one or more studies");
+                        return;
+                    }
+
+                    if (!BioBankPlugin.openConfirm("Delete Contact",
+                        "Are you sure you want to delete contact \""
+                            + contact.getName() + "\"")) {
+                        return;
+                    }
+
+                    deletedContacts.add(contact);
+                    selectedContacts.remove(contact);
+                    contactInfoTable.setCollection(selectedContacts);
+                    notifyListeners();
                 }
             });
 
@@ -81,51 +116,6 @@ public class ContactEntryWidget extends BiobankWidget {
         }
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
-    }
-
-    private void addTableMenu() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        contactInfoTable.getTableViewer().getTable().setMenu(menu);
-
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                ContactWrapper contactWrapper = contactInfoTable.getSelection();
-                if (contactWrapper == null) {
-                    BioBankPlugin.openError("Edit Clinic", "Invalid selection");
-                    return;
-                }
-                addOrEditContact(false, contactWrapper);
-            }
-        });
-
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                ContactWrapper contactWrapper = contactInfoTable.getSelection();
-                if (contactWrapper == null) {
-                    BioBankPlugin.openError("Delete Clinic",
-                        "Invalid selection");
-                    return;
-                }
-
-                boolean confirm = BioBankPlugin.openConfirm("Delete Clinic",
-                    "Are you sure you want to delete clinic \""
-                        + contactWrapper.getClinic().getName() + "\"");
-
-                if (confirm) {
-                    deletedContacts.add(contactWrapper);
-                    selectedContacts.remove(contactWrapper);
-                    contactInfoTable.setCollection(selectedContacts);
-                    notifyListeners();
-                }
-            }
-        });
     }
 
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {

@@ -9,9 +9,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
@@ -23,6 +25,8 @@ public class PatientViewForm extends BiobankViewForm {
     private Text siteLabel;
 
     private Text visitCountLabel;
+
+    private Text sampleCountLabel;
 
     private PatientVisitInfoTable visitsTable;
 
@@ -65,6 +69,8 @@ public class PatientViewForm extends BiobankViewForm {
 
         siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         visitCountLabel = createReadOnlyField(client, SWT.NONE, "Total Visits");
+        sampleCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Samples");
     }
 
     private void createPatientVisitSection() {
@@ -74,14 +80,14 @@ public class PatientViewForm extends BiobankViewForm {
             .getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
-        visitsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        visitsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void setValues() {
+    private void setValues() throws ApplicationException, BiobankCheckException {
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
         setTextValue(visitCountLabel, patient.getPatientVisitCollection()
             .size());
+        setTextValue(sampleCountLabel, patient.getSampleCount());
     }
 
     @Override

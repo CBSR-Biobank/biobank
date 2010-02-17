@@ -10,17 +10,27 @@ import org.junit.Test;
 import test.ualberta.med.biobank.TestDatabase;
 import test.ualberta.med.biobank.Utils;
 import test.ualberta.med.biobank.internal.ClinicHelper;
+import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
 import test.ualberta.med.biobank.internal.DbHelper;
+import test.ualberta.med.biobank.internal.PatientHelper;
+import test.ualberta.med.biobank.internal.PatientVisitHelper;
+import test.ualberta.med.biobank.internal.SampleHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
+import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
@@ -723,6 +733,172 @@ public class TestSite extends TestDatabase {
 
         Assert.assertTrue(site.compareTo(site2) > 0);
         Assert.assertTrue(site2.compareTo(site) < 0);
+    }
+
+    @Test
+    public void testGetPatientCountForSite() throws Exception {
+        String name = "testGetPatientCountForClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
+            study1);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
+            study2);
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "PATIENT3",
+            study2);
+
+        site.reload();
+        Assert.assertEquals(3, site.getPatientCount().longValue());
+
+        // remove a patient
+        patient2.delete();
+        site.reload();
+        Assert.assertEquals(2, site.getPatientCount().longValue());
+
+        // remove all patients
+        patient1.delete();
+        patient3.delete();
+        site.reload();
+        Assert.assertEquals(0, site.getPatientCount().longValue());
+    }
+
+    @Test
+    public void testGetPatientVisitCountForSite() throws Exception {
+        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.addContacts(Arrays.asList(contact2));
+        study2.persist();
+
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        PatientWrapper patient2 = PatientHelper
+            .addPatient(name + "_p2", study2);
+        PatientWrapper patient3 = PatientHelper
+            .addPatient(name + "_p3", study1);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+            patient1, patient3);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+            patient1, patient2);
+
+        // shipment1 has patient visits for patient1 and patient3
+        int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
+            .size();
+        int nber2 = PatientVisitHelper.addPatientVisits(patient3, shipment1)
+            .size();
+
+        // shipment 2 has patient visits for patient1 and patient2
+        int nber3 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
+            .size();
+        int nber4 = PatientVisitHelper.addPatientVisits(patient2, shipment2)
+            .size();
+
+        site.reload();
+        Assert.assertEquals(nber + nber2 + nber3 + nber4, site
+            .getPatientVisitCount().longValue());
+
+        // delete patient 1 and all it's visits
+        patient1.delete();
+        site.reload();
+        Assert.assertEquals(nber2 + nber4, site.getPatientVisitCount()
+            .longValue());
+    }
+
+    @Test
+    public void testGetSampleCountForSite() throws Exception {
+        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        study2.addContacts(Arrays.asList(contact2));
+        study2.persist();
+
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getGlobalSampleTypes(appService, true);
+        ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
+            "Pallet96", "P96", 2, 8, 12, true);
+        ctype.addSampleTypes(allSampleTypes);
+
+        ContainerWrapper container = ContainerHelper.addContainer("01", "01",
+            null, site, ctype);
+
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        PatientWrapper patient2 = PatientHelper
+            .addPatient(name + "_p2", study2);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+            patient1);
+
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+            patient2);
+
+        // shipment 1 has patient visits for patient1 and patient2
+        int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1, 10,
+            24).size();
+        int nber2 = PatientVisitHelper.addPatientVisits(patient2, shipment2,
+            10, 24).size();
+
+        // add 2 samples to each patient visit
+        //
+        // make sure we do not exceed 96 samples since that is all container
+        // type can hold
+        patient1.reload();
+        patient2.reload();
+        int sampleTypeCount = allSampleTypes.size();
+        int sampleCount = 0;
+        for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
+            for (PatientVisitWrapper visit : patient
+                .getPatientVisitCollection()) {
+                for (int i = 0; i < 2; ++i) {
+                    SampleHelper.addSample(allSampleTypes.get(r
+                        .nextInt(sampleTypeCount)), container, visit,
+                        sampleCount / 12, sampleCount % 12);
+                    ++sampleCount;
+                }
+            }
+        }
+
+        site.reload();
+        Assert.assertEquals(2 * (nber + nber2), site.getSampleCount()
+            .longValue());
+
+        // delete patient 1 and all it's visits and samples
+        for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
+            for (SampleWrapper sample : visit.getSampleCollection()) {
+                sample.delete();
+            }
+        }
+        patient1.delete();
+        site.reload();
+        Assert.assertEquals(2 * nber2, site.getSampleCount().longValue());
     }
 
 }

@@ -85,7 +85,7 @@ public class ShipmentViewForm extends BiobankViewForm {
             false);
     }
 
-    private void createMainSection() throws Exception {
+    private void createMainSection() {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -109,7 +109,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setShipmentValues();
     }
 
-    private void setShipmentValues() throws Exception {
+    private void setShipmentValues() {
         setTextValue(siteLabel, shipment.getClinic().getSite().getName());
         setTextValue(waybillLabel, shipment.getWaybill());
         setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment

@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -131,7 +132,7 @@ public class FreezerImporter {
     protected void importSample(String studyNameShort, String patientNr,
         String dateProcessedStr, ContainerWrapper hotel, int palletNr,
         String palletPos, String inventoryId, String sampleTypeNameShort,
-        String linkDateStr, double quantity) throws Exception {
+        String linkDateStr, Double quantity) throws Exception {
 
         if (palletNr > hotel.getRowCapacity()) {
             logger.error("pallet number is invalid: " + " hotel/"
@@ -174,6 +175,8 @@ public class FreezerImporter {
             return;
         }
 
+        study.getSampleStorageCollection();
+
         Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
 
         List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed);
@@ -213,9 +216,22 @@ public class FreezerImporter {
         sample.setSampleType(sampleType);
         sample.setInventoryId(inventoryId);
         sample.setLinkDate(Importer.getDateFromStr(linkDateStr));
-        sample.setQuantity(quantity);
         sample.setPosition(pos);
         sample.setPatientVisit(visit);
+
+        if (quantity != 0.0) {
+            sample.setQuantity(quantity);
+        } else {
+            SampleStorageWrapper ss = Importer.getSampleStorage(study,
+                sampleType);
+            if (ss != null) {
+                sample.setQuantity(ss.getVolume());
+            } else {
+                logger.error("study \"" + study.getNameShort()
+                    + "\" has no sample storage for sample type \""
+                    + sampleType.getName() + "\"");
+            }
+        }
 
         if (!pallet.canHoldSample(sample)) {
             logger.error("pallet " + pallet.getLabel()

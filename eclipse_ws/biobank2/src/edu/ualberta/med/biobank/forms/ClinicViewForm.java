@@ -104,8 +104,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
-        contactsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        contactsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     protected void createStudiesSection() throws Exception {
@@ -115,8 +114,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
-        studiesTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     protected void createShipmentsSection() {
@@ -126,8 +124,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         shipmentsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(shipmentsTable);
 
-        shipmentsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        shipmentsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     protected void createButtonsSection() {

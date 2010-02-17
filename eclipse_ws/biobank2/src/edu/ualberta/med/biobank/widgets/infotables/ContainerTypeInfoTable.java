@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -13,22 +16,13 @@ public class ContainerTypeInfoTable extends
     InfoTableWidget<ContainerTypeWrapper> {
 
     class TableRowData {
+        ContainerTypeWrapper containerType;
         String name;
         String nameShort;
         Integer capacity;
         String status;
         Long inUseCount;
         Double temperature;
-
-        TableRowData(String name, String nameShort, Integer capacity,
-            String status, Long inUseCount, Double temperature) {
-            this.name = (name != null) ? name : "";
-            this.nameShort = (nameShort != null) ? nameShort : "";
-            this.status = (status == null) ? status : "";
-            this.capacity = capacity;
-            this.inUseCount = inUseCount;
-            this.temperature = temperature;
-        }
 
         @Override
         public String toString() {
@@ -106,7 +100,6 @@ public class ContainerTypeInfoTable extends
         Collection<ContainerTypeWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override
@@ -114,25 +107,29 @@ public class ContainerTypeInfoTable extends
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData ct = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (ct == null)
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
                     return "";
+                }
                 switch (columnIndex) {
                 case 0:
-                    return ct.name;
+                    return item.name;
                 case 1:
-                    return ct.nameShort;
+                    return item.nameShort;
                 case 2:
-                    return (ct.capacity != null) ? ct.capacity.toString()
+                    return (item.capacity != null) ? item.capacity.toString()
                         : null;
                 case 3:
-                    return ct.status;
+                    return item.status;
                 case 4:
-                    return (ct.inUseCount != null) ? ct.inUseCount.toString()
-                        : null;
+                    return (item.inUseCount != null) ? item.inUseCount
+                        .toString() : null;
                 case 5:
-                    return (ct.temperature != null) ? ct.temperature.toString()
-                        : null;
+                    return (item.temperature != null) ? item.temperature
+                        .toString() : null;
                 default:
                     return "";
                 }
@@ -143,17 +140,20 @@ public class ContainerTypeInfoTable extends
     @Override
     public Object getCollectionModelObject(ContainerTypeWrapper type)
         throws Exception {
+        TableRowData info = new TableRowData();
         Integer rowCapacity = type.getRowCapacity();
         Integer colCapacity = type.getColCapacity();
 
+        info.containerType = type;
+        info.name = type.getName();
+        info.nameShort = type.getNameShort();
+        info.status = type.getActivityStatus();
         if ((rowCapacity != null) && (colCapacity != null)) {
-            return new TableRowData(type.getName(), type.getNameShort(),
-                rowCapacity * colCapacity, type.getActivityStatus(), type
-                    .getContainersCount(), type.getDefaultTemperature());
+            info.capacity = rowCapacity * colCapacity;
         }
-        return new TableRowData(type.getName(), type.getNameShort(), null, type
-            .getActivityStatus(), type.getContainersCount(), type
-            .getDefaultTemperature());
+        info.inUseCount = type.getContainersCount();
+        info.temperature = type.getDefaultTemperature();
+        return info;
     }
 
     @Override
@@ -161,5 +161,24 @@ public class ContainerTypeInfoTable extends
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<ContainerTypeWrapper> getCollection() {
+        List<ContainerTypeWrapper> result = new ArrayList<ContainerTypeWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).containerType);
+        }
+        return result;
+    }
+
+    @Override
+    public ContainerTypeWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.containerType;
     }
 }

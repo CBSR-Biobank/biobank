@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
@@ -40,10 +42,10 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.pnumber.compareTo(c2.pnumber);
+                rc = compare(c1.pnumber, c2.pnumber);
                 break;
             case 1:
-                rc = c1.studyNameShort.compareTo(c2.studyNameShort);
+                rc = compare(c1.studyNameShort, c2.studyNameShort);
                 break;
             default:
                 rc = 0;
@@ -66,7 +68,6 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         Collection<PatientWrapper> patients) {
         super(parent, true, patients, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
 
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override
@@ -91,14 +92,18 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData contact = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (contact == null)
-                    return null;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
-                    return contact.pnumber;
+                    return item.pnumber;
                 case 1:
-                    return contact.studyNameShort;
+                    return item.studyNameShort;
                 case 3:
                 default:
                     return "";
@@ -127,5 +132,24 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<PatientWrapper> getCollection() {
+        List<PatientWrapper> result = new ArrayList<PatientWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).patient);
+        }
+        return result;
+    }
+
+    @Override
+    public PatientWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.patient;
     }
 }

@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -15,6 +17,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     private class TableRowData {
+        ShipmentWrapper shipment;
         String dateReceived;
         String waybill;
         String shippingCompany;
@@ -68,7 +71,6 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override
@@ -77,8 +79,12 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null)
-                    return null;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
                     return item.dateReceived;
@@ -103,6 +109,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     public Object getCollectionModelObject(ShipmentWrapper shipment)
         throws Exception {
         TableRowData info = new TableRowData();
+        info.shipment = shipment;
         info.dateReceived = shipment.getFormattedDateReceived();
         info.waybill = shipment.getWaybill();
         ShippingCompanyWrapper company = shipment.getShippingCompany();
@@ -125,5 +132,24 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<ShipmentWrapper> getCollection() {
+        List<ShipmentWrapper> result = new ArrayList<ShipmentWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).shipment);
+        }
+        return result;
+    }
+
+    @Override
+    public ShipmentWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.shipment;
     }
 }

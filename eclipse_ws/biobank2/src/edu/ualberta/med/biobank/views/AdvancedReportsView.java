@@ -19,8 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.widgets.ReportsLabelProvider;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 import edu.ualberta.med.biobank.widgets.queries.QueryPage;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -35,7 +34,7 @@ public class AdvancedReportsView extends ViewPart {
     private Button searchButton;
     private Button saveSearch;
     private Collection<Object> searchData;
-    private InfoTableWidget<Object> searchTable;
+    private SearchResultsInfoTable searchTable;
 
     public AdvancedReportsView() {
         searchData = new ArrayList<Object>();
@@ -58,8 +57,7 @@ public class AdvancedReportsView extends ViewPart {
         Label resultsLabel = new Label(top, SWT.NONE);
         resultsLabel.setText("Results:");
 
-        searchTable = new InfoTableWidget<Object>(top, searchData,
-            new String[] {}, null);
+        searchTable = new SearchResultsInfoTable(top, searchData, null, null);
         GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
         // searchLayoutData.minimumHeight = 300;
         searchTable.setLayoutData(searchLayoutData);
@@ -98,10 +96,8 @@ public class AdvancedReportsView extends ViewPart {
                     }
 
                     searchTable.dispose();
-                    searchTable = new InfoTableWidget<Object>(top, searchData,
+                    searchTable = new SearchResultsInfoTable(top, searchData,
                         names, bounds);
-                    searchTable.getTableViewer().setLabelProvider(
-                        new ReportsLabelProvider());
                     GridData searchLayoutData = new GridData(SWT.FILL,
                         SWT.FILL, true, true);
                     searchLayoutData.minimumHeight = 500;

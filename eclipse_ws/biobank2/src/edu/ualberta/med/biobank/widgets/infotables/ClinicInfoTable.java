@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -15,51 +17,46 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     class TableRowData {
+        public ClinicWrapper clinic;
         public String clinicName;
         public Integer studyCount;
-        public String activityStatus;
+        public String status;
         public Long patientCount;
-        public Integer patientVisitCount;
+        public Integer visitCount;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicName,
-                studyCount.toString(),
-                (activityStatus != null) ? activityStatus : "",
-                patientCount.toString(), patientVisitCount.toString() }, "\t");
+                studyCount.toString(), (status != null) ? status : "",
+                (patientCount != null) ? patientCount.toString() : "",
+                (visitCount != null) ? visitCount.toString() : "" }, "\t");
         }
     }
 
     class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((c1 == null) || (c2 == null)) {
+            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+            if ((i1 == null) || (i2 == null)) {
                 return -1;
             }
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = c1.clinicName.compareTo(c2.clinicName);
+                rc = compare(i1.clinicName, i2.clinicName);
                 break;
             case 1:
-                rc = c1.studyCount.compareTo(c2.studyCount);
+                rc = compare(i1.studyCount, i2.studyCount);
                 break;
             case 2:
-                if (c1.activityStatus == null) {
-                    rc = -1;
-                } else if (c2.activityStatus == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.activityStatus.compareTo(c2.activityStatus);
-                }
+                rc = compare(i1.status, i2.status);
                 break;
             case 3:
-                rc = c1.patientCount.compareTo(c2.patientCount);
+                rc = compare(i1.patientCount, i2.patientCount);
                 break;
             case 4:
-                rc = c1.patientVisitCount.compareTo(c2.patientVisitCount);
+                rc = compare(i1.visitCount, i2.visitCount);
                 break;
             default:
                 rc = 0;
@@ -81,7 +78,6 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         Collection<ClinicWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
-        addClipboadCopySupport();
     }
 
     @Override
@@ -90,19 +86,23 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null)
-                    return null;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
                 switch (columnIndex) {
                 case 0:
                     return item.clinicName;
                 case 1:
                     return item.studyCount.toString();
                 case 2:
-                    return item.activityStatus;
+                    return item.status;
                 case 3:
                     return item.patientCount.toString();
                 case 4:
-                    return item.patientVisitCount.toString();
+                    return item.visitCount.toString();
                 default:
                     return "";
                 }
@@ -114,6 +114,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     public Object getCollectionModelObject(ClinicWrapper clinic)
         throws Exception {
         TableRowData info = new TableRowData();
+        info.clinic = clinic;
         info.clinicName = clinic.getName();
         List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies == null) {
@@ -121,13 +122,13 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         } else {
             info.studyCount = studies.size();
         }
-        info.activityStatus = clinic.getActivityStatus();
+        info.status = clinic.getActivityStatus();
         info.patientCount = clinic.getPatientCount();
         List<PatientVisitWrapper> pvs = clinic.getPatientVisitCollection();
         if (pvs == null) {
-            info.patientVisitCount = 0;
+            info.visitCount = 0;
         } else {
-            info.patientVisitCount = pvs.size();
+            info.visitCount = pvs.size();
         }
         return info;
     }
@@ -137,5 +138,24 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         if (o == null)
             return null;
         return ((TableRowData) o).toString();
+    }
+
+    @Override
+    public List<ClinicWrapper> getCollection() {
+        List<ClinicWrapper> result = new ArrayList<ClinicWrapper>();
+        for (BiobankCollectionModel item : model) {
+            result.add(((TableRowData) item.o).clinic);
+        }
+        return result;
+    }
+
+    @Override
+    public ClinicWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.clinic;
     }
 }
