@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -13,9 +16,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
@@ -100,7 +105,29 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
-        contactsTable.addDoubleClickListener(collectionDoubleClickListener);
+        contactsTable.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+                if (selection instanceof InfoTableSelection) {
+                    Object obj = ((InfoTableSelection) selection).getObject();
+                    if (obj instanceof ContactWrapper) {
+                        ContactWrapper contact = (ContactWrapper) obj;
+                        DoubleClickEvent newEvent = new DoubleClickEvent(
+                            (Viewer) event.getSource(), new InfoTableSelection(
+                                contact.getClinic()));
+                        collectionDoubleClickListener.doubleClick(newEvent);
+                    } else {
+                        Assert.isTrue(false,
+                            "invalid InfoTableSelection class:"
+                                + obj.getClass().getName());
+                    }
+                } else {
+                    Assert.isTrue(false, "invalid class for event selection:"
+                        + event.getClass().getName());
+                }
+            }
+        });
     }
 
     private void setStudySectionValues() throws Exception {

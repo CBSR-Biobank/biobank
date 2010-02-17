@@ -110,7 +110,7 @@ public class FreezerImporter {
         int palletNr;
         String patientNr;
         String linkDateStr;
-        double quantity;
+        double volume;
 
         while (rs.next()) {
             studyNameShort = rs.getString(3);
@@ -121,11 +121,11 @@ public class FreezerImporter {
             inventoryId = rs.getString(11);
             sampleTypeNameShort = rs.getString(4);
             linkDateStr = rs.getString(12);
-            quantity = rs.getDouble(16);
+            volume = rs.getDouble(16);
 
             importSample(studyNameShort, patientNr, dateProcessedStr, hotel,
                 palletNr, palletPos, inventoryId, sampleTypeNameShort,
-                linkDateStr, quantity);
+                linkDateStr, volume);
         }
     }
 

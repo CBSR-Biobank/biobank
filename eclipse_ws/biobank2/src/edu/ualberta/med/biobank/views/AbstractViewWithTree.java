@@ -24,6 +24,7 @@ public abstract class AbstractViewWithTree extends ViewPart implements
 
     @Override
     public void setFocus() {
+        adaptersTree.setFocus();
     }
 
     public AdapterBase getSelectedNode() {

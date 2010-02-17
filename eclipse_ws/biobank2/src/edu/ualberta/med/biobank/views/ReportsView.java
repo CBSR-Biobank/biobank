@@ -348,7 +348,7 @@ public class ReportsView extends ViewPart {
 
     @Override
     public void setFocus() {
-
+        querySelect.getControl().setFocus();
     }
 
     public void updateScrollBars() {
