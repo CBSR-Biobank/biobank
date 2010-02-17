@@ -207,11 +207,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException(
                 "the clinic does not have an address");
         }
-
         if (getSite() == null) {
             throw new BiobankCheckException("the clinic does not have an site");
         }
-
         if (!checkClinicNameUnique()) {
             throw new BiobankCheckException("A clinic with name \"" + getName()
                 + "\" already exists.");

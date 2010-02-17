@@ -94,19 +94,19 @@ public class ContainerWrapper extends
     @Override
     protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
-        boolean labelChanged = false;
+        boolean labelChanged = true;
         if (parent == null) {
-            if (origObject != null && origObject.getLabel() != null
-                && !origObject.getLabel().equals(getLabel())) {
+            if (origObject != null && getLabel() != null
+                && !getLabel().equals(origObject.getLabel())) {
                 labelChanged = true;
             }
         } else {
             if (isNew()
                 || ((origObject != null && origObject.getPosition() != null) && (((origObject
-                    .getPosition().getParentContainer() != null) && (origObject
-                    .getPosition().getParentContainer().getId() != parent
-                    .getId())) || (!new RowColPos(origObject.getPosition()
-                    .getRow(), origObject.getPosition().getCol())
+                    .getPosition().getParentContainer() != null) && (!origObject
+                    .getPosition().getParentContainer().getId().equals(
+                        parent.getId()))) || (!new RowColPos(origObject
+                    .getPosition().getRow(), origObject.getPosition().getCol())
                     .equals(getPosition()))))) {
                 String label = parent.getLabel()
                     + LabelingScheme.getPositionString(this);
@@ -473,6 +473,7 @@ public class ContainerWrapper extends
         sample.setPosition(row, col);
         sample.setParent(this);
         samples.put(new RowColPos(row, col), sample);
+        addedSamples.add(sample);
     }
 
     /**
@@ -584,8 +585,17 @@ public class ContainerWrapper extends
         if (parent == null)
             throw new BiobankCheckException("Container " + this
                 + " does not have a parent container");
-
-        List<ContainerTypeWrapper> types = getParent().getContainerType()
+        ContainerTypeWrapper parentType = getParent().getContainerType();
+        try {
+            // need to reload the type to avoid loop problems (?) from the
+            // spring server side in specific cases. (on
+            // getChildContainerTypeCollection).
+            // Ok if nothing linked to the type.
+            parentType.reload();
+        } catch (Exception e) {
+            throw new BiobankCheckException(e);
+        }
+        List<ContainerTypeWrapper> types = parentType
             .getChildContainerTypeCollection();
         if (types == null || !types.contains(getContainerType())) {
             throw new BiobankCheckException("Container "
