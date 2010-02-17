@@ -124,7 +124,8 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         reloadAction.setImageDescriptor(reloadActionImage);
         form.getToolBarManager().add(reloadAction);
 
-        if (adapter.isEditable()) {
+        final String entryFormId = getEntryFormId();
+        if (adapter.isEditable() && entryFormId != null) {
             Action edit = new Action("Edit") {
                 @Override
                 public void run() {
@@ -134,7 +135,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                                 getSite().getPage().closeEditor(
                                     BiobankViewForm.this, false);
                                 AdapterBase.openForm(new FormInput(adapter),
-                                    getEntryFormId());
+                                    entryFormId);
                             }
                         });
                 }
