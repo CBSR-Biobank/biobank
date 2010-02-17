@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -21,7 +22,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
-    private List<PatientWrapper> patientsAdded;
+    private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
 
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -85,16 +86,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
-        if (!isNew()) {
-            // want to check only new patients
-            Shipment ship = new Shipment();
-            ship.setId(getId());
-            ship = (Shipment) appService.search(Shipment.class, ship).get(0);
-            ShipmentWrapper old = new ShipmentWrapper(appService, ship);
-            List<PatientWrapper> oldPatientList = old.getPatientCollection();
-            patients.removeAll(oldPatientList);
-        }
-        for (PatientWrapper patient : patients) {
+        for (PatientWrapper patient : patientsAdded) {
             if (!patient.getStudy().isLinkedToClinic(getClinic())) {
                 throw new BiobankCheckException("Patient "
                     + patient.getPnumber()
@@ -168,7 +160,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return new ClinicWrapper(appService, clinic);
     }
 
-    public void setClinic(Clinic clinic) {
+    protected void setClinic(Clinic clinic) {
         Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
@@ -183,14 +175,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection()
-        throws Exception {
+    public List<PatientVisitWrapper> getPatientVisitCollection() {
         List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
             .get("patientVisitCollection");
         if (patientVisitCollection == null) {
-            if (wrappedObject == null) {
-                throw new Exception("wrapped object is null");
-            }
             Collection<PatientVisit> children = wrappedObject
                 .getPatientVisitCollection();
             if (children != null) {
@@ -206,26 +194,34 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return patientVisitCollection;
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
+    private void setPatientVisitCollection(
+        Collection<PatientVisit> allVisitObjects,
+        List<PatientVisitWrapper> allVisitWrappers) {
         Collection<PatientVisit> oldCollection = wrappedObject
             .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(patientVisitCollection);
+        wrappedObject.setPatientVisitCollection(allVisitObjects);
         propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, patientVisitCollection);
-        if (setNull) {
-            propertiesMap.put("patientVisitCollection", null);
-        }
+            oldCollection, allVisitObjects);
+        propertiesMap.put("patientVisitCollection", allVisitWrappers);
     }
 
-    public void setPatientVisitCollection(
-        List<PatientVisitWrapper> patientVisitCollection) {
-        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
-        for (PatientVisitWrapper pv : patientVisitCollection) {
-            pvCollection.add(pv.getWrappedObject());
+    public void addPatientVisits(List<PatientVisitWrapper> newPatientVisits) {
+        Collection<PatientVisit> allVisitObjects = new HashSet<PatientVisit>();
+        List<PatientVisitWrapper> allVisitWrappers = new ArrayList<PatientVisitWrapper>();
+        // already added visits
+        List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+        if (currentList != null) {
+            for (PatientVisitWrapper visit : currentList) {
+                allVisitObjects.add(visit.getWrappedObject());
+                allVisitWrappers.add(visit);
+            }
         }
-        setPatientVisitCollection(pvCollection, false);
-        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+        // new
+        for (PatientVisitWrapper visit : newPatientVisits) {
+            allVisitObjects.add(visit.getWrappedObject());
+            allVisitWrappers.add(visit);
+        }
+        setPatientVisitCollection(allVisitObjects, allVisitWrappers);
     }
 
     public String getComment() {
@@ -267,7 +263,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return new ShippingCompanyWrapper(appService, sc);
     }
 
-    public void setShippingCompany(ShippingCompany sc) {
+    protected void setShippingCompany(ShippingCompany sc) {
         ShippingCompany old = wrappedObject.getShippingCompany();
         wrappedObject.setShippingCompany(sc);
         propertyChangeSupport.firePropertyChange("shippingCompany", old, sc);
@@ -305,49 +301,50 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         return getPatientCollection(false);
     }
 
-    private void setPatientCollection(Collection<Patient> patients,
-        boolean setNull) {
+    private void setPatients(Collection<Patient> allPatientObjects,
+        List<PatientWrapper> allPatientWrappers) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
-        wrappedObject.setPatientCollection(patients);
+        wrappedObject.setPatientCollection(allPatientObjects);
         propertyChangeSupport.firePropertyChange("patientCollection",
-            oldPatients, patients);
-        if (setNull) {
-            propertiesMap.put("patientCollection", null);
-        }
+            oldPatients, allPatientObjects);
+        propertiesMap.put("patientCollection", allPatientWrappers);
     }
 
-    private void setPatientCollection(List<PatientWrapper> patients) {
-        Collection<Patient> patientsObjects = new HashSet<Patient>();
-        for (PatientWrapper p : patients) {
-            patientsObjects.add(p.getWrappedObject());
-        }
-        setPatientCollection(patientsObjects, false);
-        propertiesMap.put("patientCollection", patients);
-    }
-
-    public void addPatients(PatientWrapper... patients) {
-        List<PatientWrapper> patientsList = getPatientCollection();
-        if (patientsList == null) {
-            patientsList = new ArrayList<PatientWrapper>();
-        }
-        if (patientsAdded == null) {
-            patientsAdded = new ArrayList<PatientWrapper>();
-        }
-        for (PatientWrapper patient : patients) {
-            patientsAdded.add(patient);
-            patientsList.add(patient);
-        }
-        setPatientCollection(patientsList);
-    }
-
-    public void removePatients(PatientWrapper... patients) {
+    public void addPatients(List<PatientWrapper> newPatients) {
+        Collection<Patient> allPatientsObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
+        // already in list
         List<PatientWrapper> patientsList = getPatientCollection();
         if (patientsList != null) {
-            for (PatientWrapper patient : patients) {
-                patientsList.remove(patient);
+            for (PatientWrapper patient : patientsList) {
+                allPatientsObjects.add(patient.getWrappedObject());
+                allPatientsWrappers.add(patient);
             }
-            setPatientCollection(patientsList);
         }
+        // new patients
+        for (PatientWrapper patient : newPatients) {
+            patientsAdded.add(patient);
+            allPatientsObjects.add(patient.getWrappedObject());
+            allPatientsWrappers.add(patient);
+        }
+        setPatients(allPatientsObjects, allPatientsWrappers);
+    }
+
+    public void removePatients(List<PatientWrapper> patientsToRemove) {
+        patientsAdded.removeAll(patientsToRemove);
+        Collection<Patient> allPatientsObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
+        // already in list
+        List<PatientWrapper> patientsList = getPatientCollection();
+        if (patientsList != null) {
+            for (PatientWrapper patient : patientsList) {
+                if (!patientsToRemove.contains(patient)) {
+                    allPatientsObjects.add(patient.getWrappedObject());
+                    allPatientsWrappers.add(patient);
+                }
+            }
+        }
+        setPatients(allPatientsObjects, allPatientsWrappers);
     }
 
     @Override
@@ -390,5 +387,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
         return results.get(0) > 0;
+    }
+
+    @Override
+    public void resetInternalField() {
+        patientsAdded.clear();
     }
 }

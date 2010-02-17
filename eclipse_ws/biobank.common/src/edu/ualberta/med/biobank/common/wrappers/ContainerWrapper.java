@@ -3,10 +3,10 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -24,8 +24,6 @@ import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends
@@ -339,7 +337,7 @@ public class ContainerWrapper extends
         }
     }
 
-    public void setContainerType(ContainerType containerType) {
+    protected void setContainerType(ContainerType containerType) {
         ContainerType oldType = wrappedObject.getContainerType();
         wrappedObject.setContainerType(containerType);
         propertyChangeSupport.firePropertyChange("containerType", oldType,
@@ -365,7 +363,7 @@ public class ContainerWrapper extends
         return wrappedObject.getActivityStatus();
     }
 
-    public void setSite(Site site) {
+    protected void setSite(Site site) {
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -393,7 +391,7 @@ public class ContainerWrapper extends
             Collection<SamplePosition> positions = wrappedObject
                 .getSamplePositionCollection();
             if (positions != null) {
-                samples = new HashMap<RowColPos, SampleWrapper>();
+                samples = new TreeMap<RowColPos, SampleWrapper>();
                 for (SamplePosition position : positions) {
                     samples.put(new RowColPos(position.getRow(), position
                         .getCol()), new SampleWrapper(appService, position
@@ -434,7 +432,7 @@ public class ContainerWrapper extends
         samplePosition.checkPositionValid(this);
         Map<RowColPos, SampleWrapper> samples = getSamples();
         if (samples == null) {
-            samples = new HashMap<RowColPos, SampleWrapper>();
+            samples = new TreeMap<RowColPos, SampleWrapper>();
             propertiesMap.put("samples", samples);
         } else
             try {
@@ -454,7 +452,7 @@ public class ContainerWrapper extends
                     }
                 }
             } catch (ApplicationException e) {
-                LOGGER.error("Adding sample failed. " + "\n" + e.toString());
+                LOGGER.error("Adding sample failed.", e);
             }
         sample.setPosition(row, col);
         sample.setParent(this);
@@ -494,7 +492,7 @@ public class ContainerWrapper extends
             Collection<ContainerPosition> positions = wrappedObject
                 .getChildPositionCollection();
             if (positions != null) {
-                children = new HashMap<RowColPos, ContainerWrapper>();
+                children = new TreeMap<RowColPos, ContainerWrapper>();
                 for (ContainerPosition position : positions) {
                     ContainerWrapper child = new ContainerWrapper(appService,
                         position.getContainer());
@@ -590,7 +588,7 @@ public class ContainerWrapper extends
         containerPosition.checkPositionValid(this);
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
-            children = new HashMap<RowColPos, ContainerWrapper>();
+            children = new TreeMap<RowColPos, ContainerWrapper>();
             propertiesMap.put("children", children);
         } else {
             ContainerWrapper containerAtPosition = getChild(row, col);
@@ -621,7 +619,7 @@ public class ContainerWrapper extends
     public boolean canHoldSample(SampleWrapper sample) throws Exception {
         SampleTypeWrapper type = sample.getSampleType();
         if (type == null) {
-            throw new Exception("sample type is null");
+            throw new WrapperException("sample type is null");
         }
         HQLCriteria criteria = new HQLCriteria("select sampleType from "
             + ContainerType.class.getName()
@@ -668,6 +666,15 @@ public class ContainerWrapper extends
         if (hasChildren()) {
             throw new BiobankCheckException("Unable to delete container "
                 + getLabel() + ". All subcontainers must be removed first.");
+        }
+    }
+
+    @Override
+    protected void deleteDependencies() throws Exception {
+        ContainerPathWrapper path = ContainerPathWrapper.getContainerPath(
+            appService, this);
+        if (path != null) {
+            path.delete();
         }
     }
 
@@ -823,32 +830,28 @@ public class ContainerWrapper extends
      */
     public boolean deleteChildrenWithType(ContainerTypeWrapper type,
         Set<RowColPos> positions) throws BiobankCheckException, Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        boolean oneChildrenDeleted = false;
         if (positions == null) {
             for (ContainerWrapper child : getChildren().values()) {
-                addToDeleteList(queries, child, type);
+                oneChildrenDeleted = deleteChild(type, child);
             }
         } else {
             for (RowColPos rcp : positions) {
                 ContainerWrapper child = getChild(rcp);
-                addToDeleteList(queries, child, type);
+                oneChildrenDeleted = deleteChild(type, child);
             }
         }
-        if (queries.size() > 0) {
-            appService.executeBatchQuery(queries);
-            reload();
+        reload();
+        return oneChildrenDeleted;
+    }
+
+    private boolean deleteChild(ContainerTypeWrapper type,
+        ContainerWrapper child) throws Exception {
+        if (type == null || child.getContainerType().equals(type)) {
+            child.delete();
             return true;
         }
         return false;
-    }
-
-    private void addToDeleteList(List<SDKQuery> queries,
-        ContainerWrapper child, ContainerTypeWrapper type)
-        throws BiobankCheckException, ApplicationException {
-        if (type == null || child.getContainerType().equals(type)) {
-            child.deleteChecks();
-            queries.add(new DeleteExampleQuery(child.getWrappedObject()));
-        }
     }
 
     @Override
@@ -880,6 +883,20 @@ public class ContainerWrapper extends
             return posWrapper;
         }
         return null;
+    }
+
+    /**
+     * init this wrapper with the given containerWrapper.
+     * 
+     * @throws WrapperException
+     */
+    public void initObjectWith(ContainerWrapper containerWrapper)
+        throws WrapperException {
+        if (containerWrapper == null) {
+            throw new WrapperException(
+                "Cannot init internal object with a null container");
+        }
+        setWrappedObject(containerWrapper.wrappedObject);
     }
 
 }

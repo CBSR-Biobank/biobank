@@ -8,7 +8,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -67,17 +66,17 @@ public class SampleViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createWidget(client, Label.class, SWT.NONE, "Type", sample
-            .getSampleType().getName());
-        createWidget(client, Label.class, SWT.NONE, "Link Date", sample
+        createReadOnlyField(client, SWT.NONE, "Type", sample.getSampleType()
+            .getName());
+        createReadOnlyField(client, SWT.NONE, "Link Date", sample
             .getFormattedLinkDate());
-        createWidget(client, Label.class, SWT.NONE, "Quantity", sample
-            .getQuantity() == null ? null : sample.getQuantity().toString());
-        createWidget(client, Label.class, SWT.NONE, "Quantity Used", sample
+        createReadOnlyField(client, SWT.NONE, "Quantity",
+            sample.getQuantity() == null ? null : sample.getQuantity()
+                .toString());
+        createReadOnlyField(client, SWT.NONE, "Quantity Used", sample
             .getQuantityUsed() == null ? null : sample.getQuantityUsed()
             .toString());
-        createWidget(client, Label.class, SWT.NONE, "Comment", sample
-            .getComment());
+        createReadOnlyField(client, SWT.NONE, "Comment", sample.getComment());
     }
 
     private void createContainersSection() {

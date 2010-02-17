@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.apache.commons.collections.MapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -45,11 +46,13 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_EDIT_FORM));
 
+    private AdapterChangedListener adapterChangedListener;
+
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         super.init(editorSite, input);
-        adapter.addChangedListener(new AdapterChangedListener() {
+        adapterChangedListener = new AdapterChangedListener() {
             @Override
             public void changed(AdapterChangedEvent event) {
                 try {
@@ -58,7 +61,14 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     LOGGER.error("Error sending event", e);
                 }
             }
-        });
+        };
+        adapter.addChangedListener(adapterChangedListener);
+    }
+
+    @Override
+    public void dispose() {
+        Assert.isNotNull(adapterChangedListener);
+        adapter.removeChangedListener(adapterChangedListener);
     }
 
     @Override
@@ -77,19 +87,17 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         return false;
     }
 
-    protected void setWidgetsValues(ListOrderedMap fieldsMap, Object bean) {
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            FieldInfo fi = (FieldInfo) it.getValue();
-            IObservableValue ov = BeansObservables.observeValue(bean, key);
+    protected void setWidgetValues(Map<String, FieldInfo> fieldsMap, Object bean) {
+        for (String label : fieldsMap.keySet()) {
+            FieldInfo fi = fieldsMap.get(label);
+            IObservableValue ov = BeansObservables.observeValue(bean, label);
             Object value = ov.getValue();
             if (value != null) {
-                Control control = controls.get(key);
+                Control widget = getWidget(label);
                 if ((fi.widgetClass == Combo.class)
                     || (fi.widgetClass == Text.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((Label) control).setText((String) value);
+                    ((Text) widget).setText((String) value);
                 }
             }
         }

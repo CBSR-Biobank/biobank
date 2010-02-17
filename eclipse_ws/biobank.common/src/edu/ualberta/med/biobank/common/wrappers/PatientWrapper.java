@@ -46,14 +46,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return new StudyWrapper(appService, study);
     }
 
-    public void setStudy(Study study) {
-        Study oldStudy = wrappedObject.getStudy();
-        wrappedObject.setStudy(study);
-        propertyChangeSupport.firePropertyChange("study", oldStudy, study);
-    }
-
     public void setStudy(StudyWrapper study) {
-        setStudy(study.wrappedObject);
+        Study oldStudy = wrappedObject.getStudy();
+        Study newStudy = study.wrappedObject;
+        wrappedObject.setStudy(newStudy);
+        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {
@@ -114,32 +111,35 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patientVisitCollection;
     }
 
-    public void setPatientVisitCollection(
-        Collection<PatientVisit> patientVisitCollection, boolean setNull) {
+    public void addPatientVisits(
+        Collection<PatientVisitWrapper> newPatientVisits) {
+        Collection<PatientVisit> allPvObjects = new HashSet<PatientVisit>();
+        List<PatientVisitWrapper> allPvWrappers = new ArrayList<PatientVisitWrapper>();
+        // already added visits
+        List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+        if (currentList != null) {
+            for (PatientVisitWrapper visit : currentList) {
+                allPvObjects.add(visit.getWrappedObject());
+                allPvWrappers.add(visit);
+            }
+        }
+        // new
+        for (PatientVisitWrapper visit : newPatientVisits) {
+            allPvObjects.add(visit.getWrappedObject());
+            allPvWrappers.add(visit);
+        }
         Collection<PatientVisit> oldCollection = wrappedObject
             .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(patientVisitCollection);
+        wrappedObject.setPatientVisitCollection(allPvObjects);
         propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, patientVisitCollection);
-        if (setNull) {
-            propertiesMap.put("patientVisitCollection", null);
-        }
-    }
-
-    public void setPatientVisitCollection(
-        Collection<PatientVisitWrapper> patientVisitCollection) {
-        Collection<PatientVisit> pvCollection = new HashSet<PatientVisit>();
-        for (PatientVisitWrapper pv : patientVisitCollection) {
-            pvCollection.add(pv.getWrappedObject());
-        }
-        setPatientVisitCollection(pvCollection, false);
-        propertiesMap.put("patientVisitCollection", patientVisitCollection);
+            oldCollection, allPvObjects);
+        propertiesMap.put("patientVisitCollection", allPvWrappers);
     }
 
     /**
-     * Search for a patient visit with the given date processed.
+     * Search patient visits with the given date processed.
      */
-    public List<PatientVisitWrapper> getVisit(Date dateProcessed)
+    public List<PatientVisitWrapper> getVisits(Date dateProcessed)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select visits from "
             + Patient.class.getName()
@@ -232,19 +232,23 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public boolean hasSamples() throws ApplicationException,
+    public long getSampleCount() throws ApplicationException,
         BiobankCheckException {
-        String queryString = "select count(samples) from "
+        HQLCriteria c = new HQLCriteria("select count(samples) from "
             + Patient.class.getName() + " as p"
-            + " left join p.patientVisitCollection as visits"
-            + " left join visits.sampleCollection as samples where p = ?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            + " join p.patientVisitCollection as visits"
+            + " join visits.sampleCollection as samples where p = ?", Arrays
             .asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
-        return results.get(0) > 0;
+        return results.get(0);
+    }
+
+    public boolean hasSamples() throws ApplicationException,
+        BiobankCheckException {
+        return (getSampleCount() > 0);
     }
 
     @Override

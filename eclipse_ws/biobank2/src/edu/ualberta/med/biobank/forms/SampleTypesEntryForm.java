@@ -88,13 +88,17 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        siteWrapper.reload();
-        List<SampleTypeWrapper> ssCollection = siteSampleWidget
-            .getTableSampleTypes();
-        siteWrapper.setSampleTypeCollection(ssCollection);
-        siteWrapper.persist();
-        SampleTypeWrapper.persistGlobalSampleTypes(appService,
-            globalSampleWidget.getTableSampleTypes());
+        if (siteWrapper != null) {
+            siteWrapper.reload();
+            siteWrapper.addSampleTypes(siteSampleWidget
+                .getAddedOrModifiedSampleTypes());
+            siteWrapper.removeSampleTypes(siteSampleWidget
+                .getDeletedSampleTypes());
+            siteWrapper.persist();
+        }
+        SampleTypeWrapper.persistGlobalSampleTypes(globalSampleWidget
+            .getAddedOrModifiedSampleTypes(), globalSampleWidget
+            .getDeletedSampleTypes());
     }
 
     @Override

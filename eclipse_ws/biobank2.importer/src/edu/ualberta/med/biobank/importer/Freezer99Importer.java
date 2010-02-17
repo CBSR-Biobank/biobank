@@ -17,19 +17,18 @@ public class Freezer99Importer extends FreezerImporter {
         + "patient_visit.date_taken, study_list.study_name_short, "
         + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
         + "from freezer "
-        + "join study_list on freezer.study_nr=study_list.study_nr "
-        + "join patient on patient.patient_nr=freezer.patient_nr "
-        + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
-        + "and freezer.visit_nr=patient_visit.visit_nr "
-        + "and freezer.patient_nr=patient_visit.patient_nr "
+        + "join patient_visit on patient_visit.visit_nr=freezer.visit_nr "
+        + "join patient on patient.patient_nr=patient_visit.patient_nr "
+        + "join study_list on study_list.study_nr=patient_visit.study_nr "
         + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
         + "where freezer.fnum = ? and freezer.rack= ? "
         + "order by freezer.box, freezer.cell";
 
     public Freezer99Importer(WritableApplicationService appService,
-        Connection con, final SiteWrapper site, ContainerWrapper container,
-        int bbpdbFreezerNum) throws Exception {
-        super(appService, con, site, container, bbpdbFreezerNum, DEFAULT_QUERY);
+        Connection con, Configuration configuration, final SiteWrapper site,
+        ContainerWrapper container, int bbpdbFreezerNum) throws Exception {
+        super(appService, con, configuration, site, container, bbpdbFreezerNum,
+            DEFAULT_QUERY);
     }
 
 }

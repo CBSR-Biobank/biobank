@@ -1,6 +1,7 @@
 package test.ualberta.med.biobank.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -57,7 +58,7 @@ public class TestSampleType extends TestDatabase {
             .getContainerTypeCollection();
         for (int i = 0; i < nber; i++) {
             ContainerTypeWrapper containerType = containerTypes.get(i);
-            containerType.setSampleTypeCollection(sampleTypes);
+            containerType.addSampleTypes(sampleTypes);
             containerType.persist();
         }
 
@@ -80,7 +81,7 @@ public class TestSampleType extends TestDatabase {
             .getContainerTypeCollection();
         for (int i = 0; i < nber; i++) {
             ContainerTypeWrapper containerType = containerTypes.get(i);
-            containerType.setSampleTypeCollection(sampleTypes);
+            containerType.addSampleTypes(sampleTypes);
             containerType.persist();
         }
 
@@ -120,10 +121,10 @@ public class TestSampleType extends TestDatabase {
         SampleTypeWrapper sampleType4 = SampleTypeHelper.addSampleType(site,
             "ST4");
         sampleTypes2.add(sampleType4);
-        containerType1.setSampleTypeCollection(sampleTypes1);
+        containerType1.addSampleTypes(sampleTypes1);
         int type1Size = sampleTypes1.size();
         containerType1.persist();
-        containerType2.setSampleTypeCollection(sampleTypes2);
+        containerType2.addSampleTypes(sampleTypes2);
         int type2Size = sampleTypes2.size();
         containerType2.persist();
 
@@ -178,16 +179,13 @@ public class TestSampleType extends TestDatabase {
 
         String name = "testPersistGlobalSampleTypes" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(null, name);
-        types.add(type);
-        SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
+        SampleTypeWrapper.persistGlobalSampleTypes(Arrays.asList(type), null);
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
             .getGlobalSampleTypes(appService, false).size());
 
-        types.remove(type);
-        SampleTypeWrapper.persistGlobalSampleTypes(appService, types);
+        SampleTypeWrapper.persistGlobalSampleTypes(null, Arrays.asList(type));
         Assert.assertEquals(startSize, SampleTypeWrapper.getGlobalSampleTypes(
             appService, false).size());
-
     }
 
     @Test

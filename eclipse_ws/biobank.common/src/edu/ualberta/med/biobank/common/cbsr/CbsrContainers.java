@@ -111,7 +111,7 @@ public class CbsrContainers {
             h13Type, h19Type, h19Type, h19Type, h19Type, h19Type, h19Type,
             h19Type, h19Type, h19Type, h19Type, h19Type, h19Type, h13Type,
             h13Type, h13Type, h13Type, h19Type, h19Type, h19Type, h19Type,
-            h13Type, h13Type, h13Type, h13Type };
+            h13Type, h13Type };
 
         RowColPos pos = new RowColPos();
         int count = 0;
@@ -367,8 +367,8 @@ public class CbsrContainers {
             ftaBinLoerschType, // 13
             ftaBinLoerschType, // 14
             ftaBinLoerschType, // 15
-            null, // 16
-            null, // 17
+            ftaBinLoerschType, // 16
+            ftaBinLoerschType, // 17
             null, // 18
             null, // 19
             ftaBinLoerschType, // 20
@@ -376,7 +376,9 @@ public class CbsrContainers {
             ftaBinLoerschType, // 22
             ftaBinLoerschType, // 23
             ftaBinLoerschType, // 24
-            ftaBinLoerschType // 25
+            ftaBinLoerschType, // 25
+            ftaBinLoerschType, // 26
+            hairBinType // 27
         };
 
         drawer = addContainer(site, drawerType, cabinet, 3, 0);

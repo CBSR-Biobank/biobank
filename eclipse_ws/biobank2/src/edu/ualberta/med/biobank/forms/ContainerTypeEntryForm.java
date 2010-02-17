@@ -20,11 +20,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -151,8 +151,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text siteLabel = createReadOnlyField(client, SWT.NONE,
+            "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Name", null, BeansObservables.observeValue(containerType, "name"),
@@ -322,18 +322,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
      */
     @Override
     protected void saveForm() throws Exception {
-        // set sampletypes
-        List<Integer> selectedIds = new ArrayList<Integer>();
-        if (hasSamples.getSelection()) {
-            selectedIds = samplesMultiSelect.getSelected();
-        }
-        containerType.setSampleTypes(selectedIds, allSampleTypes);
-        // set childcontainers
-        selectedIds = new ArrayList<Integer>();
-        if (hasContainers.getSelection()) {
-            selectedIds = childContainerTypesMultiSelect.getSelected();
-        }
-        containerType.setChildContainerTypes(selectedIds, allContainerTypes);
+        setSampleTypes();
+
+        setChildContainerTypes();
 
         // associate the storage type to it's site
         containerType.setSite(site);
@@ -345,6 +336,74 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         containerType.persist();
         containerTypeAdapter.getParent().performExpand();
+    }
+
+    private void setSampleTypes() throws BiobankCheckException {
+        List<Integer> addedIds = new ArrayList<Integer>();
+        List<Integer> removedIds = new ArrayList<Integer>();
+        if (hasSamples.getSelection()) {
+            addedIds = samplesMultiSelect.getAddedToSelection();
+            removedIds = samplesMultiSelect.getRemovedToSelection();
+            List<SampleTypeWrapper> addedSampleTypes = new ArrayList<SampleTypeWrapper>();
+            List<SampleTypeWrapper> removedSampleTypes = new ArrayList<SampleTypeWrapper>();
+            for (SampleTypeWrapper sampleType : allSampleTypes) {
+                if (addedIds.indexOf(sampleType.getId()) >= 0) {
+                    addedSampleTypes.add(sampleType);
+                }
+                if (removedIds.indexOf(sampleType.getId()) >= 0) {
+                    removedSampleTypes.add(sampleType);
+                }
+            }
+            if (addedIds.size() != addedSampleTypes.size()) {
+                throw new BiobankCheckException(
+                    "Problem with added sample types");
+            }
+            if (removedIds.size() != removedSampleTypes.size()) {
+                throw new BiobankCheckException(
+                    "Problem with removed sample types");
+            }
+            containerType.addSampleTypes(addedSampleTypes);
+            containerType.removeSampleTypes(removedSampleTypes);
+        } else {
+            containerType.removeSampleTypes(containerType
+                .getSampleTypeCollection());
+        }
+    }
+
+    private void setChildContainerTypes() throws BiobankCheckException {
+        List<Integer> addedTypesIds = new ArrayList<Integer>();
+        List<Integer> removedTypesIds = new ArrayList<Integer>();
+        if (hasContainers.getSelection()) {
+            addedTypesIds = childContainerTypesMultiSelect
+                .getAddedToSelection();
+            removedTypesIds = childContainerTypesMultiSelect
+                .getRemovedToSelection();
+            List<ContainerTypeWrapper> addedContainerTypes = new ArrayList<ContainerTypeWrapper>();
+            List<ContainerTypeWrapper> removedContainerTypes = new ArrayList<ContainerTypeWrapper>();
+            if (allContainerTypes != null) {
+                for (ContainerTypeWrapper containerType : allContainerTypes) {
+                    if (addedTypesIds.indexOf(containerType.getId()) >= 0) {
+                        addedContainerTypes.add(containerType);
+                    }
+                    if (removedTypesIds.indexOf(containerType.getId()) >= 0) {
+                        removedContainerTypes.add(containerType);
+                    }
+                }
+            }
+            if (addedTypesIds.size() != addedContainerTypes.size()) {
+                throw new BiobankCheckException(
+                    "Problem with added child container types");
+            }
+            if (removedTypesIds.size() != removedContainerTypes.size()) {
+                throw new BiobankCheckException(
+                    "Problem with removed child container types");
+            }
+            containerType.addChildContainerTypes(addedContainerTypes);
+            containerType.removeChildContainers(removedContainerTypes);
+        } else {
+            containerType.removeChildContainers(containerType
+                .getChildContainerTypeCollection());
+        }
     }
 
     @Override

@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -55,15 +56,16 @@ public class PvAttrTypeWrapper extends ModelWrapper<PvAttrType> {
         return 0;
     }
 
-    public static List<PvAttrTypeWrapper> getAllWrappers(
+    public static Map<String, PvAttrTypeWrapper> getAllPvAttrTypesMap(
         WritableApplicationService appService) throws ApplicationException {
         List<PvAttrType> objects = appService.search(PvAttrType.class,
             new PvAttrType());
-        List<PvAttrTypeWrapper> wrappers = new ArrayList<PvAttrTypeWrapper>();
+        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = new HashMap<String, PvAttrTypeWrapper>();
         for (PvAttrType pv : objects) {
-            wrappers.add(new PvAttrTypeWrapper(appService, pv));
+            pvAttrTypeMap.put(pv.getName(), new PvAttrTypeWrapper(appService,
+                pv));
         }
-        return wrappers;
+        return pvAttrTypeMap;
     }
 
 }

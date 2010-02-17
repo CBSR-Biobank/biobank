@@ -150,7 +150,7 @@ public class ContainerHelper extends DbHelper {
             ContainerTypeWrapper type = ContainerTypeHelper
                 .addContainerTypeRandom(site, barcode + "children" + (i + 1),
                     false);
-            topContainer.getContainerType().setChildContainerTypeCollection(
+            topContainer.getContainerType().addChildContainerTypes(
                 Arrays.asList(type));
             int maxRow = topContainer.getRowCapacity();
             for (int j = 0; j < 5; j++) {

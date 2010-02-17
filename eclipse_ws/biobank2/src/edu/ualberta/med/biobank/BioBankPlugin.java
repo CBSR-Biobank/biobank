@@ -20,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
@@ -45,37 +46,38 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String IMAGE_ID = "biobank2.image";
 
-    public static final String IMG_FORM_BG = "formBg";
     public static final String IMG_ADD = "add";
     public static final String IMG_BIN = "bin";
     public static final String IMG_BOX = "box";
     public static final String IMG_CABINET = "cabinet";
     public static final String IMG_CABINET_LINK_ASSIGN = "cabinetLinkAssign";
+    public static final String IMG_CANCEL_FORM = "cancelForm";
     public static final String IMG_CLINIC = "clinic";
     public static final String IMG_CLINICS = "clinics";
-    public static final String IMG_LOGIN = "login";
-    public static final String IMG_LOGOUT = "logout";
     public static final String IMG_COMPUTER_KEY = "computerKey";
-    public static final String IMG_CONTAINER_TYPES = "containerTypes";
+    public static final String IMG_CONFIRM_FORM = "confirmForm";
     public static final String IMG_CONTAINERS = "containers";
+    public static final String IMG_CONTAINER_TYPES = "containerTypes";
     public static final String IMG_DELETE = "delete";
     public static final String IMG_DRAWER = "drawer";
+    public static final String IMG_EDIT_FORM = "editForm";
+    public static final String IMG_FORM_BG = "formBg";
     public static final String IMG_FREEZER = "freezer";
     public static final String IMG_HOTEL = "hotel";
+    public static final String IMG_LOGIN = "login";
+    public static final String IMG_LOGOUT = "logout";
     public static final String IMG_MAIN_PERSPECTIVE = "mainPerspective";
     public static final String IMG_PALLET = "pallet";
     public static final String IMG_PATIENT = "patient";
     public static final String IMG_PATIENT_VISIT = "patientVisit";
-    public static final String IMG_SHIPMENT = "shipment";
+    public static final String IMG_PRINTER = "patientVisit";
     public static final String IMG_RELOAD_FORM = "reloadForm";
-    public static final String IMG_EDIT_FORM = "editForm";
-    public static final String IMG_RESET_FORM = "resetForm";
-    public static final String IMG_CANCEL_FORM = "cancelForm";
-    public static final String IMG_CONFIRM_FORM = "confirmForm";
     public static final String IMG_REPORTS = "reports";
+    public static final String IMG_RESET_FORM = "resetForm";
     public static final String IMG_SCAN_ASSIGN = "scanAssign";
     public static final String IMG_SCAN_LINK = "scanLink";
     public static final String IMG_SESSIONS = "sessions";
+    public static final String IMG_SHIPMENT = "shipment";
     public static final String IMG_SITE = "site";
     public static final String IMG_STUDIES = "studies";
     public static final String IMG_STUDY = "study";
@@ -141,38 +143,39 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
-        registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
         registerImage(registry, IMG_ADD, "add.png");
         registerImage(registry, IMG_BIN, "bin.png");
         registerImage(registry, IMG_BOX, "bin.png");
         registerImage(registry, IMG_CABINET, "cabinet.png");
         registerImage(registry, IMG_CABINET_LINK_ASSIGN,
             "cabinetLinkAssign.png");
+        registerImage(registry, IMG_CANCEL_FORM, "cancel.png");
         registerImage(registry, IMG_CLINIC, "clinic.png");
         registerImage(registry, IMG_CLINICS, "clinics.png");
-        registerImage(registry, IMG_LOGIN, "computer.png");
         registerImage(registry, IMG_COMPUTER_KEY, "computer_key.png");
-        registerImage(registry, IMG_LOGOUT, "computer_delete.png");
-        registerImage(registry, IMG_CONTAINER_TYPES, "containerTypes.png");
+        registerImage(registry, IMG_CONFIRM_FORM, "confirm.png");
         registerImage(registry, IMG_CONTAINERS, "containers.png");
+        registerImage(registry, IMG_CONTAINER_TYPES, "containerTypes.png");
         registerImage(registry, IMG_DELETE, "delete.png");
         registerImage(registry, IMG_DRAWER, "drawer.png");
+        registerImage(registry, IMG_EDIT_FORM, "edit.png");
+        registerImage(registry, IMG_FORM_BG, "form_banner.bmp");
         registerImage(registry, IMG_FREEZER, "freezer.png");
         registerImage(registry, IMG_HOTEL, "hotel.png");
+        registerImage(registry, IMG_LOGIN, "computer.png");
+        registerImage(registry, IMG_LOGOUT, "computer_delete.png");
         registerImage(registry, IMG_MAIN_PERSPECTIVE, "mainPerspective.png");
         registerImage(registry, IMG_PALLET, "pallet.png");
         registerImage(registry, IMG_PATIENT, "patient.png");
         registerImage(registry, IMG_PATIENT_VISIT, "patientVisit.png");
-        registerImage(registry, IMG_SHIPMENT, "shipment.png");
+        registerImage(registry, IMG_PRINTER, "printer.png");
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
-        registerImage(registry, IMG_EDIT_FORM, "edit.png");
-        registerImage(registry, IMG_RESET_FORM, "reset.png");
-        registerImage(registry, IMG_CANCEL_FORM, "cancel.png");
-        registerImage(registry, IMG_CONFIRM_FORM, "confirm.png");
         registerImage(registry, IMG_REPORTS, "reports.png");
+        registerImage(registry, IMG_RESET_FORM, "reset.png");
         registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
         registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
+        registerImage(registry, IMG_SHIPMENT, "shipment.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
         registerImage(registry, IMG_STUDY, "study.png");
@@ -360,10 +363,13 @@ public class BioBankPlugin extends AbstractUIPlugin {
             && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
             String ctName;
             if (element instanceof ContainerAdapter) {
-                ctName = ((ContainerAdapter) element).getContainer()
-                    .getContainerType().getName();
+                ContainerWrapper container = ((ContainerAdapter) element)
+                    .getContainer();
+                if (container == null)
+                    return null;
+                ctName = container.getContainerType().getName();
             } else {
-                ctName = ((ContainerTypeAdapter) element).getName();
+                ctName = ((ContainerTypeAdapter) element).getLabel();
             }
             return getIconForTypeName(ctName);
         }

@@ -57,15 +57,21 @@ public class PatientVisitHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber)
-        throws ParseException, Exception {
-        int count = r.nextInt(15) + minimumNumber;
+        PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber,
+        int maxNumber) throws ParseException, Exception {
+        int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (int i = 0; i < count; i++) {
             visits.add(addPatientVisit(patient, shipment, TestCommon
                 .getUniqueDate(r)));
         }
         return visits;
+    }
+
+    public static List<PatientVisitWrapper> addPatientVisits(
+        PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber)
+        throws ParseException, Exception {
+        return addPatientVisits(patient, shipment, 1, 15);
     }
 
     public static List<PatientVisitWrapper> addPatientVisits(

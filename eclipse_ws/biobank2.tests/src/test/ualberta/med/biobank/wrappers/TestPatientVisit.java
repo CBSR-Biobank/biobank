@@ -78,7 +78,7 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Visit Test");
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
@@ -94,13 +94,13 @@ public class TestPatientVisit extends TestDatabase {
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
-        childType.setSampleTypeCollection(allSampleTypes);
+        childType.addSampleTypes(allSampleTypes);
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, 3, 10, true);
-        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+        topType.addChildContainerTypes(Arrays.asList(containerTypeMap
             .get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);
@@ -589,7 +589,7 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testSetPvSampleSourceCollection() throws Exception {
+    public void testAddPvSampleSources() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 
@@ -600,7 +600,7 @@ public class TestPatientVisit extends TestDatabase {
         ss2 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
             .getAllSampleSources(appService).get(1).getName(), visit);
 
-        visit.setPvSampleSourceCollection(Arrays.asList(ss1, ss2));
+        visit.addPvSampleSources(Arrays.asList(ss1, ss2));
         visit.persist();
 
         visit.reload();
@@ -613,9 +613,10 @@ public class TestPatientVisit extends TestDatabase {
         ss3 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
             .getAllSampleSources(appService).get(1).getName(), visit);
 
-        list.remove(0);
-        list.add(ss3);
-        visit.setPvSampleSourceCollection(list);
+        PvSampleSourceWrapper pvss = list.get(0);
+        visit.removePvSampleSources(Arrays.asList(pvss));
+        visit.addPvSampleSources(Arrays.asList(ss3));
+
         visit.persist();
 
         list = visit.getPvSampleSourceCollection();

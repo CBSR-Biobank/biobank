@@ -10,6 +10,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -62,7 +63,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return new SiteWrapper(appService, site);
     }
 
-    public void setSite(Site site) {
+    protected void setSite(Site site) {
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -184,6 +185,11 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
+        if (isUsedBySamples()) {
+            throw new BiobankCheckException("Unable to delete sample type "
+                + getName() + ". A sample of this type exists in storage."
+                + " Remove all instances before deleting this type.");
+        }
     }
 
     public static List<SampleTypeWrapper> getGlobalSampleTypes(
@@ -203,36 +209,29 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     /**
-     * This method should only be called to save the new sample type list. The
-     * differences between the old list and the new list will be deleted and the
-     * new list written to the database.
-     * 
-     * @param appService
-     * @param newGlobalSampleTypes
-     * 
-     * @throws BiobankCheckException
-     * @throws Exception
+     * This method should only be called to save the new sample type list.
      */
     public static void persistGlobalSampleTypes(
-        WritableApplicationService appService,
-        List<SampleTypeWrapper> newGlobalSampleTypes)
-        throws BiobankCheckException, Exception {
-        SampleTypeWrapper
-            .deleteOldSampleTypes(appService, newGlobalSampleTypes);
-        for (SampleTypeWrapper ss : newGlobalSampleTypes) {
-            ss.persist();
+        List<SampleTypeWrapper> addedOrModifiedTypes,
+        List<SampleTypeWrapper> typesToDelete) throws BiobankCheckException,
+        Exception {
+        if (addedOrModifiedTypes != null) {
+            for (SampleTypeWrapper ss : addedOrModifiedTypes) {
+                if (ss.getSite() == null) {
+                    ss.persist();
+                } else {
+                    throw new WrapperException(
+                        "Trying to add/modify a non global sample type");
+                }
+            }
         }
-    }
-
-    private static void deleteOldSampleTypes(
-        WritableApplicationService appService, List<SampleTypeWrapper> newTypes)
-        throws BiobankCheckException, Exception {
-        List<SampleTypeWrapper> oldTypes = getGlobalSampleTypes(appService,
-            false);
-        if (oldTypes != null) {
-            for (SampleTypeWrapper ss : oldTypes) {
-                if ((newTypes == null) || !newTypes.contains(ss)) {
+        if (typesToDelete != null) {
+            for (SampleTypeWrapper ss : typesToDelete) {
+                if (ss.getSite() == null) {
                     ss.delete();
+                } else {
+                    throw new WrapperException(
+                        "Trying to delete a non global sample type");
                 }
             }
         }
@@ -254,4 +253,18 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public String toString() {
         return getName();
     }
+
+    public boolean isUsedBySamples() throws ApplicationException,
+        BiobankCheckException {
+        String queryString = "select count(s) from " + Sample.class.getName()
+            + " as s where s.sampleType=?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0) > 0;
+    }
+
 }

@@ -3,7 +3,10 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
@@ -13,12 +16,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -35,7 +36,6 @@ import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
-@SuppressWarnings("serial")
 public class StudyEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm";
 
@@ -46,18 +46,19 @@ public class StudyEntryForm extends BiobankEntryForm {
     public static final String[] ORDERED_FIELDS = new String[] { "name",
         "nameShort", "activityStatus", "comment" };
 
-    public static final ListOrderedMap FIELDS = new ListOrderedMap() {
-        {
-            put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
-                NonEmptyStringValidator.class, "Study name cannot be blank"));
-            put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
-                null, NonEmptyStringValidator.class,
-                "Study short name cannot be blank"));
-            put("activityStatus", new FieldInfo("Activity Status", Combo.class,
-                SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
-            put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
-                null, null, null));
-        }
+    public static final Map<String, FieldInfo> FIELDS;
+    static {
+        Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
+        aMap.put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
+            NonEmptyStringValidator.class, "Study name cannot be blank"));
+        aMap.put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
+            null, NonEmptyStringValidator.class,
+            "Study short name cannot be blank"));
+        aMap.put("activityStatus", new FieldInfo("Activity Status",
+            Combo.class, SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
+        aMap.put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
+            null, null, null));
+        FIELDS = Collections.unmodifiableMap(aMap);
     };
 
     private StudyAdapter studyAdapter;
@@ -125,16 +126,16 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text siteLabel = createReadOnlyField(client, SWT.NONE,
+            "Repository Site");
         setTextValue(siteLabel, study.getSite().getName());
 
         createBoundWidgetsFromMap(FIELDS, study, client);
 
-        firstControl = controls.get("name");
+        firstControl = getWidget("name");
         Assert.isNotNull(firstControl, "name field does not exist");
 
-        Text comments = (Text) controls.get("comment");
+        Text comments = (Text) getWidget("comment");
         GridData gd = (GridData) comments.getLayoutData();
         gd.heightHint = 40;
 
@@ -267,21 +268,29 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        // get the selected sample sources from widget
-        List<Integer> selSampleSourceIds = sampleSourceMultiSelect
-            .getSelected();
-        List<SampleSourceWrapper> selSampleSource = new ArrayList<SampleSourceWrapper>();
-        for (SampleSourceWrapper ss : allSampleSources) {
-            int id = ss.getId();
-            if (selSampleSourceIds.indexOf(id) >= 0) {
-                selSampleSource.add(ss);
-            }
-        }
-        Assert.isTrue(selSampleSource.size() == selSampleSourceIds.size(),
-            "problem with sample source selections");
-        study.setSampleSourceCollection(selSampleSource);
+        setSampleSources();
 
-        // get study pv attributes
+        setStudyPvAttr();
+
+        // sample storages
+        study.addSampleStorages(sampleStorageEntryWidget
+            .getAddedOrModifiedSampleStorages());
+        study.removeSampleStorages(sampleStorageEntryWidget
+            .getDeletedSampleStorages());
+
+        study.addContacts(contactEntryWidget.getAddedContacts());
+        study.removeContacts(contactEntryWidget.getRemovedContacts());
+
+        SiteAdapter siteAdapter = studyAdapter
+            .getParentFromClass(SiteAdapter.class);
+        study.setSite(siteAdapter.getWrapper());
+
+        study.persist();
+
+        studyAdapter.getParent().performExpand();
+    }
+
+    private void setStudyPvAttr() throws Exception, UserUIException {
         List<String> newPvInfoLabels = new ArrayList<String>();
         for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             String label = studyPvAttrCustom.getLabel();
@@ -317,19 +326,31 @@ public class StudyEntryForm extends BiobankEntryForm {
                 }
             }
         }
+    }
 
-        // get sample storages
-        study.setSampleStorageCollection(sampleStorageEntryWidget
-            .getSampleStorage());
-
-        study.setContactCollection(contactEntryWidget.getContacts());
-        SiteAdapter siteAdapter = studyAdapter
-            .getParentFromClass(SiteAdapter.class);
-        study.setSite(siteAdapter.getWrapper());
-
-        study.persist();
-
-        studyAdapter.getParent().performExpand();
+    private void setSampleSources() {
+        List<Integer> addedSampleSourceIds = sampleSourceMultiSelect
+            .getAddedToSelection();
+        List<Integer> removedSampleSourceIds = sampleSourceMultiSelect
+            .getRemovedToSelection();
+        List<SampleSourceWrapper> addedSampleSources = new ArrayList<SampleSourceWrapper>();
+        List<SampleSourceWrapper> removedSampleSources = new ArrayList<SampleSourceWrapper>();
+        if (allSampleSources != null) {
+            for (SampleSourceWrapper ss : allSampleSources) {
+                int id = ss.getId();
+                if (addedSampleSourceIds.indexOf(id) >= 0) {
+                    addedSampleSources.add(ss);
+                } else if (removedSampleSourceIds.indexOf(id) >= 0) {
+                    removedSampleSources.add(ss);
+                }
+            }
+        }
+        Assert.isTrue(addedSampleSources.size() == addedSampleSourceIds.size(),
+            "problem with added sample source selections");
+        study.addSampleSources(addedSampleSources);
+        Assert.isTrue(removedSampleSources.size() == removedSampleSourceIds
+            .size(), "problem with removed sample source selections");
+        study.removeSampleSources(removedSampleSources);
     }
 
     @Override
@@ -340,15 +361,12 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        List<ContactWrapper> contacts = study.getContactCollection();
-        if (contacts != null) {
-            contactEntryWidget.setContacts(contacts);
-        }
+        contactEntryWidget.loadContacts(study);
 
         List<SampleStorageWrapper> sampleStorages = study
             .getSampleStorageCollection();
         if (sampleStorages != null) {
-            sampleStorageEntryWidget.setSampleStorage(sampleStorages);
+            sampleStorageEntryWidget.setSampleStorages(sampleStorages);
         }
 
         setSampleSourceWidgetSelections();

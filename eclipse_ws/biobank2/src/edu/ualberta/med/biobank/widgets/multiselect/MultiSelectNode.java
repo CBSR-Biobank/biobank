@@ -18,6 +18,10 @@ public class MultiSelectNode {
 
     protected List<MultiSelectNode> children;
 
+    protected List<MultiSelectNode> addedChildren;
+
+    protected List<MultiSelectNode> removedChildren;
+
     protected IDeltaListener listener = NullDeltaListener.getSoleInstance();
 
     public MultiSelectNode(MultiSelectNode parent) {
@@ -29,6 +33,8 @@ public class MultiSelectNode {
         this(parent);
         setId(id);
         setName(name);
+        addedChildren = new ArrayList<MultiSelectNode>();
+        removedChildren = new ArrayList<MultiSelectNode>();
     }
 
     public void setParent(MultiSelectNode parent) {
@@ -59,9 +65,19 @@ public class MultiSelectNode {
         return children;
     }
 
+    public List<MultiSelectNode> getAddedChildren() {
+        return addedChildren;
+    }
+
+    public List<MultiSelectNode> getRemovedChildren() {
+        return removedChildren;
+    }
+
     public void addChild(MultiSelectNode child) {
         child.setParent(this);
         children.add(child);
+        addedChildren.add(child);
+        removedChildren.remove(child);
         child.addListener(listener);
         fireAdd(child);
     }
@@ -74,6 +90,8 @@ public class MultiSelectNode {
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(listener);
+        addedChildren.add(newNode);
+        removedChildren.remove(newNode);
         fireAdd(newNode);
     }
 
@@ -90,6 +108,8 @@ public class MultiSelectNode {
 
         if (itemToRemove != null) {
             children.remove(itemToRemove);
+            removedChildren.add(itemToRemove);
+            addedChildren.remove(itemToRemove);
             fireRemove(itemToRemove);
         }
     }
@@ -129,9 +149,24 @@ public class MultiSelectNode {
         return name;
     }
 
+    /**
+     * remove all current selections
+     */
     public void clear() {
         for (MultiSelectNode node : new ArrayList<MultiSelectNode>(children)) {
             removeChild(node);
         }
+        children.clear();
+        addedChildren.clear();
+        removedChildren.clear();
     }
+
+    /**
+     * Reset internal lists except current selections
+     */
+    public void reset() {
+        addedChildren.clear();
+        removedChildren.clear();
+    }
+
 }

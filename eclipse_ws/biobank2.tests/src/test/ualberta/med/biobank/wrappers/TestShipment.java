@@ -55,7 +55,7 @@ public class TestShipment extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic2, name
             + "CONTACT2");
         StudyWrapper study = clinic.getStudyCollection().get(0);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
 
         shipment.setClinic(clinic2);
@@ -90,7 +90,7 @@ public class TestShipment extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.addContacts(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
         ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
@@ -102,7 +102,7 @@ public class TestShipment extends TestDatabase {
         PatientVisitHelper.addPatientVisits(patient1, shipment2).size();
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
+        study2.addContacts(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
         ShipmentWrapper shipment3 = ShipmentHelper.addShipment(clinic1,
@@ -122,8 +122,8 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testSetPatientVisitCollectionAdd() throws Exception {
-        String name = "testSetPatientVisitCollectionAdd" + r.nextInt();
+    public void testAddPatientVisits() throws Exception {
+        String name = "testAddPatientVisits" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomPatient(
@@ -135,11 +135,9 @@ public class TestShipment extends TestDatabase {
         }
         shipment.reload();
 
-        List<PatientVisitWrapper> visits = shipment.getPatientVisitCollection();
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(shipment
             .getPatientCollection().get(0), shipment, Utils.getRandomDate());
-        visits.add(visit);
-        shipment.setPatientVisitCollection(visits);
+        shipment.addPatientVisits(Arrays.asList(visit));
         shipment.persist();
 
         shipment.reload();
@@ -182,18 +180,18 @@ public class TestShipment extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.addContacts(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study1);
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
+        study2.addContacts(contacts);
         study2.persist();
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.addPatients(patient1, patient2, patient3);
+        shipment.addPatients(Arrays.asList(patient1, patient2, patient3));
         shipment.persist();
 
         shipment.reload();
@@ -216,7 +214,7 @@ public class TestShipment extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.addContacts(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient("QWERTY" + name,
             study1);
@@ -224,13 +222,13 @@ public class TestShipment extends TestDatabase {
             study1);
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
+        study2.addContacts(contacts);
         study2.persist();
         PatientWrapper patient3 = PatientHelper.addPatient("ZXCVB" + name,
             study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.addPatients(patient1, patient2, patient3);
+        shipment.addPatients(Arrays.asList(patient1, patient2, patient3));
         shipment.persist();
 
         shipment.reload();
@@ -245,13 +243,13 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testSetPatientCollectionAdd() throws Exception {
-        String name = "testSetPatientCollectionAdd" + r.nextInt();
+    public void testAddPatients() throws Exception {
+        String name = "testAddPatients" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper firstPatient = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
@@ -260,7 +258,7 @@ public class TestShipment extends TestDatabase {
 
         PatientWrapper patient = PatientHelper.addPatient(name + "NewPatient",
             study);
-        shipment.addPatients(patient);
+        shipment.addPatients(Arrays.asList(patient));
         shipment.persist();
 
         shipment.reload();
@@ -269,13 +267,13 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testSetPatientCollectionRemove() throws Exception {
-        String name = "testSetPatientCollectionRemove" + r.nextInt();
+    public void testRemovePatients() throws Exception {
+        String name = "testRemovePatients" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
@@ -285,7 +283,7 @@ public class TestShipment extends TestDatabase {
 
         PatientWrapper patient = DbHelper.chooseRandomlyInList(shipment
             .getPatientCollection());
-        shipment.removePatients(patient);
+        shipment.removePatients(Arrays.asList(patient));
         shipment.persist();
 
         shipment.reload();
@@ -300,7 +298,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentHelper.addShipment(clinic, patient1);
@@ -334,19 +332,19 @@ public class TestShipment extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        study1.setContactCollection(contacts);
+        study1.addContacts(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study1);
 
         StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
-        study2.setContactCollection(contacts);
+        study2.addContacts(contacts);
         study2.persist();
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
         PatientHelper.addPatient(name + "_4", study2);
 
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic1);
-        shipment.addPatients(patient1, patient2, patient3);
+        shipment.addPatients(Arrays.asList(patient1, patient2, patient3));
         shipment.persist();
 
         shipment.reload();
@@ -361,7 +359,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic, name,
@@ -377,7 +375,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic, null,
@@ -398,7 +396,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic, name,
@@ -424,7 +422,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
         try {
@@ -464,7 +462,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentHelper.addShipment(clinic, patient1);
@@ -490,7 +488,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentHelper.addShipment(clinic, patient1);
@@ -530,7 +528,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment1 = ShipmentHelper
@@ -553,7 +551,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.setContactCollection(Arrays.asList(contact));
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment1 = ShipmentHelper

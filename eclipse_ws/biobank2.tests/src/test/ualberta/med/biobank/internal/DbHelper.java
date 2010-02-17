@@ -91,7 +91,6 @@ public class DbHelper {
         throws Exception {
         for (ClinicWrapper clinic : clinics) {
             clinic.reload();
-            deleteFromList(clinic.getContactCollection());
             deleteFromList(clinic.getShipmentCollection());
             clinic.reload();
             clinic.delete();

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -22,6 +23,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicWrapper extends ModelWrapper<Clinic> {
+
+    private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
@@ -217,17 +220,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected void persistDependencies(Clinic origObject) throws Exception {
-        // remove contacts which are not on the list anymore
-        if (origObject != null) {
-            List<ContactWrapper> contactsOrig = new ClinicWrapper(appService,
-                origObject).getContactCollection();
-            if (contactsOrig != null && contactsOrig.size() > 0) {
-                Collection<ContactWrapper> contactsNew = getContactCollection();
-                for (ContactWrapper cw : contactsOrig) {
-                    if (!contactsNew.contains(cw)) {
-                        cw.delete();
-                    }
-                }
+        for (ContactWrapper cw : deletedContacts) {
+            if (!cw.isNew()) {
+                cw.delete();
             }
         }
     }
@@ -277,24 +272,50 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getContactCollection(true);
     }
 
-    public void setContactCollection(Collection<Contact> contacts,
-        boolean setNull) {
+    private void setContacts(Collection<Contact> allContactsObjects,
+        List<ContactWrapper> allContactsWrappers) {
         Collection<Contact> oldContacts = wrappedObject.getContactCollection();
-        wrappedObject.setContactCollection(contacts);
+        wrappedObject.setContactCollection(allContactsObjects);
         propertyChangeSupport.firePropertyChange("contactCollection",
-            oldContacts, contacts);
-        if (setNull) {
-            propertiesMap.put("contactCollection", null);
-        }
+            oldContacts, allContactsObjects);
+        propertiesMap.put("contactCollection", allContactsWrappers);
     }
 
-    public void setContactCollection(Collection<ContactWrapper> contacts) {
-        Collection<Contact> collection = new HashSet<Contact>();
-        for (ContactWrapper pv : contacts) {
-            collection.add(pv.getWrappedObject());
+    public void addContacts(List<ContactWrapper> newContacts) {
+        Collection<Contact> allContactsObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                allContactsObjects.add(contact.getWrappedObject());
+                allContactsWrappers.add(contact);
+            }
         }
-        setContactCollection(collection, false);
-        propertiesMap.put("contactCollection", contacts);
+        // new contacts added
+        for (ContactWrapper contact : newContacts) {
+            allContactsObjects.add(contact.getWrappedObject());
+            allContactsWrappers.add(contact);
+            deletedContacts.remove(contact);
+        }
+        setContacts(allContactsObjects, allContactsWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToDelete) {
+        deletedContacts.addAll(contactsToDelete);
+        Collection<Contact> allContactsObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                if (!deletedContacts.contains(contact)) {
+                    allContactsObjects.add(contact.getWrappedObject());
+                    allContactsWrappers.add(contact);
+                }
+            }
+        }
+        setContacts(allContactsObjects, allContactsWrappers);
     }
 
     /**
@@ -322,8 +343,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             HQLCriteria c = new HQLCriteria("select distinct studies from "
                 + Contact.class.getName() + " as contacts"
                 + " inner join contacts.studyCollection as studies"
-                + " where contacts.clinic = ? order by studies.nameShort",
-                Arrays.asList(new Object[] { wrappedObject }));
+                + " where contacts.clinic.id = ? order by studies.nameShort",
+                Arrays.asList(new Object[] { getId() }));
             List<Study> collection = appService.query(c);
             for (Study study : collection) {
                 studyCollection.add(new StudyWrapper(appService, study));
@@ -379,26 +400,27 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return shipmentCollection;
     }
 
-    public void setShipmentCollection(Collection<Shipment> shipmentCollection,
-        boolean setNull) {
+    public void addShipments(Collection<ShipmentWrapper> newShipments) {
+        Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
+        List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
+        // already added shipments
+        List<ShipmentWrapper> currentList = getShipmentCollection();
+        if (currentList != null) {
+            for (ShipmentWrapper ship : currentList) {
+                allShipmentObjects.add(ship.getWrappedObject());
+                allShipmentWrappers.add(ship);
+            }
+        }
+        for (ShipmentWrapper ship : newShipments) {
+            allShipmentObjects.add(ship.getWrappedObject());
+            allShipmentWrappers.add(ship);
+        }
         Collection<Shipment> oldCollection = wrappedObject
             .getShipmentCollection();
-        wrappedObject.setShipmentCollection(shipmentCollection);
+        wrappedObject.setShipmentCollection(allShipmentObjects);
         propertyChangeSupport.firePropertyChange("shipmentCollection",
-            oldCollection, shipmentCollection);
-        if (setNull) {
-            propertiesMap.put("shipmentCollection", null);
-        }
-    }
-
-    public void setShipmentCollection(
-        Collection<ShipmentWrapper> shipmentCollection) {
-        Collection<Shipment> sCollection = new HashSet<Shipment>();
-        for (ShipmentWrapper s : shipmentCollection) {
-            sCollection.add(s.getWrappedObject());
-        }
-        setShipmentCollection(sCollection, false);
-        propertiesMap.put("shipmentCollection", shipmentCollection);
+            oldCollection, allShipmentObjects);
+        propertiesMap.put("shipmentCollection", allShipmentWrappers);
     }
 
     /**
@@ -452,6 +474,21 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getName();
     }
 
+    public long getPatientCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
+            + Clinic.class.getName() + " as clinic"
+            + " join clinic.shipmentCollection as shipments"
+            + " join shipments.patientCollection as patients"
+            + " where clinic.id=?", Arrays.asList(new Object[] { getId() }));
+
+        List<Long> result = appService.query(c);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
+    }
+
     @SuppressWarnings("unchecked")
     public List<PatientVisitWrapper> getPatientVisitCollection()
         throws ApplicationException {
@@ -471,6 +508,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             propertiesMap.put("patientVisitCollection", pvCollection);
         }
         return pvCollection;
+    }
+
+    @Override
+    protected void resetInternalField() {
+        deletedContacts.clear();
     }
 
 }

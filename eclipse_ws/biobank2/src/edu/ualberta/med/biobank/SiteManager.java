@@ -185,4 +185,11 @@ public class SiteManager {
         siteCombo.setEnabled(true);
     }
 
+    public boolean isAllSitesSelected() {
+        if (currentSiteWrapper == null) {
+            return false;
+        }
+        return allSiteWrapper.getName().equals(currentSiteWrapper.getName());
+    }
+
 }

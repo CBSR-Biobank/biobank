@@ -14,7 +14,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -86,8 +85,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label labelSite = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text labelSite = createReadOnlyField(client, SWT.NONE, "Site");
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 

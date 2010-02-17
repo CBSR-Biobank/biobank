@@ -29,15 +29,15 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         SampleWrapper sample = getSample();
-        Assert.isNotNull(sample, "Clinic is null");
+        Assert.isNotNull(sample, "sample is null");
         return sample.getInventoryId();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Sample");
+    public String getTooltipText() {
+        return getTooltipText("Sample");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class SampleAdapter extends AdapterBase {
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), SampleViewForm.ID);
     }
 
@@ -57,6 +57,11 @@ public class SampleAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
+        return null;
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
         return null;
     }
 

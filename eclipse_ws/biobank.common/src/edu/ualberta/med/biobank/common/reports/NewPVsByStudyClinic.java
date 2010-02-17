@@ -9,7 +9,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class NewPVsByStudyClinic extends QueryObject {
 
-    protected static final String NAME = "Patient Visist per Study per Clinic by Date";
+    protected static final String NAME = "New Patient Visits per Study per Clinic by Date";
 
     public NewPVsByStudyClinic(String op, Integer siteId) {
         super(

@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -16,8 +14,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -28,6 +24,9 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -50,6 +49,10 @@ public class SampleStorageEntryWidget extends BiobankWidget {
 
     private List<SampleStorageWrapper> selectedSampleStorages;
 
+    private List<SampleStorageWrapper> addedOrModifiedSampleStorages;
+
+    private List<SampleStorageWrapper> deletedSampleStorages;
+
     /**
      * 
      * @param parent a composite control which will be the parent of the new
@@ -66,12 +69,9 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
+
         getSampleTypes(site);
-        if (sampleStorageCollection == null) {
-            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
-        } else {
-            selectedSampleStorages = sampleStorageCollection;
-        }
+        setSampleStorages(sampleStorageCollection);
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -79,7 +79,7 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         sampleStorageTable = new SampleStorageInfoTable(parent,
             selectedSampleStorages);
         sampleStorageTable.adaptToToolkit(toolkit, true);
-        addTableMenu();
+        addEditSupport();
         sampleStorageTable
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
@@ -111,57 +111,43 @@ public class SampleStorageEntryWidget extends BiobankWidget {
                 selectedSampleStorages.add(dlg.getSampleStorage());
             }
             sampleStorageTable.setCollection(selectedSampleStorages);
+            addedOrModifiedSampleStorages.add(dlg.getSampleStorage());
             notifyListeners();
         }
     }
 
-    private void addTableMenu() {
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        sampleStorageTable.getTableViewer().getTable().setMenu(menu);
+    private void addEditSupport() {
+        sampleStorageTable
+            .addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(InfoTableEvent event) {
+                    SampleStorageWrapper sampleStorage = sampleStorageTable
+                        .getSelection();
+                    addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
+                }
+            });
 
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                SampleStorageWrapper sampleStorage = sampleStorageTable
-                    .getSelection();
-                addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
-            }
-        });
+        sampleStorageTable
+            .addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    SampleStorageWrapper sampleStorage = sampleStorageTable
+                        .getSelection();
 
-        item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                SampleStorageWrapper sampleStorage = sampleStorageTable
-                    .getSelection();
-
-                boolean confirm = MessageDialog.openConfirm(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Delete Sample Storage",
-                    "Are you sure you want to delete sample storage \""
-                        + sampleStorage.getSampleType().getName() + "\"?");
-
-                if (confirm) {
-                    Collection<SampleStorageWrapper> ssToDelete = new HashSet<SampleStorageWrapper>();
-                    for (SampleStorageWrapper ss : selectedSampleStorages) {
-                        if (ss.getSampleType().getName().equals(
-                            sampleStorage.getSampleType().getName()))
-                            ssToDelete.add(ss);
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        "Delete Sample Storage",
+                        "Are you sure you want to delete sample storage \""
+                            + sampleStorage.getSampleType().getName() + "\"?")) {
+                        return;
                     }
 
-                    for (SampleStorageWrapper ss : ssToDelete) {
-                        selectedSampleStorages.remove(ss);
-                    }
-
+                    selectedSampleStorages.remove(sampleStorage);
                     sampleStorageTable.setCollection(selectedSampleStorages);
+                    deletedSampleStorages.add(sampleStorage);
                     notifyListeners();
                 }
-            }
-        });
+            });
     }
 
     private void getSampleTypes(SiteWrapper site) {
@@ -174,13 +160,25 @@ public class SampleStorageEntryWidget extends BiobankWidget {
         }
     }
 
-    public List<SampleStorageWrapper> getSampleStorage() {
-        return sampleStorageTable.getCollection();
+    public List<SampleStorageWrapper> getAddedOrModifiedSampleStorages() {
+        return addedOrModifiedSampleStorages;
     }
 
-    public void setSampleStorage(List<SampleStorageWrapper> sampleStorage) {
-        selectedSampleStorages = sampleStorage;
-        sampleStorageTable.setCollection(sampleStorage);
+    public List<SampleStorageWrapper> getDeletedSampleStorages() {
+        return deletedSampleStorages;
+    }
+
+    public void setSampleStorages(List<SampleStorageWrapper> sampleStorages) {
+        if (sampleStorages == null) {
+            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        } else {
+            selectedSampleStorages = sampleStorages;
+        }
+        if (sampleStorageTable != null) {
+            sampleStorageTable.setCollection(selectedSampleStorages);
+        }
+        addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
     }
 
     @Override

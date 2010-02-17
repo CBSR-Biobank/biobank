@@ -26,20 +26,30 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         ShipmentWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment.getWrappedObject(), "shipment is null");
+        Assert.isNotNull(shipment, "shipment is null");
         return shipment.getWaybill() + " - "
             + shipment.getFormattedDateShipped();
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Shipment");
+    public String getTooltipText() {
+        SiteAdapter site = getParentFromClass(SiteAdapter.class);
+        StringBuffer sb = new StringBuffer();
+        if (site != null) {
+            sb.append(site.getLabel()).append(" - ");
+        }
+        ClinicAdapter clinic = getParentFromClass(ClinicAdapter.class);
+        if (clinic != null) {
+            sb.append("Clinic ").append(clinic.getLabel()).append(" - ");
+        }
+        sb.append(getTooltipText("Shipment"));
+        return sb.toString();
     }
 
     @Override
-    public void performDoubleClick() {
+    public void executeDoubleClick() {
         openForm(new FormInput(this), ShipmentViewForm.ID);
     }
 
@@ -52,6 +62,11 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new PatientVisitAdapter(this, null);
     }
 
     @Override

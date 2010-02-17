@@ -46,7 +46,7 @@ public class SampleSourceHelper extends DbHelper {
         for (int i = 0; i < nber; i++) {
             sources.add(SampleSourceHelper.addSampleSource(name + i));
         }
-        study.setSampleSourceCollection(sources);
+        study.addSampleSources(sources);
         study.persist();
         return nber;
     }

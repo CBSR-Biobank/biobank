@@ -126,13 +126,19 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected AdapterBase getNotFoundAdapter() {
         AdapterBase noPatientFoundAdapter = new AdapterBase(rootNode, 0,
-            getNoFoundText()) {
+            getNoFoundText(), false, false) {
+
             @Override
-            public void performDoubleClick() {
+            protected String getLabelInternal() {
+                return null;
             }
 
             @Override
-            public String getTitle() {
+            public void executeDoubleClick() {
+            }
+
+            @Override
+            public String getTooltipText() {
                 return null;
             }
 
@@ -142,6 +148,11 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
             @Override
             public AdapterBase accept(NodeSearchVisitor visitor) {
+                return null;
+            }
+
+            @Override
+            protected AdapterBase createChildNode() {
                 return null;
             }
 

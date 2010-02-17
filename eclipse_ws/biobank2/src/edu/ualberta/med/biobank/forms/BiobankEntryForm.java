@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 
 import org.acegisecurity.AccessDeniedException;
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
@@ -28,11 +28,13 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -60,6 +62,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     private static Logger LOGGER = Logger.getLogger(BiobankEntryForm.class
         .getName());
+
+    private static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
+        .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     protected String sessionName;
 
@@ -205,7 +210,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             errorMsg);
     }
 
-    protected void createBoundWidgetsFromMap(ListOrderedMap fieldsMap,
+    protected void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
         widgetCreator.createBoundWidgetsFromMap(fieldsMap, bean, client);
     }
@@ -231,6 +236,18 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         String propertyName, final String emptyMessage) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
             observedObject, propertyName, emptyMessage);
+    }
+
+    /*
+     * Applies a background color to the read only field.
+     */
+    @Override
+    protected Text createReadOnlyField(Composite parent, int widgetOptions,
+        String fieldLabel, String value) {
+        Text widget = super.createReadOnlyField(parent, widgetOptions,
+            fieldLabel, value);
+        widget.setBackground(READ_ONLY_TEXT_BGR);
+        return widget;
     }
 
     protected void bindChangeListener() {
@@ -359,6 +376,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public void cancel() {
         try {
+            adapter.resetObject();
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().closeEditor(this, false);
         } catch (Exception e) {

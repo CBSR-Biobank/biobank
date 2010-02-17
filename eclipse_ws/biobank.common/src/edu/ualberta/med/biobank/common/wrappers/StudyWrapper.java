@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -29,6 +30,12 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class StudyWrapper extends ModelWrapper<Study> {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
+
+    private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
+
+    private Set<SampleSourceWrapper> deletedSampleSources = new HashSet<SampleSourceWrapper>();
+
+    private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
@@ -92,14 +99,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return new SiteWrapper(appService, site);
     }
 
-    public void setSite(Site site) {
-        Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
     public void setSite(SiteWrapper site) {
-        setSite(site.getWrappedObject());
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = site.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     @Override
@@ -242,26 +246,68 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getContactCollection(false);
     }
 
-    public void setContactCollection(Collection<Contact> contacts,
-        boolean setNull) {
-        Collection<Contact> oldContacts = wrappedObject.getContactCollection();
-        wrappedObject.setContactCollection(contacts);
-        propertyChangeSupport.firePropertyChange("contactCollection",
-            oldContacts, contacts);
-        if (setNull) {
-            propertiesMap.put("contactCollection", null);
+    /**
+     * Returns a list of contacts that have not yet been associated with this
+     * study.
+     */
+    public List<ContactWrapper> getContactsNotAssoc() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select distinct contacts from "
+            + Contact.class.getName()
+            + " as contacts left join contacts.studyCollection as studies "
+            + "where (studies.id <> ?  or studies is null)"
+            + "and contacts.clinic.site.id = ? "
+            + "order by contacts.clinic.name", Arrays.asList(new Object[] {
+            getId(), getSite().getId() }));
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        List<Contact> rawContacts = appService.query(criteria);
+        for (Contact rawContact : rawContacts) {
+            contacts.add(new ContactWrapper(appService, rawContact));
         }
+        return contacts;
     }
 
-    public void setContactCollection(List<ContactWrapper> contacts) {
-        Collection<Contact> contactObjects = new HashSet<Contact>();
-        if (contacts != null) {
-            for (ContactWrapper contact : contacts) {
-                contactObjects.add(contact.getWrappedObject());
+    private void setContactCollection(Collection<Contact> allContactObjects,
+        List<ContactWrapper> allContactWrappers) {
+        Collection<Contact> oldContacts = wrappedObject.getContactCollection();
+        wrappedObject.setContactCollection(allContactObjects);
+        propertyChangeSupport.firePropertyChange("contactCollection",
+            oldContacts, allContactObjects);
+        propertiesMap.put("contactCollection", allContactWrappers);
+    }
+
+    public void addContacts(List<ContactWrapper> newContacts) {
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                allContactObjects.add(contact.getWrappedObject());
+                allContactWrappers.add(contact);
             }
         }
-        setContactCollection(contactObjects, false);
-        propertiesMap.put("contactCollection", contacts);
+        // new contacts added
+        for (ContactWrapper contact : newContacts) {
+            allContactObjects.add(contact.getWrappedObject());
+            allContactWrappers.add(contact);
+        }
+        setContactCollection(allContactObjects, allContactWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToRemove) {
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                if (!contactsToRemove.contains(contact)) {
+                    allContactObjects.add(contact.getWrappedObject());
+                    allContactWrappers.add(contact);
+                }
+            }
+        }
+        setContactCollection(allContactObjects, allContactWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -289,43 +335,61 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getSampleStorageCollection(false);
     }
 
-    public void setSampleStorageCollection(
-        Collection<SampleStorage> collection, boolean setNull) {
-        Collection<SampleStorage> oldSampleStorage = wrappedObject
-            .getSampleStorageCollection();
-        wrappedObject.setSampleStorageCollection(collection);
-        propertyChangeSupport.firePropertyChange("sampleStorageCollection",
-            oldSampleStorage, collection);
-        if (setNull) {
-            propertiesMap.put("sampleStorageCollection", null);
+    public void addSampleStorages(List<SampleStorageWrapper> newSampleStorages) {
+        Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+        List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
+        // already in list
+        List<SampleStorageWrapper> currentList = getSampleStorageCollection();
+        if (currentList != null) {
+            for (SampleStorageWrapper ss : currentList) {
+                allSsObjects.add(ss.getWrappedObject());
+                allSsWrappers.add(ss);
+            }
         }
+        // new
+        for (SampleStorageWrapper ss : newSampleStorages) {
+            ss.setStudy(this);
+            allSsObjects.add(ss.getWrappedObject());
+            allSsWrappers.add(ss);
+            deletedSampleStorages.remove(ss);
+        }
+        setSampleStorages(allSsObjects, allSsWrappers);
     }
 
-    public void setSampleStorageCollection(
-        List<SampleStorageWrapper> ssCollection) {
-        Collection<SampleStorage> ssObjects = new HashSet<SampleStorage>();
-        for (SampleStorageWrapper ss : ssCollection) {
-            ss.setStudy(wrappedObject);
-            ssObjects.add(ss.getWrappedObject());
+    public void removeSampleStorages(
+        List<SampleStorageWrapper> sampleStoragesToRemove) {
+        deletedSampleStorages.addAll(sampleStoragesToRemove);
+        Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+        List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
+        // already in list
+        List<SampleStorageWrapper> currentList = getSampleStorageCollection();
+        if (currentList != null) {
+            for (SampleStorageWrapper ss : currentList) {
+                if (!sampleStoragesToRemove.contains(ss)) {
+                    allSsObjects.add(ss.getWrappedObject());
+                    allSsWrappers.add(ss);
+                }
+            }
         }
-        setSampleStorageCollection(ssObjects, false);
-        propertiesMap.put("sampleStorageCollection", ssCollection);
+        setSampleStorages(allSsObjects, allSsWrappers);
+    }
+
+    private void setSampleStorages(Collection<SampleStorage> allSsObjects,
+        List<SampleStorageWrapper> allSsWrappers) {
+        Collection<SampleStorage> oldSampleStorage = wrappedObject
+            .getSampleStorageCollection();
+        wrappedObject.setSampleStorageCollection(allSsObjects);
+        propertyChangeSupport.firePropertyChange("sampleStorageCollection",
+            oldSampleStorage, allSsObjects);
+        propertiesMap.put("sampleStorageCollection", allSsWrappers);
     }
 
     /*
      * Removes the StudyPvAttr objects that are not contained in the collection.
      */
-    private void deleteStudyPvAttrDifference(Study origStudy) throws Exception {
-        List<StudyPvAttrWrapper> oldStudyPvAttrList = new StudyWrapper(
-            appService, origStudy).getStudyPvAttrCollection();
-        if (oldStudyPvAttrList == null) {
-            return;
-        }
-        getStudyPvAttrMap();
-        int newStudyPvAttrCount = studyPvAttrMap.size();
-        for (StudyPvAttrWrapper st : oldStudyPvAttrList) {
-            if ((newStudyPvAttrCount == 0)
-                || (studyPvAttrMap.get(st.getLabel()) == null)) {
+    private void deleteStudyPvAttrs() throws Exception {
+        for (StudyPvAttrWrapper st : deletedStudyPvAttr) {
+            if (!st.isNew()) {
                 st.delete();
             }
         }
@@ -334,22 +398,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     /**
      * Removes the sample storage objects that are not contained in the
      * collection.
-     * 
-     * @param ssCollection
-     * @throws BiobankCheckException
-     * @throws Exception
      */
-    private void deleteSampleStorageDifference(Study origStudy)
-        throws Exception {
-        List<SampleStorageWrapper> newSampleStorage = getSampleStorageCollection();
-        List<SampleStorageWrapper> oldSampleStorage = new StudyWrapper(
-            appService, origStudy).getSampleStorageCollection();
-        if (oldSampleStorage != null) {
-            for (SampleStorageWrapper st : oldSampleStorage) {
-                if ((newSampleStorage == null)
-                    || !newSampleStorage.contains(st)) {
-                    st.delete();
-                }
+    private void deleteSampleStorages() throws Exception {
+        for (SampleStorageWrapper st : deletedSampleStorages) {
+            if (!st.isNew()) {
+                st.delete();
             }
         }
     }
@@ -379,88 +432,72 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getSampleSourceCollection(false);
     }
 
-    public void setSampleSourceCollection(Collection<SampleSource> ss,
-        boolean setNull) {
+    private void setSampleSources(Collection<SampleSource> allSsObject,
+        List<SampleSourceWrapper> allSsWrappers) {
         Collection<SampleSource> oldSampleSource = wrappedObject
             .getSampleSourceCollection();
-        wrappedObject.setSampleSourceCollection(ss);
+        wrappedObject.setSampleSourceCollection(allSsObject);
         propertyChangeSupport.firePropertyChange("sampleSourceCollection",
-            oldSampleSource, ss);
-        if (setNull) {
-            propertiesMap.put("sampleSourceCollection", null);
-        }
+            oldSampleSource, allSsObject);
+        propertiesMap.put("sampleSourceCollection", allSsWrappers);
     }
 
-    public void setSampleSourceCollection(List<SampleSourceWrapper> ssCollection) {
-        Collection<SampleSource> ssObjects = new HashSet<SampleSource>();
-        for (SampleSourceWrapper ss : ssCollection) {
-            ssObjects.add(ss.getWrappedObject());
+    public void addSampleSources(List<SampleSourceWrapper> newSampleSources) {
+        Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
+        List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
+        // already in list
+        List<SampleSourceWrapper> currentList = getSampleSourceCollection();
+        if (currentList != null) {
+            for (SampleSourceWrapper ss : currentList) {
+                allSsObjects.add(ss.getWrappedObject());
+                allSsWrappers.add(ss);
+            }
         }
-        setSampleSourceCollection(ssObjects, false);
-        propertiesMap.put("sampleSourceCollection", ssCollection);
+        // new
+        for (SampleSourceWrapper ss : newSampleSources) {
+            allSsObjects.add(ss.getWrappedObject());
+            allSsWrappers.add(ss);
+            deletedSampleSources.remove(ss);
+        }
+        setSampleSources(allSsObjects, allSsWrappers);
+    }
+
+    public void removeSampleSources(
+        List<SampleSourceWrapper> sampleSourcesToDelete) {
+        deletedSampleSources.addAll(sampleSourcesToDelete);
+        Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
+        List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
+        // already in list
+        List<SampleSourceWrapper> currentList = getSampleSourceCollection();
+        if (currentList != null) {
+            for (SampleSourceWrapper ss : currentList) {
+                if (!deletedSampleSources.contains(ss)) {
+                    allSsObjects.add(ss.getWrappedObject());
+                    allSsWrappers.add(ss);
+                }
+            }
+        }
+        setSampleSources(allSsObjects, allSsWrappers);
     }
 
     /**
      * Removes the sample storage objects that are not contained in the
      * collection.
-     * 
-     * @param newCollection
-     * @throws BiobankCheckException
-     * @throws Exception
      */
-    private void deleteSampleSourceDifference(Study origStudy) throws Exception {
-        List<SampleSourceWrapper> newSampleSource = getSampleSourceCollection();
-        List<SampleSourceWrapper> oldSampleSource = new StudyWrapper(
-            appService, origStudy).getSampleSourceCollection();
-        if (oldSampleSource != null) {
-            for (SampleSourceWrapper ss : oldSampleSource) {
-                if ((newSampleSource == null) || !newSampleSource.contains(ss)) {
-                    ss.delete();
-                }
+    private void deleteSampleSources() throws Exception {
+        for (SampleSourceWrapper ss : deletedSampleSources) {
+            if (!ss.isNew()) {
+                ss.delete();
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected List<StudyPvAttrWrapper> getStudyPvAttrCollection() {
-        List<StudyPvAttrWrapper> studyPvAttrCollection = (List<StudyPvAttrWrapper>) propertiesMap
-            .get("studyPvAttrCollection");
-        if (studyPvAttrCollection == null) {
-            Collection<StudyPvAttr> children = wrappedObject
-                .getStudyPvAttrCollection();
-            if (children != null) {
-                studyPvAttrCollection = new ArrayList<StudyPvAttrWrapper>();
-                for (StudyPvAttr studyPvAttr : children) {
-                    studyPvAttrCollection.add(new StudyPvAttrWrapper(
-                        appService, studyPvAttr));
-                }
-                propertiesMap.put("studyPvAttrCollection",
-                    studyPvAttrCollection);
-            }
+    protected Collection<StudyPvAttrWrapper> getStudyPvAttrCollection() {
+        Map<String, StudyPvAttrWrapper> map = getStudyPvAttrMap();
+        if (map == null) {
+            return null;
         }
-        return studyPvAttrCollection;
-    }
-
-    private void setStudyPvAttrCollection(
-        Collection<StudyPvAttr> studyPvAttrCollection, boolean setNull) {
-        Collection<StudyPvAttr> oldStudyPvAttrs = wrappedObject
-            .getStudyPvAttrCollection();
-        wrappedObject.setStudyPvAttrCollection(studyPvAttrCollection);
-        propertyChangeSupport.firePropertyChange("studyPvAttrCollection",
-            oldStudyPvAttrs, studyPvAttrCollection);
-        if (setNull) {
-            propertiesMap.put("studyPvAttrCollection", null);
-        }
-    }
-
-    private void setStudyPvAttrCollection(
-        List<StudyPvAttrWrapper> studyPvAttrCollection) {
-        Collection<StudyPvAttr> studyPvAttrObjects = new HashSet<StudyPvAttr>();
-        for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
-            studyPvAttrObjects.add(studyPvAttr.getWrappedObject());
-        }
-        setStudyPvAttrCollection(studyPvAttrObjects, false);
-        propertiesMap.put("studyPvAttrCollection", studyPvAttrCollection);
+        return map.values();
     }
 
     private Map<String, StudyPvAttrWrapper> getStudyPvAttrMap() {
@@ -468,10 +505,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        List<StudyPvAttrWrapper> studyPvAttrCollection = getStudyPvAttrCollection();
+        Collection<StudyPvAttr> studyPvAttrCollection = wrappedObject
+            .getStudyPvAttrCollection();
         if (studyPvAttrCollection != null) {
-            for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
-                studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
+            for (StudyPvAttr studyPvAttr : studyPvAttrCollection) {
+                studyPvAttrMap.put(studyPvAttr.getLabel(),
+                    new StudyPvAttrWrapper(appService, studyPvAttr));
             }
         }
         return studyPvAttrMap;
@@ -548,15 +587,16 @@ public class StudyWrapper extends ModelWrapper<Study> {
         StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
 
         if (type.startsWith("select_")) {
-            // type has permissble values
+            // type has permissible values
             if ((studyPvAttr == null) && (permissibleValues == null)) {
                 // nothing to do
                 return;
             }
 
             if ((studyPvAttr != null) && (permissibleValues == null)) {
-                studyPvAttr.delete();
-                studyPvAttrMap.remove(label);
+                deleteStudyPvAttr(label);
+                // studyPvAttr.delete();
+                // studyPvAttrMap.remove(label);
                 return;
             }
         }
@@ -568,6 +608,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr.setPvAttrType(pvAttrType);
             studyPvAttr.setStudy(wrappedObject);
         }
+        deletedStudyPvAttr.remove(studyPvAttr);
 
         studyPvAttr.setLocked(false);
         studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
@@ -619,8 +660,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
                 + "\" is in use by patient visits");
         }
         studyPvAttrMap.remove(label);
-        setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
-            studyPvAttrMap.values()));
+        deletedStudyPvAttr.add(studyPvAttr);
     }
 
     public List<ClinicWrapper> getClinicCollection()
@@ -702,24 +742,47 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return result.get(0) > 0;
     }
 
-    public void setPatientCollection(Collection<Patient> patients,
-        boolean setNull) {
+    private void setPatientCollection(Collection<Patient> allPatientObjects,
+        List<PatientWrapper> allPatientWrappers) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
-        wrappedObject.setPatientCollection(patients);
+        wrappedObject.setPatientCollection(allPatientObjects);
         propertyChangeSupport.firePropertyChange("patientCollection",
-            oldPatients, patients);
-        if (setNull) {
-            propertiesMap.put("patientCollection", null);
-        }
+            oldPatients, allPatientObjects);
+        propertiesMap.put("patientCollection", allPatientWrappers);
     }
 
-    public void setPatientCollection(List<PatientWrapper> patients) {
-        Collection<Patient> patientsObjects = new HashSet<Patient>();
-        for (PatientWrapper p : patients) {
-            patientsObjects.add(p.getWrappedObject());
+    public void addPatients(List<PatientWrapper> newPatients) {
+        Collection<Patient> allPatientObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
+        // already added patients
+        List<PatientWrapper> currentList = getPatientCollection();
+        if (currentList != null) {
+            for (PatientWrapper patient : currentList) {
+                allPatientObjects.add(patient.getWrappedObject());
+                allPatientWrappers.add(patient);
+            }
         }
-        setPatientCollection(patientsObjects, false);
-        propertiesMap.put("patientCollection", patients);
+        // new patients added
+        for (PatientWrapper patient : newPatients) {
+            allPatientObjects.add(patient.getWrappedObject());
+            allPatientWrappers.add(patient);
+        }
+        setPatientCollection(allPatientObjects, allPatientWrappers);
+    }
+
+    public void removePatients(List<PatientWrapper> patientsToRemove) {
+        Collection<Patient> allPatientObjects = new HashSet<Patient>();
+        List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
+        List<PatientWrapper> currentList = getPatientCollection();
+        if (currentList != null) {
+            for (PatientWrapper patient : currentList) {
+                if (!patientsToRemove.contains(patient)) {
+                    allPatientObjects.add(patient.getWrappedObject());
+                    allPatientWrappers.add(patient);
+                }
+            }
+        }
+        setPatientCollection(allPatientObjects, allPatientWrappers);
     }
 
     @Override
@@ -745,7 +808,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(*) from "
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
             + Study.class.getName() + " as study"
             + " join study.patientCollection as patients"
             + " join patients.shipmentCollection as shipments"
@@ -762,13 +825,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(visits) from "
+        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
             + Study.class.getName() + " as study"
             + " join study.patientCollection as patients"
-            + " join patients.patientVisitCollection as visits"
-            + " join visits.shipment as shipments"
+            + " join patients.shipmentCollection as shipments"
             + " join shipments.clinic as clinic"
-            + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
+            + " join shipments.patientVisitCollection as visits"
+            + " where study.id=? and clinic.id=?"
+            + " and visits.patient.study=study", Arrays.asList(new Object[] {
             getId(), clinic.getId() }));
 
         List<Long> results = appService.query(c);
@@ -796,14 +860,22 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistDependencies(Study origObject) throws Exception {
         if (studyPvAttrMap != null) {
-            setStudyPvAttrCollection(new ArrayList<StudyPvAttrWrapper>(
-                studyPvAttrMap.values()));
+            Collection<StudyPvAttr> allStudyPvAttrObjects = new HashSet<StudyPvAttr>();
+            List<StudyPvAttrWrapper> allStudyPvAttrWrappers = new ArrayList<StudyPvAttrWrapper>();
+            for (StudyPvAttrWrapper ss : studyPvAttrMap.values()) {
+                allStudyPvAttrObjects.add(ss.getWrappedObject());
+                allStudyPvAttrWrappers.add(ss);
+            }
+            Collection<StudyPvAttr> oldStudyPvAttrs = wrappedObject
+                .getStudyPvAttrCollection();
+            wrappedObject.setStudyPvAttrCollection(allStudyPvAttrObjects);
+            propertyChangeSupport.firePropertyChange("studyPvAttrCollection",
+                oldStudyPvAttrs, allStudyPvAttrObjects);
+            propertiesMap.put("studyPvAttrCollection", allStudyPvAttrWrappers);
         }
-        if (origObject != null) {
-            deleteSampleStorageDifference(origObject);
-            deleteSampleSourceDifference(origObject);
-            deleteStudyPvAttrDifference(origObject);
-        }
+        deleteSampleStorages();
+        deleteSampleSources();
+        deleteStudyPvAttrs();
     }
 
     /**
@@ -825,9 +897,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalField() {
         studyPvAttrMap = null;
+        deletedSampleStorages.clear();
+        deletedSampleSources.clear();
+        deletedStudyPvAttr.clear();
     }
 
     @Override

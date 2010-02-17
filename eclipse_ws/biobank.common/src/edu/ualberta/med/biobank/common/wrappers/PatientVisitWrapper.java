@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -29,6 +30,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
     private Map<String, PvAttrWrapper> pvAttrMap;
+
+    private Set<PvSampleSourceWrapper> deletedPvSampleSources = new HashSet<PvSampleSourceWrapper>();
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
@@ -68,15 +71,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return new PatientWrapper(appService, patient);
     }
 
-    public void setPatient(PatientWrapper patientWrapper) {
-        setPatient(patientWrapper.getWrappedObject());
-    }
-
-    public void setPatient(Patient patient) {
+    public void setPatient(PatientWrapper patient) {
         Patient oldPatient = wrappedObject.getPatient();
-        wrappedObject.setPatient(patient);
-        propertyChangeSupport
-            .firePropertyChange("patient", oldPatient, patient);
+        Patient newPatient = patient.getWrappedObject();
+        wrappedObject.setPatient(newPatient);
+        propertyChangeSupport.firePropertyChange("patient", oldPatient,
+            newPatient);
     }
 
     @SuppressWarnings("unchecked")
@@ -138,7 +138,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        List<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
+        Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
             .getStudy().getStudyPvAttrCollection();
         if (studyPvAttrCollection != null) {
             for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
@@ -350,22 +350,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (pvAttrMap != null) {
             setPvAttrCollection(pvAttrMap.values());
         }
-        if (origObject != null) {
-            removeDeletedPvSampleSources(origObject);
-        }
+        deletedPvSampleSources();
     }
 
-    private void removeDeletedPvSampleSources(PatientVisit pvDatabase)
-        throws Exception {
-        List<PvSampleSourceWrapper> newSampleSources = getPvSampleSourceCollection();
-        List<PvSampleSourceWrapper> oldSampleSources = new PatientVisitWrapper(
-            appService, pvDatabase).getPvSampleSourceCollection();
-        if (oldSampleSources != null) {
-            for (PvSampleSourceWrapper ss : oldSampleSources) {
-                if ((newSampleSources == null)
-                    || !newSampleSources.contains(ss)) {
-                    ss.delete();
-                }
+    private void deletedPvSampleSources() throws Exception {
+        for (PvSampleSourceWrapper ss : deletedPvSampleSources) {
+            if (!ss.isNew()) {
+                ss.delete();
             }
         }
     }
@@ -389,14 +380,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return new ShipmentWrapper(appService, s);
     }
 
-    public void setShipment(Shipment s) {
-        ShipmentWrapper oldShipment = getShipment();
-        wrappedObject.setShipment(s);
-        propertyChangeSupport.firePropertyChange("shipment", oldShipment, s);
-    }
-
     public void setShipment(ShipmentWrapper s) {
-        setShipment(s.wrappedObject);
+        Shipment oldShipment = wrappedObject.getShipment();
+        Shipment newShipment = s.getWrappedObject();
+        wrappedObject.setShipment(newShipment);
+        propertyChangeSupport.firePropertyChange("shipment", oldShipment,
+            newShipment);
     }
 
     @SuppressWarnings("unchecked")
@@ -425,26 +414,52 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return getPvSampleSourceCollection(false);
     }
 
-    public void setPvSampleSourceCollection(
-        Collection<PvSampleSource> pvSampleSources, boolean setNull) {
-        Collection<PvSampleSource> oldCollection = wrappedObject
-            .getPvSampleSourceCollection();
-        wrappedObject.setPvSampleSourceCollection(pvSampleSources);
-        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
-            oldCollection, pvSampleSources);
-        if (setNull) {
-            propertiesMap.put("pvSampleSourceCollection", null);
+    public void addPvSampleSources(
+        Collection<PvSampleSourceWrapper> newPvSampleSources) {
+        Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
+        List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
+        // already added
+        List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
+        if (currentList != null) {
+            for (PvSampleSourceWrapper pvss : currentList) {
+                allPvObjects.add(pvss.getWrappedObject());
+                allPvWrappers.add(pvss);
+            }
         }
+        // new added
+        for (PvSampleSourceWrapper pvss : newPvSampleSources) {
+            allPvObjects.add(pvss.getWrappedObject());
+            allPvWrappers.add(pvss);
+        }
+        setPvSamplSources(allPvObjects, allPvWrappers);
     }
 
-    public void setPvSampleSourceCollection(
-        Collection<PvSampleSourceWrapper> pvSampleSources) {
-        Collection<PvSampleSource> pvCollection = new HashSet<PvSampleSource>();
-        for (PvSampleSourceWrapper pv : pvSampleSources) {
-            pvCollection.add(pv.getWrappedObject());
+    private void setPvSamplSources(Collection<PvSampleSource> allPvObjects,
+        List<PvSampleSourceWrapper> allPvWrappers) {
+        Collection<PvSampleSource> oldCollection = wrappedObject
+            .getPvSampleSourceCollection();
+        wrappedObject.setPvSampleSourceCollection(allPvObjects);
+        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
+            oldCollection, allPvObjects);
+        propertiesMap.put("pvSampleSourceCollection", allPvWrappers);
+    }
+
+    public void removePvSampleSources(
+        Collection<PvSampleSourceWrapper> pvSampleSourcesToRemove) {
+        deletedPvSampleSources.addAll(pvSampleSourcesToRemove);
+        Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
+        List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
+        // already added
+        List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
+        if (currentList != null) {
+            for (PvSampleSourceWrapper pvss : currentList) {
+                if (!deletedPvSampleSources.contains(pvss)) {
+                    allPvObjects.add(pvss.getWrappedObject());
+                    allPvWrappers.add(pvss);
+                }
+            }
         }
-        setPvSampleSourceCollection(pvCollection, false);
-        propertiesMap.put("pvSampleSourceCollection", pvSampleSources);
+        setPvSamplSources(allPvObjects, allPvWrappers);
     }
 
     @Override
@@ -491,10 +506,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalField() {
         pvAttrMap = null;
         studyPvAttrMap = null;
+        deletedPvSampleSources.clear();
     }
 
     @Override

@@ -310,7 +310,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             });
         if (sampleTypes.size() == 1) {
             viewerSampleTypes.getCombo().select(0);
-            sampleWrapper.setSampleType(sampleTypes.get(0).getWrappedObject());
+            sampleWrapper.setSampleType(sampleTypes.get(0));
         }
     }
 
@@ -340,15 +340,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 if (e.keyCode == 13) {
                     inventoryIdText.setFocus();
                 }
-            }
-        });
-        comboVisits.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                PatientVisitWrapper pv = getSelectedPatientVisit();
-                sampleWrapper.setPatientVisit(pv);
-                appendLog("Visit selected " + pv.getFormattedDateProcessed()
-                    + " - " + pv.getShipment().getClinic().getName());
             }
         });
     }
@@ -381,6 +372,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             public void run() {
                 try {
                     appendLog("----");
+                    PatientVisitWrapper pv = getSelectedPatientVisit();
+                    sampleWrapper.setPatientVisit(pv);
+                    appendLog("Visit selected "
+                        + pv.getFormattedDateProcessed() + " - "
+                        + pv.getShipment().getClinic().getName());
                     if (radioNew.getSelection()) {
                         appendLog("Checking inventoryID "
                             + sampleWrapper.getInventoryId());
@@ -558,7 +554,6 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void saveForm() throws Exception {
         if (radioNew.getSelection()) {
             sampleWrapper.setLinkDate(new Date());
-            sampleWrapper.setPatientVisit(getSelectedPatientVisit());
             sampleWrapper.setQuantityFromType();
         }
         sampleWrapper.persist();

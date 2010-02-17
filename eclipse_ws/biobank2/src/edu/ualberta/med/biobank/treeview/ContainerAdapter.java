@@ -29,7 +29,15 @@ public class ContainerAdapter extends AdapterBase {
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
-        setHasChildren(container.hasChildren());
+        if (container != null) {
+            setHasChildren(container.hasChildren());
+        }
+    }
+
+    @Override
+    public void setModelObject(ModelWrapper<?> modelObject) {
+        super.setModelObject(modelObject);
+        setHasChildren(((ContainerWrapper) modelObject).hasChildren());
     }
 
     public ContainerWrapper getContainer() {
@@ -37,9 +45,8 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public String getName() {
+    protected String getLabelInternal() {
         ContainerWrapper container = getContainer();
-        Assert.isNotNull(container, "container is null");
         if (container.getContainerType() == null) {
             return container.getLabel();
         }
@@ -48,14 +55,15 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTitle() {
-        return getTitle("Container");
+    public String getTooltipText() {
+        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
+            + getTooltipText("Container");
     }
 
     @Override
-    public void performDoubleClick() {
-        openForm(new FormInput(this), ContainerViewForm.ID);
+    public void executeDoubleClick() {
         performExpand();
+        openForm(new FormInput(this), ContainerViewForm.ID);
     }
 
     @Override
@@ -149,6 +157,11 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    @Override
+    protected AdapterBase createChildNode() {
+        return new ContainerAdapter(this, null);
     }
 
     @Override

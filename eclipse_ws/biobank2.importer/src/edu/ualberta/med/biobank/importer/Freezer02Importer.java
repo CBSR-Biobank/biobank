@@ -23,9 +23,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class Freezer02Importer extends FreezerImporter {
 
     public Freezer02Importer(WritableApplicationService appService,
-        Connection con, final SiteWrapper site, ContainerWrapper container,
-        int bbpdbFreezerNum) throws Exception {
-        super(appService, con, site, container, bbpdbFreezerNum, DEFAULT_QUERY);
+        Connection con, Configuration configuration, final SiteWrapper site,
+        ContainerWrapper container, int bbpdbFreezerNum) throws Exception {
+        super(appService, con, configuration, site, container, bbpdbFreezerNum,
+            DEFAULT_QUERY);
     }
 
     @Override
@@ -53,6 +54,12 @@ public class Freezer02Importer extends FreezerImporter {
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('J'); h++) {
             hotelLabel = "C" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
+
+            if (!configuration.importFreezerHotel("02" + hotelLabel)) {
+                logger.info("not configured for importing hotel " + hotelLabel);
+                continue;
+            }
+
             ps = con.prepareStatement(DEFAULT_QUERY);
             ps.setInt(1, bbpdbFreezerNum);
             ps.setString(2, hotelLabel);
@@ -96,6 +103,12 @@ public class Freezer02Importer extends FreezerImporter {
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('T'); h++) {
             hotelLabel = "A" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
+
+            if (!configuration.importFreezerHotel("02" + hotelLabel)) {
+                logger.info("not configured for importing hotel " + hotelLabel);
+                continue;
+            }
+
             ps = con.prepareStatement(DEFAULT_QUERY);
             ps.setInt(1, 4);
             ps.setString(2, hotelLabel);

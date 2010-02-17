@@ -14,7 +14,7 @@ public class NodeLabelProvider implements ILabelProvider {
 
     public String getText(Object element) {
         if (element instanceof AdapterBase) {
-            return ((AdapterBase) element).getTreeText();
+            return ((AdapterBase) element).getLabel();
         }
         return new String();
     }

@@ -38,18 +38,24 @@ public class ContactHelper extends DbHelper {
                 .getContactCollection());
             contacts.add(contact);
         }
-        study.setContactCollection(contacts);
+        study.addContacts(contacts);
         study.persist();
         return nber;
     }
 
-    public static int addContactsToClinic(ClinicWrapper clinic, String name)
-        throws Exception {
-        int nber = r.nextInt(5) + 1;
+    public static int addContactsToClinic(ClinicWrapper clinic, String name,
+        int min, int max) throws Exception {
+        int nber = r.nextInt(max - min + 1) + min;
         for (int i = 0; i < nber; i++) {
             ContactHelper.addContact(clinic, name + i);
         }
         clinic.reload();
         return nber;
     }
+
+    public static int addContactsToClinic(ClinicWrapper clinic, String name)
+        throws Exception {
+        return addContactsToClinic(clinic, name, 1, 5);
+    }
+
 }

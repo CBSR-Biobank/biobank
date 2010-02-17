@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import junit.framework.Assert;
@@ -77,29 +78,29 @@ public class TestContainer extends TestDatabase {
         childType = ContainerTypeHelper.addContainerType(site,
             "Child L3 Container Type", "CCTL3", 1, CONTAINER_CHILD_L3_ROWS,
             CONTAINER_CHILD_L3_COLS, false);
-        childType.setChildContainerTypeCollection(Arrays
-            .asList(containerTypeMap.get("ChildCtL4")));
+        childType.addChildContainerTypes(Arrays.asList(containerTypeMap
+            .get("ChildCtL4")));
         childType.persist();
         containerTypeMap.put("ChildCtL3", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L2 Container Type", "CCTL2", 1, 3, 12, false);
-        childType.setChildContainerTypeCollection(Arrays
-            .asList(containerTypeMap.get("ChildCtL3")));
+        childType.addChildContainerTypes(Arrays.asList(containerTypeMap
+            .get("ChildCtL3")));
         childType.persist();
         containerTypeMap.put("ChildCtL2", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
-        childType.setChildContainerTypeCollection(Arrays
-            .asList(containerTypeMap.get("ChildCtL2")));
+        childType.addChildContainerTypes(Arrays.asList(containerTypeMap
+            .get("ChildCtL2")));
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+        topType.addChildContainerTypes(Arrays.asList(containerTypeMap
             .get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);
@@ -192,7 +193,7 @@ public class TestContainer extends TestDatabase {
             "H-13", 2, 1, 13, false);
         List<ContainerTypeWrapper> childContainerTypes = new ArrayList<ContainerTypeWrapper>();
         childContainerTypes.add(hotelType);
-        freezerType.setChildContainerTypeCollection(childContainerTypes);
+        freezerType.addChildContainerTypes(childContainerTypes);
         freezerType.persist();
         containerTypeMap.put("hotel13", hotelType);
 
@@ -203,7 +204,7 @@ public class TestContainer extends TestDatabase {
             "D36", 2, 1, 36, false);
         childContainerTypes = new ArrayList<ContainerTypeWrapper>();
         childContainerTypes.add(drawerType);
-        cabinetType.setChildContainerTypeCollection(childContainerTypes);
+        cabinetType.addChildContainerTypes(childContainerTypes);
         cabinetType.persist();
         containerTypeMap.put("drawer36", drawerType);
 
@@ -843,7 +844,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
 
-        Map<RowColPos, SampleTypeWrapper> samplesTypesMap = new HashMap<RowColPos, SampleTypeWrapper>();
+        Map<RowColPos, SampleTypeWrapper> samplesTypesMap = new TreeMap<RowColPos, SampleTypeWrapper>();
         SampleTypeWrapper sampleType;
 
         ContainerWrapper childL3 = containerMap.get("ChildL3");
@@ -1067,7 +1068,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
 
-        topType.setChildContainerTypeCollection(Arrays.asList(containerTypeMap
+        topType.addChildContainerTypes(Arrays.asList(containerTypeMap
             .get("ChildCtL1"), childType1_2));
         topType.persist();
         topType.reload();
@@ -1167,7 +1168,7 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper altTopType = ContainerTypeHelper.newContainerType(
             altSite, "Alt Top Container Type", "ATCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        altTopType.setChildContainerTypeCollection(Arrays.asList(childType));
+        altTopType.addChildContainerTypes(Arrays.asList(childType));
         altTopType.persist();
         childType.reload();
 
@@ -1229,8 +1230,7 @@ public class TestContainer extends TestDatabase {
         PatientVisitWrapper pv = addPatientVisit();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
-        childL4.getContainerType().setSampleTypeCollection(
-            Arrays.asList(sampleType));
+        childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
         SampleWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
             0, 0);
 
@@ -1299,13 +1299,11 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper existingType = containerTypeMap.get("ChildCtL2");
         ContainerTypeWrapper newChildType1 = ContainerTypeHelper
             .addContainerType(site, "newChild1", "NC1", 3, 15, 1, false);
-        newChildType1.setChildContainerTypeCollection(Arrays
-            .asList(existingType));
+        newChildType1.addChildContainerTypes(Arrays.asList(existingType));
         newChildType1.persist();
         ContainerTypeWrapper newTopType = ContainerTypeHelper.addContainerType(
             site, "NewTop", "NT", 2, 3, 5, true);
-        newTopType
-            .setChildContainerTypeCollection(Arrays.asList(newChildType1));
+        newTopType.addChildContainerTypes(Arrays.asList(newChildType1));
         newTopType.persist();
 
         ContainerWrapper newTopContainer = ContainerHelper.addContainer("01",

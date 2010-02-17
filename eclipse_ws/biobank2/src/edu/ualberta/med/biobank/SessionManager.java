@@ -135,6 +135,13 @@ public class SessionManager {
         }
     }
 
+    public static void refreshTreeNode(AdapterBase node) {
+        AbstractViewWithTree view = getCurrentViewWithTree();
+        if (view != null) {
+            view.getTreeViewer().refresh(node, true);
+        }
+    }
+
     public static void setSelectedNode(AdapterBase node) {
         AbstractViewWithTree view = getCurrentViewWithTree();
         if (view != null) {
@@ -195,6 +202,11 @@ public class SessionManager {
     public void unlockSite() {
         Assert.isNotNull(siteManager, "site manager is null");
         siteManager.unlockSite();
+    }
+
+    public boolean isAllSitesSelected() {
+        Assert.isNotNull(siteManager, "site manager is null");
+        return siteManager.isAllSitesSelected();
     }
 
     public void setSiteCombo(SiteCombo siteCombo) {
