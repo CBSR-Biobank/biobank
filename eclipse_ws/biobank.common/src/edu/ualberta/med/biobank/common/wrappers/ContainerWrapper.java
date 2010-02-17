@@ -94,24 +94,42 @@ public class ContainerWrapper extends
     @Override
     protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
-        boolean labelChanged = true;
+        boolean labelChanged = false;
         if (parent == null) {
             if (origObject != null && getLabel() != null
                 && !getLabel().equals(origObject.getLabel())) {
                 labelChanged = true;
             }
         } else {
-            if (isNew()
-                || ((origObject != null && origObject.getPosition() != null) && (((origObject
-                    .getPosition().getParentContainer() != null) && (!origObject
-                    .getPosition().getParentContainer().getId().equals(
-                        parent.getId()))) || (!new RowColPos(origObject
-                    .getPosition().getRow(), origObject.getPosition().getCol())
-                    .equals(getPosition()))))) {
+            if (isNew()) {
+                labelChanged = true;
+            } else {
+                if (origObject != null && origObject.getPosition() != null) {
+                    // check the parent is the same
+                    if (origObject.getPosition().getParentContainer() != null) {
+                        if (!origObject.getPosition().getParentContainer()
+                            .getId().equals(parent.getId())) {
+                            labelChanged = true;
+                        }
+                    }
+                    // check the position is the same
+                    if (!new RowColPos(origObject.getPosition().getRow(),
+                        origObject.getPosition().getCol())
+                        .equals(getPosition())) {
+                        labelChanged = true;
+                    }
+                }
+                // check the parent label is the same
+                if (getLabel() == null
+                    || !getLabel().startsWith(parent.getLabel())) {
+                    labelChanged = true;
+                }
+            }
+            if (labelChanged) {
+                // the label need to be modified
                 String label = parent.getLabel()
                     + LabelingScheme.getPositionString(this);
                 setLabel(label);
-                labelChanged = true;
             }
         }
         persistChildren(labelChanged);
