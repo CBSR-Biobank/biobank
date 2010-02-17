@@ -104,7 +104,14 @@ public abstract class BiobankFormBase extends EditorPart {
 
     @Override
     public void setFocus() {
-        SessionManager.setSelectedNode(adapter);
+        if (adapter.getId() != null) {
+            SessionManager.setSelectedNode(adapter);
+            // if selection fails, then the adapter needs to be matched at the
+            // id level
+            if (SessionManager.getSelectedNode() == null)
+                SessionManager.setSelectedNode(SessionManager
+                    .searchNode(adapter.getModelObject()));
+        }
     }
 
     @Override
