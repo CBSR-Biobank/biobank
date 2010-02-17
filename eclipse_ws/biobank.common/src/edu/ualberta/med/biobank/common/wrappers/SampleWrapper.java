@@ -93,7 +93,13 @@ public class SampleWrapper extends
     private void checkParentAcceptSampleType() throws BiobankCheckException {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            List<SampleTypeWrapper> types = getParent().getContainerType()
+            ContainerTypeWrapper parentType = getParent().getContainerType();
+            try {
+                parentType.reload();
+            } catch (Exception e) {
+                throw new BiobankCheckException(e);
+            }
+            List<SampleTypeWrapper> types = parentType
                 .getSampleTypeCollection();
             if (types == null || !types.contains(getSampleType())) {
                 throw new BiobankCheckException("Container "

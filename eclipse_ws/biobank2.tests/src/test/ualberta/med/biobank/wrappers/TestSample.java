@@ -1,6 +1,5 @@
 package test.ualberta.med.biobank.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -15,9 +14,11 @@ import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
+import test.ualberta.med.biobank.internal.DbHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SampleHelper;
+import test.ualberta.med.biobank.internal.SampleStorageHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
@@ -67,8 +68,8 @@ public class TestSample extends TestDatabase {
         topType.addChildContainerTypes(Arrays.asList(typeChild));
         topType.persist();
 
-        topContainer = ContainerHelper.addContainer("newcontainer"
-            + r.nextInt(), "cc", null, site, topType);
+        topContainer = ContainerHelper.addContainer("top" + r.nextInt(), "cc",
+            null, site, topType);
 
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 0, 0);
@@ -283,6 +284,7 @@ public class TestSample extends TestDatabase {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(sample
             .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
         type.addSampleTypes(Arrays.asList(sample.getSampleType()));
+        type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, sample.getSite(), type);
 
@@ -316,30 +318,20 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void testCreateNewSample() throws BiobankCheckException, Exception {
-        Collection<SampleStorageWrapper> ssCollection = new ArrayList<SampleStorageWrapper>();
-        SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
-        ss1.setSampleType(SampleTypeHelper.addSampleType(sample.getSite(),
-            "ss1"));
-        ss1.setVolume(1.0);
-        ss1.setStudy(sample.getPatientVisit().getPatient().getStudy());
-        ss1.persist();
-        SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
-        ss2.setSampleType(SampleTypeHelper.addSampleType(sample.getSite(),
-            "ss2"));
-        ss2.setVolume(2.0);
-        ss2.setStudy(sample.getPatientVisit().getPatient().getStudy());
-        ss2.persist();
-        SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
-        ss3.setSampleType(sample.getSampleType());
+        StudyWrapper study = sample.getPatientVisit().getPatient().getStudy();
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, false);
+        SampleStorageWrapper ss1 = SampleStorageHelper.addSampleStorage(study,
+            DbHelper.chooseRandomlyInList(types));
+        SampleStorageWrapper ss2 = SampleStorageHelper.addSampleStorage(study,
+            DbHelper.chooseRandomlyInList(types));
+        SampleStorageWrapper ss3 = SampleStorageHelper.newSampleStorage(study,
+            sample.getSampleType());
         ss3.setVolume(3.0);
-        ss3.setStudy(sample.getPatientVisit().getPatient().getStudy());
         ss3.persist();
-        ssCollection.add(ss1);
-        ssCollection.add(ss2);
-        ssCollection.add(ss3);
         SampleWrapper newSample = SampleWrapper.createNewSample(appService,
-            "newid", sample.getPatientVisit(), sample.getSampleType(),
-            ssCollection);
+            "newid", sample.getPatientVisit(), sample.getSampleType(), Arrays
+                .asList(ss1, ss2, ss3));
         newSample.persist();
         Sample dbSample = ModelUtils.getObjectWithId(appService, Sample.class,
             newSample.getId());
@@ -412,6 +404,7 @@ public class TestSample extends TestDatabase {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
         type.addSampleTypes(Arrays.asList(sampleType));
+        type.persist();
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);
@@ -475,6 +468,7 @@ public class TestSample extends TestDatabase {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
         type.addSampleTypes(Arrays.asList(sampleType));
+        type.persist();
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);

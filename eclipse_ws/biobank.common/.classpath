@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar" sourcepath="/home/delphine/projects/sources/acegy-security-1.0.4-src"/>
+	<classpathentry exported="true" kind="lib" path="lib/acegi-security-1.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis.jar"/>
@@ -17,12 +17,12 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.14.jar" sourcepath="/home/delphine/projects/sources/log4j-1.2.14-src"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-client-framework.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-grid-remoting.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-security.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sdk-writable-client-framework.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring.jar" sourcepath="/home/delphine/aicml/sources/spring-framework-2.0.3/src"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="conf/"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>

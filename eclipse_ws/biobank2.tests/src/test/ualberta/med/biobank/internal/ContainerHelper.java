@@ -152,6 +152,7 @@ public class ContainerHelper extends DbHelper {
                     false);
             topContainer.getContainerType().addChildContainerTypes(
                 Arrays.asList(type));
+            topContainer.getContainerType().persist();
             int maxRow = topContainer.getRowCapacity();
             for (int j = 0; j < 5; j++) {
                 ContainerWrapper child = newContainer(null, barcode + "child"

@@ -846,6 +846,7 @@ public class TestSite extends TestDatabase {
         ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
             "Pallet96", "P96", 2, 8, 12, true);
         ctype.addSampleTypes(allSampleTypes);
+        ctype.persist();
 
         ContainerWrapper container = ContainerHelper.addContainer("01", "01",
             null, site, ctype);

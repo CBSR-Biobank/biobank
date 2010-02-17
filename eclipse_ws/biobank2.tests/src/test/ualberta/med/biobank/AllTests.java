@@ -33,7 +33,7 @@ import test.ualberta.med.biobank.wrappers.TestStudy;
     TestPvSampleSource.class, TestSample.class, TestClinic.class,
     TestSampleStorage.class, TestSampleSource.class, TestSampleType.class,
     TestContainer.class, TestContainerType.class, TestShipment.class,
-    TestContact.class, TestShippingCompany.class })
+    TestContact.class, TestShippingCompany.class, })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

@@ -8,10 +8,12 @@ import org.junit.Test;
 
 import test.ualberta.med.biobank.TestDatabase;
 import test.ualberta.med.biobank.internal.DbHelper;
+import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.SampleStorageHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
 import test.ualberta.med.biobank.internal.StudyHelper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -170,5 +172,37 @@ public class TestSampleStorage extends TestDatabase {
 
         Assert.assertTrue(sampleStorage1.compareTo(sampleStorage2) > 0);
         Assert.assertTrue(sampleStorage2.compareTo(sampleStorage1) < 0);
+    }
+
+    @Test
+    public void testStudyDeleteRemoveSampleStorages() throws Exception {
+        String name = "testStudyDeleteRemoveSampleStorages" + r.nextInt();
+        int nbSampleStorage = appService.search(SampleStorage.class,
+            new SampleStorage()).size();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        StudyWrapper study1 = StudyHelper.addStudy(site, name);
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, false);
+        SampleStorageHelper.addSampleStorage(study1, DbHelper
+            .chooseRandomlyInList(types));
+        study1.delete();
+        Assert.assertEquals(nbSampleStorage, appService.search(
+            SampleStorage.class, new SampleStorage()).size());
+
+        StudyWrapper study = StudyHelper.addStudy(site, "studyname"
+            + r.nextInt());
+        PatientWrapper patient = PatientHelper.addPatient("5684", study);
+        study.persist();
+        SampleStorageHelper.addSampleStorage(study, DbHelper
+            .chooseRandomlyInList(types));
+        study.reload();
+        patient.delete();
+        study.reload();
+        study.delete();
+        // FIXME this test is failing when the study has a patient. Should find
+        // why !
+        Assert.assertEquals(nbSampleStorage, appService.search(
+            SampleStorage.class, new SampleStorage()).size());
     }
 }

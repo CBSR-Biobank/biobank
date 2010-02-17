@@ -635,31 +635,6 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testRemovePatients() throws Exception {
-        String name = "testRemovePatients" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = PatientHelper.addPatients(name, study);
-
-        List<PatientWrapper> patients = study.getPatientCollection();
-        PatientWrapper patient = DbHelper.chooseRandomlyInList(patients);
-        study.removePatients(Arrays.asList(patient));
-        try {
-            study.persist();
-            Assert.fail("a patient is missing and is not deleted");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        patient.delete();
-        study.persist();
-
-        study.reload();
-        // one patient added
-        Assert.assertEquals(nber - 1, study.getPatientCollection().size());
-    }
-
-    @Test
     public void testHasPatients() throws Exception {
         String name = "testHasPatients" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);

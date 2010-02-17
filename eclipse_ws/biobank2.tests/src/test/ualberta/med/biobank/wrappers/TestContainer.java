@@ -1231,6 +1231,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
+        childL4.getContainerType().persist();
         SampleWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
             0, 0);
 

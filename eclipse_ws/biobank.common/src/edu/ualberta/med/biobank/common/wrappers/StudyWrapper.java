@@ -135,7 +135,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         checkNameShortNotEmpty();
         checkStudyNameUnique();
         checkContactsFromSameSite();
-        // checkNoPatientRemoved();
     }
 
     private void checkNameNotEmpty() throws BiobankCheckException {
@@ -147,34 +146,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private void checkNameShortNotEmpty() throws BiobankCheckException {
         if (getNameShort() == null || getNameShort().isEmpty()) {
             throw new BiobankCheckException("Short Name can't be empty");
-        }
-    }
-
-    private void checkNoPatientRemoved() throws BiobankCheckException,
-        ApplicationException {
-        if (!isNew()) {
-            List<PatientWrapper> newPatients = getPatientCollection();
-            Study origStudy = new Study();
-            origStudy.setId(getId());
-            origStudy = (Study) appService.search(Study.class, origStudy)
-                .get(0);
-            List<PatientWrapper> oldPatients = new StudyWrapper(appService,
-                origStudy).getPatientCollection();
-            if (oldPatients != null) {
-                for (PatientWrapper p : oldPatients) {
-                    if ((newPatients == null) || !newPatients.contains(p)) {
-                        Patient dbPatient = new Patient();
-                        dbPatient.setId(p.getId());
-                        // check if still in database
-                        if (appService.search(Patient.class, dbPatient).size() == 1) {
-                            throw new BiobankCheckException(
-                                "Patient "
-                                    + p.getPnumber()
-                                    + " has been removed from the patients list: this patient should be deleted first.");
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -766,21 +737,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         for (PatientWrapper patient : newPatients) {
             allPatientObjects.add(patient.getWrappedObject());
             allPatientWrappers.add(patient);
-        }
-        setPatientCollection(allPatientObjects, allPatientWrappers);
-    }
-
-    public void removePatients(List<PatientWrapper> patientsToRemove) {
-        Collection<Patient> allPatientObjects = new HashSet<Patient>();
-        List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
-        List<PatientWrapper> currentList = getPatientCollection();
-        if (currentList != null) {
-            for (PatientWrapper patient : currentList) {
-                if (!patientsToRemove.contains(patient)) {
-                    allPatientObjects.add(patient.getWrappedObject());
-                    allPatientWrappers.add(patient);
-                }
-            }
         }
         setPatientCollection(allPatientObjects, allPatientWrappers);
     }

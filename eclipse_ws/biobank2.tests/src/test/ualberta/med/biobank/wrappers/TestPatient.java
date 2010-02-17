@@ -195,13 +195,12 @@ public class TestPatient extends TestDatabase {
 
         try {
             patient.delete();
-            Assert
-                .fail("should not be allowed to delete patient with visits and samples");
+            Assert.fail("should not be allowed to delete patient with samples");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
-        // // delete sample and patient
+        // delete sample and patient
         sample.delete();
         patient.delete();
     }
