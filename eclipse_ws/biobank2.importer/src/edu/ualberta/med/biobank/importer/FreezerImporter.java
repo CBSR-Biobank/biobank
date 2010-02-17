@@ -216,21 +216,21 @@ public class FreezerImporter {
         sample.setSampleType(sampleType);
         sample.setInventoryId(inventoryId);
         sample.setLinkDate(Importer.getDateFromStr(linkDateStr));
-        sample.setQuantity(quantity);
         sample.setPosition(pos);
         sample.setPatientVisit(visit);
 
-        SampleStorageWrapper ss = Importer.getSampleStorage(study, sampleType);
-        if (ss == null) {
-            logger.error("study \"" + study.getNameShort()
-                + "\" has no sample storage for sample type \""
-                + sampleType.getName());
-        }
-
-        if (quantity != null) {
-            sample.setQuantity(ss.getVolume());
-        } else if (ss != null) {
-            sample.setQuantity(ss.getVolume());
+        if (quantity != 0.0) {
+            sample.setQuantity(quantity);
+        } else {
+            SampleStorageWrapper ss = Importer.getSampleStorage(study,
+                sampleType);
+            if (ss != null) {
+                sample.setQuantity(ss.getVolume());
+            } else {
+                logger.error("study \"" + study.getNameShort()
+                    + "\" has no sample storage for sample type \""
+                    + sampleType.getName() + "\"");
+            }
         }
 
         if (!pallet.canHoldSample(sample)) {

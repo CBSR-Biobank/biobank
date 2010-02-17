@@ -307,6 +307,7 @@ public class Importer {
 
     private static void initStudiesMap() {
         studiesMap = new HashMap<String, StudyWrapper>();
+        sampleStorageMap = new HashMap<StudyWrapper, Map<SampleTypeWrapper, SampleStorageWrapper>>();
         for (StudyWrapper study : cbsrSite.getStudyCollection()) {
             studiesMap.put(study.getNameShort(), study);
 
