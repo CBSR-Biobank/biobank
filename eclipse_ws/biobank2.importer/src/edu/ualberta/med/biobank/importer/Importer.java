@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -152,6 +153,8 @@ public class Importer {
     private static Map<String, ContainerWrapper> topContainersMap = null;
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
+
+    private static Map<StudyWrapper, Map<SampleTypeWrapper, SampleStorageWrapper>> sampleStorageMap;
 
     private static ImportCounts importCounts;
 
@@ -306,6 +309,13 @@ public class Importer {
         studiesMap = new HashMap<String, StudyWrapper>();
         for (StudyWrapper study : cbsrSite.getStudyCollection()) {
             studiesMap.put(study.getNameShort(), study);
+
+            sampleStorageMap.put(study,
+                new HashMap<SampleTypeWrapper, SampleStorageWrapper>());
+
+            for (SampleStorageWrapper ss : study.getSampleStorageCollection()) {
+                sampleStorageMap.get(study).put(ss.getSampleType(), ss);
+            }
         }
     }
 
@@ -1318,6 +1328,16 @@ public class Importer {
         cal.set(Calendar.MILLISECOND, 0);
         cal.set(Calendar.SECOND, 0);
         return cal.getTime();
+    }
+
+    public static SampleStorageWrapper getSampleStorage(StudyWrapper study,
+        SampleTypeWrapper sampleType) {
+        Map<SampleTypeWrapper, SampleStorageWrapper> innerMap = sampleStorageMap
+            .get(study);
+        if (innerMap == null) {
+            return null;
+        }
+        return innerMap.get(sampleType);
     }
 }
 

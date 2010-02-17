@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -131,7 +132,7 @@ public class FreezerImporter {
     protected void importSample(String studyNameShort, String patientNr,
         String dateProcessedStr, ContainerWrapper hotel, int palletNr,
         String palletPos, String inventoryId, String sampleTypeNameShort,
-        String linkDateStr, double quantity) throws Exception {
+        String linkDateStr, Double quantity) throws Exception {
 
         if (palletNr > hotel.getRowCapacity()) {
             logger.error("pallet number is invalid: " + " hotel/"
@@ -173,6 +174,8 @@ public class FreezerImporter {
                 + patient.getPnumber() + ",  " + studyNameShort);
             return;
         }
+
+        study.getSampleStorageCollection();
 
         Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
 
@@ -216,6 +219,19 @@ public class FreezerImporter {
         sample.setQuantity(quantity);
         sample.setPosition(pos);
         sample.setPatientVisit(visit);
+
+        SampleStorageWrapper ss = Importer.getSampleStorage(study, sampleType);
+        if (ss == null) {
+            logger.error("study \"" + study.getNameShort()
+                + "\" has no sample storage for sample type \""
+                + sampleType.getName());
+        }
+
+        if (quantity != null) {
+            sample.setQuantity(ss.getVolume());
+        } else if (ss != null) {
+            sample.setQuantity(ss.getVolume());
+        }
 
         if (!pallet.canHoldSample(sample)) {
             logger.error("pallet " + pallet.getLabel()
