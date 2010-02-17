@@ -100,3 +100,9 @@ Following code generation, primary key and cascade settings you have applied to
 the model can be verified by opening the corresponding generated *.hbm.xml file
 located within the /output/<<project name>>/src/ sub-folders.
 
+<<<<<<< HEAD
+BBPDB EXPORT
+- use Bullzip Access to Mysql to export data to MySQL
+- table "patient" must be exported using MS Access due to CHR data
+=======
+>>>>>>> 473902da95faa5e9b35c5432f67b3bdac39febad
