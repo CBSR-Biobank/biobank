@@ -112,27 +112,29 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     public void addPatientVisits(
         Collection<PatientVisitWrapper> newPatientVisits) {
-        Collection<PatientVisit> allPvObjects = new HashSet<PatientVisit>();
-        List<PatientVisitWrapper> allPvWrappers = new ArrayList<PatientVisitWrapper>();
-        // already added visits
-        List<PatientVisitWrapper> currentList = getPatientVisitCollection();
-        if (currentList != null) {
-            for (PatientVisitWrapper visit : currentList) {
+        if (newPatientVisits != null && newPatientVisits.size() > 0) {
+            Collection<PatientVisit> allPvObjects = new HashSet<PatientVisit>();
+            List<PatientVisitWrapper> allPvWrappers = new ArrayList<PatientVisitWrapper>();
+            // already added visits
+            List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+            if (currentList != null) {
+                for (PatientVisitWrapper visit : currentList) {
+                    allPvObjects.add(visit.getWrappedObject());
+                    allPvWrappers.add(visit);
+                }
+            }
+            // new
+            for (PatientVisitWrapper visit : newPatientVisits) {
                 allPvObjects.add(visit.getWrappedObject());
                 allPvWrappers.add(visit);
             }
+            Collection<PatientVisit> oldCollection = wrappedObject
+                .getPatientVisitCollection();
+            wrappedObject.setPatientVisitCollection(allPvObjects);
+            propertyChangeSupport.firePropertyChange("patientVisitCollection",
+                oldCollection, allPvObjects);
+            propertiesMap.put("patientVisitCollection", allPvWrappers);
         }
-        // new
-        for (PatientVisitWrapper visit : newPatientVisits) {
-            allPvObjects.add(visit.getWrappedObject());
-            allPvWrappers.add(visit);
-        }
-        Collection<PatientVisit> oldCollection = wrappedObject
-            .getPatientVisitCollection();
-        wrappedObject.setPatientVisitCollection(allPvObjects);
-        propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, allPvObjects);
-        propertiesMap.put("patientVisitCollection", allPvWrappers);
     }
 
     /**

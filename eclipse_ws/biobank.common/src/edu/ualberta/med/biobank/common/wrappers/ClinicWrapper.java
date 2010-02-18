@@ -280,40 +280,44 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void addContacts(List<ContactWrapper> newContacts) {
-        Collection<Contact> allContactsObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
-        // already added contacts
-        List<ContactWrapper> currentList = getContactCollection();
-        if (currentList != null) {
-            for (ContactWrapper contact : currentList) {
-                allContactsObjects.add(contact.getWrappedObject());
-                allContactsWrappers.add(contact);
-            }
-        }
-        // new contacts added
-        for (ContactWrapper contact : newContacts) {
-            allContactsObjects.add(contact.getWrappedObject());
-            allContactsWrappers.add(contact);
-            deletedContacts.remove(contact);
-        }
-        setContacts(allContactsObjects, allContactsWrappers);
-    }
-
-    public void removeContacts(List<ContactWrapper> contactsToDelete) {
-        deletedContacts.addAll(contactsToDelete);
-        Collection<Contact> allContactsObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
-        // already added contacts
-        List<ContactWrapper> currentList = getContactCollection();
-        if (currentList != null) {
-            for (ContactWrapper contact : currentList) {
-                if (!deletedContacts.contains(contact)) {
+        if (newContacts != null && newContacts.size() > 0) {
+            Collection<Contact> allContactsObjects = new HashSet<Contact>();
+            List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
+            // already added contacts
+            List<ContactWrapper> currentList = getContactCollection();
+            if (currentList != null) {
+                for (ContactWrapper contact : currentList) {
                     allContactsObjects.add(contact.getWrappedObject());
                     allContactsWrappers.add(contact);
                 }
             }
+            // new contacts added
+            for (ContactWrapper contact : newContacts) {
+                allContactsObjects.add(contact.getWrappedObject());
+                allContactsWrappers.add(contact);
+                deletedContacts.remove(contact);
+            }
+            setContacts(allContactsObjects, allContactsWrappers);
         }
-        setContacts(allContactsObjects, allContactsWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToDelete) {
+        if (contactsToDelete != null && contactsToDelete.size() > 0) {
+            deletedContacts.addAll(contactsToDelete);
+            Collection<Contact> allContactsObjects = new HashSet<Contact>();
+            List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
+            // already added contacts
+            List<ContactWrapper> currentList = getContactCollection();
+            if (currentList != null) {
+                for (ContactWrapper contact : currentList) {
+                    if (!deletedContacts.contains(contact)) {
+                        allContactsObjects.add(contact.getWrappedObject());
+                        allContactsWrappers.add(contact);
+                    }
+                }
+            }
+            setContacts(allContactsObjects, allContactsWrappers);
+        }
     }
 
     /**
@@ -399,26 +403,28 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public void addShipments(Collection<ShipmentWrapper> newShipments) {
-        Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
-        List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
-        // already added shipments
-        List<ShipmentWrapper> currentList = getShipmentCollection();
-        if (currentList != null) {
-            for (ShipmentWrapper ship : currentList) {
+        if (newShipments != null && newShipments.size() > 0) {
+            Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
+            List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
+            // already added shipments
+            List<ShipmentWrapper> currentList = getShipmentCollection();
+            if (currentList != null) {
+                for (ShipmentWrapper ship : currentList) {
+                    allShipmentObjects.add(ship.getWrappedObject());
+                    allShipmentWrappers.add(ship);
+                }
+            }
+            for (ShipmentWrapper ship : newShipments) {
                 allShipmentObjects.add(ship.getWrappedObject());
                 allShipmentWrappers.add(ship);
             }
+            Collection<Shipment> oldCollection = wrappedObject
+                .getShipmentCollection();
+            wrappedObject.setShipmentCollection(allShipmentObjects);
+            propertyChangeSupport.firePropertyChange("shipmentCollection",
+                oldCollection, allShipmentObjects);
+            propertiesMap.put("shipmentCollection", allShipmentWrappers);
         }
-        for (ShipmentWrapper ship : newShipments) {
-            allShipmentObjects.add(ship.getWrappedObject());
-            allShipmentWrappers.add(ship);
-        }
-        Collection<Shipment> oldCollection = wrappedObject
-            .getShipmentCollection();
-        wrappedObject.setShipmentCollection(allShipmentObjects);
-        propertyChangeSupport.firePropertyChange("shipmentCollection",
-            oldCollection, allShipmentObjects);
-        propertiesMap.put("shipmentCollection", allShipmentWrappers);
     }
 
     /**

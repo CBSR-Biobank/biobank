@@ -416,22 +416,24 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public void addPvSampleSources(
         Collection<PvSampleSourceWrapper> newPvSampleSources) {
-        Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
-        List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
-        // already added
-        List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
-        if (currentList != null) {
-            for (PvSampleSourceWrapper pvss : currentList) {
+        if (newPvSampleSources != null && newPvSampleSources.size() > 0) {
+            Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
+            List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
+            // already added
+            List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
+            if (currentList != null) {
+                for (PvSampleSourceWrapper pvss : currentList) {
+                    allPvObjects.add(pvss.getWrappedObject());
+                    allPvWrappers.add(pvss);
+                }
+            }
+            // new added
+            for (PvSampleSourceWrapper pvss : newPvSampleSources) {
                 allPvObjects.add(pvss.getWrappedObject());
                 allPvWrappers.add(pvss);
             }
+            setPvSamplSources(allPvObjects, allPvWrappers);
         }
-        // new added
-        for (PvSampleSourceWrapper pvss : newPvSampleSources) {
-            allPvObjects.add(pvss.getWrappedObject());
-            allPvWrappers.add(pvss);
-        }
-        setPvSamplSources(allPvObjects, allPvWrappers);
     }
 
     private void setPvSamplSources(Collection<PvSampleSource> allPvObjects,
@@ -446,20 +448,23 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public void removePvSampleSources(
         Collection<PvSampleSourceWrapper> pvSampleSourcesToRemove) {
-        deletedPvSampleSources.addAll(pvSampleSourcesToRemove);
-        Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
-        List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
-        // already added
-        List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
-        if (currentList != null) {
-            for (PvSampleSourceWrapper pvss : currentList) {
-                if (!deletedPvSampleSources.contains(pvss)) {
-                    allPvObjects.add(pvss.getWrappedObject());
-                    allPvWrappers.add(pvss);
+        if (pvSampleSourcesToRemove != null
+            && pvSampleSourcesToRemove.size() > 0) {
+            deletedPvSampleSources.addAll(pvSampleSourcesToRemove);
+            Collection<PvSampleSource> allPvObjects = new HashSet<PvSampleSource>();
+            List<PvSampleSourceWrapper> allPvWrappers = new ArrayList<PvSampleSourceWrapper>();
+            // already added
+            List<PvSampleSourceWrapper> currentList = getPvSampleSourceCollection();
+            if (currentList != null) {
+                for (PvSampleSourceWrapper pvss : currentList) {
+                    if (!deletedPvSampleSources.contains(pvss)) {
+                        allPvObjects.add(pvss.getWrappedObject());
+                        allPvWrappers.add(pvss);
+                    }
                 }
             }
+            setPvSamplSources(allPvObjects, allPvWrappers);
         }
-        setPvSamplSources(allPvObjects, allPvWrappers);
     }
 
     @Override

@@ -206,22 +206,24 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     public void addPatientVisits(List<PatientVisitWrapper> newPatientVisits) {
-        Collection<PatientVisit> allVisitObjects = new HashSet<PatientVisit>();
-        List<PatientVisitWrapper> allVisitWrappers = new ArrayList<PatientVisitWrapper>();
-        // already added visits
-        List<PatientVisitWrapper> currentList = getPatientVisitCollection();
-        if (currentList != null) {
-            for (PatientVisitWrapper visit : currentList) {
+        if (newPatientVisits != null && newPatientVisits.size() > 0) {
+            Collection<PatientVisit> allVisitObjects = new HashSet<PatientVisit>();
+            List<PatientVisitWrapper> allVisitWrappers = new ArrayList<PatientVisitWrapper>();
+            // already added visits
+            List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+            if (currentList != null) {
+                for (PatientVisitWrapper visit : currentList) {
+                    allVisitObjects.add(visit.getWrappedObject());
+                    allVisitWrappers.add(visit);
+                }
+            }
+            // new
+            for (PatientVisitWrapper visit : newPatientVisits) {
                 allVisitObjects.add(visit.getWrappedObject());
                 allVisitWrappers.add(visit);
             }
+            setPatientVisitCollection(allVisitObjects, allVisitWrappers);
         }
-        // new
-        for (PatientVisitWrapper visit : newPatientVisits) {
-            allVisitObjects.add(visit.getWrappedObject());
-            allVisitWrappers.add(visit);
-        }
-        setPatientVisitCollection(allVisitObjects, allVisitWrappers);
     }
 
     public String getComment() {
@@ -311,40 +313,44 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     public void addPatients(List<PatientWrapper> newPatients) {
-        Collection<Patient> allPatientsObjects = new HashSet<Patient>();
-        List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
-        // already in list
-        List<PatientWrapper> patientsList = getPatientCollection();
-        if (patientsList != null) {
-            for (PatientWrapper patient : patientsList) {
-                allPatientsObjects.add(patient.getWrappedObject());
-                allPatientsWrappers.add(patient);
-            }
-        }
-        // new patients
-        for (PatientWrapper patient : newPatients) {
-            patientsAdded.add(patient);
-            allPatientsObjects.add(patient.getWrappedObject());
-            allPatientsWrappers.add(patient);
-        }
-        setPatients(allPatientsObjects, allPatientsWrappers);
-    }
-
-    public void removePatients(List<PatientWrapper> patientsToRemove) {
-        patientsAdded.removeAll(patientsToRemove);
-        Collection<Patient> allPatientsObjects = new HashSet<Patient>();
-        List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
-        // already in list
-        List<PatientWrapper> patientsList = getPatientCollection();
-        if (patientsList != null) {
-            for (PatientWrapper patient : patientsList) {
-                if (!patientsToRemove.contains(patient)) {
+        if (newPatients != null && newPatients.size() > 0) {
+            Collection<Patient> allPatientsObjects = new HashSet<Patient>();
+            List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
+            // already in list
+            List<PatientWrapper> patientsList = getPatientCollection();
+            if (patientsList != null) {
+                for (PatientWrapper patient : patientsList) {
                     allPatientsObjects.add(patient.getWrappedObject());
                     allPatientsWrappers.add(patient);
                 }
             }
+            // new patients
+            for (PatientWrapper patient : newPatients) {
+                patientsAdded.add(patient);
+                allPatientsObjects.add(patient.getWrappedObject());
+                allPatientsWrappers.add(patient);
+            }
+            setPatients(allPatientsObjects, allPatientsWrappers);
         }
-        setPatients(allPatientsObjects, allPatientsWrappers);
+    }
+
+    public void removePatients(List<PatientWrapper> patientsToRemove) {
+        if (patientsToRemove != null && patientsToRemove.size() > 0) {
+            patientsAdded.removeAll(patientsToRemove);
+            Collection<Patient> allPatientsObjects = new HashSet<Patient>();
+            List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
+            // already in list
+            List<PatientWrapper> patientsList = getPatientCollection();
+            if (patientsList != null) {
+                for (PatientWrapper patient : patientsList) {
+                    if (!patientsToRemove.contains(patient)) {
+                        allPatientsObjects.add(patient.getWrappedObject());
+                        allPatientsWrappers.add(patient);
+                    }
+                }
+            }
+            setPatients(allPatientsObjects, allPatientsWrappers);
+        }
     }
 
     @Override

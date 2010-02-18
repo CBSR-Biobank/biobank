@@ -150,8 +150,9 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         if (c2 instanceof ContactWrapper) {
             String myName = wrappedObject.getName();
             String c2Name = c2.wrappedObject.getName();
-            return ((myName.compareTo(c2Name) > 0) ? 1 : (myName
-                .equals(c2Name) ? 0 : -1));
+            if (myName != null && c2Name != null) {
+                return myName.compareTo(c2Name);
+            }
         }
         return 0;
     }

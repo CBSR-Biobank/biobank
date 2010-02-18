@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -93,7 +94,7 @@ public class ContainerAdapter extends AdapterBase {
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());
         if (mc.open() == Dialog.OK) {
-            Display.getDefault().asyncExec(new Runnable() {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 public void run() {
                     try {
                         setNewPositionFromLabel(mc.getNewLabel());

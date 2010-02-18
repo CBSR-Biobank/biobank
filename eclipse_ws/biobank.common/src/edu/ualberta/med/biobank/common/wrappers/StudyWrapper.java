@@ -247,38 +247,42 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addContacts(List<ContactWrapper> newContacts) {
-        Collection<Contact> allContactObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-        // already added contacts
-        List<ContactWrapper> currentList = getContactCollection();
-        if (currentList != null) {
-            for (ContactWrapper contact : currentList) {
-                allContactObjects.add(contact.getWrappedObject());
-                allContactWrappers.add(contact);
-            }
-        }
-        // new contacts added
-        for (ContactWrapper contact : newContacts) {
-            allContactObjects.add(contact.getWrappedObject());
-            allContactWrappers.add(contact);
-        }
-        setContactCollection(allContactObjects, allContactWrappers);
-    }
-
-    public void removeContacts(List<ContactWrapper> contactsToRemove) {
-        Collection<Contact> allContactObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-        // already added contacts
-        List<ContactWrapper> currentList = getContactCollection();
-        if (currentList != null) {
-            for (ContactWrapper contact : currentList) {
-                if (!contactsToRemove.contains(contact)) {
+        if (newContacts != null && newContacts.size() > 0) {
+            Collection<Contact> allContactObjects = new HashSet<Contact>();
+            List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+            // already added contacts
+            List<ContactWrapper> currentList = getContactCollection();
+            if (currentList != null) {
+                for (ContactWrapper contact : currentList) {
                     allContactObjects.add(contact.getWrappedObject());
                     allContactWrappers.add(contact);
                 }
             }
+            // new contacts added
+            for (ContactWrapper contact : newContacts) {
+                allContactObjects.add(contact.getWrappedObject());
+                allContactWrappers.add(contact);
+            }
+            setContactCollection(allContactObjects, allContactWrappers);
         }
-        setContactCollection(allContactObjects, allContactWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToRemove) {
+        if (contactsToRemove != null && contactsToRemove.size() > 0) {
+            Collection<Contact> allContactObjects = new HashSet<Contact>();
+            List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+            // already added contacts
+            List<ContactWrapper> currentList = getContactCollection();
+            if (currentList != null) {
+                for (ContactWrapper contact : currentList) {
+                    if (!contactsToRemove.contains(contact)) {
+                        allContactObjects.add(contact.getWrappedObject());
+                        allContactWrappers.add(contact);
+                    }
+                }
+            }
+            setContactCollection(allContactObjects, allContactWrappers);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -307,42 +311,46 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addSampleStorages(List<SampleStorageWrapper> newSampleStorages) {
-        Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
-        List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
-        // already in list
-        List<SampleStorageWrapper> currentList = getSampleStorageCollection();
-        if (currentList != null) {
-            for (SampleStorageWrapper ss : currentList) {
-                allSsObjects.add(ss.getWrappedObject());
-                allSsWrappers.add(ss);
-            }
-        }
-        // new
-        for (SampleStorageWrapper ss : newSampleStorages) {
-            ss.setStudy(this);
-            allSsObjects.add(ss.getWrappedObject());
-            allSsWrappers.add(ss);
-            deletedSampleStorages.remove(ss);
-        }
-        setSampleStorages(allSsObjects, allSsWrappers);
-    }
-
-    public void removeSampleStorages(
-        List<SampleStorageWrapper> sampleStoragesToRemove) {
-        deletedSampleStorages.addAll(sampleStoragesToRemove);
-        Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
-        List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
-        // already in list
-        List<SampleStorageWrapper> currentList = getSampleStorageCollection();
-        if (currentList != null) {
-            for (SampleStorageWrapper ss : currentList) {
-                if (!sampleStoragesToRemove.contains(ss)) {
+        if (newSampleStorages != null && newSampleStorages.size() > 0) {
+            Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+            List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
+            // already in list
+            List<SampleStorageWrapper> currentList = getSampleStorageCollection();
+            if (currentList != null) {
+                for (SampleStorageWrapper ss : currentList) {
                     allSsObjects.add(ss.getWrappedObject());
                     allSsWrappers.add(ss);
                 }
             }
+            // new
+            for (SampleStorageWrapper ss : newSampleStorages) {
+                ss.setStudy(this);
+                allSsObjects.add(ss.getWrappedObject());
+                allSsWrappers.add(ss);
+                deletedSampleStorages.remove(ss);
+            }
+            setSampleStorages(allSsObjects, allSsWrappers);
         }
-        setSampleStorages(allSsObjects, allSsWrappers);
+    }
+
+    public void removeSampleStorages(
+        List<SampleStorageWrapper> sampleStoragesToRemove) {
+        if (sampleStoragesToRemove != null && sampleStoragesToRemove.size() > 0) {
+            deletedSampleStorages.addAll(sampleStoragesToRemove);
+            Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+            List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
+            // already in list
+            List<SampleStorageWrapper> currentList = getSampleStorageCollection();
+            if (currentList != null) {
+                for (SampleStorageWrapper ss : currentList) {
+                    if (!sampleStoragesToRemove.contains(ss)) {
+                        allSsObjects.add(ss.getWrappedObject());
+                        allSsWrappers.add(ss);
+                    }
+                }
+            }
+            setSampleStorages(allSsObjects, allSsWrappers);
+        }
     }
 
     private void setSampleStorages(Collection<SampleStorage> allSsObjects,
@@ -414,41 +422,45 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addSampleSources(List<SampleSourceWrapper> newSampleSources) {
-        Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
-        List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
-        // already in list
-        List<SampleSourceWrapper> currentList = getSampleSourceCollection();
-        if (currentList != null) {
-            for (SampleSourceWrapper ss : currentList) {
-                allSsObjects.add(ss.getWrappedObject());
-                allSsWrappers.add(ss);
-            }
-        }
-        // new
-        for (SampleSourceWrapper ss : newSampleSources) {
-            allSsObjects.add(ss.getWrappedObject());
-            allSsWrappers.add(ss);
-            deletedSampleSources.remove(ss);
-        }
-        setSampleSources(allSsObjects, allSsWrappers);
-    }
-
-    public void removeSampleSources(
-        List<SampleSourceWrapper> sampleSourcesToDelete) {
-        deletedSampleSources.addAll(sampleSourcesToDelete);
-        Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
-        List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
-        // already in list
-        List<SampleSourceWrapper> currentList = getSampleSourceCollection();
-        if (currentList != null) {
-            for (SampleSourceWrapper ss : currentList) {
-                if (!deletedSampleSources.contains(ss)) {
+        if (newSampleSources != null && newSampleSources.size() > 0) {
+            Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
+            List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
+            // already in list
+            List<SampleSourceWrapper> currentList = getSampleSourceCollection();
+            if (currentList != null) {
+                for (SampleSourceWrapper ss : currentList) {
                     allSsObjects.add(ss.getWrappedObject());
                     allSsWrappers.add(ss);
                 }
             }
+            // new
+            for (SampleSourceWrapper ss : newSampleSources) {
+                allSsObjects.add(ss.getWrappedObject());
+                allSsWrappers.add(ss);
+                deletedSampleSources.remove(ss);
+            }
+            setSampleSources(allSsObjects, allSsWrappers);
         }
-        setSampleSources(allSsObjects, allSsWrappers);
+    }
+
+    public void removeSampleSources(
+        List<SampleSourceWrapper> sampleSourcesToDelete) {
+        if (sampleSourcesToDelete != null && sampleSourcesToDelete.size() > 0) {
+            deletedSampleSources.addAll(sampleSourcesToDelete);
+            Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
+            List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
+            // already in list
+            List<SampleSourceWrapper> currentList = getSampleSourceCollection();
+            if (currentList != null) {
+                for (SampleSourceWrapper ss : currentList) {
+                    if (!deletedSampleSources.contains(ss)) {
+                        allSsObjects.add(ss.getWrappedObject());
+                        allSsWrappers.add(ss);
+                    }
+                }
+            }
+            setSampleSources(allSsObjects, allSsWrappers);
+        }
     }
 
     /**
@@ -723,22 +735,24 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addPatients(List<PatientWrapper> newPatients) {
-        Collection<Patient> allPatientObjects = new HashSet<Patient>();
-        List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
-        // already added patients
-        List<PatientWrapper> currentList = getPatientCollection();
-        if (currentList != null) {
-            for (PatientWrapper patient : currentList) {
+        if (newPatients != null && newPatients.size() > 0) {
+            Collection<Patient> allPatientObjects = new HashSet<Patient>();
+            List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
+            // already added patients
+            List<PatientWrapper> currentList = getPatientCollection();
+            if (currentList != null) {
+                for (PatientWrapper patient : currentList) {
+                    allPatientObjects.add(patient.getWrappedObject());
+                    allPatientWrappers.add(patient);
+                }
+            }
+            // new patients added
+            for (PatientWrapper patient : newPatients) {
                 allPatientObjects.add(patient.getWrappedObject());
                 allPatientWrappers.add(patient);
             }
+            setPatientCollection(allPatientObjects, allPatientWrappers);
         }
-        // new patients added
-        for (PatientWrapper patient : newPatients) {
-            allPatientObjects.add(patient.getWrappedObject());
-            allPatientWrappers.add(patient);
-        }
-        setPatientCollection(allPatientObjects, allPatientWrappers);
     }
 
     @Override
