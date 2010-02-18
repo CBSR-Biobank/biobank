@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
@@ -57,8 +58,12 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
-            + getTooltipText("Container");
+        ContainerWrapper container = getContainer();
+        SiteWrapper site = container.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Container");
+        }
+        return getTooltipText("Container");
     }
 
     @Override

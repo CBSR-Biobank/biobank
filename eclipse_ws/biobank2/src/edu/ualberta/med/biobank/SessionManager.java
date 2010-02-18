@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.views.AbstractViewWithTree;
@@ -162,7 +163,13 @@ public class SessionManager {
         AdapterBase adapter = searchNode(wrapper);
         if (adapter != null) {
             adapter.performDoubleClick();
+            return;
         }
+
+        // adapter for object not yet in the tree, create new adapter
+        // and load the view form
+        adapter = AdapterFactory.getAdapter(wrapper);
+        adapter.performDoubleClick();
     }
 
     public static AbstractViewWithTree getCurrentViewWithTree() {

@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -33,8 +34,12 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return parent.getParent().getLabel() + " - "
-            + getTooltipText("Container Type");
+        ContainerTypeWrapper container = getContainerType();
+        SiteWrapper site = container.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Container Type");
+        }
+        return getTooltipText("Container Type");
     }
 
     @Override

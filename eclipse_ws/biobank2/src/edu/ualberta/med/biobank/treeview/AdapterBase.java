@@ -297,7 +297,9 @@ public abstract class AdapterBase {
     }
 
     public WritableApplicationService getAppService() {
-        Assert.isNotNull(parent, "parent is null");
+        if (modelObject != null) {
+            return modelObject.getAppService();
+        }
         return parent.getAppService();
     }
 
@@ -390,7 +392,11 @@ public abstract class AdapterBase {
                     SessionManager.updateTreeNode(node);
                 }
             }
-            getRootNode().expandChild(AdapterBase.this);
+            notifyListeners();
+            RootNode root = getRootNode();
+            if (root != null) {
+                root.expandChild(this);
+            }
 
             childUpdateThread = new Thread() {
                 @Override
