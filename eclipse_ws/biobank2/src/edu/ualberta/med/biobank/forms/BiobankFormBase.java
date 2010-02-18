@@ -78,8 +78,6 @@ public abstract class BiobankFormBase extends EditorPart {
                 }
             } else if (selection instanceof InfoTableSelection) {
                 InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                System.out.println("double click selection: "
-                    + tableSelection.getObject().getClass().getName());
                 if (tableSelection.getObject() instanceof ModelWrapper<?>) {
                     SessionManager
                         .openViewForm((ModelWrapper<?>) tableSelection

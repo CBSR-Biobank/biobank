@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
@@ -43,7 +44,12 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return parent.getParent().getLabel() + " - " + getTooltipText("Study");
+        StudyWrapper study = getWrapper();
+        SiteWrapper site = study.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Study");
+        }
+        return getTooltipText("Study");
     }
 
     @Override

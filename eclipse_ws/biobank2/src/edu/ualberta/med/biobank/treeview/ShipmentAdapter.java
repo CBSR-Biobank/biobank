@@ -7,9 +7,11 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -35,17 +37,14 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        SiteAdapter site = getParentFromClass(SiteAdapter.class);
-        StringBuffer sb = new StringBuffer();
-        if (site != null) {
-            sb.append(site.getLabel()).append(" - ");
-        }
-        ClinicAdapter clinic = getParentFromClass(ClinicAdapter.class);
+        ShipmentWrapper shipment = getWrapper();
+        ClinicWrapper clinic = shipment.getClinic();
         if (clinic != null) {
-            sb.append("Clinic ").append(clinic.getLabel()).append(" - ");
+            SiteWrapper site = clinic.getSite();
+            return site.getName() + " - " + clinic.getName() + " - "
+                + getTooltipText("Shipment");
         }
-        sb.append(getTooltipText("Shipment"));
-        return sb.toString();
+        return getTooltipText("Shipment");
     }
 
     @Override

@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -44,17 +46,16 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        SiteAdapter siteAdapter = getParentFromClass(SiteAdapter.class);
-        StudyAdapter studyAdapter = getParentFromClass(StudyAdapter.class);
-        StringBuffer text = new StringBuffer();
-        if (siteAdapter != null) {
-            text.append(siteAdapter.getLabel()).append(" - ");
+        PatientWrapper patient = getWrapper();
+        StudyWrapper study = patient.getStudy();
+        if (study != null) {
+            SiteWrapper site = study.getSite();
+            Assert.isNotNull(site, "site is null");
+            return site.getName() + " - " + study.getName() + " - "
+                + getTooltipText("Patient");
+
         }
-        if (studyAdapter != null) {
-            text.append(studyAdapter.getLabel()).append(" - ");
-        }
-        text.append(getTooltipText("Patient"));
-        return text.toString();
+        return getTooltipText("Patient");
     }
 
     @Override

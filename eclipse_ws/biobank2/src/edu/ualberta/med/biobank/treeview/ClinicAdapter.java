@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -37,7 +38,12 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return parent.getParent().getLabel() + " - " + getTooltipText("Clinic");
+        ClinicWrapper clinic = getWrapper();
+        SiteWrapper site = clinic.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Clinic");
+        }
+        return getTooltipText("Clinic");
     }
 
     @Override
