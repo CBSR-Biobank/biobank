@@ -103,8 +103,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
             .getContactCollection());
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
-
-        contactsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     protected void createStudiesSection() throws Exception {
