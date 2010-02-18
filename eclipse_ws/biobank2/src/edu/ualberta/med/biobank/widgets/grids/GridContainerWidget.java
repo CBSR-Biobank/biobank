@@ -95,6 +95,15 @@ public class GridContainerWidget extends AbstractGridWidget {
 
     @Override
     protected String getDefaultTextForBox(int indexRow, int indexCol) {
+        String text = super.getDefaultTextForBox(indexRow, indexCol);
+        if (!text.isEmpty()) {
+            return text;
+        }
+        return "";
+    }
+
+    @Override
+    protected String getBottomTextForBox(int indexRow, int indexCol) {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = (ContainerCell) cells.get(new RowColPos(
@@ -103,14 +112,11 @@ public class GridContainerWidget extends AbstractGridWidget {
                 && (cell.getContainer() != null)
                 && (cell.getContainer().getContainerType() != null)
                 && (cell.getContainer().getContainerType().getNameShort() != null))
-                sname += "-"
-                    + cell.getContainer().getContainerType().getNameShort();
+                sname = "("
+                    + cell.getContainer().getContainerType().getNameShort()
+                    + ")";
         }
-        String text = super.getDefaultTextForBox(indexRow, indexCol);
-        if (!text.isEmpty()) {
-            return text + sname;
-        }
-        return "";
+        return sname;
     }
 
     public void setLegend(List<ContainerStatus> legendStatus) {

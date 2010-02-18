@@ -125,9 +125,8 @@ public class SampleViewForm extends BiobankViewForm {
             layout.marginWidth = 0;
             layout.verticalSpacing = 0;
             containerComposite.setLayout(layout);
-            toolkit.createLabel(containerComposite, container
-                .getContainerType().getName()
-                + ": " + container.getLabel());
+            toolkit.createLabel(containerComposite, container.getLabel() + " ("
+                + container.getContainerType().getNameShort() + ") ");
             AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
                 .createWidget(containerComposite, container);
             containerWidget.setSelection(position);
