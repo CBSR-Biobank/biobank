@@ -159,6 +159,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     setDirty(true);
                 }
             });
+        shipmentPatientsWidget
+            .addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override

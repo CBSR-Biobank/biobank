@@ -6,15 +6,11 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
@@ -69,22 +65,23 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         super(parent, true, patients, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
 
-        tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                Object selection = event.getSelection();
-                BiobankCollectionModel obj = (BiobankCollectionModel) ((StructuredSelection) selection)
-                    .getFirstElement();
-                Assert
-                    .isTrue(obj.o instanceof TableRowData,
-                        "Invalid class where patient expected: "
-                            + obj.o.getClass());
-
-                TableRowData item = (TableRowData) obj.o;
-                ShipmentAdministrationView.currentInstance
-                    .displayPatient(item.patient);
-            }
-        });
+        // tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+        // @Override
+        // public void doubleClick(DoubleClickEvent event) {
+        // Object selection = event.getSelection();
+        // BiobankCollectionModel obj = (BiobankCollectionModel)
+        // ((StructuredSelection) selection)
+        // .getFirstElement();
+        // Assert
+        // .isTrue(obj.o instanceof TableRowData,
+        // "Invalid class where patient expected: "
+        // + obj.o.getClass());
+        //
+        // TableRowData item = (TableRowData) obj.o;
+        // ShipmentAdministrationView.currentInstance
+        // .displayPatient(item.patient);
+        // }
+        // });
     }
 
     @Override

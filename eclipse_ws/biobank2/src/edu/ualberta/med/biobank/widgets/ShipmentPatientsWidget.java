@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -153,5 +154,9 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
     public void reloadList() {
         patientTable.setCollection(shipment.getPatientCollection());
+    }
+
+    public void addDoubleClickListener(IDoubleClickListener listener) {
+        patientTable.addDoubleClickListener(listener);
     }
 }
