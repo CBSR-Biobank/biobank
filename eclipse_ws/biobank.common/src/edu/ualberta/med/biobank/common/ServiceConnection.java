@@ -15,14 +15,7 @@ public class ServiceConnection {
     public static WritableApplicationService getAppService(String serverUrl,
         String userName, String password) throws Exception {
         if (serverUrl.startsWith("https")) {
-            String name = serverUrl.substring("https://".length());
-            name = name.substring(0, name.indexOf(":"));
-            URL url = ServiceConnection.class.getResource("cert/" + name
-                + ".keystore");
-            if (url == null) {
-                url = ServiceConnection.class
-                    .getResource("cert/localhost.keystore");
-            }
+            URL url = ServiceConnection.class.getResource("cert/all.keystore");
             if (url != null) {
                 if (resourceResolver != null) {
                     url = resourceResolver.resolveURL(url);

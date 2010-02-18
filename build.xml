@@ -230,7 +230,7 @@
 		<fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
 		<copy file="${secu-log.dir}/jboss/login-config.xml" tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml" overwrite="true" />
 		<copy file="${secu-log.dir}/jboss/server${debugMode}.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml" overwrite="true" />
-		<copy file="${secu-log.dir}/jboss/biobank.keystore" tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore" overwrite="true" />
+		<copy file="${secu-log.dir}/jboss/localhost.keystore" tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore" overwrite="true" />
 		<!-- for compatibility: this file has been split -->
 		<delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
 		<copy file="${secu-log.dir}/jboss/upt-ds.xml" tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml" overwrite="true" />
