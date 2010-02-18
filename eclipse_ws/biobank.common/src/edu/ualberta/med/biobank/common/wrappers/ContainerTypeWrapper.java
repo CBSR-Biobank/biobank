@@ -303,40 +303,44 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void addSampleTypes(List<SampleTypeWrapper> newSampleTypes) {
-        Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-        List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
-        // already added types
-        List<SampleTypeWrapper> currentList = getSampleTypeCollection();
-        if (currentList != null) {
-            for (SampleTypeWrapper type : currentList) {
-                allTypeObjects.add(type.getWrappedObject());
-                allTypeWrappers.add(type);
-            }
-        }
-        // new types
-        for (SampleTypeWrapper type : newSampleTypes) {
-            allTypeObjects.add(type.getWrappedObject());
-            allTypeWrappers.add(type);
-            deletedSampleTypes.remove(type);
-        }
-        setSampleTypeCollection(allTypeObjects, allTypeWrappers);
-    }
-
-    public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
-        deletedSampleTypes.addAll(typesToRemove);
-        Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-        List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
-        // already added types
-        List<SampleTypeWrapper> currentList = getSampleTypeCollection();
-        if (currentList != null) {
-            for (SampleTypeWrapper type : currentList) {
-                if (!deletedSampleTypes.contains(type)) {
+        if (newSampleTypes != null && newSampleTypes.size() > 0) {
+            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
+            List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+            // already added types
+            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
+            if (currentList != null) {
+                for (SampleTypeWrapper type : currentList) {
                     allTypeObjects.add(type.getWrappedObject());
                     allTypeWrappers.add(type);
                 }
             }
+            // new types
+            for (SampleTypeWrapper type : newSampleTypes) {
+                allTypeObjects.add(type.getWrappedObject());
+                allTypeWrappers.add(type);
+                deletedSampleTypes.remove(type);
+            }
+            setSampleTypeCollection(allTypeObjects, allTypeWrappers);
         }
-        setSampleTypeCollection(allTypeObjects, allTypeWrappers);
+    }
+
+    public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
+        if (typesToRemove != null && typesToRemove.size() > 0) {
+            deletedSampleTypes.addAll(typesToRemove);
+            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
+            List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+            // already added types
+            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
+            if (currentList != null) {
+                for (SampleTypeWrapper type : currentList) {
+                    if (!deletedSampleTypes.contains(type)) {
+                        allTypeObjects.add(type.getWrappedObject());
+                        allTypeWrappers.add(type);
+                    }
+                }
+            }
+            setSampleTypeCollection(allTypeObjects, allTypeWrappers);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -381,40 +385,44 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public void addChildContainerTypes(
         List<ContainerTypeWrapper> newContainerTypes) {
-        Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-        List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
-        // already added types
-        List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
-        if (currentList != null) {
-            for (ContainerTypeWrapper type : currentList) {
-                allTypeObjects.add(type.getWrappedObject());
-                allTypesWrappers.add(type);
-            }
-        }
-        // new types
-        for (ContainerTypeWrapper type : newContainerTypes) {
-            allTypeObjects.add(type.getWrappedObject());
-            allTypesWrappers.add(type);
-            deletedChildTypes.remove(type);
-        }
-        setChildContainerTypes(allTypeObjects, allTypesWrappers);
-    }
-
-    public void removeChildContainers(List<ContainerTypeWrapper> typesToRemove) {
-        deletedChildTypes.addAll(typesToRemove);
-        Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-        List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
-        // already added types
-        List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
-        if (currentList != null) {
-            for (ContainerTypeWrapper type : currentList) {
-                if (!deletedChildTypes.contains(type)) {
+        if (newContainerTypes != null && newContainerTypes.size() > 0) {
+            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
+            List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
+            // already added types
+            List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
+            if (currentList != null) {
+                for (ContainerTypeWrapper type : currentList) {
                     allTypeObjects.add(type.getWrappedObject());
                     allTypesWrappers.add(type);
                 }
             }
+            // new types
+            for (ContainerTypeWrapper type : newContainerTypes) {
+                allTypeObjects.add(type.getWrappedObject());
+                allTypesWrappers.add(type);
+                deletedChildTypes.remove(type);
+            }
+            setChildContainerTypes(allTypeObjects, allTypesWrappers);
         }
-        setChildContainerTypes(allTypeObjects, allTypesWrappers);
+    }
+
+    public void removeChildContainers(List<ContainerTypeWrapper> typesToRemove) {
+        if (typesToRemove != null && typesToRemove.size() > 0) {
+            deletedChildTypes.addAll(typesToRemove);
+            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
+            List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
+            // already added types
+            List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
+            if (currentList != null) {
+                for (ContainerTypeWrapper type : currentList) {
+                    if (!deletedChildTypes.contains(type)) {
+                        allTypeObjects.add(type.getWrappedObject());
+                        allTypesWrappers.add(type);
+                    }
+                }
+            }
+            setChildContainerTypes(allTypeObjects, allTypesWrappers);
+        }
     }
 
     @SuppressWarnings("unchecked")

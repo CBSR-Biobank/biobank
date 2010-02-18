@@ -394,7 +394,7 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     protected void reload() throws Exception {
         if (!form.isDisposed()) {
-            containerAdapter.getContainer().reload();
+            container.reload();
             form.setText("Container " + container.getLabel() + " ("
                 + container.getContainerType().getName() + ")");
             if (container.getContainerType().getChildContainerTypeCollection()
