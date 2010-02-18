@@ -392,7 +392,6 @@ public abstract class AdapterBase {
                     SessionManager.updateTreeNode(node);
                 }
             }
-            notifyListeners();
             RootNode root = getRootNode();
             if (root != null) {
                 root.expandChild(this);

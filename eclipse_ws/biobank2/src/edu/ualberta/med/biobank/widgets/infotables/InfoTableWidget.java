@@ -83,8 +83,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private Thread backgroundThread;
 
-    private boolean exitBrackgroundThread;
-
     protected Menu menu;
 
     protected ListenerList editItemListeners = new ListenerList();
@@ -253,15 +251,11 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     public void setCollection(final Collection<T> collection) {
-        if (collection == null)
-            return;
-
-        if ((backgroundThread != null) && backgroundThread.isAlive()) {
-            exitBrackgroundThread = true;
+        if ((collection == null)
+            || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
         }
 
-        exitBrackgroundThread = false;
         backgroundThread = new Thread() {
             @Override
             public void run() {
@@ -273,8 +267,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                     model.clear();
                     for (int i = 0, n = collection.size(); i < n; ++i) {
                         model.add(new BiobankCollectionModel());
-                        if (exitBrackgroundThread)
-                            return;
                     }
                     display.syncExec(new Runnable() {
                         public void run() {
@@ -288,7 +280,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                     for (T item : collection) {
                         if (viewer.getTable().isDisposed())
                             return;
-
                         final BiobankCollectionModel modelItem = model
                             .get(count);
                         if (item instanceof ModelWrapper<?>) {
@@ -297,8 +288,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         if (item != null) {
                             modelItem.o = getCollectionModelObject(item);
                         }
-                        if (exitBrackgroundThread)
-                            return;
 
                         if (!isDisposed()) {
                             display.syncExec(new Runnable() {

@@ -169,7 +169,9 @@ public class SessionManager {
         // adapter for object not yet in the tree, create new adapter
         // and load the view form
         adapter = AdapterFactory.getAdapter(wrapper);
-        adapter.performDoubleClick();
+        if (adapter != null) {
+            adapter.performDoubleClick();
+        }
     }
 
     public static AbstractViewWithTree getCurrentViewWithTree() {
