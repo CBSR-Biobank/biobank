@@ -186,6 +186,10 @@
             id="edu.ualberta.med.biobank.commands.shipmentAdmin"
             name="Shipment administration">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.sessionReload"
+            name="Session Reload">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -450,6 +454,17 @@
                </reference>
                <reference
                      definitionId="biobank2.siteSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
+            commandId="edu.ualberta.med.biobank.commands.sessionReload">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
                </reference>
             </and>
          </activeWhen>
@@ -928,6 +943,19 @@
             </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="edu.ualberta.med.biobank.views.SessionsView">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.sessionReload"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload Session">
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
         point="org.eclipse.ui.perspectiveExtensions">
@@ -942,7 +970,7 @@
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
-               standalone="true"
+               standalone="false"
                visible="true">
          </view>
          
