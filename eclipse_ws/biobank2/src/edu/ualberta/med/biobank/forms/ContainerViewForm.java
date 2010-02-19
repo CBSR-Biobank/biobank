@@ -95,14 +95,14 @@ public class ContainerViewForm extends BiobankViewForm {
         container = containerAdapter.getContainer();
         container.reload();
         setPartName(container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
+            + container.getContainerType().getNameShort() + ")");
         initCells();
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
+            + container.getContainerType().getNameShort() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
             container.getContainerType().getName()));
