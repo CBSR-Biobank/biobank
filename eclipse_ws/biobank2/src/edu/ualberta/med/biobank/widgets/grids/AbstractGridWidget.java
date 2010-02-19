@@ -168,8 +168,8 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
         setStorageSize(rowCap, colCap);
         if (colCap <= 1) {
             // single dimension size
-            setCellWidth(150);
-            setCellHeight(20);
+            setCellWidth(120);
+            setCellHeight(36);
             setLegendOnSide(true);
         }
     }
