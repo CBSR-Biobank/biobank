@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -647,25 +646,15 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:");
         int nber = 0;
         StudyWrapper study = patientVisit.getPatient().getStudy();
-        Collection<SampleStorageWrapper> sampleStorages = study
+        List<SampleStorageWrapper> sampleStorages = study
             .getSampleStorageCollection();
         for (PalletCell cell : cells.values()) {
-
             if (PalletCell.hasValue(cell)
-                && cell.getStatus().equals(SampleCellStatus.TYPE)) {
-                // add new samples
-                SampleWrapper sample = SampleWrapper.createNewSample(
-                    appService, cell.getValue(), patientVisit, cell.getType(),
+                && cell.getStatus() == SampleCellStatus.TYPE) {
+                patientVisit.addNewSample(cell.getValue(), cell.getType(),
                     sampleStorages);
-                sample.persist();
-                sb.append("\nLINKED: ").append(cell.getValue());
-                sb.append(" - patient: ").append(
-                    patientVisit.getPatient().getPnumber());
-                sb.append(" - Visit: ").append(
-                    patientVisit.getFormattedDateProcessed());
-                sb.append(" - ").append(
-                    patientVisit.getShipment().getClinic().getName());
-                sb.append(" - ").append(cell.getType().getName());
+                appendSampleLogMessage(sb, patientVisit, cell.getValue(), cell
+                    .getType());
                 nber++;
             }
         }
@@ -673,6 +662,19 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         appendLog(sb.toString());
         appendLog("SCAN-LINK: " + nber + " samples linked to visit");
         setSaved(true);
+    }
+
+    private void appendSampleLogMessage(StringBuffer sb,
+        PatientVisitWrapper patientVisit, String cellValue,
+        SampleTypeWrapper cellType) {
+        sb.append("\nLINKED: ").append(cellValue);
+        sb.append(" - patient: ")
+            .append(patientVisit.getPatient().getPnumber());
+        sb.append(" - Visit: ")
+            .append(patientVisit.getFormattedDateProcessed());
+        sb.append(" - ").append(
+            patientVisit.getShipment().getClinic().getName());
+        sb.append(" - ").append(cellType.getName());
     }
 
     /**
