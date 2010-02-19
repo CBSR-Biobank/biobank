@@ -74,9 +74,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             containerType.getName()));
 
         createContainerTypeSection();
-        if (containerType.getChildContainerTypeCollection().size() > 0) {
-            createVisualizeContainer();
-        }
         if (containerType.getSampleTypeCollection() != null
             && containerType.getSampleTypeCollection().size() > 0) {
             createSampleTypesSection();
@@ -84,6 +81,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         if (containerType.getChildContainerTypeCollection() != null
             && containerType.getChildContainerTypeCollection().size() > 0) {
             createChildContainerTypesSection();
+        }
+        if (containerType.getChildContainerTypeCollection().size() > 0) {
+            createVisualizeContainer();
         }
         createButtons();
     }
