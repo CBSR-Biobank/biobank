@@ -467,6 +467,32 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
+    /**
+     * Create a new sample (and persist it)
+     * 
+     * @param inventoryId
+     * @param type
+     * @param studySampleStorages
+     */
+    public SampleWrapper addNewSample(String inventoryId,
+        SampleTypeWrapper type, List<SampleStorageWrapper> studySampleStorages)
+        throws Exception {
+        SampleWrapper sample = new SampleWrapper(appService);
+        sample.setInventoryId(inventoryId);
+        sample.setPatientVisit(this);
+        sample.setLinkDate(new Date());
+        sample.setSampleType(type);
+        Double volume = null;
+        for (SampleStorageWrapper ss : studySampleStorages) {
+            if (ss.getSampleType().getId().equals(type.getId())) {
+                volume = ss.getVolume();
+            }
+        }
+        sample.setQuantity(volume);
+        sample.persist();
+        return sample;
+    }
+
     @Override
     public Class<PatientVisit> getWrappedClass() {
         return PatientVisit.class;

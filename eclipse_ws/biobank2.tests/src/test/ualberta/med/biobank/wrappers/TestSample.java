@@ -14,11 +14,9 @@ import test.ualberta.med.biobank.internal.ClinicHelper;
 import test.ualberta.med.biobank.internal.ContactHelper;
 import test.ualberta.med.biobank.internal.ContainerHelper;
 import test.ualberta.med.biobank.internal.ContainerTypeHelper;
-import test.ualberta.med.biobank.internal.DbHelper;
 import test.ualberta.med.biobank.internal.PatientHelper;
 import test.ualberta.med.biobank.internal.PatientVisitHelper;
 import test.ualberta.med.biobank.internal.SampleHelper;
-import test.ualberta.med.biobank.internal.SampleStorageHelper;
 import test.ualberta.med.biobank.internal.SampleTypeHelper;
 import test.ualberta.med.biobank.internal.ShipmentHelper;
 import test.ualberta.med.biobank.internal.SiteHelper;
@@ -38,7 +36,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
 
 public class TestSample extends TestDatabase {
 
@@ -314,30 +311,6 @@ public class TestSample extends TestDatabase {
         Assert.assertTrue(stw.getId() != newStw.getId());
         sample.setSampleType(newStw);
         Assert.assertTrue(newStw.getId() == sample.getSampleType().getId());
-    }
-
-    @Test
-    public void testCreateNewSample() throws BiobankCheckException, Exception {
-        StudyWrapper study = sample.getPatientVisit().getPatient().getStudy();
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
-            appService, false);
-        SampleStorageWrapper ss1 = SampleStorageHelper.addSampleStorage(study,
-            DbHelper.chooseRandomlyInList(types));
-        SampleStorageWrapper ss2 = SampleStorageHelper.addSampleStorage(study,
-            DbHelper.chooseRandomlyInList(types));
-        SampleStorageWrapper ss3 = SampleStorageHelper.newSampleStorage(study,
-            sample.getSampleType());
-        ss3.setVolume(3.0);
-        ss3.persist();
-        SampleWrapper newSample = SampleWrapper.createNewSample(appService,
-            "newid", sample.getPatientVisit(), sample.getSampleType(), Arrays
-                .asList(ss1, ss2, ss3));
-        newSample.persist();
-        Sample dbSample = ModelUtils.getObjectWithId(appService, Sample.class,
-            newSample.getId());
-        Assert.assertTrue(dbSample.getSampleType().getId().equals(
-            sample.getSampleType().getId()));
-        Assert.assertTrue(dbSample.getQuantity().equals(3.0));
     }
 
     @Test

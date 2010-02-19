@@ -272,25 +272,6 @@ public class SampleWrapper extends
             + LabelingScheme.getPositionString(position, directParent);
     }
 
-    public static SampleWrapper createNewSample(
-        WritableApplicationService appService, String inventoryId,
-        PatientVisitWrapper pv, SampleTypeWrapper type,
-        Collection<SampleStorageWrapper> sampleStorageWrappers) {
-        Sample sample = new Sample();
-        sample.setInventoryId(inventoryId);
-        sample.setPatientVisit(pv.getWrappedObject());
-        sample.setLinkDate(new Date());
-        sample.setSampleType(type.getWrappedObject());
-        Double volume = null;
-        for (SampleStorageWrapper ss : sampleStorageWrappers) {
-            if (ss.getSampleType().getId().equals(type.getId())) {
-                volume = ss.getVolume();
-            }
-        }
-        sample.setQuantity(volume);
-        return new SampleWrapper(appService, sample);
-    }
-
     public void setQuantityFromType() {
         StudyWrapper study = getPatientVisit().getPatient().getStudy();
         Double volume = null;
