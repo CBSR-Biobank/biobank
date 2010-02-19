@@ -389,6 +389,7 @@ public class ContainerViewForm extends BiobankViewForm {
         samplesWidget = new SamplesListInfoTable(parent, container.getSamples()
             .values());
         samplesWidget.adaptToToolkit(toolkit, true);
+        samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
