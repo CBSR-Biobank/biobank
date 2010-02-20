@@ -14,7 +14,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -50,29 +52,8 @@ public class ContainerGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                try {
-                    List<ContainerTypeWrapper> top = ContainerTypeWrapper
-                        .getTopContainerTypesInSite(SessionManager
-                            .getAppService(), ((SiteAdapter) parent)
-                            .getWrapper());
-                    if (top.size() == 0) {
-                        MessageDialog
-                            .openError(PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getShell(),
-                                "Unable to create container",
-                                "You must define a top-level container type before initializing storage.");
-                    } else {
-                        ContainerWrapper c = new ContainerWrapper(
-                            SessionManager.getAppService());
-                        c.setSite(getParentFromClass(SiteAdapter.class)
-                            .getWrapper());
-                        ContainerAdapter adapter = new ContainerAdapter(
-                            ContainerGroup.this, c);
-                        openForm(new FormInput(adapter), ContainerEntryForm.ID);
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Problem executing add container", e);
-                }
+                addContainer(ContainerGroup.this
+                    .getParentFromClass(SiteAdapter.class));
             }
         });
     }
@@ -110,5 +91,31 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public void notifyListeners(AdapterChangedEvent event) {
         getParent().notifyListeners(event);
+    }
+
+    public static void addContainer(SiteAdapter siteAdapter) {
+        try {
+            List<ContainerTypeWrapper> top = ContainerTypeWrapper
+                .getTopContainerTypesInSite(SessionManager.getAppService(),
+                    siteAdapter.getWrapper());
+            if (top.size() == 0) {
+                MessageDialog
+                    .openError(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        "Unable to create container",
+                        "You must define a top-level container type before initializing storage.");
+            } else {
+                ContainerWrapper c = new ContainerWrapper(SessionManager
+                    .getAppService());
+                c.setSite(siteAdapter.getWrapper());
+                ContainerAdapter adapter = new ContainerAdapter(siteAdapter
+                    .getContainersGroupNode(), c);
+                openForm(new FormInput(adapter), ContainerEntryForm.ID);
+            }
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (Exception e) {
+            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+        }
     }
 }

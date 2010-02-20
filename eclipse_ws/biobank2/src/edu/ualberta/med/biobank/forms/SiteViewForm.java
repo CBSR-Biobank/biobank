@@ -6,18 +6,18 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.ClinicGroup;
+import edu.ualberta.med.biobank.treeview.ContainerGroup;
+import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
@@ -54,13 +54,6 @@ public class SiteViewForm extends AddressViewFormCommon {
     private Text activityStatusLabel;
 
     private Text commentLabel;
-
-    private SelectionListener addStudySelectionListener = new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-            StudyGroup.addStudy(siteAdapter);
-        }
-    };
 
     @Override
     public void init() {
@@ -132,56 +125,71 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private void createStudySection() {
         Section section = createSection("Studies");
-        Composite client = sectionAddClient(section);
+        addSectionToolbar(section, "Add Study", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                StudyGroup.addStudy(siteAdapter);
+            }
+        });
 
-        ToolBar tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
-        ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_ADD));
-        titem.setToolTipText("Add Study");
-        titem.addSelectionListener(addStudySelectionListener);
-        section.setTextClient(tbar);
-
-        studiesTable = new StudyInfoTable(client, site.getStudyCollection());
+        studiesTable = new StudyInfoTable(section, site.getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addDoubleClickListener(collectionDoubleClickListener);
+        section.setClient(studiesTable);
     }
 
     public void createClinicSection() {
-        Collection<ClinicWrapper> clinics = site.getClinicCollection(true);
-        Section section = toolkit.createSection(form.getBody(), Section.TWISTIE
-            | Section.TITLE_BAR | Section.EXPANDED);
-        section.setText("Clinics");
-        section.setLayout(new GridLayout(1, false));
-        section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Section section = createSection("Clinics");
+        addSectionToolbar(section, "Add Clinic", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ClinicGroup.addClinic(siteAdapter);
+            }
+        });
 
+        Collection<ClinicWrapper> clinics = site.getClinicCollection(true);
         clinicsTable = new ClinicInfoTable(section, clinics);
-        section.setClient(clinicsTable);
         clinicsTable.adaptToToolkit(toolkit, true);
         clinicsTable.addDoubleClickListener(collectionDoubleClickListener);
+        section.setClient(clinicsTable);
     }
 
     private void createContainerTypesSection() {
-        Composite client = createSectionWithClient("Container Types");
+        Section section = createSection("Container Types");
+        addSectionToolbar(section, "Add Container Type",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ContainerTypeGroup.addContainerType(siteAdapter);
+                }
+            });
 
-        containerTypesTable = new ContainerTypeInfoTable(client, site
+        containerTypesTable = new ContainerTypeInfoTable(section, site
             .getContainerTypeCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable
             .addDoubleClickListener(collectionDoubleClickListener);
+        section.setClient(containerTypesTable);
     }
 
     private void createContainerSection() throws Exception {
         Section section = createSection("Top Level Containers");
+        addSectionToolbar(section, "Add Container", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ContainerGroup.addContainer(siteAdapter);
+            }
+        });
+
         topContainersTable = new ContainerInfoTable(section, siteAdapter
             .getWrapper().getTopContainerCollection());
-        section.setClient(topContainersTable);
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
         topContainersTable
             .addDoubleClickListener(collectionDoubleClickListener);
+        section.setClient(topContainersTable);
     }
 
     @Override

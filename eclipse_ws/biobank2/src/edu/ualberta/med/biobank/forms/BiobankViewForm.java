@@ -8,16 +8,21 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -145,6 +150,21 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         }
 
         form.updateToolBar();
+    }
+
+    protected void addSectionToolbar(Section section, String tooltip,
+        SelectionListener listener) {
+        ToolBar tbar = (ToolBar) section.getTextClient();
+        if (tbar == null) {
+            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+            section.setTextClient(tbar);
+        }
+
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        titem.setToolTipText(tooltip);
+        titem.addSelectionListener(listener);
     }
 
     protected abstract void reload() throws Exception;
