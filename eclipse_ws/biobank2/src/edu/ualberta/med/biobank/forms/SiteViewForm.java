@@ -18,11 +18,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
@@ -61,11 +58,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     private SelectionListener addStudySelectionListener = new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-            AdapterBase studiesNode = siteAdapter.getStudiesGroupNode();
-            StudyAdapter studyAdapter = new StudyAdapter(studiesNode,
-                new StudyWrapper(siteAdapter.getAppService()));
-            AdapterBase
-                .openForm(new FormInput(studyAdapter), StudyEntryForm.ID);
+            StudyGroup.addStudy(siteAdapter);
         }
     };
 
