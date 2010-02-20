@@ -13,12 +13,15 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -215,6 +218,21 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected Composite createSectionWithClient(String title) {
         return sectionAddClient(createSection(title));
+    }
+
+    protected void addSectionToolbar(Section section, String tooltip,
+        SelectionListener listener) {
+        ToolBar tbar = (ToolBar) section.getTextClient();
+        if (tbar == null) {
+            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+            section.setTextClient(tbar);
+        }
+
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        titem.setToolTipText(tooltip);
+        titem.addSelectionListener(listener);
     }
 
     public FormToolkit getToolkit() {
