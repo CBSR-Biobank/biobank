@@ -14,6 +14,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -24,22 +25,26 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSampleSourceHelper;
 import edu.ualberta.med.biobank.test.internal.SampleHelper;
+import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -621,5 +626,30 @@ public class TestPatientVisit extends TestDatabase {
 
         list = visit.getPvSampleSourceCollection();
         Assert.assertEquals(2, list.size());
+    }
+
+    @Test
+    public void testAddNewSample() throws BiobankCheckException, Exception {
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate());
+
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, false);
+        SampleStorageWrapper ss1 = SampleStorageHelper.addSampleStorage(study,
+            DbHelper.chooseRandomlyInList(types));
+        SampleStorageWrapper ss2 = SampleStorageHelper.addSampleStorage(study,
+            DbHelper.chooseRandomlyInList(types));
+        SampleTypeWrapper sampleType = DbHelper.chooseRandomlyInList(types);
+        SampleStorageWrapper ss3 = SampleStorageHelper.newSampleStorage(study,
+            sampleType);
+        ss3.setVolume(3.0);
+        ss3.persist();
+        SampleWrapper newSample = visit.addNewSample("newid", sampleType,
+            Arrays.asList(ss1, ss2, ss3));
+        Sample dbSample = ModelUtils.getObjectWithId(appService, Sample.class,
+            newSample.getId());
+        Assert.assertEquals(dbSample.getSampleType().getId(), newSample
+            .getSampleType().getId());
+        Assert.assertTrue(dbSample.getQuantity().equals(3.0));
     }
 }
