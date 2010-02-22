@@ -36,6 +36,7 @@
 	<property name="biobank.importer.jar.files" value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
 
 	<property name="cacore.system.jar.files" value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
+	<property name="test.output" value="testing" />
 
 	<condition property="perl" value="perl" else="/usr/bin/perl">
 		<os family="windows" />
@@ -455,6 +456,67 @@
 			</fileset>
 			<report format="noframes" todir="${dest.dir.results}/html" />
 		</junitreport>
+	</target>
+
+	<property name="emma.dir" value="${req.jars.dir}" />
+
+	<path id="emma.lib">
+		<pathelement location="${emma.dir}/emma.jar" />
+		<pathelement location="${emma.dir}/emma_ant.jar" />
+	</path>
+
+	<target name="emma" description="turns on EMMA's on-the-fly instrumentation mode">
+		<property name="emma.enabled" value="true" />
+	</target>
+
+	<target name="test-emma" depends="tests-compile" description="executes test cases with code coverage">
+        <delete file="${test.output}/coverage.emma" />
+		<junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
+			<classpath refid="junit.class.path" />
+			<classpath refid="application.config.class.path" />
+			<classpath refid="common.lib.class.path" />
+			<classpath refid="test.class.path" />
+			<classpath refid="emma.lib" />
+
+			<formatter usefile="yes" type="brief" />
+
+			<!--test name="test.ualberta.med.biobank.AllTests" haltonfailure="no" outfile="result">
+                <formatter type="xml" />
+            </test-->
+
+			<batchtest todir="testing/raw">
+				<fileset dir="${eclipse.proj.dir.junit}/src">
+					<include name="**/Test*.java" />
+					<exclude name="**/TestCommon.java" />
+					<exclude name="**/TestDatabase.java" />
+					<exclude name="**/TestFunctionalities.java" />
+					<exclude name="**/AllTests.java" />
+				</fileset>
+				<formatter type="xml" />
+			</batchtest>
+
+			<jvmarg value="-Xbootclasspath/a:${emma.dir}/emma.jar" />
+			<jvmarg value="emmarun" />
+			<jvmarg value="-out" />
+			<jvmarg value="${test.output}/coverage.emma" />
+			<jvmarg value="-raw" />
+			<jvmarg value="-merge" />
+			<jvmarg value="yes" />
+			<jvmarg value="-ix" />
+			<jvmarg value="edu.ualberta.med.biobank.common.wrappers*" />
+		</junit>
+		<java classname="emma" fork="true">
+            <arg value="report" />
+            <arg value="-r" />
+            <arg value="html" />
+            <arg value="-sp" />
+            <arg value="eclipse_ws/biobank.common/src" />
+            <arg value="-in" />
+            <arg value="testing/coverage.emma" />
+	         <classpath>
+	           <pathelement path="${emma.dir}/emma.jar"/>
+	         </classpath>
+		</java>
 	</target>
 
 </project>
