@@ -75,6 +75,7 @@ public class ContainerHelper extends DbHelper {
      * @param parent The containers parent container.
      * @param site The site this container belongs to.
      * @param type The container type for this container.
+     * 
      * @return The container wrapper for the container.
      * @throws Exception Exception is thrown if a label is specified and the
      *             container is meant to be a child container. An exception is

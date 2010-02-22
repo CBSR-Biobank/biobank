@@ -51,6 +51,7 @@ Export-Package: antlr;
  antlr.preprocessor;uses:="antlr.collections.impl,antlr",
  edu.ualberta.med.biobank.common,
  edu.ualberta.med.biobank.common.cbsr,
+ edu.ualberta.med.biobank.common.debug,
  edu.ualberta.med.biobank.common.formatters,
  edu.ualberta.med.biobank.common.reports;uses:="gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.common.wrappers;

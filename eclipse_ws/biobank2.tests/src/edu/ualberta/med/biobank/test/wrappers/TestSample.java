@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -478,8 +479,8 @@ public class TestSample extends TestDatabase {
         sample.persist();
         SampleHelper.addSample(sampleType, null, pv, null, null);
 
-        SampleWrapper.getRandomSamplesAlreadyLinked(appService, siteId);
-        SampleWrapper.getRandomSamplesAlreadyAssigned(appService, siteId);
-        SampleWrapper.getRandomSamplesNotAssigned(appService, siteId);
+        DebugUtil.getRandomSamplesAlreadyLinked(appService, siteId);
+        DebugUtil.getRandomSamplesAlreadyAssigned(appService, siteId);
+        DebugUtil.getRandomSamplesNotAssigned(appService, siteId);
     }
 }
