@@ -65,7 +65,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
         String[] properties = getPropertyChangeNames();
-        if ((properties == null) && (properties.length == 0)) {
+        if ((properties == null) || (properties.length == 0)) {
             throw new RuntimeException("wrapper has not defined any properties");
         }
         List<String> propertiesList = Arrays.asList(properties);
