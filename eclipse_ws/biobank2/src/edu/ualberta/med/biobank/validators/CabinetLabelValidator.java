@@ -26,10 +26,10 @@ public class CabinetLabelValidator extends AbstractValidator {
         String v = (String) value;
         Matcher m = PATTERN.matcher(v);
         if (m.matches()) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 

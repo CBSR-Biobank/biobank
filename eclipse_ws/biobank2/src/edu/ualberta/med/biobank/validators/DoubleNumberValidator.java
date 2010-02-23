@@ -18,17 +18,17 @@ public class DoubleNumberValidator extends AbstractValidator {
     @Override
     public IStatus validate(Object value) {
         if (((String) value).length() == 0) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
         Matcher m = pattern.matcher((String) value);
         if (m.matches()) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 }

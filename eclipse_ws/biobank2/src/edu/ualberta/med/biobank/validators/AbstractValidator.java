@@ -8,7 +8,7 @@ public abstract class AbstractValidator implements IValidator {
 
     protected final String errorMessage;
 
-    protected ControlDecoration controlDecoration;
+    private ControlDecoration controlDecoration;
 
     public AbstractValidator(String message) {
         super();
@@ -21,6 +21,18 @@ public abstract class AbstractValidator implements IValidator {
 
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    protected void hideDecoration() {
+        if (controlDecoration != null) {
+            controlDecoration.hide();
+        }
+    }
+
+    protected void showDecoration() {
+        if (controlDecoration != null) {
+            controlDecoration.show();
+        }
     }
 
     @Override

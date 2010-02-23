@@ -33,10 +33,10 @@ public class CabinetInventoryIDValidator extends AbstractValidator {
             matches = matches || PATTERN2.matcher(v).matches();
         }
         if (matches) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 

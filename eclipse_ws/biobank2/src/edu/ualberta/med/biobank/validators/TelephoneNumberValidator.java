@@ -22,7 +22,7 @@ public class TelephoneNumberValidator extends AbstractValidator {
         int numDigits = 0;
 
         if (len == 0) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
@@ -33,11 +33,11 @@ public class TelephoneNumberValidator extends AbstractValidator {
         }
 
         if (numDigits >= 10) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 }

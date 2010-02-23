@@ -22,11 +22,11 @@ public class ScannerBarcodeValidator extends AbstractValidator {
         String barcode = (String) value;
         if (barcode.length() != 0
             && BioBankPlugin.getDefault().isValidPlateBarcode(barcode)) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 

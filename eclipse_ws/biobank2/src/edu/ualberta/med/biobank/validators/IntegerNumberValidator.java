@@ -25,27 +25,27 @@ public class IntegerNumberValidator extends AbstractValidator {
     @Override
     public IStatus validate(Object value) {
         if ((value == null) || (value instanceof Integer)) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
         if (((String) value).length() == 0) {
             if (allowEmpty) {
-                controlDecoration.hide();
+                hideDecoration();
                 return Status.OK_STATUS;
             } else {
-                controlDecoration.show();
+                showDecoration();
                 return ValidationStatus.error(errorMessage);
             }
         }
 
         Matcher m = pattern.matcher((String) value);
         if (m.matches()) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 

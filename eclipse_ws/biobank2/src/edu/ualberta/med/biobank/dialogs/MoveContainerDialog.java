@@ -73,10 +73,10 @@ public class MoveContainerDialog extends BiobankDialog {
                 String v = (String) value;
                 Matcher m = PATTERN.matcher(v);
                 if (m.matches()) {
-                    controlDecoration.hide();
+                    hideDecoration();
                     return Status.OK_STATUS;
                 }
-                controlDecoration.show();
+                showDecoration();
                 return ValidationStatus
                     .error("Destination label must be another container (4 characters minimum).");
             }

@@ -18,11 +18,10 @@ public class NonEmptyStringValidator extends AbstractValidator {
         }
 
         if (((String) value).length() != 0) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
-
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 
