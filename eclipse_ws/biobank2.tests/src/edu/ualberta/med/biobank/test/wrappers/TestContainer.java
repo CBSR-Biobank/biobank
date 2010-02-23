@@ -44,6 +44,9 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestContainer extends TestDatabase {
+
+    private final String CBSR_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
     private static final int CONTAINER_TOP_ROWS = 5;
 
     private static final int CONTAINER_TOP_COLS = 9;
@@ -1059,34 +1062,57 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(childrenMap.size() == 1);
         Assert.assertEquals(childrenMap.get(new RowColPos(0, 1)), childL3_2);
         Assert.assertEquals(childL2.getChild(0, 1), childL3_2);
+    }
 
-        // clean up for next test
-        childL3_2.delete();
-        childL2.reload();
+    private void testGetChilddByLabel(ContainerWrapper container)
+        throws Exception {
+        ContainerWrapper child;
 
-        // test getChildByLabel()
-        ContainerTypeWrapper childCtL3 = containerTypeMap.get("ChildCtL3");
+        String label;
+        int labelingScheme = container.getContainerType()
+            .getChildLabelingScheme();
 
-        for (int row = 0, maxRow = childL2.getRowCapacity(); row < maxRow; ++row) {
-            for (int col = 0, maxCol = childL2.getColCapacity(); col < maxCol; ++col) {
-                Assert.assertNull(childL2.getChild(row, col));
-                childL3 = ContainerHelper.addContainer(null, TestCommon
-                    .getNewBarcode(r), childL2, site, childCtL3, row, col);
-                childL2.reload();
-
+        for (int row = 0, maxRow = container.getRowCapacity(); row < maxRow; ++row) {
+            for (int col = 0, maxCol = container.getColCapacity(); col < maxCol; ++col) {
                 // label does not contain parent's label
-                String label = String.format("%c%d", 'A' + row, col + 1);
-                Assert.assertEquals(childL3, childL2.getChildByLabel(label));
+                switch (labelingScheme) {
+                case 1:
+                    label = String.format("%c%d", 'A' + row, col + 1);
+                    break;
+                case 2:
+                    int sum = row + col * maxRow;
+                    label = "" + CBSR_ALPHA.charAt(sum / CBSR_ALPHA.length())
+                        + CBSR_ALPHA.charAt(sum % CBSR_ALPHA.length());
+                    break;
+                case 3:
+                default:
+                    label = String.format("%02d", row + col * maxRow + 1);
+                }
+                child = container.getChild(row, col);
+                Assert.assertEquals(child, container.getChildByLabel(label));
 
                 // add parent's label
-                label = childL2.getLabel() + label;
-                Assert.assertEquals(childL3, childL2.getChildByLabel(label));
-
-                childL3.delete();
-                childL2.reload();
-                Assert.assertNull(childL2.getChild(row, col));
+                label = container.getLabel() + label;
+                Assert.assertEquals(child, container.getChildByLabel(label));
             }
         }
+
+    }
+
+    @Test
+    public void testGetChilddByLabel() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        // test getChildByLabel()
+        top.initChildrenWithType(containerTypeMap.get("ChildCtL1"), null);
+        top.getChild(0, 0).initChildrenWithType(
+            containerTypeMap.get("ChildCtL2"), null);
+        top.getChild(0, 0).getChild(0, 0).initChildrenWithType(
+            containerTypeMap.get("ChildCtL3"), null);
+
+        testGetChilddByLabel(top);
+        testGetChilddByLabel(top.getChild(0, 0));
+        testGetChilddByLabel(top.getChild(0, 0).getChild(0, 0));
     }
 
     @Test

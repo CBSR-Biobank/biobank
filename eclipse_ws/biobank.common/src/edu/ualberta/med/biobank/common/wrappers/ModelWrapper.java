@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
+        String[] properties = getPropertyChangeNames();
+        if ((properties == null) && (properties.length == 0)) {
+            throw new RuntimeException("wrapper has not defined any properties");
+        }
+        List<String> propertiesList = Arrays.asList(properties);
+        if (!propertiesList.contains(propertyName)) {
+            throw new RuntimeException("invalid property: " + propertyName);
+        }
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
@@ -279,16 +288,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (getId() != null)
             return getId().hashCode();
         return 0;
-    }
-
-    /**
-     * return the list of all objects of the database of this type
-     */
-    protected List<E> getAllObjects() throws Exception {
-        Class<E> classType = getWrappedClass();
-        Constructor<E> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        return appService.search(classType, instance);
     }
 
     /**

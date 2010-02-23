@@ -42,7 +42,7 @@ public class TestSampleSource extends TestDatabase {
         }
         ssw.reload();
         List<StudyWrapper> foundStudies = new ArrayList<StudyWrapper>(ssw
-            .getStudyCollection(false));
+            .getStudyCollection(true));
         Assert.assertEquals(studies.size(), foundStudies.size());
         for (StudyWrapper study : studies) {
             Assert.assertTrue(foundStudies.contains(study));

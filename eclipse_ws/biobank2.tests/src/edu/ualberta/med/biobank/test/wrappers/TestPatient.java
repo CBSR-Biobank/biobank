@@ -207,8 +207,10 @@ public class TestPatient extends TestDatabase {
 
     @Test
     public void testGetStudy() throws Exception {
-        PatientWrapper patient = PatientHelper.addPatient(Utils
-            .getRandomNumericString(20), study);
+        PatientWrapper patient = new PatientWrapper(appService);
+        Assert.assertNull(patient.getStudy());
+        patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
+            study);
         Assert.assertEquals(study, patient.getStudy());
     }
 
@@ -292,9 +294,15 @@ public class TestPatient extends TestDatabase {
             shipment, Utils.getRandomDate());
         patient.addPatientVisits(Arrays.asList(visit));
         patient.persist();
-
         patient.reload();
         Assert.assertEquals(1, patient.getPatientVisitCollection().size());
+
+        visit = PatientVisitHelper.newPatientVisit(patient, shipment, Utils
+            .getRandomDate());
+        patient.addPatientVisits(Arrays.asList(visit));
+        patient.persist();
+        patient.reload();
+        Assert.assertEquals(2, patient.getPatientVisitCollection().size());
     }
 
     @Test
@@ -305,6 +313,10 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient2 = PatientWrapper.getPatientInSite(appService,
             pnumber, site);
         Assert.assertEquals(patient, patient2);
+
+        PatientWrapper patient3 = PatientWrapper.getPatientInSite(appService,
+            Utils.getRandomNumericString(20), site);
+        Assert.assertNull(patient3);
     }
 
     @Test
@@ -322,7 +334,8 @@ public class TestPatient extends TestDatabase {
         }
         patient.reload();
 
-        List<ShipmentWrapper> savedShipments = patient.getShipmentCollection();
+        List<ShipmentWrapper> savedShipments = patient
+            .getShipmentCollection(true);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (ShipmentWrapper shipment : savedShipments) {
             Assert.assertTrue(shipments.contains(shipment));

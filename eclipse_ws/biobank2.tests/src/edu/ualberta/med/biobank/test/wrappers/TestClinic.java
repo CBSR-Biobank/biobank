@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -601,5 +604,49 @@ public class TestClinic extends TestDatabase {
 
         shipFound = clinic.getShipment(new Date(), patient1.getPnumber());
         Assert.assertNull(shipFound);
+    }
+
+    @Test
+    public void testGetPatientCount() throws Exception {
+        String name = "testGetPatientCount" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name + "2");
+
+        StudyWrapper study = StudyHelper.addStudy(clinic1.getSite(), name);
+        study.addContacts(Arrays.asList(contact1, contact2));
+        study.persist();
+
+        PatientWrapper patient;
+        List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
+        Map<ClinicWrapper, List<PatientWrapper>> patientMap = new HashMap<ClinicWrapper, List<PatientWrapper>>();
+
+        for (ClinicWrapper clinic : clinics) {
+            patientMap.put(clinic, new ArrayList<PatientWrapper>());
+        }
+
+        // add patients
+        for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
+            patient = PatientHelper.addPatient(name + "_p" + i, study);
+
+            ClinicWrapper clinic = clinics.get(i & 1);
+            patientMap.get(clinic).add(patient);
+            ShipmentHelper.addShipment(clinic, patient);
+            Assert.assertEquals(patientMap.get(clinic).size(), clinic
+                .getPatientCount());
+        }
+
+        // delete patients
+        for (ClinicWrapper clinic : clinics) {
+            while (patientMap.get(clinic).size() > 0) {
+                patient = patientMap.get(clinic).get(0);
+                patient.delete();
+                patientMap.get(clinic).remove(0);
+                Assert.assertEquals(patientMap.get(clinic).size(), clinic
+                    .getPatientCount());
+            }
+        }
     }
 }
