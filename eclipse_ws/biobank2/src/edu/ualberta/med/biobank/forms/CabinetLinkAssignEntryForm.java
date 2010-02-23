@@ -468,8 +468,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         positionText.setText(sampleWrapper.getPositionString(true, false));
         viewerSampleTypes.setSelection(new StructuredSelection(sampleWrapper
             .getSampleType()));
+        String posStr = sampleWrapper.getPositionString();
+        if (posStr == null) {
+            posStr = "none";
+        }
         appendLog("Sample " + sampleWrapper.getInventoryId()
-            + ": current position = " + sampleWrapper.getPositionString());
+            + ": current position = " + posStr);
     }
 
     private void showPositions() {
@@ -557,15 +561,18 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             sampleWrapper.setQuantityFromType();
         }
         sampleWrapper.persist();
+        String posStr = sampleWrapper.getPositionString();
+        if (posStr == null) {
+            posStr = "none";
+        }
         if (radioNew.getSelection()) {
             appendLog("Sample " + sampleWrapper.getInventoryId()
-                + " saved in position " + sampleWrapper.getPositionString()
-                + " for visit "
+                + " saved in position " + posStr + " for visit "
                 + sampleWrapper.getPatientVisit().getFormattedDateProcessed()
                 + "(patient " + currentPatient.getPnumber() + ")");
         } else {
             appendLog("Sample " + sampleWrapper.getInventoryId()
-                + " moved to position " + sampleWrapper.getPositionString());
+                + " moved to position " + posStr);
         }
         setSaved(true);
     }

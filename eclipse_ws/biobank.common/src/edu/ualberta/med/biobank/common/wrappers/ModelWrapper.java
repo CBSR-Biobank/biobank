@@ -41,9 +41,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         try {
             this.wrappedObject = getNewObject();
         } catch (Exception e) {
-            throw new RuntimeException(
-                "was not able to create new object of type "
-                    + getWrappedClass().getName());
+            Class<E> classType = getWrappedClass();
+            if (classType != null) {
+                throw new RuntimeException(
+                    "was not able to create new object of type "
+                        + classType.getName());
+            } else {
+                throw new RuntimeException("was not able to create new object");
+            }
         }
     }
 
@@ -159,7 +164,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         } else {
             query = new UpdateExampleQuery(wrappedObject);
             origObject = getObjectFromDatabase();
-
         }
         persistDependencies(origObject);
         SDKQueryResult result = appService.executeQuery(query);

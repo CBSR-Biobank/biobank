@@ -96,7 +96,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         }
 
         ContainerPathWrapper path = getContainerPath(appService, container);
-        if (path != null) {
+        if ((path != null) && (isNew() || !getId().equals(path.getId()))) {
             throw new BiobankCheckException("path already in database");
         }
     }

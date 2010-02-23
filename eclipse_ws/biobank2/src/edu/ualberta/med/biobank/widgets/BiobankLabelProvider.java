@@ -63,7 +63,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return sample.getSampleType() == null ? "" : sample
                     .getSampleType().getName();
             case 2:
-                return sample.getPositionString();
+                String position = sample.getPositionString();
+                return (position != null) ? position : "none";
             case 3:
                 return sample.getLinkDate() == null ? "" : DateFormatter
                     .formatAsDateTime(sample.getLinkDate());

@@ -90,11 +90,11 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         return pos.getParent();
     }
 
-    public void setParent(ContainerWrapper parent) {
+    public void setParent(ContainerWrapper container) {
         ContainerWrapper oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
-        pos.setParent(parent);
-        propertyChangeSupport.firePropertyChange("parent", oldValue, parent);
+        pos.setParent(container);
+        propertyChangeSupport.firePropertyChange("parent", oldValue, container);
     }
 
     public boolean hasParent() {

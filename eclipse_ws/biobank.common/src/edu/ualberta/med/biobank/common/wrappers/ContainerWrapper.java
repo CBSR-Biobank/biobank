@@ -96,7 +96,7 @@ public class ContainerWrapper extends
         ContainerWrapper parent = getParent();
         boolean labelChanged = false;
         if (parent == null) {
-            if (origObject != null && getLabel() != null
+            if ((origObject != null) && (getLabel() != null)
                 && !getLabel().equals(origObject.getLabel())) {
                 labelChanged = true;
             }
@@ -162,11 +162,12 @@ public class ContainerWrapper extends
     }
 
     private void persistPath() throws Exception {
-        ContainerPathWrapper containerPath = getContainerPath();
+        ContainerPathWrapper containerPath = ContainerPathWrapper
+            .getContainerPath(appService, this);
         if (containerPath == null) {
             containerPath = new ContainerPathWrapper(appService);
+            containerPath.setContainer(this);
         }
-        containerPath.setContainer(this);
         containerPath.persist();
     }
 
@@ -832,9 +833,10 @@ public class ContainerWrapper extends
     }
 
     /**
-     * Initialise children at given position with the given type (except
-     * children already initialised). If the positions list is null, initialise
-     * all the children
+     * Initialise children at given position with the given type. If the
+     * positions list is null, initialise all the children. <strong>If a
+     * position is already filled then it is skipped and no changes are made to
+     * it</strong>.
      * 
      * @return true if at least one children has been initialised
      * @throws BiobankCheckException
@@ -847,18 +849,18 @@ public class ContainerWrapper extends
             for (int i = 0; i < getContainerType().getRowCapacity().intValue(); i++) {
                 for (int j = 0; j < getContainerType().getColCapacity()
                     .intValue(); j++) {
-                    initPosition(type, i, j);
+                    initPositionIfEmpty(type, i, j);
                 }
             }
         } else {
             for (RowColPos rcp : positions) {
-                initPosition(type, rcp.row, rcp.col);
+                initPositionIfEmpty(type, rcp.row, rcp.col);
             }
         }
         reload();
     }
 
-    private void initPosition(ContainerTypeWrapper type, int i, int j)
+    private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
         throws Exception {
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {

@@ -36,7 +36,8 @@
 	<property name="biobank.importer.jar.files" value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
 
 	<property name="cacore.system.jar.files" value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
-	<property name="test.output" value="testing" />
+	<property name="test.output" location="testing" />
+    <property name="converage.output" location="coverage" />
 
 	<condition property="perl" value="perl" else="/usr/bin/perl">
 		<os family="windows" />
@@ -456,6 +457,7 @@
 			</fileset>
 			<report format="noframes" todir="${dest.dir.results}/html" />
 		</junitreport>
+        <echo message="test report: file://${test.output}/html/junit-noframes.html" />
 	</target>
 
 	<property name="emma.dir" value="${req.jars.dir}" />
@@ -503,8 +505,14 @@
 			<jvmarg value="-merge" />
 			<jvmarg value="yes" />
 			<jvmarg value="-ix" />
-			<jvmarg value="edu.ualberta.med.biobank.common.wrappers*" />
+			<jvmarg value="edu.ualberta.med.biobank.common*" />
 		</junit>
+        <junitreport todir="${dest.dir.results}">
+            <fileset dir="${dest.dir.results.raw}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="noframes" todir="${dest.dir.results}/html" />
+        </junitreport>
 		<java classname="emma" fork="true">
             <arg value="report" />
             <arg value="-r" />
@@ -517,6 +525,8 @@
 	           <pathelement path="${emma.dir}/emma.jar"/>
 	         </classpath>
 		</java>
+        <echo message="test report: file://${test.output}/html/junit-noframes.html" />
+        <echo message="coverage report: file://${converage.output}/index.html" />
 	</target>
 
 </project>

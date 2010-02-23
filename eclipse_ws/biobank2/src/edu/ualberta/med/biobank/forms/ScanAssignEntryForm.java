@@ -482,6 +482,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     // the scanned sample has already a position but a different
                     // one - ie MOVED
                     String expectedPosition = foundSample.getPositionString();
+                    if (expectedPosition == null) {
+                        expectedPosition = "none";
+                    }
                     String info = "Aliquot registered on another pallet with position "
                         + expectedPosition;
                     String logMsg = "aliquot " + value
@@ -555,8 +558,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                         sample.setParent(currentPalletWrapper);
                         sample.persist();
                         PatientVisitWrapper visit = sample.getPatientVisit();
-                        sb.append("\nASSIGNED position ").append(
-                            sample.getPositionString());
+                        String posStr = sample.getPositionString();
+                        if (posStr == null) {
+                            posStr = "none";
+                        }
+                        sb.append("\nASSIGNED position ").append(posStr);
                         sb.append(" to aliquot ").append(cell.getValue());
                         sb.append(" - Type: ").append(
                             sample.getSampleType().getName());

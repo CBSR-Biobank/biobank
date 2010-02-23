@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +50,12 @@ public class TestPvSampleSource extends TestDatabase {
 
     @Test
     public void testGetSetSampleSource() throws Exception {
+        PvSampleSourceWrapper pvss = new PvSampleSourceWrapper(appService);
+        Assert.assertNull(pvss.getSampleSource());
+
+        pvss.setSampleSource(null);
+        Assert.assertNull(pvss.getSampleSource());
+
         SampleSourceWrapper oldSource = pvSampleSource.getSampleSource();
         String name = "testGetSetSampleSource" + r.nextInt();
         SampleSourceWrapper newSampleSource = SampleSourceHelper
@@ -64,6 +73,9 @@ public class TestPvSampleSource extends TestDatabase {
 
     @Test
     public void testGetSetPatientVisit() throws Exception {
+        PvSampleSourceWrapper pvss = new PvSampleSourceWrapper(appService);
+        Assert.assertNull(pvss.getPatientVisit());
+
         PatientVisitWrapper oldPv = pvSampleSource.getPatientVisit();
         PatientVisitWrapper newPv = PatientVisitHelper.addPatientVisit(oldPv
             .getPatient(), oldPv.getShipment(), Utils.getRandomDate());
@@ -75,6 +87,16 @@ public class TestPvSampleSource extends TestDatabase {
         Assert.assertTrue(pv != null);
         Assert.assertFalse(oldPv.equals(pvSampleSource.getPatientVisit()));
         Assert.assertEquals(pvSampleSource.getPatientVisit(), newPv);
+    }
+
+    @Test
+    public void testGetDateDrawn() throws Exception {
+        Date date = Utils.getRandomDate();
+        pvSampleSource.setDateDrawn(date);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Assert.assertTrue(sdf.format(date).equals(
+            pvSampleSource.getFormattedDateDrawn()));
     }
 
     @Test

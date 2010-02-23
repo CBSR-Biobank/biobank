@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -27,6 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -419,6 +422,20 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
+    public void testGetPath() throws Exception {
+        ContainerWrapper top, child;
+
+        top = containerMap.get("Top");
+        child = ContainerHelper.newContainer(null, "uvwxyz", top, site,
+            containerTypeMap.get("ChildCtL1"), 0, 0);
+        Assert.assertNull(child.getPath());
+        child.persist();
+        child.reload();
+        String expectedPath = top.getId() + "/" + child.getId();
+        Assert.assertEquals(expectedPath, child.getPath());
+    }
+
+    @Test
     public void testReset() throws Exception {
         ContainerWrapper container = ContainerHelper.addContainer("05",
             TestCommon.getNewBarcode(r), null, site, containerTypeMap
@@ -804,14 +821,24 @@ public class TestContainer extends TestDatabase {
         // reload because we changed container type
         childL3.reload();
         PatientVisitWrapper pv = addPatientVisit();
+        SampleWrapper sample;
+
         for (SampleTypeWrapper st : allSampleTypes) {
-            SampleWrapper sample = SampleHelper
-                .newSample(st, childL3, pv, 0, 0);
+            sample = SampleHelper.newSample(st, childL3, pv, 0, 0);
             if (selectedSampleTypes.contains(st)) {
                 Assert.assertTrue(childL3.canHoldSample(sample));
             } else {
                 Assert.assertTrue(!childL3.canHoldSample(sample));
             }
+        }
+
+        sample = SampleHelper.newSample(null, childL3, pv, 0, 0);
+        try {
+            childL3.canHoldSample(sample);
+            Assert
+                .fail("should not be allowed to add sample with null sample type");
+        } catch (WrapperException e) {
+            Assert.assertTrue(true);
         }
     }
 
@@ -848,12 +875,14 @@ public class TestContainer extends TestDatabase {
         SampleTypeWrapper sampleType;
 
         ContainerWrapper childL3 = containerMap.get("ChildL3");
-        for (int row = 0, n = selectedSampleTypes.size(); row < CONTAINER_CHILD_L3_ROWS; ++row) {
-            for (int col = 0; col < CONTAINER_CHILD_L3_COLS; ++col) {
+        for (int row = 0, maxRow = childL3.getRowCapacity(), n = selectedSampleTypes
+            .size(); row < maxRow; ++row) {
+            for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
                 if ((row == 1) && (col == 1)) {
                     // attempt to add invalid sample type
                     sampleType = unselectedSampleTypes.get(r
                         .nextInt(unselectedSampleTypes.size()));
+                    Assert.assertNull(childL3.getSample(row, col));
                     try {
                         childL3.addSample(row, col, SampleHelper
                             .newSample(sampleType));
@@ -900,12 +929,14 @@ public class TestContainer extends TestDatabase {
                 .getSampleType());
         }
 
-        for (int row = 0; row < CONTAINER_CHILD_L3_ROWS; ++row) {
-            for (int col = 0; col < CONTAINER_CHILD_L3_COLS; ++col) {
+        for (int row = 0, maxRow = childL3.getRowCapacity(); row < maxRow; ++row) {
+            for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
                 SampleWrapper sample = childL3.getSample(row, col);
                 Assert.assertEquals(samplesTypesMap
                     .get(new RowColPos(row, col)), sample.getSampleType());
-
+                sample.delete();
+                childL3.reload();
+                Assert.assertNull(childL3.getSample(row, col));
             }
         }
 
@@ -1028,6 +1059,34 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(childrenMap.size() == 1);
         Assert.assertEquals(childrenMap.get(new RowColPos(0, 1)), childL3_2);
         Assert.assertEquals(childL2.getChild(0, 1), childL3_2);
+
+        // clean up for next test
+        childL3_2.delete();
+        childL2.reload();
+
+        // test getChildByLabel()
+        ContainerTypeWrapper childCtL3 = containerTypeMap.get("ChildCtL3");
+
+        for (int row = 0, maxRow = childL2.getRowCapacity(); row < maxRow; ++row) {
+            for (int col = 0, maxCol = childL2.getColCapacity(); col < maxCol; ++col) {
+                Assert.assertNull(childL2.getChild(row, col));
+                childL3 = ContainerHelper.addContainer(null, TestCommon
+                    .getNewBarcode(r), childL2, site, childCtL3, row, col);
+                childL2.reload();
+
+                // label does not contain parent's label
+                String label = String.format("%c%d", 'A' + row, col + 1);
+                Assert.assertEquals(childL3, childL2.getChildByLabel(label));
+
+                // add parent's label
+                label = childL2.getLabel() + label;
+                Assert.assertEquals(childL3, childL2.getChildByLabel(label));
+
+                childL3.delete();
+                childL2.reload();
+                Assert.assertNull(childL2.getChild(row, col));
+            }
+        }
     }
 
     @Test
@@ -1056,10 +1115,10 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testInitChildrenWithType() throws Exception {
-        ContainerWrapper top;
+        ContainerWrapper top, child;
 
         top = containerMap.get("Top");
-        addContainerHierarchy(top);
+        addContainerHierarchy(top, null, 1);
 
         // create a new child type to go under top level container
         ContainerTypeWrapper childType1_2 = ContainerTypeHelper
@@ -1088,6 +1147,21 @@ public class TestContainer extends TestDatabase {
                 Assert.assertTrue(container.getContainerType().equals(
                     childType1_2));
             }
+            container.delete();
+        }
+
+        top.reload();
+        Set<RowColPos> positions = new HashSet<RowColPos>();
+        positions.add(new RowColPos(0, 0));
+        positions.add(new RowColPos(0, 1));
+        positions.add(new RowColPos(1, 0));
+        positions.add(new RowColPos(1, 1));
+        top.initChildrenWithType(childType1_2, positions);
+
+        for (RowColPos pos : positions) {
+            child = top.getChild(pos);
+            Assert.assertNotNull(child);
+            Assert.assertEquals(childType1_2, child.getContainerType());
         }
     }
 
@@ -1473,5 +1547,19 @@ public class TestContainer extends TestDatabase {
         Assert.assertFalse(child2Label.equals(child2.getLabel()));
         Assert.assertEquals(child.getLabel() + endChild2Label, child2
             .getLabel());
+    }
+
+    @Test
+    public void testInitObjectWith() throws Exception {
+        ContainerWrapper container = new ContainerWrapper(appService);
+        try {
+            container.initObjectWith(null);
+            Assert
+                .fail("should not be allowed to add initialize container with null wrapper");
+        } catch (WrapperException e) {
+            Assert.assertTrue(true);
+        }
+
+        container.initObjectWith(containerMap.get("Top"));
     }
 }

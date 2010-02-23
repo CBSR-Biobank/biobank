@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Assert;
@@ -164,6 +166,16 @@ public class TestSample extends TestDatabase {
 
         sample.setSampleType(oldSampleType);
         sample.persist();
+
+        ContainerWrapper container = new ContainerWrapper(appService);
+        SampleWrapper sample = new SampleWrapper(appService);
+        sample.setParent(container);
+        try {
+            sample.persist();
+            Assert.fail("container has no container type");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -250,6 +262,17 @@ public class TestSample extends TestDatabase {
         } catch (Exception bce) {
             Assert.assertTrue(true);
         }
+
+        SampleWrapper sample = new SampleWrapper(appService);
+        Assert.assertNull(sample.getPositionString());
+    }
+
+    @Test
+    public void testGetSite() {
+        Assert.assertEquals(siteId, sample.getSite().getId());
+
+        SampleWrapper sample1 = new SampleWrapper(appService);
+        Assert.assertNull(sample1.getSite());
     }
 
     @Test
@@ -306,12 +329,16 @@ public class TestSample extends TestDatabase {
     @Test
     public void testGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = sample.getSampleType();
-        SampleTypeWrapper newStw = SampleTypeHelper.addSampleType(sample
+        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(sample
             .getSite(), "newStw");
         stw.persist();
-        Assert.assertTrue(stw.getId() != newStw.getId());
-        sample.setSampleType(newStw);
-        Assert.assertTrue(newStw.getId() == sample.getSampleType().getId());
+        Assert.assertTrue(stw.getId() != newType.getId());
+        sample.setSampleType(newType);
+        Assert.assertTrue(newType.getId() == sample.getSampleType().getId());
+
+        SampleWrapper sample1 = new SampleWrapper(appService);
+        sample1.setSampleType(null);
+        Assert.assertNull(sample1.getSampleType());
     }
 
     @Test
@@ -342,6 +369,16 @@ public class TestSample extends TestDatabase {
         // should be 3
         sample.setQuantityFromType();
         Assert.assertTrue(sample.getQuantity().equals(3.0));
+    }
+
+    @Test
+    public void testGetFormattedLinkDate() throws Exception {
+        Date date = Utils.getRandomDate();
+        sample.setLinkDate(date);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Assert.assertTrue(sdf.format(date)
+            .equals(sample.getFormattedLinkDate()));
     }
 
     @Test
