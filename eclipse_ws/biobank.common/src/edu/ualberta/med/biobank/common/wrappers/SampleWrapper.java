@@ -252,7 +252,7 @@ public class SampleWrapper extends
         boolean addTopParentShortName) {
         RowColPos position = getPosition();
         if (position == null) {
-            return "none";
+            return null;
         }
 
         if (!fullString) {

@@ -55,6 +55,9 @@ public class TestSampleStorage extends TestDatabase {
 
         Assert.assertEquals(newStudy, sampleStorage.getStudy());
         Assert.assertFalse(study.equals(sampleStorage.getStudy()));
+
+        sampleStorage = new SampleStorageWrapper(appService);
+        Assert.assertNull(sampleStorage.getStudy());
     }
 
     @Test
@@ -77,6 +80,9 @@ public class TestSampleStorage extends TestDatabase {
 
         Assert.assertEquals(newType, sampleStorage.getSampleType());
         Assert.assertFalse(type.equals(sampleStorage.getSampleType()));
+
+        sampleStorage = new SampleStorageWrapper(appService);
+        Assert.assertNull(sampleStorage.getSampleType());
     }
 
     @Test
@@ -202,6 +208,9 @@ public class TestSampleStorage extends TestDatabase {
         study.delete();
         // FIXME this test is failing when the study has a patient. Should find
         // why !
+        //
+        // it seems like hibernate forgets about the cascade setting for
+        // this association . NL
         Assert.assertEquals(nbSampleStorage, appService.search(
             SampleStorage.class, new SampleStorage()).size());
     }

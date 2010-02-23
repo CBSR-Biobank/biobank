@@ -109,8 +109,18 @@ public class TestModelWrapper extends TestDatabase {
             public void propertyChange(PropertyChangeEvent arg0) {
             }
         };
-        wrapper.addPropertyChangeListener("propertyX", listener);
-        wrapper.removePropertyChangeListener(listener);
+
+        try {
+            wrapper.addPropertyChangeListener("propertyX", listener);
+            Assert
+                .fail("should not be allowed to create listener for non exisiting property");
+        } catch (RuntimeException e) {
+            Assert.assertTrue(true);
+        }
+
+        SiteWrapper site = SiteHelper.addSite("testPropertyChangeListener");
+        site.addPropertyChangeListener("name", listener);
+        site.removePropertyChangeListener(listener);
     }
 
     @Test
@@ -192,5 +202,10 @@ public class TestModelWrapper extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite("testEquals");
         site.setName(Utils.getRandomString(10, 15));
         site.reset();
+    }
+
+    @Test
+    public void testGetAllObjects() throws Exception {
+
     }
 }
