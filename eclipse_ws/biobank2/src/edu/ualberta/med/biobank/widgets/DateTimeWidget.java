@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
- * Wrapper for around Nebula's CDateTime widget.
+ * Wrapper around Nebula's CDateTime widget.
  * 
  * HISTORY
  * 

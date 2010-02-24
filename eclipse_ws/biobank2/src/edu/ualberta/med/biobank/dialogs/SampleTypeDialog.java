@@ -25,13 +25,17 @@ public class SampleTypeDialog extends BiobankDialog {
     // this is the object that is modified via the bound widgets
     private SampleTypeWrapper sampleType;
 
-    public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType) {
+    private String message;
+
+    public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType,
+        String message) {
         super(parent);
         Assert.isNotNull(sampleType);
         origSampleType = sampleType;
         this.sampleType = new SampleTypeWrapper(sampleType.getAppService());
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
+        this.message = message;
     }
 
     @Override
@@ -46,11 +50,10 @@ public class SampleTypeDialog extends BiobankDialog {
         Control contents = super.createContents(parent);
         if (origSampleType.isNew()) {
             setTitle("Add Sample Type");
-            setMessage("Enter the information for the new sample type");
         } else {
             setTitle("Edit Sample Type");
-            setMessage("Edit the information for the sample type");
         }
+        setMessage(message);
         return contents;
     }
 
