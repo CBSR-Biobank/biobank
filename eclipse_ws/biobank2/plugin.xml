@@ -190,6 +190,9 @@
             id="edu.ualberta.med.biobank.commands.sessionReload"
             name="Session Reload">
       </command>
+      <command id="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
+            name="Delete tree view selection">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -461,6 +464,17 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
             commandId="edu.ualberta.med.biobank.commands.sessionReload">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SessionDeleteSelectionHandler"      
+            commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection">
          <activeWhen>
             <and>
                <reference
@@ -944,9 +958,16 @@
          </toolbar>
       </menuContribution>
       <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+            locationURI="toolbar:edu.ualberta.med.biobank.toolbar.view">
          <toolbar
                id="edu.ualberta.med.biobank.views.SessionsView">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.sessionReload"
                   icon="icons/reload.png"
