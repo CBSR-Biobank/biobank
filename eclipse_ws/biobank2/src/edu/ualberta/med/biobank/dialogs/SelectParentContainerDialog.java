@@ -3,21 +3,19 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
 /**
@@ -39,38 +37,36 @@ public class SelectParentContainerDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        String title = "Selecting new parent container";
+        String title = "Select Parent Container";
         shell.setText(title);
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
-        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-        Label label = new Label(contents, SWT.NONE);
-        label.setText("Available Parents: ");
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.LEFT;
-        gd.verticalAlignment = SWT.TOP;
-
-        label.setLayoutData(gd);
-        createCombo(contents);
-
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitle("Multiple Parents are Possible");
+        setMessage("Select the appropriate parent container");
         return contents;
     }
 
-    private void createCombo(Composite parent) {
-        comboViewer = new ComboViewer(parent);
-        comboViewer.setContentProvider(new ArrayContentProvider());
+    @Override
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        comboViewer = getWidgetCreator()
+            .createComboViewerWithNoSelectionValidator(contents,
+                "Select parent", containers, null,
+                "A source vessel should be selected");
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((ContainerWrapper) element).getLabel() + " ("
-                    + ((ContainerWrapper) element).getContainerType().getName()
-                    + ")";
+                ContainerWrapper container = (ContainerWrapper) element;
+                return container.getLabel() + " ("
+                    + container.getContainerType().getNameShort() + ")";
             }
         });
         comboViewer
@@ -80,10 +76,6 @@ public class SelectParentContainerDialog extends BiobankDialog {
                     saveSelectedContainer();
                 }
             });
-        comboViewer.setComparator(new ViewerComparator());
-        comboViewer.setInput(containers);
-        comboViewer.getCombo().select(0);
-        saveSelectedContainer();
     }
 
     private void saveSelectedContainer() {

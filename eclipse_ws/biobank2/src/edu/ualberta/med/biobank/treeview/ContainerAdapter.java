@@ -137,25 +137,36 @@ public class ContainerAdapter extends AdapterBase {
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newParentContainerLabel);
         if (newParentContainers.size() == 0) {
-            // invalid parent
-            throw new Exception(
-                "Unable to find suitable parent container with label "
-                    + newParentContainerLabel + ".");
-        } else {
-            ContainerWrapper newParent = newParentContainers.get(0);
-            if (newParentContainers.size() > 1) {
-                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), newParentContainers);
-                if (dlg.open() == Dialog.OK) {
-                    newParent = dlg.getSelectedContainer();
-                } else
-                    return;
-            }
-            newParent.addChild(newLabel.substring(newLabel.length() - 2),
-                container);
-            container.persist();
+            BioBankPlugin.openError("Move Error",
+                "A parent container with label \"" + newParentContainerLabel
+                    + "\" does not exist.");
+            return;
         }
+
+        ContainerWrapper newParent;
+        if (newParentContainers.size() > 1) {
+            SelectParentContainerDialog dlg = new SelectParentContainerDialog(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                newParentContainers);
+            if (dlg.open() != Dialog.OK) {
+                return;
+            }
+            newParent = dlg.getSelectedContainer();
+        } else {
+            newParent = newParentContainers.get(0);
+        }
+
+        ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
+        if (currentChild != null) {
+            BioBankPlugin.openError("Move Error", "Container position \""
+                + newLabel
+                + "\" is not empty. Please chose a different location.");
+            return;
+        }
+
+        newParent.addChild(newLabel, container);
+        container.persist();
+
         BioBankPlugin.openInformation("Container moved", "The container "
             + oldLabel + " has been moved to " + container.getLabel());
     }

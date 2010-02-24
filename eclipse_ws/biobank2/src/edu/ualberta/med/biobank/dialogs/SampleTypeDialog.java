@@ -37,32 +37,42 @@ public class SampleTypeDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        Integer id = origSampleType.getId();
-        shell.setText(((id == null) ? "Add " : "Edit ") + TITLE);
+        shell.setText(((origSampleType.getId() == null) ? "Add " : "Edit ")
+            + TITLE);
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite client = new Composite(parentComposite, SWT.NONE);
-        GridLayout layout = new GridLayout(2, false);
-        client.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        if (origSampleType.isNew()) {
+            setTitle("Add Sample Type");
+            setMessage("Enter the information for the new sample type");
+        } else {
+            setTitle("Edit Sample Type");
+            setMessage("Edit the information for the sample type");
+        }
+        return contents;
+    }
 
-        Control c = createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+    @Override
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite content = new Composite(parent, SWT.NONE);
+        content.setLayout(new GridLayout(3, false));
+        content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        Control c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
             "Name", null, PojoObservables.observeValue(sampleType, "name"),
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.widthHint = 200;
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+        gd.horizontalSpan = 2;
         c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+        c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
             "Short Name", null, PojoObservables.observeValue(sampleType,
                 "nameShort"), new NonEmptyStringValidator(MSG_NO_ST_SNAME));
-
-        return client;
+        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+        gd.horizontalSpan = 2;
+        c.setLayoutData(gd);
     }
 
     @Override
@@ -73,7 +83,7 @@ public class SampleTypeDialog extends BiobankDialog {
     }
 
     public SampleTypeWrapper getSampleType() {
-        return origSampleType;
+        return sampleType;
     }
 
 }

@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 
 public class TestLabelingScheme extends TestDatabase {
 
-    private static final Map<Integer, String> cbsrAlpha;
+    private static final Map<Integer, String> CBSR_ALPHA;
     static {
         Map<Integer, String> aMap = new HashMap<Integer, String>();
         aMap.put(0, "A");
@@ -40,7 +40,7 @@ public class TestLabelingScheme extends TestDatabase {
         aMap.put(21, "X");
         aMap.put(22, "Y");
         aMap.put(23, "Z");
-        cbsrAlpha = Collections.unmodifiableMap(aMap);
+        CBSR_ALPHA = Collections.unmodifiableMap(aMap);
     };
 
     @Test
@@ -85,23 +85,32 @@ public class TestLabelingScheme extends TestDatabase {
                     totalCols);
                 Assert.assertTrue((cbsrString.length() == 2)
                     || (cbsrString.length() == 3));
-                Assert.assertEquals(cbsrAlpha.get((row + col * totalRows)
-                    % cbsrAlpha.size()), cbsrString.substring(1));
-                Assert.assertEquals(cbsrAlpha.get((row + col * totalRows)
-                    / cbsrAlpha.size()), cbsrString.substring(0, 1));
+                Assert.assertEquals(CBSR_ALPHA.get((row + col * totalRows)
+                    % CBSR_ALPHA.size()), cbsrString.substring(1));
+                Assert.assertEquals(CBSR_ALPHA.get((row + col * totalRows)
+                    / CBSR_ALPHA.size()), cbsrString.substring(0, 1));
             }
         }
 
         for (int col = 0; col < totalCols; ++col) {
             for (int row = 0; row < totalRows; ++row) {
-                cbsrString = cbsrAlpha.get((row + col * totalRows)
-                    / cbsrAlpha.size())
-                    + cbsrAlpha.get((row + col * totalRows) % cbsrAlpha.size());
+                cbsrString = CBSR_ALPHA.get((row + col * totalRows)
+                    / CBSR_ALPHA.size())
+                    + CBSR_ALPHA.get((row + col * totalRows)
+                        % CBSR_ALPHA.size());
                 pos = LabelingScheme.cbsrTwoCharToRowCol(cbsrString, totalRows,
                     totalCols, "test");
                 Assert.assertEquals(new Integer(row), pos.row);
                 Assert.assertEquals(new Integer(col), pos.col);
             }
+        }
+
+        try {
+            pos = LabelingScheme.cbsrTwoCharToRowCol("aa", totalRows,
+                totalCols, "test");
+            Assert.fail("should not be allowed to use lower case characters");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
         }
     }
 
@@ -136,8 +145,8 @@ public class TestLabelingScheme extends TestDatabase {
                     } else {
                         Assert.assertTrue(posString.length() == 2);
                     }
-                    Assert.assertEquals(cbsrAlpha.get(row).charAt(0), posString
-                        .charAt(0));
+                    Assert.assertEquals(CBSR_ALPHA.get(row).charAt(0),
+                        posString.charAt(0));
                     Assert.assertEquals(col + 1, Integer.valueOf(
                         posString.substring(1)).intValue());
                 }
@@ -146,7 +155,7 @@ public class TestLabelingScheme extends TestDatabase {
             for (int col = 0; col < totalCols; ++col) {
                 for (int row = 0; row < totalRows; ++row) {
                     pos = LabelingScheme.sbsToRowCol(String.format("%s%02d",
-                        cbsrAlpha.get(row), col + 1));
+                        CBSR_ALPHA.get(row), col + 1));
                     Assert.assertEquals(row, pos.row.intValue());
                     Assert.assertEquals(col, pos.col.intValue());
                 }

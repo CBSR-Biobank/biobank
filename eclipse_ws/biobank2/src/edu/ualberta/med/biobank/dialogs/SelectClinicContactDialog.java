@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.dialogs;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
-public class SelectClinicContactDialog extends BiobankDialog {
+public class SelectClinicContactDialog extends TitleAreaDialog {
 
     private static Logger LOGGER = Logger
         .getLogger(SelectClinicContactDialog.class.getName());
@@ -44,9 +45,16 @@ public class SelectClinicContactDialog extends BiobankDialog {
     }
 
     @Override
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        setTitle("Add a clinic contact to study");
+        setMessage("Select a contact to add to this study");
+        return contents;
+    }
+
+    @Override
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
-        setStatusMessage("Select a contact:");
         Composite contents = new Composite(parentComposite, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -59,7 +67,6 @@ public class SelectClinicContactDialog extends BiobankDialog {
                 if (contactInfoTable.getSelection() != null)
                     SelectClinicContactDialog.this.getButton(
                         IDialogConstants.OK_ID).setEnabled(true);
-
             }
         });
 
@@ -90,5 +97,4 @@ public class SelectClinicContactDialog extends BiobankDialog {
         super.createButtonsForButtonBar(parent);
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
-
 }
