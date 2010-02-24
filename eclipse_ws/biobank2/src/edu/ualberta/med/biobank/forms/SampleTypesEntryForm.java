@@ -3,15 +3,16 @@ package edu.ualberta.med.biobank.forms;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.widgets.SampleTypeEntryWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SampleTypeEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -27,8 +28,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     private SiteWrapper siteWrapper;
     private List<SampleTypeWrapper> globalSampleTypes;
     private List<SampleTypeWrapper> siteSampleTypes;
-    private SampleTypeEntryWidget siteSampleWidget;
-    private SampleTypeEntryWidget globalSampleWidget;
+    private SampleTypeEntryInfoTable siteSampleWidget;
+    private SampleTypeEntryInfoTable globalSampleWidget;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -62,28 +63,42 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     private void createSiteSampleTypeSection() {
-        Composite client = createSectionWithClient("Site Sample Types");
-        GridLayout layout = new GridLayout(1, true);
-        client.setLayout(layout);
-
-        siteSampleWidget = new SampleTypeEntryWidget(client, SWT.NONE,
-            siteSampleTypes, globalSampleTypes, "Add Site Sample Type", toolkit);
+        Section section = createSection("Site Sample Types");
+        siteSampleWidget = new SampleTypeEntryInfoTable(section,
+            siteSampleTypes, globalSampleTypes,
+            "Edit the repository site's sample type");
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(siteSampleWidget);
+
+        addSectionToolbar(section, "Add Site Sample Type",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    siteSampleWidget
+                        .addSampleType("Add a new sample type to the repository site");
+                }
+            });
+        section.setClient(siteSampleWidget);
     }
 
     private void createGlobalSampleTypeSection() {
-        Composite client = createSectionWithClient("Global Sample Types");
-        GridLayout layout = new GridLayout(1, true);
-        client.setLayout(layout);
-
-        globalSampleWidget = new SampleTypeEntryWidget(client, SWT.NONE,
-            globalSampleTypes, siteSampleTypes, "Add Global Sample Type",
-            toolkit);
+        Section section = createSection("Global Sample Types");
+        globalSampleWidget = new SampleTypeEntryInfoTable(section,
+            globalSampleTypes, siteSampleTypes, "Edit the global sample type");
         globalSampleWidget.adaptToToolkit(toolkit, true);
         globalSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(globalSampleWidget);
+
+        addSectionToolbar(section, "Add Global Sample Type",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    globalSampleWidget
+                        .addSampleType("Add a new global sample type");
+                }
+            });
+        section.setClient(globalSampleWidget);
     }
 
     @Override

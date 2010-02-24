@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.ContactEntryWidget;
+import edu.ualberta.med.biobank.widgets.infotables.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -34,7 +34,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ClinicWrapper clinic;
 
-    private ContactEntryWidget contactEntryWidget;
+    private ContactEntryInfoTable contactEntryWidget;
 
     protected Combo session;
 
@@ -123,7 +123,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     private void createContactSection() {
         Section section = createSection("Contacts");
 
-        contactEntryWidget = new ContactEntryWidget(section, clinic);
+        contactEntryWidget = new ContactEntryInfoTable(section, clinic);
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 

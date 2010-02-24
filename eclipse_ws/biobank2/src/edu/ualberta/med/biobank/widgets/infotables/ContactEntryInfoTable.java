@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,12 +14,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
-import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 
-public class ContactEntryWidget extends ContactInfoTable {
+public class ContactEntryInfoTable extends ContactInfoTable {
 
     private Collection<ContactWrapper> selectedContacts;
 
@@ -29,7 +25,7 @@ public class ContactEntryWidget extends ContactInfoTable {
 
     private ClinicWrapper clinic;
 
-    public ContactEntryWidget(Composite parent, ClinicWrapper clinic) {
+    public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, clinic.getContactCollection(true));
         this.clinic = clinic;
 
