@@ -83,6 +83,8 @@ public class LoginDialog extends TitleAreaDialog {
 
     private Boolean okButtonEnabled;
 
+    private boolean setupFinished = false;
+
     public LoginDialog(Shell parentShell) {
         super(parentShell);
 
@@ -148,8 +150,6 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
-        bindChangeListener();
-
         Composite contents = new Composite(parentComposite, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
@@ -157,7 +157,7 @@ public class LoginDialog extends TitleAreaDialog {
 
         String lastServer = pluginPrefs.get(LAST_SERVER, "");
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            "Server field cannot be null");
+            "Server field cannot be empty");
         serverWidget = createWritableCombo(contents, "&Server", servers
             .toArray(new String[0]), "server", lastServer, validator);
 
@@ -179,9 +179,9 @@ public class LoginDialog extends TitleAreaDialog {
             });
         } else {
             userNameValidator = new NonEmptyStringValidator(
-                "Username field cannot be null");
+                "Username field cannot be empty");
             passwordValidator = new NonEmptyStringValidator(
-                "Password field cannot be null");
+                "Password field cannot be empty");
         }
 
         userNameWidget = createWritableCombo(contents, "&User Name", userNames
@@ -190,6 +190,11 @@ public class LoginDialog extends TitleAreaDialog {
 
         passwordWidget = createPassWordText(contents, "&Password", "password",
             passwordValidator);
+
+        bindChangeListener();
+
+        setupFinished = true;
+
         return contents;
     }
 
@@ -251,7 +256,9 @@ public class LoginDialog extends TitleAreaDialog {
                     setErrorMessage(null);
                     setOkButtonEnabled(true);
                 } else {
-                    setErrorMessage(status.getMessage());
+                    if (setupFinished) {
+                        setErrorMessage(status.getMessage());
+                    }
                     setOkButtonEnabled(false);
                 }
             }
