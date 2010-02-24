@@ -24,7 +24,7 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "quantity", "patientVisit", "sampleSource",
-            "patientCollection" };
+            "patientCollection", "dateDrawn" };
     }
 
     @Override

@@ -56,8 +56,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private PatientVisitWrapper patientVisit;
 
-    private DateTimeWidget dateProcessed;
-
     private PatientWrapper patient;
 
     private class FormPvCustomInfo extends PvAttrCustom {
@@ -135,14 +133,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Shipment", patientShipments, selectedShip,
             "A shipment should be selected");
+        firstControl = shipmentsComboViewer.getControl();
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }
-        dateProcessed = createDateTimeWidget(client, "Date Processed",
-            patientVisit.getDateProcessed(), patientVisit, "dateProcessed",
+        createDateTimeWidget(client, "Date Processed", patientVisit
+            .getDateProcessed(), patientVisit, "dateProcessed",
             "Date processed should be set");
-        firstControl = dateProcessed;
 
         createPvDataSection(client);
 

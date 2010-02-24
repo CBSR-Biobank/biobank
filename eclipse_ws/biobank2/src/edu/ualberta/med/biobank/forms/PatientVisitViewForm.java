@@ -38,6 +38,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Text clinicLabel;
 
+    private Text shipmentWaybillLabel;
+
+    private Text patientLabel;
+
     private Text dateProcessedLabel;
 
     private Text commentLabel;
@@ -63,9 +67,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Visit Date Processed: "
-            + patientVisit.getFormattedDateProcessed() + " for patient "
-            + patientVisit.getPatient().getPnumber());
+        form.setText("Patient Visit - Date Processed: "
+            + patientVisit.getFormattedDateProcessed());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -85,6 +88,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
         siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
+        shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
+            "Shipment Waybill");
+        patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyField(client, SWT.NONE,
             "Date Processed");
 
@@ -137,6 +143,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
             .getSite().getName());
         setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
             : patientVisit.getShipment().getClinic().getName());
+        setTextValue(shipmentWaybillLabel, patientVisit.getShipment()
+            .getWaybill());
+        setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel, patientVisit
             .getFormattedDateProcessed());
         setTextValue(commentLabel, patientVisit.getComment());

@@ -16,20 +16,18 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class PvSampleSourceDialog extends BiobankDialog {
 
-    private static final String TITLE = "Sample Source";
+    private static final String TITLE = "Source Vessel";
 
     private PvSampleSourceWrapper pvSampleSource;
 
     private ComboViewer sampleSourcesComboViewer;
-
-    private DateTimeWidget dateDrawnWidget;
 
     private Collection<SampleSourceWrapper> sampleSources;
 
@@ -46,11 +44,10 @@ public class PvSampleSourceDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        Integer id = pvSampleSource.getId();
         String title = new String();
 
-        if (id == null) {
-            title = "Add";
+        if (pvSampleSource.isNew()) {
+            title = "Add ";
         } else {
             title = "Edit ";
         }
@@ -59,17 +56,31 @@ public class PvSampleSourceDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_COMPUTER_KEY));
+        if (pvSampleSource.isNew()) {
+            setTitle("Add Source Vessel");
+            setMessage("Add a source vessel to a patient visit");
+        } else {
+            setTitle("Edit Source Vessel");
+            setMessage("Edit a source vessel in a patient visit");
+        }
+        return contents;
+    }
+
+    @Override
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         sampleSourcesComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
-                "Sample Source", sampleSources,
+                "Source Vessel", sampleSources,
                 pvSampleSource.getSampleSource(),
-                "A sample source should be selected");
+                "A source vessel should be selected");
         sampleSourcesComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -81,28 +92,24 @@ public class PvSampleSourceDialog extends BiobankDialog {
                             .getFirstElement());
                 }
             });
-        GridData gd = new GridData();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
         sampleSourcesComboViewer.getCombo().setLayoutData(gd);
 
-        Text quantityText = (Text) createBoundWidgetWithLabel(contents,
-            Text.class, SWT.BORDER, "Quantity", new String[0], BeansObservables
+        Control c = createBoundWidgetWithLabel(contents, Text.class,
+            SWT.BORDER, "Quantity", new String[0], BeansObservables
                 .observeValue(pvSampleSource, "quantity"),
             new IntegerNumberValidator("quantity should be a whole number",
                 false));
-        gd = new GridData();
+        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.FILL;
-        quantityText.setLayoutData(gd);
+        c.setLayoutData(gd);
 
-        dateDrawnWidget = createDateTimeWidget(contents, "Date drawn", null,
-            pvSampleSource, "dateDrawn", "Date drawn should be selected");
-        gd = new GridData();
+        c = createDateTimeWidget(contents, "Date drawn", null, pvSampleSource,
+            "dateDrawn", "Date drawn should be selected");
+        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.FILL;
-        dateDrawnWidget.setLayoutData(gd);
-
-        return contents;
+        c.setLayoutData(gd);
     }
 
     public PvSampleSourceWrapper getPvSampleSource() {

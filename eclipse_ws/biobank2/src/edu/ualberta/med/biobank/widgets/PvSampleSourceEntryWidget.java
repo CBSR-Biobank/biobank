@@ -102,7 +102,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
             });
 
         addPvSampleSourceButton = toolkit.createButton(parent,
-            "Add Sample Source", SWT.PUSH);
+            "Add Source Vessel", SWT.PUSH);
         addPvSampleSourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -130,7 +130,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
     public void addBinding(WidgetCreator dbc) {
         final ControlDecoration controlDecoration = createDecorator(
             addPvSampleSourceButton,
-            "Sample sources should be selected for this visit");
+            "Source vessels should be selected for this visit");
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(new IValidator() {
@@ -139,7 +139,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                 if (value instanceof Boolean && !(Boolean) value) {
                     controlDecoration.show();
                     return ValidationStatus
-                        .error("Sample sources should be selected");
+                        .error("Source vessels should be selected");
                 } else {
                     controlDecoration.hide();
                     return Status.OK_STATUS;

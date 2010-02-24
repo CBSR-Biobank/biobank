@@ -81,7 +81,7 @@ public class SampleStorageInfoTable extends
         info.sampleStorage = sampleStorage;
         SampleTypeWrapper type = sampleStorage.getSampleType();
         Assert.isNotNull(type, "sample storage - sample type is null");
-        info.typeName = type.getNameShort();
+        info.typeName = type.getName();
         info.volume = sampleStorage.getVolume();
         info.quantity = sampleStorage.getQuantity();
         return info;

@@ -341,8 +341,8 @@ public class ContainerWrapper extends
                     + type.getColCapacity());
             }
             if (rcp.row < 0 || rcp.col < 0) {
-                throw new Exception("Position " + position
-                    + " is invalid in container " + getFullInfoLabel());
+                throw new Exception("Position \"" + position
+                    + "\" is invalid for this container " + getFullInfoLabel());
             }
         }
         return rcp;
