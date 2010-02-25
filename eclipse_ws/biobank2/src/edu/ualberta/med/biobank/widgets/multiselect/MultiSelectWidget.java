@@ -55,10 +55,8 @@ public class MultiSelectWidget extends BiobankWidget {
 
         Composite moveComposite = new Composite(this, SWT.NONE);
         moveComposite.setLayout(new GridLayout(1, false));
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessVerticalSpace = true;
-        moveComposite.setLayoutData(gd);
+        moveComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
+            false, true));
         moveRightButton = new Button(moveComposite, SWT.PUSH);
         moveRightButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_ARROW_RIGHT));

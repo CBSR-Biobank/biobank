@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -69,7 +70,11 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     private static final int[] BOUNDS = new int[] { 180, 140, 140, 100, -1 };
 
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS);
+        super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS,
+            10);
+        GridData gd = (GridData) getTableViewer().getTable().getLayoutData();
+        gd.heightHint = 190;
+        getTableViewer().getTable().setLayoutData(gd);
         setSorter(new TableSorter());
     }
 

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.TableLayout;
@@ -39,8 +38,8 @@ public class PagedTableWidget<T> extends BiobankWidget {
 
     private List<Object> input;
 
-    private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
-        .getName());
+    // private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
+    // .getName());
 
     public PagedTableWidget(Composite parent, List<Object> input,
         String[] headings, int[] columnWidths) {
