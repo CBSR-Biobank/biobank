@@ -62,6 +62,13 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     private void addDeleteSupport() {
+        addAddItemListener(new IInfoTableAddItemListener() {
+            @Override
+            public void addItem(InfoTableEvent event) {
+                createClinicContact();
+            }
+        });
+
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
