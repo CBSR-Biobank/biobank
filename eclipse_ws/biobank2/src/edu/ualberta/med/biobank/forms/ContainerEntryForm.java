@@ -9,7 +9,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -159,7 +158,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         containerTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Container Type", containerTypes, currentContainerType,
-            MSG_CONTAINER_TYPE_EMPTY);
+            MSG_CONTAINER_TYPE_EMPTY, true);
         containerTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -178,7 +177,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 }
             });
-        containerTypeComboViewer.setComparator(new ViewerComparator());
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, BeansObservables
                 .observeValue(containerWrapper, "temperature"),

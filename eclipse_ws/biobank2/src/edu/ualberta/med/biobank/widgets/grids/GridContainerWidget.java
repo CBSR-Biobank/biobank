@@ -98,22 +98,22 @@ public class GridContainerWidget extends AbstractGridWidget {
     @Override
     protected String getDefaultTextForBox(int indexRow, int indexCol) {
         String text = super.getDefaultTextForBox(indexRow, indexCol);
-        if (!text.isEmpty()) {
-            if (getCellHeight() <= HEIGHT_TWO_LINES) {
-                return text + " - " + getContainerTypeText(indexRow, indexCol);
-            }
-            return text;
+        if (text.isEmpty()) {
+            return "";
         }
-        return "";
+
+        if (getCellHeight() <= HEIGHT_TWO_LINES) {
+            return text + " - " + getContainerTypeText(indexRow, indexCol);
+        }
+        return text;
     }
 
     @Override
     protected String getBottomTextForBox(int indexRow, int indexCol) {
-        String sname = "";
         if (getCellHeight() > HEIGHT_TWO_LINES) {
-            sname = getContainerTypeText(indexRow, indexCol);
+            return getContainerTypeText(indexRow, indexCol);
         }
-        return sname;
+        return "";
     }
 
     protected String getContainerTypeText(int indexRow, int indexCol) {

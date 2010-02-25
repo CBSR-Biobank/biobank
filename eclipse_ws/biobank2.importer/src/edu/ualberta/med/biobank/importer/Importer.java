@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
@@ -152,6 +153,8 @@ public class Importer {
 
     private static Map<String, ContainerWrapper> topContainersMap = null;
 
+    private static Map<String, ShippingCompanyWrapper> shippingCompanyMap = null;
+
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
     private static Map<StudyWrapper, Map<SampleTypeWrapper, SampleStorageWrapper>> sampleStorageMap;
@@ -219,10 +222,6 @@ public class Importer {
     }
 
     private static void importAll() throws Exception {
-        // checkCabinet();
-        // checkFreezer();
-        // System.exit(0);
-
         CbsrSite.deleteConfiguration(appService);
         logger.info("creating CBSR site...");
         cbsrSite = CbsrSite.addSite(appService);
@@ -246,7 +245,9 @@ public class Importer {
         initStudiesMap();
         initContainerTypesMap();
         initTopContainersMap();
+        initShipmentCompanyMap();
 
+        checkShippingCompanies();
         checkSampleTypes();
         checkContainerConfiguration();
 
@@ -334,6 +335,14 @@ public class Importer {
         }
     }
 
+    private static void initShipmentCompanyMap() throws Exception {
+        shippingCompanyMap = new HashMap<String, ShippingCompanyWrapper>();
+        for (ShippingCompanyWrapper company : ShippingCompanyWrapper
+            .getShippingCompanies(appService)) {
+            shippingCompanyMap.put(company.getName(), company);
+        }
+    }
+
     public static SampleTypeWrapper getSampleType(String nameShort) {
         String newName = newSampleTypeName.get(nameShort);
         if (newName != null) {
@@ -390,6 +399,14 @@ public class Importer {
     private static void checkContainerConfiguration() throws Exception {
         if (!checkCabinetConfiguration() || !checkFreezerConfiguration()) {
             logger.error("container configuration failed");
+            System.exit(1);
+        }
+    }
+
+    private static void checkShippingCompanies() {
+        if (shippingCompanyMap.get("unknown") == null) {
+            logger
+                .error("shipping company \"unknown\" missing - configuration failed");
             System.exit(1);
         }
     }
@@ -671,6 +688,9 @@ public class Importer {
         ShipmentWrapper shipment;
         BlowfishCipher cipher = new BlowfishCipher();
 
+        ShippingCompanyWrapper unknownShippingCompany = shippingCompanyMap
+            .get("unknown");
+
         removeAllShipments();
 
         logger.info("importing shipments ...");
@@ -760,6 +780,7 @@ public class Importer {
                     count));
                 shipment.setDateReceived(dateReceived);
                 shipment.addPatients(Arrays.asList(patient));
+                shipment.setShippingCompany(unknownShippingCompany);
                 shipment.persist();
             } else if (!shipment.hasPatient(patientNr)) {
                 logger.debug("adding to shipment: patient/"

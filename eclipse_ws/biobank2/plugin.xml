@@ -830,8 +830,11 @@
                </visibleWhen>
             </command>
          </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:edu.ualberta.med.biobank.toolbar.view">
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.mainPerpective">
+               id="edu.ualberta.med.biobank.views.SessionsView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
@@ -880,9 +883,23 @@
                   </reference>
                </visibleWhen>
             </command>
-         </toolbar> 
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.sessionReload"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload Session">
+            </command>
+         </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
+               id="edu.ualberta.med.biobank.views.patientsAdmin">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
@@ -954,26 +971,6 @@
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
-            </command>
-         </toolbar>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:edu.ualberta.med.biobank.toolbar.view">
-         <toolbar
-               id="edu.ualberta.med.biobank.views.SessionsView">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push"
-                  tooltip="Delete Selected Item">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.sessionReload"
-                  icon="icons/reload.png"
-                  label="Reload"
-                  style="push"
-                  tooltip="Reload Session">
             </command>
          </toolbar>
       </menuContribution>

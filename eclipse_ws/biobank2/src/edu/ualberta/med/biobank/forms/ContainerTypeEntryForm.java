@@ -206,7 +206,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createContainsSection() throws Exception {
-        Composite client = createSectionWithClient("Contains");
+        Composite client = createSectionWithClient("Contents");
         hasContainers = toolkit.createButton(client, "Contains Containers",
             SWT.RADIO);
         hasSamples = toolkit
@@ -418,7 +418,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setChildContainerTypeSelection();
         setSampleTypesSelection();
         showContainersOrSamples();
-
+        setLabelilngScheme();
     }
 
     private void showContainersOrSamples() {
@@ -427,7 +427,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         showSamples(containsSamples);
         hasSamples.setSelection(containsSamples);
         hasContainers.setSelection(!containsSamples);
+    }
 
+    private void setLabelilngScheme() {
         String currentScheme = containerType.getChildLabelingSchemeName();
         if (currentScheme == null) {
             labelingSchemeComboViewer.getCombo().deselectAll();

@@ -32,10 +32,6 @@ public class MultiSelectWidget extends BiobankWidget {
 
     private Button moveLeftButton;
 
-    private Button moveUpButton;
-
-    private Button moveDownButton;
-
     private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0,
         "selRoot");
 
@@ -50,7 +46,7 @@ public class MultiSelectWidget extends BiobankWidget {
 
         this.minHeight = minHeight;
 
-        setLayout(new GridLayout(4, false));
+        setLayout(new GridLayout(3, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         availTree = createLabelledTree(this, rightLabel);
@@ -75,21 +71,6 @@ public class MultiSelectWidget extends BiobankWidget {
         selTree = createLabelledTree(this, leftLabel);
         selTree.setInput(selTreeRootNode);
         selTree.setComparator(new ViewerComparator());
-
-        Composite arrangeComposite = new Composite(this, SWT.NONE);
-        arrangeComposite.setLayout(new GridLayout(1, false));
-        gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessVerticalSpace = true;
-        arrangeComposite.setLayoutData(gd);
-        moveUpButton = new Button(arrangeComposite, SWT.PUSH);
-        moveUpButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ARROW_UP));
-        moveUpButton.setToolTipText("Move up");
-        moveDownButton = new Button(arrangeComposite, SWT.PUSH);
-        moveDownButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ARROW_DOWN));
-        moveDownButton.setToolTipText("Move down");
 
         dragAndDropSupport(availTree, selTree);
         dragAndDropSupport(selTree, availTree);
