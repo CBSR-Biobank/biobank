@@ -66,6 +66,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         Section section = createSection("Site Sample Types");
         siteSampleWidget = new SampleTypeEntryInfoTable(section,
             siteSampleTypes, globalSampleTypes,
+            "Add a new sample type to the repository site",
             "Edit the repository site's sample type");
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
@@ -75,8 +76,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    siteSampleWidget
-                        .addSampleType("Add a new sample type to the repository site");
+                    siteSampleWidget.addSampleType();
                 }
             });
         section.setClient(siteSampleWidget);
@@ -85,7 +85,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     private void createGlobalSampleTypeSection() {
         Section section = createSection("Global Sample Types");
         globalSampleWidget = new SampleTypeEntryInfoTable(section,
-            globalSampleTypes, siteSampleTypes, "Edit the global sample type");
+            globalSampleTypes, siteSampleTypes, "Add a new global sample type",
+            "Edit the global sample type");
         globalSampleWidget.adaptToToolkit(toolkit, true);
         globalSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(globalSampleWidget);
@@ -94,8 +95,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    globalSampleWidget
-                        .addSampleType("Add a new global sample type");
+                    globalSampleWidget.addSampleType();
                 }
             });
         section.setClient(globalSampleWidget);

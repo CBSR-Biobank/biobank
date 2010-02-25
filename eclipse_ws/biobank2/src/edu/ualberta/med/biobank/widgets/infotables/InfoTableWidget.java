@@ -85,6 +85,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected Menu menu;
 
+    protected ListenerList addItemListeners = new ListenerList();
+
     protected ListenerList editItemListeners = new ListenerList();
 
     protected ListenerList deleteItemListeners = new ListenerList();
@@ -371,6 +373,20 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         }
     }
 
+    public void addAddItemListener(IInfoTableAddItemListener listener) {
+        addItemListeners.add(listener);
+
+        Assert.isNotNull(menu);
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Add");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                addItem();
+            }
+        });
+    }
+
     public void addEditItemListener(IInfoTableEditItemListener listener) {
         editItemListeners.add(listener);
 
@@ -397,6 +413,20 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 deleteItem();
             }
         });
+    }
+
+    protected void addItem() {
+        InfoTableSelection selection = new InfoTableSelection(getSelection());
+        final InfoTableEvent event = new InfoTableEvent(this, selection);
+        Object[] listeners = addItemListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.addItem(event);
+                }
+            });
+        }
     }
 
     protected void editItem() {
