@@ -316,7 +316,13 @@ public class LoginDialog extends TitleAreaDialog {
             new URL("http://" + serverWidget.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(), "Invalid Server URL",
-                "Please enter a valid server URL.");
+                "Please enter a valid server URL. Ex. hostname:port");
+            return;
+        }
+
+        if (!serverWidget.getText().contains(":")) {
+            MessageDialog.openError(getShell(), "Invalid Server URL",
+                "Please enter a valid server URL. Ex. hostname:port");
             return;
         }
 
