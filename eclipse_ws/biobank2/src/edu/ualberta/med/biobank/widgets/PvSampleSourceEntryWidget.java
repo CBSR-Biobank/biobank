@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSampleSourceDialog;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -106,13 +107,17 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         addPvSampleSourceButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                PvSampleSourceWrapper sampleSource = new PvSampleSourceWrapper(
-                    SessionManager.getAppService());
-                sampleSource.setPatientVisit(patientVisit);
-                addOrEditPvSampleSource(true, sampleSource,
-                    getNonDuplicateSampleSources());
+                addPvSampleSource();
             }
         });
+    }
+
+    public void addPvSampleSource() {
+        PvSampleSourceWrapper sampleSource = new PvSampleSourceWrapper(
+            SessionManager.getAppService());
+        sampleSource.setPatientVisit(patientVisit);
+        addOrEditPvSampleSource(true, sampleSource,
+            getNonDuplicateSampleSources());
     }
 
     private void setLists() {
@@ -139,7 +144,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
                 if (value instanceof Boolean && !(Boolean) value) {
                     controlDecoration.show();
                     return ValidationStatus
-                        .error("Source vessels should be selected");
+                        .error("Source vessels should be added");
                 } else {
                     controlDecoration.hide();
                     return Status.OK_STATUS;
@@ -180,6 +185,13 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
     }
 
     private void addEditSupport() {
+        pvSampleSourceTable.addAddItemListener(new IInfoTableAddItemListener() {
+            @Override
+            public void addItem(InfoTableEvent event) {
+                addPvSampleSource();
+            }
+        });
+
         pvSampleSourceTable
             .addEditItemListener(new IInfoTableEditItemListener() {
                 @Override

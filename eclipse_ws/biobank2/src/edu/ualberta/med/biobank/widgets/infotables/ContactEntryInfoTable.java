@@ -28,8 +28,14 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, clinic.getContactCollection(true));
         this.clinic = clinic;
-
         setContacts(clinic);
+
+        addAddItemListener(new IInfoTableAddItemListener() {
+            @Override
+            public void addItem(InfoTableEvent event) {
+                addContact();
+            }
+        });
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override

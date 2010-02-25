@@ -36,6 +36,8 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
     private List<SampleTypeWrapper> deletedSampleTypes;
 
+    private String addMessage;
+
     private String editMessage;
 
     /**
@@ -47,9 +49,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      */
     public SampleTypeEntryInfoTable(Composite parent,
         List<SampleTypeWrapper> sampleTypeCollection,
-        List<SampleTypeWrapper> conflictTypes, String editMessage) {
+        List<SampleTypeWrapper> conflictTypes, String addMessage,
+        String editMessage) {
         super(parent, null);
         setLists(sampleTypeCollection, conflictTypes);
+        this.addMessage = addMessage;
         this.editMessage = editMessage;
         addEditSupport();
     }
@@ -58,9 +62,9 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      * 
      * @param message The message to display in the SampleTypeDialog.
      */
-    public void addSampleType(String message) {
+    public void addSampleType() {
         addOrEditSampleType(true, new SampleTypeWrapper(SessionManager
-            .getAppService()), getRestrictedTypes(), message);
+            .getAppService()), getRestrictedTypes(), addMessage);
     }
 
     private boolean addOrEditSampleType(boolean add,
@@ -95,13 +99,20 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     }
 
     private void addEditSupport() {
+        addAddItemListener(new IInfoTableAddItemListener() {
+            @Override
+            public void addItem(InfoTableEvent event) {
+                addSampleType();
+            }
+        });
+
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
-                SampleTypeWrapper pvss = getSelection();
+                SampleTypeWrapper type = getSelection();
                 Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
-                restrictedTypes.remove(pvss);
-                addOrEditSampleType(false, pvss, restrictedTypes, editMessage);
+                restrictedTypes.remove(type);
+                addOrEditSampleType(false, type, restrictedTypes, editMessage);
             }
         });
 

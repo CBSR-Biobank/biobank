@@ -83,6 +83,12 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
     }
 
     private void addEditSupport() {
+        addAddItemListener(new IInfoTableAddItemListener() {
+            @Override
+            public void addItem(InfoTableEvent event) {
+                addSampleStorage();
+            }
+        });
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
