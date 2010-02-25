@@ -954,9 +954,21 @@
                id="edu.ualberta.med.biobank.views.ReportsView"
                minimized="false"
                moveable="false"
-               ratio="0.5"
+               ratio="0.95"
                relationship="left"
                relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.AdvancedReportsView"
+               minimized="false"
+               moveable="false"
+               ratio="0.95"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.ReportsView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -1327,6 +1339,14 @@
             id="edu.ualberta.med.biobank.views.ReportsView"
             icon="icons/reportsPerspective.png"
             name="Reports"
+            restorable="true">
+      </view>
+       <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            id="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            icon="icons/reportsPerspective.png"
+            name="Advanced Reports"
             restorable="true">
       </view>
       <view

@@ -13,7 +13,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class QueryObject {
+public abstract class QueryObject {
 
     private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
 
@@ -35,6 +35,8 @@ public class QueryObject {
         aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
         aMap.put(SampleRequest.NAME, SampleRequest.class);
         aMap.put(SampleSCount.NAME, SampleSCount.class);
+        aMap.put(QACabinetSamples.NAME, QACabinetSamples.class);
+        aMap.put(QAFreezerSamples.NAME, QAFreezerSamples.class);
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
@@ -226,5 +228,7 @@ public class QueryObject {
                 .add(new Object[] { grpNumber, study, clinic, count });
         return totalledResults;
     }
+
+    public abstract String getName();
 
 }

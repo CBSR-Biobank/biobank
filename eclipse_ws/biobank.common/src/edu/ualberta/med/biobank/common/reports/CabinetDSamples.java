@@ -43,7 +43,6 @@ public class CabinetDSamples extends QueryObject {
         params.set(0, "%Cabinet%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        System.out.println(queryString);
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
@@ -51,6 +50,11 @@ public class CabinetDSamples extends QueryObject {
     @Override
     public List<Object> postProcess(List<Object> results) {
         return sumByDate(results);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

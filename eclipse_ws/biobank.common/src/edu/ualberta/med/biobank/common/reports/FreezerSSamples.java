@@ -37,4 +37,9 @@ public class FreezerSSamples extends QueryObject {
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

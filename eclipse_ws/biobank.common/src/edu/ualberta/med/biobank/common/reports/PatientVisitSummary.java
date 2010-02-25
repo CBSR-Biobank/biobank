@@ -99,4 +99,9 @@ public class PatientVisitSummary extends QueryObject {
             sums[2], sums[3], sums[4], sums[5], sums[6] });
         return totalledResults;
     }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

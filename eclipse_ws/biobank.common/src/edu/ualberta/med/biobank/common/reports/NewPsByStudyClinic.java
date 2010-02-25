@@ -45,7 +45,6 @@ public class NewPsByStudyClinic extends QueryObject {
         }
         columnNames[0] = (String) params.get(0);
         HQLCriteria c = new HQLCriteria(queryString);
-        System.out.println(queryString);
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
@@ -53,5 +52,10 @@ public class NewPsByStudyClinic extends QueryObject {
     @Override
     public List<Object> postProcess(List<Object> results) {
         return sumByDate(results);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

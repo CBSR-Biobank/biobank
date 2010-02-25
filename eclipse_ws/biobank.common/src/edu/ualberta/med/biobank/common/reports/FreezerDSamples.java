@@ -43,7 +43,6 @@ public class FreezerDSamples extends QueryObject {
         params.set(0, "%Freezer%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        System.out.println(queryString);
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
@@ -53,4 +52,8 @@ public class FreezerDSamples extends QueryObject {
         return sumByDate(results);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

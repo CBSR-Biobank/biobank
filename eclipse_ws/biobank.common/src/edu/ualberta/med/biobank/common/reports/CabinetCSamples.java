@@ -10,7 +10,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class CabinetCSamples extends QueryObject {
 
-    protected static final String NAME = "Cabinet Samples per Study per Clinic";
+    public static final String NAME = "Cabinet Samples per Study per Clinic";
 
     public CabinetCSamples(String op, Integer siteId) {
         super(
@@ -37,5 +37,10 @@ public class CabinetCSamples extends QueryObject {
         c.setParameters(params);
         List<Object> results = appService.query(c);
         return postProcess(results);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

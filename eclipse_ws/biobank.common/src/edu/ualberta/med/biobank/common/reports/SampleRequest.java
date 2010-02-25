@@ -42,4 +42,9 @@ public class SampleRequest extends QueryObject {
         }
         return postProcess(results);
     }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }
