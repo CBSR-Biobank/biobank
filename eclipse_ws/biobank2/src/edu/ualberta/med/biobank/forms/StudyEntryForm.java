@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
@@ -195,7 +194,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     public void setSampleSourceWidgetSelections() {
         Collection<SampleSourceWrapper> studySampleSources = study
             .getSampleSourceCollection();
-        ListOrderedMap availSampleSource = new ListOrderedMap();
+        LinkedHashMap<Integer, String> availSampleSource = new LinkedHashMap<Integer, String>();
         List<Integer> selSampleSource = new ArrayList<Integer>();
 
         if (studySampleSources != null) {

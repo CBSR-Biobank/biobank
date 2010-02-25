@@ -42,7 +42,6 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
         for (MultiSelectNode node : nodes) {
             if (target.getParent() == null) {
                 target.addChild(node);
-
             } else {
                 target.getParent().insertAfter(target, node);
             }

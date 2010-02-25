@@ -47,6 +47,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMAGE_ID = "biobank2.image";
 
     public static final String IMG_ADD = "add";
+    public static final String IMG_ARROW_UP = "arrow_up";
+    public static final String IMG_ARROW_DOWN = "arrow_down";
+    public static final String IMG_ARROW_LEFT = "arrow_left";
+    public static final String IMG_ARROW_RIGHT = "arrow_right";
     public static final String IMG_BIN = "bin";
     public static final String IMG_BOX = "box";
     public static final String IMG_CABINET = "cabinet";
@@ -144,6 +148,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_ADD, "add.png");
+        registerImage(registry, IMG_ARROW_UP, "arrow_up.png");
+        registerImage(registry, IMG_ARROW_DOWN, "arrow_down.png");
+        registerImage(registry, IMG_ARROW_LEFT, "arrow_left.png");
+        registerImage(registry, IMG_ARROW_RIGHT, "arrow_right.png");
         registerImage(registry, IMG_BIN, "bin.png");
         registerImage(registry, IMG_BOX, "bin.png");
         registerImage(registry, IMG_CABINET, "cabinet.png");
