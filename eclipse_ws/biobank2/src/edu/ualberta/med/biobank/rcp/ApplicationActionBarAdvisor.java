@@ -85,7 +85,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         menuBar.add(helpMenu);
 
         // this group will also show the "Key Assist" menu. We need to add an
-        // activity if we don't want this menu to be displayed
+        // activity if we don't want this menu to be displayed, but it is not
+        // displayed after the product is exported
         helpMenu.add(new Separator("group.assist"));
         // View Error Logs
         helpMenu.add(showDlgAction);
