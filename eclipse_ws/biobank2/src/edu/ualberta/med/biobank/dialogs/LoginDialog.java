@@ -320,7 +320,7 @@ public class LoginDialog extends TitleAreaDialog {
             return;
         }
 
-        if (!serverText.getText().contains(":")) {
+        if (!serverWidget.getText().contains(":")) {
             MessageDialog.openError(getShell(), "Invalid Server URL",
                 "Please enter a valid server URL. Ex. hostname:port");
             return;
