@@ -11,10 +11,23 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
+import edu.ualberta.med.biobank.forms.ScanAssignEntryForm;
+import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
+import edu.ualberta.med.biobank.rcp.SampleManagementPerspective;
+
+/**
+ * Display in ConsoleView and possibly printed.
+ * 
+ * @see SampleManagementPerspective
+ * @see ScanLinkEntryForm
+ * @see ScanAssignEntryForm
+ * @see CabinetLinkAssignEntryForm
+ */
 public class ActivityLogAppender extends AppenderSkeleton {
 
     private MessageConsole messageConsole;
-    private MessageConsoleStream msg;
+    private MessageConsoleStream consoleStream;
     private List<LogInfo> logsList;
 
     public ActivityLogAppender(String name) {
@@ -22,7 +35,7 @@ public class ActivityLogAppender extends AppenderSkeleton {
         messageConsole = new MessageConsole(name, null);
         ConsolePlugin.getDefault().getConsoleManager().addConsoles(
             new IConsole[] { messageConsole });
-        msg = messageConsole.newMessageStream();
+        consoleStream = messageConsole.newMessageStream();
         setLayout(new PatternLayout("%d{ABSOLUTE} %m%n"));
         logsList = new ArrayList<LogInfo>();
     }
@@ -30,7 +43,7 @@ public class ActivityLogAppender extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent event) {
         String text = this.layout.format(event);
-        msg.print(text);
+        consoleStream.print(text);
         logsList.add(new LogInfo(text.substring(0, text.lastIndexOf("\n"))));
     }
 

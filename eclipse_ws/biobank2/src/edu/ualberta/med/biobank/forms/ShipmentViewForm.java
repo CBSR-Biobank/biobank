@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -10,13 +9,14 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 
 public class ShipmentViewForm extends BiobankViewForm {
 
-    private static Logger LOGGER = Logger.getLogger(ShipmentViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ShipmentViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
     private ShipmentAdapter shipmentAdapter;
@@ -59,7 +59,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         try {
             shipment.reload();
         } catch (Exception ex) {
-            LOGGER.error("Error while retrieving shipment "
+            logger.error("Error while retrieving shipment "
                 + shipment.getWaybill(), ex);
         }
     }

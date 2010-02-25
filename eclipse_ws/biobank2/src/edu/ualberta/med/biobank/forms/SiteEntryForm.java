@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -13,13 +12,14 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
 
-    private static Logger LOGGER = Logger.getLogger(SiteEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SiteEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
@@ -44,7 +44,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         try {
             siteWrapper.reload();
         } catch (Exception e) {
-            LOGGER.error("Can't reload site", e);
+            logger.error("Can't reload site", e);
         }
 
         String tabName;

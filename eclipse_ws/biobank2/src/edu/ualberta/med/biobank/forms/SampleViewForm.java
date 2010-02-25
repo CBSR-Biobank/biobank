@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -14,14 +13,15 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
 public class SampleViewForm extends BiobankViewForm {
 
-    private static Logger LOGGER = Logger.getLogger(SampleViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SampleViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleViewForm";
 
@@ -60,7 +60,7 @@ public class SampleViewForm extends BiobankViewForm {
         try {
             sample.reload();
         } catch (Exception e) {
-            LOGGER.error("Can't reload sample with id " + sample.getId());
+            logger.error("Can't reload sample with id " + sample.getId());
         }
     }
 

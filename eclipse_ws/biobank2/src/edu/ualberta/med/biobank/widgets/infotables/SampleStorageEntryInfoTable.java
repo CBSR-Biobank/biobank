@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.layout.GridData;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -26,7 +26,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(SampleStorageEntryInfoTable.class.getName());
 
     private List<SampleTypeWrapper> allSampleTypes;
@@ -124,7 +124,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {
-            LOGGER.error("getSampleTypes", e);
+            logger.error("getSampleTypes", e);
         }
     }
 

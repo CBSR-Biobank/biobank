@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -24,12 +23,13 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ContainerGroup extends AdapterBase {
 
-    private static Logger LOGGER = Logger.getLogger(ContainerGroup.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ContainerGroup.class.getName());
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, "Containers", true, true);
@@ -115,7 +115,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+            logger.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 }

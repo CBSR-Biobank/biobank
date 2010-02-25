@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -35,6 +34,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
@@ -74,8 +74,8 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
  */
 public abstract class InfoTableWidget<T> extends BiobankWidget {
 
-    private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(InfoTableWidget.class.getName());
 
     protected TableViewer tableViewer;
 
@@ -303,7 +303,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         ++count;
                     }
                 } catch (Exception e) {
-                    LOGGER.error("setCollection error", e);
+                    logger.error("setCollection error", e);
                 }
             }
 

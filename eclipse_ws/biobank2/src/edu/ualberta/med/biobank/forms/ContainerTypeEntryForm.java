@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -23,11 +22,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -39,7 +38,7 @@ import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(ContainerTypeEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
@@ -53,8 +52,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private static final String MSG_NO_CONTAINER_TYPE_NAME_SHORT = "Container type must have a short name";
 
     public static final String MSG_CHILD_LABELING_SCHEME_EMPTY = "Select a child labeling scheme";
-
-    static Logger log4j = Logger.getLogger(SessionManager.class.getName());
 
     private ContainerTypeAdapter containerTypeAdapter;
 
@@ -121,12 +118,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         try {
             site.reload();
         } catch (Exception e) {
-            LOGGER.error("Can't retrieve site", e);
+            logger.error("Can't retrieve site", e);
         }
         try {
             containerType.reload();
         } catch (Exception e) {
-            LOGGER.error("Error while retrieving type "
+            logger.error("Error while retrieving type "
                 + containerType.getName(), e);
         }
     }
