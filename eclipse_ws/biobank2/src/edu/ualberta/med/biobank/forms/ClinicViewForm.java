@@ -64,9 +64,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createClinicSection();
         createAddressSection(clinic);
         createContactsSection();
-        createStudiesSection();
-        createShipmentsSection();
-        createButtonsSection();
+        // createStudiesSection();
+        // createShipmentsSection();
     }
 
     private void createClinicSection() throws Exception {
@@ -124,12 +123,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(shipmentsTable);
 
         shipmentsTable.addDoubleClickListener(collectionDoubleClickListener);
-    }
-
-    protected void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        client.setLayout(new GridLayout(4, false));
-        toolkit.paintBordersFor(client);
     }
 
     @Override

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +76,7 @@ public class ReportsView extends ViewPart {
     private List<Label> textLabels;
 
     private Button searchButton;
-    private Collection<Object> searchData;
+    private List<Object> searchData;
     private SearchResultsInfoTable searchTable;
 
     private Button printButton;
@@ -209,7 +208,7 @@ public class ReportsView extends ViewPart {
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
-    private Collection<Object> search() throws ApplicationException {
+    private List<Object> search() throws ApplicationException {
         IStructuredSelection typeSelection = (IStructuredSelection) querySelect
             .getSelection();
         try {

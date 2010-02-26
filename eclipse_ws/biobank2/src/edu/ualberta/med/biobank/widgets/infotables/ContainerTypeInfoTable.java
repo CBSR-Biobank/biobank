@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -97,7 +96,7 @@ public class ContainerTypeInfoTable extends
         130 };
 
     public ContainerTypeInfoTable(Composite parent,
-        Collection<ContainerTypeWrapper> collection) {
+        List<ContainerTypeWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
     }

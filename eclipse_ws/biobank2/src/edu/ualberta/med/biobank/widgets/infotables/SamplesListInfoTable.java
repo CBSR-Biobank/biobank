@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -90,7 +89,7 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         -1 };
 
     public SamplesListInfoTable(Composite parent,
-        Collection<SampleWrapper> sampleCollection) {
+        List<SampleWrapper> sampleCollection) {
         super(parent, sampleCollection, HEADINGS, BOUNDS);
         GridData tableData = ((GridData) getLayoutData());
         tableData.heightHint = 500;

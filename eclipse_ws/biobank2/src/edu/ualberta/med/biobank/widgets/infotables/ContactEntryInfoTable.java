@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -17,7 +15,7 @@ import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
 
 public class ContactEntryInfoTable extends ContactInfoTable {
 
-    private Collection<ContactWrapper> selectedContacts;
+    private List<ContactWrapper> selectedContacts;
 
     private List<ContactWrapper> addedOrModifiedContacts;
 
@@ -75,7 +73,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     private void setContacts(ClinicWrapper clinic) {
         selectedContacts = clinic.getContactCollection();
         if (selectedContacts == null) {
-            selectedContacts = new HashSet<ContactWrapper>();
+            selectedContacts = new ArrayList<ContactWrapper>();
         }
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();

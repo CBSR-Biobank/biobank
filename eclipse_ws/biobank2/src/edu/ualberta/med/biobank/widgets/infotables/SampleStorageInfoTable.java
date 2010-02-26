@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -69,7 +68,7 @@ public class SampleStorageInfoTable extends
         -1 };
 
     public SampleStorageInfoTable(Composite parent,
-        Collection<SampleStorageWrapper> sampleStorageCollection) {
+        List<SampleStorageWrapper> sampleStorageCollection) {
         super(parent, sampleStorageCollection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
     }

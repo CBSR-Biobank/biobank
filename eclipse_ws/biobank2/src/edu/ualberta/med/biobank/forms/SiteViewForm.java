@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Collection;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,7 +11,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
@@ -147,8 +144,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             }
         });
 
-        Collection<ClinicWrapper> clinics = site.getClinicCollection(true);
-        clinicsTable = new ClinicInfoTable(section, clinics);
+        clinicsTable = new ClinicInfoTable(section, site
+            .getClinicCollection(true));
         clinicsTable.adaptToToolkit(toolkit, true);
         clinicsTable.addDoubleClickListener(collectionDoubleClickListener);
         section.setClient(clinicsTable);

@@ -94,6 +94,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
+    private boolean paginationRequired;
+
     private Composite paginationWidget;
 
     protected PageInformation pageInfo = new PageInformation();
@@ -160,7 +162,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.getTable().setMenu(menu);
 
         model = new ArrayList<BiobankCollectionModel>();
-        tableViewer.setInput(model);
 
         if (collection != null) {
             initModel(collection);
@@ -184,22 +185,28 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         this(parent, false, collection, headings, columnWidths);
     }
 
-    private void initModel(List<T> collection) {
-        if (collection == null)
-            return;
-        for (int i = 0, n = collection.size(); i < n; ++i) {
-            model.add(new BiobankCollectionModel(i));
-        }
-    }
-
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         List<T> collection, String[] headings, int[] columnWidths,
         int rowsPerPage) {
         this(parent, multilineSelection, null, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
         addPaginationWidget(this);
-        initModel(collection);
-        setCollection(collection);
+        if (collection != null) {
+            initModel(collection);
+            setCollection(collection);
+        }
+    }
+
+    private void initModel(List<T> collection) {
+        if (collection == null)
+            return;
+
+        if (model.size() == collection.size())
+            return;
+
+        for (int i = 0, n = collection.size(); i < n; ++i) {
+            model.add(new BiobankCollectionModel(i));
+        }
     }
 
     private void addClipboadCopySupport() {
@@ -289,41 +296,64 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         }
 
         if ((pageInfo.rowsPerPage != 0)
-            && (collection.size() > pageInfo.rowsPerPage)) {
+            && (collection.size() > pageInfo.rowsPerPage)
+            && !paginationWidget.getVisible()) {
             pageInfo.page = 0;
             pageInfo.pageTotal = collection.size() / pageInfo.rowsPerPage + 1;
             enablePaginationWidget();
-            initModel(collection);
+            setPageLabelText();
+            paginationRequired = true;
         }
 
         backgroundThread = new Thread() {
-            @SuppressWarnings("unchecked")
             @Override
             public void run() {
                 final TableViewer viewer = getTableViewer();
                 Display display = viewer.getTable().getDisplay();
-                int count = 0;
+
+                initModel(collection);
+                display.syncExec(new Runnable() {
+                    public void run() {
+                        if (!viewer.getTable().isDisposed())
+                            getTableViewer().refresh();
+                    }
+                });
 
                 try {
-                    List<BiobankCollectionModel> input = (List<BiobankCollectionModel>) tableViewer
-                        .getInput();
-                    for (final BiobankCollectionModel item : input) {
+                    int start;
+                    int end;
+
+                    if (paginationRequired) {
+                        start = pageInfo.page * pageInfo.rowsPerPage;
+                        end = Math.min(start + pageInfo.rowsPerPage, model
+                            .size() - 1);
+                    } else {
+                        start = 0;
+                        end = model.size() - 1;
+                    }
+
+                    final List<BiobankCollectionModel> modelSubList = model
+                        .subList(start, end);
+
+                    for (int i = start; i <= end; ++i) {
                         if (viewer.getTable().isDisposed())
                             return;
+                        final BiobankCollectionModel item = model.get(i);
                         Assert.isNotNull(item != null);
-                        item.o = getCollectionModelObject(collection
-                            .get(item.index));
+                        if (item.o == null) {
+                            item.o = getCollectionModelObject(collection
+                                .get(item.index));
+                        }
 
                         if (!isDisposed()) {
                             display.syncExec(new Runnable() {
                                 public void run() {
                                     if (!viewer.getTable().isDisposed()) {
-                                        viewer.refresh(item, false);
+                                        tableViewer.setInput(modelSubList);
                                     }
                                 }
                             });
                         }
-                        ++count;
                     }
                 } catch (Exception e) {
                     LOGGER.error("setCollection error", e);
@@ -524,6 +554,9 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     private void enablePaginationWidget() {
+        if (paginationWidget.getVisible())
+            return;
+
         paginationWidget.setVisible(true);
         paginationWidget.setEnabled(true);
         if (pageInfo.pageTotal == 1) {
@@ -532,7 +565,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         } else {
             prevButton.setEnabled(false);
         }
-        setPageLabelText();
     }
 
     private void prevPage() {
@@ -545,7 +577,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             nextButton.setEnabled(true);
         }
         setPageLabelText();
-        refresh();
+        setCollection(collection);
     }
 
     private void nextPage() {
@@ -558,21 +590,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             nextButton.setEnabled(false);
         }
         setPageLabelText();
-        refresh();
+        setCollection(collection);
     }
 
     private void setPageLabelText() {
         pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
             + pageInfo.pageTotal);
         layout(true, true);
-    }
-
-    public void refresh() {
-        int start = pageInfo.page * pageInfo.rowsPerPage;
-        int end = start + pageInfo.rowsPerPage;
-        end = Math.min(end, model.size());
-        tableViewer.setInput(model.subList(start, end));
-        setCollection(collection);
     }
 }
 

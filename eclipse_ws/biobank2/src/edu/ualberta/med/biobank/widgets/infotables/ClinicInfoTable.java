@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -74,8 +73,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
-    public ClinicInfoTable(Composite parent,
-        Collection<ClinicWrapper> collection) {
+    public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
     }

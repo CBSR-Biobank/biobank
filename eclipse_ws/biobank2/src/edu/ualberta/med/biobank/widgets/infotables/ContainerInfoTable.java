@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,7 +75,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public ContainerInfoTable(Composite parent,
-        Collection<ContainerWrapper> collection) {
+        List<ContainerWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
     }

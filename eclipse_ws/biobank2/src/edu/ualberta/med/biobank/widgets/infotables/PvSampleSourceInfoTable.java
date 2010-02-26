@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -67,7 +66,7 @@ public class PvSampleSourceInfoTable extends
     private final static int[] bounds = new int[] { 250, 100, -1, -1, -1 };
 
     public PvSampleSourceInfoTable(Composite parent,
-        Collection<PvSampleSourceWrapper> collection) {
+        List<PvSampleSourceWrapper> collection) {
         super(parent, collection, headings, bounds);
         setSorter(new TableSorter());
     }

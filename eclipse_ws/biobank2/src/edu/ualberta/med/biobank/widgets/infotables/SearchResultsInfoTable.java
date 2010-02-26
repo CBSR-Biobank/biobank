@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
@@ -9,8 +8,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
-    public SearchResultsInfoTable(Composite parent,
-        Collection<Object> collection, String[] headings, int[] bounds) {
+    public SearchResultsInfoTable(Composite parent, List<Object> collection,
+        String[] headings, int[] bounds) {
         super(parent, false, collection, headings, bounds);
     }
 

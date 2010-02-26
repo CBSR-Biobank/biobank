@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.views;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class AdvancedReportsView extends ViewPart {
 
     private Button searchButton;
     private Button saveSearch;
-    private Collection<Object> searchData;
+    private List<Object> searchData;
     private SearchResultsInfoTable searchTable;
 
     public AdvancedReportsView() {
@@ -125,7 +124,7 @@ public class AdvancedReportsView extends ViewPart {
 
     }
 
-    private Collection<Object> search() {
+    private List<Object> search() {
         try {
             HQLCriteria c = queryPage.getQuery();
             List<Object> result = SessionManager.getAppService().query(c);

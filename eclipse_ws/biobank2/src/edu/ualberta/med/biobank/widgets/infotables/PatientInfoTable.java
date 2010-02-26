@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -60,8 +59,7 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     private static final int[] BOUNDS = new int[] { 150, 150, -1, -1, -1, -1 };
 
-    public PatientInfoTable(Composite parent,
-        Collection<PatientWrapper> patients) {
+    public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
         super(parent, true, patients, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
 

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -46,7 +45,7 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
         -1 };
 
     public SampleTypeInfoTable(Composite parent,
-        Collection<SampleTypeWrapper> sampleTypeCollection) {
+        List<SampleTypeWrapper> sampleTypeCollection) {
         super(parent, sampleTypeCollection, HEADINGS, BOUNDS);
         setSorter(new TableSorter());
     }
