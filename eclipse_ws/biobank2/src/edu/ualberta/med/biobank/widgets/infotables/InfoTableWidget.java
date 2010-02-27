@@ -202,10 +202,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     private void initModel(List<T> collection) {
-        if (collection == null)
-            return;
-
-        if (model.size() == collection.size())
+        if ((collection == null) || (model.size() == collection.size()))
             return;
 
         for (int i = 0, n = collection.size(); i < n; ++i) {
@@ -313,34 +310,35 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             @Override
             public void run() {
                 final TableViewer viewer = getTableViewer();
+                final Table table = viewer.getTable();
                 Display display = viewer.getTable().getDisplay();
+                int start;
+                int end;
 
                 initModel(collection);
+                if (paginationRequired) {
+                    start = pageInfo.page * pageInfo.rowsPerPage;
+                    end = Math.min(start + pageInfo.rowsPerPage, model.size());
+                } else {
+                    start = 0;
+                    end = model.size();
+                }
+
+                final List<BiobankCollectionModel> modelSubList = model
+                    .subList(start, end);
+
                 display.syncExec(new Runnable() {
                     public void run() {
-                        if (!viewer.getTable().isDisposed())
-                            getTableViewer().refresh();
+                        if (!table.isDisposed()) {
+                            tableViewer.setInput(modelSubList);
+                        }
                     }
                 });
 
                 try {
-                    int start;
-                    int end;
 
-                    if (paginationRequired) {
-                        start = pageInfo.page * pageInfo.rowsPerPage;
-                        end = Math.min(start + pageInfo.rowsPerPage, model
-                            .size() - 1);
-                    } else {
-                        start = 0;
-                        end = model.size() - 1;
-                    }
-
-                    final List<BiobankCollectionModel> modelSubList = model
-                        .subList(start, end);
-
-                    for (int i = start; i <= end; ++i) {
-                        if (viewer.getTable().isDisposed())
+                    for (int i = start; i < end; ++i) {
+                        if (table.isDisposed())
                             return;
                         final BiobankCollectionModel item = model.get(i);
                         Assert.isNotNull(item != null);
@@ -349,15 +347,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                                 .get(item.index));
                         }
 
-                        if (!isDisposed()) {
-                            display.syncExec(new Runnable() {
-                                public void run() {
-                                    if (!viewer.getTable().isDisposed()) {
-                                        tableViewer.setInput(modelSubList);
-                                    }
+                        display.syncExec(new Runnable() {
+                            public void run() {
+                                if (!table.isDisposed()) {
+                                    viewer.refresh(item, false);
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 } catch (Exception e) {
                     logger.error("setCollection error", e);

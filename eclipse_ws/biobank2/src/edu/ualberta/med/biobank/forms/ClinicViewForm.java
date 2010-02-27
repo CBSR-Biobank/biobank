@@ -64,8 +64,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createClinicSection();
         createAddressSection(clinic);
         createContactsSection();
-        // createStudiesSection();
-        // createShipmentsSection();
+        createStudiesSection();
+        createShipmentsSection();
     }
 
     private void createClinicSection() throws Exception {
