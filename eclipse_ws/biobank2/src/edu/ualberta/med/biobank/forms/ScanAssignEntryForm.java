@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -45,6 +44,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -58,8 +58,8 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
-    private static Logger LOGGER = Logger.getLogger(ScanAssignEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ScanAssignEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanAssignEntryForm";
 
@@ -632,7 +632,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSiteWrapper());
         } catch (Exception e) {
-            LOGGER.error("Error while reseting pallet values", e);
+            logger.error("Error while reseting pallet values", e);
         }
     }
 

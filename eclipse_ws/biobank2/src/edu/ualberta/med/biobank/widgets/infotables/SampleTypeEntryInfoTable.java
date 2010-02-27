@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Composite;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 /**
  * Displays the current sample storage collection and allows the user to add
@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
  */
 public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(SampleTypeEntryInfoTable.class.getName());
 
     private List<SampleTypeWrapper> selectedSampleTypes;
@@ -149,7 +149,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    LOGGER.error("BioBankFormBase.createPartControl Error", e);
+                    logger.error("BioBankFormBase.createPartControl Error", e);
                 }
             }
         });

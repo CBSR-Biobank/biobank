@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
@@ -22,6 +21,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -33,8 +33,8 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
 
-    private static Logger LOGGER = Logger.getLogger(BiobankViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankViewForm.class.getName());
 
     protected String sessionName;
 
@@ -58,7 +58,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 try {
                     reload();
                 } catch (Exception e) {
-                    LOGGER.error("Error sending event", e);
+                    logger.error("Error sending event", e);
                 }
             }
         };
@@ -114,7 +114,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                         } catch (final RemoteConnectFailureException exp) {
                             BioBankPlugin.openRemoteConnectErrorMessage();
                         } catch (Exception e) {
-                            LOGGER.error(
+                            logger.error(
                                 "BioBankFormBase.createPartControl Error", e);
                         }
                     }

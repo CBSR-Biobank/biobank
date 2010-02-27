@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -38,6 +37,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -53,8 +53,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class BiobankFormBase extends EditorPart {
 
-    private static Logger LOGGER = Logger.getLogger(BiobankFormBase.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankFormBase.class.getName());
 
     protected WritableApplicationService appService;
 
@@ -147,7 +147,7 @@ public abstract class BiobankFormBase extends EditorPart {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+            logger.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 

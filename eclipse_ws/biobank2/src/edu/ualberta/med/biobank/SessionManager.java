@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -14,6 +13,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
@@ -28,8 +28,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    private static Logger LOGGER = Logger.getLogger(SessionManager.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SessionManager.class.getName());
 
     private static SessionManager instance = null;
 
@@ -71,7 +71,7 @@ public class SessionManager {
 
     public void addSession(final WritableApplicationService appService,
         String serverName, String userName, Collection<SiteWrapper> sites) {
-        LOGGER.debug("addSession: " + serverName + ", user/" + userName
+        logger.debug("addSession: " + serverName + ", user/" + userName
             + " numSites/" + sites.size());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, userName);

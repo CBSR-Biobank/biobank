@@ -3,19 +3,19 @@ package edu.ualberta.med.biobank.helpers;
 import java.util.Collection;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
-import org.apache.log4j.Logger;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionHelper implements Runnable {
 
-    private static Logger LOGGER = Logger.getLogger(SessionHelper.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SessionHelper.class.getName());
 
     private String serverUrl;
 
@@ -58,7 +58,7 @@ public class SessionHelper implements Runnable {
             }
             siteWrappers = SiteWrapper.getSites(appService);
         } catch (ApplicationException exp) {
-            LOGGER.error("Error while logging to application", exp);
+            logger.error("Error while logging to application", exp);
             if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
                 BioBankPlugin.openAsyncError("Login Failed",

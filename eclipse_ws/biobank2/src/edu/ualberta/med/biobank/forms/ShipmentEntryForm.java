@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
@@ -32,8 +32,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
 
-    private static Logger LOGGER = Logger.getLogger(ShipmentEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ShipmentEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentEntryForm";
 
@@ -65,7 +65,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         try {
             shipmentWrapper.reload();
         } catch (Exception e) {
-            LOGGER.error("Error while retrieving shipment", e);
+            logger.error("Error while retrieving shipment", e);
         }
         String tabName;
         if (shipmentWrapper.isNew()) {

@@ -23,5 +23,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/biobank2/lib/commons-lang-2.4.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/biobank.common/lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -16,11 +15,12 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends TitleAreaDialog {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(SelectClinicContactDialog.class.getName());
 
     public static final int ADD_BTN_ID = 100;
@@ -75,7 +75,7 @@ public class SelectClinicContactDialog extends TitleAreaDialog {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+            logger.error("BioBankFormBase.createPartControl Error", e);
         }
 
         contactInfoTable.setEnabled(true);

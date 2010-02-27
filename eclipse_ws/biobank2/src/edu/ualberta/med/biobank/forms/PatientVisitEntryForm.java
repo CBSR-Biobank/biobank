@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -41,8 +41,8 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class PatientVisitEntryForm extends BiobankEntryForm {
 
-    private static Logger LOGGER = Logger.getLogger(PatientVisitEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(PatientVisitEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitEntryForm";
 
@@ -93,7 +93,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.reload();
             patient.reload();
         } catch (Exception e) {
-            LOGGER.error("Error while retrieving patient visit "
+            logger.error("Error while retrieving patient visit "
                 + patientVisitAdapter.getWrapper().getFormattedDateProcessed()
                 + " (Patient " + patientVisit.getPatient() + ")", e);
         }

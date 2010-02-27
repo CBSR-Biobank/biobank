@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -26,6 +25,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,7 +36,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class AdapterBase {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(AdapterBase.class.getName());
 
     protected static final String BGR_LOADING_LABEL = "loading...";
@@ -367,7 +367,7 @@ public abstract class AdapterBase {
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
-            LOGGER.error("Error while loading children of node "
+            logger.error("Error while loading children of node "
                 + modelObject.toString(), e);
         }
     }
@@ -434,14 +434,14 @@ public abstract class AdapterBase {
                     } catch (final RemoteAccessException exp) {
                         BioBankPlugin.openRemoteAccessErrorMessage();
                     } catch (Exception e) {
-                        LOGGER.error("Error while loading children of node "
+                        logger.error("Error while loading children of node "
                             + modelObject.toString() + " in background", e);
                     }
                 }
             };
             childUpdateThread.start();
         } catch (Exception e) {
-            LOGGER.error("Error while expanding children of node "
+            logger.error("Error while expanding children of node "
                 + modelObject.toString(), e);
         }
     }
@@ -534,7 +534,7 @@ public abstract class AdapterBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, id, true);
         } catch (PartInitException e) {
-            LOGGER.error("Can't open form with id " + id, e);
+            logger.error("Can't open form with id " + id, e);
         }
     }
 

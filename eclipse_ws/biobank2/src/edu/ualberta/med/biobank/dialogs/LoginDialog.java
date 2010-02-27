@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -42,6 +41,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -72,8 +72,8 @@ public class LoginDialog extends TitleAreaDialog {
 
     private static final String LAST_USER_NAME = "lastUserName";
 
-    private static final Logger logger = Logger.getLogger(LoginDialog.class
-        .getName());
+    private static final BiobankLogger logger = BiobankLogger
+        .getLogger(LoginDialog.class.getName());
 
     public Preferences pluginPrefs = null;
 

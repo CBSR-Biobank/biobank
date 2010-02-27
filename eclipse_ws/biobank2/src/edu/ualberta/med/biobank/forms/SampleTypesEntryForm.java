@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -11,6 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -19,8 +19,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SampleTypesEntryForm extends BiobankEntryForm {
 
-    private static Logger LOGGER = Logger.getLogger(SampleTypesEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SampleTypesEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleTypesEntryForm";
     public static final String OK_MESSAGE = "View and edit sample types.";
@@ -133,7 +133,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(
                 appService, true);
         } catch (ApplicationException e) {
-            LOGGER.error("Can't reset global sample types", e);
+            logger.error("Can't reset global sample types", e);
         }
         siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
         globalSampleWidget.setLists(globalSampleTypes, siteSampleTypes);

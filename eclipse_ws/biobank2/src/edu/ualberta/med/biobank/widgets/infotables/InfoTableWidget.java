@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
@@ -36,6 +35,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
@@ -75,8 +75,8 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
  */
 public abstract class InfoTableWidget<T> extends BiobankWidget {
 
-    private static Logger LOGGER = Logger.getLogger(InfoTableWidget.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(InfoTableWidget.class.getName());
 
     protected TableViewer tableViewer;
 
@@ -99,6 +99,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     private Composite paginationWidget;
 
     protected PageInformation pageInfo = new PageInformation();
+
+    private Button firstButton;
+
+    private Button lastButton;
 
     private Button prevButton;
 
@@ -356,7 +360,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.error("setCollection error", e);
+                    logger.error("setCollection error", e);
                 }
             }
 
@@ -514,10 +518,17 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         paginationWidget = new Composite(parent, SWT.NONE);
         paginationWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
             true));
-        GridLayout layout = new GridLayout(3, true);
+        GridLayout layout = new GridLayout(5, true);
         layout.marginTop = 0;
         layout.marginBottom = 0;
         paginationWidget.setLayout(layout);
+
+        firstButton = new Button(paginationWidget, SWT.NONE);
+        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_2_ARROW_LEFT));
+        firstButton.setToolTipText("First page");
+        firstButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
+            false, false));
 
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -548,6 +559,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 nextPage();
             }
         });
+
+        lastButton = new Button(paginationWidget, SWT.NONE);
+        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_2_ARROW_RIGHT));
+        lastButton.setToolTipText("Last page");
+        lastButton
+            .setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);

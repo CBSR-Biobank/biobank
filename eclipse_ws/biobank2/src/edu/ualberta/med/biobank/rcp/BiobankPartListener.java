@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.rcp;
 
-import org.apache.log4j.Logger;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
@@ -9,11 +8,12 @@ import org.eclipse.ui.WorkbenchException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AbstractPatientAdminForm;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class BiobankPartListener implements IPartListener {
 
-    private static Logger LOGGER = Logger.getLogger(BiobankPartListener.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankPartListener.class.getName());
 
     @Override
     public void partActivated(IWorkbenchPart part) {
@@ -35,7 +35,7 @@ public class BiobankPartListener implements IPartListener {
                         PatientsAdministrationPerspective.ID, workbench
                             .getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
-                    LOGGER.error("Error while opening patients perpective", e);
+                    logger.error("Error while opening patients perpective", e);
                 }
             }
             SessionManager.getInstance().unlockSite();

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -27,6 +26,7 @@ import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
@@ -36,8 +36,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public class CbsrConfigJob {
 
-    private static Logger LOGGER = Logger.getLogger(CbsrConfigJob.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(CbsrConfigJob.class.getName());
 
     protected WritableApplicationService appService;
 
@@ -106,7 +106,7 @@ public class CbsrConfigJob {
                         ++subTaskCount;
                     }
                 } catch (Exception e) {
-                    LOGGER.error("initialization error", e);
+                    logger.error("initialization error", e);
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
@@ -137,7 +137,7 @@ public class CbsrConfigJob {
                                     .openError("Init Examples",
                                         "Error encounted when adding init examples");
                         } catch (Exception e) {
-                            LOGGER.error("Init Examples error", e);
+                            logger.error("Init Examples error", e);
                         }
                     }
                 });

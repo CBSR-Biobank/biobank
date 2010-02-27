@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -34,6 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -51,8 +51,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm";
 
-    private static Logger LOGGER = Logger.getLogger(ContainerViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ContainerViewForm.class.getName());
 
     private ContainerAdapter containerAdapter;
 
@@ -332,7 +332,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     try {
                         reload();
                     } catch (Exception e) {
-                        LOGGER.error("Error loading", e);
+                        logger.error("Error loading", e);
                     }
                     if (rebuild) {
                         containerAdapter.rebuild();

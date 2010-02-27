@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.rcp;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IWorkbench;
@@ -13,9 +12,11 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
+import edu.ualberta.med.biobank.logs.BiobankLogger;
+
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
 
     public ApplicationWorkbenchWindowAdvisor(
@@ -63,7 +64,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 workbench.showPerspective(PatientsAdministrationPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
             } catch (WorkbenchException e) {
-                LOGGER.error("Error while opening patients perpective", e);
+                logger.error("Error while opening patients perpective", e);
             }
         }
         page.addPartListener(new BiobankPartListener());

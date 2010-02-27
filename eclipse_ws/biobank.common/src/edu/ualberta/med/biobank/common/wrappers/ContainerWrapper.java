@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -28,9 +26,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends
     AbstractPositionHolder<Container, ContainerPosition> {
-
-    private static Logger LOGGER = Logger.getLogger(ContainerWrapper.class
-        .getName());
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
@@ -469,26 +464,20 @@ public class ContainerWrapper extends
         if (samples == null) {
             samples = new TreeMap<RowColPos, SampleWrapper>();
             propertiesMap.put("samples", samples);
-        } else
-            try {
-                if (!canHoldSample(sample)) {
-                    throw new BiobankCheckException("Container "
-                        + getFullInfoLabel()
-                        + " does not allow inserts of type "
-                        + sample.getSampleType().getName() + ".");
-                } else {
-                    SampleWrapper sampleAtPosition = getSample(row, col);
-                    if (sampleAtPosition != null) {
-                        throw new BiobankCheckException("Container "
-                            + getFullInfoLabel()
-                            + " is already holding a sample at position "
-                            + sampleAtPosition.getPositionString(false, false)
-                            + " (" + row + ":" + col + ")");
-                    }
-                }
-            } catch (ApplicationException e) {
-                LOGGER.error("Adding sample failed.", e);
+        } else if (!canHoldSample(sample)) {
+            throw new BiobankCheckException("Container " + getFullInfoLabel()
+                + " does not allow inserts of type "
+                + sample.getSampleType().getName() + ".");
+        } else {
+            SampleWrapper sampleAtPosition = getSample(row, col);
+            if (sampleAtPosition != null) {
+                throw new BiobankCheckException("Container "
+                    + getFullInfoLabel()
+                    + " is already holding a sample at position "
+                    + sampleAtPosition.getPositionString(false, false) + " ("
+                    + row + ":" + col + ")");
             }
+        }
         sample.setPosition(row, col);
         sample.setParent(this);
         samples.put(new RowColPos(row, col), sample);

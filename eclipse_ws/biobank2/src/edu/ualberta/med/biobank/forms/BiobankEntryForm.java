@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.acegisecurity.AccessDeniedException;
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -47,6 +46,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -60,8 +60,8 @@ import edu.ualberta.med.biobank.widgets.DateTimeWidget;
  */
 public abstract class BiobankEntryForm extends BiobankFormBase {
 
-    private static Logger LOGGER = Logger.getLogger(BiobankEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankEntryForm.class.getName());
 
     private static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
         .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
@@ -151,8 +151,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     setDirty(true);
                 } catch (BiobankCheckException bce) {
                     setDirty(true);
-                    BioBankPlugin
-                        .openAsyncError("Save error", bce.getMessage());
+                    BioBankPlugin.openAsyncError("Save error", bce);
                 } catch (Exception e) {
                     setDirty(true);
                     throw new RuntimeException(e);
@@ -377,7 +376,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Can't save the form", e);
+            logger.error("Can't save the form", e);
         }
     }
 
@@ -387,7 +386,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().closeEditor(this, false);
         } catch (Exception e) {
-            LOGGER.error("Can't close the form", e);
+            logger.error("Can't close the form", e);
         }
     }
 
