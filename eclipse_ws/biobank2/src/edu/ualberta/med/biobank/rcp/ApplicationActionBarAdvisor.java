@@ -28,11 +28,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ApplicationActionBarAdvisor.class.getName());
 
-    private IWorkbenchAction aboutAction;
-
     public static final String VIEW_ID_PARM = "org.eclipse.ui.views.showView.viewId";
     public static final String ERROR_LOGS_VIEW = "org.eclipse.pde.runtime.LogView";
     private Action showDlgAction;
+
+    public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail";
+    private Action sendErrorMailAction;
+
+    private IWorkbenchAction aboutAction;
 
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
@@ -40,6 +43,34 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void makeActions(IWorkbenchWindow window) {
+        createSendErrorMailAction(window);
+
+        createShowErrorLogsAction(window);
+
+        // about action
+        aboutAction = ActionFactory.ABOUT.create(window);
+        register(aboutAction);
+    }
+
+    private void createSendErrorMailAction(IWorkbenchWindow window) {
+        final IHandlerService handlerService = (IHandlerService) window
+            .getService(IHandlerService.class);
+        sendErrorMailAction = new Action("Send Error Mail") {
+            @Override
+            public void run() {
+                try {
+                    handlerService.executeCommand(SEND_ERROR_EMAIL_ID, null);
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Problem with command", e);
+                }
+            }
+        };
+        sendErrorMailAction.setId("sendErrorMail");
+        register(sendErrorMailAction);
+
+    }
+
+    private void createShowErrorLogsAction(IWorkbenchWindow window) {
         // Show error logs view action
         final IHandlerService handlerService = (IHandlerService) window
             .getService(IHandlerService.class);
@@ -71,10 +102,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         };
         showDlgAction.setId("showErrorLogs");
         register(showDlgAction);
-
-        // about action
-        aboutAction = ActionFactory.ABOUT.create(window);
-        register(aboutAction);
     }
 
     @Override
@@ -88,11 +115,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         // activity if we don't want this menu to be displayed, but it is not
         // displayed after the product is exported
         helpMenu.add(new Separator("group.assist"));
-        // View Error Logs
+        helpMenu.add(sendErrorMailAction);
         helpMenu.add(showDlgAction);
-
         helpMenu.add(new Separator());
-        // About
         helpMenu.add(aboutAction);
     }
 }

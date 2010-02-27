@@ -11,7 +11,8 @@ Bundle-ClassPath: .,
  lib/commons-lang-2.4.jar,
  lib/iText-2.1.0.jar,
  lib/DynamicJasper-3.0.14.jar,
- lib/jdt-compiler-3.1.1.jar
+ lib/jdt-compiler-3.1.1.jar,
+ lib/mail.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
@@ -27,7 +28,9 @@ Require-Bundle: org.eclipse.ui,
  sampleProcessingRobot;bundle-version="0.0.1";resolution:=optional,
  biobank.common;visibility:=reexport,
  org.eclipse.ui.console;bundle-version="3.4.0",
- org.eclipse.ui.views.log;bundle-version="1.0.100"
+ org.eclipse.ui.views.log;bundle-version="1.0.100",
+ org.eclipse.equinox.security;bundle-version="1.0.100",
+ org.eclipse.equinox.security.ui;bundle-version="1.0.100"
 Bundle-Version: 1.1.2
 Bundle-Vendor: AICML
 Import-Package: org.apache.log4j,

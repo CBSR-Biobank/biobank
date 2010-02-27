@@ -82,6 +82,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_STUDIES = "studies";
     public static final String IMG_STUDY = "study";
     public static final String IMG_USER_ADD = "userAdd";
+    public static final String IMG_EMAIL = "email";
+    public static final String IMG_EMAIL_BANNER = "emailBanner";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -179,6 +181,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
         registerImage(registry, IMG_STUDY, "study.png");
+        registerImage(registry, IMG_EMAIL, "email.png");
+        registerImage(registry, IMG_EMAIL_BANNER, "email_banner.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
