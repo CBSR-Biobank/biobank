@@ -72,8 +72,14 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
  * abstract method getCollectionModelObject().
  * 
  * @param <T> The model object wrapper the table is based on.
+ * 
  */
 public abstract class InfoTableWidget<T> extends BiobankWidget {
+
+    /*
+     * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
+     * .html for how to set row height.
+     */
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(InfoTableWidget.class.getName());
@@ -201,6 +207,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             initModel(collection);
             setCollection(collection);
         }
+        Table table = getTableViewer().getTable();
+        GridData gd = (GridData) table.getLayoutData();
+        gd.heightHint = (table.getItemHeight() + 2) * rowsPerPage;
+        table.setLayoutData(gd);
     }
 
     private void initModel(List<T> collection) {

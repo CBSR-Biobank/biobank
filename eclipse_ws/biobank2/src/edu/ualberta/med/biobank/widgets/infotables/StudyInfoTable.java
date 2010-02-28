@@ -74,7 +74,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS);
+        super(parent, true, collection, HEADINGS, BOUNDS, 5);
         setSorter(new TableSorter());
     }
 

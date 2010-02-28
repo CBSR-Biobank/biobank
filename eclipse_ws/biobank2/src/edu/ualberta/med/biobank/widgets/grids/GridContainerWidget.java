@@ -103,7 +103,7 @@ public class GridContainerWidget extends AbstractGridWidget {
         }
 
         if (getCellHeight() <= HEIGHT_TWO_LINES) {
-            return text + " - " + getContainerTypeText(indexRow, indexCol);
+            return text + " " + getContainerTypeText(indexRow, indexCol);
         }
         return text;
     }
