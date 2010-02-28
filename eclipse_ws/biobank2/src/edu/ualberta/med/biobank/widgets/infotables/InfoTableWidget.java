@@ -117,8 +117,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         super(parent, SWT.NONE);
 
         pageInfo.rowsPerPage = 0;
+        GridLayout gl = new GridLayout(1, false);
+        gl.verticalSpacing = 1;
+        setLayout(gl);
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        setLayout(new GridLayout(1, false));
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;
@@ -512,25 +514,26 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected void addPaginationWidget(Composite parent) {
         paginationWidget = new Composite(parent, SWT.NONE);
-        paginationWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-            true));
-        GridLayout layout = new GridLayout(5, true);
-        layout.marginTop = 0;
-        layout.marginBottom = 0;
-        paginationWidget.setLayout(layout);
+        paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_2_ARROW_LEFT));
         firstButton.setToolTipText("First page");
-        firstButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
-            false, false));
+        firstButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false,
+            false));
+        firstButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                firstPage();
+            }
+        });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_ARROW_LEFT));
         prevButton.setToolTipText("Previous page");
-        prevButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+        prevButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false,
             false));
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -540,15 +543,15 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         });
 
         pageLabel = new Label(paginationWidget, SWT.NONE);
-        pageLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,
-            false));
+        GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+        gd.widthHint = 80;
+        pageLabel.setLayoutData(gd);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_ARROW_RIGHT));
         nextButton.setToolTipText("Next page");
-        nextButton
-            .setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+        nextButton.setLayoutData(new GridData(SWT.END, SWT.TOP, false, false));
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -560,25 +563,52 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_2_ARROW_RIGHT));
         lastButton.setToolTipText("Last page");
-        lastButton
-            .setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+        lastButton.setLayoutData(new GridData(SWT.END, SWT.TOP, false, false));
+        lastButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                lastPage();
+            }
+        });
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
+        gd = new GridData(SWT.CENTER, SWT.TOP, true, true);
+        gd.exclude = true;
+        paginationWidget.setLayoutData(gd);
     }
 
     private void enablePaginationWidget() {
         if (paginationWidget.getVisible())
             return;
 
+        GridData gd = (GridData) paginationWidget.getLayoutData();
+        gd.exclude = false;
         paginationWidget.setVisible(true);
         paginationWidget.setEnabled(true);
-        if (pageInfo.pageTotal == 1) {
-            prevButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        } else {
-            prevButton.setEnabled(false);
-        }
+        firstButton.setEnabled(false);
+        prevButton.setEnabled(false);
+        layout(true);
+    }
+
+    private void firstPage() {
+        pageInfo.page = 0;
+        firstButton.setEnabled(false);
+        prevButton.setEnabled(false);
+        lastButton.setEnabled(true);
+        nextButton.setEnabled(true);
+        setPageLabelText();
+        setCollection(collection);
+    }
+
+    private void lastPage() {
+        pageInfo.page = pageInfo.pageTotal - 1;
+        firstButton.setEnabled(true);
+        prevButton.setEnabled(true);
+        lastButton.setEnabled(false);
+        nextButton.setEnabled(false);
+        setPageLabelText();
+        setCollection(collection);
     }
 
     private void prevPage() {
@@ -586,8 +616,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             return;
         pageInfo.page--;
         if (pageInfo.page == 0) {
+            firstButton.setEnabled(false);
             prevButton.setEnabled(false);
         } else if (pageInfo.page == pageInfo.pageTotal - 2) {
+            lastButton.setEnabled(true);
             nextButton.setEnabled(true);
         }
         setPageLabelText();
@@ -599,8 +631,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             return;
         pageInfo.page++;
         if (pageInfo.page == 1) {
+            firstButton.setEnabled(true);
             prevButton.setEnabled(true);
         } else if (pageInfo.page == pageInfo.pageTotal - 1) {
+            lastButton.setEnabled(false);
             nextButton.setEnabled(false);
         }
         setPageLabelText();
