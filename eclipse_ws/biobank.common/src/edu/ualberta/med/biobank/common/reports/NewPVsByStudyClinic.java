@@ -47,4 +47,9 @@ public class NewPVsByStudyClinic extends QueryObject {
         return sumByDate(results);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
 }
