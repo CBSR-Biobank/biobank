@@ -74,7 +74,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 5);
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
         setSorter(new TableSorter());
     }
 

@@ -10,7 +10,7 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
         String[] headings, int[] bounds) {
-        super(parent, false, collection, headings, bounds);
+        super(parent, false, collection, headings, bounds, false);
     }
 
     @Override

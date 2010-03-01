@@ -76,7 +76,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     public ContainerInfoTable(Composite parent,
         List<ContainerWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 5);
+        super(parent, true, collection, HEADINGS, BOUNDS, true);
         setSorter(new TableSorter());
     }
 

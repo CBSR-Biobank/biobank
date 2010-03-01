@@ -60,7 +60,7 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
     private static final int[] BOUNDS = new int[] { 150, 150, -1, -1, -1, -1 };
 
     public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
-        super(parent, true, patients, HEADINGS, BOUNDS);
+        super(parent, true, patients, HEADINGS, BOUNDS, true);
         setSorter(new TableSorter());
 
         // tableViewer.addDoubleClickListener(new IDoubleClickListener() {

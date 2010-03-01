@@ -9,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -38,6 +39,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
@@ -51,6 +54,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Shipment;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -64,7 +68,10 @@ public class Importer {
     private static final Logger logger = Logger.getLogger(Importer.class
         .getName());
 
-    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String WAYBILL_DATE_FORMAT = "yyyyMMdd";
+
+    private static SimpleDateFormat WAYBILL_DATE_FORMATTER = new SimpleDateFormat(
+        WAYBILL_DATE_FORMAT);
 
     private static WritableApplicationService appService;
 
@@ -163,6 +170,10 @@ public class Importer {
 
     private static Configuration configuration;
 
+    private static SampleSourceWrapper importSourceVessel;
+
+    private static Date defaultDateShipped;
+
     public static void main(String[] args) {
         try {
             configuration = new Configuration("config.properties");
@@ -247,9 +258,12 @@ public class Importer {
         initTopContainersMap();
         initShipmentCompanyMap();
 
+        checkSourceVessels();
         checkShippingCompanies();
         checkSampleTypes();
         checkContainerConfiguration();
+
+        defaultDateShipped = getDateFromStr("1900-01-01");
 
         if (configuration.importPatients()) {
             importPatients();
@@ -407,6 +421,21 @@ public class Importer {
         if (shippingCompanyMap.get("unknown") == null) {
             logger
                 .error("shipping company \"unknown\" missing - configuration failed");
+            System.exit(1);
+        }
+    }
+
+    private static void checkSourceVessels() throws ApplicationException {
+        for (SampleSourceWrapper sourceVessel : SampleSourceWrapper
+            .getAllSampleSources(appService)) {
+            if (sourceVessel.getName().equals("Unknown - import")) {
+                importSourceVessel = sourceVessel;
+            }
+        }
+
+        if (importSourceVessel == null) {
+            logger
+                .error("\"import\" source vessel is missing in configuration");
             System.exit(1);
         }
     }
@@ -776,9 +805,10 @@ public class Importer {
 
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
-                shipment.setWaybill(String.format("W-CBSR-%s-%05d", clinicName,
-                    count));
+                shipment.setWaybill(String.format("W-CBSR-%s-%s", clinicName,
+                    getWaybillDate(dateReceived)));
                 shipment.setDateReceived(dateReceived);
+                shipment.setDateShipped(defaultDateShipped);
                 shipment.addPatients(Arrays.asList(patient));
                 shipment.setShippingCompany(unknownShippingCompany);
                 shipment.persist();
@@ -906,7 +936,15 @@ public class Importer {
             pv.setDateProcessed(dateProcessed);
             pv.setPatient(patient);
             pv.setShipment(shipment);
-            pv.setComment(rs.getString(4));
+
+            PvSampleSourceWrapper sourceVessel = new PvSampleSourceWrapper(
+                appService);
+            sourceVessel.setSampleSource(importSourceVessel);
+            sourceVessel.setQuantity(0);
+            sourceVessel.setDateDrawn(getDateFromStr(rs.getString(5)));
+            sourceVessel.setPatientVisit(pv);
+
+            pv.addPvSampleSources(Arrays.asList(sourceVessel));
 
             logger.debug("importing patient visit: " + importCounts.visits
                 + " patient/" + patient.getPnumber() + " study/"
@@ -935,6 +973,10 @@ public class Importer {
                     pv.setPvAttrValue(label, StringUtils.join(consents, ";"));
                 } else if (label.equals("Worksheet")) {
                     pv.setPvAttrValue(label, rs.getString(15));
+                } else if (label.equals("Phlebotomist")) {
+                    if (studyNameShort.equals("BBP")) {
+                        pv.setPvAttrValue(label, rs.getString(4));
+                    }
                 }
             }
 
@@ -1127,6 +1169,15 @@ public class Importer {
                         logger.error("sample type not in database: "
                             + sampleTypeNameShort);
                         continue;
+                    }
+
+                    SampleStorageWrapper ss = getSampleStorage(study,
+                        sampleType);
+                    if (ss == null) {
+                        logger.error("study \"" + study.getNameShort()
+                            + "\" has no sample storage for sample type \""
+                            + sampleType.getName() + "\"");
+                        return;
                     }
 
                     SampleWrapper sample = new SampleWrapper(appService);
@@ -1344,12 +1395,19 @@ public class Importer {
     }
 
     public static Date getDateFromStr(String str) throws ParseException {
-        Date dateProcessed = DateFormatter.parseToDateTime(str);
+        Date date = DateFormatter.parseToDateTime(str);
+        if (date == null) {
+            date = DateFormatter.parseToDate(str);
+        }
         Calendar cal = new GregorianCalendar();
-        cal.setTime(dateProcessed);
+        cal.setTime(date);
         cal.set(Calendar.MILLISECOND, 0);
         cal.set(Calendar.SECOND, 0);
         return cal.getTime();
+    }
+
+    public static String getWaybillDate(Date dateReceived) {
+        return WAYBILL_DATE_FORMATTER.format(dateReceived);
     }
 
     public static SampleStorageWrapper getSampleStorage(StudyWrapper study,

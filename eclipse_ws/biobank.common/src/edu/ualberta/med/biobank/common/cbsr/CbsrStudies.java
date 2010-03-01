@@ -256,6 +256,7 @@ public class CbsrStudies {
             "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
         addPvAttr("BBPSP", "Worksheet", "text");
         addPvAttr("BBPSP", "PBMC Count", "number");
+        addPvAttr("BBPSP", "Phlebotomist", "text");
         addPvAttr("CCCS", "PBMC Count", "number");
         addPvAttr("CCCS", "Worksheet", "text");
         addPvAttr("CEGIIR", "Worksheet", "text");

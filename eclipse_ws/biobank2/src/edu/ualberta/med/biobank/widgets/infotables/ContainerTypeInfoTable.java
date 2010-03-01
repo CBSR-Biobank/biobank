@@ -97,7 +97,7 @@ public class ContainerTypeInfoTable extends
 
     public ContainerTypeInfoTable(Composite parent,
         List<ContainerTypeWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 5);
+        super(parent, true, collection, HEADINGS, BOUNDS, true);
         setSorter(new TableSorter());
     }
 
