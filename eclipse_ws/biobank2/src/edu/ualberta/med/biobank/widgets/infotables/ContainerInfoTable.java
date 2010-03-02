@@ -76,12 +76,11 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     public ContainerInfoTable(Composite parent,
         List<ContainerWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, true);
-        setSorter(new TableSorter());
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -111,6 +110,11 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

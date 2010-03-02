@@ -83,13 +83,12 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
-        super(parent, study.getContactCollection(), HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+        super(parent, true, study.getContactCollection(), HEADINGS, BOUNDS, 10);
         this.study = study;
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -118,6 +117,11 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

@@ -80,11 +80,10 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
         super(parent, contactCollection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -113,6 +112,11 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

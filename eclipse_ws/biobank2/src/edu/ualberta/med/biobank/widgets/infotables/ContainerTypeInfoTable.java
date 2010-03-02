@@ -97,12 +97,11 @@ public class ContainerTypeInfoTable extends
 
     public ContainerTypeInfoTable(Composite parent,
         List<ContainerTypeWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, true);
-        setSorter(new TableSorter());
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -134,6 +133,11 @@ public class ContainerTypeInfoTable extends
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

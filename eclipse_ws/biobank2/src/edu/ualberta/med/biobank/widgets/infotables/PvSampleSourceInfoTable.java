@@ -60,19 +60,18 @@ public class PvSampleSourceInfoTable extends
         }
     }
 
-    private final static String[] headings = new String[] { "Name", "Quantity",
+    private final static String[] HEADINGS = new String[] { "Name", "Quantity",
         "Date Drawn" };
 
-    private final static int[] bounds = new int[] { 250, 100, -1, -1, -1 };
+    private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
 
     public PvSampleSourceInfoTable(Composite parent,
         List<PvSampleSourceWrapper> collection) {
-        super(parent, collection, headings, bounds);
-        setSorter(new TableSorter());
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -96,6 +95,11 @@ public class PvSampleSourceInfoTable extends
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

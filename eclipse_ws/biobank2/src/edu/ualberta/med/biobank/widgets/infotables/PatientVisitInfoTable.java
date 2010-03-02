@@ -61,12 +61,11 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     public PatientVisitInfoTable(Composite parent,
         List<PatientVisitWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -89,6 +88,11 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

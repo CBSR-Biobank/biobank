@@ -14,7 +14,7 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -35,6 +35,11 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
                 return "no label provider";
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new BiobankTableSorter();
     }
 
     @Override

@@ -71,14 +71,13 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic)
         throws ApplicationException {
-        super(parent, true, null, HEADINGS, BOUNDS, 5);
+        super(parent, true, null, HEADINGS, BOUNDS, 10);
         this.clinic = clinic;
         setCollection(clinic.getStudyCollection());
-        setSorter(new TableSorter());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -104,6 +103,11 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

@@ -41,7 +41,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = s1.dateReceived.compareTo(s2.dateReceived);
+                rc = s2.dateReceived.compareTo(s1.dateReceived);
                 break;
             case 1:
                 rc = s1.waybill.compareTo(s2.waybill);
@@ -71,11 +71,10 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS,
             10);
-        setSorter(new TableSorter());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -100,6 +99,11 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     /**

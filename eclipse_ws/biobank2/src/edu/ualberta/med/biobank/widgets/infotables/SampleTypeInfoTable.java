@@ -47,11 +47,10 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
     public SampleTypeInfoTable(Composite parent,
         List<SampleTypeWrapper> sampleTypeCollection) {
         super(parent, sampleTypeCollection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -72,6 +71,11 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

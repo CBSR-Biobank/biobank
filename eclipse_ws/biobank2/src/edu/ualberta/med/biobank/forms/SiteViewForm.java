@@ -42,6 +42,8 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private Text topContainerCountLabel;
 
+    private Text shipmentCountLabel;
+
     private Text patientCountLabel;
 
     private Text patientVisitCountLabel;
@@ -94,6 +96,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             "Container Types");
         topContainerCountLabel = createReadOnlyField(client, SWT.NONE,
             "Top Level Containers");
+        shipmentCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Shipments");
         patientCountLabel = createReadOnlyField(client, SWT.NONE,
             "Total Patients");
         patientVisitCountLabel = createReadOnlyField(client, SWT.NONE,
@@ -113,6 +117,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             .size());
         setTextValue(topContainerCountLabel, site.getTopContainerCollection()
             .size());
+        setTextValue(shipmentCountLabel, site.getShipmentCount());
         setTextValue(patientCountLabel, site.getPatientCount());
         setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
         setTextValue(sampleCountLabel, site.getSampleCount());

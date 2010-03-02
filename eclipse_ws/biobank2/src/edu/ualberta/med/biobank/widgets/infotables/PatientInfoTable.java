@@ -61,29 +61,10 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
         super(parent, true, patients, HEADINGS, BOUNDS, true);
-        setSorter(new TableSorter());
-
-        // tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-        // @Override
-        // public void doubleClick(DoubleClickEvent event) {
-        // Object selection = event.getSelection();
-        // BiobankCollectionModel obj = (BiobankCollectionModel)
-        // ((StructuredSelection) selection)
-        // .getFirstElement();
-        // Assert
-        // .isTrue(obj.o instanceof TableRowData,
-        // "Invalid class where patient expected: "
-        // + obj.o.getClass());
-        //
-        // TableRowData item = (TableRowData) obj.o;
-        // ShipmentAdministrationView.currentInstance
-        // .displayPatient(item.patient);
-        // }
-        // });
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -105,6 +86,11 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

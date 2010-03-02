@@ -84,6 +84,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(InfoTableWidget.class.getName());
 
+    private static final int DEFAULT_NUM_ROWS = 10;
+
     private static int ROW_SIZE_ADJUST;
 
     static {
@@ -191,12 +193,15 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             getTableViewer().refresh();
             setCollection(collection);
 
+            int height = table.getItemHeight() + ROW_SIZE_ADJUST;
             if (resize) {
-                gd = (GridData) table.getLayoutData();
-                gd.heightHint = (table.getItemHeight() + ROW_SIZE_ADJUST)
-                    * collection.size();
-                table.setLayoutData(gd);
+                height *= collection.size();
+            } else {
+                height *= DEFAULT_NUM_ROWS;
             }
+            gd = (GridData) table.getLayoutData();
+            gd.heightHint = height;
+            table.setLayoutData(gd);
         }
 
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -207,7 +212,15 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 }
             }
         });
+        setSorter();
         addClipboadCopySupport();
+        addPaginationWidget(this);
+    }
+
+    public InfoTableWidget(Composite parent, boolean multiLineSelection,
+        List<T> collection, String[] headings, int[] columnWidths) {
+        this(parent, multiLineSelection, collection, headings, columnWidths,
+            false);
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
@@ -224,11 +237,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         if (collection != null) {
             initModel(collection);
             setCollection(collection);
-            Table table = getTableViewer().getTable();
-            GridData gd = (GridData) table.getLayoutData();
-            gd.heightHint = (table.getItemHeight() + ROW_SIZE_ADJUST)
-                * rowsPerPage;
-            table.setLayoutData(gd);
+            resizeTable();
         }
     }
 
@@ -273,7 +282,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected abstract String getCollectionModelObjectToString(Object o);
 
-    protected void setSorter(final BiobankTableSorter tableSorter) {
+    private void setSorter() {
+        final BiobankTableSorter tableSorter = getTableSorter();
         tableViewer.setSorter(tableSorter);
         final Table table = tableViewer.getTable();
         for (int i = 0, n = table.getColumnCount(); i < n; ++i) {
@@ -304,7 +314,9 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.refresh();
     }
 
-    public abstract BiobankLabelProvider getLabelProvider();
+    protected abstract BiobankLabelProvider getLabelProvider();
+
+    protected abstract BiobankTableSorter getTableSorter();
 
     @Override
     public boolean setFocus() {
@@ -339,6 +351,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             setPageLabelText();
             paginationRequired = true;
         }
+
+        resizeTable();
 
         backgroundThread = new Thread() {
             @Override
@@ -552,8 +566,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_2_ARROW_LEFT));
         firstButton.setToolTipText("First page");
-        firstButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false,
-            false));
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -565,8 +577,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_ARROW_LEFT));
         prevButton.setToolTipText("Previous page");
-        prevButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false,
-            false));
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -575,7 +585,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         });
 
         pageLabel = new Label(paginationWidget, SWT.NONE);
-        GridData gd = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+        GridData gd = new GridData(SWT.END, SWT.CENTER, false, false);
         gd.widthHint = 80;
         pageLabel.setLayoutData(gd);
 
@@ -583,7 +593,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_ARROW_RIGHT));
         nextButton.setToolTipText("Next page");
-        nextButton.setLayoutData(new GridData(SWT.END, SWT.TOP, false, false));
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -595,7 +604,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_2_ARROW_RIGHT));
         lastButton.setToolTipText("Last page");
-        lastButton.setLayoutData(new GridData(SWT.END, SWT.TOP, false, false));
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -605,7 +613,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
-        gd = new GridData(SWT.CENTER, SWT.TOP, true, true);
+        gd = new GridData(SWT.END, SWT.TOP, true, true);
         gd.exclude = true;
         paginationWidget.setLayoutData(gd);
     }
@@ -677,6 +685,30 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
             + pageInfo.pageTotal);
         layout(true, true);
+    }
+
+    private void resizeTable() {
+        int rows;
+        if (pageInfo.rowsPerPage != 0) {
+            rows = pageInfo.rowsPerPage;
+            if (collection != null) {
+                rows = Math.min(pageInfo.rowsPerPage, collection.size());
+            }
+        } else if (collection != null) {
+            rows = Math.min(DEFAULT_NUM_ROWS, collection.size());
+        } else {
+            rows = DEFAULT_NUM_ROWS;
+        }
+
+        if (rows == 0) {
+            rows = 1;
+        }
+
+        Table table = getTableViewer().getTable();
+        GridData gd = (GridData) table.getLayoutData();
+        gd.heightHint = (table.getItemHeight() + ROW_SIZE_ADJUST) * rows;
+        table.setLayoutData(gd);
+        layout(true);
     }
 }
 

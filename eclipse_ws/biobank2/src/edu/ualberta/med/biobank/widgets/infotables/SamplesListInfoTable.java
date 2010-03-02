@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -90,14 +89,11 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
 
     public SamplesListInfoTable(Composite parent,
         List<SampleWrapper> sampleCollection) {
-        super(parent, sampleCollection, HEADINGS, BOUNDS);
-        GridData tableData = ((GridData) getLayoutData());
-        tableData.heightHint = 500;
-        setSorter(new TableSorter());
+        super(parent, true, sampleCollection, HEADINGS, BOUNDS, 96);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -130,6 +126,11 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

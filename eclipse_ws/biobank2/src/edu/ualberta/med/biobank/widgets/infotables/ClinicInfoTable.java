@@ -75,11 +75,10 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS, 10);
-        setSorter(new TableSorter());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -106,6 +105,11 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override
