@@ -25,10 +25,15 @@ import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ExpandAdapter;
+import org.eclipse.swt.events.ExpandEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ExpandBar;
+import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -40,6 +45,8 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 public class SendErrorMessageDialog extends BiobankDialog {
 
     private EMailDescriptor email;
+
+    private int compositeHeight;
 
     private static final BiobankLogger logger = BiobankLogger
         .getLogger(SendErrorMessageDialog.class.getName());
@@ -80,28 +87,62 @@ public class SendErrorMessageDialog extends BiobankDialog {
         gd.heightHint = 200;
         descText.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.NONE,
-            "Smtp server", new String[0], PojoObservables.observeValue(email,
-                "smtpServer"), new NonEmptyStringValidator(
-                "Please enter the smtp server name"));
+        ExpandBar bar = new ExpandBar(contents, SWT.NONE);
+        bar.setLayoutData(new GridData(GridData.FILL_BOTH));
+        final Composite compositeWithBar = new Composite(bar, SWT.NONE);
+        compositeWithBar.setLayout(new GridLayout(2, false));
+        GridData compData = new GridData(GridData.FILL_BOTH);
+        compositeWithBar.setLayoutData(compData);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.NONE, "Port",
-            new String[0], PojoObservables.observeValue(email, "serverPort"),
-            new NonEmptyStringValidator("Please enter the server port"));
+        Text smtp = (Text) createBoundWidgetWithLabel(compositeWithBar,
+            Text.class, SWT.NONE, "Smtp server", new String[0], PojoObservables
+                .observeValue(email, "smtpServer"),
+            new NonEmptyStringValidator("Please enter the smtp server name"));
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.NONE, "Username",
-            new String[0], PojoObservables
-                .observeValue(email, "serverUsername"),
-            new NonEmptyStringValidator("Please enter the server username"));
+        createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
+            "Port", new String[0], PojoObservables.observeValue(email,
+                "serverPort"), new NonEmptyStringValidator(
+                "Please enter the server port"));
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.PASSWORD,
+        createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
+            "Username", new String[0], PojoObservables.observeValue(email,
+                "serverUsername"), new NonEmptyStringValidator(
+                "Please enter the server username"));
+
+        createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.PASSWORD,
             "Password", new String[0], PojoObservables.observeValue(email,
                 "serverPassword"), new NonEmptyStringValidator(
                 "Please enter the server password"));
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.NONE, "Sender",
-            new String[0], PojoObservables.observeValue(email, "senderEmail"),
-            new NonEmptyStringValidator("Please enter the sender email"));
+        createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
+            "Sender", new String[0], PojoObservables.observeValue(email,
+                "senderEmail"), new NonEmptyStringValidator(
+                "Please enter the sender email"));
+
+        ExpandItem item = new ExpandItem(bar, SWT.NONE, 0);
+        item.setText("Email configuration");
+        compositeHeight = compositeWithBar
+            .computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+        item.setHeight(compositeHeight);
+        item.setControl(compositeWithBar);
+        item.setExpanded(true);
+
+        bar.addExpandListener(new ExpandAdapter() {
+            @Override
+            public void itemCollapsed(ExpandEvent e) {
+                compositeWithBar.layout(true, true);
+                Point shellSize = getShell().getSize();
+                getShell().setSize(shellSize.x, shellSize.y - compositeHeight);
+            }
+
+            @Override
+            public void itemExpanded(ExpandEvent e) {
+                compositeWithBar.layout(true, true);
+                compositeWithBar.setVisible(true);
+                Point shellSize = getShell().getSize();
+                getShell().setSize(shellSize.x, shellSize.y + compositeHeight);
+            }
+        });
     }
 
     @Override
