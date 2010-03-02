@@ -70,14 +70,18 @@ and sample_list.sample_name='{sample_type}'"
 );
 
 function getOldStudyName($name) {
-    if (!empty($old_study_name[$name])) {
+    global $old_study_name;
+    
+    if (isset($old_study_name[$name])) {
         return $old_study_name[$name];
     } 
     return $name;
 }
 
 function getOldSampleTypeName($name) {
-    if (!empty($old_sample_type_name[$name])) {
+    global $old_study_name;
+    
+    if (isset($old_sample_type_name[$name])) {
         $sample_type_name = $old_sample_type_name[$name];
     }
     return $name;
@@ -102,11 +106,20 @@ foreach ($invalid_samples as $invalid_sample) {
                              array($study_name, $sample_type_name),
                              $query);
         $result = mysql_query($query)  or die(mysql_error());    
+        
+        $num_rows = mysql_num_rows($result); 
     
-        if (mysql_num_rows($result) == 0) {
-            error_log("zero rows for " . $key . ' - ' . $invalid_sample[0] 
-                . ' - ' . $invalid_sample[1]);
+        if ($num_rows == 0) {
+            error_log("zero rows for " . $key . ' - ' . $study_name 
+                . ' - ' . $sample_type_name);
+            continue;
         }
+        
+        error_log("rows for " . $key . ' - ' . $study_name 
+            . ' - ' . $sample_type_name . ': ' . $num_rows);
+            
+        error_log("rows for " . $key . ' - ' . $study_name 
+            . ' - ' . $sample_type_name . ': ' . $num_rows);
     
         while($row = mysql_fetch_array($result)) {
             $op = array();
