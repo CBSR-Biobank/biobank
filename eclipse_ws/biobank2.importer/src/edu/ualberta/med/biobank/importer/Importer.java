@@ -1177,7 +1177,7 @@ public class Importer {
                         logger.error("study \"" + study.getNameShort()
                             + "\" has no sample storage for sample type \""
                             + sampleType.getName() + "\"");
-                        return;
+                        continue;
                     }
 
                     SampleWrapper sample = new SampleWrapper(appService);
