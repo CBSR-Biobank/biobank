@@ -24,7 +24,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     private ClinicWrapper clinic;
 
     public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getContactCollection(true));
+        super(parent, false, clinic.getContactCollection(true));
         this.clinic = clinic;
         setContacts(clinic);
 

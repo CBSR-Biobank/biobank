@@ -65,9 +65,14 @@ public class PvSampleSourceInfoTable extends
 
     private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
 
+    public PvSampleSourceInfoTable(Composite parent, boolean multiSelectRows,
+        List<PvSampleSourceWrapper> collection) {
+        super(parent, multiSelectRows, collection, HEADINGS, BOUNDS, 10);
+    }
+
     public PvSampleSourceInfoTable(Composite parent,
         List<PvSampleSourceWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        this(parent, true, collection);
     }
 
     @Override

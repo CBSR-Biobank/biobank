@@ -108,9 +108,9 @@ public class PvInfoWidget extends BiobankWidget {
             bcomp.setLayoutData(new GridData());
 
             addButton = new Button(bcomp, SWT.PUSH);
-            addButton.setText("Add");
             addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
                 .get(BioBankPlugin.IMG_ADD));
+            addButton.setToolTipText("Add");
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             addButton.addSelectionListener(new SelectionAdapter() {
@@ -153,9 +153,9 @@ public class PvInfoWidget extends BiobankWidget {
             });
 
             removeButton = new Button(bcomp, SWT.PUSH);
-            removeButton.setText("Remove");
             removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
                 .get(BioBankPlugin.IMG_DELETE));
+            removeButton.setToolTipText("Remove");
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             removeButton.addSelectionListener(new SelectionAdapter() {

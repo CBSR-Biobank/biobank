@@ -77,7 +77,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             });
         }
 
-        patientTable = new PatientInfoTable(this, shipment
+        patientTable = new PatientInfoTable(this, !editable, shipment
             .getPatientCollection());
         patientTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();

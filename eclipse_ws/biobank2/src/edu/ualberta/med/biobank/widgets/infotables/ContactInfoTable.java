@@ -78,6 +78,11 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final int[] BOUNDS = new int[] { 120, 120, 200, 120, 120,
         100 };
 
+    public ContactInfoTable(Composite parent, boolean multiSelectRows,
+        List<ContactWrapper> contacts) {
+        super(parent, multiSelectRows, contacts, HEADINGS, BOUNDS, 10);
+    }
+
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, true, contacts, HEADINGS, BOUNDS, 10);
     }

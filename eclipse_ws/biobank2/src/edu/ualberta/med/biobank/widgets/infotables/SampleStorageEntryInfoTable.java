@@ -50,7 +50,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
      */
     public SampleStorageEntryInfoTable(Composite parent, SiteWrapper site,
         List<SampleStorageWrapper> sampleStorageCollection) {
-        super(parent, null);
+        super(parent, false, null);
         getSampleTypes(site);
         setSampleStorages(sampleStorageCollection);
 

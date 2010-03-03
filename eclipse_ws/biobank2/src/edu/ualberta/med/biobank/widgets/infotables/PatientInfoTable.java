@@ -59,6 +59,11 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     private static final int[] BOUNDS = new int[] { 150, 150, -1, -1, -1, -1 };
 
+    public PatientInfoTable(Composite parent, boolean multiSelectRows,
+        List<PatientWrapper> patients) {
+        super(parent, multiSelectRows, patients, HEADINGS, BOUNDS, 10);
+    }
+
     public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
         super(parent, true, patients, HEADINGS, BOUNDS, 10);
     }

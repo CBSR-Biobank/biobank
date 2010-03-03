@@ -90,7 +90,7 @@ public class PvSampleSourceEntryWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        pvSampleSourceTable = new PvSampleSourceInfoTable(parent, null);
+        pvSampleSourceTable = new PvSampleSourceInfoTable(parent, false, null);
         updateCollection();
         pvSampleSourceTable.adaptToToolkit(toolkit, true);
         addEditSupport();
