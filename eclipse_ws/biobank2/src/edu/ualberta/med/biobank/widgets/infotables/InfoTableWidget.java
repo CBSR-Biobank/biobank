@@ -86,13 +86,17 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private static final int DEFAULT_NUM_ROWS = 10;
 
-    private static int ROW_SIZE_ADJUST;
+    private static double ROW_SIZE_ADJUST;
+
+    private static double FIRST_ROW_SIZE_ADJUST;
 
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
-            ROW_SIZE_ADJUST = 2;
+            ROW_SIZE_ADJUST = 1.1;
+            FIRST_ROW_SIZE_ADJUST = 4;
         } else {
             ROW_SIZE_ADJUST = 0;
+            FIRST_ROW_SIZE_ADJUST = 0;
         }
     };
 
@@ -131,8 +135,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     private List<T> collection;
 
     public InfoTableWidget(Composite parent, boolean multilineSelection,
-        List<T> collection, String[] headings, int[] columnWidths,
-        boolean resize) {
+        List<T> collection, String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
         pageInfo.rowsPerPage = 0;
@@ -151,9 +154,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());
-        GridData gd = new GridData(GridData.FILL_BOTH);
-        gd.heightHint = 100;
-        table.setLayoutData(gd);
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
@@ -192,16 +192,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             initModel(collection);
             getTableViewer().refresh();
             setCollection(collection);
-
-            int height = table.getItemHeight() + ROW_SIZE_ADJUST;
-            if (resize) {
-                height *= collection.size();
-            } else {
-                height *= DEFAULT_NUM_ROWS;
-            }
-            gd = (GridData) table.getLayoutData();
-            gd.heightHint = height;
-            table.setLayoutData(gd);
         }
 
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -214,26 +204,20 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         });
         setSorter();
         addClipboadCopySupport();
-        addPaginationWidget(this);
-    }
-
-    public InfoTableWidget(Composite parent, boolean multiLineSelection,
-        List<T> collection, String[] headings, int[] columnWidths) {
-        this(parent, multiLineSelection, collection, headings, columnWidths,
-            false);
+        addPaginationWidget();
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
-        this(parent, false, collection, headings, columnWidths, false);
+        this(parent, false, collection, headings, columnWidths);
     }
 
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         List<T> collection, String[] headings, int[] columnWidths,
         int rowsPerPage) {
-        this(parent, multilineSelection, null, headings, columnWidths, false);
+        this(parent, multilineSelection, null, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
-        addPaginationWidget(this);
+        addPaginationWidget();
         if (collection != null) {
             initModel(collection);
             setCollection(collection);
@@ -558,8 +542,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         }
     }
 
-    protected void addPaginationWidget(Composite parent) {
-        paginationWidget = new Composite(parent, SWT.NONE);
+    protected void addPaginationWidget() {
+        paginationWidget = new Composite(this, SWT.NONE);
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
@@ -700,13 +684,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             rows = DEFAULT_NUM_ROWS;
         }
 
-        if (rows == 0) {
-            rows = 1;
-        }
+        rows = Math.max(rows, 1);
 
         Table table = getTableViewer().getTable();
-        GridData gd = (GridData) table.getLayoutData();
-        gd.heightHint = (table.getItemHeight() + ROW_SIZE_ADJUST) * rows;
+        double height = rows * (table.getItemHeight() + ROW_SIZE_ADJUST)
+            + FIRST_ROW_SIZE_ADJUST;
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.heightHint = new Double(height).intValue();
         table.setLayoutData(gd);
         layout(true);
     }

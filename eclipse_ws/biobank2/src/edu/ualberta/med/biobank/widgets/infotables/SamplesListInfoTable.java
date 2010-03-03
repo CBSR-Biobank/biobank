@@ -89,7 +89,7 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
 
     public SamplesListInfoTable(Composite parent,
         List<SampleWrapper> sampleCollection) {
-        super(parent, true, sampleCollection, HEADINGS, BOUNDS, 96);
+        super(parent, true, sampleCollection, HEADINGS, BOUNDS, 20);
     }
 
     @Override

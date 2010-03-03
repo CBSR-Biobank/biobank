@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
@@ -70,7 +69,7 @@ import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.SmartCombo;
-import edu.ualberta.med.biobank.widgets.infotables.PagedTableWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 
 public class AdvancedReportsView extends ViewPart {
 
@@ -89,7 +88,7 @@ public class AdvancedReportsView extends ViewPart {
 
     private Button generateButton;
     private List<Object> reportData;
-    private PagedTableWidget<Object> reportTable;
+    private SearchResultsInfoTable reportTable;
 
     private Button printButton;
     private Button exportButton;
@@ -184,10 +183,7 @@ public class AdvancedReportsView extends ViewPart {
         // create the query's display here
         subSection = new Composite(top, SWT.NONE);
 
-        reportTable = new PagedTableWidget<Object>(top, reportData,
-            new String[] {}, null);
-        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        reportTable.setLayoutData(searchLayoutData);
+        reportTable = new SearchResultsInfoTable(top, reportData, null, null);
 
         top.layout();
         sc.setContent(top);
@@ -250,7 +246,7 @@ public class AdvancedReportsView extends ViewPart {
                                     bounds[i] = 100 + names[i].length() * 2;
                                 }
                                 reportTable.dispose();
-                                reportTable = new PagedTableWidget<Object>(top,
+                                reportTable = new SearchResultsInfoTable(top,
                                     reportData, names, bounds);
                                 GridData searchLayoutData = new GridData(
                                     SWT.FILL, SWT.FILL, true, true);
@@ -520,13 +516,10 @@ public class AdvancedReportsView extends ViewPart {
 
     public void resetSearch() {
         if (reportTable != null) {
+            reportTable.dispose();
+            reportTable = new SearchResultsInfoTable(top, reportData, null,
+                null);
             reportData = new ArrayList<Object>();
-            reportTable.reset();
-            TableColumn[] cols = reportTable.getTableViewer().getTable()
-                .getColumns();
-            for (TableColumn col : cols) {
-                col.setText("");
-            }
         }
         printButton.setEnabled(false);
         exportButton.setEnabled(false);
