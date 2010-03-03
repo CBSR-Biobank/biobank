@@ -14,7 +14,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PalletCell extends Cell {
 
-    private SampleCellStatus status;
+    private AliquotCellStatus status;
 
     private String information;
 
@@ -22,7 +22,7 @@ public class PalletCell extends Cell {
 
     private SampleTypeWrapper type;
 
-    private AliquotWrapper sample;
+    private AliquotWrapper aliquot;
 
     private ScanCell scanCell;
 
@@ -111,11 +111,11 @@ public class PalletCell extends Cell {
         return palletScanned;
     }
 
-    public SampleCellStatus getStatus() {
+    public AliquotCellStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SampleCellStatus status) {
+    public void setStatus(AliquotCellStatus status) {
         this.status = status;
     }
 
@@ -149,12 +149,12 @@ public class PalletCell extends Cell {
         this.type = type;
     }
 
-    public void setSample(AliquotWrapper sample) {
-        this.sample = sample;
+    public void setAliquot(AliquotWrapper aliquot) {
+        this.aliquot = aliquot;
     }
 
-    public AliquotWrapper getSample() {
-        return sample;
+    public AliquotWrapper getAliquot() {
+        return aliquot;
     }
 
     public String getValue() {

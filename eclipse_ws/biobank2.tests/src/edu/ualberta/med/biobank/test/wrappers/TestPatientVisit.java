@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.PvSampleSourceHelper;
+import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
@@ -594,18 +594,18 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testAddPvSampleSources() throws Exception {
+    public void testAddPvSourceVessels() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 
         PvSourceVesselWrapper ss1, ss2, ss3;
 
-        ss1 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(0).getName(), visit);
-        ss2 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(1).getName(), visit);
+        ss1 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
+            .getAllSourceVessels(appService).get(0).getName(), visit);
+        ss2 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
+            .getAllSourceVessels(appService).get(1).getName(), visit);
 
-        visit.addPvSampleSources(Arrays.asList(ss1, ss2));
+        visit.addPvSourceVessels(Arrays.asList(ss1, ss2));
         visit.persist();
 
         visit.reload();
@@ -615,12 +615,12 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(2, list.size());
         Assert.assertTrue(list.get(0).compareTo(list.get(1)) < 0);
 
-        ss3 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(1).getName(), visit);
+        ss3 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
+            .getAllSourceVessels(appService).get(1).getName(), visit);
 
         PvSourceVesselWrapper pvss = list.get(0);
-        visit.removePvSampleSources(Arrays.asList(pvss));
-        visit.addPvSampleSources(Arrays.asList(ss3));
+        visit.removePvSourceVessels(Arrays.asList(pvss));
+        visit.addPvSourceVessels(Arrays.asList(ss3));
 
         visit.persist();
 
@@ -644,7 +644,7 @@ public class TestPatientVisit extends TestDatabase {
             sampleType);
         ss3.setVolume(3.0);
         ss3.persist();
-        AliquotWrapper newSample = visit.addNewSample("newid", sampleType,
+        AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
             Arrays.asList(ss1, ss2, ss3));
         Aliquot dbSample = ModelUtils.getObjectWithId(appService, Aliquot.class,
             newSample.getId());

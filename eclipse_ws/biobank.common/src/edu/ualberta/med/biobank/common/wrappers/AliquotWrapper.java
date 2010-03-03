@@ -11,17 +11,17 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AliquotWrapper extends
-    AbstractPositionHolder<Aliquot, SamplePosition> {
+    AbstractPositionHolder<Aliquot, AliquotPosition> {
 
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
@@ -71,21 +71,21 @@ public class AliquotWrapper extends
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<AliquotWrapper> samples = getSamplesInSite(appService,
+        List<AliquotWrapper> aliquots = getSamplesInSite(appService,
             getInventoryId(), getSite());
         boolean alreadyExists = false;
-        if (samples.size() > 0 && isNew()) {
+        if (aliquots.size() > 0 && isNew()) {
             alreadyExists = true;
         } else {
-            for (AliquotWrapper sample : samples) {
-                if (!sample.getId().equals(getId())) {
+            for (AliquotWrapper aliquot : aliquots) {
+                if (!aliquot.getId().equals(getId())) {
                     alreadyExists = true;
                     break;
                 }
             }
         }
         if (alreadyExists) {
-            throw new BiobankCheckException("A sample with inventoryId \""
+            throw new BiobankCheckException("An aliquot with inventory id \""
                 + getInventoryId() + "\" already exists.");
         }
     }
@@ -153,7 +153,7 @@ public class AliquotWrapper extends
     }
 
     /**
-     * Method used to check if the current position of this sample is available
+     * Method used to check if the current position of this aliquot is available
      * on the container. Return true if the position is free, false otherwise
      */
     public boolean isPositionFree(ContainerWrapper parentContainer)
@@ -296,11 +296,11 @@ public class AliquotWrapper extends
                 + Aliquot.class.getName()
                 + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
             Arrays.asList(new Object[] { inventoryId, siteWrapper.getId() }));
-        List<Aliquot> samples = appService.query(criteria);
+        List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (Aliquot sample : samples) {
-            if (sample.getInventoryId().equals(inventoryId)) {
-                list.add(new AliquotWrapper(appService, sample));
+        for (Aliquot aliquot : aliquots) {
+            if (aliquot.getInventoryId().equals(inventoryId)) {
+                list.add(new AliquotWrapper(appService, aliquot));
             }
         }
         return list;
@@ -316,15 +316,15 @@ public class AliquotWrapper extends
     }
 
     @Override
-    protected AbstractPositionWrapper<SamplePosition> getSpecificPositionWrapper(
+    protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        SamplePosition pos = wrappedObject.getSamplePosition();
+        AliquotPosition pos = wrappedObject.getSamplePosition();
         if (pos != null) {
-            return new SamplePositionWrapper(appService, pos);
+            return new AliquotPositionWrapper(appService, pos);
         } else if (initIfNoPosition) {
-            SamplePositionWrapper posWrapper = new SamplePositionWrapper(
+            AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
                 appService);
-            posWrapper.setSample(this);
+            posWrapper.setAliquot(this);
             wrappedObject.setSamplePosition(posWrapper.getWrappedObject());
             return posWrapper;
         }

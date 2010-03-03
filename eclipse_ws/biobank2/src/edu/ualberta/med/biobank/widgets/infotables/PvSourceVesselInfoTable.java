@@ -11,11 +11,11 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class PvSampleSourceInfoTable extends
+public class PvSourceVesselInfoTable extends
     InfoTableWidget<PvSourceVesselWrapper> {
 
     protected class TableRowData {
-        PvSourceVesselWrapper pvSampleSource;
+        PvSourceVesselWrapper pvSourceVessel;
         String name;
         Integer quantity;
         String dateDrawn;
@@ -65,12 +65,12 @@ public class PvSampleSourceInfoTable extends
 
     private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
 
-    public PvSampleSourceInfoTable(Composite parent, boolean multiSelectRows,
+    public PvSourceVesselInfoTable(Composite parent, boolean multiSelectRows,
         List<PvSourceVesselWrapper> collection) {
         super(parent, multiSelectRows, collection, HEADINGS, BOUNDS, 10);
     }
 
-    public PvSampleSourceInfoTable(Composite parent,
+    public PvSourceVesselInfoTable(Composite parent,
         List<PvSourceVesselWrapper> collection) {
         this(parent, true, collection);
     }
@@ -108,15 +108,15 @@ public class PvSampleSourceInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(PvSourceVesselWrapper pvSampleSource)
+    public Object getCollectionModelObject(PvSourceVesselWrapper pvSourceVessel)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.pvSampleSource = pvSampleSource;
-        Assert.isNotNull(pvSampleSource.getSourceVessel(),
-            "patient visit sample source has null for sample source");
-        info.name = pvSampleSource.getSourceVessel().getName();
-        info.quantity = pvSampleSource.getQuantity();
-        info.dateDrawn = pvSampleSource.getFormattedDateDrawn();
+        info.pvSourceVessel = pvSourceVessel;
+        Assert.isNotNull(pvSourceVessel.getSourceVessel(),
+            "patient visit source vessel has null for source vessel");
+        info.name = pvSourceVessel.getSourceVessel().getName();
+        info.quantity = pvSourceVessel.getQuantity();
+        info.dateDrawn = pvSourceVessel.getFormattedDateDrawn();
         return info;
     }
 
@@ -131,7 +131,7 @@ public class PvSampleSourceInfoTable extends
     public List<PvSourceVesselWrapper> getCollection() {
         List<PvSourceVesselWrapper> result = new ArrayList<PvSourceVesselWrapper>();
         for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).pvSampleSource);
+            result.add(((TableRowData) item.o).pvSourceVessel);
         }
         return result;
     }
@@ -143,7 +143,7 @@ public class PvSampleSourceInfoTable extends
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.pvSampleSource;
+        return row.pvSourceVessel;
     }
 
 }

@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -170,7 +170,7 @@ public class Importer {
 
     private static Configuration configuration;
 
-    private static SampleSourceWrapper importSourceVessel;
+    private static SourceVesselWrapper importSourceVessel;
 
     private static Date defaultDateShipped;
 
@@ -426,8 +426,8 @@ public class Importer {
     }
 
     private static void checkSourceVessels() throws ApplicationException {
-        for (SampleSourceWrapper sourceVessel : SampleSourceWrapper
-            .getAllSampleSources(appService)) {
+        for (SourceVesselWrapper sourceVessel : SourceVesselWrapper
+            .getAllSourceVessels(appService)) {
             if (sourceVessel.getName().equals("Unknown - import")) {
                 importSourceVessel = sourceVessel;
             }
@@ -944,7 +944,7 @@ public class Importer {
             sourceVessel.setDateDrawn(getDateFromStr(rs.getString(5)));
             sourceVessel.setPatientVisit(pv);
 
-            pv.addPvSampleSources(Arrays.asList(sourceVessel));
+            pv.addPvSourceVessels(Arrays.asList(sourceVessel));
 
             logger.debug("importing patient visit: " + importCounts.visits
                 + " patient/" + patient.getPnumber() + " study/"
@@ -1189,7 +1189,7 @@ public class Importer {
                     sample.setPosition(binPos.row, 0);
                     sample.setPatientVisit(visit);
 
-                    if (!bin.canHoldSample(sample)) {
+                    if (!bin.canHoldAliquot(sample)) {
                         logger.error("bin " + bin.getLabel()
                             + " cannot hold sample of type "
                             + sampleType.getName());
@@ -1342,7 +1342,7 @@ public class Importer {
                 .getContainer().getLabel(), pos.getContainer()
                 .getContainerType().getName(), pos.getParentContainer()
                 .getLabel(), pos.getRow(), pos.getCol(), pos.getContainer()
-                .getSamplePositionCollection().size()));
+                .getAliquotPositionCollection().size()));
         }
 
         for (ContainerPosition pos : positions) {

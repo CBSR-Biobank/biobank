@@ -5,7 +5,7 @@ import org.eclipse.swt.graphics.Color;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
-public enum SampleCellStatus {
+public enum AliquotCellStatus {
     EMPTY(SWT.COLOR_WHITE, "Empty"), FILLED(SWT.COLOR_DARK_GRAY, "Filled"), NEW(
         SWT.COLOR_DARK_GREEN, "New"), MOVED(87, 129, 0, "Moved"), MISSING(
         SWT.COLOR_CYAN, "Missing"), ERROR(SWT.COLOR_YELLOW, "Error"), NO_TYPE(
@@ -14,13 +14,13 @@ public enum SampleCellStatus {
     private Color color;
     private String legend;
 
-    private SampleCellStatus(int color, String legend) {
+    private AliquotCellStatus(int color, String legend) {
         this.color = BioBankPlugin.getDefault().getWorkbench().getDisplay()
             .getSystemColor(color);
         this.legend = legend;
     }
 
-    private SampleCellStatus(int red, int green, int blue, String legend) {
+    private AliquotCellStatus(int red, int green, int blue, String legend) {
         this.color = new Color(BioBankPlugin.getDefault().getWorkbench()
             .getDisplay(), red, green, blue);
         this.legend = legend;

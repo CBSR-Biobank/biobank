@@ -2,31 +2,31 @@ package edu.ualberta.med.biobank.test.internal;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 
-public class PvSampleSourceHelper extends DbHelper {
+public class PvSourceVesselHelper extends DbHelper {
 
-    public static PvSourceVesselWrapper newPvSampleSource(String name,
+    public static PvSourceVesselWrapper newPvSourceVessel(String name,
         PatientVisitWrapper visit) throws Exception {
         PvSourceVesselWrapper pss = new PvSourceVesselWrapper(appService);
-        SampleSourceWrapper ssw = SampleSourceHelper.addSampleSource(name);
+        SourceVesselWrapper ssw = SourceVesselHelper.addSourceVessel(name);
         pss.setSourceVessel(ssw);
         pss.setQuantity(r.nextInt(10));
         pss.setPatientVisit(visit);
         return pss;
     }
 
-    public static PvSourceVesselWrapper addPvSampleSource(String name,
+    public static PvSourceVesselWrapper addPvSourceVessel(String name,
         PatientVisitWrapper visit) throws Exception {
-        PvSourceVesselWrapper sss = newPvSampleSource(name, visit);
+        PvSourceVesselWrapper sss = newPvSourceVessel(name, visit);
         sss.persist();
         return sss;
     }
 
-    public static void addPvSampleSources(String name,
+    public static void addPvSourceVessels(String name,
         PatientVisitWrapper visit, int count) throws Exception {
         for (int i = 0; i < count; i++) {
-            addPvSampleSource(name + i, visit);
+            addPvSourceVessel(name + i, visit);
         }
     }
 

@@ -41,7 +41,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
-    private SourceVesselInfoTable sampleSourceTable;
+    private SourceVesselInfoTable sourceVesselTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
         public Text wiget;
@@ -92,7 +92,7 @@ public class StudyViewForm extends BiobankViewForm {
 
         createClinicSection();
         createSampleStorageSection();
-        createSampleSourceSection();
+        createSourceVesselSection();
         createPvCustomInfoSection();
         setStudySectionValues();
         setPvDataSectionValues();
@@ -149,11 +149,11 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
-    private void createSampleSourceSection() {
+    private void createSourceVesselSection() {
         Section section = createSection("Source Vessels");
-        sampleSourceTable = new SourceVesselInfoTable(section, study
+        sourceVesselTable = new SourceVesselInfoTable(section, study
             .getSourceVesselCollection());
-        section.setClient(sampleSourceTable);
+        section.setClient(sourceVesselTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
     }

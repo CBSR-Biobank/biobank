@@ -22,7 +22,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -69,9 +69,9 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ClinicAddInfoTable contactEntryTable;
 
-    private Collection<SampleSourceWrapper> allSampleSources;
+    private Collection<SourceVesselWrapper> allSourceVessels;
 
-    private MultiSelectWidget sampleSourceMultiSelect;
+    private MultiSelectWidget sourceVesselMultiSelect;
 
     private List<StudyPvAttrCustom> pvCustomInfoList;
 
@@ -183,31 +183,31 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSourceVesselsSection() throws Exception {
         Composite client = createSectionWithClient("Source Vessels");
-        allSampleSources = SampleSourceWrapper.getAllSampleSources(appService);
-        sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+        allSourceVessels = SourceVesselWrapper.getAllSourceVessels(appService);
+        sourceVesselMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Source Vessels", "Available Source Vessels", 100);
-        sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
-        sampleSourceMultiSelect.addSelectionChangedListener(listener);
-        setSampleSourceWidgetSelections();
+        sourceVesselMultiSelect.adaptToToolkit(toolkit, true);
+        sourceVesselMultiSelect.addSelectionChangedListener(listener);
+        setSourceVesselWidgetSelections();
     }
 
-    public void setSampleSourceWidgetSelections() {
-        Collection<SampleSourceWrapper> studySampleSources = study
+    public void setSourceVesselWidgetSelections() {
+        Collection<SourceVesselWrapper> studySourceVessels = study
             .getSourceVesselCollection();
-        LinkedHashMap<Integer, String> availSampleSource = new LinkedHashMap<Integer, String>();
-        List<Integer> selSampleSource = new ArrayList<Integer>();
+        LinkedHashMap<Integer, String> availSourceVessel = new LinkedHashMap<Integer, String>();
+        List<Integer> selSourceVessel = new ArrayList<Integer>();
 
-        if (studySampleSources != null) {
-            for (SampleSourceWrapper ss : studySampleSources) {
-                selSampleSource.add(ss.getId());
+        if (studySourceVessels != null) {
+            for (SourceVesselWrapper ss : studySourceVessels) {
+                selSourceVessel.add(ss.getId());
             }
         }
 
-        for (SampleSourceWrapper ss : allSampleSources) {
-            availSampleSource.put(ss.getId(), ss.getName());
+        for (SourceVesselWrapper ss : allSourceVessels) {
+            availSourceVessel.put(ss.getId(), ss.getName());
         }
-        sampleSourceMultiSelect.setSelections(availSampleSource,
-            selSampleSource);
+        sourceVesselMultiSelect.setSelections(availSourceVessel,
+            selSourceVessel);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -278,12 +278,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        setSampleSources();
+        setSourceVessels();
 
         setStudyPvAttr();
 
-        // sample storages
-        study.addSampleStorages(sampleStorageEntryTable
+        // sample storage
+        study.addSampleStorage(sampleStorageEntryTable
             .getAddedOrModifiedSampleStorages());
         study.removeSampleStorages(sampleStorageEntryTable
             .getDeletedSampleStorages());
@@ -338,29 +338,29 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void setSampleSources() {
-        List<Integer> addedSampleSourceIds = sampleSourceMultiSelect
+    private void setSourceVessels() {
+        List<Integer> addedSourceVesselIds = sourceVesselMultiSelect
             .getAddedToSelection();
-        List<Integer> removedSampleSourceIds = sampleSourceMultiSelect
+        List<Integer> removedSourceVesselIds = sourceVesselMultiSelect
             .getRemovedToSelection();
-        List<SampleSourceWrapper> addedSampleSources = new ArrayList<SampleSourceWrapper>();
-        List<SampleSourceWrapper> removedSampleSources = new ArrayList<SampleSourceWrapper>();
-        if (allSampleSources != null) {
-            for (SampleSourceWrapper ss : allSampleSources) {
+        List<SourceVesselWrapper> addedSourceVessels = new ArrayList<SourceVesselWrapper>();
+        List<SourceVesselWrapper> removedSourceVessels = new ArrayList<SourceVesselWrapper>();
+        if (allSourceVessels != null) {
+            for (SourceVesselWrapper ss : allSourceVessels) {
                 int id = ss.getId();
-                if (addedSampleSourceIds.indexOf(id) >= 0) {
-                    addedSampleSources.add(ss);
-                } else if (removedSampleSourceIds.indexOf(id) >= 0) {
-                    removedSampleSources.add(ss);
+                if (addedSourceVesselIds.indexOf(id) >= 0) {
+                    addedSourceVessels.add(ss);
+                } else if (removedSourceVesselIds.indexOf(id) >= 0) {
+                    removedSourceVessels.add(ss);
                 }
             }
         }
-        Assert.isTrue(addedSampleSources.size() == addedSampleSourceIds.size(),
-            "problem with added sample source selections");
-        study.addSampleSources(addedSampleSources);
-        Assert.isTrue(removedSampleSources.size() == removedSampleSourceIds
-            .size(), "problem with removed sample source selections");
-        study.removeSampleSources(removedSampleSources);
+        Assert.isTrue(addedSourceVessels.size() == addedSourceVesselIds.size(),
+            "problem with added source vessel selections");
+        study.addSourceVessels(addedSourceVessels);
+        Assert.isTrue(removedSourceVessels.size() == removedSourceVesselIds
+            .size(), "problem with removed source vessel selections");
+        study.removeSourceVessels(removedSourceVessels);
     }
 
     @Override
@@ -379,7 +379,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             sampleStorageEntryTable.setSampleStorages(sampleStorages);
         }
 
-        setSampleSourceWidgetSelections();
+        setSourceVesselWidgetSelections();
 
         // TODO reset PV CUSTOM INFO
 

@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.SampleCellStatus;
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 
 /**
  * Widget to draw a pallet for scan link screen. Can do selections inside the
@@ -21,11 +21,11 @@ public class ScanLinkPalletWidget extends ScanPalletWidget {
     @Override
     public void initLegend() {
         hasLegend = true;
-        statusAvailable = new ArrayList<SampleCellStatus>();
-        statusAvailable.add(SampleCellStatus.EMPTY);
-        statusAvailable.add(SampleCellStatus.NO_TYPE);
-        statusAvailable.add(SampleCellStatus.TYPE);
-        statusAvailable.add(SampleCellStatus.ERROR);
+        statusAvailable = new ArrayList<AliquotCellStatus>();
+        statusAvailable.add(AliquotCellStatus.EMPTY);
+        statusAvailable.add(AliquotCellStatus.NO_TYPE);
+        statusAvailable.add(AliquotCellStatus.TYPE);
+        statusAvailable.add(AliquotCellStatus.ERROR);
         legendWidth = PALLET_WIDTH / statusAvailable.size();
     }
 

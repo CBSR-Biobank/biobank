@@ -364,7 +364,7 @@ public class TestAliquot extends TestDatabase {
         ss3.setVolume(3.0);
         ss3.setStudy(sample.getPatientVisit().getPatient().getStudy());
         ss3.persist();
-        sample.getPatientVisit().getPatient().getStudy().addSampleStorages(
+        sample.getPatientVisit().getPatient().getStudy().addSampleStorage(
             Arrays.asList(ss1, ss2, ss3));
         // should be 3
         sample.setQuantityFromType();

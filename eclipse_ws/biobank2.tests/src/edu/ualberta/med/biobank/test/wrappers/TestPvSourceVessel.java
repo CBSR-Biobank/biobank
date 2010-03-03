@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -22,14 +22,14 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.PvSampleSourceHelper;
-import edu.ualberta.med.biobank.test.internal.SampleSourceHelper;
+import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 
-public class TestPvSampleSource extends TestDatabase {
+public class TestPvSourceVessel extends TestDatabase {
 
-    private PvSourceVesselWrapper pvSampleSource;
+    private PvSourceVesselWrapper pvSourceVessel;
 
     @Override
     @Before
@@ -44,31 +44,31 @@ public class TestPvSampleSource extends TestDatabase {
         PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 
-        pvSampleSource = PvSampleSourceHelper.addPvSampleSource(Utils
+        pvSourceVessel = PvSourceVesselHelper.addPvSourceVessel(Utils
             .getRandomString(10), pvw);
     }
 
     @Test
-    public void testGetSetSampleSource() throws Exception {
+    public void testGetSetSourceVessel() throws Exception {
         PvSourceVesselWrapper pvss = new PvSourceVesselWrapper(appService);
         Assert.assertNull(pvss.getSourceVessel());
 
         pvss.setSourceVessel(null);
         Assert.assertNull(pvss.getSourceVessel());
 
-        SampleSourceWrapper oldSource = pvSampleSource.getSourceVessel();
-        String name = "testGetSetSampleSource" + r.nextInt();
-        SampleSourceWrapper newSampleSource = SampleSourceHelper
-            .addSampleSource(name);
+        SourceVesselWrapper oldSource = pvSourceVessel.getSourceVessel();
+        String name = "testGetSetSourceVessel" + r.nextInt();
+        SourceVesselWrapper newSourceVessel = SourceVesselHelper
+            .addSourceVessel(name);
 
-        pvSampleSource.setSourceVessel(newSampleSource);
-        pvSampleSource.persist();
+        pvSourceVessel.setSourceVessel(newSourceVessel);
+        pvSourceVessel.persist();
 
         SourceVessel ss = ModelUtils.getObjectWithId(appService,
-            SourceVessel.class, newSampleSource.getId());
+            SourceVessel.class, newSourceVessel.getId());
         Assert.assertTrue(ss != null);
-        Assert.assertFalse(oldSource.equals(pvSampleSource.getSourceVessel()));
-        Assert.assertEquals(pvSampleSource.getSourceVessel(), newSampleSource);
+        Assert.assertFalse(oldSource.equals(pvSourceVessel.getSourceVessel()));
+        Assert.assertEquals(pvSourceVessel.getSourceVessel(), newSourceVessel);
     }
 
     @Test
@@ -76,67 +76,67 @@ public class TestPvSampleSource extends TestDatabase {
         PvSourceVesselWrapper pvss = new PvSourceVesselWrapper(appService);
         Assert.assertNull(pvss.getPatientVisit());
 
-        PatientVisitWrapper oldPv = pvSampleSource.getPatientVisit();
+        PatientVisitWrapper oldPv = pvSourceVessel.getPatientVisit();
         PatientVisitWrapper newPv = PatientVisitHelper.addPatientVisit(oldPv
             .getPatient(), oldPv.getShipment(), Utils.getRandomDate());
-        pvSampleSource.setPatientVisit(newPv);
-        pvSampleSource.persist();
+        pvSourceVessel.setPatientVisit(newPv);
+        pvSourceVessel.persist();
 
         PatientVisit pv = ModelUtils.getObjectWithId(appService,
             PatientVisit.class, newPv.getId());
         Assert.assertTrue(pv != null);
-        Assert.assertFalse(oldPv.equals(pvSampleSource.getPatientVisit()));
-        Assert.assertEquals(pvSampleSource.getPatientVisit(), newPv);
+        Assert.assertFalse(oldPv.equals(pvSourceVessel.getPatientVisit()));
+        Assert.assertEquals(pvSourceVessel.getPatientVisit(), newPv);
     }
 
     @Test
     public void testGetDateDrawn() throws Exception {
         Date date = Utils.getRandomDate();
-        pvSampleSource.setDateDrawn(date);
+        pvSourceVessel.setDateDrawn(date);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Assert.assertTrue(sdf.format(date).equals(
-            pvSampleSource.getFormattedDateDrawn()));
+            pvSourceVessel.getFormattedDateDrawn()));
     }
 
     @Test
     public void testBasicGettersAndSetters() throws BiobankCheckException,
         Exception {
-        testGettersAndSetters(pvSampleSource);
+        testGettersAndSetters(pvSourceVessel);
     }
 
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        SampleSourceWrapper ss1 = SampleSourceHelper.addSampleSource("QWERTY"
+        SourceVesselWrapper ss1 = SourceVesselHelper.addSourceVessel("QWERTY"
             + name);
-        pvSampleSource.setSourceVessel(ss1);
-        pvSampleSource.persist();
+        pvSourceVessel.setSourceVessel(ss1);
+        pvSourceVessel.persist();
 
-        SampleSourceWrapper ss2 = SampleSourceHelper.addSampleSource("ASDFG"
+        SourceVesselWrapper ss2 = SourceVesselHelper.addSourceVessel("ASDFG"
             + name);
-        PvSourceVesselWrapper pvSampleSource2 = new PvSourceVesselWrapper(
+        PvSourceVesselWrapper pvSourceVessel2 = new PvSourceVesselWrapper(
             appService);
-        pvSampleSource2.setPatientVisit(pvSampleSource.getPatientVisit());
-        pvSampleSource2.setSourceVessel(ss2);
+        pvSourceVessel2.setPatientVisit(pvSourceVessel.getPatientVisit());
+        pvSourceVessel2.setSourceVessel(ss2);
 
-        Assert.assertTrue(pvSampleSource.compareTo(pvSampleSource2) > 0);
-        Assert.assertTrue(pvSampleSource2.compareTo(pvSampleSource) < 0);
+        Assert.assertTrue(pvSourceVessel.compareTo(pvSourceVessel2) > 0);
+        Assert.assertTrue(pvSourceVessel2.compareTo(pvSourceVessel) < 0);
     }
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        Integer oldQuantity = pvSampleSource.getQuantity();
-        pvSampleSource.setQuantity(5);
-        pvSampleSource.reset();
-        Assert.assertEquals(oldQuantity, pvSampleSource.getQuantity());
+        Integer oldQuantity = pvSourceVessel.getQuantity();
+        pvSourceVessel.setQuantity(5);
+        pvSourceVessel.reset();
+        Assert.assertEquals(oldQuantity, pvSourceVessel.getQuantity());
     }
 
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetNew" + r.nextInt();
-        PvSourceVesselWrapper pvSs = PvSampleSourceHelper.newPvSampleSource(
-            name, pvSampleSource.getPatientVisit());
+        PvSourceVesselWrapper pvSs = PvSourceVesselHelper.newPvSourceVessel(
+            name, pvSourceVessel.getPatientVisit());
         pvSs.setQuantity(5);
         pvSs.reset();
         Assert.assertEquals(null, pvSs.getQuantity());
@@ -144,10 +144,10 @@ public class TestPvSampleSource extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        pvSampleSource.persist();
+        pvSourceVessel.persist();
         int count = appService.search(PvSourceVessel.class,
             new PvSourceVessel()).size();
-        pvSampleSource.delete();
+        pvSourceVessel.delete();
         int countAfter = appService.search(PvSourceVessel.class,
             new PvSourceVessel()).size();
         Assert.assertEquals(count - 1, countAfter);

@@ -23,7 +23,7 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "quantity", "patientVisit", "sampleSource",
+        return new String[] { "quantity", "patientVisit", "sourceVessel",
             "patientCollection", "dateDrawn" };
     }
 
@@ -82,21 +82,21 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
         propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
     }
 
-    public SampleSourceWrapper getSourceVessel() {
+    public SourceVesselWrapper getSourceVessel() {
         SourceVessel ss = wrappedObject.getSourceVessel();
         if (ss == null) {
             return null;
         }
-        return new SampleSourceWrapper(appService, ss);
+        return new SourceVesselWrapper(appService, ss);
     }
 
     protected void setSourceVessel(SourceVessel ss) {
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         wrappedObject.setSourceVessel(ss);
-        propertyChangeSupport.firePropertyChange("sampleSource", oldSs, ss);
+        propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, ss);
     }
 
-    public void setSourceVessel(SampleSourceWrapper ss) {
+    public void setSourceVessel(SourceVesselWrapper ss) {
         if (ss == null) {
             setSourceVessel((SourceVessel) null);
         } else {

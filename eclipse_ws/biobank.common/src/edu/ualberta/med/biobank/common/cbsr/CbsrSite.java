@@ -160,18 +160,18 @@ public class CbsrSite {
 
     private static void patientVisitDeleteSubObjects(PatientVisitWrapper visit)
         throws Exception {
-        List<PvSourceVesselWrapper> sampleSources = visit
+        List<PvSourceVesselWrapper> sourceVessels = visit
             .getPvSourceVesselCollection();
-        if (sampleSources != null) {
-            for (PvSourceVesselWrapper sampleSource : sampleSources) {
-                sampleSource.delete();
+        if (sourceVessels != null) {
+            for (PvSourceVesselWrapper sourceVessel : sourceVessels) {
+                sourceVessel.delete();
             }
         }
         visit.reload();
-        List<AliquotWrapper> samples = visit.getAliquotCollection();
-        if (samples != null) {
-            for (AliquotWrapper sample : samples) {
-                sample.delete();
+        List<AliquotWrapper> aliquots = visit.getAliquotCollection();
+        if (aliquots != null) {
+            for (AliquotWrapper aliquot : aliquots) {
+                aliquot.delete();
             }
         }
         visit.reload();

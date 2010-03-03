@@ -829,15 +829,15 @@ public class TestContainer extends TestDatabase {
         for (SampleTypeWrapper st : allSampleTypes) {
             sample = SampleHelper.newSample(st, childL3, pv, 0, 0);
             if (selectedSampleTypes.contains(st)) {
-                Assert.assertTrue(childL3.canHoldSample(sample));
+                Assert.assertTrue(childL3.canHoldAliquot(sample));
             } else {
-                Assert.assertTrue(!childL3.canHoldSample(sample));
+                Assert.assertTrue(!childL3.canHoldAliquot(sample));
             }
         }
 
         sample = SampleHelper.newSample(null, childL3, pv, 0, 0);
         try {
-            childL3.canHoldSample(sample);
+            childL3.canHoldAliquot(sample);
             Assert
                 .fail("should not be allowed to add sample with null sample type");
         } catch (WrapperException e) {
@@ -887,7 +887,7 @@ public class TestContainer extends TestDatabase {
                         .nextInt(unselectedSampleTypes.size()));
                     Assert.assertNull(childL3.getSample(row, col));
                     try {
-                        childL3.addSample(row, col, SampleHelper
+                        childL3.addAliquot(row, col, SampleHelper
                             .newSample(sampleType));
                         Assert
                             .fail("should not be allowed to add invalid sample type");
@@ -898,7 +898,7 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                childL3.addSample(row, col, SampleHelper.newSample(sampleType));
+                childL3.addAliquot(row, col, SampleHelper.newSample(sampleType));
                 AliquotWrapper sample = childL3.getSample(row, col);
                 sample.setPatientVisit(pv);
                 sample.persist();
@@ -911,7 +911,7 @@ public class TestContainer extends TestDatabase {
         sampleType = selectedSampleTypes.get(r.nextInt(selectedSampleTypes
             .size()));
         try {
-            childL3.addSample(0, 0, SampleHelper.newSample(sampleType));
+            childL3.addAliquot(0, 0, SampleHelper.newSample(sampleType));
             Assert
                 .fail("should not be allowed to add second sample type in same position");
         } catch (Exception e) {

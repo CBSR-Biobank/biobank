@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -64,8 +64,8 @@ public class TestFunctionalities extends TestDatabase {
     public void addSamplePosition() throws Exception {
         int abstractPositionSize = appService.search(AbstractPosition.class,
             new AbstractPosition()).size();
-        int samplePositionSize = appService.search(SamplePosition.class,
-            new SamplePosition()).size();
+        int samplePositionSize = appService.search(AliquotPosition.class,
+            new AliquotPosition()).size();
 
         Container sc = getContainer();
 
@@ -77,7 +77,7 @@ public class TestFunctionalities extends TestDatabase {
         int abstractPositionSizeAfterTest1 = appService.search(
             AbstractPosition.class, new AbstractPosition()).size();
         int samplePositionSizeAfterTest1 = appService.search(
-            SamplePosition.class, new SamplePosition()).size();
+            AliquotPosition.class, new AliquotPosition()).size();
 
         // insertion should be ok
         Assert.assertEquals(abstractPositionSize + 1,
@@ -93,7 +93,7 @@ public class TestFunctionalities extends TestDatabase {
         int abstractPositionSizeAfterTest2 = appService.search(
             AbstractPosition.class, new AbstractPosition()).size();
         int samplePositionSizeAfterTest2 = appService.search(
-            SamplePosition.class, new SamplePosition()).size();
+            AliquotPosition.class, new AliquotPosition()).size();
         // insertion should not be done
         Assert.assertEquals(abstractPositionSizeAfterTest1,
             abstractPositionSizeAfterTest2);
@@ -102,18 +102,18 @@ public class TestFunctionalities extends TestDatabase {
     }
 
     /**
-     * Insert a new SamplePosition
+     * Insert a new AliquotPosition
      */
     private void trySamplePositionInsert(Aliquot sample, Container sc) {
         try {
-            SamplePosition samplePosition = new SamplePosition();
+            AliquotPosition samplePosition = new AliquotPosition();
             samplePosition.setRow(3);
             samplePosition.setCol(3);
             samplePosition.setSample(sample);
             samplePosition.setContainer(sc);
             SDKQueryResult res = appService
                 .executeQuery(new InsertExampleQuery(samplePosition));
-            samplePosition = (SamplePosition) res.getObjectResult();
+            samplePosition = (AliquotPosition) res.getObjectResult();
         } catch (Exception e) {
             System.err.println("trySamplePositionInsert="
                 + e.getCause().getMessage());
@@ -129,22 +129,22 @@ public class TestFunctionalities extends TestDatabase {
     public void batchQueriesSamplePosition() throws Exception {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
 
-        int samplePositionSize = appService.search(SamplePosition.class,
-            new SamplePosition()).size();
+        int samplePositionSize = appService.search(AliquotPosition.class,
+            new AliquotPosition()).size();
 
         Container sc = getContainer();
 
         Aliquot sample = findNotUsedSampleInSamplePosition();
         System.out.println("Not used sample = " + sample.getId());
 
-        SamplePosition samplePosition = new SamplePosition();
+        AliquotPosition samplePosition = new AliquotPosition();
         samplePosition.setRow(1);
         samplePosition.setCol(1);
         samplePosition.setSample(sample);
         samplePosition.setContainer(sc);
         queries.add(new InsertExampleQuery(samplePosition));
 
-        samplePosition = new SamplePosition();
+        samplePosition = new AliquotPosition();
         samplePosition.setSample(sample);
         samplePosition.setRow(2);
         samplePosition.setCol(2);
@@ -160,7 +160,7 @@ public class TestFunctionalities extends TestDatabase {
                 + ae.getCause().getMessage());
         } finally {
             int samplePositionSizeAfter = appService.search(
-                SamplePosition.class, new SamplePosition()).size();
+                AliquotPosition.class, new AliquotPosition()).size();
             Assert.assertEquals(samplePositionSize, samplePositionSizeAfter);
         }
     }
@@ -172,7 +172,7 @@ public class TestFunctionalities extends TestDatabase {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Aliquot as sample "
                 + " where sample not in "
-                + " (select p.sample from edu.ualberta.med.biobank.model.SamplePosition as p)");
+                + " (select p.sample from edu.ualberta.med.biobank.model.AliquotPosition as p)");
         List<Aliquot> samples = appService.query(c);
         if (samples.size() > 0) {
             return samples.get(0);
@@ -187,7 +187,7 @@ public class TestFunctionalities extends TestDatabase {
         HQLCriteria c = new HQLCriteria(
             "from edu.ualberta.med.biobank.model.Aliquot as sample "
                 + " where sample in "
-                + " (select p.sample from edu.ualberta.med.biobank.model.SamplePosition as p)");
+                + " (select p.sample from edu.ualberta.med.biobank.model.AliquotPosition as p)");
         List<Aliquot> samples = appService.query(c);
         if (samples.size() > 0) {
             return samples.get(0);

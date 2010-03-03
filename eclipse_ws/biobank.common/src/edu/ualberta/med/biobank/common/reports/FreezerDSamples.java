@@ -2,29 +2,31 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class FreezerDSamples extends QueryObject {
 
-    protected static final String NAME = "Freezer Samples per Study per Clinic by Date";
+    protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";
 
     public FreezerDSamples(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer samples per study per clinic by date range.",
-            "select sample.linkDate, sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name from "
+            "Displays the total number of freezer aliquots per study per clinic by date range.",
+            "select aliquot.linkDate, aliquot.patientVisit.patient.study.nameShort, "
+                + "aliquot.patientVisit.shipment.clinic.name from "
                 + Aliquot.class.getName()
-                + " as sample where sample.samplePosition.container.id in (select path1.container.id from "
+                + " as aliquot where aliquot.samplePosition.container.id "
+                + "in (select path1.container.id from "
+                + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()
-                + " as path1, "
-                + ContainerPath.class.getName()
-                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site"
-                + op
-                + siteId
-                + " order by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, sample.linkDate",
+                + " as path2 where locate(path2.path, path1.path) > 0 "
+                + "and path2.container.containerType.name like ?) "
+                + "and aliquot.patientVisit.patient.study.site" + op + siteId
+                + " order by aliquot.patientVisit.patient.study.nameShort, "
+                + "aliquot.patientVisit.shipment.clinic.name, aliquot.linkDate",
             new String[] { "", "Study", "Clinic", "Total" }, new int[] { 100,
                 200, 100, 100 });
         addOption("Date Range", DateRange.class, DateRange.Week);

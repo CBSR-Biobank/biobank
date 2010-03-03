@@ -12,12 +12,12 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -29,7 +29,7 @@ public class ContainerWrapper extends
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
-    private List<AliquotWrapper> addedSamples = new ArrayList<AliquotWrapper>();
+    private List<AliquotWrapper> addedAliquots = new ArrayList<AliquotWrapper>();
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -44,7 +44,7 @@ public class ContainerWrapper extends
     protected String[] getPropertyChangeNames() {
         return new String[] { "productBarcode", "position", "activityStatus",
             "site", "label", "temperature", "comment",
-            "samplePositionCollection", "samples", "childPositionCollection",
+            "samplePositionCollection", "aliquots", "childPositionCollection",
             "children", "containerType", "parent" };
     }
 
@@ -128,13 +128,13 @@ public class ContainerWrapper extends
             }
         }
         persistChildren(labelChanged);
-        persistSamples();
+        persistAliquots();
     }
 
-    private void persistSamples() throws Exception {
-        for (AliquotWrapper sample : addedSamples) {
-            sample.setParent(this);
-            sample.persist();
+    private void persistAliquots() throws Exception {
+        for (AliquotWrapper aliquot : addedAliquots) {
+            aliquot.setParent(this);
+            aliquot.persist();
         }
     }
 
@@ -418,11 +418,11 @@ public class ContainerWrapper extends
         Map<RowColPos, AliquotWrapper> samples = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("samples");
         if (samples == null) {
-            Collection<SamplePosition> positions = wrappedObject
-                .getSamplePositionCollection();
+            Collection<AliquotPosition> positions = wrappedObject
+                .getAliquotPositionCollection();
             if (positions != null) {
                 samples = new TreeMap<RowColPos, AliquotWrapper>();
-                for (SamplePosition position : positions) {
+                for (AliquotPosition position : positions) {
                     samples.put(new RowColPos(position.getRow(), position
                         .getCol()), new AliquotWrapper(appService, position
                         .getSample()));
@@ -434,14 +434,14 @@ public class ContainerWrapper extends
     }
 
     public boolean hasSamples() {
-        Collection<SamplePosition> positions = wrappedObject
-            .getSamplePositionCollection();
+        Collection<AliquotPosition> positions = wrappedObject
+            .getAliquotPositionCollection();
         return ((positions != null) && (positions.size() > 0));
     }
 
     public AliquotWrapper getSample(Integer row, Integer col)
         throws BiobankCheckException {
-        SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+        AliquotPositionWrapper samplePosition = new AliquotPositionWrapper(
             appService);
         samplePosition.setRow(row);
         samplePosition.setCol(col);
@@ -453,9 +453,9 @@ public class ContainerWrapper extends
         return samples.get(new RowColPos(row, col));
     }
 
-    public void addSample(Integer row, Integer col, AliquotWrapper sample)
+    public void addAliquot(Integer row, Integer col, AliquotWrapper aliquot)
         throws Exception {
-        SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+        AliquotPositionWrapper samplePosition = new AliquotPositionWrapper(
             appService);
         samplePosition.setRow(row);
         samplePosition.setCol(col);
@@ -463,25 +463,25 @@ public class ContainerWrapper extends
         Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
             samples = new TreeMap<RowColPos, AliquotWrapper>();
-            propertiesMap.put("samples", samples);
-        } else if (!canHoldSample(sample)) {
+            propertiesMap.put("aliquots", samples);
+        } else if (!canHoldAliquot(aliquot)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
-                + sample.getSampleType().getName() + ".");
+                + aliquot.getSampleType().getName() + ".");
         } else {
             AliquotWrapper sampleAtPosition = getSample(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
-                    + " is already holding a sample at position "
+                    + " is already holding an aliquot at position "
                     + sampleAtPosition.getPositionString(false, false) + " ("
                     + row + ":" + col + ")");
             }
         }
-        sample.setPosition(row, col);
-        sample.setParent(this);
-        samples.put(new RowColPos(row, col), sample);
-        addedSamples.add(sample);
+        aliquot.setPosition(row, col);
+        aliquot.setParent(this);
+        samples.put(new RowColPos(row, col), aliquot);
+        addedAliquots.add(aliquot);
     }
 
     /**
@@ -658,8 +658,8 @@ public class ContainerWrapper extends
      * 
      * @throws Exception if the sample type is null.
      */
-    public boolean canHoldSample(AliquotWrapper sample) throws Exception {
-        SampleTypeWrapper type = sample.getSampleType();
+    public boolean canHoldAliquot(AliquotWrapper aliquot) throws Exception {
+        SampleTypeWrapper type = aliquot.getSampleType();
         if (type == null) {
             throw new WrapperException("sample type is null");
         }
@@ -946,7 +946,7 @@ public class ContainerWrapper extends
     protected void resetInternalField() {
         super.resetInternalField();
         addedChildren.clear();
-        addedSamples.clear();
+        addedAliquots.clear();
     }
 
 }

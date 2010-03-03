@@ -31,7 +31,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private Map<String, PvAttrWrapper> pvAttrMap;
 
-    private Set<PvSourceVesselWrapper> deletedPvSampleSources = new HashSet<PvSourceVesselWrapper>();
+    private Set<PvSourceVesselWrapper> deletedPvSourceVessels = new HashSet<PvSourceVesselWrapper>();
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
@@ -48,7 +48,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     protected String[] getPropertyChangeNames() {
         return new String[] { "patient", "dateProcessed", "comment",
             "pvAttrCollection", "sampleCollection", "username", "shipment",
-            "pvSampleSourceCollection" };
+            "pvSourceVesselCollection" };
     }
 
     public Date getDateProcessed() {
@@ -87,9 +87,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             Collection<Aliquot> children = wrappedObject.getAliquotCollection();
             if (children != null) {
                 sampleCollection = new ArrayList<AliquotWrapper>();
-                for (Aliquot sample : children) {
+                for (Aliquot aliquot : children) {
                     sampleCollection
-                        .add(new AliquotWrapper(appService, sample));
+                        .add(new AliquotWrapper(appService, aliquot));
                 }
                 propertiesMap.put("sampleCollection", sampleCollection);
             }
@@ -351,11 +351,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (pvAttrMap != null) {
             setPvAttrCollection(pvAttrMap.values());
         }
-        deletedPvSampleSources();
+        deletePvSourceVessels();
     }
 
-    private void deletedPvSampleSources() throws Exception {
-        for (PvSourceVesselWrapper ss : deletedPvSampleSources) {
+    private void deletePvSourceVessels() throws Exception {
+        for (PvSourceVesselWrapper ss : deletedPvSourceVessels) {
             if (!ss.isNew()) {
                 ss.delete();
             }
@@ -391,33 +391,33 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @SuppressWarnings("unchecked")
     public List<PvSourceVesselWrapper> getPvSourceVesselCollection(boolean sort) {
-        List<PvSourceVesselWrapper> pvSampleSourceCollection = (List<PvSourceVesselWrapper>) propertiesMap
-            .get("pvSampleSourceCollection");
-        if (pvSampleSourceCollection == null) {
+        List<PvSourceVesselWrapper> pvSourceVesselCollection = (List<PvSourceVesselWrapper>) propertiesMap
+            .get("pvSourceVesselCollection");
+        if (pvSourceVesselCollection == null) {
             Collection<PvSourceVessel> children = wrappedObject
                 .getPvSourceVesselCollection();
             if (children != null) {
-                pvSampleSourceCollection = new ArrayList<PvSourceVesselWrapper>();
-                for (PvSourceVessel pvSampleSource : children) {
-                    pvSampleSourceCollection.add(new PvSourceVesselWrapper(
-                        appService, pvSampleSource));
+                pvSourceVesselCollection = new ArrayList<PvSourceVesselWrapper>();
+                for (PvSourceVessel pvSourceVessel : children) {
+                    pvSourceVesselCollection.add(new PvSourceVesselWrapper(
+                        appService, pvSourceVessel));
                 }
-                propertiesMap.put("pvSampleSourceCollection",
-                    pvSampleSourceCollection);
+                propertiesMap.put("pvSourceVesselCollection",
+                    pvSourceVesselCollection);
             }
         }
-        if ((pvSampleSourceCollection != null) && sort)
-            Collections.sort(pvSampleSourceCollection);
-        return pvSampleSourceCollection;
+        if ((pvSourceVesselCollection != null) && sort)
+            Collections.sort(pvSourceVesselCollection);
+        return pvSourceVesselCollection;
     }
 
     public List<PvSourceVesselWrapper> getPvSourceVesselCollection() {
         return getPvSourceVesselCollection(false);
     }
 
-    public void addPvSampleSources(
-        Collection<PvSourceVesselWrapper> newPvSampleSources) {
-        if (newPvSampleSources != null && newPvSampleSources.size() > 0) {
+    public void addPvSourceVessels(
+        Collection<PvSourceVesselWrapper> newPvSourceVessels) {
+        if (newPvSourceVessels != null && newPvSourceVessels.size() > 0) {
             Collection<PvSourceVessel> allPvObjects = new HashSet<PvSourceVessel>();
             List<PvSourceVesselWrapper> allPvWrappers = new ArrayList<PvSourceVesselWrapper>();
             // already added
@@ -429,7 +429,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 }
             }
             // new added
-            for (PvSourceVesselWrapper pvss : newPvSampleSources) {
+            for (PvSourceVesselWrapper pvss : newPvSourceVessels) {
                 allPvObjects.add(pvss.getWrappedObject());
                 allPvWrappers.add(pvss);
             }
@@ -442,23 +442,23 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         Collection<PvSourceVessel> oldCollection = wrappedObject
             .getPvSourceVesselCollection();
         wrappedObject.setPvSourceVesselCollection(allPvObjects);
-        propertyChangeSupport.firePropertyChange("pvSampleSourceCollection",
+        propertyChangeSupport.firePropertyChange("pvSourceVesselCollection",
             oldCollection, allPvObjects);
-        propertiesMap.put("pvSampleSourceCollection", allPvWrappers);
+        propertiesMap.put("pvSourceVesselCollection", allPvWrappers);
     }
 
-    public void removePvSampleSources(
-        Collection<PvSourceVesselWrapper> pvSampleSourcesToRemove) {
-        if (pvSampleSourcesToRemove != null
-            && pvSampleSourcesToRemove.size() > 0) {
-            deletedPvSampleSources.addAll(pvSampleSourcesToRemove);
+    public void removePvSourceVessels(
+        Collection<PvSourceVesselWrapper> pvSourceVesselsToRemove) {
+        if (pvSourceVesselsToRemove != null
+            && pvSourceVesselsToRemove.size() > 0) {
+            deletedPvSourceVessels.addAll(pvSourceVesselsToRemove);
             Collection<PvSourceVessel> allPvObjects = new HashSet<PvSourceVessel>();
             List<PvSourceVesselWrapper> allPvWrappers = new ArrayList<PvSourceVesselWrapper>();
             // already added
             List<PvSourceVesselWrapper> currentList = getPvSourceVesselCollection();
             if (currentList != null) {
                 for (PvSourceVesselWrapper pvss : currentList) {
-                    if (!deletedPvSampleSources.contains(pvss)) {
+                    if (!deletedPvSourceVessels.contains(pvss)) {
                         allPvObjects.add(pvss.getWrappedObject());
                         allPvWrappers.add(pvss);
                     }
@@ -469,29 +469,29 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     /**
-     * Create a new sample (and persist it)
+     * Create a new aliquot (and persist it)
      * 
      * @param inventoryId
      * @param type
      * @param studySampleStorages
      */
-    public AliquotWrapper addNewSample(String inventoryId,
+    public AliquotWrapper addNewAliquot(String inventoryId,
         SampleTypeWrapper type, List<SampleStorageWrapper> studySampleStorages)
         throws Exception {
-        AliquotWrapper sample = new AliquotWrapper(appService);
-        sample.setInventoryId(inventoryId);
-        sample.setPatientVisit(this);
-        sample.setLinkDate(new Date());
-        sample.setSampleType(type);
+        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        aliquot.setInventoryId(inventoryId);
+        aliquot.setPatientVisit(this);
+        aliquot.setLinkDate(new Date());
+        aliquot.setSampleType(type);
         Double volume = null;
         for (SampleStorageWrapper ss : studySampleStorages) {
             if (ss.getSampleType().getId().equals(type.getId())) {
                 volume = ss.getVolume();
             }
         }
-        sample.setQuantity(volume);
-        sample.persist();
-        return sample;
+        aliquot.setQuantity(volume);
+        aliquot.persist();
+        return aliquot;
     }
 
     @Override
@@ -541,7 +541,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void resetInternalField() {
         pvAttrMap = null;
         studyPvAttrMap = null;
-        deletedPvSampleSources.clear();
+        deletedPvSourceVessels.clear();
     }
 
     @Override

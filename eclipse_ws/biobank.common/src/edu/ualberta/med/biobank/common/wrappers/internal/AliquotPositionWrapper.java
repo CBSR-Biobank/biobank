@@ -5,25 +5,25 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.SamplePosition;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SamplePositionWrapper extends
-    AbstractPositionWrapper<SamplePosition> {
+public class AliquotPositionWrapper extends
+    AbstractPositionWrapper<AliquotPosition> {
 
-    public SamplePositionWrapper(WritableApplicationService appService,
-        SamplePosition wrappedObject) {
+    public AliquotPositionWrapper(WritableApplicationService appService,
+        AliquotPosition wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SamplePositionWrapper(WritableApplicationService appService) {
+    public AliquotPositionWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -31,7 +31,7 @@ public class SamplePositionWrapper extends
     protected String[] getPropertyChangeNames() {
         List<String> properties = new ArrayList<String>(Arrays.asList(super
             .getPropertyChangeNames()));
-        properties.add("sample");
+        properties.add("aliquot");
         properties.add("container");
         return properties.toArray(new String[properties.size()]);
     }
@@ -43,26 +43,27 @@ public class SamplePositionWrapper extends
     }
 
     @Override
-    public Class<SamplePosition> getWrappedClass() {
-        return SamplePosition.class;
+    public Class<AliquotPosition> getWrappedClass() {
+        return AliquotPosition.class;
     }
 
-    public void setSample(Aliquot sample) {
-        Aliquot oldSample = wrappedObject.getSample();
-        wrappedObject.setSample(sample);
-        propertyChangeSupport.firePropertyChange("sample", oldSample, sample);
+    public void setAliquot(Aliquot aliquot) {
+        Aliquot oldAliquot = wrappedObject.getSample();
+        wrappedObject.setSample(aliquot);
+        propertyChangeSupport
+            .firePropertyChange("aliquot", oldAliquot, aliquot);
     }
 
-    public void setSample(AliquotWrapper sample) {
-        setSample(sample.getWrappedObject());
+    public void setAliquot(AliquotWrapper aliquot) {
+        setAliquot(aliquot.getWrappedObject());
     }
 
-    public AliquotWrapper getSample() {
-        Aliquot sample = wrappedObject.getSample();
-        if (sample == null) {
+    public AliquotWrapper getAliquot() {
+        Aliquot aliquot = wrappedObject.getSample();
+        if (aliquot == null) {
             return null;
         }
-        return new AliquotWrapper(appService, sample);
+        return new AliquotWrapper(appService, aliquot);
     }
 
     private void setContainer(Container container) {
@@ -89,7 +90,7 @@ public class SamplePositionWrapper extends
     }
 
     @Override
-    public int compareTo(ModelWrapper<SamplePosition> o) {
+    public int compareTo(ModelWrapper<AliquotPosition> o) {
         return 0;
     }
 
@@ -111,16 +112,16 @@ public class SamplePositionWrapper extends
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !
             HQLCriteria criteria = new HQLCriteria("from "
-                + SamplePosition.class.getName()
+                + AliquotPosition.class.getName()
                 + " where container.id=? and row=? and col=?", Arrays
                 .asList(new Object[] { parent.getId(), getRow(), getCol() }));
-            List<SamplePosition> positions = appService.query(criteria);
+            List<AliquotPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
                 return;
             }
-            SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+            AliquotPositionWrapper samplePosition = new AliquotPositionWrapper(
                 appService, positions.get(0));
-            if (!samplePosition.getSample().equals(getSample())) {
+            if (!samplePosition.getAliquot().equals(getAliquot())) {
                 throw new BiobankCheckException("Position " + getRow() + ":"
                     + getCol() + " in container " + getParent().toString()
                     + " is not available.");

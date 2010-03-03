@@ -39,12 +39,12 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
@@ -184,10 +184,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         fieldsComposite.setLayoutData(gd);
 
         // radio button to choose new or move
-        radioNew = toolkit.createButton(fieldsComposite, "New sample",
+        radioNew = toolkit.createButton(fieldsComposite, "New aliquot",
             SWT.RADIO);
         final Button radioMove = toolkit.createButton(fieldsComposite,
-            "Move sample", SWT.RADIO);
+            "Move aliquot", SWT.RADIO);
         radioNew.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -238,9 +238,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 if (!radioNew.getSelection()) {
                     // Move Mode
                     try {
-                        retrieveSampleDataForMoving();
+                        retrieveAliquotDataForMoving();
                     } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Move - sample error", ex);
+                        BioBankPlugin
+                            .openAsyncError("Move - aliquot error", ex);
                     }
                 }
             }
@@ -423,11 +424,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     /**
-     * In move mode, get informations from the existing sample
+     * In move mode, get informations from the existing aliquot
      * 
      * @throws Exception
      */
-    protected void retrieveSampleDataForMoving() throws Exception {
+    protected void retrieveAliquotDataForMoving() throws Exception {
         String inventoryId = inventoryIdText.getText();
         if (inventoryId.isEmpty()) {
             return;
@@ -449,12 +450,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 .getInstance().getCurrentSiteWrapper());
         if (samples.size() > 1) {
             throw new Exception(
-                "Error while retrieving sample with inventoryId "
+                "Error while retrieving aliquot with inventoryId "
                     + sampleWrapper.getInventoryId()
-                    + ": more than one sample found.");
+                    + ": more than one aliquot found.");
         }
         if (samples.size() == 0) {
-            throw new Exception("No sample found with inventoryId "
+            throw new Exception("No aliquot found with inventoryId "
                 + sampleWrapper.getInventoryId());
         }
         sampleWrapper = samples.get(0);
@@ -525,7 +526,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 errorMsg = "Can't find bin labelled " + binLabel;
             }
             if (errorMsg != null) {
-                BioBankPlugin.openError("Check position and sample", errorMsg);
+                BioBankPlugin.openError("Check position and aliquot", errorMsg);
                 appendLog("ERROR: " + errorMsg);
             }
             return;

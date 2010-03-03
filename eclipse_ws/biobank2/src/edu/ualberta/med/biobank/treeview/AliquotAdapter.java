@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.forms.AliquotViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleAdapter extends AdapterBase {
+public class AliquotAdapter extends AdapterBase {
 
-    public SampleAdapter(AdapterBase parent, AliquotWrapper sample) {
+    public AliquotAdapter(AdapterBase parent, AliquotWrapper sample) {
         super(parent, sample);
     }
 

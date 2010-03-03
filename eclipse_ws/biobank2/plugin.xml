@@ -86,7 +86,7 @@
             name="Patients View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.SampleManagementPerspective"
+            class="edu.ualberta.med.biobank.rcp.AliquotManagementPerspective"
             id="edu.ualberta.med.biobank.perspective.samplesManagement"
             name="Samples Management Perspective">
       </perspective>

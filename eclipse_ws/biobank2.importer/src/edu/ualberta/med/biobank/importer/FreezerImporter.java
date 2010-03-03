@@ -233,7 +233,7 @@ public class FreezerImporter {
             sample.setQuantity(ss.getVolume());
         }
 
-        if (!pallet.canHoldSample(sample)) {
+        if (!pallet.canHoldAliquot(sample)) {
             logger.error("pallet " + pallet.getLabel()
                 + " cannot hold sample of type " + sampleType.getName());
             return;

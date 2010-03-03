@@ -127,7 +127,7 @@ public class ReportsLabelProvider extends LabelProvider implements
         // case 6:
         // return container.getProductBarcode();
         // case 7:
-        // return String.valueOf(container.getSamplePositionCollection()
+        // return String.valueOf(container.getAliquotPositionCollection()
         // .size());
         // case 8:
         // return container.getSite().getName();

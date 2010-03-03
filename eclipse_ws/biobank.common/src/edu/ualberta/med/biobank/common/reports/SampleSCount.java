@@ -8,7 +8,7 @@ public class SampleSCount extends QueryObject {
 
     public SampleSCount(String op, Integer siteId) {
         super(
-            "Lists the total number of each sample type by study.",
+            "Lists the total number of each aliquot sample type by study.",
             "Select Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name, count(*) from "
                 + Aliquot.class.getName()
                 + " as Alias where Alias.patientVisit.patient.study.site "

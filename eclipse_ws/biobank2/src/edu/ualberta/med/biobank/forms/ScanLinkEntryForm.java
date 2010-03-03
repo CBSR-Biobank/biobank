@@ -46,16 +46,16 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -202,7 +202,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             @Override
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error("Give a type to each sample");
+                    return ValidationStatus
+                        .error("Give a type to each aliquot");
                 } else {
                     return Status.OK_STATUS;
                 }
@@ -319,7 +320,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                                 PalletCell pCell = (PalletCell) cell;
                                 if (pCell != null && pCell.getValue() != null) {
                                     pCell.setType(null);
-                                    pCell.setStatus(SampleCellStatus.NO_TYPE);
+                                    pCell.setStatus(AliquotCellStatus.NO_TYPE);
                                 }
                             }
 
@@ -366,7 +367,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                         .getSelectedCells()) {
                         PalletCell pCell = (PalletCell) cell;
                         pCell.setType(type);
-                        pCell.setStatus(SampleCellStatus.TYPE);
+                        pCell.setStatus(AliquotCellStatus.TYPE);
                     }
                     spw.getMultiSelectionManager().clearMultiSelection();
                     customSelection.resetValues(true);
@@ -617,21 +618,21 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     appService, value, SessionManager.getInstance()
                         .getCurrentSiteWrapper());
                 if (samples.size() > 0) {
-                    cell.setStatus(SampleCellStatus.ERROR);
+                    cell.setStatus(AliquotCellStatus.ERROR);
                     String msg = "Aliquot already in database";
                     cell.setInformation(msg);
                     scanOk = false;
-                    AliquotWrapper sample = samples.get(0);
+                    AliquotWrapper aliquot = samples.get(0);
                     appendLog("ERROR: " + value + " - " + msg + " see visit "
-                        + sample.getPatientVisit().getFormattedDateProcessed()
+                        + aliquot.getPatientVisit().getFormattedDateProcessed()
                         + " of patient "
-                        + sample.getPatientVisit().getPatient().getPnumber());
+                        + aliquot.getPatientVisit().getPatient().getPnumber());
                 } else {
-                    cell.setStatus(SampleCellStatus.NO_TYPE);
+                    cell.setStatus(AliquotCellStatus.NO_TYPE);
                 }
                 return true;
             } else {
-                cell.setStatus(SampleCellStatus.EMPTY);
+                cell.setStatus(AliquotCellStatus.EMPTY);
             }
         }
         return false;
@@ -650,8 +651,8 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             .getSampleStorageCollection();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
-                && cell.getStatus() == SampleCellStatus.TYPE) {
-                patientVisit.addNewSample(cell.getValue(), cell.getType(),
+                && cell.getStatus() == AliquotCellStatus.TYPE) {
+                patientVisit.addNewAliquot(cell.getValue(), cell.getType(),
                     sampleStorages);
                 appendSampleLogMessage(sb, patientVisit, cell.getValue(), cell
                     .getType());
@@ -708,7 +709,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                             PalletCell cell = cells.get(rcp);
                             if (PalletCell.hasValue(cell)) {
                                 cell.setType(type);
-                                cell.setStatus(SampleCellStatus.TYPE);
+                                cell.setStatus(AliquotCellStatus.TYPE);
                                 spw.redraw();
                             }
                         }

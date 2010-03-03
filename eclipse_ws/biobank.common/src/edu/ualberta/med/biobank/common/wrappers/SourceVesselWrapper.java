@@ -11,14 +11,14 @@ import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleSourceWrapper extends ModelWrapper<SourceVessel> {
+public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
 
-    public SampleSourceWrapper(WritableApplicationService appService,
+    public SourceVesselWrapper(WritableApplicationService appService,
         SourceVessel wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SampleSourceWrapper(WritableApplicationService appService) {
+    public SourceVesselWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -39,7 +39,7 @@ public class SampleSourceWrapper extends ModelWrapper<SourceVessel> {
 
     /**
      * Get study list. Use Study.setSourceVesselCollection to link studies and
-     * sample sources
+     * source vessels.
      */
     @SuppressWarnings("unchecked")
     public Collection<StudyWrapper> getStudyCollection(boolean sort) {
@@ -75,20 +75,20 @@ public class SampleSourceWrapper extends ModelWrapper<SourceVessel> {
         ApplicationException {
     }
 
-    public static List<SampleSourceWrapper> getAllSampleSources(
+    public static List<SourceVesselWrapper> getAllSourceVessels(
         WritableApplicationService appService) throws ApplicationException {
         List<SourceVessel> list = appService.search(SourceVessel.class,
             new SourceVessel());
-        List<SampleSourceWrapper> wrappers = new ArrayList<SampleSourceWrapper>();
+        List<SourceVesselWrapper> wrappers = new ArrayList<SourceVesselWrapper>();
         for (SourceVessel ss : list) {
-            wrappers.add(new SampleSourceWrapper(appService, ss));
+            wrappers.add(new SourceVesselWrapper(appService, ss));
         }
         return wrappers;
     }
 
     @Override
     public int compareTo(ModelWrapper<SourceVessel> wrapper) {
-        if (wrapper instanceof SampleSourceWrapper) {
+        if (wrapper instanceof SourceVesselWrapper) {
             String name1 = wrappedObject.getName();
             String name2 = wrapper.wrappedObject.getName();
             return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0

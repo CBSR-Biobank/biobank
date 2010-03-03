@@ -14,15 +14,17 @@ public class SampleRequest extends QueryObject {
 
     public SampleRequest(String op, Integer siteId) {
         super(
-            "Given a CSV file detailing a request (Study, Date Drawn, Aliquot Type, # Requested), generate a list of sample locations.",
-            "select s.patientVisit.patient.study.nameShort, s.inventoryId, s.linkDate, s.sampleType.name, s.samplePosition.container.label from "
+            "Given a CSV file detailing a request (Study, Date Drawn, Aliquot Type, "
+                + "# Requested), generate a list of aliquot locations.",
+            "select s.patientVisit.patient.study.nameShort, s.inventoryId, "
+                + "s.linkDate, s.sampleType.name, s.samplePosition.container.label from "
                 + Aliquot.class.getName()
-                + " s where s.patientVisit.patient.study.site "
-                + op
-                + siteId
-                + " and s.patientVisit.patient.study.nameShort like ? and datediff(s.linkDate, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
-            new String[] { "Study", "Inventory ID", "Date Drawn", "Type",
-                "Location" }, new int[] { 100, 200, 100, 100, 100 });
+                + " s where s.patientVisit.patient.study.site " + op + siteId
+                + " and s.patientVisit.patient.study.nameShort like ? "
+                + "and datediff(s.linkDate, ?) between 0 and 1  "
+                + "and s.sampleType.name like ? ORDER BY RAND()", new String[] {
+                "Study", "Inventory ID", "Date Drawn", "Type", "Location" },
+            new int[] { 100, 200, 100, 100, 100 });
         addOption("CSV File", String.class, "");
     }
 

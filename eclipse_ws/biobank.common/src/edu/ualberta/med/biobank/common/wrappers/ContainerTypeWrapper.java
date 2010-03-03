@@ -12,12 +12,12 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -81,10 +81,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private void checkDeletedSampleTypes() throws ApplicationException,
         BiobankCheckException {
         if (deletedSampleTypes.size() > 0) {
-            String queryString = "from " + SamplePosition.class.getName()
+            String queryString = "from " + AliquotPosition.class.getName()
                 + " as sp inner join sp.container as sparent"
                 + " where sparent.containerType.id=? and "
-                + "sp.sample.sampleType.id in (select id from "
+                + "sp.aliquot.sampleType.id in (select id from "
                 + SampleType.class.getName() + " as st where";
             List<Object> params = new ArrayList<Object>();
             params.add(getId());

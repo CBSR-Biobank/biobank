@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -58,7 +58,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private SamplesListInfoTable samplesWidget;
+    private AliquotListInfoTable samplesWidget;
 
     private Text siteLabel;
 
@@ -389,7 +389,7 @@ public class ContainerViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Samples");
         List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
             .getSamples().values());
-        samplesWidget = new SamplesListInfoTable(parent, samples);
+        samplesWidget = new AliquotListInfoTable(parent, samples);
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
     }

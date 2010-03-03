@@ -18,27 +18,27 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
-public class PvSampleSourceDialog extends BiobankDialog {
+public class PvSourceVesselDialog extends BiobankDialog {
 
     private static final String TITLE = "Source Vessel";
 
-    private PvSourceVesselWrapper pvSampleSource;
+    private PvSourceVesselWrapper pvSourceVessel;
 
-    private ComboViewer sampleSourcesComboViewer;
+    private ComboViewer sourceVesselsComboViewer;
 
-    private Collection<SampleSourceWrapper> sampleSources;
+    private Collection<SourceVesselWrapper> sourceVessels;
 
-    public PvSampleSourceDialog(Shell parent,
-        PvSourceVesselWrapper pvSampleSource,
-        Collection<SampleSourceWrapper> sampleSources) {
+    public PvSourceVesselDialog(Shell parent,
+        PvSourceVesselWrapper pvSourceVessel,
+        Collection<SourceVesselWrapper> sourceVessels) {
         super(parent);
-        Assert.isNotNull(pvSampleSource);
-        Assert.isNotNull(sampleSources);
-        this.pvSampleSource = pvSampleSource;
-        this.sampleSources = sampleSources;
+        Assert.isNotNull(pvSourceVessel);
+        Assert.isNotNull(sourceVessels);
+        this.pvSourceVessel = pvSourceVessel;
+        this.sourceVessels = sourceVessels;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         super.configureShell(shell);
         String title = new String();
 
-        if (pvSampleSource.isNew()) {
+        if (pvSourceVessel.isNew()) {
             title = "Add ";
         } else {
             title = "Edit ";
@@ -60,7 +60,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         Control contents = super.createContents(parent);
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_COMPUTER_KEY));
-        if (pvSampleSource.isNew()) {
+        if (pvSourceVessel.isNew()) {
             setTitle("Add Source Vessel");
             setMessage("Add a source vessel to a patient visit");
         } else {
@@ -76,44 +76,44 @@ public class PvSampleSourceDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        sampleSourcesComboViewer = getWidgetCreator()
+        sourceVesselsComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
-                "Source Vessel", sampleSources,
-                pvSampleSource.getSourceVessel(),
+                "Source Vessel", sourceVessels,
+                pvSourceVessel.getSourceVessel(),
                 "A source vessel should be selected");
-        sampleSourcesComboViewer
+        sourceVesselsComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection stSelection = (IStructuredSelection) sampleSourcesComboViewer
+                    IStructuredSelection stSelection = (IStructuredSelection) sourceVesselsComboViewer
                         .getSelection();
-                    pvSampleSource
-                        .setSourceVessel((SampleSourceWrapper) stSelection
+                    pvSourceVessel
+                        .setSourceVessel((SourceVesselWrapper) stSelection
                             .getFirstElement());
                 }
             });
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
-        sampleSourcesComboViewer.getCombo().setLayoutData(gd);
+        sourceVesselsComboViewer.getCombo().setLayoutData(gd);
 
         Control c = createBoundWidgetWithLabel(contents, Text.class,
             SWT.BORDER, "Quantity", new String[0], BeansObservables
-                .observeValue(pvSampleSource, "quantity"),
+                .observeValue(pvSourceVessel, "quantity"),
             new IntegerNumberValidator("quantity should be a whole number",
                 false));
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
         c.setLayoutData(gd);
 
-        c = createDateTimeWidget(contents, "Date drawn", null, pvSampleSource,
+        c = createDateTimeWidget(contents, "Date drawn", null, pvSourceVessel,
             "dateDrawn", "Date drawn should be selected");
         gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
         c.setLayoutData(gd);
     }
 
-    public PvSourceVesselWrapper getPvSampleSource() {
-        return pvSampleSource;
+    public PvSourceVesselWrapper getPvSourceVessel() {
+        return pvSourceVessel;
     }
 
 }

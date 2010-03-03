@@ -6,7 +6,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 /**
  * Perspective to manage samples using scanners
  */
-public class SampleManagementPerspective implements IPerspectiveFactory {
+public class AliquotManagementPerspective implements IPerspectiveFactory {
 
     public final static String ID = "edu.ualberta.med.biobank.perspective.samplesManagement";
 

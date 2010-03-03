@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.SampleCellStatus;
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.scanlib.ScanCell;
 
 /**
@@ -33,7 +33,7 @@ public class ScanPalletWidget extends AbstractGridWidget {
     public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
     public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
 
-    protected List<SampleCellStatus> statusAvailable;
+    protected List<AliquotCellStatus> statusAvailable;
 
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
@@ -75,13 +75,13 @@ public class ScanPalletWidget extends AbstractGridWidget {
     @Override
     public void initLegend() {
         hasLegend = true;
-        statusAvailable = new ArrayList<SampleCellStatus>();
-        statusAvailable.add(SampleCellStatus.EMPTY);
-        statusAvailable.add(SampleCellStatus.NEW);
-        statusAvailable.add(SampleCellStatus.MOVED);
-        statusAvailable.add(SampleCellStatus.FILLED);
-        statusAvailable.add(SampleCellStatus.MISSING);
-        statusAvailable.add(SampleCellStatus.ERROR);
+        statusAvailable = new ArrayList<AliquotCellStatus>();
+        statusAvailable.add(AliquotCellStatus.EMPTY);
+        statusAvailable.add(AliquotCellStatus.NEW);
+        statusAvailable.add(AliquotCellStatus.MOVED);
+        statusAvailable.add(AliquotCellStatus.FILLED);
+        statusAvailable.add(AliquotCellStatus.MISSING);
+        statusAvailable.add(AliquotCellStatus.ERROR);
         legendWidth = PALLET_WIDTH / statusAvailable.size();
     }
 
@@ -93,7 +93,7 @@ public class ScanPalletWidget extends AbstractGridWidget {
         super.paintGrid(e);
         if (hasLegend) {
             for (int i = 0; i < statusAvailable.size(); i++) {
-                SampleCellStatus status = statusAvailable.get(i);
+                AliquotCellStatus status = statusAvailable.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
@@ -127,9 +127,9 @@ public class ScanPalletWidget extends AbstractGridWidget {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));
             if (cell != null) {
-                AliquotWrapper sample = cell.getSample();
-                if (sample != null) {
-                    return sample.getSampleType().getNameShort();
+                AliquotWrapper aliquot = cell.getAliquot();
+                if (aliquot != null) {
+                    return aliquot.getSampleType().getNameShort();
                 }
             }
         }

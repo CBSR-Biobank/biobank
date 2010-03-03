@@ -19,7 +19,7 @@ import org.eclipse.ui.console.IConsoleConstants;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.rcp.SampleManagementPerspective;
+import edu.ualberta.med.biobank.rcp.AliquotManagementPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**
@@ -39,7 +39,7 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true)) {
-                workbench.showPerspective(SampleManagementPerspective.ID,
+                workbench.showPerspective(AliquotManagementPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
                 IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
                     .getActivePage();
@@ -50,7 +50,7 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
             }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                "Error while opening sample management perspective", e);
+                "Error while opening aliquot management perspective", e);
         }
         return null;
     }

@@ -7,16 +7,16 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SourceVesselInfoTable extends InfoTableWidget<SampleSourceWrapper> {
+public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> {
 
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
-            SampleSourceWrapper i1 = (SampleSourceWrapper) ((BiobankCollectionModel) e1).o;
-            SampleSourceWrapper i2 = (SampleSourceWrapper) ((BiobankCollectionModel) e2).o;
+            SourceVesselWrapper i1 = (SourceVesselWrapper) ((BiobankCollectionModel) e1).o;
+            SourceVesselWrapper i2 = (SourceVesselWrapper) ((BiobankCollectionModel) e2).o;
             if (i1 == null) {
                 return -1;
             } else if (i2 == null) {
@@ -43,7 +43,7 @@ public class SourceVesselInfoTable extends InfoTableWidget<SampleSourceWrapper> 
     private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
 
     public SourceVesselInfoTable(Composite parent,
-        List<SampleSourceWrapper> sampleStorageCollection) {
+        List<SourceVesselWrapper> sampleStorageCollection) {
         super(parent, true, sampleStorageCollection, HEADINGS, BOUNDS, 10);
     }
 
@@ -52,7 +52,7 @@ public class SourceVesselInfoTable extends InfoTableWidget<SampleSourceWrapper> 
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                SampleSourceWrapper item = (SampleSourceWrapper) ((BiobankCollectionModel) element).o;
+                SourceVesselWrapper item = (SourceVesselWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";
@@ -78,24 +78,24 @@ public class SourceVesselInfoTable extends InfoTableWidget<SampleSourceWrapper> 
     protected String getCollectionModelObjectToString(Object o) {
         if (o == null)
             return null;
-        return ((SampleSourceWrapper) o).getName();
+        return ((SourceVesselWrapper) o).getName();
     }
 
     @Override
-    public List<SampleSourceWrapper> getCollection() {
-        List<SampleSourceWrapper> result = new ArrayList<SampleSourceWrapper>();
+    public List<SourceVesselWrapper> getCollection() {
+        List<SourceVesselWrapper> result = new ArrayList<SourceVesselWrapper>();
         for (BiobankCollectionModel item : model) {
-            result.add((SampleSourceWrapper) item.o);
+            result.add((SourceVesselWrapper) item.o);
         }
         return result;
     }
 
     @Override
-    public SampleSourceWrapper getSelection() {
+    public SourceVesselWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        SampleSourceWrapper source = (SampleSourceWrapper) item.o;
+        SourceVesselWrapper source = (SourceVesselWrapper) item.o;
         Assert.isNotNull(source);
         return source;
     }

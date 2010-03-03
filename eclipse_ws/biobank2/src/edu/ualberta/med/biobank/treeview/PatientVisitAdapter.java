@@ -22,7 +22,7 @@ public class PatientVisitAdapter extends AdapterBase {
     /**
      * Aliquot selected in this patient visit
      */
-    private AliquotWrapper selectedSample;
+    private AliquotWrapper selectedAliquot;
 
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
@@ -78,12 +78,12 @@ public class PatientVisitAdapter extends AdapterBase {
         addViewMenu(menu, "Visit", PatientVisitViewForm.ID);
     }
 
-    public void setSelectedSample(AliquotWrapper sample) {
-        this.selectedSample = sample;
+    public void setSelectedAliquot(AliquotWrapper aliquot) {
+        this.selectedAliquot = aliquot;
     }
 
-    public AliquotWrapper getSelectedSample() {
-        return selectedSample;
+    public AliquotWrapper getSelectedAliquot() {
+        return selectedAliquot;
     }
 
     @Override
