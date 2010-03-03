@@ -124,6 +124,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
 
+        Text patientNumberLabel = createReadOnlyField(client, SWT.NONE,
+            "Patient");
+        setTextValue(patientNumberLabel, patient.getPnumber());
+
         List<ShipmentWrapper> patientShipments = patient
             .getShipmentCollection();
         ShipmentWrapper selectedShip = patientVisit.getShipment();
