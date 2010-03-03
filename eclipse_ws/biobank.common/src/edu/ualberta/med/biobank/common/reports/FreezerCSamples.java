@@ -18,7 +18,7 @@ public class FreezerCSamples extends QueryObject {
             "select aliquot.patientVisit.patient.study.nameShort, "
                 + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.samplePosition.container.id "
+                + " as aliquot where aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
                 + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()

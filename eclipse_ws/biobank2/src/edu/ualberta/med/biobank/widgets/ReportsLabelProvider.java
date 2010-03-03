@@ -167,11 +167,11 @@ public class ReportsLabelProvider extends LabelProvider implements
         // else
         // return sample.getQuantityUsed().toString();
         // case 7:
-        // if (sample.getSamplePosition() == null)
+        // if (sample.getAliquotPosition() == null)
         // return "";
         // else
-        // return sample.getSamplePosition().getRow() + ","
-        // + sample.getSamplePosition();
+        // return sample.getAliquotPosition().getRow() + ","
+        // + sample.getAliquotPosition();
         // case 8:
         // if (sample.getSampleType() == null)
         // return "";

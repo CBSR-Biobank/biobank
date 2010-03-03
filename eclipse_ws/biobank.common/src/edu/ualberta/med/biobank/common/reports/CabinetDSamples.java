@@ -18,7 +18,7 @@ public class CabinetDSamples extends QueryObject {
             "select aliquot.linkDate, aliquot.patientVisit.patient.study.nameShort, "
                 + "aliquot.patientVisit.shipment.clinic.name from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.samplePosition.container.id in "
+                + " as aliquot where aliquot.aliquotPosition.container.id in "
                 + "(select path1.container.id from "
                 + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()

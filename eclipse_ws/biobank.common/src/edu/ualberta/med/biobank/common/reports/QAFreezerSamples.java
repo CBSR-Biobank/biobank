@@ -18,13 +18,13 @@ public class QAFreezerSamples extends QueryObject {
     public QAFreezerSamples(String op, Integer siteId) {
         super(
             "Retrieves a list of aliquots, at random, within a date range, by aliquot type.",
-            "select aliquot.samplePosition.container.label, aliquot.inventoryId, "
+            "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
                 + Aliquot.class.getName()
                 + " as aliquot where aliquot.patientVisit.dateProcessed "
                 + "between ? and ? and aliquot.sampleType.name like ?"
-                + " and aliquot.samplePosition.container.id "
+                + " and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
                 + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()

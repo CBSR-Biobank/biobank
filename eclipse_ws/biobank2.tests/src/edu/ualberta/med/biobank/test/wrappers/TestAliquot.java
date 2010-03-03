@@ -245,19 +245,19 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testSetSamplePositionFromString() throws Exception {
-        sample.setSamplePositionFromString("A1", sample.getParent());
+    public void testSetAliquotPositionFromString() throws Exception {
+        sample.setAliquotPositionFromString("A1", sample.getParent());
         Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
         RowColPos pos = sample.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
 
-        sample.setSamplePositionFromString("C2", sample.getParent());
+        sample.setAliquotPositionFromString("C2", sample.getParent());
         Assert.assertTrue(sample.getPositionString(false, false).equals("C2"));
         pos = sample.getPosition();
         Assert.assertTrue((pos.col == 1) && (pos.row == 2));
 
         try {
-            sample.setSamplePositionFromString("79", sample.getParent());
+            sample.setAliquotPositionFromString("79", sample.getParent());
             Assert.fail("invalid position");
         } catch (Exception bce) {
             Assert.assertTrue(true);
@@ -277,7 +277,7 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testGetPositionString() throws Exception {
-        sample.setSamplePositionFromString("A1", sample.getParent());
+        sample.setAliquotPositionFromString("A1", sample.getParent());
         Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
         String parentLabel = sample.getParent().getLabel();
         Assert.assertTrue(sample.getPositionString(true, false).equals(

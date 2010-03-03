@@ -48,8 +48,8 @@ public class AliquotPositionWrapper extends
     }
 
     public void setAliquot(Aliquot aliquot) {
-        Aliquot oldAliquot = wrappedObject.getSample();
-        wrappedObject.setSample(aliquot);
+        Aliquot oldAliquot = wrappedObject.getAliquot();
+        wrappedObject.setAliquot(aliquot);
         propertyChangeSupport
             .firePropertyChange("aliquot", oldAliquot, aliquot);
     }
@@ -59,7 +59,7 @@ public class AliquotPositionWrapper extends
     }
 
     public AliquotWrapper getAliquot() {
-        Aliquot aliquot = wrappedObject.getSample();
+        Aliquot aliquot = wrappedObject.getAliquot();
         if (aliquot == null) {
             return null;
         }
@@ -119,9 +119,9 @@ public class AliquotPositionWrapper extends
             if (positions.size() == 0) {
                 return;
             }
-            AliquotPositionWrapper samplePosition = new AliquotPositionWrapper(
+            AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
                 appService, positions.get(0));
-            if (!samplePosition.getAliquot().equals(getAliquot())) {
+            if (!aliquotPosition.getAliquot().equals(getAliquot())) {
                 throw new BiobankCheckException("Position " + getRow() + ":"
                     + getCol() + " in container " + getParent().toString()
                     + " is not available.");

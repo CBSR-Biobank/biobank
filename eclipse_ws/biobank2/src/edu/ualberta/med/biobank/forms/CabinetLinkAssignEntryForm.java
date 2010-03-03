@@ -391,7 +391,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                         return;
                     }
                     appendLog("Checking position " + positionString);
-                    sampleWrapper.setSamplePositionFromString(positionString,
+                    sampleWrapper.setAliquotPositionFromString(positionString,
                         bin);
                     if (sampleWrapper.isPositionFree(bin)) {
                         sampleWrapper.setParent(bin);

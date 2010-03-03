@@ -44,7 +44,7 @@ public class ContainerWrapper extends
     protected String[] getPropertyChangeNames() {
         return new String[] { "productBarcode", "position", "activityStatus",
             "site", "label", "temperature", "comment",
-            "samplePositionCollection", "aliquots", "childPositionCollection",
+            "aliquotPositionCollection", "aliquots", "childPositionCollection",
             "children", "containerType", "parent" };
     }
 
@@ -425,7 +425,7 @@ public class ContainerWrapper extends
                 for (AliquotPosition position : positions) {
                     samples.put(new RowColPos(position.getRow(), position
                         .getCol()), new AliquotWrapper(appService, position
-                        .getSample()));
+                        .getAliquot()));
                 }
                 propertiesMap.put("samples", samples);
             }
@@ -441,11 +441,11 @@ public class ContainerWrapper extends
 
     public AliquotWrapper getSample(Integer row, Integer col)
         throws BiobankCheckException {
-        AliquotPositionWrapper samplePosition = new AliquotPositionWrapper(
+        AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
-        samplePosition.setRow(row);
-        samplePosition.setCol(col);
-        samplePosition.checkPositionValid(this);
+        aliquotPosition.setRow(row);
+        aliquotPosition.setCol(col);
+        aliquotPosition.checkPositionValid(this);
         Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
             return null;
@@ -455,11 +455,11 @@ public class ContainerWrapper extends
 
     public void addAliquot(Integer row, Integer col, AliquotWrapper aliquot)
         throws Exception {
-        AliquotPositionWrapper samplePosition = new AliquotPositionWrapper(
+        AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
-        samplePosition.setRow(row);
-        samplePosition.setCol(col);
-        samplePosition.checkPositionValid(this);
+        aliquotPosition.setRow(row);
+        aliquotPosition.setCol(col);
+        aliquotPosition.checkPositionValid(this);
         Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
             samples = new TreeMap<RowColPos, AliquotWrapper>();

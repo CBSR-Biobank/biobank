@@ -16,7 +16,7 @@ public class FreezerSSamples extends QueryObject {
         super("Displays the total number of freezer aliquots per study.",
             "select aliquot.patientVisit.patient.study.nameShort, count(*) from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.samplePosition.container.id "
+                + " as aliquot where aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
                 + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()

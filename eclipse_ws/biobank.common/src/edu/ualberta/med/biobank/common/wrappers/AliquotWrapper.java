@@ -141,7 +141,7 @@ public class AliquotWrapper extends
         return new PatientVisitWrapper(appService, pv);
     }
 
-    public void setSamplePositionFromString(String positionString,
+    public void setAliquotPositionFromString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
             positionString, parentContainer.getContainerType());
@@ -162,8 +162,8 @@ public class AliquotWrapper extends
         if (position != null) {
             HQLCriteria criteria = new HQLCriteria("from "
                 + Aliquot.class.getName()
-                + " where samplePosition.row=? and samplePosition.col=?"
-                + " and samplePosition.container=?", Arrays
+                + " where aliquotPosition.row=? and aliquotPosition.col=?"
+                + " and aliquotPosition.container=?", Arrays
                 .asList(new Object[] { position.row, position.col,
                     parentContainer.getWrappedObject() }));
 
@@ -318,14 +318,14 @@ public class AliquotWrapper extends
     @Override
     protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        AliquotPosition pos = wrappedObject.getSamplePosition();
+        AliquotPosition pos = wrappedObject.getAliquotPosition();
         if (pos != null) {
             return new AliquotPositionWrapper(appService, pos);
         } else if (initIfNoPosition) {
             AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
                 appService);
             posWrapper.setAliquot(this);
-            wrappedObject.setSamplePosition(posWrapper.getWrappedObject());
+            wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
             return posWrapper;
         }
         return null;
