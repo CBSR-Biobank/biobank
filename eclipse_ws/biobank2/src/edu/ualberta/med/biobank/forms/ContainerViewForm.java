@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
@@ -387,7 +387,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        List<SampleWrapper> samples = new ArrayList<SampleWrapper>(container
+        List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
             .getSamples().values());
         samplesWidget = new SamplesListInfoTable(parent, samples);
         samplesWidget.adaptToToolkit(toolkit, true);

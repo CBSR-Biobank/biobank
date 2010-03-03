@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -40,9 +40,9 @@ import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
-public class TestSample extends TestDatabase {
+public class TestAliquot extends TestDatabase {
 
-    private SampleWrapper sample;
+    private AliquotWrapper sample;
 
     private Integer siteId;
 
@@ -101,7 +101,7 @@ public class TestSample extends TestDatabase {
         throws BiobankCheckException, Exception {
         sample.persist();
 
-        SampleWrapper duplicate = SampleHelper.newSample(
+        AliquotWrapper duplicate = SampleHelper.newSample(
             sample.getSampleType(), sample.getParent(), sample
                 .getPatientVisit(), 2, 2);
         duplicate.setInventoryId(sample.getInventoryId());
@@ -131,7 +131,7 @@ public class TestSample extends TestDatabase {
         Exception {
         sample.persist();
 
-        SampleWrapper duplicate = SampleHelper.newSample(
+        AliquotWrapper duplicate = SampleHelper.newSample(
             sample.getSampleType(), sample.getParent(), sample
                 .getPatientVisit(), 3, 3);
 
@@ -168,7 +168,7 @@ public class TestSample extends TestDatabase {
         sample.persist();
 
         ContainerWrapper container = new ContainerWrapper(appService);
-        SampleWrapper sample = new SampleWrapper(appService);
+        AliquotWrapper sample = new AliquotWrapper(appService);
         sample.setParent(container);
         try {
             sample.persist();
@@ -263,7 +263,7 @@ public class TestSample extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        SampleWrapper sample = new SampleWrapper(appService);
+        AliquotWrapper sample = new AliquotWrapper(appService);
         Assert.assertNull(sample.getPositionString());
     }
 
@@ -271,7 +271,7 @@ public class TestSample extends TestDatabase {
     public void testGetSite() {
         Assert.assertEquals(siteId, sample.getSite().getId());
 
-        SampleWrapper sample1 = new SampleWrapper(appService);
+        AliquotWrapper sample1 = new AliquotWrapper(appService);
         Assert.assertNull(sample1.getSite());
     }
 
@@ -317,9 +317,9 @@ public class TestSample extends TestDatabase {
         // check to make sure added to new parent
         parent.reload();
         Assert.assertTrue(sample.getParent() != null);
-        Collection<SampleWrapper> sampleWrappers = parent.getSamples().values();
+        Collection<AliquotWrapper> sampleWrappers = parent.getSamples().values();
         boolean found = false;
-        for (SampleWrapper sampleWrapper : sampleWrappers) {
+        for (AliquotWrapper sampleWrapper : sampleWrappers) {
             if (sampleWrapper.getId().equals(sample.getId()))
                 found = true;
         }
@@ -336,7 +336,7 @@ public class TestSample extends TestDatabase {
         sample.setSampleType(newType);
         Assert.assertTrue(newType.getId() == sample.getSampleType().getId());
 
-        SampleWrapper sample1 = new SampleWrapper(appService);
+        AliquotWrapper sample1 = new AliquotWrapper(appService);
         sample1.setSampleType(null);
         Assert.assertNull(sample1.getSampleType());
     }
@@ -385,7 +385,7 @@ public class TestSample extends TestDatabase {
     public void testCompareTo() throws BiobankCheckException, Exception {
         sample.setInventoryId("defgh");
         sample.persist();
-        SampleWrapper sample2 = SampleHelper.newSample(sample.getSampleType(),
+        AliquotWrapper sample2 = SampleHelper.newSample(sample.getSampleType(),
             sample.getParent(), sample.getPatientVisit(), 2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
@@ -419,13 +419,13 @@ public class TestSample extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);
-        SampleWrapper sample = SampleHelper.newSample(sampleType, container,
+        AliquotWrapper sample = SampleHelper.newSample(sampleType, container,
             pv, 2, 3);
         sample.setInventoryId(Utils.getRandomString(5));
         sample.persist();
         SampleHelper.addSample(sampleType, container, pv, 3, 3);
 
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
             appService, sample.getInventoryId(), site);
         Assert.assertEquals(1, samples.size());
         Assert.assertEquals(samples.get(0), sample);
@@ -451,7 +451,7 @@ public class TestSample extends TestDatabase {
     public void testCheckPosition() throws BiobankCheckException, Exception {
         sample.persist();
 
-        SampleWrapper sample2 = new SampleWrapper(appService);
+        AliquotWrapper sample2 = new AliquotWrapper(appService);
         sample2.setPosition(3, 3);
 
         Assert.assertFalse(sample2.isPositionFree(sample.getParent()));
@@ -483,7 +483,7 @@ public class TestSample extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         SampleHelper.addSample(sampleType, container, pv, 0, 0);
-        SampleWrapper sample = SampleHelper.newSample(sampleType, container,
+        AliquotWrapper sample = SampleHelper.newSample(sampleType, container,
             pv, 2, 3);
         sample.setInventoryId(Utils.getRandomString(5));
         sample.persist();

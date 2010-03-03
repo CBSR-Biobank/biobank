@@ -50,7 +50,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.Cell;
@@ -240,7 +240,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
     }
 
     /**
-     * Sample types selection.
+     * Aliquot types selection.
      */
     private void createTypesSelectionSection(Composite parent) throws Exception {
         // Radio buttons
@@ -276,7 +276,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
             .getSampleTypeForContainerTypes(appService, SessionManager
                 .getInstance().getCurrentSiteWrapper(), palletNameContains);
         if (sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Sample Types",
+            BioBankPlugin.openAsyncError("Aliquot Types",
                 "No sample type found for containers of container type containing '"
                     + palletNameContains + "'...");
         }
@@ -613,7 +613,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+                List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
                     appService, value, SessionManager.getInstance()
                         .getCurrentSiteWrapper());
                 if (samples.size() > 0) {
@@ -621,7 +621,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                     String msg = "Aliquot already in database";
                     cell.setInformation(msg);
                     scanOk = false;
-                    SampleWrapper sample = samples.get(0);
+                    AliquotWrapper sample = samples.get(0);
                     appendLog("ERROR: " + value + " - " + msg + " see visit "
                         + sample.getPatientVisit().getFormattedDateProcessed()
                         + " of patient "

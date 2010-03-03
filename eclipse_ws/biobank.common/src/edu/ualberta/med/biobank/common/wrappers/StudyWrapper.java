@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.SampleSource;
+import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -387,15 +387,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SampleSourceWrapper> getSampleSourceCollection(boolean sort) {
+    public List<SampleSourceWrapper> getSourceVesselCollection(boolean sort) {
         List<SampleSourceWrapper> ssCollection = (List<SampleSourceWrapper>) propertiesMap
             .get("SampleSourceCollection");
         if (ssCollection == null) {
-            Collection<SampleSource> children = wrappedObject
-                .getSampleSourceCollection();
+            Collection<SourceVessel> children = wrappedObject
+                .getSourceVesselCollection();
             if (children != null) {
                 ssCollection = new ArrayList<SampleSourceWrapper>();
-                for (SampleSource study : children) {
+                for (SourceVessel study : children) {
                     ssCollection
                         .add(new SampleSourceWrapper(appService, study));
                 }
@@ -407,15 +407,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return ssCollection;
     }
 
-    public List<SampleSourceWrapper> getSampleSourceCollection() {
-        return getSampleSourceCollection(false);
+    public List<SampleSourceWrapper> getSourceVesselCollection() {
+        return getSourceVesselCollection(false);
     }
 
-    private void setSampleSources(Collection<SampleSource> allSsObject,
+    private void setSampleSources(Collection<SourceVessel> allSsObject,
         List<SampleSourceWrapper> allSsWrappers) {
-        Collection<SampleSource> oldSampleSource = wrappedObject
-            .getSampleSourceCollection();
-        wrappedObject.setSampleSourceCollection(allSsObject);
+        Collection<SourceVessel> oldSampleSource = wrappedObject
+            .getSourceVesselCollection();
+        wrappedObject.setSourceVesselCollection(allSsObject);
         propertyChangeSupport.firePropertyChange("sampleSourceCollection",
             oldSampleSource, allSsObject);
         propertiesMap.put("sampleSourceCollection", allSsWrappers);
@@ -423,10 +423,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public void addSampleSources(List<SampleSourceWrapper> newSampleSources) {
         if (newSampleSources != null && newSampleSources.size() > 0) {
-            Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
+            Collection<SourceVessel> allSsObjects = new HashSet<SourceVessel>();
             List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
             // already in list
-            List<SampleSourceWrapper> currentList = getSampleSourceCollection();
+            List<SampleSourceWrapper> currentList = getSourceVesselCollection();
             if (currentList != null) {
                 for (SampleSourceWrapper ss : currentList) {
                     allSsObjects.add(ss.getWrappedObject());
@@ -447,10 +447,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         List<SampleSourceWrapper> sampleSourcesToDelete) {
         if (sampleSourcesToDelete != null && sampleSourcesToDelete.size() > 0) {
             deletedSampleSources.addAll(sampleSourcesToDelete);
-            Collection<SampleSource> allSsObjects = new HashSet<SampleSource>();
+            Collection<SourceVessel> allSsObjects = new HashSet<SourceVessel>();
             List<SampleSourceWrapper> allSsWrappers = new ArrayList<SampleSourceWrapper>();
             // already in list
-            List<SampleSourceWrapper> currentList = getSampleSourceCollection();
+            List<SampleSourceWrapper> currentList = getSourceVesselCollection();
             if (currentList != null) {
                 for (SampleSourceWrapper ss : currentList) {
                     if (!deletedSampleSources.contains(ss)) {

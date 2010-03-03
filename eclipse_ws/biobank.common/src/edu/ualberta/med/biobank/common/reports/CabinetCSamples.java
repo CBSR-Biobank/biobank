@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.Sample;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -17,7 +17,7 @@ public class CabinetCSamples extends QueryObject {
             "Displays the total number of cabinet samples per study per clinic.",
 
             "select sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, count(*) from "
-                + Sample.class.getName()
+                + Aliquot.class.getName()
                 + " as sample where sample.samplePosition.container.id in (select path1.container.id from "
                 + ContainerPath.class.getName()
                 + " as path1, "

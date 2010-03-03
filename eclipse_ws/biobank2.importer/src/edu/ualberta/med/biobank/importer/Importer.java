@@ -34,25 +34,25 @@ import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.Shipment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -937,9 +937,9 @@ public class Importer {
             pv.setPatient(patient);
             pv.setShipment(shipment);
 
-            PvSampleSourceWrapper sourceVessel = new PvSampleSourceWrapper(
+            PvSourceVesselWrapper sourceVessel = new PvSourceVesselWrapper(
                 appService);
-            sourceVessel.setSampleSource(importSourceVessel);
+            sourceVessel.setSourceVessel(importSourceVessel);
             sourceVessel.setQuantity(0);
             sourceVessel.setDateDrawn(getDateFromStr(rs.getString(5)));
             sourceVessel.setPatientVisit(pv);
@@ -988,10 +988,11 @@ public class Importer {
     private static void removeAllSamples() throws Exception {
         logger.info("removing old samples...");
 
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName());
-        List<Sample> samples = appService.query(criteria);
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Aliquot.class.getName());
+        List<Aliquot> samples = appService.query(criteria);
         while (samples.size() > 0) {
-            SampleWrapper sw = new SampleWrapper(appService, samples.get(0));
+            AliquotWrapper sw = new AliquotWrapper(appService, samples.get(0));
             sw.delete();
             samples.remove(0);
         }
@@ -1180,12 +1181,11 @@ public class Importer {
                         continue;
                     }
 
-                    SampleWrapper sample = new SampleWrapper(appService);
+                    AliquotWrapper sample = new AliquotWrapper(appService);
                     sample.setParent(bin);
                     sample.setSampleType(sampleType);
                     sample.setInventoryId(inventoryId);
                     sample.setLinkDate(rs.getDate(14));
-                    sample.setQuantityUsed(rs.getDouble(15));
                     sample.setPosition(binPos.row, 0);
                     sample.setPatientVisit(visit);
 
@@ -1267,13 +1267,13 @@ public class Importer {
 
     public static boolean inventoryIdUnique(String inventoryId)
         throws Exception {
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
             appService, inventoryId, cbsrSite);
         if (samples.size() == 0)
             return true;
 
         String labels = "";
-        for (SampleWrapper samp : samples) {
+        for (AliquotWrapper samp : samples) {
             labels += samp.getPositionString(true, true) + ", ";
         }
         logger.error("a sample with inventory id " + inventoryId

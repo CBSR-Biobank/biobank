@@ -288,7 +288,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleSourceHelper.addSampleSources(study, name);
 
-        List<SampleSourceWrapper> storages = study.getSampleSourceCollection();
+        List<SampleSourceWrapper> storages = study.getSourceVesselCollection();
         int sizeFound = storages.size();
 
         Assert.assertEquals(nber, sizeFound);
@@ -302,7 +302,7 @@ public class TestStudy extends TestDatabase {
         SampleSourceHelper.addSampleSources(study, name);
 
         List<SampleSourceWrapper> sources = study
-            .getSampleSourceCollection(true);
+            .getSourceVesselCollection(true);
         if (sources.size() > 1) {
             for (int i = 0; i < sources.size() - 1; i++) {
                 SampleSourceWrapper source1 = sources.get(i);
@@ -325,7 +325,7 @@ public class TestStudy extends TestDatabase {
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber + 1, study.getSampleSourceCollection().size());
+        Assert.assertEquals(nber + 1, study.getSourceVesselCollection().size());
     }
 
     @Test
@@ -335,7 +335,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(site, name);
         int nber = SampleSourceHelper.addSampleSources(study, name);
 
-        List<SampleSourceWrapper> sources = study.getSampleSourceCollection();
+        List<SampleSourceWrapper> sources = study.getSourceVesselCollection();
         SampleSourceWrapper source = DbHelper.chooseRandomlyInList(sources);
         // don't have to delete the storage thanks to
         // deleteSampleSourceDifference method
@@ -345,7 +345,7 @@ public class TestStudy extends TestDatabase {
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber - 1, study.getSampleSourceCollection().size());
+        Assert.assertEquals(nber - 1, study.getSourceVesselCollection().size());
     }
 
     @Test

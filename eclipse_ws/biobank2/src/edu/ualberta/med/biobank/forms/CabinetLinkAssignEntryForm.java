@@ -44,7 +44,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
@@ -85,7 +85,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private IObservableValue selectedSampleTypeValue = new WritableValue("",
         String.class);
 
-    private SampleWrapper sampleWrapper;
+    private AliquotWrapper sampleWrapper;
     private ContainerWrapper cabinet;
     private ContainerWrapper drawer;
     private ContainerWrapper bin;
@@ -102,7 +102,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void init() {
         super.init();
         setPartName("Cabinet Link/Assign");
-        sampleWrapper = new SampleWrapper(appService);
+        sampleWrapper = new AliquotWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
@@ -291,12 +291,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             appService, SessionManager.getInstance().getCurrentSiteWrapper(),
             cabinetNameContains);
         if (sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Sample types",
+            BioBankPlugin.openAsyncError("Aliquot types",
                 "No sample type found for container with type containing '"
                     + cabinetNameContains + "' in the same.");
         }
         viewerSampleTypes = createComboViewerWithNoSelectionValidator(
-            fieldsComposite, "Sample type", sampleTypes, null,
+            fieldsComposite, "Aliquot type", sampleTypes, null,
             "A sample type should be selected");
         viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -444,7 +444,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         appendLog("Getting informations for inventoryID "
             + sampleWrapper.getInventoryId());
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
             appService, sampleWrapper.getInventoryId(), SessionManager
                 .getInstance().getCurrentSiteWrapper());
         if (samples.size() > 1) {
@@ -472,7 +472,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         if (posStr == null) {
             posStr = "none";
         }
-        appendLog("Sample " + sampleWrapper.getInventoryId()
+        appendLog("Aliquot " + sampleWrapper.getInventoryId()
             + ": current position = " + posStr);
     }
 
@@ -566,12 +566,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             posStr = "none";
         }
         if (radioNew.getSelection()) {
-            appendLog("Sample " + sampleWrapper.getInventoryId()
+            appendLog("Aliquot " + sampleWrapper.getInventoryId()
                 + " saved in position " + posStr + " for visit "
                 + sampleWrapper.getPatientVisit().getFormattedDateProcessed()
                 + "(patient " + currentPatient.getPnumber() + ")");
         } else {
-            appendLog("Sample " + sampleWrapper.getInventoryId()
+            appendLog("Aliquot " + sampleWrapper.getInventoryId()
                 + " moved to position " + posStr);
         }
         setSaved(true);

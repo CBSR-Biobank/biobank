@@ -6,15 +6,15 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.model.SampleSource;
+import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
+public class SampleSourceWrapper extends ModelWrapper<SourceVessel> {
 
     public SampleSourceWrapper(WritableApplicationService appService,
-        SampleSource wrappedObject) {
+        SourceVessel wrappedObject) {
         super(appService, wrappedObject);
     }
 
@@ -38,7 +38,7 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
     }
 
     /**
-     * Get study list. Use Study.setSampleSourceCollection to link studies and
+     * Get study list. Use Study.setSourceVesselCollection to link studies and
      * sample sources
      */
     @SuppressWarnings("unchecked")
@@ -61,8 +61,8 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
     }
 
     @Override
-    public Class<SampleSource> getWrappedClass() {
-        return SampleSource.class;
+    public Class<SourceVessel> getWrappedClass() {
+        return SourceVessel.class;
     }
 
     @Override
@@ -77,17 +77,17 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
 
     public static List<SampleSourceWrapper> getAllSampleSources(
         WritableApplicationService appService) throws ApplicationException {
-        List<SampleSource> list = appService.search(SampleSource.class,
-            new SampleSource());
+        List<SourceVessel> list = appService.search(SourceVessel.class,
+            new SourceVessel());
         List<SampleSourceWrapper> wrappers = new ArrayList<SampleSourceWrapper>();
-        for (SampleSource ss : list) {
+        for (SourceVessel ss : list) {
             wrappers.add(new SampleSourceWrapper(appService, ss));
         }
         return wrappers;
     }
 
     @Override
-    public int compareTo(ModelWrapper<SampleSource> wrapper) {
+    public int compareTo(ModelWrapper<SourceVessel> wrapper) {
         if (wrapper instanceof SampleSourceWrapper) {
             String name1 = wrappedObject.getName();
             String name2 = wrapper.wrappedObject.getName();

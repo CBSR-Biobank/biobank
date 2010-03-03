@@ -8,14 +8,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PvSampleSourceInfoTable extends
-    InfoTableWidget<PvSampleSourceWrapper> {
+    InfoTableWidget<PvSourceVesselWrapper> {
 
     protected class TableRowData {
-        PvSampleSourceWrapper pvSampleSource;
+        PvSourceVesselWrapper pvSampleSource;
         String name;
         Integer quantity;
         String dateDrawn;
@@ -66,12 +66,12 @@ public class PvSampleSourceInfoTable extends
     private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
 
     public PvSampleSourceInfoTable(Composite parent, boolean multiSelectRows,
-        List<PvSampleSourceWrapper> collection) {
+        List<PvSourceVesselWrapper> collection) {
         super(parent, multiSelectRows, collection, HEADINGS, BOUNDS, 10);
     }
 
     public PvSampleSourceInfoTable(Composite parent,
-        List<PvSampleSourceWrapper> collection) {
+        List<PvSourceVesselWrapper> collection) {
         this(parent, true, collection);
     }
 
@@ -108,13 +108,13 @@ public class PvSampleSourceInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(PvSampleSourceWrapper pvSampleSource)
+    public Object getCollectionModelObject(PvSourceVesselWrapper pvSampleSource)
         throws Exception {
         TableRowData info = new TableRowData();
         info.pvSampleSource = pvSampleSource;
-        Assert.isNotNull(pvSampleSource.getSampleSource(),
+        Assert.isNotNull(pvSampleSource.getSourceVessel(),
             "patient visit sample source has null for sample source");
-        info.name = pvSampleSource.getSampleSource().getName();
+        info.name = pvSampleSource.getSourceVessel().getName();
         info.quantity = pvSampleSource.getQuantity();
         info.dateDrawn = pvSampleSource.getFormattedDateDrawn();
         return info;
@@ -128,8 +128,8 @@ public class PvSampleSourceInfoTable extends
     }
 
     @Override
-    public List<PvSampleSourceWrapper> getCollection() {
-        List<PvSampleSourceWrapper> result = new ArrayList<PvSampleSourceWrapper>();
+    public List<PvSourceVesselWrapper> getCollection() {
+        List<PvSourceVesselWrapper> result = new ArrayList<PvSourceVesselWrapper>();
         for (BiobankCollectionModel item : model) {
             result.add(((TableRowData) item.o).pvSampleSource);
         }
@@ -137,7 +137,7 @@ public class PvSampleSourceInfoTable extends
     }
 
     @Override
-    public PvSampleSourceWrapper getSelection() {
+    public PvSourceVesselWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

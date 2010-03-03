@@ -1243,7 +1243,7 @@
             name="Cabinet Link/Assign Entry ">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SampleViewForm"
+            class="edu.ualberta.med.biobank.forms.AliquotViewForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.SampleViewForm"
             name="Sample View">

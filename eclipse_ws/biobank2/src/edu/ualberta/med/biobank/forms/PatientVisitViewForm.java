@@ -160,14 +160,14 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
         PvSampleSourceInfoTable table = new PvSampleSourceInfoTable(client,
-            patientVisit.getPvSampleSourceCollection());
+            patientVisit.getPvSourceVesselCollection());
         table.adaptToToolkit(toolkit, true);
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
         samplesWidget = new SamplesListInfoTable(parent, patientVisit
-            .getSampleCollection());
+            .getAliquotCollection());
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.setSelection(patientVisitAdapter.getSelectedSample());
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);

@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -893,7 +893,7 @@ public class TestSite extends TestDatabase {
 
         // delete patient 1 and all it's visits and samples
         for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
-            for (SampleWrapper sample : visit.getSampleCollection()) {
+            for (AliquotWrapper sample : visit.getAliquotCollection()) {
                 sample.delete();
             }
         }

@@ -1,24 +1,24 @@
 package edu.ualberta.med.biobank.test.internal;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 
 public class PvSampleSourceHelper extends DbHelper {
 
-    public static PvSampleSourceWrapper newPvSampleSource(String name,
+    public static PvSourceVesselWrapper newPvSampleSource(String name,
         PatientVisitWrapper visit) throws Exception {
-        PvSampleSourceWrapper pss = new PvSampleSourceWrapper(appService);
+        PvSourceVesselWrapper pss = new PvSourceVesselWrapper(appService);
         SampleSourceWrapper ssw = SampleSourceHelper.addSampleSource(name);
-        pss.setSampleSource(ssw);
+        pss.setSourceVessel(ssw);
         pss.setQuantity(r.nextInt(10));
         pss.setPatientVisit(visit);
         return pss;
     }
 
-    public static PvSampleSourceWrapper addPvSampleSource(String name,
+    public static PvSourceVesselWrapper addPvSampleSource(String name,
         PatientVisitWrapper visit) throws Exception {
-        PvSampleSourceWrapper sss = newPvSampleSource(name, visit);
+        PvSourceVesselWrapper sss = newPvSampleSource(name, visit);
         sss.persist();
         return sss;
     }

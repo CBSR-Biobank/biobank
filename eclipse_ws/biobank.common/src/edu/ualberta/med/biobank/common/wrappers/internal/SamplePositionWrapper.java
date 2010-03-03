@@ -7,9 +7,9 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.SamplePosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -47,22 +47,22 @@ public class SamplePositionWrapper extends
         return SamplePosition.class;
     }
 
-    public void setSample(Sample sample) {
-        Sample oldSample = wrappedObject.getSample();
+    public void setSample(Aliquot sample) {
+        Aliquot oldSample = wrappedObject.getSample();
         wrappedObject.setSample(sample);
         propertyChangeSupport.firePropertyChange("sample", oldSample, sample);
     }
 
-    public void setSample(SampleWrapper sample) {
+    public void setSample(AliquotWrapper sample) {
         setSample(sample.getWrappedObject());
     }
 
-    public SampleWrapper getSample() {
-        Sample sample = wrappedObject.getSample();
+    public AliquotWrapper getSample() {
+        Aliquot sample = wrappedObject.getSample();
         if (sample == null) {
             return null;
         }
-        return new SampleWrapper(appService, sample);
+        return new AliquotWrapper(appService, sample);
     }
 
     private void setContainer(Container container) {

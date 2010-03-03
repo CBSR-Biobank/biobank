@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> {
+public class SourceVesselInfoTable extends InfoTableWidget<SampleSourceWrapper> {
 
     private class TableSorter extends BiobankTableSorter {
         @Override
@@ -42,7 +42,7 @@ public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> 
 
     private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
 
-    public SampleSourceInfoTable(Composite parent,
+    public SourceVesselInfoTable(Composite parent,
         List<SampleSourceWrapper> sampleStorageCollection) {
         super(parent, true, sampleStorageCollection, HEADINGS, BOUNDS, 10);
     }

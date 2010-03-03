@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 public class PatientVisitAdapter extends AdapterBase {
 
     /**
-     * Sample selected in this patient visit
+     * Aliquot selected in this patient visit
      */
-    private SampleWrapper selectedSample;
+    private AliquotWrapper selectedSample;
 
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
@@ -42,7 +42,7 @@ public class PatientVisitAdapter extends AdapterBase {
         if (wrapper.getShipment() != null) {
             name += " - " + wrapper.getShipment().getWaybill();
         }
-        Collection<SampleWrapper> samples = wrapper.getSampleCollection();
+        Collection<AliquotWrapper> samples = wrapper.getAliquotCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -78,11 +78,11 @@ public class PatientVisitAdapter extends AdapterBase {
         addViewMenu(menu, "Visit", PatientVisitViewForm.ID);
     }
 
-    public void setSelectedSample(SampleWrapper sample) {
+    public void setSelectedSample(AliquotWrapper sample) {
         this.selectedSample = sample;
     }
 
-    public SampleWrapper getSelectedSample() {
+    public AliquotWrapper getSelectedSample() {
         return selectedSample;
     }
 

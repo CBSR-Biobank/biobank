@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class TestSampleSource extends TestDatabase {
+public class TestSourceVessel extends TestDatabase {
 
     SampleSourceWrapper ssw;
     SiteWrapper defaultSite;

@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
 public class SampleStorageDialog extends BiobankDialog {
 
-    private static final String TITLE = "Sample Storage";
+    private static final String TITLE = "Aliquot Storage";
 
     private SampleStorageWrapper origSampleStorage;
 
@@ -72,10 +72,10 @@ public class SampleStorageDialog extends BiobankDialog {
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_COMPUTER_KEY));
         if (origSampleStorage.isNew()) {
-            setTitle("Add Sample Storage");
+            setTitle("Add Aliquot Storage");
             setMessage("Add sample storage to this study");
         } else {
-            setTitle("Edit Sample Storage");
+            setTitle("Edit Aliquot Storage");
             setMessage("Edit sample storage for this study");
         }
         return contents;
@@ -94,7 +94,7 @@ public class SampleStorageDialog extends BiobankDialog {
         }
 
         sampleTypeComboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents, "Sample Type",
+            .createComboViewerWithNoSelectionValidator(contents, "Aliquot Type",
                 sampleTypeMap.keySet(), selection,
                 "A sample type should be selected");
         sampleTypeComboViewer

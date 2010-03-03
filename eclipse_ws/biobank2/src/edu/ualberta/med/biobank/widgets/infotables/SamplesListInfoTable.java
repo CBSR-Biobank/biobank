@@ -10,14 +10,14 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
+public class SamplesListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
     protected class TableRowData {
-        SampleWrapper sample;
+        AliquotWrapper sample;
         String inventoryId;
         String type;
         String position;
@@ -88,7 +88,7 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         -1 };
 
     public SamplesListInfoTable(Composite parent,
-        List<SampleWrapper> sampleCollection) {
+        List<AliquotWrapper> sampleCollection) {
         super(parent, true, sampleCollection, HEADINGS, BOUNDS, 20);
     }
 
@@ -134,7 +134,7 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(SampleWrapper sample)
+    public Object getCollectionModelObject(AliquotWrapper sample)
         throws Exception {
         TableRowData info = new TableRowData();
         info.sample = sample;
@@ -145,7 +145,6 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         info.position = sample.getPositionString();
         info.linkDate = DateFormatter.formatAsDateTime(sample.getLinkDate());
         info.quantity = sample.getQuantity();
-        info.quantityUsed = sample.getQuantityUsed();
         info.comment = sample.getComment();
         return info;
     }
@@ -157,7 +156,7 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         return ((TableRowData) o).toString();
     }
 
-    public void setSelection(SampleWrapper selectedSample) {
+    public void setSelection(AliquotWrapper selectedSample) {
         if (selectedSample == null)
             return;
         for (BiobankCollectionModel item : model) {
@@ -170,8 +169,8 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
     }
 
     @Override
-    public List<SampleWrapper> getCollection() {
-        List<SampleWrapper> result = new ArrayList<SampleWrapper>();
+    public List<AliquotWrapper> getCollection() {
+        List<AliquotWrapper> result = new ArrayList<AliquotWrapper>();
         for (BiobankCollectionModel item : model) {
             result.add(((TableRowData) item.o).sample);
         }
@@ -179,7 +178,7 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
     }
 
     @Override
-    public SampleWrapper getSelection() {
+    public AliquotWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

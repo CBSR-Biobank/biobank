@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -184,14 +184,14 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
         patientVisit.setPatient(patient);
-        SampleWrapper sample = addSample(patientVisit);
+        AliquotWrapper sample = addSample(patientVisit);
         sample.setPatientVisit(patientVisit);
         patientVisit.setShipment(shipments.get(r.nextInt(shipments.size())));
         return patientVisit;
     }
 
-    private SampleWrapper addSample(PatientVisitWrapper patientVisit) {
-        SampleWrapper sample = new SampleWrapper(appService);
+    private AliquotWrapper addSample(PatientVisitWrapper patientVisit) {
+        AliquotWrapper sample = new AliquotWrapper(appService);
         sample.setInventoryId(Integer.valueOf(r.nextInt(10000)).toString());
         sample.setPatientVisit(patientVisit);
         sample.setLinkDate(new Date());

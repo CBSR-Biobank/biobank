@@ -313,7 +313,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setDateProcessed(new Date());
         }
         pvSampleSourceEntryWidget.setSelectedPvSampleSources(patientVisit
-            .getPvSampleSourceCollection());
+            .getPvSourceVesselCollection());
         // FIXME also reset for pv infos
     }
 }

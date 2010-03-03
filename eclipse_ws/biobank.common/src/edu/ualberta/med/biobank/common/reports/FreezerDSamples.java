@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.Aliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -16,7 +16,7 @@ public class FreezerDSamples extends QueryObject {
         super(
             "Displays the total number of freezer samples per study per clinic by date range.",
             "select sample.linkDate, sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name from "
-                + Sample.class.getName()
+                + Aliquot.class.getName()
                 + " as sample where sample.samplePosition.container.id in (select path1.container.id from "
                 + ContainerPath.class.getName()
                 + " as path1, "

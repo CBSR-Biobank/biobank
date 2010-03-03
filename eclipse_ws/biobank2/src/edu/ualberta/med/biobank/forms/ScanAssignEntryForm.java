@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -356,10 +356,10 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     }
                 }
                 boolean result = true;
-                Map<RowColPos, SampleWrapper> samples = currentPalletWrapper
+                Map<RowColPos, AliquotWrapper> samples = currentPalletWrapper
                     .getSamples();
                 for (RowColPos rcp : cells.keySet()) {
-                    SampleWrapper expectedSample = null;
+                    AliquotWrapper expectedSample = null;
                     if (samples != null) {
                         expectedSample = samples.get(rcp);
                     }
@@ -416,7 +416,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     protected boolean setStatus(PalletCell scanCell) throws Exception {
-        SampleWrapper expectedSample = scanCell.getExpectedSample();
+        AliquotWrapper expectedSample = scanCell.getExpectedSample();
         String value = scanCell.getValue();
         String positionString = LabelingScheme.rowColToSbs(new RowColPos(
             scanCell.getRow(), scanCell.getCol()));
@@ -438,7 +438,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 positionString, logMsg);
             return false;
         }
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
             appService, value, SessionManager.getInstance()
                 .getCurrentSiteWrapper());
         if (samples.size() == 0) {
@@ -448,7 +448,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 "Aliquot not found", null, positionString, logMsg);
             return false;
         } else if (samples.size() == 1) {
-            SampleWrapper foundSample = samples.get(0);
+            AliquotWrapper foundSample = samples.get(0);
             if (expectedSample != null
                 && !foundSample.getId().equals(expectedSample.getId())) {
                 // sample found but another sample already at this position
@@ -552,7 +552,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 if (cell != null
                     && (cell.getStatus() == SampleCellStatus.NEW || cell
                         .getStatus() == SampleCellStatus.MOVED)) {
-                    SampleWrapper sample = cell.getSample();
+                    AliquotWrapper sample = cell.getSample();
                     if (sample != null) {
                         sample.setPosition(rcp);
                         sample.setParent(currentPalletWrapper);

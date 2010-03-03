@@ -29,7 +29,7 @@ public class ContainerWrapper extends
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
-    private List<SampleWrapper> addedSamples = new ArrayList<SampleWrapper>();
+    private List<AliquotWrapper> addedSamples = new ArrayList<AliquotWrapper>();
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -132,7 +132,7 @@ public class ContainerWrapper extends
     }
 
     private void persistSamples() throws Exception {
-        for (SampleWrapper sample : addedSamples) {
+        for (AliquotWrapper sample : addedSamples) {
             sample.setParent(this);
             sample.persist();
         }
@@ -414,17 +414,17 @@ public class ContainerWrapper extends
     }
 
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, SampleWrapper> getSamples() {
-        Map<RowColPos, SampleWrapper> samples = (Map<RowColPos, SampleWrapper>) propertiesMap
+    public Map<RowColPos, AliquotWrapper> getSamples() {
+        Map<RowColPos, AliquotWrapper> samples = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("samples");
         if (samples == null) {
             Collection<SamplePosition> positions = wrappedObject
                 .getSamplePositionCollection();
             if (positions != null) {
-                samples = new TreeMap<RowColPos, SampleWrapper>();
+                samples = new TreeMap<RowColPos, AliquotWrapper>();
                 for (SamplePosition position : positions) {
                     samples.put(new RowColPos(position.getRow(), position
-                        .getCol()), new SampleWrapper(appService, position
+                        .getCol()), new AliquotWrapper(appService, position
                         .getSample()));
                 }
                 propertiesMap.put("samples", samples);
@@ -439,37 +439,37 @@ public class ContainerWrapper extends
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public SampleWrapper getSample(Integer row, Integer col)
+    public AliquotWrapper getSample(Integer row, Integer col)
         throws BiobankCheckException {
         SamplePositionWrapper samplePosition = new SamplePositionWrapper(
             appService);
         samplePosition.setRow(row);
         samplePosition.setCol(col);
         samplePosition.checkPositionValid(this);
-        Map<RowColPos, SampleWrapper> samples = getSamples();
+        Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
             return null;
         }
         return samples.get(new RowColPos(row, col));
     }
 
-    public void addSample(Integer row, Integer col, SampleWrapper sample)
+    public void addSample(Integer row, Integer col, AliquotWrapper sample)
         throws Exception {
         SamplePositionWrapper samplePosition = new SamplePositionWrapper(
             appService);
         samplePosition.setRow(row);
         samplePosition.setCol(col);
         samplePosition.checkPositionValid(this);
-        Map<RowColPos, SampleWrapper> samples = getSamples();
+        Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
-            samples = new TreeMap<RowColPos, SampleWrapper>();
+            samples = new TreeMap<RowColPos, AliquotWrapper>();
             propertiesMap.put("samples", samples);
         } else if (!canHoldSample(sample)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
                 + sample.getSampleType().getName() + ".");
         } else {
-            SampleWrapper sampleAtPosition = getSample(row, col);
+            AliquotWrapper sampleAtPosition = getSample(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
@@ -658,7 +658,7 @@ public class ContainerWrapper extends
      * 
      * @throws Exception if the sample type is null.
      */
-    public boolean canHoldSample(SampleWrapper sample) throws Exception {
+    public boolean canHoldSample(AliquotWrapper sample) throws Exception {
         SampleTypeWrapper type = sample.getSampleType();
         if (type == null) {
             throw new WrapperException("sample type is null");

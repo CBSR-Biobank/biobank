@@ -5,21 +5,21 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.Sample;
+import edu.ualberta.med.biobank.model.Aliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class QAFreezerSamples extends QueryObject {
 
-    protected static final String NAME = "Freezer Sample QA";
+    protected static final String NAME = "Freezer Aliquot QA";
     int numResults;
 
     public QAFreezerSamples(String op, Integer siteId) {
         super(
             "Retrieves a list of samples, at random, within a date range, by sample type.",
             "select sample.samplePosition.container.label, sample.inventoryId, sample.patientVisit.patient.pnumber, sample.patientVisit.id, sample.patientVisit.dateProcessed, sample.sampleType.nameShort from "
-                + Sample.class.getName()
+                + Aliquot.class.getName()
                 + " as sample where sample.patientVisit.dateProcessed between ? and ? and sample.sampleType.name like ?"
                 + " and sample.samplePosition.container.id in (select path1.container.id from "
                 + ContainerPath.class.getName()
@@ -28,10 +28,10 @@ public class QAFreezerSamples extends QueryObject {
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site "
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
-                "Sample Type" }, new int[] { 100, 200, 100, 100, 100, 100 });
+                "Aliquot Type" }, new int[] { 100, 200, 100, 100, 100, 100 });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
-        addOption("Sample Type", String.class, "");
+        addOption("Aliquot Type", String.class, "");
         addOption("# Samples", Integer.class, 0);
     }
 

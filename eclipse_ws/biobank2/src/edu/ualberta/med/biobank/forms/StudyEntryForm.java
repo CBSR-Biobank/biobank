@@ -165,13 +165,13 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleStorageSection() {
-        Section section = createSection("Sample Storage");
+        Section section = createSection("Aliquot Storage");
         sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
             study.getSite(), study.getSampleStorageCollection());
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);
         sampleStorageEntryTable.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, "Add Sample Storage",
+        addSectionToolbar(section, "Add Aliquot Storage",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -193,7 +193,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     public void setSampleSourceWidgetSelections() {
         Collection<SampleSourceWrapper> studySampleSources = study
-            .getSampleSourceCollection();
+            .getSourceVesselCollection();
         LinkedHashMap<Integer, String> availSampleSource = new LinkedHashMap<Integer, String>();
         List<Integer> selSampleSource = new ArrayList<Integer>();
 

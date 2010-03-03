@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -20,7 +20,7 @@ public class SearchUtils {
 
     public static List<Class<? extends ModelWrapper<?>>> getSearchableObjs() {
         ArrayList<Class<? extends ModelWrapper<?>>> objList = new ArrayList<Class<? extends ModelWrapper<?>>>();
-        objList.add(SampleWrapper.class);
+        objList.add(AliquotWrapper.class);
         objList.add(ContainerWrapper.class);
         objList.add(SiteWrapper.class);
         objList.add(ClinicWrapper.class);

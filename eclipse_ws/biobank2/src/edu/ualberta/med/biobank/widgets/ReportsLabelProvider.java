@@ -37,7 +37,7 @@ public class ReportsLabelProvider extends LabelProvider implements
         // case 5:
         // return String.valueOf(study.getStudyPvAttrCollection().size());
         // case 6:
-        // return String.valueOf(study.getSampleSourceCollection().size());
+        // return String.valueOf(study.getSourceVesselCollection().size());
         // case 7:
         // return String
         // .valueOf(study.getSampleStorageCollection().size());
@@ -138,8 +138,8 @@ public class ReportsLabelProvider extends LabelProvider implements
         // return container.getTemperature().toString();
         //
         // }
-        // } else if (element instanceof Sample) {
-        // final Sample sample = (Sample) element;
+        // } else if (element instanceof Aliquot) {
+        // final Aliquot sample = (Aliquot) element;
         // switch (columnIndex) {
         // case 0:
         // return sample.getId().toString();

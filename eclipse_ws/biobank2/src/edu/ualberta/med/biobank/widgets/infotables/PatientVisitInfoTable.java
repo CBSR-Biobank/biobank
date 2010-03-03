@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
@@ -101,7 +101,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
         TableRowData info = new TableRowData();
         info.visit = visit;
         info.dateProcessed = visit.getFormattedDateProcessed();
-        List<SampleWrapper> samples = visit.getSampleCollection();
+        List<AliquotWrapper> samples = visit.getAliquotCollection();
         if (samples != null) {
             info.sampleCount = samples.size();
         }

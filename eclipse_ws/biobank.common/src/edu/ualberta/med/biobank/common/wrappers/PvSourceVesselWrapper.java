@@ -5,19 +5,19 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.PvSampleSource;
-import edu.ualberta.med.biobank.model.SampleSource;
+import edu.ualberta.med.biobank.model.PvSourceVessel;
+import edu.ualberta.med.biobank.model.SourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
+public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
 
-    public PvSampleSourceWrapper(WritableApplicationService appService,
-        PvSampleSource wrappedObject) {
+    public PvSourceVesselWrapper(WritableApplicationService appService,
+        PvSourceVessel wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public PvSampleSourceWrapper(WritableApplicationService appService) {
+    public PvSourceVesselWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -28,8 +28,8 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
     }
 
     @Override
-    public Class<PvSampleSource> getWrappedClass() {
-        return PvSampleSource.class;
+    public Class<PvSourceVessel> getWrappedClass() {
+        return PvSourceVessel.class;
     }
 
     @Override
@@ -82,33 +82,33 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
     }
 
-    public SampleSourceWrapper getSampleSource() {
-        SampleSource ss = wrappedObject.getSampleSource();
+    public SampleSourceWrapper getSourceVessel() {
+        SourceVessel ss = wrappedObject.getSourceVessel();
         if (ss == null) {
             return null;
         }
         return new SampleSourceWrapper(appService, ss);
     }
 
-    protected void setSampleSource(SampleSource ss) {
-        SampleSource oldSs = wrappedObject.getSampleSource();
-        wrappedObject.setSampleSource(ss);
+    protected void setSourceVessel(SourceVessel ss) {
+        SourceVessel oldSs = wrappedObject.getSourceVessel();
+        wrappedObject.setSourceVessel(ss);
         propertyChangeSupport.firePropertyChange("sampleSource", oldSs, ss);
     }
 
-    public void setSampleSource(SampleSourceWrapper ss) {
+    public void setSourceVessel(SampleSourceWrapper ss) {
         if (ss == null) {
-            setSampleSource((SampleSource) null);
+            setSourceVessel((SourceVessel) null);
         } else {
-            setSampleSource(ss.getWrappedObject());
+            setSourceVessel(ss.getWrappedObject());
         }
     }
 
     @Override
-    public int compareTo(ModelWrapper<PvSampleSource> o) {
-        if (o instanceof PvSampleSourceWrapper) {
-            return getSampleSource().compareTo(
-                ((PvSampleSourceWrapper) o).getSampleSource());
+    public int compareTo(ModelWrapper<PvSourceVessel> o) {
+        if (o instanceof PvSourceVesselWrapper) {
+            return getSourceVessel().compareTo(
+                ((PvSourceVesselWrapper) o).getSourceVessel());
         }
         return 0;
     }

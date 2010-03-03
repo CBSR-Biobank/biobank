@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.model.SampleCellStatus;
@@ -127,7 +127,7 @@ public class ScanPalletWidget extends AbstractGridWidget {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));
             if (cell != null) {
-                SampleWrapper sample = cell.getSample();
+                AliquotWrapper sample = cell.getSample();
                 if (sample != null) {
                     return sample.getSampleType().getNameShort();
                 }

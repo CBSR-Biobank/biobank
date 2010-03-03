@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -824,7 +824,7 @@ public class TestContainer extends TestDatabase {
         // reload because we changed container type
         childL3.reload();
         PatientVisitWrapper pv = addPatientVisit();
-        SampleWrapper sample;
+        AliquotWrapper sample;
 
         for (SampleTypeWrapper st : allSampleTypes) {
             sample = SampleHelper.newSample(st, childL3, pv, 0, 0);
@@ -899,7 +899,7 @@ public class TestContainer extends TestDatabase {
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
                 childL3.addSample(row, col, SampleHelper.newSample(sampleType));
-                SampleWrapper sample = childL3.getSample(row, col);
+                AliquotWrapper sample = childL3.getSample(row, col);
                 sample.setPatientVisit(pv);
                 sample.persist();
             }
@@ -920,10 +920,10 @@ public class TestContainer extends TestDatabase {
 
         // force samples to be loaded from DB
         childL3 = containerMap.get("ChildL2").getChild(0, 0);
-        Map<RowColPos, SampleWrapper> samples = childL3.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = childL3.getSamples();
         Assert.assertEquals(samplesTypesMap.size(), samples.size());
         for (RowColPos pos : samples.keySet()) {
-            SampleWrapper sample = samples.get(pos);
+            AliquotWrapper sample = samples.get(pos);
             Assert.assertTrue((pos.row >= 0)
                 && (pos.row < CONTAINER_CHILD_L3_ROWS));
             Assert.assertTrue((pos.col >= 0)
@@ -934,7 +934,7 @@ public class TestContainer extends TestDatabase {
 
         for (int row = 0, maxRow = childL3.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
-                SampleWrapper sample = childL3.getSample(row, col);
+                AliquotWrapper sample = childL3.getSample(row, col);
                 Assert.assertEquals(samplesTypesMap
                     .get(new RowColPos(row, col)), sample.getSampleType());
                 sample.delete();
@@ -1332,7 +1332,7 @@ public class TestContainer extends TestDatabase {
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
         childL4.getContainerType().persist();
-        SampleWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
+        AliquotWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
             0, 0);
 
         // attempt to delete the containers - should fail

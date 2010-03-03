@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -22,11 +22,11 @@ public class PalletCell extends Cell {
 
     private SampleTypeWrapper type;
 
-    private SampleWrapper sample;
+    private AliquotWrapper sample;
 
     private ScanCell scanCell;
 
-    private SampleWrapper expectedSample;
+    private AliquotWrapper expectedSample;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -50,7 +50,7 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithSamplesAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<SampleWrapper> samples = DebugUtil
+        List<AliquotWrapper> samples = DebugUtil
             .getRandomSamplesAlreadyLinked(appService, siteId);
         if (samples.size() > 1) {
             int row = 2;
@@ -69,7 +69,7 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomSamplesAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> palletScanned = initArray();
-        List<SampleWrapper> randomSamples = DebugUtil
+        List<AliquotWrapper> randomSamples = DebugUtil
             .getRandomSamplesAlreadyAssigned(appService, siteId);
         if (randomSamples.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
@@ -86,7 +86,7 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = initArray();
-        List<SampleWrapper> randomSamples = DebugUtil
+        List<AliquotWrapper> randomSamples = DebugUtil
             .getRandomSamplesNotAssigned(appService, siteId);
         if (randomSamples.size() > 1) {
             // Random r = new Random();
@@ -149,11 +149,11 @@ public class PalletCell extends Cell {
         this.type = type;
     }
 
-    public void setSample(SampleWrapper sample) {
+    public void setSample(AliquotWrapper sample) {
         this.sample = sample;
     }
 
-    public SampleWrapper getSample() {
+    public AliquotWrapper getSample() {
         return sample;
     }
 
@@ -184,11 +184,11 @@ public class PalletCell extends Cell {
         return cell != null && cell.getValue() != null;
     }
 
-    public void setExpectedSample(SampleWrapper expectedSample) {
+    public void setExpectedSample(AliquotWrapper expectedSample) {
         this.expectedSample = expectedSample;
     }
 
-    public SampleWrapper getExpectedSample() {
+    public AliquotWrapper getExpectedSample() {
         return expectedSample;
     }
 

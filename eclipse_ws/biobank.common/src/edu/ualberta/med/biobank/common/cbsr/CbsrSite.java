@@ -7,9 +7,9 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -160,17 +160,17 @@ public class CbsrSite {
 
     private static void patientVisitDeleteSubObjects(PatientVisitWrapper visit)
         throws Exception {
-        List<PvSampleSourceWrapper> sampleSources = visit
-            .getPvSampleSourceCollection();
+        List<PvSourceVesselWrapper> sampleSources = visit
+            .getPvSourceVesselCollection();
         if (sampleSources != null) {
-            for (PvSampleSourceWrapper sampleSource : sampleSources) {
+            for (PvSourceVesselWrapper sampleSource : sampleSources) {
                 sampleSource.delete();
             }
         }
         visit.reload();
-        List<SampleWrapper> samples = visit.getSampleCollection();
+        List<AliquotWrapper> samples = visit.getAliquotCollection();
         if (samples != null) {
-            for (SampleWrapper sample : samples) {
+            for (AliquotWrapper sample : samples) {
                 sample.delete();
             }
         }
@@ -199,7 +199,7 @@ public class CbsrSite {
 
     private static void containerDeleteSubObjects(ContainerWrapper container)
         throws Exception {
-        Map<RowColPos, SampleWrapper> samples = container.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = container.getSamples();
         if (samples.size() > 0) {
             // samples should be deleted when patient visits are deleted
             throw new Exception(

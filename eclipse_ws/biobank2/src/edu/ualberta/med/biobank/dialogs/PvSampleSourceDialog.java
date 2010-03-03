@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
@@ -25,14 +25,14 @@ public class PvSampleSourceDialog extends BiobankDialog {
 
     private static final String TITLE = "Source Vessel";
 
-    private PvSampleSourceWrapper pvSampleSource;
+    private PvSourceVesselWrapper pvSampleSource;
 
     private ComboViewer sampleSourcesComboViewer;
 
     private Collection<SampleSourceWrapper> sampleSources;
 
     public PvSampleSourceDialog(Shell parent,
-        PvSampleSourceWrapper pvSampleSource,
+        PvSourceVesselWrapper pvSampleSource,
         Collection<SampleSourceWrapper> sampleSources) {
         super(parent);
         Assert.isNotNull(pvSampleSource);
@@ -79,7 +79,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         sampleSourcesComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
                 "Source Vessel", sampleSources,
-                pvSampleSource.getSampleSource(),
+                pvSampleSource.getSourceVessel(),
                 "A source vessel should be selected");
         sampleSourcesComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -88,7 +88,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
                     IStructuredSelection stSelection = (IStructuredSelection) sampleSourcesComboViewer
                         .getSelection();
                     pvSampleSource
-                        .setSampleSource((SampleSourceWrapper) stSelection
+                        .setSourceVessel((SampleSourceWrapper) stSelection
                             .getFirstElement());
                 }
             });
@@ -112,7 +112,7 @@ public class PvSampleSourceDialog extends BiobankDialog {
         c.setLayoutData(gd);
     }
 
-    public PvSampleSourceWrapper getPvSampleSource() {
+    public PvSourceVesselWrapper getPvSampleSource() {
         return pvSampleSource;
     }
 
