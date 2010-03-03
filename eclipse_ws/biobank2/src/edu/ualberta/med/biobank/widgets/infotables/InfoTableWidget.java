@@ -92,7 +92,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     static {
         if (System.getProperty("os.name").startsWith("Windows")) {
-            ROW_SIZE_ADJUST = 1.1;
+            ROW_SIZE_ADJUST = 0.75;
             FIRST_ROW_SIZE_ADJUST = 4;
         } else {
             ROW_SIZE_ADJUST = 0;
@@ -142,7 +142,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
         setLayout(gl);
-        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;

@@ -114,7 +114,7 @@ public class SmartCombo extends Composite {
 
                 // ignore traversal
                 if (!traversed) {
-                    System.out.println("Selected");
+                    // System.out.println("Selected");
                     ignore = true;
                     if (combo.getSelectionIndex() == -1)
                         combo.select(0);

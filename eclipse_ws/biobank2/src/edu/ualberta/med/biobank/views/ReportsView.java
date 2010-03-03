@@ -16,6 +16,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -170,11 +171,7 @@ public class ReportsView extends ViewPart {
 
         // create the query's display here
         subSection = new Composite(top, SWT.NONE);
-
         reportTable = new SearchResultsInfoTable(top, reportData, null, null);
-        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        reportTable.setLayoutData(searchLayoutData);
-
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -252,11 +249,6 @@ public class ReportsView extends ViewPart {
                                 reportTable.dispose();
                                 reportTable = new SearchResultsInfoTable(top,
                                     reportData, names, bounds);
-                                GridData searchLayoutData = new GridData(
-                                    SWT.FILL, SWT.FILL, true, true);
-                                searchLayoutData.minimumHeight = 500;
-                                reportTable.setLayoutData(searchLayoutData);
-                                reportTable.moveBelow(subSection);
                                 printButton.setEnabled(true);
                                 exportButton.setEnabled(true);
                             } else {
@@ -419,12 +411,11 @@ public class ReportsView extends ViewPart {
     }
 
     public void resetSearch() {
-        if (reportTable != null) {
-            reportTable.dispose();
-            reportTable = new SearchResultsInfoTable(top, reportData, null,
-                null);
-            reportData = new ArrayList<Object>();
-        }
+        Assert.isNotNull(reportTable);
+        reportTable.dispose();
+        reportTable = new SearchResultsInfoTable(top, null, null, null);
+        reportData = new ArrayList<Object>();
+
         printButton.setEnabled(false);
         exportButton.setEnabled(false);
     }
