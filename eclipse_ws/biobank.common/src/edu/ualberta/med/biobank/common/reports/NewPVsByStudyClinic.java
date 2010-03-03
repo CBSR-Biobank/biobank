@@ -20,7 +20,8 @@ public class NewPVsByStudyClinic extends QueryObject {
                 + op
                 + siteId
                 + " ORDER BY Alias.patient.study.nameShort, Alias.shipment.clinic.name, Alias.dateProcessed ASC",
-            new String[] { "", "Study", "Clinic", "Total" });
+            new String[] { "", "Study", "Clinic", "Total" }, new int[] { 100,
+                200, 100, 100 });
         addOption("Date Range", DateRange.class, DateRange.Month);
     }
 

@@ -86,20 +86,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private static final int DEFAULT_NUM_ROWS = 10;
 
-    private static double ROW_SIZE_ADJUST;
-
-    private static double FIRST_ROW_SIZE_ADJUST;
-
-    static {
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            ROW_SIZE_ADJUST = 0.75;
-            FIRST_ROW_SIZE_ADJUST = 4;
-        } else {
-            ROW_SIZE_ADJUST = 0;
-            FIRST_ROW_SIZE_ADJUST = 0;
-        }
-    };
-
     protected TableViewer tableViewer;
 
     protected List<BiobankCollectionModel> model;
@@ -268,6 +254,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private void setSorter() {
         final BiobankTableSorter tableSorter = getTableSorter();
+
+        if (tableSorter == null)
+            return;
+
         tableViewer.setSorter(tableSorter);
         final Table table = tableViewer.getTable();
         for (int i = 0, n = table.getColumnCount(); i < n; ++i) {
@@ -687,10 +677,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         rows = Math.max(rows, 1);
 
         Table table = getTableViewer().getTable();
-        double height = rows * (table.getItemHeight() + ROW_SIZE_ADJUST)
-            + FIRST_ROW_SIZE_ADJUST;
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.heightHint = new Double(height).intValue();
+        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
         table.setLayoutData(gd);
         layout(true);
     }

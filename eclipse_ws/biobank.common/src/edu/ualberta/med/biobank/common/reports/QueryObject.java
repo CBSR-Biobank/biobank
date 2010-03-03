@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.springframework.util.Assert;
+
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -59,6 +61,8 @@ public abstract class QueryObject {
      */
     protected String[] columnNames;
 
+    protected int[] columnWidths;
+
     protected List<Option> queryOptions;
 
     public class Option {
@@ -90,11 +94,13 @@ public abstract class QueryObject {
     }
 
     public QueryObject(String description, String queryString,
-        String[] columnNames) {
+        String[] columnNames, int[] columnWidths) {
         this.description = description;
         this.queryString = queryString;
         queryOptions = new ArrayList<Option>();
+        Assert.isTrue(columnNames.length == columnWidths.length);
         this.columnNames = columnNames;
+        this.columnWidths = columnWidths;
     }
 
     public void addOption(String name, Class<?> type, Object defaultValue) {
@@ -132,6 +138,10 @@ public abstract class QueryObject {
 
     public String[] getColumnNames() {
         return columnNames;
+    }
+
+    public int[] getColumnWidths() {
+        return columnWidths;
     }
 
     public List<Option> getOptions() {

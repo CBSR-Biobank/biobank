@@ -39,7 +39,7 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new BiobankTableSorter();
+        return null;
     }
 
     @Override

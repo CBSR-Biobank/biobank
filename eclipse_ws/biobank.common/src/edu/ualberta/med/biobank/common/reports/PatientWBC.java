@@ -15,7 +15,8 @@ public class PatientWBC extends QueryObject {
                 + op
                 + siteId
                 + " and sample.sampleType.nameShort = 'DNA (WBC)'",
-            new String[] { "Study", "Clinic", "Patient", "Date", "ID" });
+            new String[] { "Study", "Clinic", "Patient", "Date", "ID" },
+            new int[] { 100, 200, 100, 100, 100 });
     }
 
     @Override

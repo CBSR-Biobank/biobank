@@ -241,21 +241,16 @@ public class ReportsView extends ViewPart {
                         public void run() {
                             monitor.done();
                             if (reportData.size() > 0) {
-                                String[] names = currentQuery.getColumnNames();
-                                int[] bounds = new int[names.length];
-                                for (int i = 0; i < names.length; i++) {
-                                    bounds[i] = 100 + names[i].length() * 2;
-                                }
                                 reportTable.dispose();
                                 reportTable = new SearchResultsInfoTable(top,
-                                    reportData, names, bounds);
+                                    reportData, currentQuery.getColumnNames(),
+                                    currentQuery.getColumnWidths());
                                 printButton.setEnabled(true);
                                 exportButton.setEnabled(true);
                             } else {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
-                            reportTable.redraw();
                             setEnabled(true);
                             top.layout();
 

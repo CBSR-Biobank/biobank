@@ -25,7 +25,8 @@ public class CabinetDSamples extends QueryObject {
                 + op
                 + siteId
                 + " order by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, sample.linkDate",
-            new String[] { "", "Study", "Clinic", "Total" });
+            new String[] { "", "Study", "Clinic", "Total" }, new int[] { 100,
+                200, 100, 100 });
         addOption("Date Range", DateRange.class, DateRange.Week);
     }
 

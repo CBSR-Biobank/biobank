@@ -26,7 +26,8 @@ public class FreezerCSamples extends QueryObject {
                 + op
                 + siteId
                 + " group by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name",
-            new String[] { "Study", "Clinic", "Total" });
+            new String[] { "Study", "Clinic", "Total" }, new int[] { 200, 100,
+                100 });
     }
 
     @Override
