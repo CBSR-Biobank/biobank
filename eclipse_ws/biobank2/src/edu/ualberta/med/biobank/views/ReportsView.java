@@ -171,7 +171,7 @@ public class ReportsView extends ViewPart {
 
         // create the query's display here
         subSection = new Composite(top, SWT.NONE);
-        reportTable = new SearchResultsInfoTable(top, reportData, null, null);
+        createEmptyReportTable();
         top.layout();
         sc.setContent(top);
         sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -182,6 +182,14 @@ public class ReportsView extends ViewPart {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+    }
+
+    private void createEmptyReportTable() {
+        if (reportTable != null) {
+            reportTable.dispose();
+        }
+        reportTable = new SearchResultsInfoTable(top, null,
+            new String[] { " " }, new int[] { 500 });
     }
 
     private void generate() {
@@ -407,8 +415,7 @@ public class ReportsView extends ViewPart {
 
     public void resetSearch() {
         Assert.isNotNull(reportTable);
-        reportTable.dispose();
-        reportTable = new SearchResultsInfoTable(top, null, null, null);
+        createEmptyReportTable();
         reportData = new ArrayList<Object>();
 
         printButton.setEnabled(false);
