@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SitePvAttrWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -51,11 +52,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "activityStatus", "comment", "address",
-            "clinicCollection", "siteCollection", "containerCollection",
-            "sampleTypeCollection", "sitePvAttrCollection", "street1",
-            "street2", "city", "province", "postalCode",
-            "allSampleTypeCollection" };
+        return new String[] { "name", "nameShort", "activityStatus", "comment",
+            "address", "clinicCollection", "siteCollection",
+            "containerCollection", "sampleTypeCollection",
+            "sitePvAttrCollection", "street1", "street2", "city", "province",
+            "postalCode", "allSampleTypeCollection" };
     }
 
     public String getName() {
@@ -68,15 +69,47 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertyChangeSupport.firePropertyChange("name", oldName, name);
     }
 
-    public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+    public String getNameShort() {
+        return wrappedObject.getNameShort();
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldStatus = getActivityStatus();
+    public void setNameShort(String nameShort) {
+        String oldNameShort = getNameShort();
+        wrappedObject.setNameShort(nameShort);
+        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
+            nameShort);
+    }
+
+    private ActivityStatusWrapper getActivityStatusInternal() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
+    }
+
+    public String getActivityStatus() {
+        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
+        if (activityStatus == null) {
+            return null;
+        }
+        return activityStatus.getName();
+    }
+
+    private void setActivityStatus(ActivityStatus activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus", oldStatus,
-            activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+
+    }
+
+    public void setActivityStatus(String name) throws Exception {
+        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name + "\" is invalid");
+        }
+        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     public String getComment() {
@@ -205,6 +238,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
         ApplicationException {
         if (getAddress() == null) {
             throw new BiobankCheckException("the site does not have an address");
+        }
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the site does not have an activity status");
         }
 
         if (!checkSiteNameUnique()) {
@@ -764,13 +801,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return result.get(0);
     }
 
-    public Long getSampleCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(samples) from "
+    public Long getAliquotCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
             + Site.class.getName() + " as site "
             + "join site.studyCollection as studies "
             + "join studies.patientCollection as patients "
             + "join patients.patientVisitCollection as visits "
-            + "join visits.sampleCollection as samples where site.id = ?",
+            + "join visits.aliquotCollection as aliquots where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {

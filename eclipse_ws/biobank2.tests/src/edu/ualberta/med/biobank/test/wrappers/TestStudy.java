@@ -12,11 +12,11 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -26,11 +26,11 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestStudy extends TestDatabase {
@@ -507,32 +507,33 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertEquals(false, study.getStudyPvAttrLocked("Worksheet")
-            .booleanValue());
+        Assert.assertEquals("Active", study
+            .getStudyPvAttrActivityStatus("Worksheet"));
 
         // lock the attribute
-        study.setStudyPvAttrLocked("Worksheet", true);
-        Assert.assertEquals(true, study.getStudyPvAttrLocked("Worksheet")
-            .booleanValue());
+        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
+        Assert.assertEquals("Closed", study
+            .getStudyPvAttrActivityStatus("Worksheet"));
 
         // get lock for non existing label, expect exception
         try {
-            study.getStudyPvAttrLocked(Utils.getRandomString(10, 20));
+            study.getStudyPvAttrActivityStatus(Utils.getRandomString(10, 20));
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
-        // set lock for non existing label, expect exception
+        // set activity status for non existing label, expect exception
         try {
-            study.setStudyPvAttrLocked(Utils.getRandomString(10, 20), false);
+            study.setStudyPvAttrActivityStatus(Utils.getRandomString(10, 20),
+                "Active");
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
         // add patient visit that uses the locked attribute
         study.setStudyPvAttr("Worksheet", "text");
-        study.setStudyPvAttrLocked("Worksheet", true);
+        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
         study.persist();
         study.reload();
         List<PatientVisitWrapper> visits = studyAddPatientVisits(study);

@@ -12,6 +12,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -60,6 +61,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         ApplicationException, WrapperException {
         checkSite();
         checkNameUnique();
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the site does not have an activity status");
+        }
         if (getCapacity() == null) {
             throw new BiobankCheckException("Capacity should be set");
         }
@@ -281,15 +286,36 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return wrappedObject.getDefaultTemperature();
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldActivityStatus = wrappedObject.getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+    private ActivityStatusWrapper getActivityStatusInternal() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
     }
 
     public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
+        if (activityStatus == null) {
+            return null;
+        }
+        return activityStatus.getName();
+    }
+
+    private void setActivityStatus(ActivityStatus activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        wrappedObject.setActivityStatus(activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+
+    }
+
+    public void setActivityStatus(String name) throws Exception {
+        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name + "\" is invalid");
+        }
+        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     private void setSampleTypeCollection(Collection<SampleType> allTypeObjects,

@@ -7,10 +7,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -59,7 +59,7 @@ public class PatientVisitAdapter extends AdapterBase {
             Assert.isNotNull(study, "study is null");
             SiteWrapper site = study.getSite();
             Assert.isNotNull(site, "site is null");
-            return site.getName() + " - " + study.getName() + " - "
+            return site.getNameShort() + " - " + study.getName() + " - "
                 + patient.getPnumber() + " - "
                 + getTooltipText("Patient Visit");
 

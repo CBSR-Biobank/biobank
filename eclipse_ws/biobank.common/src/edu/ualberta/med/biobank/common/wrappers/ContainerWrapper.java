@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -51,6 +52,10 @@ public class ContainerWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the site does not have an activity status");
+        }
         checkSiteNotNull();
         checkContainerTypeNotNull();
         checkLabelUniqueForType();
@@ -382,15 +387,36 @@ public class ContainerWrapper extends
         return new ContainerTypeWrapper(appService, type);
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldActivityStatus = getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+    private ActivityStatusWrapper getActivityStatusInternal() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
     }
 
     public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
+        if (activityStatus == null) {
+            return null;
+        }
+        return activityStatus.getName();
+    }
+
+    private void setActivityStatus(ActivityStatus activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        wrappedObject.setActivityStatus(activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+
+    }
+
+    public void setActivityStatus(String name) throws Exception {
+        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name + "\" is invalid");
+        }
+        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     protected void setSite(Site site) {

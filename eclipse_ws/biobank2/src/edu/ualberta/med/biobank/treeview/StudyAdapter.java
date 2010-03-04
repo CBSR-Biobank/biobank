@@ -49,7 +49,7 @@ public class StudyAdapter extends AdapterBase {
         StudyWrapper study = getWrapper();
         SiteWrapper site = study.getSite();
         if (site != null) {
-            return site.getName() + " - " + getTooltipText("Study");
+            return site.getNameShort() + " - " + getTooltipText("Study");
         }
         return getTooltipText("Study");
     }

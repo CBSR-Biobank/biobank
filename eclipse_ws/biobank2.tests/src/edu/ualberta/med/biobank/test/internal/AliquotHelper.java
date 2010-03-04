@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
-public class SampleHelper extends DbHelper {
+public class AliquotHelper extends DbHelper {
 
     public static AliquotWrapper newSample(SampleTypeWrapper sampleType) {
         AliquotWrapper sample = new AliquotWrapper(appService);
@@ -17,7 +17,7 @@ public class SampleHelper extends DbHelper {
         return sample;
     }
 
-    public static AliquotWrapper newSample(SampleTypeWrapper sampleType,
+    public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) {
         AliquotWrapper sample = new AliquotWrapper(appService);
@@ -36,7 +36,7 @@ public class SampleHelper extends DbHelper {
     public static AliquotWrapper addSample(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        AliquotWrapper sample = newSample(sampleType, container, pv, row, col);
+        AliquotWrapper sample = newAliquot(sampleType, container, pv, row, col);
         sample.persist();
         return sample;
     }

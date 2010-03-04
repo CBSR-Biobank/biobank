@@ -1181,15 +1181,15 @@ public class Importer {
                         continue;
                     }
 
-                    AliquotWrapper sample = new AliquotWrapper(appService);
-                    sample.setParent(bin);
-                    sample.setSampleType(sampleType);
-                    sample.setInventoryId(inventoryId);
-                    sample.setLinkDate(rs.getDate(14));
-                    sample.setPosition(binPos.row, 0);
-                    sample.setPatientVisit(visit);
+                    AliquotWrapper aliquot = new AliquotWrapper(appService);
+                    aliquot.setParent(bin);
+                    aliquot.setSampleType(sampleType);
+                    aliquot.setInventoryId(inventoryId);
+                    aliquot.setLinkDate(rs.getDate(14));
+                    aliquot.setPosition(binPos.row, 0);
+                    aliquot.setPatientVisit(visit);
 
-                    if (!bin.canHoldAliquot(sample)) {
+                    if (!bin.canHoldAliquot(aliquot)) {
                         logger.error("bin " + bin.getLabel()
                             + " cannot hold sample of type "
                             + sampleType.getName());
@@ -1199,7 +1199,7 @@ public class Importer {
                     logger.debug("importing cabinet sample " + bin.getLabel()
                         + binPosLabel);
                     ++importCounts.samples;
-                    sample.persist();
+                    aliquot.persist();
                 }
             }
         }

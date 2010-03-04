@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
@@ -73,9 +74,42 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         propertyChangeSupport.firePropertyChange("volume", oldVolume, volume);
     }
 
+    private ActivityStatusWrapper getActivityStatusInternal() {
+        ActivityStatus ac = wrappedObject.getActivityStatus();
+        if (ac == null)
+            return null;
+        return new ActivityStatusWrapper(appService, ac);
+    }
+
+    public String getActivityStatus() {
+        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
+        if (activityStatus == null) {
+            return null;
+        }
+        return activityStatus.getName();
+    }
+
+    private void setActivityStatus(ActivityStatus activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        wrappedObject.setActivityStatus(activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+
+    }
+
+    public void setActivityStatus(String name) throws Exception {
+        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name + "\" is invalid");
+        }
+        setActivityStatus(activityStatus.getWrappedObject());
+    }
+
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "study", "sampleType", "quantity", "volume" };
+        return new String[] { "study", "sampleType", "quantity", "volume",
+            "activityStatus" };
     }
 
     @Override
@@ -91,6 +125,10 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the site does not have an activity status");
+        }
     }
 
     @Override

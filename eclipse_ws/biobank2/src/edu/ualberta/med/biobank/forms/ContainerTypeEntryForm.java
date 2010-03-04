@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -35,6 +36,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
 
@@ -140,7 +142,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         createContainsSection();
     }
 
-    protected void createContainerTypeSection() {
+    protected void createContainerTypeSection() throws ApplicationException {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -191,7 +193,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
+            "Activity Status", ActivityStatusWrapper.getAllActivityStatusNames(
+                appService).toArray(new String[] {}), BeansObservables
                 .observeValue(containerType, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,

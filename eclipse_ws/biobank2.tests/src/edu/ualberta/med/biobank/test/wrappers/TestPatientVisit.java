@@ -17,6 +17,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -24,17 +25,17 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -43,7 +44,6 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
-import edu.ualberta.med.biobank.test.internal.SampleHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -204,7 +204,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        AliquotWrapper sample = SampleHelper.addSample(allSampleTypes.get(0),
+        AliquotWrapper sample = AliquotHelper.addSample(allSampleTypes.get(0),
             containerMap.get("ChildL1"), visit, 0, 0);
         visit.reload();
 
@@ -248,7 +248,7 @@ public class TestPatientVisit extends TestDatabase {
                 if (r.nextGaussian() > 0.0)
                     continue;
                 // System.out.println("setting sample at: " + row + ", " + col);
-                sampleMap.put(row + col * rows, SampleHelper.addSample(
+                sampleMap.put(row + col * rows, AliquotHelper.addSample(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
                     container, visit, row, col));
             }
@@ -496,7 +496,7 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrLocked("Worksheet", true);
+        study.setStudyPvAttrActivityStatus("Worksheet", "Active");
         study.persist();
         visit.reload();
         try {
@@ -507,7 +507,7 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyPvAttrLocked("Worksheet", false);
+        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
@@ -646,8 +646,8 @@ public class TestPatientVisit extends TestDatabase {
         ss3.persist();
         AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
             Arrays.asList(ss1, ss2, ss3));
-        Aliquot dbSample = ModelUtils.getObjectWithId(appService, Aliquot.class,
-            newSample.getId());
+        Aliquot dbSample = ModelUtils.getObjectWithId(appService,
+            Aliquot.class, newSample.getId());
         Assert.assertEquals(dbSample.getSampleType().getId(), newSample
             .getSampleType().getId());
         Assert.assertTrue(dbSample.getQuantity().equals(3.0));

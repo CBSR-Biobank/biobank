@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
@@ -69,15 +70,36 @@ public class StudyWrapper extends ModelWrapper<Study> {
             nameShort);
     }
 
-    public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+    private ActivityStatusWrapper getActivityStatusInternal() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldStatus = getActivityStatus();
+    public String getActivityStatus() {
+        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
+        if (activityStatus == null) {
+            return null;
+        }
+        return activityStatus.getName();
+    }
+
+    private void setActivityStatus(ActivityStatus activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus", oldStatus,
-            activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+
+    }
+
+    public void setActivityStatus(String name) throws Exception {
+        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name + "\" is invalid");
+        }
+        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     public String getComment() {
@@ -534,15 +556,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     /**
-     * Retrieves the locked status for a patient visit attribute. If locked,
+     * Retrieves the activity status for a patient visit attribute. If locked,
      * patient visits will not allow information to be saved for this attribute.
      * 
      * @param label
      * @return True if the attribute is locked. False otherwise.
      * @throws Exception
      */
-    public Boolean getStudyPvAttrLocked(String label) throws Exception {
-        return getStudyPvAttr(label).getLocked();
+    public String getStudyPvAttrActivityStatus(String label) throws Exception {
+        return getStudyPvAttr(label).getActivityStatus();
     }
 
     /**
@@ -593,7 +615,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
         deletedStudyPvAttr.remove(studyPvAttr);
 
-        studyPvAttr.setLocked(false);
+        studyPvAttr.setActivityStatus("Active");
         studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
         studyPvAttrMap.put(label, studyPvAttr);
     }
@@ -622,11 +644,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * 
      * @throws Exception if attribute with label does not exist.
      */
-    public void setStudyPvAttrLocked(String label, Boolean enable)
+    public void setStudyPvAttrActivityStatus(String label, String activityStatus)
         throws Exception {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
-        studyPvAttr.setLocked(enable);
+        studyPvAttr.setActivityStatus(activityStatus);
     }
 
     /**

@@ -10,9 +10,9 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -123,7 +123,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof ClinicWrapper) {
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
-            return ((SiteWrapper) element).getName();
+            return ((SiteWrapper) element).getNameShort();
         } else if (element instanceof SampleTypeWrapper) {
             return ((SampleTypeWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {

@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 /**
@@ -365,13 +365,12 @@ public class CbsrStudies {
         return new ArrayList<String>(studiesMap.keySet());
     }
 
-    private static void addSourceVessel(String studyNameShort,
-        String name) throws Exception {
+    private static void addSourceVessel(String studyNameShort, String name)
+        throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
         SourceVesselWrapper ss = sourceVesselMap.get(name);
         if (ss == null) {
-            throw new Exception("invalid source vessel name: "
-                + name);
+            throw new Exception("invalid source vessel name: " + name);
         }
         study.addSourceVessels(Arrays.asList(ss));
         study.persist();
@@ -388,6 +387,7 @@ public class CbsrStudies {
         ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
         ss.setQuantity(quantity);
         ss.setVolume(volume);
+        ss.setActivityStatus("Active");
 
         study.addSampleStorage(Arrays.asList(ss));
         study.persist();
@@ -403,6 +403,7 @@ public class CbsrStudies {
         } else {
             study.setStudyPvAttr(label, type);
         }
+        study.setStudyPvAttrActivityStatus(label, "Active");
         study.persist();
         study.reload();
     }

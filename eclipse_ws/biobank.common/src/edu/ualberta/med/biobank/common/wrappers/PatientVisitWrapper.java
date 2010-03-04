@@ -254,7 +254,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         }
 
-        if (studyPvAttr.getLocked().equals(true)) {
+        if (studyPvAttr.getActivityStatus().equals("Active")) {
             throw new Exception("attribute for label \"" + label
                 + "\" is locked, changes not premitted");
         }
@@ -511,10 +511,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public boolean hasSamples() throws ApplicationException,
         BiobankCheckException {
-        String queryString = "select count(samples) from "
+        String queryString = "select count(aliquots) from "
             + Patient.class.getName() + " as p"
             + " left join p.patientVisitCollection as visits"
-            + " left join visits.sampleCollection as samples"
+            + " left join visits.aliquotCollection as aliquots"
             + " where p = ? and visits = ?)";
         HQLCriteria c = new HQLCriteria(queryString, Arrays
             .asList(new Object[] { wrappedObject.getPatient(), wrappedObject }));
