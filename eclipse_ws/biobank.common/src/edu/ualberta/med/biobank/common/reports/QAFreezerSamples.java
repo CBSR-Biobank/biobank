@@ -28,7 +28,7 @@ public class QAFreezerSamples extends QueryObject {
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site "
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
-                "Sample Type" }, new int[] { 100, 200, 100, 100, 100, 100 });
+                "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
         addOption("Sample Type", String.class, "");

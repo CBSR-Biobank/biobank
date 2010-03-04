@@ -15,8 +15,7 @@ public class FvLPatientVisits extends QueryObject {
                 + op
                 + siteId
                 + " GROUP BY Alias.shipment.clinic ORDER By Alias.patient.study.nameShort, Alias.shipment.clinic.name",
-            new String[] { "Study", "Clinic", "First Visit", "Last Visit" },
-            new int[] { 100, 200, 100, 100 });
+            new String[] { "Study", "Clinic", "First Visit", "Last Visit" });
     }
 
     @Override

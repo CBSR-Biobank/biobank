@@ -51,7 +51,25 @@ import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.CabinetCSamples;
+import edu.ualberta.med.biobank.common.reports.CabinetDSamples;
+import edu.ualberta.med.biobank.common.reports.CabinetSSamples;
+import edu.ualberta.med.biobank.common.reports.FreezerCSamples;
+import edu.ualberta.med.biobank.common.reports.FreezerDSamples;
+import edu.ualberta.med.biobank.common.reports.FreezerSSamples;
+import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
+import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
+import edu.ualberta.med.biobank.common.reports.PatientWBC;
+import edu.ualberta.med.biobank.common.reports.QACabinetSamples;
+import edu.ualberta.med.biobank.common.reports.QAFreezerSamples;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.SampleCount;
+import edu.ualberta.med.biobank.common.reports.SampleInvoiceByClinic;
+import edu.ualberta.med.biobank.common.reports.SampleInvoiceByPatient;
+import edu.ualberta.med.biobank.common.reports.SampleRequest;
+import edu.ualberta.med.biobank.common.reports.SampleSCount;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -89,9 +107,34 @@ public class ReportsView extends ViewPart {
     private Button exportButton;
 
     private QueryObject currentQuery;
+    private HashMap<Class<?>, int[]> columnWidths;
 
     public ReportsView() {
         reportData = new ArrayList<Object>();
+        columnWidths = new HashMap<Class<?>, int[]>();
+        columnWidths.put(CabinetCSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(CabinetDSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(CabinetSSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(FreezerCSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(FreezerDSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(FreezerSSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(FvLPatientVisits.class, new int[] { 50, 50, 50, 50 });
+        columnWidths
+            .put(NewPsByStudyClinic.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(NewPVsByStudyClinic.class,
+            new int[] { 50, 50, 50, 50 });
+        columnWidths.put(PatientVisitSummary.class,
+            new int[] { 50, 50, 50, 50 });
+        columnWidths.put(PatientWBC.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(QACabinetSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(QAFreezerSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(SampleCount.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(SampleInvoiceByClinic.class, new int[] { 50, 50, 50,
+            50 });
+        columnWidths.put(SampleInvoiceByPatient.class, new int[] { 50, 50, 50,
+            50 });
+        columnWidths.put(SampleRequest.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(SampleSCount.class, new int[] { 50, 50, 50, 50 });
     }
 
     @Override
@@ -252,7 +295,7 @@ public class ReportsView extends ViewPart {
                                 reportTable.dispose();
                                 reportTable = new SearchResultsInfoTable(top,
                                     reportData, currentQuery.getColumnNames(),
-                                    currentQuery.getColumnWidths());
+                                    columnWidths.get(currentQuery.getClass()));
                                 printButton.setEnabled(true);
                                 exportButton.setEnabled(true);
                             } else {

@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -42,8 +43,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
@@ -62,6 +68,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -69,7 +76,6 @@ import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.SmartCombo;
-import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 
 public class AdvancedReportsView extends ViewPart {
 
@@ -86,9 +92,9 @@ public class AdvancedReportsView extends ViewPart {
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
+    private TreeViewer tree;
     private Button generateButton;
     private List<Object> reportData;
-    private SearchResultsInfoTable reportTable;
 
     private Button printButton;
     private Button exportButton;
@@ -183,7 +189,10 @@ public class AdvancedReportsView extends ViewPart {
         // create the query's display here
         subSection = new Composite(top, SWT.NONE);
 
-        reportTable = new SearchResultsInfoTable(top, reportData, null, null);
+        reportTable = new PagedTableWidget<Object>(top, reportData,
+            new String[] {}, null);
+        GridData searchLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        reportTable.setLayoutData(searchLayoutData);
 
         top.layout();
         sc.setContent(top);
@@ -246,7 +255,7 @@ public class AdvancedReportsView extends ViewPart {
                                     bounds[i] = 100 + names[i].length() * 2;
                                 }
                                 reportTable.dispose();
-                                reportTable = new SearchResultsInfoTable(top,
+                                reportTable = new PagedTableWidget<Object>(top,
                                     reportData, names, bounds);
                                 GridData searchLayoutData = new GridData(
                                     SWT.FILL, SWT.FILL, true, true);
@@ -339,7 +348,7 @@ public class AdvancedReportsView extends ViewPart {
     public void comboChanged() {
         String typeSelection = objectSelector.getSelection();
         for (Class<? extends ModelWrapper<?>> searchableModelObject : searchableModelObjects)
-            if (searchableModelObject.getSimpleName().compareTo(typeSelection) == 0)
+            if (searchableModelObject.getSimpleName().startsWith(typeSelection))
                 type = searchableModelObject;
 
         if (subSection != null)
@@ -353,7 +362,7 @@ public class AdvancedReportsView extends ViewPart {
         subSection.setLayout(layout);
         subSection.setLayoutData(gdfill);
 
-        TreeViewer tree = new TreeViewer(subSection, SWT.BORDER);
+        tree = new TreeViewer(subSection, SWT.BORDER);
         tree.setContentProvider(new ITreeContentProvider() {
 
             @Override
@@ -370,30 +379,22 @@ public class AdvancedReportsView extends ViewPart {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                HQLField field = (HQLField) inputElement;
-                return SearchUtils.getComplexFields(field.getType(),
-                    field.getPath()).toArray();
+                return ((QueryTreeNode) inputElement).getChildren().toArray();
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                Class<?> type = ((HQLField) element).getType();
-                if (type == Integer.class || type == String.class
-                    || type == Boolean.class)
-                    return false;
-                return true;
+                return !((QueryTreeNode) element).isLeaf();
             }
 
             @Override
             public Object getParent(Object element) {
-                return null;
+                return ((QueryTreeNode) element).getParent();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                HQLField field = (HQLField) parentElement;
-                return SearchUtils.getComplexFields(field.getType(),
-                    field.getPath()).toArray();
+                return ((QueryTreeNode) parentElement).getChildren().toArray();
             }
         });
         tree.setLabelProvider(new ILabelProvider() {
@@ -406,7 +407,7 @@ public class AdvancedReportsView extends ViewPart {
 
             @Override
             public String getText(Object element) {
-                return ((HQLField) element).getFname();
+                return ((QueryTreeNode) element).getLabel();
             }
 
             @Override
@@ -433,17 +434,75 @@ public class AdvancedReportsView extends ViewPart {
 
             }
         });
-        tree.setInput(new HQLField("", typeSelection, type));
+        tree.setInput(SearchUtils.constructTree(new HQLField("", typeSelection,
+            type)));
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                HQLField selectedField = (HQLField) ((IStructuredSelection) event
+                QueryTreeNode selectedNode = (QueryTreeNode) ((IStructuredSelection) event
                     .getSelection()).getFirstElement();
-                displayFields(selectedField.getPath()
-                    + selectedField.getFname(), SearchUtils.getSimpleFields(
-                    selectedField.getType(), selectedField.getPath()));
+                if (selectedNode != null)
+                    displayFields(selectedNode);
             }
         });
+
+        Menu menu = new Menu(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                Menu menu = tree.getTree().getMenu();
+                for (MenuItem menuItem : menu.getItems()) {
+                    menuItem.dispose();
+                }
+
+                final Object element = ((StructuredSelection) tree
+                    .getSelection()).getFirstElement();
+                if (element != null) {
+                    MenuItem mi = new MenuItem(menu, SWT.NONE);
+                    mi.setText("Add OR Node");
+                    mi.addSelectionListener(new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent event) {
+                            QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                            QueryTreeNode newOperator = new QueryTreeNode(
+                                new HQLField(selectedNode.getNodeInfo()
+                                    .getPath(), "OR", Boolean.class));
+                            QueryTreeNode parent = selectedNode.getParent();
+                            parent.removeChild(selectedNode);
+                            parent.addChild(newOperator);
+                            newOperator.setParent(parent);
+                            newOperator.addChild(selectedNode);
+                            selectedNode.setParent(newOperator);
+                            QueryTreeNode copy = selectedNode.clone();
+                            newOperator.addChild(copy);
+                            copy.setParent(newOperator);
+                            tree.refresh(true);
+                        }
+                    });
+                    if (((QueryTreeNode) element).getLabel().compareTo("OR") == 0) {
+                        MenuItem mi2 = new MenuItem(menu, SWT.NONE);
+                        mi2.setText("Remove OR Node");
+                        mi2.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode parent = selectedNode.getParent();
+                                List<QueryTreeNode> children = selectedNode
+                                    .getChildren();
+                                QueryTreeNode child = children.get(0);
+                                child.setParent(parent);
+                                selectedNode.removeChild(child);
+                                parent.addChild(child);
+                                parent.removeChild(selectedNode);
+                                tree.refresh(true);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        tree.getTree().setMenu(menu);
 
         GridData gd = new GridData();
         gd.minimumHeight = 600;
@@ -462,7 +521,7 @@ public class AdvancedReportsView extends ViewPart {
 
     }
 
-    public void displayFields(String path, List<HQLField> fields) {
+    public void displayFields(QueryTreeNode node) {
         if (fieldSection != null)
             fieldSection.dispose();
         fieldSection = new Composite(subSection, SWT.NONE);
@@ -479,11 +538,11 @@ public class AdvancedReportsView extends ViewPart {
         GridData gdl = new GridData();
         gdl.horizontalSpan = 2;
         headerLabel.setLayoutData(gdl);
-        headerLabel.setText(path.replaceAll("[.]", " > "));
+        headerLabel.setText(node.getTreePath());
 
-        textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
-
+        textLabels = new ArrayList<Label>();
+        fields = node.getFieldData();
         for (HQLField field : fields) {
             Label fieldLabel = new Label(fieldSection, SWT.NONE);
             fieldLabel.setText(field.getFname() + ":");
@@ -516,10 +575,13 @@ public class AdvancedReportsView extends ViewPart {
 
     public void resetSearch() {
         if (reportTable != null) {
-            reportTable.dispose();
-            reportTable = new SearchResultsInfoTable(top, reportData, null,
-                null);
             reportData = new ArrayList<Object>();
+            reportTable.reset();
+            TableColumn[] cols = reportTable.getTableViewer().getTable()
+                .getColumns();
+            for (TableColumn col : cols) {
+                col.setText("");
+            }
         }
         printButton.setEnabled(false);
         exportButton.setEnabled(false);
@@ -534,7 +596,7 @@ public class AdvancedReportsView extends ViewPart {
         String[] names = new String[searchableModelObjects.size()];
         int i = 0;
         for (Class<?> objClass : searchableModelObjects) {
-            names[i] = objClass.getSimpleName();
+            names[i] = objClass.getSimpleName().replace("Wrapper", "");
             i++;
         }
         combo.setInput(names);

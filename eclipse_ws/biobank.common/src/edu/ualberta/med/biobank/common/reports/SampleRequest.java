@@ -22,7 +22,7 @@ public class SampleRequest extends QueryObject {
                 + siteId
                 + " and s.patientVisit.patient.study.nameShort like ? and datediff(s.linkDate, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
             new String[] { "Study", "Inventory ID", "Date Drawn", "Type",
-                "Location" }, new int[] { 100, 200, 100, 100, 100 });
+                "Location" });
         addOption("CSV File", String.class, "");
     }
 

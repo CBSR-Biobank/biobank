@@ -26,8 +26,7 @@ public class CabinetCSamples extends QueryObject {
                 + op
                 + siteId
                 + " group by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name",
-            new String[] { "Study", "Clinic", "Total" }, new int[] { 200, 100,
-                100 });
+            new String[] { "Study", "Clinic", "Total" });
     }
 
     @Override

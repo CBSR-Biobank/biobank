@@ -15,8 +15,7 @@ public class SampleSCount extends QueryObject {
                 + op
                 + siteId
                 + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name",
-            new String[] { "Study", "Sample Type", "Total" }, new int[] { 100,
-                200, 100 });
+            new String[] { "Study", "Sample Type", "Total" });
     }
 
     @Override

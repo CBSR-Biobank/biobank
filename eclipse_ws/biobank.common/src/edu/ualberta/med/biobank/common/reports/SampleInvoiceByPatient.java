@@ -16,7 +16,7 @@ public class SampleInvoiceByPatient extends QueryObject {
                 + " as Alias where Alias.linkDate > ? and Alias.linkDate < ? and Alias.patientVisit.patient.study.site "
                 + op + siteId + " ORDER BY Alias.patientVisit.patient.pnumber",
             new String[] { "Patient Number", "Clinic", "Link Date",
-                "Sample Type" }, new int[] { 100, 200, 100, 100 });
+                "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }

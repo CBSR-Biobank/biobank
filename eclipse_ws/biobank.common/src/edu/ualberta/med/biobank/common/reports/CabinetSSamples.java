@@ -25,7 +25,7 @@ public class CabinetSSamples extends QueryObject {
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site"
                 + op + siteId
                 + " group by sample.patientVisit.patient.study.nameShort",
-            new String[] { "Study", "Total" }, new int[] { 200, 100 });
+            new String[] { "Study", "Total" });
     }
 
     @Override
