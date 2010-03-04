@@ -112,29 +112,31 @@ public class ReportsView extends ViewPart {
     public ReportsView() {
         reportData = new ArrayList<Object>();
         columnWidths = new HashMap<Class<?>, int[]>();
-        columnWidths.put(CabinetCSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(CabinetCSamples.class, new int[] { 50, 50, 50 });
         columnWidths.put(CabinetDSamples.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(CabinetSSamples.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(FreezerCSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(CabinetSSamples.class, new int[] { 50, 50 });
+        columnWidths.put(FreezerCSamples.class, new int[] { 50, 50, 50 });
         columnWidths.put(FreezerDSamples.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(FreezerSSamples.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(FreezerSSamples.class, new int[] { 50, 50 });
         columnWidths.put(FvLPatientVisits.class, new int[] { 50, 50, 50, 50 });
         columnWidths
             .put(NewPsByStudyClinic.class, new int[] { 50, 50, 50, 50 });
         columnWidths.put(NewPVsByStudyClinic.class,
             new int[] { 50, 50, 50, 50 });
-        columnWidths.put(PatientVisitSummary.class,
-            new int[] { 50, 50, 50, 50 });
+        columnWidths.put(PatientVisitSummary.class, new int[] { 50, 50, 50, 50,
+            50, 50 });
         columnWidths.put(PatientWBC.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(QACabinetSamples.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(QAFreezerSamples.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(SampleCount.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(QACabinetSamples.class, new int[] { 50, 50, 50, 50,
+            50, 50 });
+        columnWidths.put(QAFreezerSamples.class, new int[] { 50, 50, 50, 50,
+            50, 50 });
+        columnWidths.put(SampleCount.class, new int[] { 50, 50 });
         columnWidths.put(SampleInvoiceByClinic.class, new int[] { 50, 50, 50,
             50 });
         columnWidths.put(SampleInvoiceByPatient.class, new int[] { 50, 50, 50,
             50 });
-        columnWidths.put(SampleRequest.class, new int[] { 50, 50, 50, 50 });
-        columnWidths.put(SampleSCount.class, new int[] { 50, 50, 50, 50 });
+        columnWidths.put(SampleRequest.class, new int[] { 50, 50, 50, 50, 50 });
+        columnWidths.put(SampleSCount.class, new int[] { 50, 50, 50 });
     }
 
     @Override
