@@ -4,7 +4,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -141,8 +145,8 @@ public class ContainerAdapter extends AdapterBase {
      * slot: modify this object's position, label and the label of children
      */
     public void setNewPositionFromLabel(String newLabel) throws Exception {
-        ContainerWrapper container = getContainer();
-        String oldLabel = container.getLabel();
+        final ContainerWrapper container = getContainer();
+        final String oldLabel = container.getLabel();
         String newParentContainerLabel = newLabel.substring(0, newLabel
             .length() - 2);
         List<ContainerWrapper> newParentContainers = container
@@ -176,10 +180,47 @@ public class ContainerAdapter extends AdapterBase {
         }
 
         newParent.addChild(newLabel, container);
-        container.persist();
 
-        BioBankPlugin.openInformation("Container moved", "The container "
-            + oldLabel + " has been moved to " + container.getLabel());
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        context.run(true, false, new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) {
+                Thread t = new Thread("Querying") {
+                    @Override
+                    public void run() {
+                        try {
+                            container.persist();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                monitor.beginTask("Moving...", IProgressMonitor.UNKNOWN);
+                t.start();
+                while (true) {
+                    if (!t.isAlive()) {
+                        Display.getDefault().syncExec(new Runnable() {
+                            public void run() {
+                                monitor.done();
+                                BioBankPlugin.openInformation(
+                                    "Container moved", "The container "
+                                        + oldLabel + " has been moved to "
+                                        + container.getLabel());
+                            }
+                        });
+                        break;
+                    } else
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                }
+            }
+        });
+
     }
 
     @Override
