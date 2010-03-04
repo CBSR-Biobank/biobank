@@ -49,7 +49,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
@@ -576,16 +575,11 @@ public class AdvancedReportsView extends ViewPart {
 
     public void resetSearch() {
         if (reportTable != null) {
+            reportTable.dispose();
+            reportTable = new SearchResultsInfoTable(top, reportData, null,
+                null);
             reportData = new ArrayList<Object>();
-            reportTable.reset();
-            TableColumn[] cols = reportTable.getTableViewer().getTable()
-                .getColumns();
-            for (TableColumn col : cols) {
-                col.setText("");
-            }
         }
-        printButton.setEnabled(false);
-        exportButton.setEnabled(false);
     }
 
     protected SmartCombo createCombo(Composite parent) {
