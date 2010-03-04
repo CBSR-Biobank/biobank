@@ -15,6 +15,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class SiteAdapter extends AdapterBase {
 
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
+
     public static final int CLINICS_NODE_ID = 0;
     public static final int STUDIES_NODE_ID = 1;
     public static final int STORAGE_TYPES_NODE_ID = 2;
@@ -79,8 +81,17 @@ public class SiteAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Site", SiteEntryForm.ID);
         addViewMenu(menu, "Site", SiteViewForm.ID);
-        addDeleteMenu(menu, "Site",
-            "Are you sure you want to delete this site?");
+        addDeleteMenu(menu, "Site", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     @Override

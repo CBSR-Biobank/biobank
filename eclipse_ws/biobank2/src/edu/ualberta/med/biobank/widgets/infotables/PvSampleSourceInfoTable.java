@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -61,19 +60,23 @@ public class PvSampleSourceInfoTable extends
         }
     }
 
-    private final static String[] headings = new String[] { "Name", "Quantity",
+    private final static String[] HEADINGS = new String[] { "Name", "Quantity",
         "Date Drawn" };
 
-    private final static int[] bounds = new int[] { 250, 100, -1, -1, -1 };
+    private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
+
+    public PvSampleSourceInfoTable(Composite parent, boolean multiSelectRows,
+        List<PvSampleSourceWrapper> collection) {
+        super(parent, multiSelectRows, collection, HEADINGS, BOUNDS, 10);
+    }
 
     public PvSampleSourceInfoTable(Composite parent,
-        Collection<PvSampleSourceWrapper> collection) {
-        super(parent, collection, headings, bounds);
-        setSorter(new TableSorter());
+        List<PvSampleSourceWrapper> collection) {
+        this(parent, true, collection);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -97,6 +100,11 @@ public class PvSampleSourceInfoTable extends
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

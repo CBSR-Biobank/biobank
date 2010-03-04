@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
@@ -69,14 +70,14 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private ClinicWrapper clinic;
 
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic)
-        throws Exception {
-        super(parent, true, clinic.getStudyCollection(), HEADINGS, BOUNDS);
+        throws ApplicationException {
+        super(parent, true, null, HEADINGS, BOUNDS, 10);
         this.clinic = clinic;
-        setSorter(new TableSorter());
+        setCollection(clinic.getStudyCollection());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -102,6 +103,11 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

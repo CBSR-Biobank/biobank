@@ -25,7 +25,7 @@ public class FreezerSSamples extends QueryObject {
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site"
                 + op + siteId
                 + " group by sample.patientVisit.patient.study.nameShort",
-            new String[] { "Study", "Total" });
+            new String[] { "Study", "Total" }, new int[] { 100, 200 });
     }
 
     @Override
@@ -36,5 +36,10 @@ public class FreezerSSamples extends QueryObject {
         c.setParameters(params);
         List<Object> results = appService.query(c);
         return postProcess(results);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

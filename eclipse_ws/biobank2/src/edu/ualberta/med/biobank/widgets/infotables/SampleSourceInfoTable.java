@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -44,13 +43,12 @@ public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> 
     private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
 
     public SampleSourceInfoTable(Composite parent,
-        Collection<SampleSourceWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+        List<SampleSourceWrapper> sampleStorageCollection) {
+        super(parent, true, sampleStorageCollection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -69,6 +67,11 @@ public class SampleSourceInfoTable extends InfoTableWidget<SampleSourceWrapper> 
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

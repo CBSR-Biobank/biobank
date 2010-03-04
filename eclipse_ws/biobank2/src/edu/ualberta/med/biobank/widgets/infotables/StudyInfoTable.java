@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -72,15 +71,14 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private static final String[] HEADINGS = new String[] { "Name",
         "Short Name", "Status", "Patients", "Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
+    private static final int[] BOUNDS = new int[] { 260, 130, 130, 130, 130 };
 
-    public StudyInfoTable(Composite parent, Collection<StudyWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+    public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -109,6 +107,11 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

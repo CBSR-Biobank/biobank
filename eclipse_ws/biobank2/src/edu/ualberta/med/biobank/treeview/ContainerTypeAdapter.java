@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerTypeAdapter extends AdapterBase {
 
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this container type?";
+
     public ContainerTypeAdapter(AdapterBase parent,
         ContainerTypeWrapper containerType) {
         super(parent, containerType);
@@ -51,8 +53,17 @@ public class ContainerTypeAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Container Type", ContainerTypeEntryForm.ID);
         addViewMenu(menu, "Container Type", ContainerTypeViewForm.ID);
-        addDeleteMenu(menu, "Container Type",
-            "Are you sure you want to delete this container type?");
+        addDeleteMenu(menu, "Container Type", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     @Override

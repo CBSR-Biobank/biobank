@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -79,14 +78,17 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final int[] BOUNDS = new int[] { 120, 120, 200, 120, 120,
         100 };
 
-    public ContactInfoTable(Composite parent,
-        Collection<ContactWrapper> contacts) {
-        super(parent, true, contacts, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+    public ContactInfoTable(Composite parent, boolean multiSelectRows,
+        List<ContactWrapper> contacts) {
+        super(parent, multiSelectRows, contacts, HEADINGS, BOUNDS, 10);
+    }
+
+    public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
+        super(parent, true, contacts, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -115,6 +117,11 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

@@ -2,10 +2,10 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -203,7 +203,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createContainsSection() throws Exception {
-        Composite client = createSectionWithClient("Contains");
+        Composite client = createSectionWithClient("Contents");
         hasContainers = toolkit.createButton(client, "Contains Containers",
             SWT.RADIO);
         hasSamples = toolkit
@@ -255,7 +255,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void setSampleTypesSelection() {
         Collection<SampleTypeWrapper> stSamplesTypes = containerType
             .getSampleTypeCollection();
-        ListOrderedMap availSampleTypes = new ListOrderedMap();
+        LinkedHashMap<Integer, String> availSampleTypes = new LinkedHashMap<Integer, String>();
         List<Integer> selSampleTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
@@ -294,7 +294,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 selChildContainerTypes.add(childContainerType.getId());
             }
         }
-        ListOrderedMap availContainerTypes = new ListOrderedMap();
+        LinkedHashMap<Integer, String> availContainerTypes = new LinkedHashMap<Integer, String>();
         if (allContainerTypes != null) {
             for (ContainerTypeWrapper type : allContainerTypes) {
                 if (containerType.isNew() || !containerType.equals(type)) {
@@ -415,7 +415,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setChildContainerTypeSelection();
         setSampleTypesSelection();
         showContainersOrSamples();
-
+        setLabelilngScheme();
     }
 
     private void showContainersOrSamples() {
@@ -424,7 +424,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         showSamples(containsSamples);
         hasSamples.setSelection(containsSamples);
         hasContainers.setSelection(!containsSamples);
+    }
 
+    private void setLabelilngScheme() {
         String currentScheme = containerType.getChildLabelingSchemeName();
         if (currentScheme == null) {
             labelingSchemeComboViewer.getCombo().deselectAll();

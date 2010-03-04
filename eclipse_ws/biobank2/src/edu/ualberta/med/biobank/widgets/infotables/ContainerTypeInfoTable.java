@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -97,13 +96,12 @@ public class ContainerTypeInfoTable extends
         130 };
 
     public ContainerTypeInfoTable(Composite parent,
-        Collection<ContainerTypeWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+        List<ContainerTypeWrapper> collection) {
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -135,6 +133,11 @@ public class ContainerTypeInfoTable extends
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

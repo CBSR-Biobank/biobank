@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ShipmentInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm";
@@ -65,7 +66,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createContactsSection();
         createStudiesSection();
         createShipmentsSection();
-        createButtonsSection();
     }
 
     private void createClinicSection() throws Exception {
@@ -105,7 +105,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(contactsTable);
     }
 
-    protected void createStudiesSection() throws Exception {
+    protected void createStudiesSection() throws ApplicationException {
         Composite client = createSectionWithClient("Studies");
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
@@ -123,12 +123,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(shipmentsTable);
 
         shipmentsTable.addDoubleClickListener(collectionDoubleClickListener);
-    }
-
-    protected void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
-        client.setLayout(new GridLayout(4, false));
-        toolkit.paintBordersFor(client);
     }
 
     @Override

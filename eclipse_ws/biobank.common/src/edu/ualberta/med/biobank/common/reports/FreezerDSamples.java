@@ -25,7 +25,8 @@ public class FreezerDSamples extends QueryObject {
                 + op
                 + siteId
                 + " order by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name, sample.linkDate",
-            new String[] { "", "Study", "Clinic", "Total" });
+            new String[] { "", "Study", "Clinic", "Total" }, new int[] { 100,
+                200, 100, 100 });
         addOption("Date Range", DateRange.class, DateRange.Week);
     }
 
@@ -43,7 +44,6 @@ public class FreezerDSamples extends QueryObject {
         params.set(0, "%Freezer%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        System.out.println(queryString);
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
@@ -53,4 +53,8 @@ public class FreezerDSamples extends QueryObject {
         return sumByDate(results);
     }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

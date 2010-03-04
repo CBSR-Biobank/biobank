@@ -47,7 +47,8 @@ public class PatientVisitSummary extends QueryObject {
             "Displays the total number of patients for each of 1-5+ visits, the total number of visits, and the total number of patients per study per clinic for a given date range.",
             MessageFormat.format(QUERY_STRING, siteId, op), new String[] {
                 "Study", "Clinic", "1 Visit", "2 Visit", "3 Visit", "4 Visit",
-                "5+ Visits", "Total Visits", "Total Patients" });
+                "5+ Visits", "Total Visits", "Total Patients" }, new int[] {
+                100, 200, 100, 100, 100, 100, 100, 100, 100 });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }
@@ -98,5 +99,10 @@ public class PatientVisitSummary extends QueryObject {
         totalledResults.add(new Object[] { lastStudy, "", sums[0], sums[1],
             sums[2], sums[3], sums[4], sums[5], sums[6] });
         return totalledResults;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

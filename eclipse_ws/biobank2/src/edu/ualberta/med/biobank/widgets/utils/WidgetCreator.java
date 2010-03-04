@@ -24,6 +24,7 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -243,7 +244,7 @@ public class WidgetCreator {
      */
     public <T> ComboViewer createComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage) {
+        String errorMessage, boolean useDefaultComparator) {
         Assert.isNotNull(dbc);
         Label label = createLabel(parent, fieldLabel);
 
@@ -251,6 +252,9 @@ public class WidgetCreator {
         ComboViewer comboViewer = new ComboViewer(combo);
         comboViewer.setContentProvider(new ArrayContentProvider());
         comboViewer.setLabelProvider(new BiobankLabelProvider());
+        if (useDefaultComparator) {
+            comboViewer.setComparator(new ViewerComparator());
+        }
         if (input != null) {
             comboViewer.setInput(input);
         }
@@ -273,6 +277,13 @@ public class WidgetCreator {
             combo.addModifyListener(modifyListener);
         }
         return comboViewer;
+    }
+
+    public <T> ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
+        String errorMessage) {
+        return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
+            input, selection, errorMessage, false);
     }
 
     public Label createLabel(Composite parent, String fieldLabel) {
@@ -394,7 +405,6 @@ public class WidgetCreator {
 
     public void setModifyListener(ModifyListener modifyListener) {
         this.modifyListener = modifyListener;
-
     }
 
     public void setSelectionListener(SelectionListener selectionListener) {

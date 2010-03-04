@@ -1,14 +1,12 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -90,15 +88,12 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         -1 };
 
     public SamplesListInfoTable(Composite parent,
-        Collection<SampleWrapper> sampleCollection) {
-        super(parent, sampleCollection, HEADINGS, BOUNDS);
-        GridData tableData = ((GridData) getLayoutData());
-        tableData.heightHint = 500;
-        setSorter(new TableSorter());
+        List<SampleWrapper> sampleCollection) {
+        super(parent, true, sampleCollection, HEADINGS, BOUNDS, 20);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -131,6 +126,11 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

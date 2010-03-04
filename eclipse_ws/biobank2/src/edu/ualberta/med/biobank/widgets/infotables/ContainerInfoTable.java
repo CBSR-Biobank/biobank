@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,13 +75,12 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
 
     public ContainerInfoTable(Composite parent,
-        Collection<ContainerWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+        List<ContainerWrapper> collection) {
+        super(parent, true, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -112,6 +110,11 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

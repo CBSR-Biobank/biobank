@@ -211,6 +211,14 @@ public class FreezerImporter {
             return;
         }
 
+        SampleStorageWrapper ss = Importer.getSampleStorage(study, sampleType);
+        if (ss == null) {
+            logger.error("study \"" + study.getNameShort()
+                + "\" has no sample storage for sample type \""
+                + sampleType.getName() + "\"");
+            return;
+        }
+
         sample = new SampleWrapper(appService);
         sample.setParent(pallet);
         sample.setSampleType(sampleType);
@@ -222,15 +230,7 @@ public class FreezerImporter {
         if (quantity != 0.0) {
             sample.setQuantity(quantity);
         } else {
-            SampleStorageWrapper ss = Importer.getSampleStorage(study,
-                sampleType);
-            if (ss != null) {
-                sample.setQuantity(ss.getVolume());
-            } else {
-                logger.error("study \"" + study.getNameShort()
-                    + "\" has no sample storage for sample type \""
-                    + sampleType.getName() + "\"");
-            }
+            sample.setQuantity(ss.getVolume());
         }
 
         if (!pallet.canHoldSample(sample)) {

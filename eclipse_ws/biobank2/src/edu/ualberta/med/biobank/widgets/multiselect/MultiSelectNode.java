@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.widgets.multiselect;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
-
 import edu.ualberta.med.biobank.treeview.DeltaEvent;
 import edu.ualberta.med.biobank.treeview.IDeltaListener;
 import edu.ualberta.med.biobank.treeview.NullDeltaListener;
@@ -80,19 +78,6 @@ public class MultiSelectNode {
         removedChildren.remove(child);
         child.addListener(listener);
         fireAdd(child);
-    }
-
-    public void insertAfter(MultiSelectNode existingNode,
-        MultiSelectNode newNode) {
-        int pos = children.indexOf(existingNode);
-        Assert.isTrue(pos >= 0, "existing node not found: "
-            + existingNode.getName());
-        newNode.setParent(this);
-        children.add(pos + 1, newNode);
-        newNode.addListener(listener);
-        addedChildren.add(newNode);
-        removedChildren.remove(newNode);
-        fireAdd(newNode);
     }
 
     public void removeChild(MultiSelectNode item) {

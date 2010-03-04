@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -68,10 +67,15 @@ public class SampleStorageInfoTable extends
     private static final int[] BOUNDS = new int[] { 300, 130, 100, -1, -1, -1,
         -1 };
 
+    public SampleStorageInfoTable(Composite parent, boolean multiSelectRows,
+        List<SampleStorageWrapper> sampleStorageCollection) {
+        super(parent, multiSelectRows, sampleStorageCollection, HEADINGS,
+            BOUNDS, 10);
+    }
+
     public SampleStorageInfoTable(Composite parent,
-        Collection<SampleStorageWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+        List<SampleStorageWrapper> sampleStorageCollection) {
+        this(parent, true, sampleStorageCollection);
     }
 
     @Override
@@ -88,7 +92,7 @@ public class SampleStorageInfoTable extends
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -112,6 +116,11 @@ public class SampleStorageInfoTable extends
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

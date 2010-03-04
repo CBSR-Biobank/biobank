@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 
 public class GridContainerWidget extends AbstractGridWidget {
 
+    private static final int HEIGHT_TWO_LINES = 40;
+
     private List<ContainerStatus> legendStatus;
 
     /**
@@ -96,14 +98,25 @@ public class GridContainerWidget extends AbstractGridWidget {
     @Override
     protected String getDefaultTextForBox(int indexRow, int indexCol) {
         String text = super.getDefaultTextForBox(indexRow, indexCol);
-        if (!text.isEmpty()) {
-            return text;
+        if (text.isEmpty()) {
+            return "";
         }
-        return "";
+
+        if (getCellHeight() <= HEIGHT_TWO_LINES) {
+            return text + " " + getContainerTypeText(indexRow, indexCol);
+        }
+        return text;
     }
 
     @Override
     protected String getBottomTextForBox(int indexRow, int indexCol) {
+        if (getCellHeight() > HEIGHT_TWO_LINES) {
+            return getContainerTypeText(indexRow, indexCol);
+        }
+        return "";
+    }
+
+    protected String getContainerTypeText(int indexRow, int indexCol) {
         String sname = "";
         if (cells != null) {
             ContainerCell cell = (ContainerCell) cells.get(new RowColPos(

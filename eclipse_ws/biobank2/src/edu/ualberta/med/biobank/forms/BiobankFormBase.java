@@ -179,8 +179,9 @@ public abstract class BiobankFormBase extends EditorPart {
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    BioBankPlugin.openError(
-                        "BioBankFormBase.createPartControl Error", e);
+                    BioBankPlugin
+                        .openError("BioBankFormBase.createPartControl Error", e
+                            .toString());
                 }
             }
         });

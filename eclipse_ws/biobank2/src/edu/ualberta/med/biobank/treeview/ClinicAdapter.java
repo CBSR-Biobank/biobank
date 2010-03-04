@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ClinicAdapter extends AdapterBase {
 
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this clinic?";
+
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
     }
@@ -55,8 +57,17 @@ public class ClinicAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Clinic", ClinicEntryForm.ID);
         addViewMenu(menu, "Clinic", ClinicViewForm.ID);
-        addDeleteMenu(menu, "Clinic",
-            "Are you sure you want to delete this clinic?");
+        addDeleteMenu(menu, "Clinic", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     @Override

@@ -225,9 +225,16 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage) {
+        String errorMessage, boolean useDefaultComparator) {
         return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
-            fieldLabel, input, selection, errorMessage);
+            fieldLabel, input, selection, errorMessage, useDefaultComparator);
+    }
+
+    protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
+        String errorMessage) {
+        return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
+            input, selection, errorMessage, false);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,

@@ -597,6 +597,20 @@ public abstract class AdapterBase {
         }
     }
 
+    public void deleteWithConfirm() {
+        String msg = getConfirmDeleteMessage();
+        if (msg == null) {
+            throw new RuntimeException("adapter has no confirm delete msg: "
+                + getClass().getName());
+        }
+        delete(msg);
+    }
+
+    public boolean isDeletable() {
+        // derived objects can override this
+        return false;
+    }
+
     public boolean isEditable() {
         return editable;
     }
@@ -621,6 +635,10 @@ public abstract class AdapterBase {
 
     public void notifyListeners() {
         notifyListeners(new AdapterChangedEvent(this));
+    }
+
+    protected String getConfirmDeleteMessage() {
+        return null;
     }
 
 }

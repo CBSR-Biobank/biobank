@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -60,32 +59,17 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     private static final int[] BOUNDS = new int[] { 150, 150, -1, -1, -1, -1 };
 
-    public PatientInfoTable(Composite parent,
-        Collection<PatientWrapper> patients) {
-        super(parent, true, patients, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
+    public PatientInfoTable(Composite parent, boolean multiSelectRows,
+        List<PatientWrapper> patients) {
+        super(parent, multiSelectRows, patients, HEADINGS, BOUNDS, 10);
+    }
 
-        // tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-        // @Override
-        // public void doubleClick(DoubleClickEvent event) {
-        // Object selection = event.getSelection();
-        // BiobankCollectionModel obj = (BiobankCollectionModel)
-        // ((StructuredSelection) selection)
-        // .getFirstElement();
-        // Assert
-        // .isTrue(obj.o instanceof TableRowData,
-        // "Invalid class where patient expected: "
-        // + obj.o.getClass());
-        //
-        // TableRowData item = (TableRowData) obj.o;
-        // ShipmentAdministrationView.currentInstance
-        // .displayPatient(item.patient);
-        // }
-        // });
+    public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
+        super(parent, true, patients, HEADINGS, BOUNDS, 10);
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -107,6 +91,11 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -79,13 +78,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         100 };
 
     public StudyContactEntryInfoTable(Composite parent,
-        Collection<ContactWrapper> contactCollection) {
+        List<ContactWrapper> contactCollection) {
         super(parent, contactCollection, HEADINGS, BOUNDS);
-        setSorter(new TableSorter());
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
+    protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
@@ -114,6 +112,11 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 }
             }
         };
+    }
+
+    @Override
+    protected BiobankTableSorter getTableSorter() {
+        return new TableSorter();
     }
 
     @Override

@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.springframework.util.Assert;
+
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class QueryObject {
+public abstract class QueryObject {
 
     private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
 
@@ -35,6 +37,8 @@ public class QueryObject {
         aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
         aMap.put(SampleRequest.NAME, SampleRequest.class);
         aMap.put(SampleSCount.NAME, SampleSCount.class);
+        aMap.put(QACabinetSamples.NAME, QACabinetSamples.class);
+        aMap.put(QAFreezerSamples.NAME, QAFreezerSamples.class);
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
@@ -56,6 +60,8 @@ public class QueryObject {
      * Column names for the result
      */
     protected String[] columnNames;
+
+    protected int[] columnWidths;
 
     protected List<Option> queryOptions;
 
@@ -88,11 +94,13 @@ public class QueryObject {
     }
 
     public QueryObject(String description, String queryString,
-        String[] columnNames) {
+        String[] columnNames, int[] columnWidths) {
         this.description = description;
         this.queryString = queryString;
         queryOptions = new ArrayList<Option>();
+        Assert.isTrue(columnNames.length == columnWidths.length);
         this.columnNames = columnNames;
+        this.columnWidths = columnWidths;
     }
 
     public void addOption(String name, Class<?> type, Object defaultValue) {
@@ -130,6 +138,10 @@ public class QueryObject {
 
     public String[] getColumnNames() {
         return columnNames;
+    }
+
+    public int[] getColumnWidths() {
+        return columnWidths;
     }
 
     public List<Option> getOptions() {
@@ -226,5 +238,7 @@ public class QueryObject {
                 .add(new Object[] { grpNumber, study, clinic, count });
         return totalledResults;
     }
+
+    public abstract String getName();
 
 }

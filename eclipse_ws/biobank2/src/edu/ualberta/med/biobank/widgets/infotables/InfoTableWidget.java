@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,16 +23,18 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
@@ -71,11 +72,19 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
  * abstract method getCollectionModelObject().
  * 
  * @param <T> The model object wrapper the table is based on.
+ * 
  */
 public abstract class InfoTableWidget<T> extends BiobankWidget {
 
+    /*
+     * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
+     * .html for how to set row height.
+     */
+
     private static BiobankLogger logger = BiobankLogger
         .getLogger(InfoTableWidget.class.getName());
+
+    private static final int DEFAULT_NUM_ROWS = 10;
 
     protected TableViewer tableViewer;
 
@@ -93,12 +102,33 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
+    private boolean paginationRequired;
+
+    private Composite paginationWidget;
+
+    protected PageInformation pageInfo = new PageInformation();
+
+    private Button firstButton;
+
+    private Button lastButton;
+
+    private Button prevButton;
+
+    private Button nextButton;
+
+    private Label pageLabel;
+
+    private List<T> collection;
+
     public InfoTableWidget(Composite parent, boolean multilineSelection,
-        Collection<T> collection, String[] headings, int[] bounds) {
+        List<T> collection, String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
-        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        setLayout(new GridLayout(1, false));
+        pageInfo.rowsPerPage = 0;
+        GridLayout gl = new GridLayout(1, false);
+        gl.verticalSpacing = 1;
+        setLayout(gl);
+        setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;
@@ -110,10 +140,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         Table table = tableViewer.getTable();
         table.setLayout(new TableLayout());
-        GridData gd = new GridData(GridData.FILL_BOTH);
-        gd.heightHint = 100;
-        table.setLayoutData(gd);
-        // table.setFont(getFont());
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
@@ -123,10 +149,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 final TableViewerColumn col = new TableViewerColumn(
                     tableViewer, SWT.NONE);
                 col.getColumn().setText(name);
-                if (bounds == null || bounds[index] == -1) {
+                if (columnWidths == null || columnWidths[index] == -1) {
                     col.getColumn().pack();
                 } else {
-                    col.getColumn().setWidth(bounds[index]);
+                    col.getColumn().setWidth(columnWidths[index]);
                 }
                 col.getColumn().setResizable(true);
                 col.getColumn().setMoveable(true);
@@ -147,12 +173,9 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.getTable().setMenu(menu);
 
         model = new ArrayList<BiobankCollectionModel>();
-        tableViewer.setInput(model);
 
         if (collection != null) {
-            for (int i = 0, n = collection.size(); i < n; ++i) {
-                model.add(new BiobankCollectionModel());
-            }
+            initModel(collection);
             getTableViewer().refresh();
             setCollection(collection);
         }
@@ -165,12 +188,36 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 }
             }
         });
+        setSorter();
         addClipboadCopySupport();
+        addPaginationWidget();
     }
 
-    public InfoTableWidget(Composite parent, Collection<T> collection,
-        String[] headings, int[] bounds) {
-        this(parent, false, collection, headings, bounds);
+    public InfoTableWidget(Composite parent, List<T> collection,
+        String[] headings, int[] columnWidths) {
+        this(parent, false, collection, headings, columnWidths);
+    }
+
+    public InfoTableWidget(Composite parent, boolean multilineSelection,
+        List<T> collection, String[] headings, int[] columnWidths,
+        int rowsPerPage) {
+        this(parent, multilineSelection, null, headings, columnWidths);
+        pageInfo.rowsPerPage = rowsPerPage;
+        addPaginationWidget();
+        if (collection != null) {
+            initModel(collection);
+            setCollection(collection);
+            resizeTable();
+        }
+    }
+
+    private void initModel(List<T> collection) {
+        if ((collection == null) || (model.size() == collection.size()))
+            return;
+
+        for (int i = 0, n = collection.size(); i < n; ++i) {
+            model.add(new BiobankCollectionModel(i));
+        }
     }
 
     private void addClipboadCopySupport() {
@@ -205,7 +252,12 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     protected abstract String getCollectionModelObjectToString(Object o);
 
-    protected void setSorter(final BiobankTableSorter tableSorter) {
+    private void setSorter() {
+        final BiobankTableSorter tableSorter = getTableSorter();
+
+        if (tableSorter == null)
+            return;
+
         tableViewer.setSorter(tableSorter);
         final Table table = tableViewer.getTable();
         for (int i = 0, n = table.getColumnCount(); i < n; ++i) {
@@ -236,7 +288,9 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         tableViewer.refresh();
     }
 
-    public abstract BiobankLabelProvider getLabelProvider();
+    protected abstract BiobankLabelProvider getLabelProvider();
+
+    protected abstract BiobankTableSorter getTableSorter();
 
     @Override
     public boolean setFocus() {
@@ -252,55 +306,76 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         return tableViewer;
     }
 
-    public void setCollection(final Collection<T> collection) {
+    public void setCollection(final List<T> collection) {
+        this.collection = collection;
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
         }
 
+        if ((pageInfo.rowsPerPage != 0)
+            && (collection.size() > pageInfo.rowsPerPage)
+            && !paginationWidget.getVisible()) {
+            pageInfo.page = 0;
+            Double size = new Double(collection.size());
+            Double pageSize = new Double(pageInfo.rowsPerPage);
+            pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
+                .intValue();
+            enablePaginationWidget();
+            setPageLabelText();
+            paginationRequired = true;
+        }
+
+        resizeTable();
+
         backgroundThread = new Thread() {
             @Override
             public void run() {
                 final TableViewer viewer = getTableViewer();
+                final Table table = viewer.getTable();
                 Display display = viewer.getTable().getDisplay();
-                int count = 0;
+                int start;
+                int end;
 
-                if (model.size() != collection.size()) {
-                    model.clear();
-                    for (int i = 0, n = collection.size(); i < n; ++i) {
-                        model.add(new BiobankCollectionModel());
-                    }
-                    display.syncExec(new Runnable() {
-                        public void run() {
-                            if (!viewer.getTable().isDisposed())
-                                getTableViewer().refresh();
-                        }
-                    });
+                initModel(collection);
+                if (paginationRequired) {
+                    start = pageInfo.page * pageInfo.rowsPerPage;
+                    end = Math.min(start + pageInfo.rowsPerPage, model.size());
+                } else {
+                    start = 0;
+                    end = model.size();
                 }
 
-                try {
-                    for (T item : collection) {
-                        if (viewer.getTable().isDisposed())
-                            return;
-                        final BiobankCollectionModel modelItem = model
-                            .get(count);
-                        if (item instanceof ModelWrapper<?>) {
-                            ((ModelWrapper<?>) item).loadAttributes();
+                final List<BiobankCollectionModel> modelSubList = model
+                    .subList(start, end);
+
+                display.syncExec(new Runnable() {
+                    public void run() {
+                        if (!table.isDisposed()) {
+                            tableViewer.setInput(modelSubList);
                         }
-                        if (item != null) {
-                            modelItem.o = getCollectionModelObject(item);
+                    }
+                });
+
+                try {
+
+                    for (int i = start; i < end; ++i) {
+                        if (table.isDisposed())
+                            return;
+                        final BiobankCollectionModel item = model.get(i);
+                        Assert.isNotNull(item != null);
+                        if (item.o == null) {
+                            item.o = getCollectionModelObject(collection
+                                .get(item.index));
                         }
 
-                        if (!isDisposed()) {
-                            display.syncExec(new Runnable() {
-                                public void run() {
-                                    if (!viewer.getTable().isDisposed()) {
-                                        viewer.refresh(modelItem, false);
-                                    }
+                        display.syncExec(new Runnable() {
+                            public void run() {
+                                if (!table.isDisposed()) {
+                                    viewer.refresh(item, false);
                                 }
-                            });
-                        }
-                        ++count;
+                            }
+                        });
                     }
                 } catch (Exception e) {
                     logger.error("setCollection error", e);
@@ -456,4 +531,161 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             });
         }
     }
+
+    protected void addPaginationWidget() {
+        paginationWidget = new Composite(this, SWT.NONE);
+        paginationWidget.setLayout(new GridLayout(5, false));
+
+        firstButton = new Button(paginationWidget, SWT.NONE);
+        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_2_ARROW_LEFT));
+        firstButton.setToolTipText("First page");
+        firstButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                firstPage();
+            }
+        });
+
+        prevButton = new Button(paginationWidget, SWT.NONE);
+        prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ARROW_LEFT));
+        prevButton.setToolTipText("Previous page");
+        prevButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                prevPage();
+            }
+        });
+
+        pageLabel = new Label(paginationWidget, SWT.NONE);
+        GridData gd = new GridData(SWT.END, SWT.CENTER, false, false);
+        gd.widthHint = 80;
+        pageLabel.setLayoutData(gd);
+
+        nextButton = new Button(paginationWidget, SWT.NONE);
+        nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ARROW_RIGHT));
+        nextButton.setToolTipText("Next page");
+        nextButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                nextPage();
+            }
+        });
+
+        lastButton = new Button(paginationWidget, SWT.NONE);
+        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_2_ARROW_RIGHT));
+        lastButton.setToolTipText("Last page");
+        lastButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                lastPage();
+            }
+        });
+
+        // do not display it yet, wait till collection is added
+        paginationWidget.setVisible(false);
+        gd = new GridData(SWT.END, SWT.TOP, true, true);
+        gd.exclude = true;
+        paginationWidget.setLayoutData(gd);
+    }
+
+    private void enablePaginationWidget() {
+        if (paginationWidget.getVisible())
+            return;
+
+        GridData gd = (GridData) paginationWidget.getLayoutData();
+        gd.exclude = false;
+        paginationWidget.setVisible(true);
+        paginationWidget.setEnabled(true);
+        firstButton.setEnabled(false);
+        prevButton.setEnabled(false);
+        layout(true);
+    }
+
+    private void firstPage() {
+        pageInfo.page = 0;
+        firstButton.setEnabled(false);
+        prevButton.setEnabled(false);
+        lastButton.setEnabled(true);
+        nextButton.setEnabled(true);
+        setPageLabelText();
+        setCollection(collection);
+    }
+
+    private void lastPage() {
+        pageInfo.page = pageInfo.pageTotal - 1;
+        firstButton.setEnabled(true);
+        prevButton.setEnabled(true);
+        lastButton.setEnabled(false);
+        nextButton.setEnabled(false);
+        setPageLabelText();
+        setCollection(collection);
+    }
+
+    private void prevPage() {
+        if (pageInfo.page == 0)
+            return;
+        pageInfo.page--;
+        if (pageInfo.page == 0) {
+            firstButton.setEnabled(false);
+            prevButton.setEnabled(false);
+        } else if (pageInfo.page == pageInfo.pageTotal - 2) {
+            lastButton.setEnabled(true);
+            nextButton.setEnabled(true);
+        }
+        setPageLabelText();
+        setCollection(collection);
+    }
+
+    private void nextPage() {
+        if (pageInfo.page >= pageInfo.pageTotal)
+            return;
+        pageInfo.page++;
+        if (pageInfo.page == 1) {
+            firstButton.setEnabled(true);
+            prevButton.setEnabled(true);
+        } else if (pageInfo.page == pageInfo.pageTotal - 1) {
+            lastButton.setEnabled(false);
+            nextButton.setEnabled(false);
+        }
+        setPageLabelText();
+        setCollection(collection);
+    }
+
+    private void setPageLabelText() {
+        pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
+            + pageInfo.pageTotal);
+        layout(true, true);
+    }
+
+    private void resizeTable() {
+        int rows;
+        if (pageInfo.rowsPerPage != 0) {
+            rows = pageInfo.rowsPerPage;
+            if (collection != null) {
+                rows = Math.min(pageInfo.rowsPerPage, collection.size());
+            }
+        } else if (collection != null) {
+            rows = Math.min(DEFAULT_NUM_ROWS, collection.size());
+        } else {
+            rows = DEFAULT_NUM_ROWS;
+        }
+
+        rows = Math.max(rows, 1);
+
+        Table table = getTableViewer().getTable();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
+        table.setLayoutData(gd);
+        layout(true);
+    }
+}
+
+class PageInformation {
+    Integer pageTotal;
+    Integer page;
+    Integer rowsPerPage;
 }

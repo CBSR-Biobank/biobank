@@ -11,8 +11,12 @@ public class SampleCount extends QueryObject {
             "Select Alias.sampleType.name, count(*) from "
                 + Sample.class.getName()
                 + " as Alias where Alias.patientVisit.patient.study.site " + op
-                + siteId,
-            // + " ORDER BY " + name + "Alias.patientVisit.patient.id"
-            new String[] { "Sample Type", "Total" });
+                + siteId + " GROUP BY Alias.sampleType.name", new String[] {
+                "Sample Type", "Total" }, new int[] { 200, 150 });
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

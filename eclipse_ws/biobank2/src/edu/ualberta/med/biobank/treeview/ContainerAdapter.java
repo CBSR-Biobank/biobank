@@ -29,6 +29,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerAdapter extends AdapterBase {
 
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this container?";
+
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
         if (container != null) {
@@ -89,8 +91,17 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        addDeleteMenu(menu, "Container",
-            "Are you sure you want to delete this container?");
+        addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     private void moveAction() {

@@ -28,7 +28,8 @@ public class NewPsByStudyClinic extends QueryObject {
                 + " "
                 + siteId
                 + " ORDER BY Alias.patient.study.nameShort, Alias.shipment.clinic.name",
-            new String[] { "", "Study", "Clinic", "Total" });
+            new String[] { "", "Study", "Clinic", "Total" }, new int[] { 100,
+                200, 100, 100 });
         addOption("Date Range", DateRange.class, DateRange.Month);
     }
 
@@ -45,7 +46,6 @@ public class NewPsByStudyClinic extends QueryObject {
         }
         columnNames[0] = (String) params.get(0);
         HQLCriteria c = new HQLCriteria(queryString);
-        System.out.println(queryString);
         List<Object> results = appService.query(c);
         return postProcess(results);
     }
@@ -53,5 +53,10 @@ public class NewPsByStudyClinic extends QueryObject {
     @Override
     public List<Object> postProcess(List<Object> results) {
         return sumByDate(results);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

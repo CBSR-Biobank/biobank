@@ -15,6 +15,8 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class StudyAdapter extends AdapterBase {
 
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this study?";
+
     public static final int PATIENTS_NODE_ID = 0;
 
     public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper,
@@ -63,8 +65,17 @@ public class StudyAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Study", StudyEntryForm.ID);
         addViewMenu(menu, "Study", StudyViewForm.ID);
-        addDeleteMenu(menu, "Study",
-            "Are you sure you want to delete this study?");
+        addDeleteMenu(menu, "Study", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     @Override
