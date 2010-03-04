@@ -6,7 +6,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import edu.ualberta.med.biobank.BioBankPlugin;
 
 /**
- * Class used to initialize default preference values.
+ * Class used to initialise default preference values.
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -29,5 +29,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             store.setDefault(PreferenceConstants.SCANNER_PLATE_BARCODES[i],
                 "PLATE" + (i + 1));
         }
+
+        store.setDefault(PreferenceConstants.ISSUE_TRACKER_EMAIL,
+            "biobank2@gmail.com");
+        store
+            .setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT, 25);
     }
 }

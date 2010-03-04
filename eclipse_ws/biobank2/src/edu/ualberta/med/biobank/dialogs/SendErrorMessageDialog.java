@@ -20,10 +20,8 @@ import javax.mail.internet.MimeMultipart;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ExpandAdapter;
 import org.eclipse.swt.events.ExpandEvent;
@@ -38,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
@@ -47,9 +45,6 @@ public class SendErrorMessageDialog extends BiobankDialog {
     private EMailDescriptor email;
 
     private int compositeHeight;
-
-    private static final BiobankLogger logger = BiobankLogger
-        .getLogger(SendErrorMessageDialog.class.getName());
 
     public SendErrorMessageDialog(Shell parentShell) {
         super(parentShell);
@@ -94,10 +89,10 @@ public class SendErrorMessageDialog extends BiobankDialog {
         GridData compData = new GridData(GridData.FILL_BOTH);
         compositeWithBar.setLayoutData(compData);
 
-        Text smtp = (Text) createBoundWidgetWithLabel(compositeWithBar,
-            Text.class, SWT.NONE, "Smtp server", new String[0], PojoObservables
-                .observeValue(email, "smtpServer"),
-            new NonEmptyStringValidator("Please enter the smtp server name"));
+        createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
+            "Smtp server", new String[0], PojoObservables.observeValue(email,
+                "smtpServer"), new NonEmptyStringValidator(
+                "Please enter the smtp server name"));
 
         createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
             "Port", new String[0], PojoObservables.observeValue(email,
@@ -113,11 +108,6 @@ public class SendErrorMessageDialog extends BiobankDialog {
             "Password", new String[0], PojoObservables.observeValue(email,
                 "serverPassword"), new NonEmptyStringValidator(
                 "Please enter the server password"));
-
-        createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
-            "Sender", new String[0], PojoObservables.observeValue(email,
-                "senderEmail"), new NonEmptyStringValidator(
-                "Please enter the sender email"));
 
         ExpandItem item = new ExpandItem(bar, SWT.NONE, 0);
         item.setText("Email configuration");
@@ -157,56 +147,40 @@ public class SendErrorMessageDialog extends BiobankDialog {
             BioBankPlugin.openAsyncError("Error in sending email", e);
             return;
         }
-        try {
-            registerMailInfo();
-        } catch (StorageException e) {
-            BioBankPlugin.openAsyncError("Error registering mailing info", e);
-        }
+        registerMailInfo();
         super.okPressed();
     }
 
-    private void registerMailInfo() throws StorageException {
-        ISecurePreferences node = getSecurePrefNode();
-        node.put("SmtpServer", email.getSmtpServer(), false);
-        node.put("serverPort", email.getServerPort(), false);
-        node.put("senderEmail", email.getSenderEmail(), false);
-        node.put("ServerUsername", email.getServerUsername(), false);
-        node.put("ReceiverEmail", email.getReceiverEmail(), false);
-        node.put("serverPassword", email.getServerPassword(), false); // FIXME
-        // should set to true
-    }
-
-    private ISecurePreferences getSecurePrefNode() {
-        ISecurePreferences securePreferences = SecurePreferencesFactory
-            .getDefault();
-        // securePreferences.
-        ISecurePreferences node = securePreferences.node("MailErrorPref");
-        return node;
+    private void registerMailInfo() {
+        IPreferenceStore node = BioBankPlugin.getDefault().getPreferenceStore();
+        node.putValue(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER, email
+            .getSmtpServer());
+        node.putValue(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT,
+            String.valueOf(email.getServerPort()));
+        node.putValue(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_USER, email
+            .getServerUsername());
+        node.putValue(PreferenceConstants.ISSUE_TRACKER_EMAIL, email
+            .getReceiverEmail());
     }
 
     private void initEmailDescriptor() {
-        ISecurePreferences node = getSecurePrefNode();
-
+        IPreferenceStore node = BioBankPlugin.getDefault().getPreferenceStore();
         email = new EMailDescriptor();
-        try {
-            email.setSmtpServer(node.get("SmtpServer", "smtp.company.ca"));
-            email.setServerPort(node.get("serverPort", "25"));
-            email.setSenderEmail(node.get("senderEmail",
-                "delphine.dard@gmail.com"));
-            email.setReceiverEmail(node.get("ReceiverEmail",
-                "degrisda@ualberta.ca"));
-            email
-                .setServerUsername(node.get("ServerUsername", "delphine.dard"));
-            email.setServerPassword(node.get("serverPassword", ""));
-        } catch (StorageException se) {
-            logger.debug("Can't retrieve mail stored information", se);
-        }
+        email.setSmtpServer(node
+            .getString(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER));
+        email.setServerPort(node
+            .getInt(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT));
+        email.setReceiverEmail(node
+            .getString(PreferenceConstants.ISSUE_TRACKER_EMAIL));
+        email.setServerUsername(node
+            .getString(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_USER));
     }
 
     private void sendMail() throws AddressException, MessagingException,
         IOException {
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
+        props.setProperty("mail.smtp.starttls.enable", "true");
         props.setProperty("mail.host", email.getSmtpServer());
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", email.getServerPort());
@@ -226,9 +200,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         session.setDebug(false);
 
         MimeMessage message = new MimeMessage(session);
-        message.setSender(new InternetAddress(email.getSenderEmail()));
         message.setSubject(email.getTitle());
-        // message.setContent(email.getDescription(), "text/plain");
+        message.setContent(email.getDescription(), "text/plain");
 
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(
             email.getReceiverEmail()));

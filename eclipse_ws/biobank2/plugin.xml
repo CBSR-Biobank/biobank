@@ -1406,9 +1406,9 @@
             name="Cabinet">
       </page>
       <page
-            class="org.eclipse.equinox.internal.security.ui.storage.StoragePreferencePage"
-            id="security"
-            name="security">
+            class="edu.ualberta.med.biobank.preferences.IssueTrackerPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="Issue Tracker">
       </page>
    </extension>
    <extension

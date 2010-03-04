@@ -28,4 +28,14 @@ public class PreferenceConstants {
 
     public static final String CABINET_CONTAINER_NAME_CONTAINS = "cabinet.container_name_contains";
 
+    public static final String ISSUE_TRACKER_EMAIL = "issue.tracker.email";
+
+    public static final String ISSUE_TRACKER_SMTP_SERVER = "issue.tracker.smtp.server";
+
+    public static final String ISSUE_TRACKER_SMTP_SERVER_PORT = "issue.tracker.smtp.server.port";
+
+    public static final String ISSUE_TRACKER_SMTP_SERVER_USER = "issue.tracker.smtp.server.user";
+
+    public static final String ISSUE_TRACKER_SMTP_SERVER_PASSWORD = "issue.tracker.smtp.server.password";
+
 }
