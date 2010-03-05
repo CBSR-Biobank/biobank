@@ -93,7 +93,13 @@ public class SampleWrapper extends
     private void checkParentAcceptSampleType() throws BiobankCheckException {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            List<SampleTypeWrapper> types = getParent().getContainerType()
+            ContainerTypeWrapper parentType = getParent().getContainerType();
+            try {
+                parentType.reload();
+            } catch (Exception e) {
+                throw new BiobankCheckException(e);
+            }
+            List<SampleTypeWrapper> types = parentType
                 .getSampleTypeCollection();
             if (types == null || !types.contains(getSampleType())) {
                 throw new BiobankCheckException("Container "
@@ -112,7 +118,7 @@ public class SampleWrapper extends
         return null;
     }
 
-    public void setPatientVisit(PatientVisit patientVisit) {
+    protected void setPatientVisit(PatientVisit patientVisit) {
         PatientVisit oldPV = patientVisit;
         wrappedObject.setPatientVisit(patientVisit);
         propertyChangeSupport.firePropertyChange("patientVisit", oldPV,
@@ -169,7 +175,7 @@ public class SampleWrapper extends
         return true;
     }
 
-    public void setSampleType(SampleType type) {
+    protected void setSampleType(SampleType type) {
         SampleType oldType = wrappedObject.getSampleType();
         wrappedObject.setSampleType(type);
         propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
@@ -246,7 +252,7 @@ public class SampleWrapper extends
         boolean addTopParentShortName) {
         RowColPos position = getPosition();
         if (position == null) {
-            return "none";
+            return null;
         }
 
         if (!fullString) {
@@ -259,29 +265,11 @@ public class SampleWrapper extends
         }
         String nameShort = topContainer.getContainerType().getNameShort();
         if (addTopParentShortName && nameShort != null)
-            return nameShort + "-" + directParent.getLabel()
-                + LabelingScheme.getPositionString(position, directParent);
+            return directParent.getLabel()
+                + LabelingScheme.getPositionString(position, directParent)
+                + " (" + nameShort + ")";
         return directParent.getLabel()
             + LabelingScheme.getPositionString(position, directParent);
-    }
-
-    public static SampleWrapper createNewSample(
-        WritableApplicationService appService, String inventoryId,
-        PatientVisitWrapper pv, SampleTypeWrapper type,
-        Collection<SampleStorageWrapper> sampleStorageWrappers) {
-        Sample sample = new Sample();
-        sample.setInventoryId(inventoryId);
-        sample.setPatientVisit(pv.getWrappedObject());
-        sample.setLinkDate(new Date());
-        sample.setSampleType(type.getWrappedObject());
-        Double volume = null;
-        for (SampleStorageWrapper ss : sampleStorageWrappers) {
-            if (ss.getSampleType().getId().equals(type.getId())) {
-                volume = ss.getVolume();
-            }
-        }
-        sample.setQuantity(volume);
-        return new SampleWrapper(appService, sample);
     }
 
     public void setQuantityFromType() {
@@ -336,52 +324,6 @@ public class SampleWrapper extends
                 ((SampleWrapper) o).getInventoryId());
         }
         return 0;
-    }
-
-    public static List<SampleWrapper> getRandomSamplesAlreadyLinked(
-        WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " as s where s.patientVisit.patient.study.site.id = ?", Arrays
-            .asList(new Object[] { siteId }));
-        List<Sample> samples = appService.query(criteria);
-        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
-        for (Sample sample : samples) {
-            list.add(new SampleWrapper(appService, sample));
-        }
-        return list;
-    }
-
-    public static List<SampleWrapper> getRandomSamplesAlreadyAssigned(
-        WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " as s where s in (select sp.sample from "
-            + SamplePosition.class.getName()
-            + " as sp) and s.patientVisit.patient.study.site.id = ?", Arrays
-            .asList(new Object[] { siteId }));
-        List<Sample> samples = appService.query(criteria);
-        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
-        for (Sample sample : samples) {
-            list.add(new SampleWrapper(appService, sample));
-        }
-        return list;
-    }
-
-    public static List<SampleWrapper> getRandomSamplesNotAssigned(
-        WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from " + Sample.class.getName()
-            + " as s where s not in (select sp.sample from "
-            + SamplePosition.class.getName()
-            + " as sp) and s.patientVisit.patient.study.site.id = ?", Arrays
-            .asList(new Object[] { siteId }));
-        List<Sample> samples = appService.query(criteria);
-        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
-        for (Sample sample : samples) {
-            list.add(new SampleWrapper(appService, sample));
-        }
-        return list;
     }
 
     @Override

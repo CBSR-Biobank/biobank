@@ -29,27 +29,22 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
 
     @Override
     public boolean performDrop(Object data) {
-        boolean result = true;
-
-        MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
-        if (target == null)
-            target = (MultiSelectNode) getViewer().getInput();
-
-        MultiSelectNode[] nodes = (MultiSelectNode[]) data;
-
         TreeViewer viewer = (TreeViewer) getViewer();
+        MultiSelectNode target = (MultiSelectNode) getCurrentTarget();
+        MultiSelectNode targetParent;
 
-        for (MultiSelectNode node : nodes) {
-            if (target.getParent() == null) {
-                target.addChild(node);
+        if (target != null) {
+            targetParent = target.getParent();
+        } else {
+            targetParent = (MultiSelectNode) getViewer().getInput();
+        }
 
-            } else {
-                target.getParent().insertAfter(target, node);
-            }
+        for (MultiSelectNode node : (MultiSelectNode[]) data) {
+            targetParent.addChild(node);
             viewer.reveal(node);
         }
         multiSelect.notifyListeners();
-        return result;
+        return true;
     }
 
     @Override

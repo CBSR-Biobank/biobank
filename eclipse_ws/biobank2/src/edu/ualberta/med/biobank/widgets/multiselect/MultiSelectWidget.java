@@ -1,19 +1,23 @@
 package edu.ualberta.med.biobank.widgets.multiselect;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.apache.commons.collections.MapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
@@ -23,6 +27,10 @@ public class MultiSelectWidget extends BiobankWidget {
     private TreeViewer selTree;
 
     private TreeViewer availTree;
+
+    private Button moveRightButton;
+
+    private Button moveLeftButton;
 
     private MultiSelectNode selTreeRootNode = new MultiSelectNode(null, 0,
         "selRoot");
@@ -38,18 +46,62 @@ public class MultiSelectWidget extends BiobankWidget {
 
         this.minHeight = minHeight;
 
-        setLayout(new GridLayout(2, false));
+        setLayout(new GridLayout(3, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        selTree = createLabelledTree(this, leftLabel);
-        selTree.setInput(selTreeRootNode);
-        selTree.setComparator(new ViewerComparator());
         availTree = createLabelledTree(this, rightLabel);
         availTree.setInput(availTreeRootNode);
         availTree.setComparator(new ViewerComparator());
 
+        Composite moveComposite = new Composite(this, SWT.NONE);
+        moveComposite.setLayout(new GridLayout(1, false));
+        moveComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
+            false, true));
+        moveRightButton = new Button(moveComposite, SWT.PUSH);
+        moveRightButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_ARROW_RIGHT));
+        moveRightButton.setToolTipText("Move to selected");
+        moveLeftButton = new Button(moveComposite, SWT.PUSH);
+        moveLeftButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_ARROW_LEFT));
+        moveLeftButton.setToolTipText("Remove from selected");
+
+        selTree = createLabelledTree(this, leftLabel);
+        selTree.setInput(selTreeRootNode);
+        selTree.setComparator(new ViewerComparator());
+
         dragAndDropSupport(availTree, selTree);
         dragAndDropSupport(selTree, availTree);
+
+        moveRightButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                moveTreeViewerSelection(availTree, selTree);
+            }
+        });
+
+        moveLeftButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                moveTreeViewerSelection(selTree, availTree);
+            }
+        });
+    }
+
+    private void moveTreeViewerSelection(TreeViewer srcTree, TreeViewer destTree) {
+        MultiSelectNode srcRootNode = (MultiSelectNode) srcTree.getInput();
+        MultiSelectNode destRootNode = (MultiSelectNode) destTree.getInput();
+        List<?> fromSelection = ((IStructuredSelection) srcTree.getSelection())
+            .toList();
+
+        for (Object obj : fromSelection) {
+            MultiSelectNode node = (MultiSelectNode) obj;
+            destRootNode.addChild(node);
+            srcRootNode.removeChild(node);
+            destTree.reveal(node);
+            srcTree.refresh();
+        }
+
     }
 
     private TreeViewer createLabelledTree(Composite parent, String label) {
@@ -83,16 +135,15 @@ public class MultiSelectWidget extends BiobankWidget {
         new TreeViewerDropListener(toList, this);
     }
 
-    public void addSelections(ListOrderedMap available, List<Integer> selected) {
-        MapIterator it = available.mapIterator();
-        while (it.hasNext()) {
-            Integer key = (Integer) it.next();
+    public void addSelections(LinkedHashMap<Integer, String> available,
+        List<Integer> selected) {
+        for (Integer key : available.keySet()) {
             if (selected.contains(key)) {
                 selTreeRootNode.addChild(new MultiSelectNode(selTreeRootNode,
-                    key, (String) it.getValue()));
+                    key, available.get(key)));
             } else {
                 availTreeRootNode.addChild(new MultiSelectNode(
-                    availTreeRootNode, key, (String) it.getValue()));
+                    availTreeRootNode, key, available.get(key)));
             }
         }
     }
@@ -100,10 +151,13 @@ public class MultiSelectWidget extends BiobankWidget {
     /**
      * same as addSelections but remove previously set elements
      */
-    public void setSelections(ListOrderedMap available, List<Integer> selected) {
+    public void setSelections(LinkedHashMap<Integer, String> available,
+        List<Integer> selected) {
         selTreeRootNode.clear();
         availTreeRootNode.clear();
         addSelections(available, selected);
+        selTreeRootNode.reset();
+        availTreeRootNode.reset();
     }
 
     /**
@@ -113,6 +167,22 @@ public class MultiSelectWidget extends BiobankWidget {
     public List<Integer> getSelected() {
         List<Integer> result = new ArrayList<Integer>();
         for (MultiSelectNode node : selTreeRootNode.getChildren()) {
+            result.add(new Integer(node.getId()));
+        }
+        return result;
+    }
+
+    public List<Integer> getAddedToSelection() {
+        List<Integer> result = new ArrayList<Integer>();
+        for (MultiSelectNode node : selTreeRootNode.getAddedChildren()) {
+            result.add(new Integer(node.getId()));
+        }
+        return result;
+    }
+
+    public List<Integer> getRemovedToSelection() {
+        List<Integer> result = new ArrayList<Integer>();
+        for (MultiSelectNode node : selTreeRootNode.getRemovedChildren()) {
             result.add(new Integer(node.getId()));
         }
         return result;

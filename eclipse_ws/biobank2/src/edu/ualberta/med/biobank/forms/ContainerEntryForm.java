@@ -4,19 +4,22 @@ import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -104,7 +107,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        Text siteLabel = createReadOnlyField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, containerWrapper.getSite().getName());
 
@@ -117,8 +120,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     containerWrapper, "label"), new NonEmptyStringValidator(
                     MSG_CONTAINER_NAME_EMPTY));
         } else {
-            Label l = (Label) createWidget(client, Label.class, SWT.NONE,
-                "Label");
+            Text l = createReadOnlyField(client, SWT.NONE, "Label");
             setTextValue(l, containerWrapper.getLabel());
         }
 
@@ -161,7 +163,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         containerTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Container Type", containerTypes, currentContainerType,
-            MSG_CONTAINER_TYPE_EMPTY);
+            MSG_CONTAINER_TYPE_EMPTY, true);
         containerTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -180,7 +182,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 }
             });
-        containerTypeComboViewer.setComparator(new ViewerComparator());
         tempWidget = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.NONE, "Temperature (Celcius)", null, BeansObservables
                 .observeValue(containerWrapper, "temperature"),
@@ -223,9 +224,43 @@ public class ContainerEntryForm extends BiobankEntryForm {
             ContainerTypeWrapper containerType = (ContainerTypeWrapper) ((StructuredSelection) containerTypeComboViewer
                 .getSelection()).getFirstElement();
             containerWrapper.setContainerType(containerType);
-            containerWrapper.persist();
+            IRunnableContext context = new ProgressMonitorDialog(Display
+                .getDefault().getActiveShell());
+            context.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    Thread t = new Thread("Querying") {
+                        @Override
+                        public void run() {
+                            try {
+                                containerWrapper.persist();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    monitor.beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                    t.start();
+                    while (true) {
+                        if (!t.isAlive()) {
+                            Display.getDefault().syncExec(new Runnable() {
+                                public void run() {
+                                    monitor.done();
+                                }
+                            });
+                            break;
+                        } else
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                    }
+                }
+            });
+
             if (newName) {
-                // containerWrapper.assignChildLabels(oldContainerLabel);
                 containerWrapper.reload();
                 containerAdapter.rebuild();
                 containerAdapter.performExpand();

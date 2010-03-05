@@ -186,6 +186,13 @@
             id="edu.ualberta.med.biobank.commands.shipmentAdmin"
             name="Shipment administration">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.sessionReload"
+            name="Session Reload">
+      </command>
+      <command id="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
+            name="Delete tree view selection">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -450,6 +457,28 @@
                </reference>
                <reference
                      definitionId="biobank2.siteSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
+            commandId="edu.ualberta.med.biobank.commands.sessionReload">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SessionDeleteSelectionHandler"      
+            commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
                </reference>
             </and>
          </activeWhen>
@@ -801,8 +830,11 @@
                </visibleWhen>
             </command>
          </toolbar>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:edu.ualberta.med.biobank.toolbar.view">
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.mainPerpective">
+               id="edu.ualberta.med.biobank.views.SessionsView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
@@ -851,9 +883,23 @@
                   </reference>
                </visibleWhen>
             </command>
-         </toolbar> 
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.sessionReload"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload Session">
+            </command>
+         </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.patientsPerspective">
+               id="edu.ualberta.med.biobank.views.patientsAdmin">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
@@ -934,15 +980,26 @@
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.main">
          <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.SessionsView"
                minimized="false"
                moveable="false"
-               ratio="0.5"
+               ratio="0.3"
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
-               standalone="true"
+               standalone="false"
                visible="true">
          </view>
          
@@ -950,13 +1007,36 @@
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.reports">
          <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.ReportsView"
                minimized="false"
                moveable="false"
-               ratio="0.5"
+               ratio="0.95"
                relationship="left"
                relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.AdvancedReportsView"
+               minimized="false"
+               moveable="false"
+               ratio="0.95"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.ReportsView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -964,6 +1044,17 @@
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.patients">
+         <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
          <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.patientsAdmin"
@@ -991,9 +1082,31 @@
                standalone="true"
                visible="true">
          </view>
+         <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.shipments">
+         <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
          <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.shipmentAdmin"
@@ -1329,6 +1442,14 @@
             name="Reports"
             restorable="true">
       </view>
+       <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            id="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            icon="icons/reportsPerspective.png"
+            name="Advanced Reports"
+            restorable="true">
+      </view>
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
@@ -1448,5 +1569,11 @@
             </count>
          </with>
       </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="edu.ualberta.med.biobank.rcp.BiobankStartup">
+      </startup>
    </extension>
 </plugin>

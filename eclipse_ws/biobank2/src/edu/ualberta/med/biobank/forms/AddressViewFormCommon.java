@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -16,12 +17,17 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
 
     protected void createAddressArea(Composite parent,
         ModelWrapper<?> wrapperObject) {
-        createWidgetsFromMap(AddressEntryFormCommon.ADDRESS_FIELDS, parent);
+        FieldInfo field;
+        for (String widgetName : AddressEntryFormCommon.ADDRESS_FIELDS.keySet()) {
+            field = AddressEntryFormCommon.ADDRESS_FIELDS.get(widgetName);
+            addWidget(widgetName, createReadOnlyField(parent, SWT.NONE,
+                field.label));
+        }
         setAdressValues(wrapperObject);
     }
 
     protected void setAdressValues(ModelWrapper<?> wrapperObject) {
-        setWidgetsValues(AddressEntryFormCommon.ADDRESS_FIELDS, wrapperObject);
+        setWidgetValues(AddressEntryFormCommon.ADDRESS_FIELDS, wrapperObject);
     }
 
 }

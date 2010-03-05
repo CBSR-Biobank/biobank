@@ -9,11 +9,14 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ClinicAdapter extends AdapterBase {
+
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this clinic?";
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
@@ -31,13 +34,18 @@ public class ClinicAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         ClinicWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper.getWrappedObject(), "client is null");
+        Assert.isNotNull(wrapper, "client is null");
         return wrapper.getName();
     }
 
     @Override
     public String getTooltipText() {
-        return parent.getParent().getLabel() + " - " + getTooltipText("Clinic");
+        ClinicWrapper clinic = getWrapper();
+        SiteWrapper site = clinic.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Clinic");
+        }
+        return getTooltipText("Clinic");
     }
 
     @Override
@@ -49,8 +57,17 @@ public class ClinicAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Clinic", ClinicEntryForm.ID);
         addViewMenu(menu, "Clinic", ClinicViewForm.ID);
-        addDeleteMenu(menu, "Clinic",
-            "Are you sure you want to delete this clinic?");
+        addDeleteMenu(menu, "Clinic", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     @Override

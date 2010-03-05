@@ -95,9 +95,10 @@ by AICML
       <plugin id="org.eclipse.ui.cocoa" fragment="true"/>
       <plugin id="org.eclipse.ui.console"/>
       <plugin id="org.eclipse.ui.forms"/>
+      <plugin id="org.eclipse.ui.views.log"/>
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
-      <plugin id="sampleProcessingRobot"/>
+      <plugin id="sampleProcessingRobot" fragment=""/>
       <plugin id="scannerConfig"/>
    </plugins>
 

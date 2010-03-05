@@ -2,22 +2,25 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -34,9 +37,9 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.ITableInfo;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -50,8 +53,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class BiobankFormBase extends EditorPart {
 
-    private static Logger LOGGER = Logger.getLogger(BiobankFormBase.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankFormBase.class.getName());
 
     protected WritableApplicationService appService;
 
@@ -63,40 +66,53 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected ScrolledForm form;
 
-    protected HashMap<String, Control> controls = new HashMap<String, Control>();
+    private Map<String, Control> widgets;
 
     protected WidgetCreator widgetCreator;
 
     protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
         public void doubleClick(DoubleClickEvent event) {
             Object selection = event.getSelection();
-            Object element = ((StructuredSelection) selection)
-                .getFirstElement();
-            if (element instanceof AdapterBase) {
-                ((AdapterBase) element).performDoubleClick();
-            } else if (element instanceof BiobankCollectionModel) {
-                BiobankCollectionModel item = (BiobankCollectionModel) element;
-                if (item.o != null) {
-                    if (item.o instanceof AdapterBase) {
-                        ((AdapterBase) item.o).performDoubleClick();
-                    } else if (item.o instanceof ModelWrapper<?>) {
-                        SessionManager.openViewForm((ModelWrapper<?>) item.o);
-                    } else if (item.o instanceof ITableInfo) {
-                        SessionManager.openViewForm(((ITableInfo) item.o)
-                            .getDisplayedWrapper());
-                    }
+            if (selection instanceof StructuredSelection) {
+                Object element = ((StructuredSelection) selection)
+                    .getFirstElement();
+                if (element instanceof AdapterBase) {
+                    ((AdapterBase) element).performDoubleClick();
+                }
+            } else if (selection instanceof InfoTableSelection) {
+                InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                if (tableSelection.getObject() instanceof ModelWrapper<?>) {
+                    SessionManager
+                        .openViewForm((ModelWrapper<?>) tableSelection
+                            .getObject());
                 }
             }
         }
     };
 
     public BiobankFormBase() {
-        widgetCreator = new WidgetCreator(controls);
+        widgets = new HashMap<String, Control>();
+        widgetCreator = new WidgetCreator(widgets);
+    }
+
+    protected void addWidget(String widgetName, Control widget) {
+        widgets.put(widgetName, widget);
+    }
+
+    protected Control getWidget(String widgetName) {
+        return widgets.get(widgetName);
     }
 
     @Override
     public void setFocus() {
-        SessionManager.setSelectedNode(adapter);
+        if (adapter.getId() != null) {
+            SessionManager.setSelectedNode(adapter);
+            // if selection fails, then the adapter needs to be matched at the
+            // id level
+            if (SessionManager.getSelectedNode() == null)
+                SessionManager.setSelectedNode(SessionManager
+                    .searchNode(adapter.getModelObject()));
+        }
     }
 
     @Override
@@ -131,7 +147,7 @@ public abstract class BiobankFormBase extends EditorPart {
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+            logger.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 
@@ -163,8 +179,9 @@ public abstract class BiobankFormBase extends EditorPart {
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    BioBankPlugin.openError(
-                        "BioBankFormBase.createPartControl Error", e);
+                    BioBankPlugin
+                        .openError("BioBankFormBase.createPartControl Error", e
+                            .toString());
                 }
             }
         });
@@ -204,6 +221,21 @@ public abstract class BiobankFormBase extends EditorPart {
         return sectionAddClient(createSection(title));
     }
 
+    protected void addSectionToolbar(Section section, String tooltip,
+        SelectionListener listener) {
+        ToolBar tbar = (ToolBar) section.getTextClient();
+        if (tbar == null) {
+            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+            section.setTextClient(tbar);
+        }
+
+        ToolItem titem = new ToolItem(tbar, SWT.NULL);
+        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        titem.setToolTipText(tooltip);
+        titem.addSelectionListener(listener);
+    }
+
     public FormToolkit getToolkit() {
         return toolkit;
     }
@@ -230,18 +262,30 @@ public abstract class BiobankFormBase extends EditorPart {
             null);
     }
 
-    protected void createWidgetsFromMap(ListOrderedMap fieldsMap,
+    protected void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Composite parent) {
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
 
-    public static void setTextValue(Label label, String value) {
+    protected Text createReadOnlyField(Composite parent, int widgetOptions,
+        String fieldLabel, String value) {
+        Text result = (Text) createWidget(parent, Text.class, SWT.READ_ONLY
+            | widgetOptions, fieldLabel, value);
+        return result;
+    }
+
+    protected Text createReadOnlyField(Composite parent, int widgetOptions,
+        String fieldLabel) {
+        return createReadOnlyField(parent, widgetOptions, fieldLabel, null);
+    }
+
+    public static void setTextValue(Text label, String value) {
         if (value != null && !label.isDisposed()) {
             label.setText(value);
         }
     }
 
-    public static void setTextValue(Label label, Object value) {
+    public static void setTextValue(Text label, Object value) {
         if (value != null) {
             setTextValue(label, value.toString());
         }

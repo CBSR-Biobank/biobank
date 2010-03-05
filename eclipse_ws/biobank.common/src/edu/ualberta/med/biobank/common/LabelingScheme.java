@@ -36,12 +36,18 @@ public class LabelingScheme {
      * Get the index corresponding to the given label, using the CBSR labelling.
      * Use the 2 last character in case we have a full position string
      * (01AA01A2).
+     * 
+     * @throws Exception
      */
-    private static int cbsrTwoCharToInt(String label) {
+    private static int cbsrTwoCharToInt(String label) throws Exception {
         int len = label.length();
-        return CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 2))
-            * CBSR_LABELLING_PATTERN.length()
-            + CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
+        int index1 = CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
+        int index2 = CBSR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
+        if ((index1 < 0) || (index2 < 0)) {
+            throw new Exception(
+                "Invalid characters in label. Are they in upper case?");
+        }
+        return index1 * CBSR_LABELLING_PATTERN.length() + index2;
     }
 
     /**

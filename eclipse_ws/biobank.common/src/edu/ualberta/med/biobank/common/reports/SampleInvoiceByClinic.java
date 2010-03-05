@@ -25,4 +25,9 @@ public class SampleInvoiceByClinic extends QueryObject {
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 }

@@ -1,8 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.apache.commons.collections.MapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.log4j.Logger;
+import java.util.Map;
+
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
@@ -22,6 +21,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -33,8 +33,8 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
 
-    private static Logger LOGGER = Logger.getLogger(BiobankViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankViewForm.class.getName());
 
     protected String sessionName;
 
@@ -58,7 +58,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 try {
                     reload();
                 } catch (Exception e) {
-                    LOGGER.error("Error sending event", e);
+                    logger.error("Error sending event", e);
                 }
             }
         };
@@ -87,19 +87,17 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         return false;
     }
 
-    protected void setWidgetsValues(ListOrderedMap fieldsMap, Object bean) {
-        MapIterator it = fieldsMap.mapIterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
-            FieldInfo fi = (FieldInfo) it.getValue();
-            IObservableValue ov = BeansObservables.observeValue(bean, key);
+    protected void setWidgetValues(Map<String, FieldInfo> fieldsMap, Object bean) {
+        for (String label : fieldsMap.keySet()) {
+            FieldInfo fi = fieldsMap.get(label);
+            IObservableValue ov = BeansObservables.observeValue(bean, label);
             Object value = ov.getValue();
             if (value != null) {
-                Control control = controls.get(key);
+                Control widget = getWidget(label);
                 if ((fi.widgetClass == Combo.class)
                     || (fi.widgetClass == Text.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((Label) control).setText((String) value);
+                    ((Text) widget).setText((String) value);
                 }
             }
         }
@@ -116,7 +114,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                         } catch (final RemoteConnectFailureException exp) {
                             BioBankPlugin.openRemoteConnectErrorMessage();
                         } catch (Exception e) {
-                            LOGGER.error(
+                            logger.error(
                                 "BioBankFormBase.createPartControl Error", e);
                         }
                     }
@@ -126,7 +124,8 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         reloadAction.setImageDescriptor(reloadActionImage);
         form.getToolBarManager().add(reloadAction);
 
-        if (adapter.isEditable()) {
+        final String entryFormId = getEntryFormId();
+        if (adapter.isEditable() && entryFormId != null) {
             Action edit = new Action("Edit") {
                 @Override
                 public void run() {
@@ -136,7 +135,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                                 getSite().getPage().closeEditor(
                                     BiobankViewForm.this, false);
                                 AdapterBase.openForm(new FormInput(adapter),
-                                    getEntryFormId());
+                                    entryFormId);
                             }
                         });
                 }

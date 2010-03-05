@@ -24,7 +24,7 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "quantity", "patientVisit", "sampleSource",
-            "patientCollection" };
+            "patientCollection", "dateDrawn" };
     }
 
     @Override
@@ -61,14 +61,11 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         return new PatientVisitWrapper(appService, p);
     }
 
-    public void setPatientVisit(PatientVisit visit) {
-        PatientVisitWrapper old = getPatientVisit();
-        wrappedObject.setPatientVisit(visit);
-        propertyChangeSupport.firePropertyChange("patientVisit", old, visit);
-    }
-
     public void setPatientVisit(PatientVisitWrapper visit) {
-        setPatientVisit(visit.wrappedObject);
+        PatientVisit oldPv = wrappedObject.getPatientVisit();
+        PatientVisit newPv = visit.wrappedObject;
+        wrappedObject.setPatientVisit(newPv);
+        propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
     }
 
     public Date getDateDrawn() {
@@ -93,7 +90,7 @@ public class PvSampleSourceWrapper extends ModelWrapper<PvSampleSource> {
         return new SampleSourceWrapper(appService, ss);
     }
 
-    public void setSampleSource(SampleSource ss) {
+    protected void setSampleSource(SampleSource ss) {
         SampleSource oldSs = wrappedObject.getSampleSource();
         wrappedObject.setSampleSource(ss);
         propertyChangeSupport.firePropertyChange("sampleSource", oldSs, ss);

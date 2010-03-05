@@ -42,12 +42,8 @@ public class ContainerTypeGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                ContainerTypeWrapper ct = new ContainerTypeWrapper(
-                    getAppService());
-                ct.setSite(getParentFromClass(SiteAdapter.class).getWrapper());
-                ContainerTypeAdapter adapter = new ContainerTypeAdapter(
-                    ContainerTypeGroup.this, ct);
-                openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);
+                addContainerType(ContainerTypeGroup.this
+                    .getParentFromClass(SiteAdapter.class));
             }
         });
     }
@@ -86,6 +82,15 @@ public class ContainerTypeGroup extends AdapterBase {
     @Override
     public void notifyListeners(AdapterChangedEvent event) {
         getParent().notifyListeners(event);
+    }
+
+    public static void addContainerType(SiteAdapter siteAdapter) {
+        ContainerTypeWrapper ct = new ContainerTypeWrapper(siteAdapter
+            .getAppService());
+        ct.setSite(siteAdapter.getWrapper());
+        ContainerTypeAdapter adapter = new ContainerTypeAdapter(siteAdapter
+            .getContainerTypesGroupNode(), ct);
+        openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);
     }
 
 }

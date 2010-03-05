@@ -87,6 +87,25 @@ public class Configuration {
         return !configValue.equals("no");
     }
 
+    public boolean importCabinetDrawer(String drawerLabel) throws Exception {
+        if (drawerLabel.length() < 4) {
+            throw new Exception(
+                "invalid length for drawer label. should be 4 characters: "
+                    + drawerLabel);
+        }
+
+        String configValue;
+        if (drawerLabel.length() == 4) {
+            configValue = importCabinets.get(Integer.valueOf(drawerLabel
+                .substring(0, 2)));
+        } else {
+            throw new Exception("invalid hotel label: " + drawerLabel);
+        }
+
+        return (configValue.equals("yes") || configValue.contains(drawerLabel
+            .subSequence(2, 4)));
+    }
+
     public boolean importFreezers() {
         boolean result = false;
         for (String configValue : importFreezers.values()) {

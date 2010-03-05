@@ -18,13 +18,12 @@ public class CbsrContainerTypes {
         "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
         "Colon, A", "Colon, T", };
 
-    private static String[] box81SampleTypes = new String[] { "Plasma",
-        "Paxgene", "Cells", "Urine", "Dialysate", "Effluent", "Serum",
-        "F Nails", "BC", "T Nails", "WBE", "RNA Biopsy", "HB", "F Urine",
-        "Serum B", "C Urine", "Z Urine", "S Water", "Plasma SH", "WB Serum",
-        "Serum Pel", "WBlood", "WB RNA", "WB Plasma", "CBMC", "CBMC RNA",
-        "Meconium", "WB DMSO", "PF Plasma", "Lith Hep Plasma", "CDPA Plasma",
-        "T Water" };
+    private static String[] box81SampleTypes = new String[] { "BC", "C Urine",
+        "CBMC RNA", "CBMC", "CDPA Plasma", "Cells", "Dialysate", "Effluent",
+        "F Nails", "F Urine", "HB", "Lith Hep Plasma", "Meconium", "PF Plasma",
+        "Paxgene", "Plasma SH", "Plasma", "RNA Biopsy", "S Water", "Serum B",
+        "Serum Pel", "Serum", "T Nails", "T Water", "Urine", "WB DMSO",
+        "WB Plasma", "WB RNA", "WB Serum", "WBE", "WBlood", "Z Urine" };
 
     private static String[] cellPallet96SampleTypes = new String[] { "Cells" };
 
@@ -33,15 +32,14 @@ public class CbsrContainerTypes {
 
     private static String[] hairBinSampleTypes = new String[] { "Hair" };
 
-    private static String[] pallet96SampleTypes = new String[] { "Plasma",
-        "Paxgene", "Cells", "Urine", "Dialysate", "Effluent", "Serum",
-        "F Nails", "BC", "T Nails", "WBE", "RNA Biopsy", "HB", "F Urine",
-        "Serum B", "C Urine", "Z Urine", "S Water", "Plasma SH", "WB Serum",
-        "Serum Pel", "WBlood", "WB RNA", "WB Plasma", "CBMC", "CBMC RNA",
-        "Meconium", "WB DMSO", "PF Plasma", "Lith Hep Plasma", "CDPA Plasma",
-        "T Water"
-
-    };
+    private static String[] pallet96SampleTypes = new String[] { "BC",
+        "C Urine", "CBMC RNA", "CBMC", "CDPA Plasma", "Cells", "Dialysate",
+        "Effluent", "F Nails", "F Urine", "HB", "Lith Hep Plasma", "Meconium",
+        "PF Plasma", "Paxgene", "Plasma SH", "Plasma", "R-ColonA", "R-ColonD",
+        "R-ColonT", "R-Duodenum", "R-Ilieum", "R-Jejunum", "R-StomachA",
+        "R-StomachB", "RNA Biopsy", "RNA Biopsy", "S Water", "Serum B",
+        "Serum Pel", "Serum", "T Nails", "T Water", "Urine", "WB DMSO",
+        "WB Plasma", "WB RNA", "WB Serum", "WBE", "WBlood", "Z Urine" };
 
     public static ContainerTypeWrapper getContainerType(String name)
         throws Exception {
@@ -145,7 +143,7 @@ public class CbsrContainerTypes {
         ct.setChildLabelingScheme(childLabelingScheme);
 
         if (children != null) {
-            ct.setChildContainerTypeCollection(children);
+            ct.addChildContainerTypes(children);
         }
 
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -154,7 +152,7 @@ public class CbsrContainerTypes {
                 .getSampleType(sampleTypeName);
             list.add(sampleType);
         }
-        ct.setSampleTypeCollection(list);
+        ct.addSampleTypes(list);
         ct.persist();
         ct.reload();
         containerTypeMap.put(name, ct);

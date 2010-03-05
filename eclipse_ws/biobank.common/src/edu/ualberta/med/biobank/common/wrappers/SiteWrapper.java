@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
@@ -30,6 +32,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
     private static Map<String, PvAttrTypeWrapper> pvAttrTypeMap;
 
     private Map<String, SitePvAttrWrapper> sitePvAttrMap;
+
+    private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
+
+    private Set<SitePvAttrWrapper> deletedSitePvAttr = new HashSet<SitePvAttrWrapper>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
@@ -267,31 +273,29 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    private void setStudyCollection(Collection<Study> studies, boolean setNull) {
-        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-        wrappedObject.setStudyCollection(studies);
-        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
-            studies);
-        if (setNull) {
-            propertiesMap.put("studyCollection", null);
+    public void addStudies(List<StudyWrapper> studies) {
+        if (studies != null && studies.size() > 0) {
+            Collection<Study> allStudyObjects = new HashSet<Study>();
+            List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+            // already added studies
+            List<StudyWrapper> currentList = getStudyCollection();
+            if (currentList != null) {
+                for (StudyWrapper study : currentList) {
+                    allStudyObjects.add(study.getWrappedObject());
+                    allStudyWrappers.add(study);
+                }
+            }
+            // new studies added
+            for (StudyWrapper study : studies) {
+                allStudyObjects.add(study.getWrappedObject());
+                allStudyWrappers.add(study);
+            }
+            Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+            wrappedObject.setStudyCollection(allStudyObjects);
+            propertyChangeSupport.firePropertyChange("studyCollection",
+                oldStudies, allStudyObjects);
+            propertiesMap.put("studyCollection", allStudyWrappers);
         }
-    }
-
-    public void addStudies(StudyWrapper... studies) {
-        Collection<Study> allStudyObjects = new HashSet<Study>();
-        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-        // already added studies
-        for (StudyWrapper study : getStudyCollection()) {
-            allStudyObjects.add(study.getWrappedObject());
-            allStudyWrappers.add(study);
-        }
-        // new studies added
-        for (StudyWrapper study : studies) {
-            allStudyObjects.add(study.getWrappedObject());
-            allStudyWrappers.add(study);
-        }
-        setStudyCollection(allStudyObjects, false);
-        propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -317,31 +321,29 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getClinicCollection(true);
     }
 
-    private void setClinicCollection(Collection<Clinic> clinics, boolean setNull) {
-        Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
-        wrappedObject.setClinicCollection(clinics);
-        propertyChangeSupport.firePropertyChange("clinicCollection",
-            oldClinics, clinics);
-        if (setNull) {
-            propertiesMap.put("clinicCollection", null);
+    public void addClinics(List<ClinicWrapper> clinics) {
+        if (clinics != null && clinics.size() > 0) {
+            Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
+            List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
+            // already added clinics
+            List<ClinicWrapper> currentList = getClinicCollection();
+            if (currentList != null) {
+                for (ClinicWrapper clinic : currentList) {
+                    allClinicObjects.add(clinic.getWrappedObject());
+                    allClinicWrappers.add(clinic);
+                }
+            }
+            // new clinics
+            for (ClinicWrapper clinic : clinics) {
+                allClinicObjects.add(clinic.getWrappedObject());
+                allClinicWrappers.add(clinic);
+            }
+            Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
+            wrappedObject.setClinicCollection(allClinicObjects);
+            propertyChangeSupport.firePropertyChange("clinicCollection",
+                oldClinics, allClinicObjects);
+            propertiesMap.put("clinicCollection", allClinicWrappers);
         }
-    }
-
-    public void addClinics(ClinicWrapper... clinics) {
-        Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
-        List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
-        // already added clinics
-        for (ClinicWrapper clinic : getClinicCollection()) {
-            allClinicObjects.add(clinic.getWrappedObject());
-            allClinicWrappers.add(clinic);
-        }
-        // new clinics
-        for (ClinicWrapper clinic : clinics) {
-            allClinicObjects.add(clinic.getWrappedObject());
-            allClinicWrappers.add(clinic);
-        }
-        setClinicCollection(allClinicObjects, false);
-        propertiesMap.put("clinicCollection", allClinicWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -370,33 +372,30 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getContainerTypeCollection(false);
     }
 
-    private void setContainerTypeCollection(Collection<ContainerType> types,
-        boolean setNull) {
-        Collection<ContainerType> oldTypes = wrappedObject
-            .getContainerTypeCollection();
-        wrappedObject.setContainerTypeCollection(types);
-        propertyChangeSupport.firePropertyChange("containerTypeCollection",
-            oldTypes, types);
-        if (setNull) {
-            propertiesMap.put("containerTypeCollection", null);
+    public void addContainerTypes(List<ContainerTypeWrapper> types) {
+        if (types != null && types.size() > 0) {
+            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
+            List<ContainerTypeWrapper> allTypeWrappers = new ArrayList<ContainerTypeWrapper>();
+            // already added types
+            List<ContainerTypeWrapper> currentList = getContainerTypeCollection();
+            if (currentList != null) {
+                for (ContainerTypeWrapper type : currentList) {
+                    allTypeObjects.add(type.getWrappedObject());
+                    allTypeWrappers.add(type);
+                }
+            }
+            // new types
+            for (ContainerTypeWrapper type : types) {
+                allTypeObjects.add(type.getWrappedObject());
+                allTypeWrappers.add(type);
+            }
+            Collection<ContainerType> oldTypes = wrappedObject
+                .getContainerTypeCollection();
+            wrappedObject.setContainerTypeCollection(allTypeObjects);
+            propertyChangeSupport.firePropertyChange("containerTypeCollection",
+                oldTypes, allTypeObjects);
+            propertiesMap.put("containerTypeCollection", allTypeWrappers);
         }
-    }
-
-    public void addContainerTypes(ContainerTypeWrapper... types) {
-        Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-        List<ContainerTypeWrapper> allTypeWrappers = new ArrayList<ContainerTypeWrapper>();
-        // already added types
-        for (ContainerTypeWrapper type : getContainerTypeCollection()) {
-            allTypeObjects.add(type.getWrappedObject());
-            allTypeWrappers.add(type);
-        }
-        // new types
-        for (ContainerTypeWrapper type : types) {
-            allTypeObjects.add(type.getWrappedObject());
-            allTypeWrappers.add(type);
-        }
-        setContainerTypeCollection(allTypeObjects, false);
-        propertiesMap.put("containerTypeCollection", allTypeWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -418,33 +417,30 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return containerCollection;
     }
 
-    private void setContainerCollection(Collection<Container> containers,
-        boolean setNull) {
-        Collection<Container> oldContainers = wrappedObject
-            .getContainerCollection();
-        wrappedObject.setContainerCollection(containers);
-        propertyChangeSupport.firePropertyChange("containerCollection",
-            oldContainers, containers);
-        if (setNull) {
-            propertiesMap.put("containerCollection", null);
+    public void addContainers(List<ContainerWrapper> containers) {
+        if (containers != null && containers.size() > 0) {
+            Collection<Container> allContainerObjects = new HashSet<Container>();
+            List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
+            // already added containers
+            List<ContainerWrapper> currentList = getContainerCollection();
+            if (currentList != null) {
+                for (ContainerWrapper container : currentList) {
+                    allContainerObjects.add(container.getWrappedObject());
+                    allContainerWrappers.add(container);
+                }
+            }
+            // new containers
+            for (ContainerWrapper container : containers) {
+                allContainerObjects.add(container.getWrappedObject());
+                allContainerWrappers.add(container);
+            }
+            Collection<Container> oldContainers = wrappedObject
+                .getContainerCollection();
+            wrappedObject.setContainerCollection(allContainerObjects);
+            propertyChangeSupport.firePropertyChange("containerCollection",
+                oldContainers, allContainerObjects);
+            propertiesMap.put("containerCollection", allContainerWrappers);
         }
-    }
-
-    public void addContainers(ContainerWrapper... containers) {
-        Collection<Container> allContainerObjects = new HashSet<Container>();
-        List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
-        // already added containers
-        for (ContainerWrapper container : getContainerCollection()) {
-            allContainerObjects.add(container.getWrappedObject());
-            allContainerWrappers.add(container);
-        }
-        // new containers
-        for (ContainerWrapper container : containers) {
-            allContainerObjects.add(container.getWrappedObject());
-            allContainerWrappers.add(container);
-        }
-        setContainerCollection(allContainerObjects, false);
-        propertiesMap.put("containerCollection", allContainerWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -536,120 +532,62 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getAllSampleTypeCollection(false);
     }
 
-    public void setSampleTypeCollection(Collection<SampleType> types,
-        boolean setNull) {
+    public void addSampleTypes(List<SampleTypeWrapper> types) {
+        if (types != null && types.size() > 0) {
+            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
+            Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+            // already added types
+            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
+            if (currentList != null) {
+                for (SampleTypeWrapper type : currentList) {
+                    allTypeObjects.add(type.getWrappedObject());
+                    allTypeWrappers.add(type);
+                }
+            }
+            // new types
+            for (SampleTypeWrapper type : types) {
+                type.setSite(wrappedObject);
+                allTypeObjects.add(type.getWrappedObject());
+                allTypeWrappers.add(type);
+                deletedSampleTypes.remove(type);
+            }
+            setSampleTypes(allTypeObjects, allTypeWrappers);
+        }
+    }
+
+    public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
+        if (typesToRemove != null && typesToRemove.size() > 0) {
+            deletedSampleTypes.addAll(typesToRemove);
+            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
+            Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+            // already added types
+            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
+            if (currentList != null) {
+                for (SampleTypeWrapper type : currentList) {
+                    if (!deletedSampleTypes.contains(type)) {
+                        allTypeObjects.add(type.getWrappedObject());
+                        allTypeWrappers.add(type);
+                    }
+                }
+            }
+            setSampleTypes(allTypeObjects, allTypeWrappers);
+        }
+    }
+
+    private void setSampleTypes(Collection<SampleType> allTypeObjects,
+        Collection<SampleTypeWrapper> allTypeWrappers) {
         Collection<SampleType> oldTypes = wrappedObject
             .getSampleTypeCollection();
-        wrappedObject.setSampleTypeCollection(types);
+        wrappedObject.setSampleTypeCollection(allTypeObjects);
         propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldTypes, types);
-        if (setNull) {
-            propertiesMap.put("sampleTypeCollection", null);
-        }
-    }
-
-    public void setSampleTypeCollection(List<SampleTypeWrapper> types) {
-        Collection<SampleType> typeObjects = new HashSet<SampleType>();
-        for (SampleTypeWrapper type : types) {
-            type.setSite(wrappedObject);
-            typeObjects.add(type.getWrappedObject());
-        }
-        setSampleTypeCollection(typeObjects, false);
-        propertiesMap.put("sampleTypeCollection", types);
-    }
-
-    /**
-     * Removes the sample type objects that are not contained in the collection.
-     * 
-     * @param oldCollection
-     * @throws BiobankCheckException
-     * @throws Exception
-     */
-    private void deleteSampleTypeDifference(Site origSite) throws Exception {
-        List<SampleTypeWrapper> newSampleType = getSampleTypeCollection();
-        List<SampleTypeWrapper> oldSampleSources = new SiteWrapper(appService,
-            origSite).getSampleTypeCollection();
-        if (oldSampleSources != null) {
-            for (SampleTypeWrapper st : oldSampleSources) {
-                if ((newSampleType == null) || !newSampleType.contains(st)) {
-                    st.delete();
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected List<SitePvAttrWrapper> getSitePvAttrCollection() {
-        List<SitePvAttrWrapper> sitePvAttrCollection = (List<SitePvAttrWrapper>) propertiesMap
-            .get("SitePvAttrCollection");
-        if (sitePvAttrCollection == null) {
-            Collection<SitePvAttr> possibleCollection = wrappedObject
-                .getSitePvAttrCollection();
-            if (possibleCollection != null) {
-                sitePvAttrCollection = new ArrayList<SitePvAttrWrapper>();
-                for (SitePvAttr possible : possibleCollection) {
-                    sitePvAttrCollection.add(new SitePvAttrWrapper(appService,
-                        possible));
-                }
-                propertiesMap.put("SitePvAttrCollection", sitePvAttrCollection);
-            }
-        }
-        return sitePvAttrCollection;
-    }
-
-    protected void setSitePvAttrCollection(Collection<SitePvAttr> collection,
-        boolean setNull) {
-        Collection<SitePvAttr> oldCollection = wrappedObject
-            .getSitePvAttrCollection();
-        wrappedObject.setSitePvAttrCollection(collection);
-        propertyChangeSupport.firePropertyChange("SitePvAttrCollection",
-            oldCollection, collection);
-        if (setNull) {
-            propertiesMap.put("SitePvAttrCollection", null);
-        }
-    }
-
-    protected void setSitePvAttrCollection(List<SitePvAttrWrapper> collection) {
-        Collection<SitePvAttr> pipObjects = new HashSet<SitePvAttr>();
-        for (SitePvAttrWrapper pip : collection) {
-            pip.setSite(this);
-            pipObjects.add(pip.getWrappedObject());
-        }
-        setSitePvAttrCollection(pipObjects, false);
-        propertiesMap.put("SitePvAttrCollection", collection);
-    }
-
-    /**
-     * Removes the sample type objects that are not contained in the collection.
-     * 
-     * @param oldCollection
-     * @throws BiobankCheckException
-     * @throws Exception
-     */
-    private void deleteSitePvAttrDifference(Site origSite) throws Exception {
-        List<SitePvAttrWrapper> oldSitePvAttr = new SiteWrapper(appService,
-            origSite).getSitePvAttrCollection();
-        if (oldSitePvAttr == null)
-            return;
-        getSitePvAttrMap();
-        int newSitePvAttrCount = sitePvAttrMap.size();
-        for (SitePvAttrWrapper pip : oldSitePvAttr) {
-            if ((pip.getSite() != null)
-                && ((newSitePvAttrCount == 0) || (sitePvAttrMap.get(pip
-                    .getLabel()) == null))) {
-                pip.delete();
-            }
-        }
+            oldTypes, allTypeObjects);
+        propertiesMap.put("sampleTypeCollection", allTypeWrappers);
     }
 
     protected static Map<String, PvAttrTypeWrapper> getPvAttrTypeMap(
         WritableApplicationService appService) throws ApplicationException {
         if (pvAttrTypeMap == null) {
-            pvAttrTypeMap = new HashMap<String, PvAttrTypeWrapper>();
-            for (PvAttrTypeWrapper pit : PvAttrTypeWrapper
-                .getAllWrappers(appService)) {
-                pvAttrTypeMap.put(pit.getName(), pit);
-            }
+            pvAttrTypeMap = PvAttrTypeWrapper.getAllPvAttrTypesMap(appService);
         }
         return pvAttrTypeMap;
     }
@@ -659,10 +597,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
             return sitePvAttrMap;
 
         sitePvAttrMap = new HashMap<String, SitePvAttrWrapper>();
-        List<SitePvAttrWrapper> sitePvAttrCollection = getSitePvAttrCollection();
+        Collection<SitePvAttr> sitePvAttrCollection = wrappedObject
+            .getSitePvAttrCollection();
         if (sitePvAttrCollection != null) {
-            for (SitePvAttrWrapper pip : sitePvAttrCollection) {
-                sitePvAttrMap.put(pip.getLabel(), pip);
+            for (SitePvAttr spa : sitePvAttrCollection) {
+                sitePvAttrMap.put(spa.getLabel(), new SitePvAttrWrapper(
+                    appService, spa));
             }
         }
         return sitePvAttrMap;
@@ -720,6 +660,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             sitePvAttr.setLabel(label);
             sitePvAttr.setSite(this);
             sitePvAttrMap.put(label, sitePvAttr);
+            deletedSitePvAttr.remove(sitePvAttr);
         }
         sitePvAttr.setPvAttrType(pvAttrType);
     }
@@ -727,21 +668,44 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public void deleteSitePvAttr(String label) throws Exception {
         getSitePvAttrMap();
         // this call generates exception if label does not exist
-        getSitePvAttr(label);
+        SitePvAttrWrapper sitePvAttr = getSitePvAttr(label);
         sitePvAttrMap.remove(label);
-        setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(sitePvAttrMap
-            .values()));
+        deletedSitePvAttr.add(sitePvAttr);
     }
 
     @Override
     protected void persistDependencies(Site origObject) throws Exception {
+        deleteSampleTypes();
+        persistSitePvAttr();
+    }
+
+    private void persistSitePvAttr() throws Exception {
         if (sitePvAttrMap != null) {
-            setSitePvAttrCollection(new ArrayList<SitePvAttrWrapper>(
-                sitePvAttrMap.values()));
+            Collection<SitePvAttr> sitePvAttrObjects = new HashSet<SitePvAttr>();
+            Collection<SitePvAttrWrapper> sitePvAttrWrapperList = sitePvAttrMap
+                .values();
+            for (SitePvAttrWrapper spa : sitePvAttrWrapperList) {
+                spa.setSite(this);
+                sitePvAttrObjects.add(spa.getWrappedObject());
+            }
+            Collection<SitePvAttr> oldCollection = wrappedObject
+                .getSitePvAttrCollection();
+            wrappedObject.setSitePvAttrCollection(sitePvAttrObjects);
+            propertyChangeSupport.firePropertyChange("sitePvAttrCollection",
+                oldCollection, sitePvAttrObjects);
         }
-        if (origObject != null) {
-            deleteSampleTypeDifference(origObject);
-            deleteSitePvAttrDifference(origObject);
+        for (SitePvAttrWrapper sitePvAttr : deletedSitePvAttr) {
+            if (!sitePvAttr.isNew()) {
+                sitePvAttr.delete();
+            }
+        }
+    }
+
+    private void deleteSampleTypes() throws Exception {
+        for (SampleTypeWrapper st : deletedSampleTypes) {
+            if (!st.isNew()) {
+                st.delete();
+            }
         }
     }
 
@@ -754,6 +718,65 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 : -1));
         }
         return 0;
+    }
+
+    /**
+     * Search for shipments in the site with the given waybill
+     * 
+     * @throws BiobankCheckException
+     */
+    public long getShipmentCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria("select count(*) from "
+            + Shipment.class.getName() + " where clinic.site.id = ?", Arrays
+            .asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
+    }
+
+    public Long getPatientCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(patients) from "
+            + Site.class.getName() + " as site "
+            + "join site.studyCollection as studies "
+            + "join studies.patientCollection as patients "
+            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
+    }
+
+    public Long getPatientVisitCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(visits) from "
+            + Site.class.getName() + " as site "
+            + "join site.studyCollection as studies "
+            + "join studies.patientCollection as patients "
+            + "join patients.patientVisitCollection as visits "
+            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
+    }
+
+    public Long getSampleCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria("select count(samples) from "
+            + Site.class.getName() + " as site "
+            + "join site.studyCollection as studies "
+            + "join studies.patientCollection as patients "
+            + "join patients.patientVisitCollection as visits "
+            + "join visits.sampleCollection as samples where site.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
     }
 
     /**
@@ -789,15 +812,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
-        sitePvAttrMap = null;
-        pvAttrTypeMap = null;
+    public String toString() {
+        return getName();
     }
 
     @Override
-    public String toString() {
-        return getName();
+    protected void resetInternalField() {
+        sitePvAttrMap = null;
+        pvAttrTypeMap = null;
+        deletedSampleTypes.clear();
+        deletedSitePvAttr.clear();
     }
 
 }

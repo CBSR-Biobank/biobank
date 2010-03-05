@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -26,6 +25,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,7 +36,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  */
 public abstract class AdapterBase {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(AdapterBase.class.getName());
 
     protected static final String BGR_LOADING_LABEL = "loading...";
@@ -45,6 +45,8 @@ public abstract class AdapterBase {
         .getSoleInstance();
 
     protected ModelWrapper<?> modelObject;
+
+    protected boolean haveModelObject;
 
     private Integer id;
 
@@ -73,11 +75,13 @@ public abstract class AdapterBase {
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
-        boolean enableActions, boolean loadChildrenInBackground) {
+    public AdapterBase(AdapterBase parent, boolean haveModelObject,
+        ModelWrapper<?> object, boolean enableActions,
+        boolean loadChildrenInBackground) {
         this.modelObject = object;
         this.parent = parent;
         this.enableActions = enableActions;
+        this.haveModelObject = haveModelObject;
         this.loadChildrenInBackground = loadChildrenInBackground;
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
@@ -87,20 +91,18 @@ public abstract class AdapterBase {
         Assert.isTrue(checkIntegrity(), "integrity checks failed");
     }
 
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
+        boolean enableActions, boolean loadChildrenInBackground) {
+        this(parent, true, object, enableActions, loadChildrenInBackground);
+    }
+
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
         this(parent, object, true, true);
     }
 
-    // public AdapterBase(AdapterBase parent, int id, String name,
-    // boolean loadChildrenInBackground) {
-    // this(parent, null, true, loadChildrenInBackground);
-    // setId(id);
-    // setName(name);
-    // }
-
     public AdapterBase(AdapterBase parent, int id, String name,
         boolean hasChildren, boolean loadChildrenInBackground) {
-        this(parent, null, true, loadChildrenInBackground);
+        this(parent, false, null, true, loadChildrenInBackground);
         setId(id);
         setName(name);
         setHasChildren(hasChildren);
@@ -295,7 +297,9 @@ public abstract class AdapterBase {
     }
 
     public WritableApplicationService getAppService() {
-        Assert.isNotNull(parent, "parent is null");
+        if (modelObject != null) {
+            return modelObject.getAppService();
+        }
         return parent.getAppService();
     }
 
@@ -320,7 +324,7 @@ public abstract class AdapterBase {
     public abstract void executeDoubleClick();
 
     public void performDoubleClick() {
-        if (modelObject != null) {
+        if (!haveModelObject || (modelObject != null)) {
             executeDoubleClick();
         }
     }
@@ -363,7 +367,7 @@ public abstract class AdapterBase {
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
-            LOGGER.error("Error while loading children of node "
+            logger.error("Error while loading children of node "
                 + modelObject.toString(), e);
         }
     }
@@ -388,8 +392,10 @@ public abstract class AdapterBase {
                     SessionManager.updateTreeNode(node);
                 }
             }
-            notifyListeners();
-            getRootNode().expandChild(AdapterBase.this);
+            RootNode root = getRootNode();
+            if (root != null) {
+                root.expandChild(this);
+            }
 
             childUpdateThread = new Thread() {
                 @Override
@@ -428,14 +434,14 @@ public abstract class AdapterBase {
                     } catch (final RemoteAccessException exp) {
                         BioBankPlugin.openRemoteAccessErrorMessage();
                     } catch (Exception e) {
-                        LOGGER.error("Error while loading children of node "
+                        logger.error("Error while loading children of node "
                             + modelObject.toString() + " in background", e);
                     }
                 }
             };
             childUpdateThread.start();
         } catch (Exception e) {
-            LOGGER.error("Error while expanding children of node "
+            logger.error("Error while expanding children of node "
                 + modelObject.toString(), e);
         }
     }
@@ -528,7 +534,7 @@ public abstract class AdapterBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, id, true);
         } catch (PartInitException e) {
-            LOGGER.error("Can't open form with id " + id, e);
+            logger.error("Can't open form with id " + id, e);
         }
     }
 
@@ -591,6 +597,20 @@ public abstract class AdapterBase {
         }
     }
 
+    public void deleteWithConfirm() {
+        String msg = getConfirmDeleteMessage();
+        if (msg == null) {
+            throw new RuntimeException("adapter has no confirm delete msg: "
+                + getClass().getName());
+        }
+        delete(msg);
+    }
+
+    public boolean isDeletable() {
+        // derived objects can override this
+        return false;
+    }
+
     public boolean isEditable() {
         return editable;
     }
@@ -615,6 +635,10 @@ public abstract class AdapterBase {
 
     public void notifyListeners() {
         notifyListeners(new AdapterChangedEvent(this));
+    }
+
+    protected String getConfirmDeleteMessage() {
+        return null;
     }
 
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -17,6 +16,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
@@ -24,7 +24,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteManager {
 
-    private static Logger LOGGER = Logger
+    private static BiobankLogger logger = BiobankLogger
         .getLogger(SiteManager.class.getName());
 
     private static final String SITE_PREF_NODE = "Site";
@@ -96,7 +96,7 @@ public class SiteManager {
             setEnabled(true);
             SessionManager.getInstance().updateSession();
         } catch (BackingStoreException e) {
-            LOGGER.error("Could not save site preferences", e);
+            logger.error("Could not save site preferences", e);
         }
     }
 
@@ -115,7 +115,7 @@ public class SiteManager {
 
         if (currentSiteWrapper == null)
             currentSiteWrapper = allSiteWrapper;
-        LOGGER.debug("site selected: " + currentSiteWrapper.getName());
+        logger.debug("site selected: " + currentSiteWrapper.getName());
 
         currentSiteWrappers.clear();
         currentSiteWrappers.add(0, allSiteWrapper);
@@ -130,7 +130,7 @@ public class SiteManager {
         try {
             updateSites(SiteWrapper.getSites(appService));
         } catch (Exception e) {
-            LOGGER.error("Cannot update Sites", e);
+            logger.error("Cannot update Sites", e);
         }
     }
 

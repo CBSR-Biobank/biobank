@@ -2,30 +2,47 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SampleAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
 public class SampleViewForm extends BiobankViewForm {
 
-    private static Logger LOGGER = Logger.getLogger(SampleViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SampleViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleViewForm";
 
     private SampleAdapter sampleAdapter;
     private SampleWrapper sample;
+
+    private Text sampleTypeLabel;
+
+    private Text linkDateLabel;
+
+    private Text quantityLabel;
+
+    private Text quantityUsedLabel;
+
+    private Text shipmentWaybillLabel;
+
+    private Text patientLabel;
+
+    private Text visitLabel;
+
+    private Text commentLabel;
 
     @Override
     public void init() {
@@ -43,20 +60,19 @@ public class SampleViewForm extends BiobankViewForm {
         try {
             sample.reload();
         } catch (Exception e) {
-            LOGGER.error("Can't reload sample with id " + sample.getId());
+            logger.error("Can't reload sample with id " + sample.getId());
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Sample " + sample.getInventoryId() + " from patient "
-            + sample.getPatientVisit().getPatient().getPnumber() + " / visit "
-            + sample.getPatientVisit().getShipment().getFormattedDateShipped());
+        form.setText("Sample " + sample.getInventoryId());
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
         createContainersSection();
+        setValues();
     }
 
     private void createInformationSection() {
@@ -67,17 +83,16 @@ public class SampleViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createWidget(client, Label.class, SWT.NONE, "Type", sample
-            .getSampleType().getName());
-        createWidget(client, Label.class, SWT.NONE, "Link Date", sample
-            .getFormattedLinkDate());
-        createWidget(client, Label.class, SWT.NONE, "Quantity", sample
-            .getQuantity() == null ? null : sample.getQuantity().toString());
-        createWidget(client, Label.class, SWT.NONE, "Quantity Used", sample
-            .getQuantityUsed() == null ? null : sample.getQuantityUsed()
-            .toString());
-        createWidget(client, Label.class, SWT.NONE, "Comment", sample
-            .getComment());
+        sampleTypeLabel = createReadOnlyField(client, SWT.NONE, "Type");
+        linkDateLabel = createReadOnlyField(client, SWT.NONE, "Link Date");
+        quantityLabel = createReadOnlyField(client, SWT.NONE, "Quantity");
+        quantityUsedLabel = createReadOnlyField(client, SWT.NONE,
+            "Quantity Used");
+        shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
+            "Shipment Waybill");
+        patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
+        visitLabel = createReadOnlyField(client, SWT.NONE, "Patient Visit");
+        commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
     }
 
     private void createContainersSection() {
@@ -110,9 +125,8 @@ public class SampleViewForm extends BiobankViewForm {
             layout.marginWidth = 0;
             layout.verticalSpacing = 0;
             containerComposite.setLayout(layout);
-            toolkit.createLabel(containerComposite, container
-                .getContainerType().getName()
-                + ": " + container.getLabel());
+            toolkit.createLabel(containerComposite, container.getLabel() + " ("
+                + container.getContainerType().getNameShort() + ") ");
             AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
                 .createWidget(containerComposite, container);
             containerWidget.setSelection(position);
@@ -121,9 +135,26 @@ public class SampleViewForm extends BiobankViewForm {
 
     }
 
+    private void setValues() {
+        setTextValue(sampleTypeLabel, sample.getSampleType().getName());
+        setTextValue(linkDateLabel, sample.getFormattedLinkDate());
+        setTextValue(quantityLabel, sample.getQuantity() == null ? null
+            : sample.getQuantity().toString());
+        setTextValue(quantityUsedLabel, sample.getQuantityUsed() == null ? null
+            : sample.getQuantityUsed().toString());
+        setTextValue(shipmentWaybillLabel, sample.getPatientVisit()
+            .getShipment().getWaybill());
+        setTextValue(patientLabel, sample.getPatientVisit().getPatient()
+            .getPnumber());
+        setTextValue(visitLabel, DateFormatter.formatAsDateTime(sample
+            .getPatientVisit().getDateProcessed()));
+        setTextValue(commentLabel, sample.getComment());
+    }
+
     @Override
     protected void reload() {
         retrieveSample();
+        setValues();
         setPartName("Sample: " + sample.getInventoryId());
         form.setText("Sample: " + sample.getInventoryId());
     }

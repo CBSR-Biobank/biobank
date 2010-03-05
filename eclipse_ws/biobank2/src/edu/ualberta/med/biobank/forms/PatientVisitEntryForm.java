@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
@@ -41,8 +41,8 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class PatientVisitEntryForm extends BiobankEntryForm {
 
-    private static Logger LOGGER = Logger.getLogger(PatientVisitEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(PatientVisitEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitEntryForm";
 
@@ -55,8 +55,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private PatientVisitAdapter patientVisitAdapter;
 
     private PatientVisitWrapper patientVisit;
-
-    private DateTimeWidget dateProcessed;
 
     private PatientWrapper patient;
 
@@ -95,7 +93,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.reload();
             patient.reload();
         } catch (Exception e) {
-            LOGGER.error("Error while retrieving patient visit "
+            logger.error("Error while retrieving patient visit "
                 + patientVisitAdapter.getWrapper().getFormattedDateProcessed()
                 + " (Patient " + patientVisit.getPatient() + ")", e);
         }
@@ -123,9 +121,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
+
+        Text patientNumberLabel = createReadOnlyField(client, SWT.NONE,
+            "Patient");
+        setTextValue(patientNumberLabel, patient.getPnumber());
 
         List<ShipmentWrapper> patientShipments = patient
             .getShipmentCollection();
@@ -136,14 +137,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Shipment", patientShipments, selectedShip,
             "A shipment should be selected");
+        firstControl = shipmentsComboViewer.getControl();
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }
-        dateProcessed = createDateTimeWidget(client, "Date Processed",
-            patientVisit.getDateProcessed(), patientVisit, "dateProcessed",
+        createDateTimeWidget(client, "Date Processed", patientVisit
+            .getDateProcessed(), patientVisit, "dateProcessed",
             "Date processed should be set");
-        firstControl = dateProcessed;
 
         createPvDataSection(client);
 
@@ -183,8 +184,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
             pvCustomInfo.setType(study.getStudyPvAttrType(label));
-            pvCustomInfo.setPermissible(study
-                .getStudyPvAttrPermissible(label));
+            pvCustomInfo.setPermissible(study.getStudyPvAttrPermissible(label));
             pvCustomInfo.setValue(patientVisit.getPvAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
@@ -257,8 +257,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setShipment((ShipmentWrapper) null);
         }
 
-        patientVisit.setPvSampleSourceCollection(pvSampleSourceEntryWidget
-            .getPvSampleSources());
+        patientVisit.addPvSampleSources(pvSampleSourceEntryWidget
+            .getAddedPvSampleSources());
+        patientVisit.removePvSampleSources(pvSampleSourceEntryWidget
+            .getRemovedPvSampleSources());
 
         setPvCustomInfo();
 

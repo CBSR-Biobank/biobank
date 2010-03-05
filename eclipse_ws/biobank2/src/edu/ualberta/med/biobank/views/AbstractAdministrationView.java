@@ -185,4 +185,9 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             .removeSourceProviderListener(siteStateListener);
     }
 
+    @Override
+    public void setFocus() {
+        treeText.setFocus();
+    }
+
 }

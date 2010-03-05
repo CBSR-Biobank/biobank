@@ -39,19 +39,25 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("Selecting shipment");
+        shell.setText("Shipment Select");
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
-        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
 
-        setStatusMessage("More than one shipment with waybill '"
+        setTitle("Select Shipment's Clinic");
+        setMessage("More than one shipment with waybill '"
             + shipments.get(0).getWaybill()
             + "' found.\nPlease choose the clinic associated with this shipment.");
+        return contents;
+    }
+
+    @Override
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
+        contents.setLayout(new GridLayout(2, false));
+        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         getWidgetCreator().createLabel(contents, "Clinics");
         comboViewer = new ComboViewer(contents, SWT.READ_ONLY | SWT.BORDER);
@@ -75,7 +81,6 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
         comboViewer.setComparator(new ViewerComparator());
         comboViewer.setInput(shipments);
         saveSelectedShipment();
-        return parentComposite;
     }
 
     private void saveSelectedShipment() {

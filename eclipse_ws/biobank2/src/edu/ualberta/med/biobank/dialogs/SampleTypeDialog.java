@@ -25,44 +25,57 @@ public class SampleTypeDialog extends BiobankDialog {
     // this is the object that is modified via the bound widgets
     private SampleTypeWrapper sampleType;
 
-    public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType) {
+    private String message;
+
+    public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType,
+        String message) {
         super(parent);
         Assert.isNotNull(sampleType);
         origSampleType = sampleType;
         this.sampleType = new SampleTypeWrapper(sampleType.getAppService());
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
+        this.message = message;
     }
 
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        Integer id = origSampleType.getId();
-        shell.setText(((id == null) ? "Add " : "Edit ") + TITLE);
+        shell.setText(((origSampleType.getId() == null) ? "Add " : "Edit ")
+            + TITLE);
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite client = new Composite(parentComposite, SWT.NONE);
-        GridLayout layout = new GridLayout(2, false);
-        client.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        layout.horizontalSpacing = 10;
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        if (origSampleType.isNew()) {
+            setTitle("Add Sample Type");
+        } else {
+            setTitle("Edit Sample Type");
+        }
+        setMessage(message);
+        return contents;
+    }
 
-        Control c = createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+    @Override
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite content = new Composite(parent, SWT.NONE);
+        content.setLayout(new GridLayout(3, false));
+        content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        Control c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
             "Name", null, PojoObservables.observeValue(sampleType, "name"),
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.widthHint = 200;
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+        gd.horizontalSpan = 2;
         c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.BORDER,
+        c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
             "Short Name", null, PojoObservables.observeValue(sampleType,
                 "nameShort"), new NonEmptyStringValidator(MSG_NO_ST_SNAME));
-
-        return client;
+        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+        gd.horizontalSpan = 2;
+        c.setLayoutData(gd);
     }
 
     @Override
@@ -73,7 +86,7 @@ public class SampleTypeDialog extends BiobankDialog {
     }
 
     public SampleTypeWrapper getSampleType() {
-        return origSampleType;
+        return sampleType;
     }
 
 }

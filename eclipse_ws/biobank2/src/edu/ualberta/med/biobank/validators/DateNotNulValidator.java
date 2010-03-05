@@ -13,10 +13,10 @@ public class DateNotNulValidator extends AbstractValidator {
     @Override
     public IStatus validate(Object value) {
         if (value == null) {
-            controlDecoration.show();
+            showDecoration();
             return ValidationStatus.error(errorMessage);
         } else {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
     }

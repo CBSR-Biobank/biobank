@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 
@@ -107,7 +108,9 @@ public class PvInfoWidget extends BiobankWidget {
             bcomp.setLayoutData(new GridData());
 
             addButton = new Button(bcomp, SWT.PUSH);
-            addButton.setText("Add");
+            addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+                .get(BioBankPlugin.IMG_ADD));
+            addButton.setToolTipText("Add");
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             addButton.addSelectionListener(new SelectionAdapter() {
@@ -150,7 +153,9 @@ public class PvInfoWidget extends BiobankWidget {
             });
 
             removeButton = new Button(bcomp, SWT.PUSH);
-            removeButton.setText("Remove");
+            removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+                .get(BioBankPlugin.IMG_DELETE));
+            removeButton.setToolTipText("Remove");
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             removeButton.addSelectionListener(new SelectionAdapter() {

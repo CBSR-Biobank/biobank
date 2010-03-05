@@ -7,12 +7,15 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class StudyAdapter extends AdapterBase {
+
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this study?";
 
     public static final int PATIENTS_NODE_ID = 0;
 
@@ -43,7 +46,12 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return parent.getParent().getLabel() + " - " + getTooltipText("Study");
+        StudyWrapper study = getWrapper();
+        SiteWrapper site = study.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Study");
+        }
+        return getTooltipText("Study");
     }
 
     @Override
@@ -57,8 +65,17 @@ public class StudyAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Study", StudyEntryForm.ID);
         addViewMenu(menu, "Study", StudyViewForm.ID);
-        addDeleteMenu(menu, "Study",
-            "Are you sure you want to delete this study?");
+        addDeleteMenu(menu, "Study", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     @Override

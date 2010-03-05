@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
@@ -49,7 +50,7 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithSamplesAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<SampleWrapper> samples = SampleWrapper
+        List<SampleWrapper> samples = DebugUtil
             .getRandomSamplesAlreadyLinked(appService, siteId);
         if (samples.size() > 1) {
             int row = 2;
@@ -68,7 +69,7 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomSamplesAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> palletScanned = initArray();
-        List<SampleWrapper> randomSamples = SampleWrapper
+        List<SampleWrapper> randomSamples = DebugUtil
             .getRandomSamplesAlreadyAssigned(appService, siteId);
         if (randomSamples.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
@@ -85,7 +86,7 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = initArray();
-        List<SampleWrapper> randomSamples = SampleWrapper
+        List<SampleWrapper> randomSamples = DebugUtil
             .getRandomSamplesNotAssigned(appService, siteId);
         if (randomSamples.size() > 1) {
             // Random r = new Random();

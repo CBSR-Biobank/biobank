@@ -3,19 +3,21 @@ package edu.ualberta.med.biobank.forms;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.ContactEntryWidget;
+import edu.ualberta.med.biobank.widgets.infotables.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -30,9 +32,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ClinicAdapter clinicAdapter;
 
-    private ClinicWrapper clinicWrapper;
+    private ClinicWrapper clinic;
 
-    private ContactEntryWidget contactEntryWidget;
+    private ContactEntryInfoTable contactEntryWidget;
 
     protected Combo session;
 
@@ -49,19 +51,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        clinicWrapper = clinicAdapter.getWrapper();
+        clinic = clinicAdapter.getWrapper();
 
         String tabName;
-        if (clinicWrapper.getId() == null)
+        if (clinic.getId() == null)
             tabName = "New Clinic";
         else
-            tabName = "Clinic " + clinicWrapper.getName();
+            tabName = "Clinic " + clinic.getName();
         setPartName(tabName);
     }
 
     @Override
     protected String getOkMessage() {
-        if (clinicWrapper.getId() == null) {
+        if (clinic.getId() == null) {
             return MSG_NEW_CLINIC_OK;
         }
         return MSG_CLINIC_OK;
@@ -81,7 +83,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 "Clinics can be associated with studies after submitting this initial information.",
                 SWT.LEFT);
         createClinicInfoSection();
-        createAddressArea(clinicWrapper);
+        createAddressArea(clinic);
         createContactSection();
         createButtonsSection();
 
@@ -98,36 +100,40 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
+        Text siteLabel = createReadOnlyField(client, SWT.NONE,
             "Repository Site");
-        setTextValue(siteLabel, clinicWrapper.getSite().getName());
+        setTextValue(siteLabel, clinic.getSite().getName());
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, BeansObservables.observeValue(clinicWrapper, "name"),
+            "Name", null, BeansObservables.observeValue(clinic, "name"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
             "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(clinicWrapper, "activityStatus"), null);
+                .observeValue(clinic, "activityStatus"), null);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                clinicWrapper, "comment"), null);
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(clinic,
+                "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
     }
 
     private void createContactSection() {
-        Composite client = createSectionWithClient("Contacts");
+        Section section = createSection("Contacts");
 
-        GridLayout layout = new GridLayout(1, false);
-        client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        contactEntryWidget = new ContactEntryWidget(client, SWT.NONE,
-            clinicWrapper, toolkit);
+        contactEntryWidget = new ContactEntryInfoTable(section, clinic);
+        contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
+
+        addSectionToolbar(section, "Add Contact", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                contactEntryWidget.addContact();
+            }
+        });
+        section.setClient(contactEntryWidget);
     }
 
     private void createButtonsSection() {
@@ -143,9 +149,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     public void saveForm() throws Exception {
         SiteAdapter siteAdapter = clinicAdapter
             .getParentFromClass(SiteAdapter.class);
-        clinicWrapper.setSite(siteAdapter.getWrapper());
-        clinicWrapper.setContactCollection(contactEntryWidget.getContacts());
-        clinicWrapper.persist();
+        clinic.setSite(siteAdapter.getWrapper());
+        clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
+        clinic.removeContacts(contactEntryWidget.getDeletedContacts());
+        clinic.persist();
         clinicAdapter.getParent().performExpand();
     }
 

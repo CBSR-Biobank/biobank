@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,6 +256,7 @@ public class CbsrStudies {
             "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
         addPvAttr("BBPSP", "Worksheet", "text");
         addPvAttr("BBPSP", "PBMC Count", "number");
+        addPvAttr("BBPSP", "Phlebotomist", "text");
         addPvAttr("CCCS", "PBMC Count", "number");
         addPvAttr("CCCS", "Worksheet", "text");
         addPvAttr("CEGIIR", "Worksheet", "text");
@@ -371,13 +373,7 @@ public class CbsrStudies {
             throw new Exception("invalid sample source name: "
                 + sampleSourceName);
         }
-
-        List<SampleSourceWrapper> list = study.getSampleSourceCollection();
-        if (list == null) {
-            list = new ArrayList<SampleSourceWrapper>();
-        }
-        list.add(ss);
-        study.setSampleSourceCollection(list);
+        study.addSampleSources(Arrays.asList(ss));
         study.persist();
         study.reload();
     }
@@ -393,12 +389,7 @@ public class CbsrStudies {
         ss.setQuantity(quantity);
         ss.setVolume(volume);
 
-        List<SampleStorageWrapper> list = study.getSampleStorageCollection();
-        if (list == null) {
-            list = new ArrayList<SampleStorageWrapper>();
-        }
-        list.add(ss);
-        study.setSampleStorageCollection(list);
+        study.addSampleStorages(Arrays.asList(ss));
         study.persist();
         study.reload();
 
@@ -431,12 +422,7 @@ public class CbsrStudies {
         }
         StudyWrapper study = getStudy(studyNameShort);
 
-        List<ContactWrapper> contacts = study.getContactCollection();
-        if (contacts == null) {
-            contacts = new ArrayList<ContactWrapper>();
-        }
-        contacts.add(contact);
-        study.setContactCollection(contacts);
+        study.addContacts(Arrays.asList(contact));
         study.persist();
         study.reload();
     }

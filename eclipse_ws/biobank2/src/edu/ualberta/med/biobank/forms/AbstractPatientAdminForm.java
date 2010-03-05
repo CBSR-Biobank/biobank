@@ -23,13 +23,15 @@ public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
      * Indicate if this form has been saved
      */
     private boolean isSaved = false;
+
     private static Logger logger;
     private static ActivityLogAppender appender;
 
     @Override
     protected void init() {
         if (logger == null) {
-            logger = Logger.getLogger("edu.ualberta.med.biobank.logs");
+            logger = Logger.getLogger(ActivityLogAppender.class.getPackage()
+                .getName());
             logger.setLevel(Level.TRACE);
         }
         if (appender == null) {

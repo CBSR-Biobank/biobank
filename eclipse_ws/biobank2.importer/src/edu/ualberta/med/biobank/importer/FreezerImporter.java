@@ -10,9 +10,11 @@ import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -29,11 +31,9 @@ public class FreezerImporter {
         + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
         + "from freezer "
         + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
-        + "join study_list on freezer.study_nr=study_list.study_nr "
-        + "join patient on patient.patient_nr=freezer.patient_nr "
-        + "join patient_visit on patient_visit.study_nr=study_list.study_nr "
-        + "and freezer.visit_nr=patient_visit.visit_nr "
-        + "and freezer.patient_nr=patient_visit.patient_nr "
+        + "join patient_visit on patient_visit.visit_nr=freezer.visit_nr "
+        + "join patient on patient.patient_nr=patient_visit.patient_nr "
+        + "join study_list on study_list.study_nr=patient_visit.study_nr "
         + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
         + "where freezer.fnum = ? and freezer.rack= ? "
         + "and frz_99_inv_id.inventory_id is null "
@@ -79,7 +79,7 @@ public class FreezerImporter {
 
         for (ContainerWrapper hotel : freezer.getChildren().values()) {
             if (!configuration.importFreezerHotel(hotel.getLabel())) {
-                logger.debug("not configured for importing hotel "
+                logger.debug("not configured to import hotel "
                     + hotel.getLabel());
                 continue;
             }
@@ -110,7 +110,7 @@ public class FreezerImporter {
         int palletNr;
         String patientNr;
         String linkDateStr;
-        double quantity;
+        double volume;
 
         while (rs.next()) {
             studyNameShort = rs.getString(3);
@@ -121,18 +121,18 @@ public class FreezerImporter {
             inventoryId = rs.getString(11);
             sampleTypeNameShort = rs.getString(4);
             linkDateStr = rs.getString(12);
-            quantity = rs.getDouble(16);
+            volume = rs.getDouble(16);
 
             importSample(studyNameShort, patientNr, dateProcessedStr, hotel,
                 palletNr, palletPos, inventoryId, sampleTypeNameShort,
-                linkDateStr, quantity);
+                linkDateStr, volume);
         }
     }
 
     protected void importSample(String studyNameShort, String patientNr,
         String dateProcessedStr, ContainerWrapper hotel, int palletNr,
         String palletPos, String inventoryId, String sampleTypeNameShort,
-        String linkDateStr, double quantity) throws Exception {
+        String linkDateStr, Double quantity) throws Exception {
 
         if (palletNr > hotel.getRowCapacity()) {
             logger.error("pallet number is invalid: " + " hotel/"
@@ -175,28 +175,23 @@ public class FreezerImporter {
             return;
         }
 
+        study.getSampleStorageCollection();
+
         Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
 
         List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed);
 
         if (visits.size() == 0) {
             logger.error("patient " + patientNr + ", visit not found for date "
-                + Importer.formatDate(dateProcessed));
+                + DateFormatter.formatAsDateTime(dateProcessed));
             return;
         } else if (visits.size() > 1) {
             logger.info("patient " + patientNr + ", multiple visits for date "
-                + Importer.formatDate(dateProcessed));
+                + DateFormatter.formatAsDateTime(dateProcessed));
         }
 
         PatientVisitWrapper visit = visits.get(0);
 
-        if (sampleTypeNameShort.equals("RNA Later")) {
-            sampleTypeNameShort = "RNA Biopsy";
-        } else if (sampleTypeNameShort.equals("Plasma LH")) {
-            sampleTypeNameShort = "Lith Hep Plasma";
-        } else if (sampleTypeNameShort.equals("PFP")) {
-            sampleTypeNameShort = "PF Plasma";
-        }
         SampleTypeWrapper sampleType = Importer
             .getSampleType(sampleTypeNameShort);
 
@@ -216,14 +211,27 @@ public class FreezerImporter {
             return;
         }
 
+        SampleStorageWrapper ss = Importer.getSampleStorage(study, sampleType);
+        if (ss == null) {
+            logger.error("study \"" + study.getNameShort()
+                + "\" has no sample storage for sample type \""
+                + sampleType.getName() + "\"");
+            return;
+        }
+
         sample = new SampleWrapper(appService);
         sample.setParent(pallet);
         sample.setSampleType(sampleType);
         sample.setInventoryId(inventoryId);
         sample.setLinkDate(Importer.getDateFromStr(linkDateStr));
-        sample.setQuantity(quantity);
         sample.setPosition(pos);
         sample.setPatientVisit(visit);
+
+        if (quantity != 0.0) {
+            sample.setQuantity(quantity);
+        } else {
+            sample.setQuantity(ss.getVolume());
+        }
 
         if (!pallet.canHoldSample(sample)) {
             logger.error("pallet " + pallet.getLabel()

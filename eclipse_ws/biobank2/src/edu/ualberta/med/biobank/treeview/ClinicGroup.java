@@ -41,13 +41,8 @@ public class ClinicGroup extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                ClinicWrapper clinic = new ClinicWrapper(getAppService());
-                clinic.setSite(getParentFromClass(SiteAdapter.class)
-                    .getWrapper());
-                ClinicAdapter clinicAdapter = new ClinicAdapter(
-                    ClinicGroup.this, clinic);
-                FormInput input = new FormInput(clinicAdapter);
-                openForm(input, ClinicEntryForm.ID);
+                addClinic(ClinicGroup.this
+                    .getParentFromClass(SiteAdapter.class));
             }
         });
     }
@@ -85,6 +80,14 @@ public class ClinicGroup extends AdapterBase {
     @Override
     public void notifyListeners(AdapterChangedEvent event) {
         getParent().notifyListeners(event);
+    }
+
+    public static void addClinic(SiteAdapter siteAdapter) {
+        ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
+        clinic.setSite(siteAdapter.getWrapper());
+        ClinicAdapter adapter = new ClinicAdapter(siteAdapter
+            .getClinicGroupNode(), clinic);
+        openForm(new FormInput(adapter), ClinicEntryForm.ID);
     }
 
 }

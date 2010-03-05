@@ -33,9 +33,7 @@ public class ContactAddDialog extends BiobankDialog {
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
         String title = new String();
-        Integer id = contactWrapper.getId();
-
-        if (id == null) {
+        if (contactWrapper.isNew()) {
             title = "Add";
         } else {
             title = "Edit ";
@@ -45,9 +43,22 @@ public class ContactAddDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+
+        if (contactWrapper.isNew()) {
+            setTitle("Add Contact");
+            setMessage("Add a contact person to this clinic");
+        } else {
+            setTitle("Edit Contact");
+            setMessage("Edit contact person for this clinic");
+        }
+        return contents;
+    }
+
+    @Override
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -73,8 +84,6 @@ public class ContactAddDialog extends BiobankDialog {
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
             new String[0], BeansObservables.observeValue(contactWrapper,
                 "faxNumber"), null);
-
-        return contents;
     }
 
     public ContactWrapper getContactWrapper() {

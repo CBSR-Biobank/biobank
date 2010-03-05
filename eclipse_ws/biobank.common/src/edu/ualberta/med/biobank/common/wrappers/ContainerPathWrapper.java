@@ -68,7 +68,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         return new ContainerWrapper(appService, container);
     }
 
-    public void setContainer(Container container) {
+    protected void setContainer(Container container) {
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
@@ -85,15 +85,20 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+        ApplicationException {
         ContainerWrapper container = getContainer();
         if (container == null) {
             throw new BiobankCheckException("container is null");
         }
 
-        // if (container.isNew()) {
-        // throw new BiobankCheckException("container is not in database");
-        // }
+        if (container.isNew()) {
+            throw new BiobankCheckException("container is not in database");
+        }
+
+        ContainerPathWrapper path = getContainerPath(appService, container);
+        if ((path != null) && (isNew() || !getId().equals(path.getId()))) {
+            throw new BiobankCheckException("path already in database");
+        }
     }
 
     @Override
@@ -114,7 +119,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     public static ContainerPathWrapper getContainerPath(
         WritableApplicationService appService, ContainerWrapper container)
-        throws Exception {
+        throws BiobankCheckException, ApplicationException {
         if (container.isNew())
             return null;
 
@@ -123,7 +128,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
             .asList(new Object[] { container.getId() }));
         List<ContainerPath> paths = appService.query(criteria);
         if (paths.size() > 1) {
-            throw new Exception("container should have only 1 path");
+            throw new BiobankCheckException("container should have only 1 path");
         } else if (paths.size() == 0) {
             return null;
         }

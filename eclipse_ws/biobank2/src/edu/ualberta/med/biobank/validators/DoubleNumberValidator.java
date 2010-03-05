@@ -11,24 +11,41 @@ public class DoubleNumberValidator extends AbstractValidator {
 
     private static final Pattern pattern = Pattern.compile("^[0-9\\.\\+-]*$");
 
+    private boolean allowEmpty = true;
+
     public DoubleNumberValidator(String message) {
         super(message);
     }
 
+    public DoubleNumberValidator(String message, boolean allowEmpty) {
+        this(message);
+        this.allowEmpty = allowEmpty;
+    }
+
     @Override
     public IStatus validate(Object value) {
-        if (((String) value).length() == 0) {
-            controlDecoration.hide();
+        if ((value == null) || (value instanceof Double)) {
+            hideDecoration();
             return Status.OK_STATUS;
+        }
+
+        if (((String) value).length() == 0) {
+            if (allowEmpty) {
+                hideDecoration();
+                return Status.OK_STATUS;
+            } else {
+                showDecoration();
+                return ValidationStatus.error(errorMessage);
+            }
         }
 
         Matcher m = pattern.matcher((String) value);
         if (m.matches()) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 }

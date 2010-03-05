@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -13,7 +10,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class QueryObject {
+public abstract class QueryObject {
 
     private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
 
@@ -35,6 +32,8 @@ public class QueryObject {
         aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
         aMap.put(SampleRequest.NAME, SampleRequest.class);
         aMap.put(SampleSCount.NAME, SampleSCount.class);
+        aMap.put(QACabinetSamples.NAME, QACabinetSamples.class);
+        aMap.put(QAFreezerSamples.NAME, QAFreezerSamples.class);
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
@@ -141,90 +140,6 @@ public class QueryObject {
         return this.getClass().getSimpleName();
     }
 
-    // These methodss can used in a typical date range summation
-
-    public List<Object> sumByDate(List<Object> results) {
-        if (results.size() == 0)
-            return results;
-        List<Object> totalledResults = new ArrayList<Object>();
-
-        int upperBound = 1, lowerBound = 0;
-        // weakly typed, consider changing to enum with method to protect this
-        // variable from being mis-set.. but might not be a big deal
-        int CALENDAR_TYPE;
-        int incrementBy;
-
-        if (columnNames[0].compareTo("Week") == 0) {
-            CALENDAR_TYPE = Calendar.WEEK_OF_YEAR;
-            incrementBy = 1;
-        } else if (columnNames[0].compareTo("Month") == 0) {
-            CALENDAR_TYPE = Calendar.MONTH;
-            incrementBy = 1;
-        } else if (columnNames[0].compareTo("Quarter") == 0) {
-            CALENDAR_TYPE = Calendar.MONTH;
-            incrementBy = 4;
-        } else {
-            CALENDAR_TYPE = Calendar.YEAR;
-            incrementBy = 1;
-        }
-
-        String lastStudy = (String) ((Object[]) results.get(0))[1], lastClinic = (String) ((Object[]) results
-            .get(0))[2];
-        for (Object obj : results) {
-            Object[] castObj = (Object[]) obj;
-            if (((String) castObj[1]).compareTo(lastStudy) != 0
-                || ((String) castObj[2]).compareTo(lastClinic) != 0) {
-                totalledResults.addAll(sumSection(results, lowerBound,
-                    upperBound, CALENDAR_TYPE, incrementBy, lastStudy,
-                    lastClinic));
-                lastStudy = (String) castObj[1];
-                lastClinic = (String) castObj[2];
-                lowerBound = upperBound;
-            }
-            upperBound++;
-        }
-        totalledResults.addAll(sumSection(results, lowerBound, upperBound - 1,
-            CALENDAR_TYPE, incrementBy, lastStudy, lastClinic));
-        return totalledResults;
-    }
-
-    private List<Object> sumSection(List<Object> results, int lowerbound,
-        int upperbound, int CALENDAR_TYPE, int incrementBy, String study,
-        String clinic) {
-
-        if (results.size() == 0 || upperbound - lowerbound < 1)
-            return results;
-
-        int count = 0, grpNumber = 1;
-        List<Object> totalledResults = new ArrayList<Object>();
-        Calendar start = Calendar.getInstance();
-        start.setTime((Date) ((Object[]) results.get(lowerbound))[0]);
-        Calendar end = Calendar.getInstance();
-        end.setTime(start.getTime());
-        end.add(CALENDAR_TYPE, incrementBy);
-        Calendar date = Calendar.getInstance();
-        Iterator<Object> it = results.listIterator(lowerbound);
-        for (int i = lowerbound; i < upperbound; i++) {
-            Object obj = it.next();
-            Object[] castObj = (Object[]) obj;
-            date.setTime((Date) castObj[0]);
-            if (date.compareTo(start) >= 0 && date.compareTo(end) <= 0) {
-                count++;
-            } else {
-                totalledResults.add(new Object[] { grpNumber, study, clinic,
-                    count });
-                while (date.compareTo(end) >= 0) {
-                    start.add(CALENDAR_TYPE, incrementBy);
-                    end.add(CALENDAR_TYPE, incrementBy);
-                    grpNumber++;
-                }
-                count = 1;
-            }
-        }
-        if (count > 1)
-            totalledResults
-                .add(new Object[] { grpNumber, study, clinic, count });
-        return totalledResults;
-    }
+    public abstract String getName();
 
 }

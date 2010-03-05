@@ -4,9 +4,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -19,6 +24,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
@@ -26,6 +32,8 @@ import edu.ualberta.med.biobank.forms.ContainerViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerAdapter extends AdapterBase {
+
+    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this container?";
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
@@ -56,8 +64,12 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
-            + getTooltipText("Container");
+        ContainerWrapper container = getContainer();
+        SiteWrapper site = container.getSite();
+        if (site != null) {
+            return site.getName() + " - " + getTooltipText("Container");
+        }
+        return getTooltipText("Container");
     }
 
     @Override
@@ -83,8 +95,17 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        addDeleteMenu(menu, "Container",
-            "Are you sure you want to delete this container?");
+        addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return DEL_CONFIRM_MSG;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
     }
 
     private void moveAction() {
@@ -93,7 +114,7 @@ public class ContainerAdapter extends AdapterBase {
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());
         if (mc.open() == Dialog.OK) {
-            Display.getDefault().asyncExec(new Runnable() {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 public void run() {
                     try {
                         setNewPositionFromLabel(mc.getNewLabel());
@@ -124,34 +145,82 @@ public class ContainerAdapter extends AdapterBase {
      * slot: modify this object's position, label and the label of children
      */
     public void setNewPositionFromLabel(String newLabel) throws Exception {
-        ContainerWrapper container = getContainer();
-        String oldLabel = container.getLabel();
+        final ContainerWrapper container = getContainer();
+        final String oldLabel = container.getLabel();
         String newParentContainerLabel = newLabel.substring(0, newLabel
             .length() - 2);
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newParentContainerLabel);
         if (newParentContainers.size() == 0) {
-            // invalid parent
-            throw new Exception(
-                "Unable to find suitable parent container with label "
-                    + newParentContainerLabel + ".");
-        } else {
-            ContainerWrapper newParent = newParentContainers.get(0);
-            if (newParentContainers.size() > 1) {
-                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), newParentContainers);
-                if (dlg.open() == Dialog.OK) {
-                    newParent = dlg.getSelectedContainer();
-                } else
-                    return;
-            }
-            newParent.addChild(newLabel.substring(newLabel.length() - 2),
-                container);
-            container.persist();
+            BioBankPlugin.openError("Move Error",
+                "A parent container with label \"" + newParentContainerLabel
+                    + "\" does not exist.");
+            return;
         }
-        BioBankPlugin.openInformation("Container moved", "The container "
-            + oldLabel + " has been moved to " + container.getLabel());
+
+        ContainerWrapper newParent;
+        if (newParentContainers.size() > 1) {
+            SelectParentContainerDialog dlg = new SelectParentContainerDialog(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                newParentContainers);
+            if (dlg.open() != Dialog.OK) {
+                return;
+            }
+            newParent = dlg.getSelectedContainer();
+        } else {
+            newParent = newParentContainers.get(0);
+        }
+
+        ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
+        if (currentChild != null) {
+            BioBankPlugin.openError("Move Error", "Container position \""
+                + newLabel
+                + "\" is not empty. Please chose a different location.");
+            return;
+        }
+
+        newParent.addChild(newLabel, container);
+
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        context.run(true, false, new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) {
+                Thread t = new Thread("Querying") {
+                    @Override
+                    public void run() {
+                        try {
+                            container.persist();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                monitor.beginTask("Moving...", IProgressMonitor.UNKNOWN);
+                t.start();
+                while (true) {
+                    if (!t.isAlive()) {
+                        Display.getDefault().syncExec(new Runnable() {
+                            public void run() {
+                                monitor.done();
+                                BioBankPlugin.openInformation(
+                                    "Container moved", "The container "
+                                        + oldLabel + " has been moved to "
+                                        + container.getLabel());
+                            }
+                        });
+                        break;
+                    } else
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                }
+            }
+        });
+
     }
 
     @Override

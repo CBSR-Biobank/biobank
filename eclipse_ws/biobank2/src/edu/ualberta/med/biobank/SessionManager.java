@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -14,11 +13,13 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.views.AbstractViewWithTree;
@@ -27,8 +28,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    private static Logger LOGGER = Logger.getLogger(SessionManager.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SessionManager.class.getName());
 
     private static SessionManager instance = null;
 
@@ -70,7 +71,7 @@ public class SessionManager {
 
     public void addSession(final WritableApplicationService appService,
         String serverName, String userName, Collection<SiteWrapper> sites) {
-        LOGGER.debug("addSession: " + serverName + ", user/" + userName
+        logger.debug("addSession: " + serverName + ", user/" + userName
             + " numSites/" + sites.size());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, userName);
@@ -144,7 +145,7 @@ public class SessionManager {
 
     public static void setSelectedNode(AdapterBase node) {
         AbstractViewWithTree view = getCurrentViewWithTree();
-        if (view != null) {
+        if (view != null && node != null) {
             view.setSelectedNode(node);
         }
     }
@@ -160,6 +161,14 @@ public class SessionManager {
 
     public static void openViewForm(ModelWrapper<?> wrapper) {
         AdapterBase adapter = searchNode(wrapper);
+        if (adapter != null) {
+            adapter.performDoubleClick();
+            return;
+        }
+
+        // adapter for object not yet in the tree, create new adapter
+        // and load the view form
+        adapter = AdapterFactory.getAdapter(wrapper);
         if (adapter != null) {
             adapter.performDoubleClick();
         }

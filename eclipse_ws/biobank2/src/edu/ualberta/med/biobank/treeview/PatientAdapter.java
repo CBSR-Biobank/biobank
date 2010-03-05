@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -38,15 +40,22 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         PatientWrapper patientWrapper = getWrapper();
-        Assert.isNotNull(patientWrapper.getWrappedObject(), "patient is null");
+        Assert.isNotNull(patientWrapper, "patient is null");
         return patientWrapper.getPnumber();
     }
 
     @Override
     public String getTooltipText() {
-        return getParentFromClass(SiteAdapter.class).getLabel() + " - "
-            + getParentFromClass(StudyAdapter.class).getLabel() + " - "
-            + getTooltipText("Patient");
+        PatientWrapper patient = getWrapper();
+        StudyWrapper study = patient.getStudy();
+        if (study != null) {
+            SiteWrapper site = study.getSite();
+            Assert.isNotNull(site, "site is null");
+            return site.getName() + " - " + study.getName() + " - "
+                + getTooltipText("Patient");
+
+        }
+        return getTooltipText("Patient");
     }
 
     @Override

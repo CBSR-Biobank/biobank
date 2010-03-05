@@ -26,17 +26,17 @@ public class PostalCodeValidator extends AbstractValidator {
         String v = (String) value;
 
         if (v.length() == 0) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
         Matcher m = pattern.matcher(v);
         if (m.matches()) {
-            controlDecoration.hide();
+            hideDecoration();
             return Status.OK_STATUS;
         }
 
-        controlDecoration.show();
+        showDecoration();
         return ValidationStatus.error(errorMessage);
     }
 }

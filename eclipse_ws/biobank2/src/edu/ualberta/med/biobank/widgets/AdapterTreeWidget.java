@@ -139,4 +139,9 @@ public class AdapterTreeWidget extends Composite {
         return treeViewer;
     }
 
+    @Override
+    public boolean setFocus() {
+        return treeViewer.getTree().setFocus();
+    }
+
 }

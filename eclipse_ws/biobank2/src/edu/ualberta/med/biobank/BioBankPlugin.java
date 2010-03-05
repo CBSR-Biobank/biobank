@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -21,6 +20,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
@@ -47,6 +47,12 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMAGE_ID = "biobank2.image";
 
     public static final String IMG_ADD = "add";
+    public static final String IMG_ARROW_UP = "arrow_up";
+    public static final String IMG_ARROW_DOWN = "arrow_down";
+    public static final String IMG_ARROW_LEFT = "arrow_left";
+    public static final String IMG_ARROW_RIGHT = "arrow_right";
+    public static final String IMG_2_ARROW_LEFT = "2_arrow_left";
+    public static final String IMG_2_ARROW_RIGHT = "2_arrow_right";
     public static final String IMG_BIN = "bin";
     public static final String IMG_BOX = "box";
     public static final String IMG_CABINET = "cabinet";
@@ -115,7 +121,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         .getName()
         + ".barcode";
 
-    static Logger log4j = Logger.getLogger(BioBankPlugin.class.getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BioBankPlugin.class.getName());
 
     // The shared instance
     private static BioBankPlugin plugin;
@@ -138,12 +145,17 @@ public class BioBankPlugin extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
         SessionManager.getInstance();
-        log4j.debug(PLUGIN_ID + " started");
     }
 
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_ADD, "add.png");
+        registerImage(registry, IMG_ARROW_UP, "arrow_up.png");
+        registerImage(registry, IMG_ARROW_DOWN, "arrow_down.png");
+        registerImage(registry, IMG_ARROW_LEFT, "arrow_left.png");
+        registerImage(registry, IMG_ARROW_RIGHT, "arrow_right.png");
+        registerImage(registry, IMG_2_ARROW_LEFT, "2left_arrow.png");
+        registerImage(registry, IMG_2_ARROW_RIGHT, "2right_arrow.png");
         registerImage(registry, IMG_BIN, "bin.png");
         registerImage(registry, IMG_BOX, "bin.png");
         registerImage(registry, IMG_CABINET, "cabinet.png");
@@ -205,8 +217,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
-
-        log4j.debug(PLUGIN_ID + " stopped");
     }
 
     /**
@@ -251,7 +261,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             msg = e.getCause().getMessage();
         }
         openError(title, e.getMessage());
-        log4j.error(title, e);
+        logger.error(title, e);
     }
 
     public static void openAsyncError(String title, Exception e) {
@@ -260,7 +270,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             msg = e.getCause().getMessage();
         }
         openAsyncError(title, e.getMessage());
-        log4j.error(title, e);
+        logger.error(title, e);
     }
 
     /**

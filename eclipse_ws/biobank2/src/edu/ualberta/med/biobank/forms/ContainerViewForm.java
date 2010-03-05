@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -24,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -31,7 +31,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
@@ -49,8 +51,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm";
 
-    private static Logger LOGGER = Logger.getLogger(ContainerViewForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ContainerViewForm.class.getName());
 
     private ContainerAdapter containerAdapter;
 
@@ -58,23 +60,23 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private SamplesListInfoTable samplesWidget;
 
-    private Label siteLabel;
+    private Text siteLabel;
 
-    private Label containerLabelLabel;
+    private Text containerLabelLabel;
 
-    private Label productBarcodeLabel;
+    private Text productBarcodeLabel;
 
-    private Label activityStatusLabel;
+    private Text activityStatusLabel;
 
-    private Label commentsLabel;
+    private Text commentsLabel;
 
-    private Label containerTypeLabel;
+    private Text containerTypeLabel;
 
-    private Label temperatureLabel;
+    private Text temperatureLabel;
 
-    private Label positionDimOneLabel = null;
+    private Text rowLabel = null;
 
-    private Label positionDimTwoLabel;
+    private Text colLabel;
 
     private AbstractContainerDisplayWidget containerWidget;
 
@@ -94,14 +96,14 @@ public class ContainerViewForm extends BiobankViewForm {
         container = containerAdapter.getContainer();
         container.reload();
         setPartName(container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
+            + container.getContainerType().getNameShort() + ")");
         initCells();
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getName() + ")");
+            + container.getContainerType().getNameShort() + ")");
         form.getBody().setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
             container.getContainerType().getName()));
@@ -124,20 +126,16 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Repository Site");
-        containerLabelLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Label");
-        productBarcodeLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Product Bar Code");
-        activityStatusLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Activity Status");
-        commentsLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Comments");
-        containerTypeLabel = (Label) createWidget(client, Label.class,
-            SWT.NONE, "Container Type");
-        temperatureLabel = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Temperature");
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
+        containerLabelLabel = createReadOnlyField(client, SWT.NONE, "Label");
+        productBarcodeLabel = createReadOnlyField(client, SWT.NONE,
+            "Product Bar Code");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
+        commentsLabel = createReadOnlyField(client, SWT.NONE, "Comments");
+        containerTypeLabel = createReadOnlyField(client, SWT.NONE,
+            "Container Type");
+        temperatureLabel = createReadOnlyField(client, SWT.NONE, "Temperature");
 
         setContainerValues();
 
@@ -334,7 +332,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     try {
                         reload();
                     } catch (Exception e) {
-                        LOGGER.error("Error loading", e);
+                        logger.error("Error loading", e);
                     }
                     if (rebuild) {
                         containerAdapter.rebuild();
@@ -377,27 +375,29 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(containerTypeLabel, container.getContainerType().getName());
         setTextValue(temperatureLabel, container.getTemperature());
         if (container.hasParent()) {
-            if (positionDimOneLabel != null) {
-                setTextValue(positionDimOneLabel, container.getPosition().row);
+            if (rowLabel != null) {
+                setTextValue(rowLabel, container.getPosition().row);
             }
 
-            if (positionDimTwoLabel != null) {
-                setTextValue(positionDimTwoLabel, container.getPosition().col);
+            if (colLabel != null) {
+                setTextValue(colLabel, container.getPosition().col);
             }
         }
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new SamplesListInfoTable(parent, container.getSamples()
-            .values());
+        List<SampleWrapper> samples = new ArrayList<SampleWrapper>(container
+            .getSamples().values());
+        samplesWidget = new SamplesListInfoTable(parent, samples);
         samplesWidget.adaptToToolkit(toolkit, true);
+        samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
     protected void reload() throws Exception {
         if (!form.isDisposed()) {
-            containerAdapter.getContainer().reload();
+            container.reload();
             form.setText("Container " + container.getLabel() + " ("
                 + container.getContainerType().getName() + ")");
             if (container.getContainerType().getChildContainerTypeCollection()

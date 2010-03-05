@@ -4,6 +4,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,9 +42,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         try {
             this.wrappedObject = getNewObject();
         } catch (Exception e) {
-            throw new RuntimeException(
-                "was not able to create new object of type "
-                    + getWrappedClass().getName());
+            Class<E> classType = getWrappedClass();
+            if (classType != null) {
+                throw new RuntimeException(
+                    "was not able to create new object of type "
+                        + classType.getName());
+            } else {
+                throw new RuntimeException("was not able to create new object");
+            }
         }
     }
 
@@ -57,6 +64,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
+        String[] properties = getPropertyChangeNames();
+        if ((properties == null) || (properties.length == 0)) {
+            throw new RuntimeException("wrapper has not defined any properties");
+        }
+        List<String> propertiesList = Arrays.asList(properties);
+        if (!propertiesList.contains(propertyName)) {
+            throw new RuntimeException("invalid property: " + propertyName);
+        }
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
@@ -90,6 +105,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             firePropertyChanges(oldValue, wrappedObject);
         }
         propertiesMap.clear();
+        resetInternalField();
     }
 
     /**
@@ -157,12 +173,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         } else {
             query = new UpdateExampleQuery(wrappedObject);
             origObject = getObjectFromDatabase();
-
         }
         persistDependencies(origObject);
         SDKQueryResult result = appService.executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
+        resetInternalField();
     }
 
     /**
@@ -188,7 +204,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
         reload();
         deleteChecks();
+        deleteDependencies();
         appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+    }
+
+    @SuppressWarnings("unused")
+    protected void deleteDependencies() throws Exception {
+
     }
 
     protected abstract void deleteChecks() throws Exception;
@@ -200,6 +222,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             reload();
         }
         propertiesMap.clear();
+        resetInternalField();
     }
 
     /**
@@ -221,16 +244,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void loadAttributes() throws Exception {
         Class<E> classType = getWrappedClass();
-
         if (classType == null) {
             throw new Exception("wrapped class is null");
         }
-
         Method[] methods = classType.getMethods();
         for (Method method : methods) {
             if (method.getName().startsWith("get")
                 && !method.getName().equals("getClass")
-                && !method.getReturnType().getName().equals("java.util.Set")) {
+                && !Collection.class.isAssignableFrom(method.getReturnType())) {
                 method.invoke(wrappedObject, (Object[]) null);
             }
         }
@@ -253,8 +274,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
         Integer id = getId();
         Integer id2 = ((ModelWrapper<?>) object).getId();
-        return (id == null && id2 == null)
-            || (id != null && id2 != null && id.equals(id2));
+        if (id == null && id2 == null) {
+            return toString().equals(object.toString());
+        }
+        return id != null && id2 != null && id.equals(id2);
     }
 
     /**
@@ -268,13 +291,46 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * return the list of all objects of the database of this type
+     * If we want to reset internal fields when reload or reset is called (even
+     * if the object is new).
      */
-    protected List<E> getAllObjects() throws Exception {
-        Class<E> classType = getWrappedClass();
-        Constructor<E> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        return appService.search(classType, instance);
+    protected void resetInternalField() {
+        // default do nothing
     }
 
+    /**
+     * this method is used in the equals method. If it is not redefined in
+     * subclasses, we want it to return something better than the default
+     * toString
+     */
+    @Override
+    public String toString() {
+        Class<E> classType = getWrappedClass();
+        if (classType != null) {
+            StringBuffer sb = new StringBuffer();
+            Method[] methods = classType.getMethods();
+            for (Method method : methods) {
+                String name = method.getName();
+                Class<?> returnType = method.getReturnType();
+                if (name.startsWith("get")
+                    && !name.equals("getClass")
+                    && (String.class.isAssignableFrom(returnType) || Number.class
+                        .isAssignableFrom(returnType))) {
+                    try {
+                        Object res = method.invoke(wrappedObject,
+                            (Object[]) null);
+                        if (res != null) {
+                            sb.append(name).append(":").append(res.toString())
+                                .append("/");
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error in toString method",
+                            e);
+                    }
+                }
+            }
+            return sb.toString();
+        }
+        return super.toString();
+    }
 }

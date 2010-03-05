@@ -5,22 +5,28 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
 
     private PatientAdapter patientAdapter;
 
-    private PatientWrapper patientWrapper;
+    private PatientWrapper patient;
 
-    private Label siteLabel;
+    private Text siteLabel;
+
+    private Text visitCountLabel;
+
+    private Text sampleCountLabel;
 
     private PatientVisitInfoTable visitsTable;
 
@@ -31,18 +37,18 @@ public class PatientViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         patientAdapter = (PatientAdapter) adapter;
-        patientWrapper = patientAdapter.getWrapper();
+        patient = patientAdapter.getWrapper();
         retrievePatient();
-        setPartName("Patient " + patientWrapper.getPnumber());
+        setPartName("Patient " + patient.getPnumber());
     }
 
     private void retrievePatient() throws Exception {
-        patientWrapper.reload();
+        patient.reload();
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient: " + patientWrapper.getPnumber());
+        form.setText("Patient: " + patient.getPnumber());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -61,31 +67,36 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = (Label) createWidget(client, Label.class, SWT.NONE, "Site");
+        siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
+        visitCountLabel = createReadOnlyField(client, SWT.NONE, "Total Visits");
+        sampleCountLabel = createReadOnlyField(client, SWT.NONE,
+            "Total Samples");
     }
 
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable = new PatientVisitInfoTable(section, patientWrapper
+        visitsTable = new PatientVisitInfoTable(section, patient
             .getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
-        visitsTable.getTableViewer().addDoubleClickListener(
-            collectionDoubleClickListener);
+        visitsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void setValues() {
-        setTextValue(siteLabel, patientWrapper.getStudy().getSite().getName());
+    private void setValues() throws ApplicationException, BiobankCheckException {
+        setTextValue(siteLabel, patient.getStudy().getSite().getName());
+        setTextValue(visitCountLabel, patient.getPatientVisitCollection()
+            .size());
+        setTextValue(sampleCountLabel, patient.getSampleCount());
     }
 
     @Override
     protected void reload() throws Exception {
         setValues();
         retrievePatient();
-        setPartName("Patient " + patientWrapper.getPnumber());
-        form.setText("Patient: " + patientWrapper.getPnumber());
-        visitsTable.setCollection(patientWrapper.getPatientVisitCollection());
+        setPartName("Patient " + patient.getPnumber());
+        form.setText("Patient: " + patient.getPnumber());
+        visitsTable.setCollection(patient.getPatientVisitCollection());
     }
 
     @Override

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -14,21 +13,21 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
-    private static Logger LOGGER = Logger.getLogger(PatientEntryForm.class
-        .getName());
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(PatientEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
@@ -86,8 +85,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Label labelSite = (Label) createWidget(client, Label.class, SWT.NONE,
-            "Site");
+        Text labelSite = createReadOnlyField(client, SWT.NONE, "Site");
         siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
         labelSite.setText(siteWrapper.getName());
 
@@ -141,7 +139,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         try {
             patientAdapter.getWrapper().reload();
         } catch (Exception e) {
-            LOGGER.error("Error while retrieving patient "
+            logger.error("Error while retrieving patient "
                 + patientAdapter.getWrapper().getPnumber(), e);
         }
     }
