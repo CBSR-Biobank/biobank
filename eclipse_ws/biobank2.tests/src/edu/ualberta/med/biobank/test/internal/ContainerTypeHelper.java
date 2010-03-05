@@ -18,12 +18,14 @@ public class ContainerTypeHelper extends DbHelper {
      * @param isTopLevel Whether this container type is for a container that is
      *            not contained by other container types.
      * @return
+     * @throws Exception
      * @throws BiobankCheckException
      * @throws Exception
      */
     public static ContainerTypeWrapper newContainerType(SiteWrapper site,
         String name, String nameShort, Integer labelingScheme,
-        Integer rowCapacity, Integer colCapacity, boolean isTopLevel) {
+        Integer rowCapacity, Integer colCapacity, boolean isTopLevel)
+        throws Exception {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(appService);
         if (site != null) {
             ct.setSite(site);
@@ -36,6 +38,7 @@ public class ContainerTypeHelper extends DbHelper {
         if (colCapacity != null)
             ct.setColCapacity(colCapacity);
         ct.setTopLevel(isTopLevel);
+        ct.setActivityStatus("Active");
         return ct;
     }
 

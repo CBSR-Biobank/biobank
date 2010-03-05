@@ -17,7 +17,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
@@ -192,10 +191,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client, "Child Labeling Scheme", labelingSchemeMap.values(),
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", ActivityStatusWrapper.getAllActivityStatusNames(
-                appService).toArray(new String[] {}), BeansObservables
-                .observeValue(containerType, "activityStatus"), null);
+        createComboViewerWithNoSelectionValidator(client, "Container Type",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService),
+            containerType.getActivityStatus(),
+            "Container type must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(

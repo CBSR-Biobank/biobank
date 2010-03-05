@@ -114,10 +114,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             null, BeansObservables.observeValue(clinic, "nameShort"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", ActivityStatusWrapper.getAllActivityStatusNames(
-                appService).toArray(new String[] {}), BeansObservables
-                .observeValue(clinic, "activityStatus"), null);
+        createComboViewerWithNoSelectionValidator(client, "Container Type",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService), clinic
+                .getActivityStatus(), "Clinic must have an activity status",
+            true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(clinic,

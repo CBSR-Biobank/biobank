@@ -35,6 +35,10 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestStudy extends TestDatabase {
 
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
+        "getActivityStatus", "getStudyPvAttrLocked");
+
     private static List<PatientVisitWrapper> studyAddPatientVisits(
         StudyWrapper study) throws Exception {
         String name = study.getName();
@@ -52,10 +56,6 @@ public class TestStudy extends TestDatabase {
         return PatientVisitHelper.addPatientVisits(patient, shipment);
 
     }
-
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList("getStudyPvAttrLocked");
 
     @Test
     public void testGettersAndSetters() throws Exception {

@@ -12,7 +12,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -125,10 +124,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (firstControl == null)
             firstControl = c;
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", ActivityStatusWrapper.getAllActivityStatusNames(
-                appService).toArray(new String[] {}), BeansObservables
-                .observeValue(container, "activityStatus"), null);
+        createComboViewerWithNoSelectionValidator(client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService),
+            container.getActivityStatus(),
+            "Container must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(

@@ -37,6 +37,7 @@ public class ContainerHelper extends DbHelper {
         }
         container.setSite(site);
         container.setContainerType(type);
+        container.setActivityStatus("Active");
         return container;
     }
 

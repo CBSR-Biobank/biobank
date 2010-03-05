@@ -14,7 +14,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
@@ -122,10 +121,10 @@ public class StudyEntryForm extends BiobankEntryForm {
             null, BeansObservables.observeValue(study, "nameShort"),
             new NonEmptyStringValidator("Study short name cannot be blank"));
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", ActivityStatusWrapper.getAllActivityStatusNames(
-                appService).toArray(new String[] {}), BeansObservables
-                .observeValue(study, "activityStatus"), null);
+        createComboViewerWithNoSelectionValidator(client, "Container Type",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService), study
+                .getActivityStatus(), "Study must have an activity status",
+            true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(study,

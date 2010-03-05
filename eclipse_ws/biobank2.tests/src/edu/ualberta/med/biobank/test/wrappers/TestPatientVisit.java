@@ -486,7 +486,7 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testGetSetPvAttrLocked() throws Exception {
+    public void testGetSetPvAttrActivityStatus() throws Exception {
         addPvAttrs();
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
@@ -496,7 +496,7 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", "Active");
+        study.setStudyPvAttrActivityStatus("Worksheet", "Disabled");
         study.persist();
         visit.reload();
         try {
@@ -507,7 +507,7 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
+        study.setStudyPvAttrActivityStatus("Worksheet", "Active");
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");

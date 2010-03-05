@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -35,6 +37,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     protected Combo session;
 
+    private ComboViewer activityStatusComboViewer;
+
+    private String currentActivityStatus;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof SiteAdapter),
@@ -62,6 +68,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     protected void createFormContent() throws ApplicationException {
         form.setText("Repository Site Information");
         form.getBody().setLayout(new GridLayout(1, false));
+        currentActivityStatus = site.getActivityStatus();
         createSiteSection();
         createAddressArea(site);
 
@@ -94,10 +101,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             null, BeansObservables.observeValue(site, "nameShort"),
             new NonEmptyStringValidator("Site short name cannot be blank"));
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", ActivityStatusWrapper.getAllActivityStatusNames(
-                appService).toArray(new String[] {}), BeansObservables
-                .observeValue(site, "activityStatus"), null);
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status", ActivityStatusWrapper
+                .getAllActivityStatusNames(appService), site
+                .getActivityStatus(), "Site must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(site,
@@ -120,6 +127,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
+        site
+            .setActivityStatus((String) ((StructuredSelection) activityStatusComboViewer
+                .getSelection()).getFirstElement());
         site.persist();
         SessionManager.getInstance().updateSites();
     }
@@ -127,5 +137,18 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     public String getNextOpenedFormID() {
         return SiteViewForm.ID;
+    }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        currentActivityStatus = site.getActivityStatus();
+        if (currentActivityStatus != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                currentActivityStatus));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
+
     }
 }

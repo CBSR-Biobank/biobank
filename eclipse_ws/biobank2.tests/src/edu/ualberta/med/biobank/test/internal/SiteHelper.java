@@ -13,7 +13,7 @@ public class SiteHelper extends DbHelper {
     public static SiteWrapper newSite(String name) throws Exception {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
-        site.setActivityStatus("active");
+        site.setActivityStatus("Active");
         site.setStreet1(Utils.getRandomString(32));
         site.setCity(Utils.getRandomString(32));
         return site;

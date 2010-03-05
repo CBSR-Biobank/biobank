@@ -13,6 +13,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -21,20 +22,19 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -86,7 +86,8 @@ public class TestAliquot extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null);
-        aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3, 3);
+        aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
+            3);
         container.reload();
     }
 
@@ -101,9 +102,9 @@ public class TestAliquot extends TestDatabase {
         throws BiobankCheckException, Exception {
         aliquot.persist();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(), aliquot
-                .getPatientVisit(), 2, 2);
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
+            2, 2);
         duplicate.setInventoryId(aliquot.getInventoryId());
 
         try {
@@ -131,9 +132,9 @@ public class TestAliquot extends TestDatabase {
         Exception {
         aliquot.persist();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(), aliquot
-                .getPatientVisit(), 3, 3);
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
+            3, 3);
 
         try {
             duplicate.persist();
@@ -302,8 +303,8 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testGetSetParent() throws Exception {
         ContainerWrapper oldParent = aliquot.getParent();
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(aliquot
-            .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
+            aliquot.getSite(), "newCtType", "ctNew", 1, 4, 5, true);
         type.addSampleTypes(Arrays.asList(aliquot.getSampleType()));
         type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
@@ -317,7 +318,8 @@ public class TestAliquot extends TestDatabase {
         // check to make sure added to new parent
         parent.reload();
         Assert.assertTrue(aliquot.getParent() != null);
-        Collection<AliquotWrapper> sampleWrappers = parent.getSamples().values();
+        Collection<AliquotWrapper> sampleWrappers = parent.getSamples()
+            .values();
         boolean found = false;
         for (AliquotWrapper sampleWrapper : sampleWrappers) {
             if (sampleWrapper.getId().equals(aliquot.getId()))
@@ -352,17 +354,20 @@ public class TestAliquot extends TestDatabase {
             "ss1"));
         ss1.setVolume(1.0);
         ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss1.setActivityStatus("Active");
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
         ss2.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
             "ss2"));
         ss2.setVolume(2.0);
         ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss2.setActivityStatus("Active");
         ss2.persist();
         SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
         ss3.setSampleType(aliquot.getSampleType());
         ss3.setVolume(3.0);
         ss3.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss3.setActivityStatus("Active");
         ss3.persist();
         aliquot.getPatientVisit().getPatient().getStudy().addSampleStorage(
             Arrays.asList(ss1, ss2, ss3));
@@ -377,16 +382,17 @@ public class TestAliquot extends TestDatabase {
         aliquot.setLinkDate(date);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Assert.assertTrue(sdf.format(date)
-            .equals(aliquot.getFormattedLinkDate()));
+        Assert.assertTrue(sdf.format(date).equals(
+            aliquot.getFormattedLinkDate()));
     }
 
     @Test
     public void testCompareTo() throws BiobankCheckException, Exception {
         aliquot.setInventoryId("defgh");
         aliquot.persist();
-        AliquotWrapper sample2 = AliquotHelper.newAliquot(aliquot.getSampleType(),
-            aliquot.getParent(), aliquot.getPatientVisit(), 2, 3);
+        AliquotWrapper sample2 = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
+            2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
         Assert.assertTrue(aliquot.compareTo(sample2) > 0);

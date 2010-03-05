@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -30,7 +31,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -38,6 +38,10 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getActivityStatus");
 
     @Override
     public void setUp() throws Exception {
@@ -48,7 +52,7 @@ public class TestSite extends TestDatabase {
     public void testGettersAndSetters() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"
             + r.nextInt());
-        testGettersAndSetters(site);
+        testGettersAndSetters(site, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -370,6 +374,7 @@ public class TestSite extends TestDatabase {
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        site.setActivityStatus("Active");
 
         try {
             site.persist();

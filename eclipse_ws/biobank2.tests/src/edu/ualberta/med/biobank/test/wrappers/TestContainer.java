@@ -19,13 +19,13 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,17 +33,21 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestContainer extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getActivityStatus");
 
     private final String CBSR_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -237,7 +241,7 @@ public class TestContainer extends TestDatabase {
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
-        testGettersAndSetters(container);
+        testGettersAndSetters(container, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -898,7 +902,8 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                childL3.addAliquot(row, col, AliquotHelper.newSample(sampleType));
+                childL3.addAliquot(row, col, AliquotHelper
+                    .newSample(sampleType));
                 AliquotWrapper sample = childL3.getSample(row, col);
                 sample.setPatientVisit(pv);
                 sample.persist();
@@ -1332,8 +1337,8 @@ public class TestContainer extends TestDatabase {
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
         childL4.getContainerType().persist();
-        AliquotWrapper sample = AliquotHelper.addSample(sampleType, childL4, pv,
-            0, 0);
+        AliquotWrapper sample = AliquotHelper.addSample(sampleType, childL4,
+            pv, 0, 0);
 
         // attempt to delete the containers - should fail
         String[] names = new String[] { "ChildL4", "ChildL3", "ChildL2",
