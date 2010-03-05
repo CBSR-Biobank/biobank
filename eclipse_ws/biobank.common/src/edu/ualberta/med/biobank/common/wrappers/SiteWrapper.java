@@ -241,7 +241,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the patient visit does not have an activity status");
+                "the site does not have an activity status");
         }
 
         if (!checkSiteNameUnique()) {
