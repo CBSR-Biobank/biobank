@@ -9,9 +9,9 @@ import edu.ualberta.med.biobank.test.wrappers.TestContainerLabelingScheme;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerType;
 import edu.ualberta.med.biobank.test.wrappers.TestPatient;
 import edu.ualberta.med.biobank.test.wrappers.TestPatientVisit;
-import edu.ualberta.med.biobank.test.wrappers.TestPvSampleSource;
-import edu.ualberta.med.biobank.test.wrappers.TestSample;
-import edu.ualberta.med.biobank.test.wrappers.TestSampleSource;
+import edu.ualberta.med.biobank.test.wrappers.TestPvSourceVessel;
+import edu.ualberta.med.biobank.test.wrappers.TestAliquot;
+import edu.ualberta.med.biobank.test.wrappers.TestSourceVessel;
 import edu.ualberta.med.biobank.test.wrappers.TestSampleStorage;
 import edu.ualberta.med.biobank.test.wrappers.TestSampleType;
 import edu.ualberta.med.biobank.test.wrappers.TestShipment;
@@ -30,8 +30,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
     TestStudy.class, TestContainerLabelingScheme.class,
-    TestPvSampleSource.class, TestSample.class, TestClinic.class,
-    TestSampleStorage.class, TestSampleSource.class, TestSampleType.class,
+    TestPvSourceVessel.class, TestAliquot.class, TestClinic.class,
+    TestSampleStorage.class, TestSourceVessel.class, TestSampleType.class,
     TestContainer.class, TestContainerType.class, TestShipment.class,
     TestContact.class, TestShippingCompany.class })
 public class AllTests {

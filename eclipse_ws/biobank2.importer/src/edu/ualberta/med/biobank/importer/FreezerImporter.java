@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -201,7 +201,7 @@ public class FreezerImporter {
         }
 
         RowColPos pos = LabelingScheme.sbsToRowCol(palletPos);
-        SampleWrapper sample = pallet.getSample(pos.row, pos.col);
+        AliquotWrapper sample = pallet.getSample(pos.row, pos.col);
         if ((sample != null)
             && sample.getSampleType().getNameShort()
                 .equals(sampleTypeNameShort)
@@ -219,7 +219,7 @@ public class FreezerImporter {
             return;
         }
 
-        sample = new SampleWrapper(appService);
+        sample = new AliquotWrapper(appService);
         sample.setParent(pallet);
         sample.setSampleType(sampleType);
         sample.setInventoryId(inventoryId);
@@ -233,7 +233,7 @@ public class FreezerImporter {
             sample.setQuantity(ss.getVolume());
         }
 
-        if (!pallet.canHoldSample(sample)) {
+        if (!pallet.canHoldAliquot(sample)) {
             logger.error("pallet " + pallet.getLabel()
                 + " cannot hold sample of type " + sampleType.getName());
             return;

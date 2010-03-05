@@ -3,11 +3,10 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
@@ -15,16 +14,16 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -45,33 +44,15 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private static final String MSG_STUDY_OK = "Editing an existing study.";
 
-    public static final String[] ORDERED_FIELDS = new String[] { "name",
-        "nameShort", "activityStatus", "comment" };
-
-    public static final Map<String, FieldInfo> FIELDS;
-    static {
-        Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
-        aMap.put("name", new FieldInfo("Name", Text.class, SWT.NONE, null,
-            NonEmptyStringValidator.class, "Study name cannot be blank"));
-        aMap.put("nameShort", new FieldInfo("Short Name", Text.class, SWT.NONE,
-            null, NonEmptyStringValidator.class,
-            "Study short name cannot be blank"));
-        aMap.put("activityStatus", new FieldInfo("Activity Status",
-            Combo.class, SWT.NONE, FormConstants.ACTIVITY_STATUS, null, null));
-        aMap.put("comment", new FieldInfo("Comments", Text.class, SWT.MULTI,
-            null, null, null));
-        FIELDS = Collections.unmodifiableMap(aMap);
-    };
-
     private StudyAdapter studyAdapter;
 
     private StudyWrapper study;
 
     private ClinicAddInfoTable contactEntryTable;
 
-    private Collection<SampleSourceWrapper> allSampleSources;
+    private Collection<SourceVesselWrapper> allSourceVessels;
 
-    private MultiSelectWidget sampleSourceMultiSelect;
+    private MultiSelectWidget sourceVesselMultiSelect;
 
     private List<StudyPvAttrCustom> pvCustomInfoList;
 
@@ -132,14 +113,25 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Repository Site");
         setTextValue(siteLabel, study.getSite().getName());
 
-        createBoundWidgetsFromMap(FIELDS, study, client);
+        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+            "Name", null, BeansObservables.observeValue(study, "name"),
+            new NonEmptyStringValidator("Study name cannot be blank"));
 
-        firstControl = getWidget("name");
-        Assert.isNotNull(firstControl, "name field does not exist");
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
+            null, BeansObservables.observeValue(study, "nameShort"),
+            new NonEmptyStringValidator("Study short name cannot be blank"));
 
-        Text comments = (Text) getWidget("comment");
-        GridData gd = (GridData) comments.getLayoutData();
+        createComboViewerWithNoSelectionValidator(client, "Container Type",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService), study
+                .getActivityStatus(), "Study must have an activity status",
+            true);
+
+        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(study,
+                "comment"), null);
+        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
+        comment.setLayoutData(gd);
 
         createClinicSection();
         createSampleStorageSection();
@@ -165,13 +157,13 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleStorageSection() {
-        Section section = createSection("Sample Storage");
+        Section section = createSection("Aliquot Storage");
         sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
             study.getSite(), study.getSampleStorageCollection());
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);
         sampleStorageEntryTable.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, "Add Sample Storage",
+        addSectionToolbar(section, "Add Aliquot Storage",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -183,31 +175,31 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSourceVesselsSection() throws Exception {
         Composite client = createSectionWithClient("Source Vessels");
-        allSampleSources = SampleSourceWrapper.getAllSampleSources(appService);
-        sampleSourceMultiSelect = new MultiSelectWidget(client, SWT.NONE,
+        allSourceVessels = SourceVesselWrapper.getAllSourceVessels(appService);
+        sourceVesselMultiSelect = new MultiSelectWidget(client, SWT.NONE,
             "Selected Source Vessels", "Available Source Vessels", 100);
-        sampleSourceMultiSelect.adaptToToolkit(toolkit, true);
-        sampleSourceMultiSelect.addSelectionChangedListener(listener);
-        setSampleSourceWidgetSelections();
+        sourceVesselMultiSelect.adaptToToolkit(toolkit, true);
+        sourceVesselMultiSelect.addSelectionChangedListener(listener);
+        setSourceVesselWidgetSelections();
     }
 
-    public void setSampleSourceWidgetSelections() {
-        Collection<SampleSourceWrapper> studySampleSources = study
-            .getSampleSourceCollection();
-        LinkedHashMap<Integer, String> availSampleSource = new LinkedHashMap<Integer, String>();
-        List<Integer> selSampleSource = new ArrayList<Integer>();
+    public void setSourceVesselWidgetSelections() {
+        Collection<SourceVesselWrapper> studySourceVessels = study
+            .getSourceVesselCollection();
+        LinkedHashMap<Integer, String> availSourceVessel = new LinkedHashMap<Integer, String>();
+        List<Integer> selSourceVessel = new ArrayList<Integer>();
 
-        if (studySampleSources != null) {
-            for (SampleSourceWrapper ss : studySampleSources) {
-                selSampleSource.add(ss.getId());
+        if (studySourceVessels != null) {
+            for (SourceVesselWrapper ss : studySourceVessels) {
+                selSourceVessel.add(ss.getId());
             }
         }
 
-        for (SampleSourceWrapper ss : allSampleSources) {
-            availSampleSource.put(ss.getId(), ss.getName());
+        for (SourceVesselWrapper ss : allSourceVessels) {
+            availSourceVessel.put(ss.getId(), ss.getName());
         }
-        sampleSourceMultiSelect.setSelections(availSampleSource,
-            selSampleSource);
+        sourceVesselMultiSelect.setSelections(availSourceVessel,
+            selSourceVessel);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -278,12 +270,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        setSampleSources();
+        setSourceVessels();
 
         setStudyPvAttr();
 
-        // sample storages
-        study.addSampleStorages(sampleStorageEntryTable
+        // sample storage
+        study.addSampleStorage(sampleStorageEntryTable
             .getAddedOrModifiedSampleStorages());
         study.removeSampleStorages(sampleStorageEntryTable
             .getDeletedSampleStorages());
@@ -338,29 +330,29 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void setSampleSources() {
-        List<Integer> addedSampleSourceIds = sampleSourceMultiSelect
+    private void setSourceVessels() {
+        List<Integer> addedSourceVesselIds = sourceVesselMultiSelect
             .getAddedToSelection();
-        List<Integer> removedSampleSourceIds = sampleSourceMultiSelect
+        List<Integer> removedSourceVesselIds = sourceVesselMultiSelect
             .getRemovedToSelection();
-        List<SampleSourceWrapper> addedSampleSources = new ArrayList<SampleSourceWrapper>();
-        List<SampleSourceWrapper> removedSampleSources = new ArrayList<SampleSourceWrapper>();
-        if (allSampleSources != null) {
-            for (SampleSourceWrapper ss : allSampleSources) {
+        List<SourceVesselWrapper> addedSourceVessels = new ArrayList<SourceVesselWrapper>();
+        List<SourceVesselWrapper> removedSourceVessels = new ArrayList<SourceVesselWrapper>();
+        if (allSourceVessels != null) {
+            for (SourceVesselWrapper ss : allSourceVessels) {
                 int id = ss.getId();
-                if (addedSampleSourceIds.indexOf(id) >= 0) {
-                    addedSampleSources.add(ss);
-                } else if (removedSampleSourceIds.indexOf(id) >= 0) {
-                    removedSampleSources.add(ss);
+                if (addedSourceVesselIds.indexOf(id) >= 0) {
+                    addedSourceVessels.add(ss);
+                } else if (removedSourceVesselIds.indexOf(id) >= 0) {
+                    removedSourceVessels.add(ss);
                 }
             }
         }
-        Assert.isTrue(addedSampleSources.size() == addedSampleSourceIds.size(),
-            "problem with added sample source selections");
-        study.addSampleSources(addedSampleSources);
-        Assert.isTrue(removedSampleSources.size() == removedSampleSourceIds
-            .size(), "problem with removed sample source selections");
-        study.removeSampleSources(removedSampleSources);
+        Assert.isTrue(addedSourceVessels.size() == addedSourceVesselIds.size(),
+            "problem with added source vessel selections");
+        study.addSourceVessels(addedSourceVessels);
+        Assert.isTrue(removedSourceVessels.size() == removedSourceVesselIds
+            .size(), "problem with removed source vessel selections");
+        study.removeSourceVessels(removedSourceVessels);
     }
 
     @Override
@@ -379,7 +371,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             sampleStorageEntryTable.setSampleStorages(sampleStorages);
         }
 
-        setSampleSourceWidgetSelections();
+        setSourceVesselWidgetSelections();
 
         // TODO reset PV CUSTOM INFO
 

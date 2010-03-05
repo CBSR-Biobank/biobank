@@ -35,7 +35,7 @@ public class ClinicAdapter extends AdapterBase {
     protected String getLabelInternal() {
         ClinicWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper, "client is null");
-        return wrapper.getName();
+        return wrapper.getNameShort();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ClinicAdapter extends AdapterBase {
         ClinicWrapper clinic = getWrapper();
         SiteWrapper site = clinic.getSite();
         if (site != null) {
-            return site.getName() + " - " + getTooltipText("Clinic");
+            return site.getNameShort() + " - " + getTooltipText("Clinic");
         }
         return getTooltipText("Clinic");
     }

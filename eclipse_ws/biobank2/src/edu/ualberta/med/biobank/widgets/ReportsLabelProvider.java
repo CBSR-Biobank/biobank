@@ -37,7 +37,7 @@ public class ReportsLabelProvider extends LabelProvider implements
         // case 5:
         // return String.valueOf(study.getStudyPvAttrCollection().size());
         // case 6:
-        // return String.valueOf(study.getSampleSourceCollection().size());
+        // return String.valueOf(study.getSourceVesselCollection().size());
         // case 7:
         // return String
         // .valueOf(study.getSampleStorageCollection().size());
@@ -127,7 +127,7 @@ public class ReportsLabelProvider extends LabelProvider implements
         // case 6:
         // return container.getProductBarcode();
         // case 7:
-        // return String.valueOf(container.getSamplePositionCollection()
+        // return String.valueOf(container.getAliquotPositionCollection()
         // .size());
         // case 8:
         // return container.getSite().getName();
@@ -138,8 +138,8 @@ public class ReportsLabelProvider extends LabelProvider implements
         // return container.getTemperature().toString();
         //
         // }
-        // } else if (element instanceof Sample) {
-        // final Sample sample = (Sample) element;
+        // } else if (element instanceof Aliquot) {
+        // final Aliquot sample = (Aliquot) element;
         // switch (columnIndex) {
         // case 0:
         // return sample.getId().toString();
@@ -167,11 +167,11 @@ public class ReportsLabelProvider extends LabelProvider implements
         // else
         // return sample.getQuantityUsed().toString();
         // case 7:
-        // if (sample.getSamplePosition() == null)
+        // if (sample.getAliquotPosition() == null)
         // return "";
         // else
-        // return sample.getSamplePosition().getRow() + ","
-        // + sample.getSamplePosition();
+        // return sample.getAliquotPosition().getRow() + ","
+        // + sample.getAliquotPosition();
         // case 8:
         // if (sample.getSampleType() == null)
         // return "";

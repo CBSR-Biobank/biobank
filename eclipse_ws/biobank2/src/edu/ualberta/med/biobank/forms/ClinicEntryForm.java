@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.infotables.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm";
@@ -57,7 +59,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         if (clinic.getId() == null)
             tabName = "New Clinic";
         else
-            tabName = "Clinic " + clinic.getName();
+            tabName = "Clinic " + clinic.getNameShort();
         setPartName(tabName);
     }
 
@@ -70,7 +72,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws ApplicationException {
         form.setText("Clinic Information");
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
@@ -92,7 +94,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         // IJavaHelpContextIds.XXXXX);
     }
 
-    private void createClinicInfoSection() {
+    private void createClinicInfoSection() throws ApplicationException {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -108,9 +110,14 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Name", null, BeansObservables.observeValue(clinic, "name"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(clinic, "activityStatus"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name Short",
+            null, BeansObservables.observeValue(clinic, "nameShort"),
+            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
+
+        createComboViewerWithNoSelectionValidator(client, "Container Type",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService), clinic
+                .getActivityStatus(), "Clinic must have an activity status",
+            true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(clinic,

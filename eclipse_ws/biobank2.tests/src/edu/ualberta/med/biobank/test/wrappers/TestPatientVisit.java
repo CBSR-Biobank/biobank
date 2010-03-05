@@ -17,24 +17,25 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -42,8 +43,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.PvSampleSourceHelper;
-import edu.ualberta.med.biobank.test.internal.SampleHelper;
+import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -204,7 +204,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        SampleWrapper sample = SampleHelper.addSample(allSampleTypes.get(0),
+        AliquotWrapper sample = AliquotHelper.addSample(allSampleTypes.get(0),
             containerMap.get("ChildL1"), visit, 0, 0);
         visit.reload();
 
@@ -240,7 +240,7 @@ public class TestPatientVisit extends TestDatabase {
         ContainerWrapper container = containerMap.get("ChildL1");
 
         // fill container with random samples
-        Map<Integer, SampleWrapper> sampleMap = new HashMap<Integer, SampleWrapper>();
+        Map<Integer, AliquotWrapper> sampleMap = new HashMap<Integer, AliquotWrapper>();
         int rows = container.getRowCapacity().intValue();
         int cols = container.getColCapacity().intValue();
         for (int row = 0; row < rows; ++row) {
@@ -248,7 +248,7 @@ public class TestPatientVisit extends TestDatabase {
                 if (r.nextGaussian() > 0.0)
                     continue;
                 // System.out.println("setting sample at: " + row + ", " + col);
-                sampleMap.put(row + col * rows, SampleHelper.addSample(
+                sampleMap.put(row + col * rows, AliquotHelper.addSample(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
                     container, visit, row, col));
             }
@@ -256,10 +256,10 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // verify that all samples are there
-        Collection<SampleWrapper> visitSamples = visit.getSampleCollection();
+        Collection<AliquotWrapper> visitSamples = visit.getAliquotCollection();
         Assert.assertEquals(sampleMap.size(), visitSamples.size());
 
-        for (SampleWrapper sample : visitSamples) {
+        for (AliquotWrapper sample : visitSamples) {
             RowColPos pos = sample.getPosition();
             // System.out.println("getting sample from: " + pos.row + ", "
             // + pos.col);
@@ -272,11 +272,11 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // delete all samples now
-        for (SampleWrapper sample : visitSamples) {
+        for (AliquotWrapper sample : visitSamples) {
             sample.delete();
         }
         visit.reload();
-        visitSamples = visit.getSampleCollection();
+        visitSamples = visit.getAliquotCollection();
         Assert.assertEquals(0, visitSamples.size());
     }
 
@@ -486,7 +486,7 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testGetSetPvAttrLocked() throws Exception {
+    public void testGetSetPvAttrActivityStatus() throws Exception {
         addPvAttrs();
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
@@ -496,7 +496,7 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrLocked("Worksheet", true);
+        study.setStudyPvAttrActivityStatus("Worksheet", "Disabled");
         study.persist();
         visit.reload();
         try {
@@ -507,7 +507,7 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyPvAttrLocked("Worksheet", false);
+        study.setStudyPvAttrActivityStatus("Worksheet", "Active");
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
@@ -594,37 +594,37 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testAddPvSampleSources() throws Exception {
+    public void testAddPvSourceVessels() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate());
 
-        PvSampleSourceWrapper ss1, ss2, ss3;
+        PvSourceVesselWrapper ss1, ss2, ss3;
 
-        ss1 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(0).getName(), visit);
-        ss2 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(1).getName(), visit);
+        ss1 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
+            .getAllSourceVessels(appService).get(0).getName(), visit);
+        ss2 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
+            .getAllSourceVessels(appService).get(1).getName(), visit);
 
-        visit.addPvSampleSources(Arrays.asList(ss1, ss2));
+        visit.addPvSourceVessels(Arrays.asList(ss1, ss2));
         visit.persist();
 
         visit.reload();
         // get the sorted list
-        List<PvSampleSourceWrapper> list = visit
-            .getPvSampleSourceCollection(true);
+        List<PvSourceVesselWrapper> list = visit
+            .getPvSourceVesselCollection(true);
         Assert.assertEquals(2, list.size());
         Assert.assertTrue(list.get(0).compareTo(list.get(1)) < 0);
 
-        ss3 = PvSampleSourceHelper.newPvSampleSource(SampleSourceWrapper
-            .getAllSampleSources(appService).get(1).getName(), visit);
+        ss3 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
+            .getAllSourceVessels(appService).get(1).getName(), visit);
 
-        PvSampleSourceWrapper pvss = list.get(0);
-        visit.removePvSampleSources(Arrays.asList(pvss));
-        visit.addPvSampleSources(Arrays.asList(ss3));
+        PvSourceVesselWrapper pvss = list.get(0);
+        visit.removePvSourceVessels(Arrays.asList(pvss));
+        visit.addPvSourceVessels(Arrays.asList(ss3));
 
         visit.persist();
 
-        list = visit.getPvSampleSourceCollection();
+        list = visit.getPvSourceVesselCollection();
         Assert.assertEquals(2, list.size());
     }
 
@@ -644,10 +644,10 @@ public class TestPatientVisit extends TestDatabase {
             sampleType);
         ss3.setVolume(3.0);
         ss3.persist();
-        SampleWrapper newSample = visit.addNewSample("newid", sampleType,
+        AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
             Arrays.asList(ss1, ss2, ss3));
-        Sample dbSample = ModelUtils.getObjectWithId(appService, Sample.class,
-            newSample.getId());
+        Aliquot dbSample = ModelUtils.getObjectWithId(appService,
+            Aliquot.class, newSample.getId());
         Assert.assertEquals(dbSample.getSampleType().getId(), newSample
             .getSampleType().getId());
         Assert.assertTrue(dbSample.getQuantity().equals(3.0));

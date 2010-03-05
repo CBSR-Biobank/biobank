@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -11,10 +13,12 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
 
@@ -29,9 +33,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private SiteAdapter siteAdapter;
 
-    private SiteWrapper siteWrapper;
+    private SiteWrapper site;
 
     protected Combo session;
+
+    private ComboViewer activityStatusComboViewer;
+
+    private String currentActivityStatus;
 
     @Override
     public void init() {
@@ -40,35 +48,36 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        siteWrapper = siteAdapter.getWrapper();
+        site = siteAdapter.getWrapper();
         try {
-            siteWrapper.reload();
+            site.reload();
         } catch (Exception e) {
             logger.error("Can't reload site", e);
         }
 
         String tabName;
-        if (siteWrapper.getId() == null) {
+        if (site.getId() == null) {
             tabName = "New Repository Site";
         } else {
-            tabName = "Repository Site " + siteWrapper.getName();
+            tabName = "Repository Site " + site.getNameShort();
         }
         setPartName(tabName);
     }
 
     @Override
-    protected void createFormContent() {
+    protected void createFormContent() throws ApplicationException {
         form.setText("Repository Site Information");
         form.getBody().setLayout(new GridLayout(1, false));
+        currentActivityStatus = site.getActivityStatus();
         createSiteSection();
-        createAddressArea(siteWrapper);
+        createAddressArea(site);
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
         // IJavaHelpContextIds.XXXXX);
     }
 
-    private void createSiteSection() {
+    private void createSiteSection() throws ApplicationException {
         toolkit
             .createLabel(
                 form.getBody(),
@@ -85,16 +94,21 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             BioBankPlugin.IMG_SITE));
 
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, BeansObservables.observeValue(siteWrapper, "name"),
+            "Name", null, BeansObservables.observeValue(site, "name"),
             new NonEmptyStringValidator(MSG_NO_SITE_NAME));
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(siteWrapper, "activityStatus"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name Short",
+            null, BeansObservables.observeValue(site, "nameShort"),
+            new NonEmptyStringValidator("Site short name cannot be blank"));
+
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status", ActivityStatusWrapper
+                .getAllActivityStatusNames(appService), site
+                .getActivityStatus(), "Site must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                siteWrapper, "comment"), null);
+            SWT.MULTI, "Comments", null, BeansObservables.observeValue(site,
+                "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);
@@ -102,7 +116,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected String getOkMessage() {
-        if (siteWrapper.getId() == null) {
+        if (site.getId() == null) {
             return MSG_NEW_SITE_OK;
         }
         return MSG_SITE_OK;
@@ -113,12 +127,28 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
-        siteWrapper.persist();
+        site
+            .setActivityStatus((String) ((StructuredSelection) activityStatusComboViewer
+                .getSelection()).getFirstElement());
+        site.persist();
         SessionManager.getInstance().updateSites();
     }
 
     @Override
     public String getNextOpenedFormID() {
         return SiteViewForm.ID;
+    }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        currentActivityStatus = site.getActivityStatus();
+        if (currentActivityStatus != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                currentActivityStatus));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
+
     }
 }

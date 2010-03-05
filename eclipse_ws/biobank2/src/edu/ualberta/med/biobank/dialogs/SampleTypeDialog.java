@@ -15,10 +15,10 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SampleTypeDialog extends BiobankDialog {
 
-    private static final String TITLE = "Sample Type ";
+    private static final String TITLE = "Aliquot Type ";
 
-    private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
-    private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
+    private static final String MSG_NO_ST_NAME = "Aliquot type must have a name.";
+    private static final String MSG_NO_ST_SNAME = "Aliquot type must have a short name.";
 
     private SampleTypeWrapper origSampleType;
 
@@ -49,9 +49,9 @@ public class SampleTypeDialog extends BiobankDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         if (origSampleType.isNew()) {
-            setTitle("Add Sample Type");
+            setTitle("Add Aliquot Type");
         } else {
-            setTitle("Edit Sample Type");
+            setTitle("Edit Aliquot Type");
         }
         setMessage(message);
         return contents;

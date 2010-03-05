@@ -12,12 +12,13 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -60,6 +61,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         ApplicationException, WrapperException {
         checkSite();
         checkNameUnique();
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the container type does not have an activity status");
+        }
         if (getCapacity() == null) {
             throw new BiobankCheckException("Capacity should be set");
         }
@@ -81,10 +86,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private void checkDeletedSampleTypes() throws ApplicationException,
         BiobankCheckException {
         if (deletedSampleTypes.size() > 0) {
-            String queryString = "from " + SamplePosition.class.getName()
+            String queryString = "from " + AliquotPosition.class.getName()
                 + " as sp inner join sp.container as sparent"
                 + " where sparent.containerType.id=? and "
-                + "sp.sample.sampleType.id in (select id from "
+                + "sp.aliquot.sampleType.id in (select id from "
                 + SampleType.class.getName() + " as st where";
             List<Object> params = new ArrayList<Object>();
             params.add(getId());
@@ -281,15 +286,36 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return wrappedObject.getDefaultTemperature();
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldActivityStatus = wrappedObject.getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+    private ActivityStatusWrapper getActivityStatusInternal() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
     }
 
     public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
+        if (activityStatus == null) {
+            return null;
+        }
+        return activityStatus.getName();
+    }
+
+    private void setActivityStatus(ActivityStatus activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        wrappedObject.setActivityStatus(activityStatus);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+
+    }
+
+    public void setActivityStatus(String name) throws Exception {
+        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name + "\" is invalid");
+        }
+        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     private void setSampleTypeCollection(Collection<SampleType> allTypeObjects,

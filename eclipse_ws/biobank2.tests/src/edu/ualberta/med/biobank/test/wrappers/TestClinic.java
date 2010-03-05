@@ -32,13 +32,17 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestClinic extends TestDatabase {
 
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getActivityStatus");
+
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
 
-        testGettersAndSetters(clinic);
+        testGettersAndSetters(clinic, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -191,7 +195,7 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testPersistFailAddressNotNul() throws Exception {
+    public void testPersistFailAddressNotNull() throws Exception {
         String name = "testPersistFailAddressNotNul" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicHelper.addClinic(site, name + "_1");
@@ -200,6 +204,7 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setSite(site);
+        clinic.setActivityStatus("Active");
         try {
             clinic.persist();
             Assert.fail("Should not insert the clinic : no address");
@@ -215,11 +220,12 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testPersistFailSiteNotNul() throws Exception {
+    public void testPersistFailSiteNotNull() throws Exception {
         String name = "testPersistFailSiteNotNul" + r.nextInt();
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setCity("Rupt");
+        clinic.setActivityStatus("Active");
 
         try {
             clinic.persist();
@@ -229,6 +235,25 @@ public class TestClinic extends TestDatabase {
         }
         SiteWrapper site = SiteHelper.addSite(name);
         clinic.setSite(site);
+        clinic.persist();
+    }
+
+    @Test
+    public void testPersistFailActivityStatusNull() throws Exception {
+        String name = "testPersistFailSiteNotNul" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = new ClinicWrapper(appService);
+        clinic.setSite(site);
+        clinic.setName(name);
+        clinic.setCity("Rupt");
+
+        try {
+            clinic.persist();
+            Assert.fail("Should not insert the clinic : no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+        clinic.setActivityStatus("Active");
         clinic.persist();
     }
 

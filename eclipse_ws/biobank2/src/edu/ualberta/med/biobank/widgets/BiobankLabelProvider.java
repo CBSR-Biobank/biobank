@@ -6,13 +6,13 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -54,8 +54,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 2:
                 return String.valueOf(study.getPatientCollection().size());
             }
-        } else if (element instanceof SampleWrapper) {
-            final SampleWrapper sample = (SampleWrapper) element;
+        } else if (element instanceof AliquotWrapper) {
+            final AliquotWrapper sample = (AliquotWrapper) element;
             switch (columnIndex) {
             case 0:
                 return sample.getInventoryId();
@@ -71,9 +71,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 4:
                 return sample.getQuantity() == null ? "" : sample.getQuantity()
                     .toString();
-            case 5:
-                return sample.getQuantityUsed() == null ? "" : sample
-                    .getQuantityUsed().toString();
             case 6:
                 return sample.getComment() == null ? "" : sample.getComment();
             }
@@ -102,8 +99,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "";
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
-        } else if (element instanceof SampleSourceWrapper) {
-            SampleSourceWrapper source = (SampleSourceWrapper) element;
+        } else if (element instanceof SourceVesselWrapper) {
+            SourceVesselWrapper source = (SourceVesselWrapper) element;
             if (columnIndex == 0) {
                 return source.getName();
             } else {
@@ -126,7 +123,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof ClinicWrapper) {
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
-            return ((SiteWrapper) element).getName();
+            return ((SiteWrapper) element).getNameShort();
         } else if (element instanceof SampleTypeWrapper) {
             return ((SampleTypeWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {

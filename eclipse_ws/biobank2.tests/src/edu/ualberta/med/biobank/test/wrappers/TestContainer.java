@@ -19,13 +19,13 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,17 +33,21 @@ import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SampleHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestContainer extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getActivityStatus");
 
     private final String CBSR_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -237,7 +241,7 @@ public class TestContainer extends TestDatabase {
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
-        testGettersAndSetters(container);
+        testGettersAndSetters(container, GETTER_SKIP_METHODS);
     }
 
     @Test
@@ -824,20 +828,20 @@ public class TestContainer extends TestDatabase {
         // reload because we changed container type
         childL3.reload();
         PatientVisitWrapper pv = addPatientVisit();
-        SampleWrapper sample;
+        AliquotWrapper sample;
 
         for (SampleTypeWrapper st : allSampleTypes) {
-            sample = SampleHelper.newSample(st, childL3, pv, 0, 0);
+            sample = AliquotHelper.newAliquot(st, childL3, pv, 0, 0);
             if (selectedSampleTypes.contains(st)) {
-                Assert.assertTrue(childL3.canHoldSample(sample));
+                Assert.assertTrue(childL3.canHoldAliquot(sample));
             } else {
-                Assert.assertTrue(!childL3.canHoldSample(sample));
+                Assert.assertTrue(!childL3.canHoldAliquot(sample));
             }
         }
 
-        sample = SampleHelper.newSample(null, childL3, pv, 0, 0);
+        sample = AliquotHelper.newAliquot(null, childL3, pv, 0, 0);
         try {
-            childL3.canHoldSample(sample);
+            childL3.canHoldAliquot(sample);
             Assert
                 .fail("should not be allowed to add sample with null sample type");
         } catch (WrapperException e) {
@@ -887,7 +891,7 @@ public class TestContainer extends TestDatabase {
                         .nextInt(unselectedSampleTypes.size()));
                     Assert.assertNull(childL3.getSample(row, col));
                     try {
-                        childL3.addSample(row, col, SampleHelper
+                        childL3.addAliquot(row, col, AliquotHelper
                             .newSample(sampleType));
                         Assert
                             .fail("should not be allowed to add invalid sample type");
@@ -898,8 +902,9 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                childL3.addSample(row, col, SampleHelper.newSample(sampleType));
-                SampleWrapper sample = childL3.getSample(row, col);
+                childL3.addAliquot(row, col, AliquotHelper
+                    .newSample(sampleType));
+                AliquotWrapper sample = childL3.getSample(row, col);
                 sample.setPatientVisit(pv);
                 sample.persist();
             }
@@ -911,7 +916,7 @@ public class TestContainer extends TestDatabase {
         sampleType = selectedSampleTypes.get(r.nextInt(selectedSampleTypes
             .size()));
         try {
-            childL3.addSample(0, 0, SampleHelper.newSample(sampleType));
+            childL3.addAliquot(0, 0, AliquotHelper.newSample(sampleType));
             Assert
                 .fail("should not be allowed to add second sample type in same position");
         } catch (Exception e) {
@@ -920,10 +925,10 @@ public class TestContainer extends TestDatabase {
 
         // force samples to be loaded from DB
         childL3 = containerMap.get("ChildL2").getChild(0, 0);
-        Map<RowColPos, SampleWrapper> samples = childL3.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = childL3.getSamples();
         Assert.assertEquals(samplesTypesMap.size(), samples.size());
         for (RowColPos pos : samples.keySet()) {
-            SampleWrapper sample = samples.get(pos);
+            AliquotWrapper sample = samples.get(pos);
             Assert.assertTrue((pos.row >= 0)
                 && (pos.row < CONTAINER_CHILD_L3_ROWS));
             Assert.assertTrue((pos.col >= 0)
@@ -934,7 +939,7 @@ public class TestContainer extends TestDatabase {
 
         for (int row = 0, maxRow = childL3.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
-                SampleWrapper sample = childL3.getSample(row, col);
+                AliquotWrapper sample = childL3.getSample(row, col);
                 Assert.assertEquals(samplesTypesMap
                     .get(new RowColPos(row, col)), sample.getSampleType());
                 sample.delete();
@@ -1332,8 +1337,8 @@ public class TestContainer extends TestDatabase {
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
         childL4.getContainerType().persist();
-        SampleWrapper sample = SampleHelper.addSample(sampleType, childL4, pv,
-            0, 0);
+        AliquotWrapper sample = AliquotHelper.addSample(sampleType, childL4,
+            pv, 0, 0);
 
         // attempt to delete the containers - should fail
         String[] names = new String[] { "ChildL4", "ChildL3", "ChildL2",

@@ -11,36 +11,36 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Sample;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleWrapper extends
-    AbstractPositionHolder<Sample, SamplePosition> {
+public class AliquotWrapper extends
+    AbstractPositionHolder<Aliquot, AliquotPosition> {
 
-    public SampleWrapper(WritableApplicationService appService,
-        Sample wrappedObject) {
+    public AliquotWrapper(WritableApplicationService appService,
+        Aliquot wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SampleWrapper(WritableApplicationService appService) {
+    public AliquotWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "inventoryId", "patientVisit", "position",
-            "linkDate", "sampleType", "quantity", "oldComment", "quantityUsed" };
+            "linkDate", "sampleType", "quantity", "oldComment" };
     }
 
     @Override
-    public Class<Sample> getWrappedClass() {
-        return Sample.class;
+    public Class<Aliquot> getWrappedClass() {
+        return Aliquot.class;
     }
 
     @Override
@@ -71,21 +71,21 @@ public class SampleWrapper extends
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<SampleWrapper> samples = getSamplesInSite(appService,
+        List<AliquotWrapper> aliquots = getSamplesInSite(appService,
             getInventoryId(), getSite());
         boolean alreadyExists = false;
-        if (samples.size() > 0 && isNew()) {
+        if (aliquots.size() > 0 && isNew()) {
             alreadyExists = true;
         } else {
-            for (SampleWrapper sample : samples) {
-                if (!sample.getId().equals(getId())) {
+            for (AliquotWrapper aliquot : aliquots) {
+                if (!aliquot.getId().equals(getId())) {
                     alreadyExists = true;
                     break;
                 }
             }
         }
         if (alreadyExists) {
-            throw new BiobankCheckException("A sample with inventoryId \""
+            throw new BiobankCheckException("An aliquot with inventory id \""
                 + getInventoryId() + "\" already exists.");
         }
     }
@@ -141,7 +141,7 @@ public class SampleWrapper extends
         return new PatientVisitWrapper(appService, pv);
     }
 
-    public void setSamplePositionFromString(String positionString,
+    public void setAliquotPositionFromString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = LabelingScheme.getRowColFromPositionString(
             positionString, parentContainer.getContainerType());
@@ -153,7 +153,7 @@ public class SampleWrapper extends
     }
 
     /**
-     * Method used to check if the current position of this sample is available
+     * Method used to check if the current position of this aliquot is available
      * on the container. Return true if the position is free, false otherwise
      */
     public boolean isPositionFree(ContainerWrapper parentContainer)
@@ -161,13 +161,13 @@ public class SampleWrapper extends
         RowColPos position = getPosition();
         if (position != null) {
             HQLCriteria criteria = new HQLCriteria("from "
-                + Sample.class.getName()
-                + " where samplePosition.row=? and samplePosition.col=?"
-                + " and samplePosition.container=?", Arrays
+                + Aliquot.class.getName()
+                + " where aliquotPosition.row=? and aliquotPosition.col=?"
+                + " and aliquotPosition.container=?", Arrays
                 .asList(new Object[] { position.row, position.col,
                     parentContainer.getWrappedObject() }));
 
-            List<Sample> samples = appService.query(criteria);
+            List<Aliquot> samples = appService.query(criteria);
             if (samples.size() > 0) {
                 return false;
             }
@@ -216,17 +216,6 @@ public class SampleWrapper extends
         wrappedObject.setQuantity(quantity);
         propertyChangeSupport.firePropertyChange("quantity", oldQuantity,
             quantity);
-    }
-
-    public Double getQuantityUsed() {
-        return wrappedObject.getQuantityUsed();
-    }
-
-    public void setQuantityUsed(Double quantityUsed) {
-        Double oldQuantityUsed = wrappedObject.getQuantityUsed();
-        wrappedObject.setQuantityUsed(quantityUsed);
-        propertyChangeSupport.firePropertyChange("quantityUsed",
-            oldQuantityUsed, quantityUsed);
     }
 
     public Double getQuantity() {
@@ -299,44 +288,44 @@ public class SampleWrapper extends
         ApplicationException {
     }
 
-    public static List<SampleWrapper> getSamplesInSite(
+    public static List<AliquotWrapper> getSamplesInSite(
         WritableApplicationService appService, String inventoryId,
         SiteWrapper siteWrapper) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
-                + Sample.class.getName()
+                + Aliquot.class.getName()
                 + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
             Arrays.asList(new Object[] { inventoryId, siteWrapper.getId() }));
-        List<Sample> samples = appService.query(criteria);
-        List<SampleWrapper> list = new ArrayList<SampleWrapper>();
-        for (Sample sample : samples) {
-            if (sample.getInventoryId().equals(inventoryId)) {
-                list.add(new SampleWrapper(appService, sample));
+        List<Aliquot> aliquots = appService.query(criteria);
+        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
+        for (Aliquot aliquot : aliquots) {
+            if (aliquot.getInventoryId().equals(inventoryId)) {
+                list.add(new AliquotWrapper(appService, aliquot));
             }
         }
         return list;
     }
 
     @Override
-    public int compareTo(ModelWrapper<Sample> o) {
-        if (o instanceof SampleWrapper) {
+    public int compareTo(ModelWrapper<Aliquot> o) {
+        if (o instanceof AliquotWrapper) {
             return getInventoryId().compareTo(
-                ((SampleWrapper) o).getInventoryId());
+                ((AliquotWrapper) o).getInventoryId());
         }
         return 0;
     }
 
     @Override
-    protected AbstractPositionWrapper<SamplePosition> getSpecificPositionWrapper(
+    protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        SamplePosition pos = wrappedObject.getSamplePosition();
+        AliquotPosition pos = wrappedObject.getAliquotPosition();
         if (pos != null) {
-            return new SamplePositionWrapper(appService, pos);
+            return new AliquotPositionWrapper(appService, pos);
         } else if (initIfNoPosition) {
-            SamplePositionWrapper posWrapper = new SamplePositionWrapper(
+            AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
                 appService);
-            posWrapper.setSample(this);
-            wrappedObject.setSamplePosition(posWrapper.getWrappedObject());
+            posWrapper.setAliquot(this);
+            wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
             return posWrapper;
         }
         return null;

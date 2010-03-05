@@ -6,19 +6,19 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.model.SampleSource;
+import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
+public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
 
-    public SampleSourceWrapper(WritableApplicationService appService,
-        SampleSource wrappedObject) {
+    public SourceVesselWrapper(WritableApplicationService appService,
+        SourceVessel wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SampleSourceWrapper(WritableApplicationService appService) {
+    public SourceVesselWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -38,8 +38,8 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
     }
 
     /**
-     * Get study list. Use Study.setSampleSourceCollection to link studies and
-     * sample sources
+     * Get study list. Use Study.setSourceVesselCollection to link studies and
+     * source vessels.
      */
     @SuppressWarnings("unchecked")
     public Collection<StudyWrapper> getStudyCollection(boolean sort) {
@@ -61,8 +61,8 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
     }
 
     @Override
-    public Class<SampleSource> getWrappedClass() {
-        return SampleSource.class;
+    public Class<SourceVessel> getWrappedClass() {
+        return SourceVessel.class;
     }
 
     @Override
@@ -75,20 +75,20 @@ public class SampleSourceWrapper extends ModelWrapper<SampleSource> {
         ApplicationException {
     }
 
-    public static List<SampleSourceWrapper> getAllSampleSources(
+    public static List<SourceVesselWrapper> getAllSourceVessels(
         WritableApplicationService appService) throws ApplicationException {
-        List<SampleSource> list = appService.search(SampleSource.class,
-            new SampleSource());
-        List<SampleSourceWrapper> wrappers = new ArrayList<SampleSourceWrapper>();
-        for (SampleSource ss : list) {
-            wrappers.add(new SampleSourceWrapper(appService, ss));
+        List<SourceVessel> list = appService.search(SourceVessel.class,
+            new SourceVessel());
+        List<SourceVesselWrapper> wrappers = new ArrayList<SourceVesselWrapper>();
+        for (SourceVessel ss : list) {
+            wrappers.add(new SourceVesselWrapper(appService, ss));
         }
         return wrappers;
     }
 
     @Override
-    public int compareTo(ModelWrapper<SampleSource> wrapper) {
-        if (wrapper instanceof SampleSourceWrapper) {
+    public int compareTo(ModelWrapper<SourceVessel> wrapper) {
+        if (wrapper instanceof SourceVesselWrapper) {
             String name1 = wrappedObject.getName();
             String name2 = wrapper.wrappedObject.getName();
             return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0

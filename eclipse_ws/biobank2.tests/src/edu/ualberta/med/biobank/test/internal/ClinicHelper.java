@@ -11,6 +11,7 @@ public class ClinicHelper extends DbHelper {
         clinic.setName(name);
         clinic.setCity("");
         clinic.setSite(site);
+        clinic.setActivityStatus("Active");
 
         return clinic;
     }

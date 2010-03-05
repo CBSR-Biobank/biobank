@@ -9,6 +9,7 @@ public class StudyHelper extends DbHelper {
         throws Exception {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name);
+        study.setActivityStatus("Active");
         if (name != null) {
             if (name.length() <= 50) {
                 study.setNameShort(name);

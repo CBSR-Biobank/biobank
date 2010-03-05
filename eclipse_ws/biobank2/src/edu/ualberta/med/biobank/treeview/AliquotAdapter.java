@@ -8,19 +8,19 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
-import edu.ualberta.med.biobank.forms.SampleViewForm;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.forms.AliquotViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleAdapter extends AdapterBase {
+public class AliquotAdapter extends AdapterBase {
 
-    public SampleAdapter(AdapterBase parent, SampleWrapper sample) {
+    public AliquotAdapter(AdapterBase parent, AliquotWrapper sample) {
         super(parent, sample);
     }
 
-    public SampleWrapper getSample() {
-        return (SampleWrapper) modelObject;
+    public AliquotWrapper getSample() {
+        return (AliquotWrapper) modelObject;
     }
 
     @Override
@@ -30,14 +30,14 @@ public class SampleAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        SampleWrapper sample = getSample();
+        AliquotWrapper sample = getSample();
         Assert.isNotNull(sample, "sample is null");
         return sample.getInventoryId();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Sample");
+        return getTooltipText("Aliquot");
     }
 
     @Override
@@ -47,12 +47,12 @@ public class SampleAdapter extends AdapterBase {
 
     @Override
     public void executeDoubleClick() {
-        openForm(new FormInput(this), SampleViewForm.ID);
+        openForm(new FormInput(this), AliquotViewForm.ID);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Sample", SampleViewForm.ID);
+        addViewMenu(menu, "Aliquot", AliquotViewForm.ID);
     }
 
     @Override

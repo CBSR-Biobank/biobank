@@ -12,11 +12,11 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -26,14 +26,18 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SampleSourceHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestStudy extends TestDatabase {
+
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
+        "getActivityStatus", "getStudyPvAttrLocked");
 
     private static List<PatientVisitWrapper> studyAddPatientVisits(
         StudyWrapper study) throws Exception {
@@ -52,10 +56,6 @@ public class TestStudy extends TestDatabase {
         return PatientVisitHelper.addPatientVisits(patient, shipment);
 
     }
-
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList("getStudyPvAttrLocked");
 
     @Test
     public void testGettersAndSetters() throws Exception {
@@ -253,7 +253,7 @@ public class TestStudy extends TestDatabase {
         SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
         SampleStorageWrapper newStorage = SampleStorageHelper.newSampleStorage(
             study, type);
-        study.addSampleStorages(Arrays.asList(newStorage));
+        study.addSampleStorage(Arrays.asList(newStorage));
         study.persist();
 
         study.reload();
@@ -282,70 +282,70 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetSampleSourceCollection() throws Exception {
-        String name = "testGetSampleSourceCollection" + r.nextInt();
+    public void testGetSourceVesselCollection() throws Exception {
+        String name = "testGetSourceVesselCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = SampleSourceHelper.addSampleSources(study, name);
+        int nber = SourceVesselHelper.addSourceVessels(study, name);
 
-        List<SampleSourceWrapper> storages = study.getSampleSourceCollection();
+        List<SourceVesselWrapper> storages = study.getSourceVesselCollection();
         int sizeFound = storages.size();
 
         Assert.assertEquals(nber, sizeFound);
     }
 
     @Test
-    public void testGetSampleSourceCollectionBoolean() throws Exception {
-        String name = "testGetSampleSourceCollectionBoolean" + r.nextInt();
+    public void testGetSourceVesselCollectionBoolean() throws Exception {
+        String name = "testGetSourceVesselCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        SampleSourceHelper.addSampleSources(study, name);
+        SourceVesselHelper.addSourceVessels(study, name);
 
-        List<SampleSourceWrapper> sources = study
-            .getSampleSourceCollection(true);
+        List<SourceVesselWrapper> sources = study
+            .getSourceVesselCollection(true);
         if (sources.size() > 1) {
             for (int i = 0; i < sources.size() - 1; i++) {
-                SampleSourceWrapper source1 = sources.get(i);
-                SampleSourceWrapper source2 = sources.get(i + 1);
+                SourceVesselWrapper source1 = sources.get(i);
+                SourceVesselWrapper source2 = sources.get(i + 1);
                 Assert.assertTrue(source1.compareTo(source2) <= 0);
             }
         }
     }
 
     @Test
-    public void testAddSampleSources() throws Exception {
-        String name = "testAddSampleSources" + r.nextInt();
+    public void testAddSourceVessels() throws Exception {
+        String name = "testAddSourceVessels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = SampleSourceHelper.addSampleSources(study, name);
+        int nber = SourceVesselHelper.addSourceVessels(study, name);
 
-        SampleSourceWrapper source = SampleSourceHelper.addSampleSource(name);
-        study.addSampleSources(Arrays.asList(source));
+        SourceVesselWrapper source = SourceVesselHelper.addSourceVessel(name);
+        study.addSourceVessels(Arrays.asList(source));
         study.persist();
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber + 1, study.getSampleSourceCollection().size());
+        Assert.assertEquals(nber + 1, study.getSourceVesselCollection().size());
     }
 
     @Test
-    public void testRemoveSampleSources() throws Exception {
-        String name = "testRemoveSampleSources" + r.nextInt();
+    public void testRemoveSourceVessels() throws Exception {
+        String name = "testRemoveSourceVessels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = SampleSourceHelper.addSampleSources(study, name);
+        int nber = SourceVesselHelper.addSourceVessels(study, name);
 
-        List<SampleSourceWrapper> sources = study.getSampleSourceCollection();
-        SampleSourceWrapper source = DbHelper.chooseRandomlyInList(sources);
+        List<SourceVesselWrapper> sources = study.getSourceVesselCollection();
+        SourceVesselWrapper source = DbHelper.chooseRandomlyInList(sources);
         // don't have to delete the storage thanks to
-        // deleteSampleSourceDifference method
-        SampleSourceHelper.createdSampleSources.remove(source);
-        study.removeSampleSources(Arrays.asList(source));
+        // deleteSourceVesselDifference method
+        SourceVesselHelper.createdSourceVessels.remove(source);
+        study.removeSourceVessels(Arrays.asList(source));
         study.persist();
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber - 1, study.getSampleSourceCollection().size());
+        Assert.assertEquals(nber - 1, study.getSourceVesselCollection().size());
     }
 
     @Test
@@ -507,32 +507,33 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertEquals(false, study.getStudyPvAttrLocked("Worksheet")
-            .booleanValue());
+        Assert.assertEquals("Active", study
+            .getStudyPvAttrActivityStatus("Worksheet"));
 
         // lock the attribute
-        study.setStudyPvAttrLocked("Worksheet", true);
-        Assert.assertEquals(true, study.getStudyPvAttrLocked("Worksheet")
-            .booleanValue());
+        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
+        Assert.assertEquals("Closed", study
+            .getStudyPvAttrActivityStatus("Worksheet"));
 
         // get lock for non existing label, expect exception
         try {
-            study.getStudyPvAttrLocked(Utils.getRandomString(10, 20));
+            study.getStudyPvAttrActivityStatus(Utils.getRandomString(10, 20));
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
-        // set lock for non existing label, expect exception
+        // set activity status for non existing label, expect exception
         try {
-            study.setStudyPvAttrLocked(Utils.getRandomString(10, 20), false);
+            study.setStudyPvAttrActivityStatus(Utils.getRandomString(10, 20),
+                "Active");
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
         // add patient visit that uses the locked attribute
         study.setStudyPvAttr("Worksheet", "text");
-        study.setStudyPvAttrLocked("Worksheet", true);
+        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
         study.persist();
         study.reload();
         List<PatientVisitWrapper> visits = studyAddPatientVisits(study);

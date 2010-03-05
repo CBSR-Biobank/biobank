@@ -13,6 +13,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -21,28 +22,27 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SampleHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
-public class TestSample extends TestDatabase {
+public class TestAliquot extends TestDatabase {
 
-    private SampleWrapper sample;
+    private AliquotWrapper aliquot;
 
     private Integer siteId;
 
@@ -86,25 +86,26 @@ public class TestSample extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null);
-        sample = SampleHelper.newSample(sampleTypeWrapper, container, pv, 3, 3);
+        aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
+            3);
         container.reload();
     }
 
     @Test
     public void testGettersAndSetters() throws Exception {
-        sample.persist();
-        testGettersAndSetters(sample);
+        aliquot.persist();
+        testGettersAndSetters(aliquot);
     }
 
     @Test
     public void testPersistCheckInventoryIdUnique()
         throws BiobankCheckException, Exception {
-        sample.persist();
+        aliquot.persist();
 
-        SampleWrapper duplicate = SampleHelper.newSample(
-            sample.getSampleType(), sample.getParent(), sample
-                .getPatientVisit(), 2, 2);
-        duplicate.setInventoryId(sample.getInventoryId());
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
+            2, 2);
+        duplicate.setInventoryId(aliquot.getInventoryId());
 
         try {
             duplicate.persist();
@@ -116,7 +117,7 @@ public class TestSample extends TestDatabase {
         duplicate.setInventoryId("qqqq" + r.nextInt());
         duplicate.persist();
 
-        duplicate.setInventoryId(sample.getInventoryId());
+        duplicate.setInventoryId(aliquot.getInventoryId());
         try {
             duplicate.persist();
             Assert
@@ -129,11 +130,11 @@ public class TestSample extends TestDatabase {
     @Test
     public void testPersistPositionAlreadyUsed() throws BiobankCheckException,
         Exception {
-        sample.persist();
+        aliquot.persist();
 
-        SampleWrapper duplicate = SampleHelper.newSample(
-            sample.getSampleType(), sample.getParent(), sample
-                .getPatientVisit(), 3, 3);
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
+            3, 3);
 
         try {
             duplicate.persist();
@@ -152,23 +153,23 @@ public class TestSample extends TestDatabase {
     @Test
     public void testPersistCheckParentAcceptSampleType()
         throws BiobankCheckException, Exception {
-        SampleTypeWrapper oldSampleType = sample.getSampleType();
+        SampleTypeWrapper oldSampleType = aliquot.getSampleType();
 
         SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(oldSampleType
             .getSite(), "sampletype_2");
-        sample.setSampleType(type2);
+        aliquot.setSampleType(type2);
         try {
-            sample.persist();
+            aliquot.persist();
             Assert.fail("Container can't hold this type !");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
 
-        sample.setSampleType(oldSampleType);
-        sample.persist();
+        aliquot.setSampleType(oldSampleType);
+        aliquot.persist();
 
         ContainerWrapper container = new ContainerWrapper(appService);
-        SampleWrapper sample = new SampleWrapper(appService);
+        AliquotWrapper sample = new AliquotWrapper(appService);
         sample.setParent(container);
         try {
             sample.persist();
@@ -181,9 +182,9 @@ public class TestSample extends TestDatabase {
     @Test
     public void testCheckPatientVisitNotNull() throws BiobankCheckException,
         Exception {
-        sample.setPatientVisit(null);
+        aliquot.setPatientVisit(null);
         try {
-            sample.persist();
+            aliquot.persist();
             Assert.fail("Patient visit should be set!");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -206,9 +207,9 @@ public class TestSample extends TestDatabase {
         PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
             newPatient, shipment, null);
 
-        sample.setPatientVisit(newVisit);
+        aliquot.setPatientVisit(newVisit);
         try {
-            sample.persist();
+            aliquot.persist();
             Assert.fail("visit not from same site that parent");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -217,9 +218,9 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        sample.persist();
-        SampleTypeWrapper type1 = sample.getSampleType();
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(sample
+        aliquot.persist();
+        SampleTypeWrapper type1 = aliquot.getSampleType();
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(aliquot
             .getSite(), "sampletype_2");
         SampleTypeHelper.removeFromCreated(type2);
         type2.delete();
@@ -231,7 +232,7 @@ public class TestSample extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        sample.delete();
+        aliquot.delete();
         SampleTypeHelper.removeFromCreated(type1);
         type1.delete();
     }
@@ -240,49 +241,49 @@ public class TestSample extends TestDatabase {
     public void testGetSetPatientVisit() {
         PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
             new PatientVisit());
-        sample.setPatientVisit(pvw);
-        Assert.assertTrue(sample.getPatientVisit().getId() == pvw.getId());
+        aliquot.setPatientVisit(pvw);
+        Assert.assertTrue(aliquot.getPatientVisit().getId() == pvw.getId());
     }
 
     @Test
-    public void testSetSamplePositionFromString() throws Exception {
-        sample.setSamplePositionFromString("A1", sample.getParent());
-        Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
-        RowColPos pos = sample.getPosition();
+    public void testSetAliquotPositionFromString() throws Exception {
+        aliquot.setAliquotPositionFromString("A1", aliquot.getParent());
+        Assert.assertTrue(aliquot.getPositionString(false, false).equals("A1"));
+        RowColPos pos = aliquot.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
 
-        sample.setSamplePositionFromString("C2", sample.getParent());
-        Assert.assertTrue(sample.getPositionString(false, false).equals("C2"));
-        pos = sample.getPosition();
+        aliquot.setAliquotPositionFromString("C2", aliquot.getParent());
+        Assert.assertTrue(aliquot.getPositionString(false, false).equals("C2"));
+        pos = aliquot.getPosition();
         Assert.assertTrue((pos.col == 1) && (pos.row == 2));
 
         try {
-            sample.setSamplePositionFromString("79", sample.getParent());
+            aliquot.setAliquotPositionFromString("79", aliquot.getParent());
             Assert.fail("invalid position");
         } catch (Exception bce) {
             Assert.assertTrue(true);
         }
 
-        SampleWrapper sample = new SampleWrapper(appService);
+        AliquotWrapper sample = new AliquotWrapper(appService);
         Assert.assertNull(sample.getPositionString());
     }
 
     @Test
     public void testGetSite() {
-        Assert.assertEquals(siteId, sample.getSite().getId());
+        Assert.assertEquals(siteId, aliquot.getSite().getId());
 
-        SampleWrapper sample1 = new SampleWrapper(appService);
+        AliquotWrapper sample1 = new AliquotWrapper(appService);
         Assert.assertNull(sample1.getSite());
     }
 
     @Test
     public void testGetPositionString() throws Exception {
-        sample.setSamplePositionFromString("A1", sample.getParent());
-        Assert.assertTrue(sample.getPositionString(false, false).equals("A1"));
-        String parentLabel = sample.getParent().getLabel();
-        Assert.assertTrue(sample.getPositionString(true, false).equals(
+        aliquot.setAliquotPositionFromString("A1", aliquot.getParent());
+        Assert.assertTrue(aliquot.getPositionString(false, false).equals("A1"));
+        String parentLabel = aliquot.getParent().getLabel();
+        Assert.assertTrue(aliquot.getPositionString(true, false).equals(
             parentLabel + "A1"));
-        Assert.assertTrue(sample.getPositionString().equals(
+        Assert.assertTrue(aliquot.getPositionString().equals(
             parentLabel + "A1 ("
                 + topContainer.getContainerType().getNameShort() + ")"));
 
@@ -293,34 +294,35 @@ public class TestSample extends TestDatabase {
         RowColPos position = new RowColPos();
         position.row = 1;
         position.col = 3;
-        sample.setPosition(position);
-        RowColPos newPosition = sample.getPosition();
+        aliquot.setPosition(position);
+        RowColPos newPosition = aliquot.getPosition();
         Assert.assertTrue((newPosition.row == position.row)
             && (newPosition.col == position.col));
     }
 
     @Test
     public void testGetSetParent() throws Exception {
-        ContainerWrapper oldParent = sample.getParent();
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(sample
-            .getSite(), "newCtType", "ctNew", 1, 4, 5, true);
-        type.addSampleTypes(Arrays.asList(sample.getSampleType()));
+        ContainerWrapper oldParent = aliquot.getParent();
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
+            aliquot.getSite(), "newCtType", "ctNew", 1, 4, 5, true);
+        type.addSampleTypes(Arrays.asList(aliquot.getSampleType()));
         type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
-            "newcontainerParent", "ccNew", null, sample.getSite(), type);
+            "newcontainerParent", "ccNew", null, aliquot.getSite(), type);
 
-        sample.setParent(parent);
-        sample.persist();
+        aliquot.setParent(parent);
+        aliquot.persist();
         // check to make sure gone from old parent
         oldParent.reload();
         Assert.assertTrue(oldParent.getSamples().size() == 0);
         // check to make sure added to new parent
         parent.reload();
-        Assert.assertTrue(sample.getParent() != null);
-        Collection<SampleWrapper> sampleWrappers = parent.getSamples().values();
+        Assert.assertTrue(aliquot.getParent() != null);
+        Collection<AliquotWrapper> sampleWrappers = parent.getSamples()
+            .values();
         boolean found = false;
-        for (SampleWrapper sampleWrapper : sampleWrappers) {
-            if (sampleWrapper.getId().equals(sample.getId()))
+        for (AliquotWrapper sampleWrapper : sampleWrappers) {
+            if (sampleWrapper.getId().equals(aliquot.getId()))
                 found = true;
         }
         Assert.assertTrue(found);
@@ -328,72 +330,76 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void testGetSetSampleType() throws BiobankCheckException, Exception {
-        SampleTypeWrapper stw = sample.getSampleType();
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(sample
+        SampleTypeWrapper stw = aliquot.getSampleType();
+        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(aliquot
             .getSite(), "newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newType.getId());
-        sample.setSampleType(newType);
-        Assert.assertTrue(newType.getId() == sample.getSampleType().getId());
+        aliquot.setSampleType(newType);
+        Assert.assertTrue(newType.getId() == aliquot.getSampleType().getId());
 
-        SampleWrapper sample1 = new SampleWrapper(appService);
+        AliquotWrapper sample1 = new AliquotWrapper(appService);
         sample1.setSampleType(null);
         Assert.assertNull(sample1.getSampleType());
     }
 
     @Test
     public void testGetSetQuantityFromType() throws Exception {
-        Double quantity = sample.getQuantity();
-        sample.setQuantityFromType();
+        Double quantity = aliquot.getQuantity();
+        aliquot.setQuantityFromType();
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
-        ss1.setSampleType(SampleTypeHelper.addSampleType(sample.getSite(),
+        ss1.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
             "ss1"));
         ss1.setVolume(1.0);
-        ss1.setStudy(sample.getPatientVisit().getPatient().getStudy());
+        ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss1.setActivityStatus("Active");
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
-        ss2.setSampleType(SampleTypeHelper.addSampleType(sample.getSite(),
+        ss2.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
             "ss2"));
         ss2.setVolume(2.0);
-        ss2.setStudy(sample.getPatientVisit().getPatient().getStudy());
+        ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss2.setActivityStatus("Active");
         ss2.persist();
         SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
-        ss3.setSampleType(sample.getSampleType());
+        ss3.setSampleType(aliquot.getSampleType());
         ss3.setVolume(3.0);
-        ss3.setStudy(sample.getPatientVisit().getPatient().getStudy());
+        ss3.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss3.setActivityStatus("Active");
         ss3.persist();
-        sample.getPatientVisit().getPatient().getStudy().addSampleStorages(
+        aliquot.getPatientVisit().getPatient().getStudy().addSampleStorage(
             Arrays.asList(ss1, ss2, ss3));
         // should be 3
-        sample.setQuantityFromType();
-        Assert.assertTrue(sample.getQuantity().equals(3.0));
+        aliquot.setQuantityFromType();
+        Assert.assertTrue(aliquot.getQuantity().equals(3.0));
     }
 
     @Test
     public void testGetFormattedLinkDate() throws Exception {
         Date date = Utils.getRandomDate();
-        sample.setLinkDate(date);
+        aliquot.setLinkDate(date);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Assert.assertTrue(sdf.format(date)
-            .equals(sample.getFormattedLinkDate()));
+        Assert.assertTrue(sdf.format(date).equals(
+            aliquot.getFormattedLinkDate()));
     }
 
     @Test
     public void testCompareTo() throws BiobankCheckException, Exception {
-        sample.setInventoryId("defgh");
-        sample.persist();
-        SampleWrapper sample2 = SampleHelper.newSample(sample.getSampleType(),
-            sample.getParent(), sample.getPatientVisit(), 2, 3);
+        aliquot.setInventoryId("defgh");
+        aliquot.persist();
+        AliquotWrapper sample2 = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
+            2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
-        Assert.assertTrue(sample.compareTo(sample2) > 0);
+        Assert.assertTrue(aliquot.compareTo(sample2) > 0);
 
         sample2.setInventoryId("qwerty");
         sample2.persist();
-        Assert.assertTrue(sample.compareTo(sample2) < 0);
+        Assert.assertTrue(aliquot.compareTo(sample2) < 0);
     }
 
     @Test
@@ -418,14 +424,14 @@ public class TestSample extends TestDatabase {
         type.persist();
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
-        SampleHelper.addSample(sampleType, container, pv, 0, 0);
-        SampleWrapper sample = SampleHelper.newSample(sampleType, container,
+        AliquotHelper.addSample(sampleType, container, pv, 0, 0);
+        AliquotWrapper sample = AliquotHelper.newAliquot(sampleType, container,
             pv, 2, 3);
         sample.setInventoryId(Utils.getRandomString(5));
         sample.persist();
-        SampleHelper.addSample(sampleType, container, pv, 3, 3);
+        AliquotHelper.addSample(sampleType, container, pv, 3, 3);
 
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
             appService, sample.getInventoryId(), site);
         Assert.assertEquals(1, samples.size());
         Assert.assertEquals(samples.get(0), sample);
@@ -433,31 +439,31 @@ public class TestSample extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        sample.persist();
-        String old = sample.getInventoryId();
-        sample.setInventoryId("toto");
-        sample.reset();
-        Assert.assertEquals(old, sample.getInventoryId());
+        aliquot.persist();
+        String old = aliquot.getInventoryId();
+        aliquot.setInventoryId("toto");
+        aliquot.reset();
+        Assert.assertEquals(old, aliquot.getInventoryId());
     }
 
     @Test
     public void testResetNew() throws Exception {
-        sample.setInventoryId("toto");
-        sample.reset();
-        Assert.assertEquals(null, sample.getInventoryId());
+        aliquot.setInventoryId("toto");
+        aliquot.reset();
+        Assert.assertEquals(null, aliquot.getInventoryId());
     }
 
     @Test
     public void testCheckPosition() throws BiobankCheckException, Exception {
-        sample.persist();
+        aliquot.persist();
 
-        SampleWrapper sample2 = new SampleWrapper(appService);
+        AliquotWrapper sample2 = new AliquotWrapper(appService);
         sample2.setPosition(3, 3);
 
-        Assert.assertFalse(sample2.isPositionFree(sample.getParent()));
+        Assert.assertFalse(sample2.isPositionFree(aliquot.getParent()));
 
         sample2.setPosition(2, 3);
-        Assert.assertTrue(sample2.isPositionFree(sample.getParent()));
+        Assert.assertTrue(sample2.isPositionFree(aliquot.getParent()));
     }
 
     @Test
@@ -482,12 +488,12 @@ public class TestSample extends TestDatabase {
         type.persist();
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
-        SampleHelper.addSample(sampleType, container, pv, 0, 0);
-        SampleWrapper sample = SampleHelper.newSample(sampleType, container,
+        AliquotHelper.addSample(sampleType, container, pv, 0, 0);
+        AliquotWrapper sample = AliquotHelper.newAliquot(sampleType, container,
             pv, 2, 3);
         sample.setInventoryId(Utils.getRandomString(5));
         sample.persist();
-        SampleHelper.addSample(sampleType, null, pv, null, null);
+        AliquotHelper.addSample(sampleType, null, pv, null, null);
 
         DebugUtil.getRandomSamplesAlreadyLinked(appService, siteId);
         DebugUtil.getRandomSamplesAlreadyAssigned(appService, siteId);

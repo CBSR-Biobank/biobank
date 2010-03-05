@@ -17,12 +17,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
 
@@ -140,7 +141,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         createContainsSection();
     }
 
-    protected void createContainerTypeSection() {
+    protected void createContainerTypeSection() throws ApplicationException {
         Composite client = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -190,9 +191,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client, "Child Labeling Scheme", labelingSchemeMap.values(),
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
-        createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
-            "Activity Status", FormConstants.ACTIVITY_STATUS, BeansObservables
-                .observeValue(containerType, "activityStatus"), null);
+        createComboViewerWithNoSelectionValidator(client, "Container Type",
+            ActivityStatusWrapper.getAllActivityStatusNames(appService),
+            containerType.getActivityStatus(),
+            "Container type must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(
@@ -242,7 +244,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         allSampleTypes = site.getAllSampleTypeCollection();
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
-            "Selected Sample Types", "Available Sample Types", 100);
+            "Selected Aliquot Types", "Available Aliquot Types", 100);
         samplesMultiSelect.adaptToToolkit(toolkit, true);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);

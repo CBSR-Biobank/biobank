@@ -61,7 +61,7 @@ public class SampleStorageInfoTable extends
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Sample type",
+    private static final String[] HEADINGS = new String[] { "Aliquot type",
         "Volume (ml)", "Quantity" };
 
     private static final int[] BOUNDS = new int[] { 300, 130, 100, -1, -1, -1,

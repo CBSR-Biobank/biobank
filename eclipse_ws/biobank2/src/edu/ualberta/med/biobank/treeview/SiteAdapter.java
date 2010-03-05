@@ -62,7 +62,7 @@ public class SiteAdapter extends AdapterBase {
     protected String getLabelInternal() {
         SiteWrapper site = getWrapper();
         Assert.isNotNull(site, "site is null");
-        return site.getName();
+        return site.getNameShort();
     }
 
     @Override

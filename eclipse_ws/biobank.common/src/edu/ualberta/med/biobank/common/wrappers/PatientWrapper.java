@@ -78,7 +78,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "pnumber", "study", "patientVisitCollection",
-            "shptSampleSourceCollection", "shipmentCollection" };
+            "shptSourceVesselCollection", "shipmentCollection" };
     }
 
     @Override
@@ -229,10 +229,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     public long getSampleCount() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(samples) from "
+        HQLCriteria c = new HQLCriteria("select count(aliquots) from "
             + Patient.class.getName() + " as p"
             + " join p.patientVisitCollection as visits"
-            + " join visits.sampleCollection as samples where p = ?", Arrays
+            + " join visits.aliquotCollection as aliquots where p = ?", Arrays
             .asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {

@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
@@ -209,7 +209,7 @@ public class QueryPage extends Composite {
         searchableModelObjects.add(SiteWrapper.class);
         searchableModelObjects.add(PatientWrapper.class);
         searchableModelObjects.add(StudyWrapper.class);
-        searchableModelObjects.add(SampleWrapper.class);
+        searchableModelObjects.add(AliquotWrapper.class);
         searchableModelObjects.add(ClinicWrapper.class);
     }
 
