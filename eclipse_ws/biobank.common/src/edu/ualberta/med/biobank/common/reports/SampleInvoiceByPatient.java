@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 
 public class SampleInvoiceByPatient extends QueryObject {
 
-    protected static final String NAME = "Samples per Patient by Date";
+    protected static final String NAME = "Aliquots per Patient by Date";
 
     public SampleInvoiceByPatient(String op, Integer siteId) {
         super(

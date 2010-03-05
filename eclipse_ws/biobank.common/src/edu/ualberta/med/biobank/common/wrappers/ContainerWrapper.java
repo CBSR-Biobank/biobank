@@ -54,7 +54,7 @@ public class ContainerWrapper extends
         ApplicationException {
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the site does not have an activity status");
+                "the container does not have an activity status");
         }
         checkSiteNotNull();
         checkContainerTypeNotNull();

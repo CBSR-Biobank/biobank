@@ -63,7 +63,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         checkNameUnique();
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the site does not have an activity status");
+                "the container type does not have an activity status");
         }
         if (getCapacity() == null) {
             throw new BiobankCheckException("Capacity should be set");

@@ -242,7 +242,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the site does not have an activity status");
+                "the clinic does not have an activity status");
         }
         if (getSite() == null) {
             throw new BiobankCheckException("the clinic does not have an site");

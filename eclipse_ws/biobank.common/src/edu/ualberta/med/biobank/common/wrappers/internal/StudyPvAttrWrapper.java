@@ -43,7 +43,7 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         ApplicationException {
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the site does not have an activity status");
+                "the study does not have an activity status");
         }
     }
 

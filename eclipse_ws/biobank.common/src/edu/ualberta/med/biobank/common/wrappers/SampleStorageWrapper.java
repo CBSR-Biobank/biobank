@@ -127,7 +127,7 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         ApplicationException {
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the site does not have an activity status");
+                "the sample storage does not have an activity status");
         }
     }
 
