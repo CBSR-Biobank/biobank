@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -23,6 +24,10 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSampleStorage extends TestDatabase {
 
+    // the methods to skip in the getters and setters test
+    private static final List<String> GETTER_SKIP_METHODS = Arrays
+        .asList("getActivityStatus");
+
     @Test
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
@@ -33,7 +38,7 @@ public class TestSampleStorage extends TestDatabase {
             appService, false);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
-        testGettersAndSetters(sampleStorage);
+        testGettersAndSetters(sampleStorage, GETTER_SKIP_METHODS);
     }
 
     @Test
