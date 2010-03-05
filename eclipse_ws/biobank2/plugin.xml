@@ -1378,11 +1378,6 @@
     <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="edu.ualberta.med.biobank.preferences.GeneralConfigurationPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.gereral"
-            name="General">
-      </page>
-      <page
           category="Scanner"
             class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.plateBarcodes"

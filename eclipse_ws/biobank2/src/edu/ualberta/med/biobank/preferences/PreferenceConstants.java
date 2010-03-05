@@ -9,8 +9,6 @@ public class PreferenceConstants {
 
     public static final String GENERAL_CANCEL = "general.cancel";
 
-    public static final String GENERAL_TIME_OUT = "general.timeout";
-
     public static final String SCANNER_DPI = "scanner.dpi";
 
     public static final String[] SCANNER_PLATE_BARCODES = {

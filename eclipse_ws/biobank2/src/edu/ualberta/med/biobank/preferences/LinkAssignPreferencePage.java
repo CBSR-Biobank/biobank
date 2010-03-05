@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -22,6 +23,10 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
      */
     @Override
     public void createFieldEditors() {
+        addField(new StringFieldEditor(PreferenceConstants.GENERAL_CONFIRM,
+            "Confirm barcode:", getFieldEditorParent()));
+        addField(new StringFieldEditor(PreferenceConstants.GENERAL_CANCEL,
+            "Cancel barcode:", getFieldEditorParent()));
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ASK_PRINT,
             "Ask to print activity log", getFieldEditorParent()));

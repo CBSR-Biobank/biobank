@@ -17,6 +17,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
@@ -255,6 +256,22 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 method.invoke(wrappedObject, (Object[]) null);
             }
         }
+    }
+
+    protected boolean checkNoDuplicates(Class<?> objectClass,
+        String propertyName, String value) throws ApplicationException {
+        HQLCriteria c;
+        if (isNew()) {
+            c = new HQLCriteria("from " + objectClass.getName() + " where "
+                + propertyName + "= ?", Arrays.asList(new Object[] { value }));
+        } else {
+            c = new HQLCriteria("from " + objectClass.getName()
+                + " where id <> ? and " + propertyName + "= ?", Arrays
+                .asList(new Object[] { getId(), value }));
+        }
+
+        List<Object> results = appService.query(c);
+        return (results.size() == 0);
     }
 
     /**
