@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -35,10 +36,6 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestStudy extends TestDatabase {
 
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
-        "getActivityStatus", "getStudyPvAttrActivityStatus");
-
     private static List<PatientVisitWrapper> studyAddPatientVisits(
         StudyWrapper study) throws Exception {
         String name = study.getName();
@@ -62,7 +59,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        testGettersAndSetters(study, GETTER_SKIP_METHODS);
+        testGettersAndSetters(study);
     }
 
     @Test
@@ -497,7 +494,7 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetStudyPvAttrLocked() throws Exception {
+    public void testGetStudyPvAttrClosed() throws Exception {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
@@ -507,13 +504,14 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertEquals("Active", study
-            .getStudyPvAttrActivityStatus("Worksheet"));
+        Assert.assertEquals("Active", study.getStudyPvAttrActivityStatus(
+            "Worksheet").getName());
 
         // lock the attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
-        Assert.assertEquals("Closed", study
-            .getStudyPvAttrActivityStatus("Worksheet"));
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService, "Closed"));
+        Assert.assertEquals("Closed", study.getStudyPvAttrActivityStatus(
+            "Worksheet").getName());
 
         // get lock for non existing label, expect exception
         try {
@@ -526,14 +524,15 @@ public class TestStudy extends TestDatabase {
         // set activity status for non existing label, expect exception
         try {
             study.setStudyPvAttrActivityStatus(Utils.getRandomString(10, 20),
-                "Active");
+                ActivityStatusWrapper.getActivityStatus(appService, "Active"));
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
         // add patient visit that uses the locked attribute
         study.setStudyPvAttr("Worksheet", "text");
-        study.setStudyPvAttrActivityStatus("Worksheet", "Closed");
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService, "Closed"));
         study.persist();
         study.reload();
         List<PatientVisitWrapper> visits = studyAddPatientVisits(study);

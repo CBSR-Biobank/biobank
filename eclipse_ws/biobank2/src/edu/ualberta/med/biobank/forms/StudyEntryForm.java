@@ -122,7 +122,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             new NonEmptyStringValidator("Study short name cannot be blank"));
 
         createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatusNames(appService), study
+            ActivityStatusWrapper.getAllActivityStatuses(appService), study
                 .getActivityStatus(), "Study must have an activity status",
             true);
 
@@ -157,7 +157,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleStorageSection() {
-        Section section = createSection("Aliquot Storage");
+        Section section = createSection("Sample Storage");
         sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
             study.getSite(), study.getSampleStorageCollection());
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);

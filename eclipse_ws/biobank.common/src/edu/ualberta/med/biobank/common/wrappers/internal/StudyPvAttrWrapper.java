@@ -90,36 +90,18 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
             possibleValues);
     }
 
-    private ActivityStatusWrapper getActivityStatusInternal() {
+    public ActivityStatusWrapper getActivityStatus() {
         ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
             return null;
         return new ActivityStatusWrapper(appService, activityStatus);
     }
 
-    public String getActivityStatus() {
-        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
-        if (activityStatus == null) {
-            return null;
-        }
-        return activityStatus.getName();
-    }
-
-    private void setActivityStatus(ActivityStatus activityStatus) {
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
+        wrappedObject.setActivityStatus(activityStatus.getWrappedObject());
         propertyChangeSupport.firePropertyChange("activityStatus",
             oldActivityStatus, activityStatus);
-
-    }
-
-    public void setActivityStatus(String name) throws Exception {
-        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
-            .getActivityStatus(appService, name);
-        if (activityStatus == null) {
-            throw new Exception("activity status \"" + name + "\" is invalid");
-        }
-        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     public PvAttrTypeWrapper getPvAttrType() {

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -43,7 +44,7 @@ public class CbsrSite {
         cbsrSite = new SiteWrapper(appService);
         cbsrSite.setName("Canadian BioSample Repository");
         cbsrSite.setNameShort("CBSR");
-        cbsrSite.setActivityStatus("Active");
+        cbsrSite.setActivityStatus(getActivityStatus("Active"));
         cbsrSite.setStreet1("471 Medical Sciences Building");
         cbsrSite.setStreet2("University of Alberta");
         cbsrSite.setCity("Edmonton");
@@ -87,6 +88,11 @@ public class CbsrSite {
                 + "\" not found in the database");
         }
         return sampleType;
+    }
+
+    public static ActivityStatusWrapper getActivityStatus(String name)
+        throws Exception {
+        return ActivityStatusWrapper.getActivityStatus(appService, name);
     }
 
     public static void deleteConfiguration(WritableApplicationService appServ)

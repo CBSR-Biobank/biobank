@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -335,13 +336,13 @@ public class CbsrStudies {
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,
-        String nameShort, String activityStatus, String comment)
+        String nameShort, String activityStatusName, String comment)
         throws Exception {
         StudyWrapper study = new StudyWrapper(site.getAppService());
         study.setSite(site);
         study.setName(name);
         study.setNameShort(nameShort);
-        study.setActivityStatus(activityStatus);
+        study.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
         study.setComment(comment);
         study.persist();
         study.reload();
@@ -387,7 +388,7 @@ public class CbsrStudies {
         ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
         ss.setQuantity(quantity);
         ss.setVolume(volume);
-        ss.setActivityStatus("Active");
+        ss.setActivityStatus(CbsrSite.getActivityStatus("Active"));
 
         study.addSampleStorage(Arrays.asList(ss));
         study.persist();
@@ -403,7 +404,8 @@ public class CbsrStudies {
         } else {
             study.setStudyPvAttr(label, type);
         }
-        study.setStudyPvAttrActivityStatus(label, "Active");
+        study.setStudyPvAttrActivityStatus(label, ActivityStatusWrapper
+            .getActivityStatus(study.getAppService(), "Active"));
         study.persist();
         study.reload();
     }

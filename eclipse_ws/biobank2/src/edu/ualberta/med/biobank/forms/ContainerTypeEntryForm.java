@@ -192,7 +192,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatusNames(appService),
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
             containerType.getActivityStatus(),
             "Container type must have an activity status", true);
 

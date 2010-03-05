@@ -115,7 +115,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
         createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatusNames(appService), clinic
+            ActivityStatusWrapper.getAllActivityStatuses(appService), clinic
                 .getActivityStatus(), "Clinic must have an activity status",
             true);
 

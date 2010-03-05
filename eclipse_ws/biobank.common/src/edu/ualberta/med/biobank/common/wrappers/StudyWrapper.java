@@ -70,36 +70,18 @@ public class StudyWrapper extends ModelWrapper<Study> {
             nameShort);
     }
 
-    private ActivityStatusWrapper getActivityStatusInternal() {
+    public ActivityStatusWrapper getActivityStatus() {
         ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
             return null;
         return new ActivityStatusWrapper(appService, activityStatus);
     }
 
-    public String getActivityStatus() {
-        ActivityStatusWrapper activityStatus = getActivityStatusInternal();
-        if (activityStatus == null) {
-            return null;
-        }
-        return activityStatus.getName();
-    }
-
-    private void setActivityStatus(ActivityStatus activityStatus) {
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
+        wrappedObject.setActivityStatus(activityStatus.wrappedObject);
         propertyChangeSupport.firePropertyChange("activityStatus",
             oldActivityStatus, activityStatus);
-
-    }
-
-    public void setActivityStatus(String name) throws Exception {
-        ActivityStatusWrapper activityStatus = ActivityStatusWrapper
-            .getActivityStatus(appService, name);
-        if (activityStatus == null) {
-            throw new Exception("activity status \"" + name + "\" is invalid");
-        }
-        setActivityStatus(activityStatus.getWrappedObject());
     }
 
     public String getComment() {
@@ -563,7 +545,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * @return True if the attribute is locked. False otherwise.
      * @throws Exception
      */
-    public String getStudyPvAttrActivityStatus(String label) throws Exception {
+    public ActivityStatusWrapper getStudyPvAttrActivityStatus(String label)
+        throws Exception {
         return getStudyPvAttr(label).getActivityStatus();
     }
 
@@ -615,7 +598,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
         deletedStudyPvAttr.remove(studyPvAttr);
 
-        studyPvAttr.setActivityStatus("Active");
+        studyPvAttr.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
         studyPvAttrMap.put(label, studyPvAttr);
     }
@@ -644,8 +628,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * 
      * @throws Exception if attribute with label does not exist.
      */
-    public void setStudyPvAttrActivityStatus(String label, String activityStatus)
-        throws Exception {
+    public void setStudyPvAttrActivityStatus(String label,
+        ActivityStatusWrapper activityStatus) throws Exception {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
         studyPvAttr.setActivityStatus(activityStatus);

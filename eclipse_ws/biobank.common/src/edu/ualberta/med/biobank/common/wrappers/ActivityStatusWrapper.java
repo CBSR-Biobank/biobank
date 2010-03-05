@@ -1,8 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -10,7 +11,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+/**
+ * This wrapper does not allow new activity status objects to be added to the
+ * database. Therefore, when either getActivityStatus() or
+ * getAllActivityStatuses() are called the first time a map of the exisiting
+ * statuses in the database is created.
+ * 
+ */
 public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
+
+    private static Map<String, ActivityStatusWrapper> activityStatusMap = new HashMap<String, ActivityStatusWrapper>();
 
     public ActivityStatusWrapper(WritableApplicationService appService,
         ActivityStatus wrappedObject) {
@@ -23,17 +33,11 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name" };
+        return new String[] {};
     }
 
     public String getName() {
         return wrappedObject.getName();
-    }
-
-    public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
     }
 
     @Override
@@ -65,31 +69,32 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return 0;
     }
 
-    public static List<String> getAllActivityStatusNames(
+    public static Collection<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
+        if (activityStatusMap.size() > 0) {
+            return activityStatusMap.values();
+        }
         HQLCriteria c = new HQLCriteria("from "
             + ActivityStatus.class.getName());
         List<ActivityStatus> result = appService.query(c);
-        List<String> list = new ArrayList<String>();
         for (ActivityStatus ac : result) {
-            list.add(ac.getName());
+            activityStatusMap.put(ac.getName(), new ActivityStatusWrapper(
+                appService, ac));
         }
-        return list;
+        return activityStatusMap.values();
     }
 
     public static ActivityStatusWrapper getActivityStatus(
-        WritableApplicationService appService, String name)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("from "
-            + ActivityStatus.class.getName() + " where name = ?", Arrays
-            .asList(new Object[] { name }));
-        List<ActivityStatus> result = appService.query(c);
-        if (result.size() == 0)
-            return null;
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+        WritableApplicationService appService, String name) throws Exception {
+        if (activityStatusMap.size() == 0) {
+            getAllActivityStatuses(appService);
         }
-        return new ActivityStatusWrapper(appService, result.get(0));
+        ActivityStatusWrapper activityStatus = activityStatusMap.get(name);
+        if (activityStatus == null) {
+            throw new Exception("activity status \"" + name
+                + "\" does not exist");
+        }
+        return activityStatus;
     }
 
 }

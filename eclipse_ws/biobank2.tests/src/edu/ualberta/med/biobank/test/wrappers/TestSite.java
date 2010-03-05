@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -39,10 +40,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList("getActivityStatus");
-
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -52,7 +49,7 @@ public class TestSite extends TestDatabase {
     public void testGettersAndSetters() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"
             + r.nextInt());
-        testGettersAndSetters(site, GETTER_SKIP_METHODS);
+        testGettersAndSetters(site);
     }
 
     @Test
@@ -374,7 +371,8 @@ public class TestSite extends TestDatabase {
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
-        site.setActivityStatus("Active");
+        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
 
         try {
             site.persist();

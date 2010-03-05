@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -629,7 +630,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private void initPalletValues() {
         try {
             currentPalletWrapper.reset();
-            currentPalletWrapper.setActivityStatus("Active");
+            currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
+                .getActivityStatus(appService, "Active"));
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSiteWrapper());
         } catch (Exception e) {

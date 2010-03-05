@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -32,17 +33,13 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestClinic extends TestDatabase {
 
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList("getActivityStatus");
-
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
 
-        testGettersAndSetters(clinic, GETTER_SKIP_METHODS);
+        testGettersAndSetters(clinic);
     }
 
     @Test
@@ -204,7 +201,8 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setSite(site);
-        clinic.setActivityStatus("Active");
+        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         try {
             clinic.persist();
             Assert.fail("Should not insert the clinic : no address");
@@ -225,7 +223,8 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setCity("Rupt");
-        clinic.setActivityStatus("Active");
+        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
 
         try {
             clinic.persist();
@@ -253,7 +252,8 @@ public class TestClinic extends TestDatabase {
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
-        clinic.setActivityStatus("Active");
+        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         clinic.persist();
     }
 

@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
-import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
@@ -140,7 +140,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createSampleStorageSection() {
-        Section section = createSection("Aliquot Storage");
+        Section section = createSection("Sample Storage");
 
         sampleStorageTable = new SampleStorageInfoTable(section, study
             .getSampleStorageCollection());

@@ -125,7 +125,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             firstControl = c;
 
         createComboViewerWithNoSelectionValidator(client, "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatusNames(appService),
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
             container.getActivityStatus(),
             "Container must have an activity status", true);
 

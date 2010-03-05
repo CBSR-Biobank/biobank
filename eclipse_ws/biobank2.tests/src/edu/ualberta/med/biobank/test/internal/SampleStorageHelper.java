@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -14,7 +15,8 @@ public class SampleStorageHelper extends DbHelper {
         sampleStorage.setSampleType(type);
         sampleStorage.setQuantity(r.nextInt(10));
         sampleStorage.setVolume(r.nextDouble());
-        sampleStorage.setActivityStatus("Active");
+        sampleStorage.setActivityStatus(ActivityStatusWrapper
+            .getActivityStatus(appService, "Active"));
         return sampleStorage;
     }
 

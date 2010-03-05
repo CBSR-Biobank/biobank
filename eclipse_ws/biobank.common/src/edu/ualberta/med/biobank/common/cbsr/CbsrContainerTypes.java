@@ -128,14 +128,14 @@ public class CbsrContainerTypes {
 
     private static ContainerTypeWrapper addContainerType(SiteWrapper site,
         String name, String nameShort, Double temperature,
-        String activityStatus, boolean topLevel, int childLabelingScheme,
+        String activityStatusName, boolean topLevel, int childLabelingScheme,
         int rows, int cols, List<ContainerTypeWrapper> children,
         String... sampleTypeNames) throws Exception {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(site.getAppService());
         ct.setName(name);
         ct.setNameShort(nameShort);
         ct.setDefaultTemperature(temperature);
-        ct.setActivityStatus(activityStatus);
+        ct.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
         ct.setTopLevel(topLevel);
         ct.setSite(site);
         ct.setRowCapacity(rows);

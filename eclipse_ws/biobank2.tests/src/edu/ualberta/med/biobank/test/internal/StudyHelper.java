@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -9,7 +10,8 @@ public class StudyHelper extends DbHelper {
         throws Exception {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name);
-        study.setActivityStatus("Active");
+        study.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         if (name != null) {
             if (name.length() <= 50) {
                 study.setNameShort(name);
