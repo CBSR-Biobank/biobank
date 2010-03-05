@@ -37,7 +37,7 @@ public class TestStudy extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
-        "getActivityStatus", "getStudyPvAttrLocked");
+        "getActivityStatus", "getStudyPvAttrActivityStatus");
 
     private static List<PatientVisitWrapper> studyAddPatientVisits(
         StudyWrapper study) throws Exception {

@@ -885,6 +885,7 @@ public class ContainerWrapper extends
             newContainer.setTemperature(getTemperature());
             newContainer.setPosition(i, j);
             newContainer.setParent(this);
+            newContainer.setActivityStatus("Active");
             newContainer.persist();
         }
     }
