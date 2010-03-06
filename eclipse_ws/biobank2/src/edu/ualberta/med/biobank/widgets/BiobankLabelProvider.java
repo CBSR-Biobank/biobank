@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -116,8 +117,7 @@ public class BiobankLabelProvider extends LabelProvider implements
     public String getText(Object element) {
         if (element instanceof ContainerTypeWrapper) {
             return ((ContainerTypeWrapper) element).getName();
-        }
-        if (element instanceof StudyWrapper) {
+        } else if (element instanceof StudyWrapper) {
             StudyWrapper study = (StudyWrapper) element;
             return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof ClinicWrapper) {
@@ -128,8 +128,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SampleTypeWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
-        }
-        if (element instanceof AdapterBase) {
+        } else if (element instanceof ActivityStatusWrapper) {
+            return ((ActivityStatusWrapper) element).getName();
+        } else if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }
         return element.toString();
