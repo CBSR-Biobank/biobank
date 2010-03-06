@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -46,6 +48,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             setDirty(true);
         }
     };
+
+    private ComboViewer activityStatusComboViewer;
 
     @Override
     protected void init() throws Exception {
@@ -114,9 +118,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             null, BeansObservables.observeValue(clinic, "nameShort"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatuses(appService), clinic
-                .getActivityStatus(), "Clinic must have an activity status",
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status", ActivityStatusWrapper
+                .getAllActivityStatuses(appService),
+            clinic.getActivityStatus(), "Clinic must have an activity status",
             true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
@@ -158,6 +163,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getParentFromClass(SiteAdapter.class);
         clinic.setSite(siteAdapter.getWrapper());
         clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+            .getSelection()).getFirstElement();
+        clinic.setActivityStatus(activity);
         clinic.removeContacts(contactEntryWidget.getDeletedContacts());
         clinic.persist();
         clinicAdapter.getParent().performExpand();

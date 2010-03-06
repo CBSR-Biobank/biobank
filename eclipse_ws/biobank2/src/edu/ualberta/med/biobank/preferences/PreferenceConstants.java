@@ -18,8 +18,6 @@ public class PreferenceConstants {
 
     public static final String LINK_ASSIGN_ASK_PRINT = "link.assign.ask_print";
 
-    public static final String LINK_ASSIGN_PRINTER = "link.assign.print";
-
     public static final String SCAN_LINK_ROW_SELECT_ONLY = "scan.link.row.select.only";
 
     public static final String PALLET_SCAN_CONTAINER_NAME_CONTAINS = "scan.link.container_name_contains";

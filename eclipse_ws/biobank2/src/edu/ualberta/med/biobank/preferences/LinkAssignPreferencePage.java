@@ -30,16 +30,6 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ASK_PRINT,
             "Ask to print activity log", getFieldEditorParent()));
-        // PrinterData[] datas = Printer.getPrinterList();
-        // String[][] list = new String[datas.length][2];
-        // for (int i = 0; i < datas.length; i++) {
-        // list[i][0] = datas[i].name;
-        // list[i][1] = datas[i].name;
-        // }
-        // ComboFieldEditor printerCombo = new ComboFieldEditor(
-        // PreferenceConstants.LINK_ASSIGN_PRINTER, "Printer", list,
-        // getFieldEditorParent());
-        // addField(printerCombo);
     }
 
     /*

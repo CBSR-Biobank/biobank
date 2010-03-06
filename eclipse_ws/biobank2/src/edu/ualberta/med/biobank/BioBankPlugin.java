@@ -366,11 +366,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return true;
     }
 
-    public String getPrinter() {
-        return getPreferenceStore().getString(
-            PreferenceConstants.LINK_ASSIGN_PRINTER);
-    }
-
     public Image getImage(Object element) {
         String imageKey = classToImageKey.get(element.getClass().getName());
         if ((imageKey == null)
