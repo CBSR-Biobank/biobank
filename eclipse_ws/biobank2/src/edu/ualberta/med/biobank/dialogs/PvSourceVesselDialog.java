@@ -73,7 +73,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(3, false));
+        contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         sourceVesselsComboViewer = getWidgetCreator()
@@ -92,24 +92,14 @@ public class PvSourceVesselDialog extends BiobankDialog {
                             .getFirstElement());
                 }
             });
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        sourceVesselsComboViewer.getCombo().setLayoutData(gd);
 
-        Control c = createBoundWidgetWithLabel(contents, Text.class,
-            SWT.BORDER, "Quantity", new String[0], BeansObservables
-                .observeValue(pvSourceVessel, "quantity"),
-            new IntegerNumberValidator("quantity should be a whole number",
-                false));
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Quantity", new String[0], BeansObservables.observeValue(
+                pvSourceVessel, "quantity"), new IntegerNumberValidator(
+                "quantity should be a whole number", false));
 
-        c = createDateTimeWidget(contents, "Date drawn", null, pvSourceVessel,
+        createDateTimeWidget(contents, "Date drawn", null, pvSourceVessel,
             "dateDrawn", "Date drawn should be selected");
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
     }
 
     public PvSourceVesselWrapper getPvSourceVessel() {

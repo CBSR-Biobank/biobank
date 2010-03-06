@@ -89,7 +89,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus.wrappedObject);
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
         propertyChangeSupport.firePropertyChange("activityStatus",
             oldActivityStatus, activityStatus);
     }
