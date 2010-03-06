@@ -17,6 +17,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -496,7 +497,8 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", "Disabled");
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService, "Disabled"));
         study.persist();
         visit.reload();
         try {
@@ -507,7 +509,8 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", "Active");
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService, "Active"));
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");

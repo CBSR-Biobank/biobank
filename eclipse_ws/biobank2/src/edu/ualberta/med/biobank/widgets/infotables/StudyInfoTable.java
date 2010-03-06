@@ -120,7 +120,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.study = study;
         info.name = study.getName();
         info.nameShort = study.getNameShort();
-        info.status = study.getActivityStatus();
+        info.status = study.getActivityStatus().getName();
         if (info.status == null) {
             info.status = new String();
         }

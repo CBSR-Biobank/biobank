@@ -254,7 +254,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         }
 
-        if (!studyPvAttr.getActivityStatus().equals("Active")) {
+        if (!studyPvAttr.getActivityStatus().getName().equals("Active")) {
             throw new Exception("attribute for label \"" + label
                 + "\" is locked, changes not premitted");
         }

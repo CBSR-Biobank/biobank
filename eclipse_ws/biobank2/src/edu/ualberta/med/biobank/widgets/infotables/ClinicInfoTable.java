@@ -124,7 +124,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         } else {
             info.studyCount = studies.size();
         }
-        info.status = clinic.getActivityStatus();
+        info.status = clinic.getActivityStatus().getName();
         info.patientCount = clinic.getPatientCount();
         List<PatientVisitWrapper> pvs = clinic.getPatientVisitCollection();
         if (pvs == null) {

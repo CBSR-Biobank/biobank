@@ -39,7 +39,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer activityStatusComboViewer;
 
-    private String currentActivityStatus;
+    private ActivityStatusWrapper currentActivityStatus;
 
     @Override
     public void init() {
@@ -103,8 +103,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatusNames(appService), site
-                .getActivityStatus(), "Site must have an activity status", true);
+                .getAllActivityStatuses(appService), site.getActivityStatus(),
+            "Site must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(site,
@@ -128,7 +128,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
         site
-            .setActivityStatus((String) ((StructuredSelection) activityStatusComboViewer
+            .setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
                 .getSelection()).getFirstElement());
         site.persist();
         SessionManager.getInstance().updateSites();

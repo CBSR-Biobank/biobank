@@ -209,14 +209,15 @@ public class CbsrClinics {
     }
 
     private static ClinicWrapper addClinic(SiteWrapper site, String name,
-        String nameShort, String activityStatus, String comment,
+        String nameShort, String activityStatusName, String comment,
         String street1, String street2, String city, String province,
         String postalCode) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(site.getAppService());
         clinic.setSite(site);
         clinic.setName(name);
         clinic.setNameShort(nameShort);
-        clinic.setActivityStatus(activityStatus);
+        clinic
+            .setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
         clinic.setComment(comment);
         clinic.setStreet1(street1);
         clinic.setStreet2(street2);

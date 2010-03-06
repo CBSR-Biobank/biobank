@@ -150,7 +150,7 @@ public class ContainerTypeInfoTable extends
         info.containerType = type;
         info.name = type.getName();
         info.nameShort = type.getNameShort();
-        info.status = type.getActivityStatus();
+        info.status = type.getActivityStatus().getName();
         if ((rowCapacity != null) && (colCapacity != null)) {
             info.capacity = rowCapacity * colCapacity;
         }

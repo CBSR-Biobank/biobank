@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -35,6 +36,8 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private ComboViewer sampleTypeComboViewer;
 
+    private ComboViewer activityStatusComboViewer;
+
     public SampleStorageDialog(Shell parent,
         SampleStorageWrapper sampleStorage,
         Collection<SampleTypeWrapper> sampleTypes) {
@@ -46,6 +49,7 @@ public class SampleStorageDialog extends BiobankDialog {
         this.sampleStorage.setSampleType(sampleStorage.getSampleType());
         this.sampleStorage.setVolume(sampleStorage.getVolume());
         this.sampleStorage.setQuantity(sampleStorage.getQuantity());
+        this.sampleStorage.setActivityStatus(sampleStorage.getActivityStatus());
         sampleTypeMap = new HashMap<String, SampleTypeWrapper>();
         for (SampleTypeWrapper st : sampleTypes) {
             sampleTypeMap.put(st.getName(), st);
@@ -82,7 +86,7 @@ public class SampleStorageDialog extends BiobankDialog {
     }
 
     @Override
-    protected void createDialogAreaInternal(Composite parent) {
+    protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -94,8 +98,8 @@ public class SampleStorageDialog extends BiobankDialog {
         }
 
         sampleTypeComboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents, "Aliquot Type",
-                sampleTypeMap.keySet(), selection,
+            .createComboViewerWithNoSelectionValidator(contents,
+                "Aliquot Type", sampleTypeMap.keySet(), selection,
                 "A sample type should be selected");
         sampleTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -108,6 +112,32 @@ public class SampleStorageDialog extends BiobankDialog {
                 }
             });
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
+        gd.horizontalSpan = 2;
+        sampleTypeComboViewer.getCombo().setLayoutData(gd);
+
+        activityStatusComboViewer = getWidgetCreator()
+            .createComboViewerWithNoSelectionValidator(
+                contents,
+                "Activity Status",
+                ActivityStatusWrapper.getAllActivityStatuses(sampleStorage
+                    .getAppService()), sampleStorage.getActivityStatus(),
+                "A sample type should be selected");
+        activityStatusComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection asSelection = (IStructuredSelection) sampleTypeComboViewer
+                        .getSelection();
+                    try {
+                        sampleStorage
+                            .setActivityStatus((ActivityStatusWrapper) asSelection
+                                .getFirstElement());
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                }
+            });
+        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.horizontalSpan = 2;
         sampleTypeComboViewer.getCombo().setLayoutData(gd);
 

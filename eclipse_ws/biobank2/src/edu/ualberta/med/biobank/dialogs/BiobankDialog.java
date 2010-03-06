@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
+import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -16,7 +17,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.springframework.remoting.RemoteAccessException;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -48,13 +53,26 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
-        createDialogAreaInternal(parentComposite);
+        try {
+            createDialogAreaInternal(parentComposite);
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage();
+        } catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage();
+        } catch (final AccessDeniedException ade) {
+            BioBankPlugin.openAccessDeniedErrorMessage();
+        } catch (BiobankCheckException bce) {
+            BioBankPlugin.openAsyncError("Save error", bce);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         bindChangeListener();
         setupFinished = true;
         return parentComposite;
     }
 
-    protected abstract void createDialogAreaInternal(Composite parent);
+    protected abstract void createDialogAreaInternal(Composite parent)
+        throws Exception;
 
     protected AbstractValidator createValidator(
         Class<? extends AbstractValidator> validatorClass,

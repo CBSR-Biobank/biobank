@@ -13,6 +13,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -354,20 +355,23 @@ public class TestAliquot extends TestDatabase {
             "ss1"));
         ss1.setVolume(1.0);
         ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
-        ss1.setActivityStatus("Active");
+        ss1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
         ss2.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
             "ss2"));
         ss2.setVolume(2.0);
         ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
-        ss2.setActivityStatus("Active");
+        ss2.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         ss2.persist();
         SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
         ss3.setSampleType(aliquot.getSampleType());
         ss3.setVolume(3.0);
         ss3.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
-        ss3.setActivityStatus("Active");
+        ss3.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         ss3.persist();
         aliquot.getPatientVisit().getPatient().getStudy().addSampleStorage(
             Arrays.asList(ss1, ss2, ss3));

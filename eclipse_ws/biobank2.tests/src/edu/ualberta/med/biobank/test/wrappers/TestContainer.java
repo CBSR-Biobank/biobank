@@ -45,10 +45,6 @@ import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestContainer extends TestDatabase {
 
-    // the methods to skip in the getters and setters test
-    private static final List<String> GETTER_SKIP_METHODS = Arrays
-        .asList("getActivityStatus");
-
     private final String CBSR_ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
     private static final int CONTAINER_TOP_ROWS = 5;
@@ -241,7 +237,7 @@ public class TestContainer extends TestDatabase {
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
-        testGettersAndSetters(container, GETTER_SKIP_METHODS);
+        testGettersAndSetters(container);
     }
 
     @Test

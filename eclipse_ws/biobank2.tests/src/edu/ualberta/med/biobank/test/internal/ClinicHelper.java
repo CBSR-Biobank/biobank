@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
@@ -11,7 +12,7 @@ public class ClinicHelper extends DbHelper {
         clinic.setName(name);
         clinic.setCity("");
         clinic.setSite(site);
-        clinic.setActivityStatus("Active");
+        clinic.setActivityStatus(CbsrSite.getActivityStatus("Active"));
 
         return clinic;
     }

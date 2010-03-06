@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.internal;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
@@ -38,7 +39,8 @@ public class ContainerTypeHelper extends DbHelper {
         if (colCapacity != null)
             ct.setColCapacity(colCapacity);
         ct.setTopLevel(isTopLevel);
-        ct.setActivityStatus("Active");
+        ct.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         return ct;
     }
 

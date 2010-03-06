@@ -397,7 +397,7 @@ public class CbsrContainers {
         container.setLabel(label);
         container.setSite(site);
         container.setContainerType(type);
-        container.setActivityStatus("Active");
+        container.setActivityStatus(CbsrSite.getActivityStatus("Active"));
         container.persist();
         container.reload();
         return container;
@@ -409,7 +409,7 @@ public class CbsrContainers {
         ContainerWrapper container = new ContainerWrapper(site.getAppService());
         container.setSite(site);
         container.setContainerType(type);
-        container.setActivityStatus("Active");
+        container.setActivityStatus(CbsrSite.getActivityStatus("Active"));
         container.setPosition(row, col);
         container.setParent(parent);
         container.persist();
