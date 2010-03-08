@@ -40,7 +40,7 @@ public class SampleRequest extends QueryObject {
             for (int j = 0; j < queried.size() && j < maxResults; j++)
                 results.add(queried.get(j));
         }
-        return postProcess(results);
+        return results;
     }
 
     @Override

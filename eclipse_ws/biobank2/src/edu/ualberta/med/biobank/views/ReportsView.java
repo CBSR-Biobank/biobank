@@ -269,8 +269,13 @@ public class ReportsView extends ViewPart {
                         @Override
                         public void run() {
                             try {
-                                reportData = currentQuery.executeQuery(
+                                reportData = currentQuery.generate(
                                     SessionManager.getAppService(), params);
+                                if (reportData.size() >= 1000)
+                                    BioBankPlugin
+                                        .openAsyncError(
+                                            "Size Limit Exceeded",
+                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
                             } catch (Exception e) {
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
@@ -297,7 +302,7 @@ public class ReportsView extends ViewPart {
                         @Override
                         public void run() {
                             monitor.done();
-                            if (reportData.size() > 0) {
+                            if (!reportData.isEmpty()) {
                                 reportTable.dispose();
                                 reportTable = new SearchResultsInfoTable(top,
                                     reportData, currentQuery.getColumnNames(),
@@ -523,14 +528,14 @@ public class ReportsView extends ViewPart {
                 fd.setText("Export as");
                 String[] filterExt = { "*.csv", "*.pdf" };
                 fd.setFilterExtensions(filterExt);
-                fd.setFileName(currentQuery.toString() + "_"
+                fd.setFileName(currentQuery.getName() + "_"
                     + DateFormatter.formatAsDate(new Date()));
                 String path = fd.open();
                 if (path == null)
                     throw new Exception("Printing Canceled.");
                 if (path.endsWith(".pdf"))
                     ReportingUtils.saveReport(createDynamicReport(currentQuery
-                        .toString(), params, columnInfo, listData), path);
+                        .getName(), params, columnInfo, listData), path);
                 else {
                     // csv
                     File file = new File(path);
@@ -557,7 +562,7 @@ public class ReportsView extends ViewPart {
                 }
             } else
                 ReportingUtils.printReport(createDynamicReport(currentQuery
-                    .toString(), params, columnInfo, listData));
+                    .getName(), params, columnInfo, listData));
 
             return true;
         }
