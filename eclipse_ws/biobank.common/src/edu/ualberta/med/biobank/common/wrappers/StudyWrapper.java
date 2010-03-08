@@ -141,6 +141,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         ApplicationException {
         checkNameNotEmpty();
         checkNameShortNotEmpty();
+        checkValidActivityStatus();
         checkStudyNameUnique();
         checkContactsFromSameSite();
     }
@@ -154,6 +155,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private void checkNameShortNotEmpty() throws BiobankCheckException {
         if (getNameShort() == null || getNameShort().isEmpty()) {
             throw new BiobankCheckException("Short Name can't be empty");
+        }
+    }
+
+    private void checkValidActivityStatus() throws BiobankCheckException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the clinic does not have an activity status");
         }
     }
 

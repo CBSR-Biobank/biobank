@@ -47,7 +47,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "patient", "dateProcessed", "comment",
-            "pvAttrCollection", "sampleCollection", "username", "shipment",
+            "pvAttrCollection", "aliquotCollection", "username", "shipment",
             "pvSourceVesselCollection" };
     }
 
@@ -81,20 +81,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @SuppressWarnings("unchecked")
     public List<AliquotWrapper> getAliquotCollection() {
-        List<AliquotWrapper> sampleCollection = (List<AliquotWrapper>) propertiesMap
-            .get("sampleCollection");
-        if (sampleCollection == null) {
+        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
+            .get("aliquotCollection");
+        if (aliquotCollection == null) {
             Collection<Aliquot> children = wrappedObject.getAliquotCollection();
             if (children != null) {
-                sampleCollection = new ArrayList<AliquotWrapper>();
+                aliquotCollection = new ArrayList<AliquotWrapper>();
                 for (Aliquot aliquot : children) {
-                    sampleCollection
+                    aliquotCollection
                         .add(new AliquotWrapper(appService, aliquot));
                 }
-                propertiesMap.put("sampleCollection", sampleCollection);
+                propertiesMap.put("aliquotCollection", aliquotCollection);
             }
         }
-        return sampleCollection;
+        return aliquotCollection;
     }
 
     @SuppressWarnings("unchecked")

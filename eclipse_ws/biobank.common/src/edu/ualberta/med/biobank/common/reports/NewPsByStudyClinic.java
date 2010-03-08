@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.common.reports;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.PatientVisit;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -12,24 +12,13 @@ public class NewPsByStudyClinic extends QueryObject {
 
     protected static final String NAME = "New Patients per Study per Clinic by Date";
 
-    public static String sub_query = "(select min(sub_query.dateProcessed) from "
-        + PatientVisit.class.getName()
-        + " as sub_query where sub_query.patient.study.site {0} {1} and sub_query.patient.id=Alias.patient.id)";
+    protected static final String query = "select pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed), count(*) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.dateProcessed=(select min(pvCollection.dateProcessed) from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection as pvCollection where p=pv.patient) and pv.patient.study.site {0} {1} group by pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed)";
 
     public NewPsByStudyClinic(String op, Integer siteId) {
         super(
             "Displays the total number of patients added per study per clinic by date range.",
-            "select "
-                + MessageFormat.format(sub_query, op, siteId)
-                + ", Alias.patient.study.nameShort, Alias.shipment.clinic.name from "
-                + PatientVisit.class.getName()
-                + " as Alias where Alias.patient.study.site "
-                + op
-                + " "
-                + siteId
-                + " ORDER BY Alias.patient.study.nameShort, Alias.shipment.clinic.name",
-            new String[] { "", "Study", "Clinic", "Total" }, new int[] { 100,
-                200, 100, 100 });
+            MessageFormat.format(query, op, siteId, "{0}"), new String[] {
+                "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateRange.class, DateRange.Month);
     }
 
@@ -44,15 +33,25 @@ public class NewPsByStudyClinic extends QueryObject {
             if (option.type.equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
-        columnNames[0] = (String) params.get(0);
+        columnNames[2] = (String) params.get(0);
+        queryString = MessageFormat.format(queryString, columnNames[2]);
         HQLCriteria c = new HQLCriteria(queryString);
         List<Object> results = appService.query(c);
-        return postProcess(results);
-    }
-
-    @Override
-    public List<Object> postProcess(List<Object> results) {
-        return sumByDate(results);
+        List<Object> compressedDates = new ArrayList<Object>();
+        if (columnNames[2].compareTo("Year") == 0) {
+            for (Object ob : results) {
+                Object[] castOb = (Object[]) ob;
+                compressedDates.add(new Object[] { castOb[0], castOb[1],
+                    castOb[3], castOb[4] });
+            }
+        } else {
+            for (Object ob : results) {
+                Object[] castOb = (Object[]) ob;
+                compressedDates.add(new Object[] { castOb[0], castOb[1],
+                    castOb[3] + "(" + castOb[2] + ")", castOb[4] });
+            }
+        }
+        return compressedDates;
     }
 
     @Override

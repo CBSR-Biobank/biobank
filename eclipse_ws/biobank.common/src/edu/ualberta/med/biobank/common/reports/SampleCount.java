@@ -12,7 +12,7 @@ public class SampleCount extends QueryObject {
                 + Aliquot.class.getName()
                 + " as Alias where Alias.patientVisit.patient.study.site " + op
                 + siteId + " GROUP BY Alias.sampleType.name", new String[] {
-                "Aliquot Type", "Total" }, new int[] { 200, 150 });
+                "Sample Type", "Total" });
     }
 
     @Override

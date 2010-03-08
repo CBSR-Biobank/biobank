@@ -51,7 +51,25 @@ import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.CabinetCSamples;
+import edu.ualberta.med.biobank.common.reports.CabinetDSamples;
+import edu.ualberta.med.biobank.common.reports.CabinetSSamples;
+import edu.ualberta.med.biobank.common.reports.FreezerCSamples;
+import edu.ualberta.med.biobank.common.reports.FreezerDSamples;
+import edu.ualberta.med.biobank.common.reports.FreezerSSamples;
+import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
+import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
+import edu.ualberta.med.biobank.common.reports.PatientWBC;
+import edu.ualberta.med.biobank.common.reports.QACabinetSamples;
+import edu.ualberta.med.biobank.common.reports.QAFreezerSamples;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.SampleCount;
+import edu.ualberta.med.biobank.common.reports.SampleInvoiceByClinic;
+import edu.ualberta.med.biobank.common.reports.SampleInvoiceByPatient;
+import edu.ualberta.med.biobank.common.reports.SampleRequest;
+import edu.ualberta.med.biobank.common.reports.SampleSCount;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -89,9 +107,40 @@ public class ReportsView extends ViewPart {
     private Button exportButton;
 
     private QueryObject currentQuery;
+    private HashMap<Class<?>, int[]> columnWidths;
 
     public ReportsView() {
         reportData = new ArrayList<Object>();
+        columnWidths = new HashMap<Class<?>, int[]>();
+        columnWidths.put(CabinetCSamples.class, new int[] { 100, 100, 100 });
+        columnWidths.put(CabinetDSamples.class,
+            new int[] { 100, 100, 100, 100 });
+        columnWidths.put(CabinetSSamples.class, new int[] { 100, 100 });
+        columnWidths.put(FreezerCSamples.class, new int[] { 100, 100, 100 });
+        columnWidths.put(FreezerDSamples.class,
+            new int[] { 100, 100, 100, 100 });
+        columnWidths.put(FreezerSSamples.class, new int[] { 100, 100 });
+        columnWidths.put(FvLPatientVisits.class,
+            new int[] { 100, 100, 100, 100 });
+        columnWidths.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100,
+            100 });
+        columnWidths.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100,
+            100 });
+        columnWidths.put(PatientVisitSummary.class, new int[] { 100, 100, 100,
+            100, 100, 100, 100, 100, 100 });
+        columnWidths.put(PatientWBC.class, new int[] { 100, 100, 100, 100 });
+        columnWidths.put(QACabinetSamples.class, new int[] { 100, 100, 100,
+            100, 100, 100 });
+        columnWidths.put(QAFreezerSamples.class, new int[] { 100, 100, 100,
+            100, 100, 100 });
+        columnWidths.put(SampleCount.class, new int[] { 100, 100 });
+        columnWidths.put(SampleInvoiceByClinic.class, new int[] { 100, 100,
+            100, 100 });
+        columnWidths.put(SampleInvoiceByPatient.class, new int[] { 100, 100,
+            100, 100 });
+        columnWidths.put(SampleRequest.class, new int[] { 100, 100, 100, 100,
+            100 });
+        columnWidths.put(SampleSCount.class, new int[] { 100, 100, 100 });
     }
 
     @Override
@@ -220,8 +269,13 @@ public class ReportsView extends ViewPart {
                         @Override
                         public void run() {
                             try {
-                                reportData = currentQuery.executeQuery(
+                                reportData = currentQuery.generate(
                                     SessionManager.getAppService(), params);
+                                if (reportData.size() >= 1000)
+                                    BioBankPlugin
+                                        .openAsyncError(
+                                            "Size Limit Exceeded",
+                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
                             } catch (Exception e) {
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
@@ -248,11 +302,11 @@ public class ReportsView extends ViewPart {
                         @Override
                         public void run() {
                             monitor.done();
-                            if (reportData.size() > 0) {
+                            if (!reportData.isEmpty()) {
                                 reportTable.dispose();
                                 reportTable = new SearchResultsInfoTable(top,
                                     reportData, currentQuery.getColumnNames(),
-                                    currentQuery.getColumnWidths());
+                                    columnWidths.get(currentQuery.getClass()));
                                 printButton.setEnabled(true);
                                 exportButton.setEnabled(true);
                             } else {
@@ -474,14 +528,14 @@ public class ReportsView extends ViewPart {
                 fd.setText("Export as");
                 String[] filterExt = { "*.csv", "*.pdf" };
                 fd.setFilterExtensions(filterExt);
-                fd.setFileName(currentQuery.toString() + "_"
+                fd.setFileName(currentQuery.getName() + "_"
                     + DateFormatter.formatAsDate(new Date()));
                 String path = fd.open();
                 if (path == null)
                     throw new Exception("Printing Canceled.");
                 if (path.endsWith(".pdf"))
                     ReportingUtils.saveReport(createDynamicReport(currentQuery
-                        .toString(), params, columnInfo, listData), path);
+                        .getName(), params, columnInfo, listData), path);
                 else {
                     // csv
                     File file = new File(path);
@@ -508,7 +562,7 @@ public class ReportsView extends ViewPart {
                 }
             } else
                 ReportingUtils.printReport(createDynamicReport(currentQuery
-                    .toString(), params, columnInfo, listData));
+                    .getName(), params, columnInfo, listData));
 
             return true;
         }

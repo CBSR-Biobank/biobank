@@ -21,8 +21,7 @@ public class SampleInvoiceByClinic extends QueryObject {
         super(
             "Lists all samples linked in a particular date range, ordered by clinic.",
             MessageFormat.format(QUERY_STRING, siteId, op), new String[] {
-                "Clinic", "Patient Number", "Link Date", "Aliquot Type" },
-            new int[] { 100, 200, 100, 100 });
+                "Clinic", "Patient Number", "Link Date", "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
     }

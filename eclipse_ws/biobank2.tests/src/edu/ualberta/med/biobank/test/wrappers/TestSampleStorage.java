@@ -6,6 +6,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -100,6 +102,30 @@ public class TestSampleStorage extends TestDatabase {
         int newTotal = appService.search(SampleStorage.class,
             new SampleStorage()).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testActivityStatus() throws Exception {
+        String name = "testPersist" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(site, name);
+
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+            appService, false);
+        SampleStorageWrapper ss = SampleStorageHelper.newSampleStorage(study,
+            DbHelper.chooseRandomlyInList(types));
+        ss.setActivityStatus(null);
+
+        try {
+            ss.persist();
+            Assert.fail("Should not be allowed : no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        ss.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        ss.persist();
     }
 
     @Test
