@@ -52,6 +52,7 @@ public class SiteManager {
         currentSiteWrappers = new ArrayList<SiteWrapper>();
         allSiteWrapper = new SiteWrapper(appService);
         allSiteWrapper.setName("All Sites");
+        allSiteWrapper.setNameShort("All Sites");
     }
 
     /*
