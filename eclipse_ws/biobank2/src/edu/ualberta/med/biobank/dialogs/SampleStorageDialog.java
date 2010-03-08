@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 
 public class SampleStorageDialog extends BiobankDialog {
 
-    private static final String TITLE = "Aliquot Storage";
+    private static final String TITLE = "Sample Storage";
 
     private SampleStorageWrapper origSampleStorage;
 
@@ -88,7 +88,7 @@ public class SampleStorageDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(3, false));
+        contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         String selection = null;
@@ -111,9 +111,6 @@ public class SampleStorageDialog extends BiobankDialog {
                         .getFirstElement()));
                 }
             });
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        sampleTypeComboViewer.getCombo().setLayoutData(gd);
 
         activityStatusComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(
@@ -126,7 +123,7 @@ public class SampleStorageDialog extends BiobankDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection asSelection = (IStructuredSelection) sampleTypeComboViewer
+                    IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
                         .getSelection();
                     try {
                         sampleStorage
@@ -137,23 +134,16 @@ public class SampleStorageDialog extends BiobankDialog {
                     }
                 }
             });
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        sampleTypeComboViewer.getCombo().setLayoutData(gd);
 
-        Control c = createBoundWidgetWithLabel(contents, Text.class,
-            SWT.BORDER, "Volume (ml)", new String[0], PojoObservables
-                .observeValue(sampleStorage, "volume"),
-            new DoubleNumberValidator("Volume should be a real number", false));
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Volume (ml)", new String[0], PojoObservables.observeValue(
+                sampleStorage, "volume"), new DoubleNumberValidator(
+                "Volume should be a real number", false));
 
-        c = createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
             "Quantity", new String[0], PojoObservables.observeValue(
                 sampleStorage, "quantity"), new IntegerNumberValidator(
                 "Quantity should be a whole number", false));
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
     }
 
     @Override
@@ -161,6 +151,7 @@ public class SampleStorageDialog extends BiobankDialog {
         origSampleStorage.setSampleType(sampleStorage.getSampleType());
         origSampleStorage.setVolume(sampleStorage.getVolume());
         origSampleStorage.setQuantity(sampleStorage.getQuantity());
+        origSampleStorage.setActivityStatus(sampleStorage.getActivityStatus());
         super.okPressed();
     }
 

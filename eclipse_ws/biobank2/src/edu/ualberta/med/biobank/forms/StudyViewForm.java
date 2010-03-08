@@ -155,7 +155,7 @@ public class StudyViewForm extends BiobankViewForm {
             .getSourceVesselCollection());
         section.setClient(sourceVesselTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sampleStorageTable);
+        toolkit.paintBordersFor(sourceVesselTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {

@@ -60,22 +60,16 @@ public class SampleTypeDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite content = new Composite(parent, SWT.NONE);
-        content.setLayout(new GridLayout(3, false));
+        content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
-            "Name", null, PojoObservables.observeValue(sampleType, "name"),
+        createBoundWidgetWithLabel(content, Text.class, SWT.BORDER, "Name",
+            null, PojoObservables.observeValue(sampleType, "name"),
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
 
-        c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
             "Short Name", null, PojoObservables.observeValue(sampleType,
                 "nameShort"), new NonEmptyStringValidator(MSG_NO_ST_SNAME));
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
     }
 
     @Override
