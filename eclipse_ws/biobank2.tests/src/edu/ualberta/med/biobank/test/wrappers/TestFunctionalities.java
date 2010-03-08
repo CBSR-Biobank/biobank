@@ -68,7 +68,7 @@ public class TestFunctionalities extends TestDatabase {
 
         Container sc = getContainer();
 
-        // 1st test = sample not used in another sampleposition
+        // 1st test = sample not used in another aliquot position
         Aliquot sample = findNotUsedSampleInAliquotPosition();
 
         tryAliquotPositionInsert(sample, sc);
@@ -169,7 +169,7 @@ public class TestFunctionalities extends TestDatabase {
      */
     private Aliquot findNotUsedSampleInAliquotPosition() throws Exception {
         HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Aliquot as sample "
+            "from edu.ualberta.med.biobank.model.Aliquot as aliquot "
                 + " where sample not in "
                 + " (select p.sample from edu.ualberta.med.biobank.model.AliquotPosition as p)");
         List<Aliquot> samples = appService.query(c);
@@ -184,7 +184,7 @@ public class TestFunctionalities extends TestDatabase {
      */
     private Aliquot findUsedSampleInAliquotPosition() throws Exception {
         HQLCriteria c = new HQLCriteria(
-            "from edu.ualberta.med.biobank.model.Aliquot as sample "
+            "from edu.ualberta.med.biobank.model.Aliquot as aliquot "
                 + " where sample in "
                 + " (select p.sample from edu.ualberta.med.biobank.model.AliquotPosition as p)");
         List<Aliquot> samples = appService.query(c);

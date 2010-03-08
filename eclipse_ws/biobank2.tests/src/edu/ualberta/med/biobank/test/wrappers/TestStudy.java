@@ -885,6 +885,25 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
+    public void testPersitCheckStudyNoActivityStatus() throws Exception {
+        String name = "testCheckStudyShortNameUnique" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper s1 = StudyHelper.newStudy(site, name);
+        s1.setActivityStatus(null);
+
+        try {
+            s1.persist();
+            Assert.fail("Should not insert the study : no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        s1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        s1.persist();
+    }
+
+    @Test
     public void testPersistFailCheckContactsFromSameSite() throws Exception {
         String name = "testPersistFailCheckContactsFromSameSite";
         SiteWrapper site = SiteHelper.addSite(name);

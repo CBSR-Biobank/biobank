@@ -9,8 +9,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
-        String[] headings, int[] bounds) {
-        super(parent, true, collection, headings, bounds, 24);
+        String[] headings, int[] is) {
+        super(parent, true, collection, headings, is, 24);
     }
 
     @Override

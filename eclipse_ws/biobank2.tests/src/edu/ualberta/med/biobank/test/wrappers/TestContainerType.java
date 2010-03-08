@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -864,6 +865,28 @@ public class TestContainerType extends TestDatabase {
         Assert.assertEquals(1, childTypeL3.getChildLabelingScheme().intValue());
         Assert.assertTrue(childTypeL3.getChildLabelingSchemeName().equals(
             "SBS Standard"));
+    }
+
+    @Test
+    public void testActivityStatus() throws Exception {
+        ContainerTypeWrapper topType;
+
+        // its important that topType2 is not saved to the database
+        topType = ContainerTypeHelper.newContainerType(site,
+            "Top Container Type 2", "TCT2", 2, CONTAINER_TOP_ROWS,
+            CONTAINER_TOP_COLS, true);
+        topType.setActivityStatus(null);
+
+        try {
+            topType.persist();
+            Assert.fail("Should not be allowed: no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        topType.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        topType.persist();
     }
 
     @Test

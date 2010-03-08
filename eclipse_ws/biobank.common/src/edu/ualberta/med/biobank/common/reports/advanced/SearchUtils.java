@@ -31,6 +31,27 @@ public class SearchUtils {
         return objList;
     }
 
+    public static QueryTreeNode constructTree(HQLField root) {
+        QueryTreeNode rootNode = new QueryTreeNode(root);
+        expand(rootNode);
+        return rootNode;
+    }
+
+    public static void expand(QueryTreeNode node) {
+        List<HQLField> fields = getSimpleFields(node.getNodeInfo().getType(),
+            node.getNodeInfo().getPath());
+        for (HQLField field : fields)
+            node.addField(field);
+        List<HQLField> children = getComplexFields(
+            node.getNodeInfo().getType(), node.getNodeInfo().getPath());
+        for (HQLField child : children) {
+            QueryTreeNode nodeChild = new QueryTreeNode(child);
+            nodeChild.setParent(node);
+            expand(nodeChild);
+            node.addChild(nodeChild);
+        }
+    }
+
     public static List<HQLField> getSimpleFields(Class<?> c, String path) {
         ArrayList<HQLField> searchableFields = new ArrayList<HQLField>();
         if (c == SiteWrapper.class) {
