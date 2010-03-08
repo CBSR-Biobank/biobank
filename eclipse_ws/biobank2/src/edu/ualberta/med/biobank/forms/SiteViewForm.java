@@ -205,7 +205,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     protected void reload() throws Exception {
         retrieveSite();
-        setPartName("Repository Site " + site.getName());
+        setPartName("Repository Site " + site.getNameShort());
         form.setText("Repository Site: " + site.getName());
         setSiteSectionValues();
         setAdressValues(site);

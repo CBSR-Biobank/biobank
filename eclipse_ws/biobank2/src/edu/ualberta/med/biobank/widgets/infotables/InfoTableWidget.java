@@ -215,6 +215,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         if ((collection == null) || (model.size() == collection.size()))
             return;
 
+        model.clear();
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel(i));
         }

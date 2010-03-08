@@ -123,7 +123,7 @@ public class SampleStorageDialog extends BiobankDialog {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection asSelection = (IStructuredSelection) sampleTypeComboViewer
+                    IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
                         .getSelection();
                     try {
                         sampleStorage
@@ -151,6 +151,7 @@ public class SampleStorageDialog extends BiobankDialog {
         origSampleStorage.setSampleType(sampleStorage.getSampleType());
         origSampleStorage.setVolume(sampleStorage.getVolume());
         origSampleStorage.setQuantity(sampleStorage.getQuantity());
+        origSampleStorage.setActivityStatus(sampleStorage.getActivityStatus());
         super.okPressed();
     }
 
