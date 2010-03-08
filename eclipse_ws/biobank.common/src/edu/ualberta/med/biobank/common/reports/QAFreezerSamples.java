@@ -26,17 +26,16 @@ public class QAFreezerSamples extends QueryObject {
                 + "between ? and ? and aliquot.sampleType.name like ?"
                 + " and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
-                + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()
                 + " as path1, "
                 + ContainerPath.class.getName()
-                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site "
+                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site "
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
-                "Sample Type" });
+                "Aliquot Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
-        addOption("Sample Type", String.class, "");
+        addOption("Aliquot Type", String.class, "");
         addOption("# Aliquots", Integer.class, 0);
     }
 
@@ -54,16 +53,22 @@ public class QAFreezerSamples extends QueryObject {
         params.add("%Freezer%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = appService.query(c);
-        ArrayList<Object> newList = new ArrayList<Object>();
-        int max = Math.min(numResults, results.size());
-        for (int i = 0; i < max; i++)
-            newList.add(results.get(i));
-        return newList;
+        return appService.query(c);
     }
 
     @Override
     public String getName() {
         return NAME;
     }
+
+    @Override
+    public List<Object> postProcess(List<Object> results) {
+        ArrayList<Object> newList = new ArrayList<Object>();
+        results.subList(0, numResults);
+        int max = Math.min(numResults, results.size());
+        for (int i = 0; i < max; i++)
+            newList.add(results.get(i));
+        return newList;
+    }
+
 }

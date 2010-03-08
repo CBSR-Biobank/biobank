@@ -13,9 +13,8 @@ public class PatientWBC extends QueryObject {
                 + "Alias.patient.pnumber, Alias.dateProcessed, aliquot.id from "
                 + PatientVisit.class.getName()
                 + " as Alias left join Alias.aliquotCollection as aliquot where Alias.patient.study.site "
-                + op
-                + siteId
-                + " and sample.sampleType.nameShort = 'DNA (WBC)'",
+                + op + siteId
+                + " and aliquot.sampleType.nameShort = 'DNA (WBC)'",
             new String[] { "Study", "Clinic", "Patient", "Date", "ID" });
     }
 

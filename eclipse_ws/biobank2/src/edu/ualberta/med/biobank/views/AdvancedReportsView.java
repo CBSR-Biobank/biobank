@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -34,7 +35,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -74,7 +74,6 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.SmartCombo;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 
 public class AdvancedReportsView extends ViewPart {
@@ -101,7 +100,7 @@ public class AdvancedReportsView extends ViewPart {
     private Button exportButton;
 
     private List<Class<? extends ModelWrapper<?>>> searchableModelObjects;
-    private SmartCombo objectSelector;
+    private ListViewer objectSelector;
 
     private QueryObject currentQuery;
     Class<? extends ModelWrapper<?>> type;
@@ -127,24 +126,27 @@ public class AdvancedReportsView extends ViewPart {
         header = new Composite(top, SWT.NONE);
         header.setLayout(new GridLayout(4, false));
 
-        objectSelector = createCombo(header);
-        objectSelector.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
+        String[] names = new String[searchableModelObjects.size()];
+        int i = 0;
+        for (Class<?> objClass : searchableModelObjects) {
+            names[i] = objClass.getSimpleName().replace("Wrapper", "");
+            i++;
+        }
 
-            }
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    comboChanged();
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Error",
-                        "There was an error while building page.");
+        objectSelector = new ListViewer(header, SWT.NONE);
+        objectSelector.setInput(names);
+        objectSelector
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    try {
+                        comboChanged();
+                    } catch (Exception ex) {
+                        BioBankPlugin.openAsyncError("Error",
+                            "There was an error while building page.");
+                    }
                 }
-            }
-        });
+            });
 
         generateButton = new Button(header, SWT.NONE);
         generateButton.setText("Generate");
@@ -284,7 +286,7 @@ public class AdvancedReportsView extends ViewPart {
 
     private void setEnabled(boolean enabled) {
         SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
-        objectSelector.setEnabled(enabled);
+        objectSelector.getList().setEnabled(enabled);
         generateButton.setEnabled(enabled);
         printButton.setEnabled(enabled);
         exportButton.setEnabled(enabled);
@@ -346,7 +348,7 @@ public class AdvancedReportsView extends ViewPart {
     }
 
     public void comboChanged() {
-        String typeSelection = objectSelector.getSelection();
+        String typeSelection = objectSelector.getSelection().toString();
         for (Class<? extends ModelWrapper<?>> searchableModelObject : searchableModelObjects)
             if (searchableModelObject.getSimpleName().startsWith(typeSelection))
                 type = searchableModelObject;
@@ -580,22 +582,6 @@ public class AdvancedReportsView extends ViewPart {
                 null);
             reportData = new ArrayList<Object>();
         }
-    }
-
-    protected SmartCombo createCombo(Composite parent) {
-        SmartCombo combo = new SmartCombo(parent, SWT.NONE);
-
-        GridData combodata = new GridData();
-        combodata.widthHint = 250;
-        combo.setLayoutData(combodata);
-        String[] names = new String[searchableModelObjects.size()];
-        int i = 0;
-        for (Class<?> objClass : searchableModelObjects) {
-            names[i] = objClass.getSimpleName().replace("Wrapper", "");
-            i++;
-        }
-        combo.setInput(names);
-        return combo;
     }
 
     public boolean printTable(Boolean export) throws Exception {

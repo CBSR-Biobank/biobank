@@ -17,8 +17,8 @@ public class QACabinetSamples extends QueryObject {
 
     public QACabinetSamples(String op, Integer siteId) {
         super(
-            "Retrieves a list of aliquots, at random, within a date range, by sample type.",
-            "select aliquot.samplPosition.container.label, aliquot.inventoryId, "
+            "Retrieves a list of aliquots, at random, within a date range, by aliquot type.",
+            "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
                 + Aliquot.class.getName()
@@ -26,17 +26,16 @@ public class QACabinetSamples extends QueryObject {
                 + "between ? and ? and aliquot.sampleType.name like ?"
                 + " and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
-                + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()
                 + " as path1, "
                 + ContainerPath.class.getName()
-                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site "
+                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site "
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
-                "Sample Type" });
+                "Aliquot Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
-        addOption("Sample Type", String.class, "");
+        addOption("Aliquot Type", String.class, "");
         addOption("# Aliquots", Integer.class, 0);
     }
 
@@ -54,7 +53,11 @@ public class QACabinetSamples extends QueryObject {
         params.add("%Cabinet%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = appService.query(c);
+        return appService.query(c);
+    }
+
+    @Override
+    public List<Object> postProcess(List<Object> results) {
         ArrayList<Object> newList = new ArrayList<Object>();
         int max = Math.min(numResults, results.size());
         for (int i = 0; i < max; i++)
