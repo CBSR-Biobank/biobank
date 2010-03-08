@@ -528,14 +528,14 @@ public class ReportsView extends ViewPart {
                 fd.setText("Export as");
                 String[] filterExt = { "*.csv", "*.pdf" };
                 fd.setFilterExtensions(filterExt);
-                fd.setFileName(currentQuery.toString() + "_"
+                fd.setFileName(currentQuery.getName() + "_"
                     + DateFormatter.formatAsDate(new Date()));
                 String path = fd.open();
                 if (path == null)
                     throw new Exception("Printing Canceled.");
                 if (path.endsWith(".pdf"))
                     ReportingUtils.saveReport(createDynamicReport(currentQuery
-                        .toString(), params, columnInfo, listData), path);
+                        .getName(), params, columnInfo, listData), path);
                 else {
                     // csv
                     File file = new File(path);
@@ -562,7 +562,7 @@ public class ReportsView extends ViewPart {
                 }
             } else
                 ReportingUtils.printReport(createDynamicReport(currentQuery
-                    .toString(), params, columnInfo, listData));
+                    .getName(), params, columnInfo, listData));
 
             return true;
         }
