@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,11 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
+import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -76,7 +81,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 // only add to the collection when adding and not editing
                 selectedSampleStorages.add(dlg.getSampleStorage());
             }
-            setCollection(selectedSampleStorages);
+            reloadCollection(selectedSampleStorages);
             addedOrModifiedSampleStorages.add(dlg.getSampleStorage());
             notifyListeners();
         }
