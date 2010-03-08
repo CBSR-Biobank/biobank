@@ -33,6 +33,7 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyWrapper study;
 
     private Text siteLabel;
+    private Text nameLabel;
     private Text nameShortLabel;
     private Text activityStatusLabel;
     private Text commentLabel;
@@ -82,6 +83,7 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
+        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
         nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
@@ -132,6 +134,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void setStudySectionValues() throws Exception {
         setTextValue(siteLabel, study.getSite().getName());
+        setTextValue(nameLabel, study.getName());
         setTextValue(nameShortLabel, study.getNameShort());
         setTextValue(activityStatusLabel, study.getActivityStatus());
         setTextValue(commentLabel, study.getComment());

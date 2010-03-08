@@ -114,7 +114,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Name", null, BeansObservables.observeValue(clinic, "name"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name Short",
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(clinic, "nameShort"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 

@@ -258,8 +258,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    protected boolean checkNoDuplicates(Class<?> objectClass,
-        String propertyName, String value) throws ApplicationException {
+    protected void checkNoDuplicates(Class<?> objectClass, String propertyName,
+        String value, String errorName) throws ApplicationException,
+        BiobankCheckException {
         HQLCriteria c;
         if (isNew()) {
             c = new HQLCriteria("from " + objectClass.getName() + " where "
@@ -271,7 +272,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         List<Object> results = appService.query(c);
-        return (results.size() == 0);
+        if (results.size() > 0) {
+            throw new BiobankCheckException(errorName + " \"" + value
+                + "\" already exists.");
+        }
+    }
+
+    protected void checkNotEmpty(String value, String errorName)
+        throws BiobankCheckException {
+        if (value == null || value.isEmpty()) {
+            throw new BiobankCheckException(errorName + " can't be empty");
+        }
     }
 
     /**

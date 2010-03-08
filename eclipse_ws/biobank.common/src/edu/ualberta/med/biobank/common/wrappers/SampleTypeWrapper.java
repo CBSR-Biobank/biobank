@@ -115,49 +115,11 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getName() == null || getNameShort() == null) {
-            throw new BiobankCheckException(
-                "Name and short name of this sample type cannot be null.");
-        }
-        checkNameUnique();
-        checkNameShortUnique();
-    }
-
-    private void checkNameShortUnique() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria c;
-        if (isNew()) {
-            c = new HQLCriteria("from " + SampleType.class.getName()
-                + " where nameShort = ?", Arrays
-                .asList(new Object[] { getNameShort() }));
-        } else {
-            c = new HQLCriteria("from " + SampleType.class.getName()
-                + " where id <> ? and nameShort = ?", Arrays
-                .asList(new Object[] { getId(), getNameShort() }));
-        }
-        List<Object> results = appService.query(c);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A sample type with short name \""
-                + getNameShort() + "\" already exists.");
-        }
-    }
-
-    private void checkNameUnique() throws BiobankCheckException,
-        ApplicationException {
-        HQLCriteria c;
-        if (isNew()) {
-            c = new HQLCriteria("from " + SampleType.class.getName()
-                + " where name = ?", Arrays.asList(new Object[] { getName() }));
-        } else {
-            c = new HQLCriteria("from " + SampleType.class.getName()
-                + " where id <> ? and name = ?", Arrays.asList(new Object[] {
-                getId(), getName() }));
-        }
-        List<Object> results = appService.query(c);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A sample type with name \""
-                + getName() + "\" already exists.");
-        }
+        checkNotEmpty(getName(), "Name");
+        checkNotEmpty(getNameShort(), "Short Name");
+        checkNoDuplicates(SampleType.class, "name", getName(), "Name");
+        checkNoDuplicates(SampleType.class, "nameShort", getNameShort(),
+            "Short Name");
     }
 
     /**

@@ -142,6 +142,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         table.setLayout(new TableLayout());
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        table.setLayoutData(gd);
 
         int index = 0;
         if (headings != null) {
@@ -678,9 +680,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         rows = Math.max(rows, 1);
 
         Table table = getTableViewer().getTable();
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        GridData gd = (GridData) table.getLayoutData();
         gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
-        table.setLayoutData(gd);
         layout(true);
     }
 }

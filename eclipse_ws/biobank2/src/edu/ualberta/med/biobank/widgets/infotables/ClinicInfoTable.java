@@ -18,6 +18,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     class TableRowData {
         public ClinicWrapper clinic;
         public String clinicName;
+        public String clinicNameShort;
         public Integer studyCount;
         public String status;
         public Long patientCount;
@@ -25,7 +26,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { clinicName,
+            return StringUtils.join(new String[] { clinicName, clinicNameShort,
                 studyCount.toString(), (status != null) ? status : "",
                 (patientCount != null) ? patientCount.toString() : "",
                 (visitCount != null) ? visitCount.toString() : "" }, "\t");
@@ -46,15 +47,18 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 rc = compare(i1.clinicName, i2.clinicName);
                 break;
             case 1:
-                rc = compare(i1.studyCount, i2.studyCount);
+                rc = compare(i1.clinicNameShort, i2.clinicNameShort);
                 break;
             case 2:
-                rc = compare(i1.status, i2.status);
+                rc = compare(i1.studyCount, i2.studyCount);
                 break;
             case 3:
-                rc = compare(i1.patientCount, i2.patientCount);
+                rc = compare(i1.status, i2.status);
                 break;
             case 4:
+                rc = compare(i1.patientCount, i2.patientCount);
+                break;
+            case 5:
                 rc = compare(i1.visitCount, i2.visitCount);
                 break;
             default:
@@ -69,9 +73,10 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Name",
-        "Study Count", "Status", "Patients", "Patient Visits" };
+        "Short name", "Study Count", "Status", "Patients", "Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
+    private static final int[] BOUNDS = new int[] { 180, 130, 130, 130, 130,
+        130 };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, true, collection, HEADINGS, BOUNDS, 10);
@@ -93,12 +98,14 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 case 0:
                     return item.clinicName;
                 case 1:
-                    return item.studyCount.toString();
+                    return item.clinicNameShort;
                 case 2:
-                    return item.status;
+                    return item.studyCount.toString();
                 case 3:
-                    return item.patientCount.toString();
+                    return item.status;
                 case 4:
+                    return item.patientCount.toString();
+                case 5:
                     return item.visitCount.toString();
                 default:
                     return "";
@@ -118,6 +125,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         TableRowData info = new TableRowData();
         info.clinic = clinic;
         info.clinicName = clinic.getName();
+        info.clinicNameShort = clinic.getNameShort();
         List<StudyWrapper> studies = clinic.getStudyCollection();
         if (studies == null) {
             info.studyCount = 0;

@@ -97,7 +97,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             "Name", null, BeansObservables.observeValue(site, "name"),
             new NonEmptyStringValidator(MSG_NO_SITE_NAME));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name Short",
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(site, "nameShort"),
             new NonEmptyStringValidator("Site short name cannot be blank"));
 
