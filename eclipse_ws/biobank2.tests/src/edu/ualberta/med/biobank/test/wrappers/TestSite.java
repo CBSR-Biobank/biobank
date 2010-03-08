@@ -53,6 +53,13 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
+    public void testGetWrappedClass() throws Exception {
+        String name = "testGetWrappedClass" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        Assert.assertEquals(Site.class, site.getWrappedClass());
+    }
+
+    @Test
     public void testGetStudyCollection() throws Exception {
         String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -406,6 +413,29 @@ public class TestSite extends TestDatabase {
         }
 
         site.setName("Other Name");
+        site.persist();
+        int newTotal = SiteWrapper.getSites(appService).size();
+        Assert.assertEquals(oldTotal + 1, newTotal);
+    }
+
+    @Test
+    public void testPersistFailNoAcivityStatus() throws Exception {
+        int oldTotal = SiteWrapper.getSites(appService).size();
+        String name = "testPersistFailNoAddress" + r.nextInt();
+        SiteWrapper site = new SiteWrapper(appService);
+        site.setName(name);
+        site.setCity("Vesoul");
+
+        try {
+            site.persist();
+            Assert.fail("Should not insert the site : no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        SiteHelper.createdSites.add(site);
         site.persist();
         int newTotal = SiteWrapper.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
