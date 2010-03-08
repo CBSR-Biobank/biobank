@@ -21,6 +21,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -133,7 +134,8 @@ public class AdvancedReportsView extends ViewPart {
             i++;
         }
 
-        objectSelector = new ListViewer(header, SWT.NONE);
+        objectSelector = new ListViewer(header, SWT.BORDER);
+        objectSelector.setContentProvider(new ArrayContentProvider());
         objectSelector.setInput(names);
         objectSelector
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -147,6 +149,7 @@ public class AdvancedReportsView extends ViewPart {
                     }
                 }
             });
+        objectSelector.getList().select(0);
 
         generateButton = new Button(header, SWT.NONE);
         generateButton.setText("Generate");
@@ -348,7 +351,8 @@ public class AdvancedReportsView extends ViewPart {
     }
 
     public void comboChanged() {
-        String typeSelection = objectSelector.getSelection().toString();
+        String typeSelection = (String) ((IStructuredSelection) objectSelector
+            .getSelection()).getFirstElement();
         for (Class<? extends ModelWrapper<?>> searchableModelObject : searchableModelObjects)
             if (searchableModelObject.getSimpleName().startsWith(typeSelection))
                 type = searchableModelObject;
@@ -462,14 +466,14 @@ public class AdvancedReportsView extends ViewPart {
                     .getSelection()).getFirstElement();
                 if (element != null) {
                     MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText("Add OR Node");
+                    mi.setText("OR");
                     mi.addSelectionListener(new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent event) {
                             QueryTreeNode selectedNode = ((QueryTreeNode) element);
                             QueryTreeNode newOperator = new QueryTreeNode(
                                 new HQLField(selectedNode.getNodeInfo()
-                                    .getPath(), "OR", Boolean.class));
+                                    .getPath(), "OR", String.class));
                             QueryTreeNode parent = selectedNode.getParent();
                             parent.removeChild(selectedNode);
                             parent.addChild(newOperator);
@@ -482,9 +486,9 @@ public class AdvancedReportsView extends ViewPart {
                             tree.refresh(true);
                         }
                     });
-                    if (((QueryTreeNode) element).getLabel().compareTo("OR") == 0) {
+                    if (((QueryTreeNode) element).getNodeInfo().getType() == String.class) {
                         MenuItem mi2 = new MenuItem(menu, SWT.NONE);
-                        mi2.setText("Remove OR Node");
+                        mi2.setText("Remove Node");
                         mi2.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -497,6 +501,64 @@ public class AdvancedReportsView extends ViewPart {
                                 selectedNode.removeChild(child);
                                 parent.addChild(child);
                                 parent.removeChild(selectedNode);
+                                tree.refresh(true);
+                            }
+                        });
+                    }
+                    if (((QueryTreeNode) element).getNodeInfo().getFname()
+                        .contains("Collection")) {
+
+                        MenuItem mi3 = new MenuItem(menu, SWT.NONE);
+                        mi3.setText("All");
+                        mi3.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode newOperator = new QueryTreeNode(
+                                    new HQLField(selectedNode.getNodeInfo()
+                                        .getPath(), "All", String.class));
+                                QueryTreeNode parent = selectedNode.getParent();
+                                parent.removeChild(selectedNode);
+                                parent.addChild(newOperator);
+                                newOperator.setParent(parent);
+                                newOperator.addChild(selectedNode);
+                                selectedNode.setParent(newOperator);
+                                tree.refresh(true);
+                            }
+                        });
+                        MenuItem mi4 = new MenuItem(menu, SWT.NONE);
+                        mi4.setText("No");
+                        mi4.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode newOperator = new QueryTreeNode(
+                                    new HQLField(selectedNode.getNodeInfo()
+                                        .getPath(), "No", String.class));
+                                QueryTreeNode parent = selectedNode.getParent();
+                                parent.removeChild(selectedNode);
+                                parent.addChild(newOperator);
+                                newOperator.setParent(parent);
+                                newOperator.addChild(selectedNode);
+                                selectedNode.setParent(newOperator);
+                                tree.refresh(true);
+                            }
+                        });
+                        MenuItem mi5 = new MenuItem(menu, SWT.NONE);
+                        mi5.setText("One or more");
+                        mi5.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode newOperator = new QueryTreeNode(
+                                    new HQLField(selectedNode.getNodeInfo()
+                                        .getPath(), "One or more", String.class));
+                                QueryTreeNode parent = selectedNode.getParent();
+                                parent.removeChild(selectedNode);
+                                parent.addChild(newOperator);
+                                newOperator.setParent(parent);
+                                newOperator.addChild(selectedNode);
+                                selectedNode.setParent(newOperator);
                                 tree.refresh(true);
                             }
                         });
@@ -529,7 +591,7 @@ public class AdvancedReportsView extends ViewPart {
         fieldSection = new Composite(subSection, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
-        gl.numColumns = 2;
+        gl.numColumns = 3;
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;
@@ -538,7 +600,7 @@ public class AdvancedReportsView extends ViewPart {
 
         Label headerLabel = new Label(fieldSection, SWT.NONE);
         GridData gdl = new GridData();
-        gdl.horizontalSpan = 2;
+        gdl.horizontalSpan = 3;
         headerLabel.setLayoutData(gdl);
         headerLabel.setText(node.getTreePath());
 
@@ -549,6 +611,10 @@ public class AdvancedReportsView extends ViewPart {
             Label fieldLabel = new Label(fieldSection, SWT.NONE);
             fieldLabel.setText(field.getFname() + ":");
             textLabels.add(fieldLabel);
+            Combo operatorCombo = new Combo(fieldSection, SWT.NONE);
+            operatorCombo.setItems(SearchUtils.getOperatorSet(field.getType())
+                .toArray(new String[] {}));
+            operatorCombo.select(0);
             Widget widget;
 
             if (field.getType() == Date.class)

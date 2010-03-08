@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.common.reports.advanced;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -10,13 +12,33 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Address;
 
 public class SearchUtils {
+
+    public static List<String> getOperatorSet(Class<?> type) {
+        List<String> opList = new ArrayList<String>();
+        if (type == String.class) {
+            opList.add("=");
+            opList.add("contains");
+            opList.add("starts with");
+            opList.add("ends with");
+        } else if (type == Integer.class) {
+            opList.add("=");
+            opList.add("<=");
+            opList.add(">=");
+            opList.add("<");
+            opList.add(">");
+        } else if (type == Collection.class) {
+            opList.add("all");
+            opList.add("none");
+            opList.add("one or more");
+        }
+        return opList;
+    }
 
     public static List<Class<? extends ModelWrapper<?>>> getSearchableObjs() {
         ArrayList<Class<? extends ModelWrapper<?>>> objList = new ArrayList<Class<? extends ModelWrapper<?>>>();
@@ -32,9 +54,11 @@ public class SearchUtils {
     }
 
     public static QueryTreeNode constructTree(HQLField root) {
+        QueryTreeNode dummy = new QueryTreeNode(new HQLField("", "", null));
         QueryTreeNode rootNode = new QueryTreeNode(root);
         expand(rootNode);
-        return rootNode;
+        dummy.addChild(rootNode);
+        return dummy;
     }
 
     public static void expand(QueryTreeNode node) {
