@@ -180,7 +180,6 @@ public class SendErrorMessageDialog extends BiobankDialog {
         IOException {
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
-        props.setProperty("mail.smtp.starttls.enable", "true");
         props.setProperty("mail.host", email.getSmtpServer());
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", email.getServerPort());
