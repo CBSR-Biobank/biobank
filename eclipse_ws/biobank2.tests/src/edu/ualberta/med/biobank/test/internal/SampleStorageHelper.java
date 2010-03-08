@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -7,13 +8,15 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 public class SampleStorageHelper extends DbHelper {
 
     public static SampleStorageWrapper newSampleStorage(StudyWrapper study,
-        SampleTypeWrapper type) {
+        SampleTypeWrapper type) throws Exception {
         SampleStorageWrapper sampleStorage = new SampleStorageWrapper(
             appService);
         sampleStorage.setStudy(study);
         sampleStorage.setSampleType(type);
         sampleStorage.setQuantity(r.nextInt(10));
         sampleStorage.setVolume(r.nextDouble());
+        sampleStorage.setActivityStatus(ActivityStatusWrapper
+            .getActivityStatus(appService, "Active"));
         return sampleStorage;
     }
 

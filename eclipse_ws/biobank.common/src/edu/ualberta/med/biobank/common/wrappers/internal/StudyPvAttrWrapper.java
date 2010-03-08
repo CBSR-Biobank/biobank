@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvAttrType;
 import edu.ualberta.med.biobank.model.Study;
@@ -27,8 +29,8 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "label", "permissilbe", "lock", "pvAttrType",
-            "study" };
+        return new String[] { "label", "permissilbe", "activityStatus",
+            "pvAttrType", "study" };
     }
 
     @Override
@@ -39,6 +41,10 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the study pv attribute does not have an activity status");
+        }
     }
 
     @Override
@@ -77,21 +83,29 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         return wrappedObject.getPermissible();
     }
 
-    public void setLocked(Boolean enabled) {
-        Boolean oldEnabled = wrappedObject.getLocked();
-        wrappedObject.setLocked(enabled);
-        propertyChangeSupport.firePropertyChange("locked", oldEnabled, enabled);
-    }
-
-    public Boolean getLocked() {
-        return wrappedObject.getLocked();
-    }
-
     public void setPermissible(String possibleValues) {
         String oldPV = wrappedObject.getPermissible();
         wrappedObject.setPermissible(possibleValues);
         propertyChangeSupport.firePropertyChange("possibleValues", oldPV,
             possibleValues);
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
     }
 
     public PvAttrTypeWrapper getPvAttrType() {
@@ -138,7 +152,7 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     @Override
     public String toString() {
         return "" + getId() + ":\"" + getLabel() + "\":\"" + getPermissible()
-            + "\":" + getLocked() + ":" + getPvAttrType().getName() + ":"
-            + getStudy();
+            + "\":" + getActivityStatus() + ":" + getPvAttrType().getName()
+            + ":" + getStudy();
     }
 }

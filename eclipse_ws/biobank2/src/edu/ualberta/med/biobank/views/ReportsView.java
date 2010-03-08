@@ -434,7 +434,7 @@ public class ReportsView extends ViewPart {
             } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(subSection, SWT.NONE, null);
             else if (option.getType() == String.class) {
-                if (option.getName().compareTo("Sample Type") == 0)
+                if (option.getName().compareTo("Aliquot Type") == 0)
                     widget = new AutoTextWidget(subSection, SWT.None, site
                         .getAllSampleTypeCollection(true),
                         SampleTypeWrapper.class);

@@ -33,7 +33,6 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        // FIXME make sure another object with same label is not present
     }
 
     @Override

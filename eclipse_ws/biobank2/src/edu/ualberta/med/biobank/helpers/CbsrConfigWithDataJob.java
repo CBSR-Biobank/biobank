@@ -10,10 +10,10 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -184,20 +184,20 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
         patientVisit.setPatient(patient);
-        SampleWrapper sample = addSample(patientVisit);
-        sample.setPatientVisit(patientVisit);
+        AliquotWrapper aliquot = addAliquot(patientVisit);
+        aliquot.setPatientVisit(patientVisit);
         patientVisit.setShipment(shipments.get(r.nextInt(shipments.size())));
         return patientVisit;
     }
 
-    private SampleWrapper addSample(PatientVisitWrapper patientVisit) {
-        SampleWrapper sample = new SampleWrapper(appService);
-        sample.setInventoryId(Integer.valueOf(r.nextInt(10000)).toString());
-        sample.setPatientVisit(patientVisit);
-        sample.setLinkDate(new Date());
-        sample.setSampleType(sampleTypesList.get(r.nextInt(sampleTypesList
+    private AliquotWrapper addAliquot(PatientVisitWrapper patientVisit) {
+        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        aliquot.setInventoryId(Integer.valueOf(r.nextInt(10000)).toString());
+        aliquot.setPatientVisit(patientVisit);
+        aliquot.setLinkDate(new Date());
+        aliquot.setSampleType(sampleTypesList.get(r.nextInt(sampleTypesList
             .size())));
-        return sample;
+        return aliquot;
     }
 
     public String getRandomString(int maxlen) {

@@ -81,7 +81,7 @@ public class DbHelper {
             return;
 
         for (PatientVisitWrapper visit : visits) {
-            deleteFromList(visit.getSampleCollection());
+            deleteFromList(visit.getAliquotCollection());
             visit.reload();
             visit.delete();
         }

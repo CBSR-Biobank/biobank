@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Sample;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -137,7 +137,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
         List<Object> results = appService.query(c);
         if (results.size() > 0) {
-            throw new BiobankCheckException("A sample with short name \""
+            throw new BiobankCheckException("A sample type with short name \""
                 + getNameShort() + "\" already exists.");
         }
     }
@@ -155,8 +155,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
         List<Object> results = appService.query(c);
         if (results.size() > 0) {
-            throw new BiobankCheckException("A sample with name \"" + getName()
-                + "\" already exists.");
+            throw new BiobankCheckException("A sample type with name \""
+                + getName() + "\" already exists.");
         }
     }
 
@@ -187,7 +187,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         ApplicationException {
         if (isUsedBySamples()) {
             throw new BiobankCheckException("Unable to delete sample type "
-                + getName() + ". A sample of this type exists in storage."
+                + getName() + ". A aliquots of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
     }
@@ -256,7 +256,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     public boolean isUsedBySamples() throws ApplicationException,
         BiobankCheckException {
-        String queryString = "select count(s) from " + Sample.class.getName()
+        String queryString = "select count(s) from " + Aliquot.class.getName()
             + " as s where s.sampleType=?)";
         HQLCriteria c = new HQLCriteria(queryString, Arrays
             .asList(new Object[] { wrappedObject }));

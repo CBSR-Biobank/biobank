@@ -34,6 +34,10 @@ public class SiteViewForm extends AddressViewFormCommon {
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable topContainersTable;
 
+    private Text nameLabel;
+
+    private Text nameShortLabel;
+
     private Text clinicCountLabel;
 
     private Text studyCountLabel;
@@ -63,7 +67,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         siteAdapter = (SiteAdapter) adapter;
         site = siteAdapter.getWrapper();
         retrieveSite();
-        setPartName("Repository Site " + site.getName());
+        setPartName("Repository Site " + site.getNameShort());
     }
 
     @Override
@@ -89,6 +93,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
         clinicCountLabel = createReadOnlyField(client, SWT.NONE,
             "Total Clinics");
         studyCountLabel = createReadOnlyField(client, SWT.NONE, "Total Studies");
@@ -111,6 +117,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void setSiteSectionValues() throws Exception {
+        setTextValue(nameLabel, site.getName());
+        setTextValue(nameShortLabel, site.getNameShort());
         setTextValue(clinicCountLabel, site.getClinicCollection().size());
         setTextValue(studyCountLabel, site.getStudyCollection().size());
         setTextValue(containerTypeCountLabel, site.getContainerTypeCollection()
@@ -120,8 +128,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(shipmentCountLabel, site.getShipmentCount());
         setTextValue(patientCountLabel, site.getPatientCount());
         setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
-        setTextValue(sampleCountLabel, site.getSampleCount());
-        setTextValue(activityStatusLabel, site.getActivityStatus());
+        setTextValue(sampleCountLabel, site.getAliquotCount());
+        setTextValue(activityStatusLabel, site.getActivityStatus().getName());
         setTextValue(commentLabel, site.getComment());
     }
 
@@ -197,7 +205,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     protected void reload() throws Exception {
         retrieveSite();
-        setPartName("Repository Site " + site.getName());
+        setPartName("Repository Site " + site.getNameShort());
         form.setText("Repository Site: " + site.getName());
         setSiteSectionValues();
         setAdressValues(site);

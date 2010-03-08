@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -69,7 +69,7 @@ public class NodeSearchVisitor {
     }
 
     public AdapterBase visit(SampleTypeAdapter sampleType) {
-        if (wrapper instanceof SampleWrapper) {
+        if (wrapper instanceof AliquotWrapper) {
             return sampleType.getChild(wrapper.getId(), true);
         }
         return null;

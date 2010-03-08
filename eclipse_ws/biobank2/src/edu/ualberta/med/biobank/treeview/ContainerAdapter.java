@@ -67,7 +67,7 @@ public class ContainerAdapter extends AdapterBase {
         ContainerWrapper container = getContainer();
         SiteWrapper site = container.getSite();
         if (site != null) {
-            return site.getName() + " - " + getTooltipText("Container");
+            return site.getNameShort() + " - " + getTooltipText("Container");
         }
         return getTooltipText("Container");
     }

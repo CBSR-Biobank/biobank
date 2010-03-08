@@ -11,30 +11,29 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.SampleAdapter;
+import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
-public class SampleViewForm extends BiobankViewForm {
+public class AliquotViewForm extends BiobankViewForm {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(SampleViewForm.class.getName());
+        .getLogger(AliquotViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SampleViewForm";
 
-    private SampleAdapter sampleAdapter;
-    private SampleWrapper sample;
+    private AliquotAdapter aliquotAdapter;
+
+    private AliquotWrapper aliquot;
 
     private Text sampleTypeLabel;
 
     private Text linkDateLabel;
 
     private Text quantityLabel;
-
-    private Text quantityUsedLabel;
 
     private Text shipmentWaybillLabel;
 
@@ -46,27 +45,27 @@ public class SampleViewForm extends BiobankViewForm {
 
     @Override
     public void init() {
-        Assert.isTrue((adapter instanceof SampleAdapter),
+        Assert.isTrue((adapter instanceof AliquotAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        sampleAdapter = (SampleAdapter) adapter;
-        sample = sampleAdapter.getSample();
-        retrieveSample();
-        setPartName("Sample: " + sample.getInventoryId());
+        aliquotAdapter = (AliquotAdapter) adapter;
+        aliquot = aliquotAdapter.getSample();
+        retrieveAliquot();
+        setPartName("Aliquot: " + aliquot.getInventoryId());
     }
 
-    private void retrieveSample() {
+    private void retrieveAliquot() {
         try {
-            sample.reload();
+            aliquot.reload();
         } catch (Exception e) {
-            logger.error("Can't reload sample with id " + sample.getId());
+            logger.error("Can't reload aliquot with id " + aliquot.getId());
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Sample " + sample.getInventoryId());
+        form.setText("Aliquot " + aliquot.getInventoryId());
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -86,8 +85,6 @@ public class SampleViewForm extends BiobankViewForm {
         sampleTypeLabel = createReadOnlyField(client, SWT.NONE, "Type");
         linkDateLabel = createReadOnlyField(client, SWT.NONE, "Link Date");
         quantityLabel = createReadOnlyField(client, SWT.NONE, "Quantity");
-        quantityUsedLabel = createReadOnlyField(client, SWT.NONE,
-            "Quantity Used");
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
@@ -105,7 +102,7 @@ public class SampleViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(containersComposite);
 
         Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
-        ContainerWrapper container = sample.getParent();
+        ContainerWrapper container = aliquot.getParent();
         while (container != null) {
             parents.push(container);
             container = container.getParent();
@@ -114,7 +111,7 @@ public class SampleViewForm extends BiobankViewForm {
             container = parents.pop();
             RowColPos position;
             if (parents.isEmpty()) {
-                position = sample.getPosition();
+                position = aliquot.getPosition();
             } else {
                 position = parents.peek().getPosition();
             }
@@ -136,27 +133,25 @@ public class SampleViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(sampleTypeLabel, sample.getSampleType().getName());
-        setTextValue(linkDateLabel, sample.getFormattedLinkDate());
-        setTextValue(quantityLabel, sample.getQuantity() == null ? null
-            : sample.getQuantity().toString());
-        setTextValue(quantityUsedLabel, sample.getQuantityUsed() == null ? null
-            : sample.getQuantityUsed().toString());
-        setTextValue(shipmentWaybillLabel, sample.getPatientVisit()
+        setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
+        setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
+        setTextValue(quantityLabel, aliquot.getQuantity() == null ? null
+            : aliquot.getQuantity().toString());
+        setTextValue(shipmentWaybillLabel, aliquot.getPatientVisit()
             .getShipment().getWaybill());
-        setTextValue(patientLabel, sample.getPatientVisit().getPatient()
+        setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
             .getPnumber());
-        setTextValue(visitLabel, DateFormatter.formatAsDateTime(sample
+        setTextValue(visitLabel, DateFormatter.formatAsDateTime(aliquot
             .getPatientVisit().getDateProcessed()));
-        setTextValue(commentLabel, sample.getComment());
+        setTextValue(commentLabel, aliquot.getComment());
     }
 
     @Override
     protected void reload() {
-        retrieveSample();
+        retrieveAliquot();
         setValues();
-        setPartName("Sample: " + sample.getInventoryId());
-        form.setText("Sample: " + sample.getInventoryId());
+        setPartName("Aliquot: " + aliquot.getInventoryId());
+        form.setText("Aliquot: " + aliquot.getInventoryId());
     }
 
     @Override

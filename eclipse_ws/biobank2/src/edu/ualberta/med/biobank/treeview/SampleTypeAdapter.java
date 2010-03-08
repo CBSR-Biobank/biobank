@@ -39,7 +39,7 @@ public class SampleTypeAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Sample Type");
+        return getTooltipText("Aliquot Type");
     }
 
     @Override

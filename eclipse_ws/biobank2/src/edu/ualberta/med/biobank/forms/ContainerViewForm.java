@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.infotables.SamplesListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -58,7 +58,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private SamplesListInfoTable samplesWidget;
+    private AliquotListInfoTable samplesWidget;
 
     private Text siteLabel;
 
@@ -387,9 +387,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
-        List<SampleWrapper> samples = new ArrayList<SampleWrapper>(container
+        List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
             .getSamples().values());
-        samplesWidget = new SamplesListInfoTable(parent, samples);
+        samplesWidget = new AliquotListInfoTable(parent, samples);
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
     }

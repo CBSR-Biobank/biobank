@@ -39,14 +39,15 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.SampleCellStatus;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
@@ -117,7 +118,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Assign sample locations using the scanner");
+        form.setText("Assign aliquot locations using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -356,10 +357,10 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     }
                 }
                 boolean result = true;
-                Map<RowColPos, SampleWrapper> samples = currentPalletWrapper
+                Map<RowColPos, AliquotWrapper> samples = currentPalletWrapper
                     .getSamples();
                 for (RowColPos rcp : cells.keySet()) {
-                    SampleWrapper expectedSample = null;
+                    AliquotWrapper expectedSample = null;
                     if (samples != null) {
                         expectedSample = samples.get(rcp);
                     }
@@ -416,7 +417,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     protected boolean setStatus(PalletCell scanCell) throws Exception {
-        SampleWrapper expectedSample = scanCell.getExpectedSample();
+        AliquotWrapper expectedSample = scanCell.getExpectedSample();
         String value = scanCell.getValue();
         String positionString = LabelingScheme.rowColToSbs(new RowColPos(
             scanCell.getRow(), scanCell.getCol()));
@@ -433,55 +434,56 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 + " (patient "
                 + expectedSample.getPatientVisit().getPatient().getPnumber()
                 + ") missing";
-            setStatusWithLogMessage(scanCell, SampleCellStatus.MISSING,
+            setStatusWithLogMessage(scanCell, AliquotCellStatus.MISSING,
                 "Aliquot " + expectedSample.getInventoryId() + " missing", "?",
                 positionString, logMsg);
             return false;
         }
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> aliquots = AliquotWrapper.getSamplesInSite(
             appService, value, SessionManager.getInstance()
                 .getCurrentSiteWrapper());
-        if (samples.size() == 0) {
-            // sample not found in site (not yet linked ?)
+        if (aliquots.size() == 0) {
+            // aliquot not found in site (not yet linked ?)
             String logMsg = "aliquot " + value + " not linked to any patient";
-            setStatusWithLogMessage(scanCell, SampleCellStatus.ERROR,
+            setStatusWithLogMessage(scanCell, AliquotCellStatus.ERROR,
                 "Aliquot not found", null, positionString, logMsg);
             return false;
-        } else if (samples.size() == 1) {
-            SampleWrapper foundSample = samples.get(0);
+        } else if (aliquots.size() == 1) {
+            AliquotWrapper foundAliquot = aliquots.get(0);
             if (expectedSample != null
-                && !foundSample.getId().equals(expectedSample.getId())) {
-                // sample found but another sample already at this position
+                && !foundAliquot.getId().equals(expectedSample.getId())) {
+                // aliquot found but another aliquot already at this position
                 String logMsg = "Expected inventoryId "
                     + expectedSample.getInventoryId()
                     + " from patient "
                     + expectedSample.getPatientVisit().getPatient()
                         .getPnumber() + " -- Found inventoryId "
-                    + foundSample.getInventoryId() + " from patient "
-                    + foundSample.getPatientVisit().getPatient().getPnumber();
+                    + foundAliquot.getInventoryId() + " from patient "
+                    + foundAliquot.getPatientVisit().getPatient().getPnumber();
                 setStatusWithLogMessage(
                     scanCell,
-                    SampleCellStatus.ERROR,
+                    AliquotCellStatus.ERROR,
                     "Aliquot different from the one registered at this position",
                     "!", positionString, logMsg);
                 return false;
             }
-            scanCell.setSample(foundSample);
+            scanCell.setAliquot(foundAliquot);
             if (expectedSample != null) {
-                // sample scanned is already registered at this position
+                // aliquot scanned is already registered at this position
                 // (everything is ok !)
-                scanCell.setStatus(SampleCellStatus.FILLED);
-                scanCell.setSample(expectedSample);
+                scanCell.setStatus(AliquotCellStatus.FILLED);
+                scanCell.setAliquot(expectedSample);
             } else {
-                scanCell.setStatus(SampleCellStatus.NEW);
-                scanCell.setTitle(foundSample.getPatientVisit().getPatient()
+                scanCell.setStatus(AliquotCellStatus.NEW);
+                scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
                     .getPnumber());
-                if (foundSample.hasParent()
-                    && !foundSample.getParent().getId().equals(
+                if (foundAliquot.hasParent()
+                    && !foundAliquot.getParent().getId().equals(
                         currentPalletWrapper.getId())) {
-                    // the scanned sample has already a position but a different
+                    // the scanned aliquot has already a position but a
+                    // different
                     // one - ie MOVED
-                    String expectedPosition = foundSample.getPositionString();
+                    String expectedPosition = foundAliquot.getPositionString();
                     if (expectedPosition == null) {
                         expectedPosition = "none";
                     }
@@ -490,16 +492,16 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     String logMsg = "aliquot " + value
                         + " registered on another pallet at position "
                         + expectedPosition;
-                    setStatusWithLogMessage(scanCell, SampleCellStatus.MOVED,
+                    setStatusWithLogMessage(scanCell, AliquotCellStatus.MOVED,
                         info, null, positionString, logMsg);
                 }
-                if (!currentPalletWrapper.canHoldSample(foundSample)) {
-                    // pallet can't hold this sample type
+                if (!currentPalletWrapper.canHoldAliquot(foundAliquot)) {
+                    // pallet can't hold this aliquot type
                     String logMsg = "This pallet type "
                         + currentPalletWrapper.getContainerType().getName()
                         + " can't hold this sample of type "
-                        + foundSample.getSampleType().getName();
-                    setStatusWithLogMessage(scanCell, SampleCellStatus.ERROR,
+                        + foundAliquot.getSampleType().getName();
+                    setStatusWithLogMessage(scanCell, AliquotCellStatus.ERROR,
                         logMsg, null, positionString, logMsg);
                     return false;
                 }
@@ -508,16 +510,16 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
         } else {
             Assert
                 .isTrue(false, "InventoryId " + value + " should be unique !");
-            String logMsg = "More than one sample found with the inventoryId "
+            String logMsg = "More than one aliquot found with the inventoryId "
                 + value;
-            setStatusWithLogMessage(scanCell, SampleCellStatus.ERROR, logMsg,
+            setStatusWithLogMessage(scanCell, AliquotCellStatus.ERROR, logMsg,
                 "!", positionString, logMsg);
             return false;
         }
     }
 
     private void setStatusWithLogMessage(PalletCell cell,
-        SampleCellStatus status, String information, String title,
+        AliquotCellStatus status, String information, String title,
         String position, String logMsg) {
         cell.setStatus(status);
         cell.setInformation(information);
@@ -550,22 +552,22 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             for (RowColPos rcp : cells.keySet()) {
                 PalletCell cell = cells.get(rcp);
                 if (cell != null
-                    && (cell.getStatus() == SampleCellStatus.NEW || cell
-                        .getStatus() == SampleCellStatus.MOVED)) {
-                    SampleWrapper sample = cell.getSample();
-                    if (sample != null) {
-                        sample.setPosition(rcp);
-                        sample.setParent(currentPalletWrapper);
-                        sample.persist();
-                        PatientVisitWrapper visit = sample.getPatientVisit();
-                        String posStr = sample.getPositionString();
+                    && (cell.getStatus() == AliquotCellStatus.NEW || cell
+                        .getStatus() == AliquotCellStatus.MOVED)) {
+                    AliquotWrapper aliquot = cell.getAliquot();
+                    if (aliquot != null) {
+                        aliquot.setPosition(rcp);
+                        aliquot.setParent(currentPalletWrapper);
+                        aliquot.persist();
+                        PatientVisitWrapper visit = aliquot.getPatientVisit();
+                        String posStr = aliquot.getPositionString();
                         if (posStr == null) {
                             posStr = "none";
                         }
                         sb.append("\nASSIGNED position ").append(posStr);
                         sb.append(" to aliquot ").append(cell.getValue());
                         sb.append(" - Type: ").append(
-                            sample.getSampleType().getName());
+                            aliquot.getSampleType().getName());
                         sb.append(" - Patient: ").append(
                             visit.getPatient().getPnumber());
                         sb.append(" - Visit: ").append(
@@ -628,7 +630,8 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
     private void initPalletValues() {
         try {
             currentPalletWrapper.reset();
-            currentPalletWrapper.setActivityStatus("Active");
+            currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
+                .getActivityStatus(appService, "Active"));
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSiteWrapper());
         } catch (Exception e) {

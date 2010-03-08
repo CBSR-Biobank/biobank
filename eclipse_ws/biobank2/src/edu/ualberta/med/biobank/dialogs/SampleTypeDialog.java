@@ -15,10 +15,10 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SampleTypeDialog extends BiobankDialog {
 
-    private static final String TITLE = "Sample Type ";
+    private static final String TITLE = "Aliquot Type ";
 
-    private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
-    private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
+    private static final String MSG_NO_ST_NAME = "Aliquot type must have a name.";
+    private static final String MSG_NO_ST_SNAME = "Aliquot type must have a short name.";
 
     private SampleTypeWrapper origSampleType;
 
@@ -49,9 +49,9 @@ public class SampleTypeDialog extends BiobankDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         if (origSampleType.isNew()) {
-            setTitle("Add Sample Type");
+            setTitle("Add Aliquot Type");
         } else {
-            setTitle("Edit Sample Type");
+            setTitle("Edit Aliquot Type");
         }
         setMessage(message);
         return contents;
@@ -60,22 +60,16 @@ public class SampleTypeDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite content = new Composite(parent, SWT.NONE);
-        content.setLayout(new GridLayout(3, false));
+        content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
-            "Name", null, PojoObservables.observeValue(sampleType, "name"),
+        createBoundWidgetWithLabel(content, Text.class, SWT.BORDER, "Name",
+            null, PojoObservables.observeValue(sampleType, "name"),
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
 
-        c = createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(content, Text.class, SWT.BORDER,
             "Short Name", null, PojoObservables.observeValue(sampleType,
                 "nameShort"), new NonEmptyStringValidator(MSG_NO_ST_SNAME));
-        gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
     }
 
     @Override

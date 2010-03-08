@@ -1,15 +1,16 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSampleSourceWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -42,6 +43,8 @@ public class CbsrSite {
         getSampleTypeMap(appService);
         cbsrSite = new SiteWrapper(appService);
         cbsrSite.setName("Canadian BioSample Repository");
+        cbsrSite.setNameShort("CBSR");
+        cbsrSite.setActivityStatus(getActivityStatus("Active"));
         cbsrSite.setStreet1("471 Medical Sciences Building");
         cbsrSite.setStreet2("University of Alberta");
         cbsrSite.setCity("Edmonton");
@@ -85,6 +88,11 @@ public class CbsrSite {
                 + "\" not found in the database");
         }
         return sampleType;
+    }
+
+    public static ActivityStatusWrapper getActivityStatus(String name)
+        throws Exception {
+        return ActivityStatusWrapper.getActivityStatus(appService, name);
     }
 
     public static void deleteConfiguration(WritableApplicationService appServ)
@@ -160,18 +168,18 @@ public class CbsrSite {
 
     private static void patientVisitDeleteSubObjects(PatientVisitWrapper visit)
         throws Exception {
-        List<PvSampleSourceWrapper> sampleSources = visit
-            .getPvSampleSourceCollection();
-        if (sampleSources != null) {
-            for (PvSampleSourceWrapper sampleSource : sampleSources) {
-                sampleSource.delete();
+        List<PvSourceVesselWrapper> sourceVessels = visit
+            .getPvSourceVesselCollection();
+        if (sourceVessels != null) {
+            for (PvSourceVesselWrapper sourceVessel : sourceVessels) {
+                sourceVessel.delete();
             }
         }
         visit.reload();
-        List<SampleWrapper> samples = visit.getSampleCollection();
-        if (samples != null) {
-            for (SampleWrapper sample : samples) {
-                sample.delete();
+        List<AliquotWrapper> aliquots = visit.getAliquotCollection();
+        if (aliquots != null) {
+            for (AliquotWrapper aliquot : aliquots) {
+                aliquot.delete();
             }
         }
         visit.reload();
@@ -199,7 +207,7 @@ public class CbsrSite {
 
     private static void containerDeleteSubObjects(ContainerWrapper container)
         throws Exception {
-        Map<RowColPos, SampleWrapper> samples = container.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = container.getSamples();
         if (samples.size() > 0) {
             // samples should be deleted when patient visits are deleted
             throw new Exception(

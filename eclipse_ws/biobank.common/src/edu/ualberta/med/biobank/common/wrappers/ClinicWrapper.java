@@ -11,6 +11,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -37,9 +38,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "activityStatus", "comment", "address",
-            "site", "contactCollection", "shipmentCollection", "street1",
-            "street2", "city", "province", "postalCode",
+        return new String[] { "name", "nameShort", "activityStatus", "comment",
+            "address", "site", "contactCollection", "shipmentCollection",
+            "street1", "street2", "city", "province", "postalCode",
             "patientVisitCollection" };
     }
 
@@ -68,15 +69,33 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         propertyChangeSupport.firePropertyChange("name", oldName, name);
     }
 
-    public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+    public String getNameShort() {
+        return wrappedObject.getNameShort();
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldStatus = getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus", oldStatus,
-            activityStatus);
+    public void setNameShort(String nameShort) {
+        String oldNameShort = getNameShort();
+        wrappedObject.setNameShort(nameShort);
+        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
+            nameShort);
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
     }
 
     public String getComment() {
@@ -206,6 +225,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         if (getAddress() == null) {
             throw new BiobankCheckException(
                 "the clinic does not have an address");
+        }
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the clinic does not have an activity status");
         }
         if (getSite() == null) {
             throw new BiobankCheckException("the clinic does not have an site");

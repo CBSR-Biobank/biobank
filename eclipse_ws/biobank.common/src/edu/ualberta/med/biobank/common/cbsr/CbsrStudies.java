@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleSourceWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 /**
@@ -17,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
  * 
  * select name, name_short, comment from study
  * 
- * Query to generate sample sources:
+ * Query to generate sources vessels:
  * 
  * select study.name_short, sample_source.name from study join
  * study_sample_source on study.id=study_sample_source.study_id join
@@ -41,15 +42,15 @@ public class CbsrStudies {
 
     private static Map<String, StudyWrapper> studiesMap = null;
 
-    private static Map<String, SampleSourceWrapper> sampleSourceMap = null;
+    private static Map<String, SourceVesselWrapper> sourceVesselMap = null;
 
     public static void createStudies(SiteWrapper site) throws Exception {
         studiesMap = new HashMap<String, StudyWrapper>();
 
-        sampleSourceMap = new HashMap<String, SampleSourceWrapper>();
-        for (SampleSourceWrapper sampleSource : SampleSourceWrapper
-            .getAllSampleSources(site.getAppService())) {
-            sampleSourceMap.put(sampleSource.getName(), sampleSource);
+        sourceVesselMap = new HashMap<String, SourceVesselWrapper>();
+        for (SourceVesselWrapper sourceVessel : SourceVesselWrapper
+            .getAllSourceVessels(site.getAppService())) {
+            sourceVesselMap.put(sourceVessel.getName(), sourceVessel);
         }
 
         addStudy(site, "Acute Heart Failure-Emergency Management", "AHFEM",
@@ -88,91 +89,91 @@ public class CbsrStudies {
                 + "use as controls. Also used to store leftover aliquots of staff "
                 + "blood  used in experiments");
 
-        addSampleSource("AHFEM", "5mL gold top serum tube");
-        addSampleSource("AHFEM", "6ml light green top lithium heparin tube");
-        addSampleSource("AHFEM", "EDTA cryovial");
-        addSampleSource("AHFEM", "AHFEM processing pallet ");
-        addSampleSource("BBPSP", "10mL lavender top EDTA tube");
-        addSampleSource("BBPSP", "4ml lavender top EDTA tube");
-        addSampleSource("BBPSP", "3mL lavender top EDTA tube");
-        addSampleSource("BBPSP", "10ml orange top PAXgene tube");
-        addSampleSource("BBPSP", "urine cup");
-        addSampleSource("CCCS", "6mL lavender top EDTA tube");
-        addSampleSource("CCCS", "6mL beige top tube");
-        addSampleSource("CCCS", "urine cup");
-        addSampleSource("CEGIIR", "10mL lavender top EDTA tube");
-        addSampleSource("CEGIIR", "6mL beige top tube");
-        addSampleSource("CEGIIR", "15ml centrifuge tube (sodium azide urine)");
-        addSampleSource("CHILD", "6mL beige top tube");
-        addSampleSource("CHILD", "10ml green top sodium heparin tube");
-        addSampleSource("CHILD", "urine cup");
-        addSampleSource("CHILD", "Nasal Swab");
-        addSampleSource("CHILD", "Breast milk");
-        addSampleSource("CHILD", "Meconium");
-        addSampleSource("CHILD", "Stool");
-        addSampleSource("ERCIN", "ERCIN Serum processing pallet");
-        addSampleSource("ERCIN", "ERCIN Urine processing pallet");
-        addSampleSource("KDCS", "10mL lavender top EDTA tube");
-        addSampleSource("KDCS", "3mL lavender top EDTA tube");
-        addSampleSource("KDCS", "6mL beige top tube");
-        addSampleSource("KDCS", "3mL red top tube (hemodialysate)");
-        addSampleSource("KDCS", "3ml red top tube (source water)");
-        addSampleSource("KDCS", "10ml orange top PAXgene tube");
-        addSampleSource("KDCS", "15ml centrifuge tube (sodium azide urine)");
-        addSampleSource("KDCS", "6ml beige top tube (tap water)");
-        addSampleSource("KDCS", "fingernail tube");
-        addSampleSource("KDCS", "toenail tube");
-        addSampleSource("KDCS", "hair bagette");
-        addSampleSource("KMS", "EDTA cryovial");
-        addSampleSource("LCS", "N/A");
-        addSampleSource("LCS", "10mL lavender top EDTA tube");
-        addSampleSource("LCS", "6mL lavender top EDTA tube");
-        addSampleSource("LCS", "4ml lavender top EDTA tube");
-        addSampleSource("LCS", "3mL lavender top EDTA tube");
-        addSampleSource("LCS", "5mL gold top serum tube");
-        addSampleSource("LCS", "6mL beige top tube");
-        addSampleSource("LCS", "3mL red top tube (hemodialysate)");
-        addSampleSource("LCS", "3ml red top tube (source water)");
-        addSampleSource("LCS", "10ml green top sodium heparin tube");
-        addSampleSource("LCS", "6ml light green top lithium heparin tube");
-        addSampleSource("LCS", "10ml orange top PAXgene tube");
-        addSampleSource("LCS", "15ml centrifuge tube (sodium azide urine)");
-        addSampleSource("LCS", "6ml beige top tube (tap water)");
-        addSampleSource("LCS", "urine cup");
-        addSampleSource("LCS", "fingernail tube");
-        addSampleSource("LCS", "toenail tube");
-        addSampleSource("LCS", "hair bagette");
-        addSampleSource("LCS", "4.5mL blue top Sodium citrate tube");
-        addSampleSource("LCS", "2.7mL blue top Sodium citrate tube");
-        addSampleSource("LCS", "15ml centrifuge tube (ascites fluid)");
-        addSampleSource("LCS", "EDTA cryovial");
-        addSampleSource("LCS", "Nasal Swab");
-        addSampleSource("LCS", "Breast milk");
-        addSampleSource("LCS", "Meconium");
-        addSampleSource("LCS", "Stool");
-        addSampleSource("LCS", "ERCIN Serum processing pallet");
-        addSampleSource("LCS", "ERCIN Urine processing pallet");
-        addSampleSource("LCS", "AHFEM processing pallet ");
-        addSampleSource("MPS", "2.7mL blue top Sodium citrate tube");
-        addSampleSource("NHS", "4ml lavender top EDTA tube");
-        addSampleSource("NHS", "5mL gold top serum tube");
-        addSampleSource("RVS", "10mL lavender top EDTA tube");
-        addSampleSource("RVS", "5mL gold top serum tube");
-        addSampleSource("RVS", "10ml orange top PAXgene tube");
-        addSampleSource("RVS", "15ml centrifuge tube (sodium azide urine)");
-        addSampleSource("SPARK", "4ml lavender top EDTA tube");
-        addSampleSource("SPARK", "urine cup");
-        addSampleSource("TCKS", "10mL lavender top EDTA tube");
-        addSampleSource("TCKS", "6mL beige top tube");
-        addSampleSource("TCKS", "10ml orange top PAXgene tube");
-        addSampleSource("TCKS", "15ml centrifuge tube (sodium azide urine)");
-        addSampleSource("TCKS", "fingernail tube");
-        addSampleSource("TCKS", "toenail tube");
-        addSampleSource("TCKS", "hair bagette");
-        addSampleSource("VAS", "10mL lavender top EDTA tube");
-        addSampleSource("VAS", "5mL gold top serum tube");
-        addSampleSource("VAS", "6mL beige top tube");
-        addSampleSource("VAS", "10ml orange top PAXgene tube");
+        addSourceVessel("AHFEM", "5mL gold top serum tube");
+        addSourceVessel("AHFEM", "6ml light green top lithium heparin tube");
+        addSourceVessel("AHFEM", "EDTA cryovial");
+        addSourceVessel("AHFEM", "AHFEM processing pallet ");
+        addSourceVessel("BBPSP", "10mL lavender top EDTA tube");
+        addSourceVessel("BBPSP", "4ml lavender top EDTA tube");
+        addSourceVessel("BBPSP", "3mL lavender top EDTA tube");
+        addSourceVessel("BBPSP", "10ml orange top PAXgene tube");
+        addSourceVessel("BBPSP", "urine cup");
+        addSourceVessel("CCCS", "6mL lavender top EDTA tube");
+        addSourceVessel("CCCS", "6mL beige top tube");
+        addSourceVessel("CCCS", "urine cup");
+        addSourceVessel("CEGIIR", "10mL lavender top EDTA tube");
+        addSourceVessel("CEGIIR", "6mL beige top tube");
+        addSourceVessel("CEGIIR", "15ml centrifuge tube (sodium azide urine)");
+        addSourceVessel("CHILD", "6mL beige top tube");
+        addSourceVessel("CHILD", "10ml green top sodium heparin tube");
+        addSourceVessel("CHILD", "urine cup");
+        addSourceVessel("CHILD", "Nasal Swab");
+        addSourceVessel("CHILD", "Breast milk");
+        addSourceVessel("CHILD", "Meconium");
+        addSourceVessel("CHILD", "Stool");
+        addSourceVessel("ERCIN", "ERCIN Serum processing pallet");
+        addSourceVessel("ERCIN", "ERCIN Urine processing pallet");
+        addSourceVessel("KDCS", "10mL lavender top EDTA tube");
+        addSourceVessel("KDCS", "3mL lavender top EDTA tube");
+        addSourceVessel("KDCS", "6mL beige top tube");
+        addSourceVessel("KDCS", "3mL red top tube (hemodialysate)");
+        addSourceVessel("KDCS", "3ml red top tube (source water)");
+        addSourceVessel("KDCS", "10ml orange top PAXgene tube");
+        addSourceVessel("KDCS", "15ml centrifuge tube (sodium azide urine)");
+        addSourceVessel("KDCS", "6ml beige top tube (tap water)");
+        addSourceVessel("KDCS", "fingernail tube");
+        addSourceVessel("KDCS", "toenail tube");
+        addSourceVessel("KDCS", "hair bagette");
+        addSourceVessel("KMS", "EDTA cryovial");
+        addSourceVessel("LCS", "N/A");
+        addSourceVessel("LCS", "10mL lavender top EDTA tube");
+        addSourceVessel("LCS", "6mL lavender top EDTA tube");
+        addSourceVessel("LCS", "4ml lavender top EDTA tube");
+        addSourceVessel("LCS", "3mL lavender top EDTA tube");
+        addSourceVessel("LCS", "5mL gold top serum tube");
+        addSourceVessel("LCS", "6mL beige top tube");
+        addSourceVessel("LCS", "3mL red top tube (hemodialysate)");
+        addSourceVessel("LCS", "3ml red top tube (source water)");
+        addSourceVessel("LCS", "10ml green top sodium heparin tube");
+        addSourceVessel("LCS", "6ml light green top lithium heparin tube");
+        addSourceVessel("LCS", "10ml orange top PAXgene tube");
+        addSourceVessel("LCS", "15ml centrifuge tube (sodium azide urine)");
+        addSourceVessel("LCS", "6ml beige top tube (tap water)");
+        addSourceVessel("LCS", "urine cup");
+        addSourceVessel("LCS", "fingernail tube");
+        addSourceVessel("LCS", "toenail tube");
+        addSourceVessel("LCS", "hair bagette");
+        addSourceVessel("LCS", "4.5mL blue top Sodium citrate tube");
+        addSourceVessel("LCS", "2.7mL blue top Sodium citrate tube");
+        addSourceVessel("LCS", "15ml centrifuge tube (ascites fluid)");
+        addSourceVessel("LCS", "EDTA cryovial");
+        addSourceVessel("LCS", "Nasal Swab");
+        addSourceVessel("LCS", "Breast milk");
+        addSourceVessel("LCS", "Meconium");
+        addSourceVessel("LCS", "Stool");
+        addSourceVessel("LCS", "ERCIN Serum processing pallet");
+        addSourceVessel("LCS", "ERCIN Urine processing pallet");
+        addSourceVessel("LCS", "AHFEM processing pallet ");
+        addSourceVessel("MPS", "2.7mL blue top Sodium citrate tube");
+        addSourceVessel("NHS", "4ml lavender top EDTA tube");
+        addSourceVessel("NHS", "5mL gold top serum tube");
+        addSourceVessel("RVS", "10mL lavender top EDTA tube");
+        addSourceVessel("RVS", "5mL gold top serum tube");
+        addSourceVessel("RVS", "10ml orange top PAXgene tube");
+        addSourceVessel("RVS", "15ml centrifuge tube (sodium azide urine)");
+        addSourceVessel("SPARK", "4ml lavender top EDTA tube");
+        addSourceVessel("SPARK", "urine cup");
+        addSourceVessel("TCKS", "10mL lavender top EDTA tube");
+        addSourceVessel("TCKS", "6mL beige top tube");
+        addSourceVessel("TCKS", "10ml orange top PAXgene tube");
+        addSourceVessel("TCKS", "15ml centrifuge tube (sodium azide urine)");
+        addSourceVessel("TCKS", "fingernail tube");
+        addSourceVessel("TCKS", "toenail tube");
+        addSourceVessel("TCKS", "hair bagette");
+        addSourceVessel("VAS", "10mL lavender top EDTA tube");
+        addSourceVessel("VAS", "5mL gold top serum tube");
+        addSourceVessel("VAS", "6mL beige top tube");
+        addSourceVessel("VAS", "10ml orange top PAXgene tube");
 
         addSampleStorage("AHFEM", "Serum", 5, 0.2);
         addSampleStorage("AHFEM", "Plasma", 5, 0.2);
@@ -335,13 +336,13 @@ public class CbsrStudies {
     }
 
     private static StudyWrapper addStudy(SiteWrapper site, String name,
-        String nameShort, String activityStatus, String comment)
+        String nameShort, String activityStatusName, String comment)
         throws Exception {
         StudyWrapper study = new StudyWrapper(site.getAppService());
         study.setSite(site);
         study.setName(name);
         study.setNameShort(nameShort);
-        study.setActivityStatus(activityStatus);
+        study.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
         study.setComment(comment);
         study.persist();
         study.reload();
@@ -365,15 +366,14 @@ public class CbsrStudies {
         return new ArrayList<String>(studiesMap.keySet());
     }
 
-    private static void addSampleSource(String studyNameShort,
-        String sampleSourceName) throws Exception {
+    private static void addSourceVessel(String studyNameShort, String name)
+        throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
-        SampleSourceWrapper ss = sampleSourceMap.get(sampleSourceName);
+        SourceVesselWrapper ss = sourceVesselMap.get(name);
         if (ss == null) {
-            throw new Exception("invalid sample source name: "
-                + sampleSourceName);
+            throw new Exception("invalid source vessel name: " + name);
         }
-        study.addSampleSources(Arrays.asList(ss));
+        study.addSourceVessels(Arrays.asList(ss));
         study.persist();
         study.reload();
     }
@@ -388,8 +388,9 @@ public class CbsrStudies {
         ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
         ss.setQuantity(quantity);
         ss.setVolume(volume);
+        ss.setActivityStatus(CbsrSite.getActivityStatus("Active"));
 
-        study.addSampleStorages(Arrays.asList(ss));
+        study.addSampleStorage(Arrays.asList(ss));
         study.persist();
         study.reload();
 
@@ -403,6 +404,8 @@ public class CbsrStudies {
         } else {
             study.setStudyPvAttr(label, type);
         }
+        study.setStudyPvAttrActivityStatus(label, ActivityStatusWrapper
+            .getActivityStatus(study.getAppService(), "Active"));
         study.persist();
         study.reload();
     }

@@ -41,7 +41,7 @@ public class ShipmentAdapter extends AdapterBase {
         ClinicWrapper clinic = shipment.getClinic();
         if (clinic != null) {
             SiteWrapper site = clinic.getSite();
-            return site.getName() + " - " + clinic.getName() + " - "
+            return site.getNameShort() + " - " + clinic.getName() + " - "
                 + getTooltipText("Shipment");
         }
         return getTooltipText("Shipment");

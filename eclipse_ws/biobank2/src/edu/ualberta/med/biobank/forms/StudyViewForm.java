@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
-import edu.ualberta.med.biobank.widgets.infotables.SampleSourceInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
@@ -41,7 +41,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
-    private SampleSourceInfoTable sampleSourceTable;
+    private SourceVesselInfoTable sourceVesselTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
         public Text wiget;
@@ -92,7 +92,7 @@ public class StudyViewForm extends BiobankViewForm {
 
         createClinicSection();
         createSampleStorageSection();
-        createSampleSourceSection();
+        createSourceVesselSection();
         createPvCustomInfoSection();
         setStudySectionValues();
         setPvDataSectionValues();
@@ -149,13 +149,13 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sampleStorageTable);
     }
 
-    private void createSampleSourceSection() {
+    private void createSourceVesselSection() {
         Section section = createSection("Source Vessels");
-        sampleSourceTable = new SampleSourceInfoTable(section, study
-            .getSampleSourceCollection());
-        section.setClient(sampleSourceTable);
+        sourceVesselTable = new SourceVesselInfoTable(section, study
+            .getSourceVesselCollection());
+        section.setClient(sourceVesselTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sampleStorageTable);
+        toolkit.paintBordersFor(sourceVesselTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {

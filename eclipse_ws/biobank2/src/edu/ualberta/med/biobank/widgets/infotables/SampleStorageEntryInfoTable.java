@@ -104,7 +104,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
 
                 if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(),
-                    "Delete Sample Storage",
+                    "Delete Aliquot Storage",
                     "Are you sure you want to delete sample storage \""
                         + sampleStorage.getSampleType().getName() + "\"?")) {
                     return;

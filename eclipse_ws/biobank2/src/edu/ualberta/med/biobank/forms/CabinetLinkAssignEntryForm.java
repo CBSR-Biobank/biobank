@@ -39,12 +39,12 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
@@ -85,7 +85,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     private IObservableValue selectedSampleTypeValue = new WritableValue("",
         String.class);
 
-    private SampleWrapper sampleWrapper;
+    private AliquotWrapper sampleWrapper;
     private ContainerWrapper cabinet;
     private ContainerWrapper drawer;
     private ContainerWrapper bin;
@@ -102,7 +102,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     protected void init() {
         super.init();
         setPartName("Cabinet Link/Assign");
-        sampleWrapper = new SampleWrapper(appService);
+        sampleWrapper = new AliquotWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
@@ -184,10 +184,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         fieldsComposite.setLayoutData(gd);
 
         // radio button to choose new or move
-        radioNew = toolkit.createButton(fieldsComposite, "New sample",
+        radioNew = toolkit.createButton(fieldsComposite, "New aliquot",
             SWT.RADIO);
         final Button radioMove = toolkit.createButton(fieldsComposite,
-            "Move sample", SWT.RADIO);
+            "Move aliquot", SWT.RADIO);
         radioNew.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -238,9 +238,10 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 if (!radioNew.getSelection()) {
                     // Move Mode
                     try {
-                        retrieveSampleDataForMoving();
+                        retrieveAliquotDataForMoving();
                     } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Move - sample error", ex);
+                        BioBankPlugin
+                            .openAsyncError("Move - aliquot error", ex);
                     }
                 }
             }
@@ -291,12 +292,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             appService, SessionManager.getInstance().getCurrentSiteWrapper(),
             cabinetNameContains);
         if (sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Sample types",
+            BioBankPlugin.openAsyncError("Aliquot types",
                 "No sample type found for container with type containing '"
                     + cabinetNameContains + "' in the same.");
         }
         viewerSampleTypes = createComboViewerWithNoSelectionValidator(
-            fieldsComposite, "Sample type", sampleTypes, null,
+            fieldsComposite, "Aliquot type", sampleTypes, null,
             "A sample type should be selected");
         viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -390,7 +391,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                         return;
                     }
                     appendLog("Checking position " + positionString);
-                    sampleWrapper.setSamplePositionFromString(positionString,
+                    sampleWrapper.setAliquotPositionFromString(positionString,
                         bin);
                     if (sampleWrapper.isPositionFree(bin)) {
                         sampleWrapper.setParent(bin);
@@ -423,11 +424,11 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
     }
 
     /**
-     * In move mode, get informations from the existing sample
+     * In move mode, get informations from the existing aliquot
      * 
      * @throws Exception
      */
-    protected void retrieveSampleDataForMoving() throws Exception {
+    protected void retrieveAliquotDataForMoving() throws Exception {
         String inventoryId = inventoryIdText.getText();
         if (inventoryId.isEmpty()) {
             return;
@@ -444,17 +445,17 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         appendLog("Getting informations for inventoryID "
             + sampleWrapper.getInventoryId());
-        List<SampleWrapper> samples = SampleWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
             appService, sampleWrapper.getInventoryId(), SessionManager
                 .getInstance().getCurrentSiteWrapper());
         if (samples.size() > 1) {
             throw new Exception(
-                "Error while retrieving sample with inventoryId "
+                "Error while retrieving aliquot with inventoryId "
                     + sampleWrapper.getInventoryId()
-                    + ": more than one sample found.");
+                    + ": more than one aliquot found.");
         }
         if (samples.size() == 0) {
-            throw new Exception("No sample found with inventoryId "
+            throw new Exception("No aliquot found with inventoryId "
                 + sampleWrapper.getInventoryId());
         }
         sampleWrapper = samples.get(0);
@@ -472,7 +473,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         if (posStr == null) {
             posStr = "none";
         }
-        appendLog("Sample " + sampleWrapper.getInventoryId()
+        appendLog("Aliquot " + sampleWrapper.getInventoryId()
             + ": current position = " + posStr);
     }
 
@@ -525,7 +526,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
                 errorMsg = "Can't find bin labelled " + binLabel;
             }
             if (errorMsg != null) {
-                BioBankPlugin.openError("Check position and sample", errorMsg);
+                BioBankPlugin.openError("Check position and aliquot", errorMsg);
                 appendLog("ERROR: " + errorMsg);
             }
             return;
@@ -566,12 +567,12 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             posStr = "none";
         }
         if (radioNew.getSelection()) {
-            appendLog("Sample " + sampleWrapper.getInventoryId()
+            appendLog("Aliquot " + sampleWrapper.getInventoryId()
                 + " saved in position " + posStr + " for visit "
                 + sampleWrapper.getPatientVisit().getFormattedDateProcessed()
                 + "(patient " + currentPatient.getPnumber() + ")");
         } else {
-            appendLog("Sample " + sampleWrapper.getInventoryId()
+            appendLog("Aliquot " + sampleWrapper.getInventoryId()
                 + " moved to position " + posStr);
         }
         setSaved(true);

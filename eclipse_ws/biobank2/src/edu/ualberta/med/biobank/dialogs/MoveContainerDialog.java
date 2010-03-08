@@ -47,16 +47,13 @@ public class MoveContainerDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(3, false));
+        contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(contents, Text.class, SWT.FILL,
+        createBoundWidgetWithLabel(contents, Text.class, SWT.FILL,
             "Destination Address", null, newLabel, new ContainerLabelValidator(
                 "Destination label must be another container "
                     + "(4 characters minimum)."));
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
-        gd.horizontalSpan = 2;
-        c.setLayoutData(gd);
     }
 
     public String getNewLabel() {

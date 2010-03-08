@@ -10,29 +10,26 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
+public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
     protected class TableRowData {
-        SampleWrapper sample;
+        AliquotWrapper aliquot;
         String inventoryId;
         String type;
         String position;
         String linkDate;
         Double quantity;
-        Double quantityUsed;
         String comment;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] { inventoryId, type, position, linkDate,
-                    (quantity != null) ? quantity.toString() : "",
-                    (quantityUsed != null) ? quantityUsed.toString() : "",
-                    comment }, "\t");
+            return StringUtils.join(new String[] { inventoryId, type, position,
+                linkDate, (quantity != null) ? quantity.toString() : "",
+                comment }, "\t");
         }
     }
 
@@ -64,9 +61,6 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
                 rc = compare(i1.quantity, i2.quantity);
                 break;
             case 5:
-                rc = compare(i1.quantityUsed, i2.quantityUsed);
-                break;
-            case 6:
                 rc = compare(i1.comment, i2.comment);
                 break;
             default:
@@ -81,15 +75,14 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Inventory ID",
-        "Type", "Position", "Link Date", "Quantity (ml)", "Quantity Used",
-        "Comment" };
+        "Type", "Position", "Link Date", "Quantity (ml)", "Comment" };
 
-    private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, -1, -1,
-        -1 };
+    private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, 150,
+        150, -1 };
 
-    public SamplesListInfoTable(Composite parent,
-        List<SampleWrapper> sampleCollection) {
-        super(parent, true, sampleCollection, HEADINGS, BOUNDS, 20);
+    public AliquotListInfoTable(Composite parent,
+        List<AliquotWrapper> aliquotCollection) {
+        super(parent, true, aliquotCollection, HEADINGS, BOUNDS, 20);
     }
 
     @Override
@@ -117,9 +110,6 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
                     return (info.quantity != null) ? info.quantity.toString()
                         : "";
                 case 5:
-                    return (info.quantityUsed != null) ? info.quantityUsed
-                        .toString() : "";
-                case 6:
                     return info.comment;
                 default:
                     return "";
@@ -134,10 +124,10 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(SampleWrapper sample)
+    public Object getCollectionModelObject(AliquotWrapper sample)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.sample = sample;
+        info.aliquot = sample;
         info.inventoryId = sample.getInventoryId();
         SampleTypeWrapper type = sample.getSampleType();
         Assert.isNotNull(type, "sample with null for sample type");
@@ -145,7 +135,6 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         info.position = sample.getPositionString();
         info.linkDate = DateFormatter.formatAsDateTime(sample.getLinkDate());
         info.quantity = sample.getQuantity();
-        info.quantityUsed = sample.getQuantityUsed();
         info.comment = sample.getComment();
         return info;
     }
@@ -157,12 +146,12 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
         return ((TableRowData) o).toString();
     }
 
-    public void setSelection(SampleWrapper selectedSample) {
+    public void setSelection(AliquotWrapper selectedSample) {
         if (selectedSample == null)
             return;
         for (BiobankCollectionModel item : model) {
             TableRowData info = (TableRowData) item.o;
-            if (info.sample == selectedSample) {
+            if (info.aliquot == selectedSample) {
                 getTableViewer().setSelection(new StructuredSelection(item),
                     true);
             }
@@ -170,21 +159,21 @@ public class SamplesListInfoTable extends InfoTableWidget<SampleWrapper> {
     }
 
     @Override
-    public List<SampleWrapper> getCollection() {
-        List<SampleWrapper> result = new ArrayList<SampleWrapper>();
+    public List<AliquotWrapper> getCollection() {
+        List<AliquotWrapper> result = new ArrayList<AliquotWrapper>();
         for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).sample);
+            result.add(((TableRowData) item.o).aliquot);
         }
         return result;
     }
 
     @Override
-    public SampleWrapper getSelection() {
+    public AliquotWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.sample;
+        return row.aliquot;
     }
 }

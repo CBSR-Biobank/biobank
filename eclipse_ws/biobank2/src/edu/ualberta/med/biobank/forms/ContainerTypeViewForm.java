@@ -135,7 +135,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
-        Label label = toolkit.createLabel(client, "Sample types:");
+        Label label = toolkit.createLabel(client, "Aliquot types:");
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 

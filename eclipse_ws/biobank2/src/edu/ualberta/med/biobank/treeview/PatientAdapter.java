@@ -51,7 +51,7 @@ public class PatientAdapter extends AdapterBase {
         if (study != null) {
             SiteWrapper site = study.getSite();
             Assert.isNotNull(site, "site is null");
-            return site.getName() + " - " + study.getName() + " - "
+            return site.getNameShort() + " - " + study.getName() + " - "
                 + getTooltipText("Patient");
 
         }

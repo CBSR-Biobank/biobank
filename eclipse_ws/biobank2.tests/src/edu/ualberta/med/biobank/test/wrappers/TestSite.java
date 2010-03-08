@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -15,7 +17,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -23,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -30,7 +32,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SampleHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -370,6 +371,8 @@ public class TestSite extends TestDatabase {
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
 
         try {
             site.persist();
@@ -879,7 +882,7 @@ public class TestSite extends TestDatabase {
             for (PatientVisitWrapper visit : patient
                 .getPatientVisitCollection()) {
                 for (int i = 0; i < 2; ++i) {
-                    SampleHelper.addSample(allSampleTypes.get(r
+                    AliquotHelper.addSample(allSampleTypes.get(r
                         .nextInt(sampleTypeCount)), container, visit,
                         sampleCount / 12, sampleCount % 12);
                     ++sampleCount;
@@ -888,18 +891,18 @@ public class TestSite extends TestDatabase {
         }
 
         site.reload();
-        Assert.assertEquals(2 * (nber + nber2), site.getSampleCount()
+        Assert.assertEquals(2 * (nber + nber2), site.getAliquotCount()
             .longValue());
 
         // delete patient 1 and all it's visits and samples
         for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
-            for (SampleWrapper sample : visit.getSampleCollection()) {
+            for (AliquotWrapper sample : visit.getAliquotCollection()) {
                 sample.delete();
             }
         }
         patient1.delete();
         site.reload();
-        Assert.assertEquals(2 * nber2, site.getSampleCount().longValue());
+        Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
     }
 
 }

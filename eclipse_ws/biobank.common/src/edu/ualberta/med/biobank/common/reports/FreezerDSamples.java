@@ -4,19 +4,19 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.Sample;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class FreezerDSamples extends QueryObject {
 
-    protected static final String NAME = "Freezer Samples per Study per Clinic by Date";
+    protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";
 
     protected static final String query = "select sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name , year(sample.linkDate), {2}(sample.linkDate), count(sample.linkDate) from "
-        + Sample.class.getName()
-        + " as sample where sample.samplePosition.container.id in (select path1.container.id from "
+        + Aliquot.class.getName()
+        + " as aliquot where sample.aliquotPosition.container.id in (select path1.container.id from "
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()

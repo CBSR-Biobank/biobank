@@ -46,12 +46,12 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
             true);
         siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
-        setPartName("Sample Types Entry");
+        setPartName("Aliquot Types Entry");
     }
 
     @Override
     protected void createFormContent() {
-        form.setText("Sample Type Information");
+        form.setText("Aliquot Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
         if (!siteWrapper.getName().equals("All Sites"))
             createSiteSampleTypeSection();
@@ -63,7 +63,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     private void createSiteSampleTypeSection() {
-        Section section = createSection("Site Sample Types");
+        Section section = createSection("Site Aliquot Types");
         siteSampleWidget = new SampleTypeEntryInfoTable(section,
             siteSampleTypes, globalSampleTypes,
             "Add a new sample type to the repository site",
@@ -72,7 +72,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         siteSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(siteSampleWidget);
 
-        addSectionToolbar(section, "Add Site Sample Type",
+        addSectionToolbar(section, "Add Site Aliquot Type",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -83,7 +83,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     private void createGlobalSampleTypeSection() {
-        Section section = createSection("Global Sample Types");
+        Section section = createSection("Global Aliquot Types");
         globalSampleWidget = new SampleTypeEntryInfoTable(section,
             globalSampleTypes, siteSampleTypes, "Add a new global sample type",
             "Edit the global sample type");
@@ -91,7 +91,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         globalSampleWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(globalSampleWidget);
 
-        addSectionToolbar(section, "Add Global Sample Type",
+        addSectionToolbar(section, "Add Global Aliquot Type",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

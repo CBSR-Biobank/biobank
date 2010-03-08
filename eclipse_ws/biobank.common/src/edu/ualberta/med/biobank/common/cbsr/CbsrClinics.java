@@ -20,83 +20,96 @@ public class CbsrClinics {
         clinicsMap = new HashMap<String, ClinicWrapper>();
         contactsMap = new HashMap<String, ContactWrapper>();
 
-        addClinic(site, "CL1", "Active", null, "Foothills Medical Centre",
-            "1403 29 Street", "Calgary", "Alberta", "t2n2t9");
-        addClinic(site, "CL1-KDCS", "Active",
+        addClinic(site, "CL1", "CL1", "Active", null,
+            "Foothills Medical Centre", "1403 29 Street", "Calgary", "Alberta",
+            "t2n2t9");
+        addClinic(site, "CL1-KDCS", "CL1-KDCS", "Active",
             "Charlynn Ursu, Sharon Gulewich and Coralea Bignell",
             "Sunridge Medical Gallery, Alberta Health Services Building",
             "#200, 2580- 32 street NE Room 3001", "Calgary", "Alberta",
             "T1Y7M8");
-        addClinic(site, "CL1-NHS", "Active", "Shirley Cole",
+        addClinic(site, "CL1-NHS", "CL1-NHS", "Active", "Shirley Cole",
             "Heritage Medical Research Clinic",
             "Suite 1140, 3350 Hospital Drive", "Calgary", "Alberta", "T2N4N1");
-        addClinic(site, "CL2", "Active", null, "Alberta Children's Hospital",
-            "2888 Shaganappi Trail NW", "Calgary", "Alberta", "t3b6a8");
-        addClinic(site, "ED1", "Active", null,
+        addClinic(site, "CL2", "CL2", "Active", null,
+            "Alberta Children's Hospital", "2888 Shaganappi Trail NW",
+            "Calgary", "Alberta", "t3b6a8");
+        addClinic(site, "ED1", "ED1", "Active", null,
             "University of Alberta Hospital", null, "Edmonton", "Alberta",
             "T6G2B7");
-        addClinic(site, "FM1", "Active", "Philo King",
+        addClinic(site, "FM1", "FM1", "Active", "Philo King",
             "124 Beardsley Crescent", null, "Fort McMurray", "Alberta",
             "T9H2S2");
-        addClinic(site, "GP1", "Active", "Sharon Mollins", "Renal Dialysis 2W",
-            "10409-98 Street", "Grande Prairie", "Alberta", "T8V0E2");
-        addClinic(site, "HL1", "Active", null, "QE11 Health Sciences Centre",
-            "5788 University Avenue", "Halifax", "Nova Scotia", "B3H1V8");
-        addClinic(site, "HL2", "Active", null, "IWK Health Centre",
+        addClinic(site, "GP1", "GP1", "Active", "Sharon Mollins",
+            "Renal Dialysis 2W", "10409-98 Street", "Grande Prairie",
+            "Alberta", "T8V0E2");
+        addClinic(site, "HL1", "HL1", "Active", null,
+            "QE11 Health Sciences Centre", "5788 University Avenue", "Halifax",
+            "Nova Scotia", "B3H1V8");
+        addClinic(site, "HL2", "HL2", "Active", null, "IWK Health Centre",
             "5850 University Ave PO Box 9700", "Halifax", "Nova Scotia",
             "B3K6R8");
-        addClinic(site, "HM1", "Active", null,
+        addClinic(site, "HM1", "HM1", "Active", null,
             "McMaster University Medical Centre", "1200 Main street West",
             "Hamilton", "Ontario", "L8N3Z5");
-        addClinic(site, "KN1", "Active", null, "Kingston Cancer Centre",
+        addClinic(site, "KN1", "KN1", "Active", null, "Kingston Cancer Centre",
             "25 King Street", "Kingston", "Ontario", "K7L5P9");
-        addClinic(site, "LM1", "Active", "", "3820 43 Avenue", "Room 307",
-            "Lloydminister", "Saskatchewan", "S9V1Y5");
-        addClinic(site, "LN1", "Active", null, "St Joseph's Health Centre",
-            "800 Comissioners Road East", "London", "Ontario", "N6A4V2");
-        addClinic(site, "MC1", "Active", null, "Moncton Hospital",
+        addClinic(site, "LM1", "LM1", "Active", "", "3820 43 Avenue",
+            "Room 307", "Lloydminister", "Saskatchewan", "S9V1Y5");
+        addClinic(site, "LN1", "LN1", "Active", null,
+            "St Joseph's Health Centre", "800 Comissioners Road East",
+            "London", "Ontario", "N6A4V2");
+        addClinic(site, "MC1", "MC1", "Active", null, "Moncton Hospital",
             "135 MacBeath", "Moncton", "New Brunswick", "E1C6Z8");
-        addClinic(site, "MN1", "Active", null, "Hopital Ste-Justine",
+        addClinic(site, "MN1", "MN1", "Active", null, "Hopital Ste-Justine",
             "3175 Cote Ste-Catherine", "Montreal", "Quebec", "H3T1C5");
-        addClinic(site, "MN2", "Active", null, "Montreal Children's Hospital",
-            "2300 rue Tupper", "Montreal", "Quebec", "H3H1P3");
-        addClinic(site, "OL1", "Active", "", "5123 42 Street", null, "Olds",
-            "Alberta", "T4H1X1");
-        addClinic(site, "OT1", "Active", null, "Ottawa Hospital",
+        addClinic(site, "MN2", "MN2", "Active", null,
+            "Montreal Children's Hospital", "2300 rue Tupper", "Montreal",
+            "Quebec", "H3H1P3");
+        addClinic(site, "OL1", "OL1", "Active", "", "5123 42 Street", null,
+            "Olds", "Alberta", "T4H1X1");
+        addClinic(site, "OT1", "OT1", "Active", null, "Ottawa Hospital",
             "501 Smyth Road", "Ottawa", "Ontario", "K1H8L6");
-        addClinic(site, "OT2", "Active", null,
+        addClinic(site, "OT2", "OT2", "Active", null,
             "Children's Hospital of Eastern Ontario", "401 Smyth Road",
             "Ottawa", "Ontario", "K1G4X3");
-        addClinic(site, "QB1", "Active", null, "CHA Hopital Enfant-Jesus",
-            "1401 18e Rue", "Quebec City", "Quebec", "G1J1Z4");
-        addClinic(site, "RD1", "Active", "", "Red Deer Regional Hospital",
-            "Room 120, 3942 50A Avenue", "Red Deer", "Alberta", "T4N6R2");
-        addClinic(site, "SB1", "Active", null, "Saint Johns Regional Hospital",
-            "400 University Avenue", "St John", "New Brunswick", "E2L4L2");
-        addClinic(site, "SD1", "Active", null, "Sudbury Regional Hospital",
-            "41 Ramsey Lake Road", "Sudbury", "Ontario", "P3E5J1");
-        addClinic(site, "SF1", "Active", "",
+        addClinic(site, "QB1", "QB1", "Active", null,
+            "CHA Hopital Enfant-Jesus", "1401 18e Rue", "Quebec City",
+            "Quebec", "G1J1Z4");
+        addClinic(site, "RD1", "RD1", "Active", "",
+            "Red Deer Regional Hospital", "Room 120, 3942 50A Avenue",
+            "Red Deer", "Alberta", "T4N6R2");
+        addClinic(site, "SB1", "SB1", "Active", null,
+            "Saint Johns Regional Hospital", "400 University Avenue",
+            "St John", "New Brunswick", "E2L4L2");
+        addClinic(site, "SD1", "SD1", "Active", null,
+            "Sudbury Regional Hospital", "41 Ramsey Lake Road", "Sudbury",
+            "Ontario", "P3E5J1");
+        addClinic(site, "SF1", "SF1", "Active", "",
             "Health Science Centre, Eastern Health",
             "300 Prince Philip Drive, Room 4304D", "St John's",
             "Newfoundland and Labrador", "A1B3V6");
-        addClinic(site, "SP1", "Active", "", "St Therese Hospital",
+        addClinic(site, "SP1", "SP1", "Active", "", "St Therese Hospital",
             "4713 48 Avenue, PO Box 880", "St Paul", "Alberta", "T0A3A3");
-        addClinic(site, "SS1", "Active", null, "Royal University Hospital",
-            "103 Hospital Drive", "Saskatoon", "Alberta", "S7N0W8");
-        addClinic(site, "TH1", "Active", null, "Thunder Bay Regional Hospital",
-            "980 Oliver Road", "Thunder Bay", "Ontario", "P7B6V4");
-        addClinic(site, "VN1", "Active", "", "St Paul's Hospital",
+        addClinic(site, "SS1", "SS1", "Active", null,
+            "Royal University Hospital", "103 Hospital Drive", "Saskatoon",
+            "Alberta", "S7N0W8");
+        addClinic(site, "TH1", "TH1", "Active", null,
+            "Thunder Bay Regional Hospital", "980 Oliver Road", "Thunder Bay",
+            "Ontario", "P7B6V4");
+        addClinic(site, "VN1", "VN1", "Active", "", "St Paul's Hospital",
             "1081 Burrard Street, Room 318 Comox Building", "Vancouver",
             "British Columbia", "V6Z1Y6");
-        addClinic(site, "VN2", "Active", null,
+        addClinic(site, "VN2", "VN2", "Active", null,
             "Women's and Children's Health Centre", "4480 Oak Street",
             "Vancouver", "British Columbia", "V6H3V4");
-        addClinic(site, "WL1", "Active", "", "Westlock Health Care Centre",
+        addClinic(site, "WL1", "WL1", "Active", "",
+            "Westlock Health Care Centre",
             "Clinical Laboratory, 10020 93 Street", "Westlock", "Alberta",
             "T7P2G4");
-        addClinic(site, "WN1", "Active", null, "Cancer Care Manitoba",
+        addClinic(site, "WN1", "WN1", "Active", null, "Cancer Care Manitoba",
             "675 McDermot Avenue", "Winnipeg", "Manitoba", "R3E0V9");
-        addClinic(site, "TR1", "Closed", null, null, null, "Toronto",
+        addClinic(site, "TR1", "TR1", "Closed", null, null, null, "Toronto",
             "Ontario", null);
 
         addContact("CL1", "Morna Brown", null, "403-944-4057", "403-944-1745",
@@ -196,12 +209,15 @@ public class CbsrClinics {
     }
 
     private static ClinicWrapper addClinic(SiteWrapper site, String name,
-        String activityStatus, String comment, String street1, String street2,
-        String city, String province, String postalCode) throws Exception {
+        String nameShort, String activityStatusName, String comment,
+        String street1, String street2, String city, String province,
+        String postalCode) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(site.getAppService());
         clinic.setSite(site);
         clinic.setName(name);
-        clinic.setActivityStatus(activityStatus);
+        clinic.setNameShort(nameShort);
+        clinic
+            .setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
         clinic.setComment(comment);
         clinic.setStreet1(street1);
         clinic.setStreet2(street2);

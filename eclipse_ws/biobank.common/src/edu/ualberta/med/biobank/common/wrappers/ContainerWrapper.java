@@ -12,12 +12,13 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.SamplePositionWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SamplePosition;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -29,7 +30,7 @@ public class ContainerWrapper extends
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
-    private List<SampleWrapper> addedSamples = new ArrayList<SampleWrapper>();
+    private List<AliquotWrapper> addedAliquots = new ArrayList<AliquotWrapper>();
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -44,13 +45,17 @@ public class ContainerWrapper extends
     protected String[] getPropertyChangeNames() {
         return new String[] { "productBarcode", "position", "activityStatus",
             "site", "label", "temperature", "comment",
-            "samplePositionCollection", "samples", "childPositionCollection",
+            "aliquotPositionCollection", "aliquots", "childPositionCollection",
             "children", "containerType", "parent" };
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the container does not have an activity status");
+        }
         checkSiteNotNull();
         checkContainerTypeNotNull();
         checkLabelUniqueForType();
@@ -128,13 +133,13 @@ public class ContainerWrapper extends
             }
         }
         persistChildren(labelChanged);
-        persistSamples();
+        persistAliquots();
     }
 
-    private void persistSamples() throws Exception {
-        for (SampleWrapper sample : addedSamples) {
-            sample.setParent(this);
-            sample.persist();
+    private void persistAliquots() throws Exception {
+        for (AliquotWrapper aliquot : addedAliquots) {
+            aliquot.setParent(this);
+            aliquot.persist();
         }
     }
 
@@ -382,15 +387,22 @@ public class ContainerWrapper extends
         return new ContainerTypeWrapper(appService, type);
     }
 
-    public void setActivityStatus(String activityStatus) {
-        String oldActivityStatus = getActivityStatus();
-        wrappedObject.setActivityStatus(activityStatus);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
     }
 
-    public String getActivityStatus() {
-        return wrappedObject.getActivityStatus();
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
     }
 
     protected void setSite(Site site) {
@@ -414,18 +426,18 @@ public class ContainerWrapper extends
     }
 
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, SampleWrapper> getSamples() {
-        Map<RowColPos, SampleWrapper> samples = (Map<RowColPos, SampleWrapper>) propertiesMap
+    public Map<RowColPos, AliquotWrapper> getSamples() {
+        Map<RowColPos, AliquotWrapper> samples = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("samples");
         if (samples == null) {
-            Collection<SamplePosition> positions = wrappedObject
-                .getSamplePositionCollection();
+            Collection<AliquotPosition> positions = wrappedObject
+                .getAliquotPositionCollection();
             if (positions != null) {
-                samples = new TreeMap<RowColPos, SampleWrapper>();
-                for (SamplePosition position : positions) {
+                samples = new TreeMap<RowColPos, AliquotWrapper>();
+                for (AliquotPosition position : positions) {
                     samples.put(new RowColPos(position.getRow(), position
-                        .getCol()), new SampleWrapper(appService, position
-                        .getSample()));
+                        .getCol()), new AliquotWrapper(appService, position
+                        .getAliquot()));
                 }
                 propertiesMap.put("samples", samples);
             }
@@ -434,54 +446,54 @@ public class ContainerWrapper extends
     }
 
     public boolean hasSamples() {
-        Collection<SamplePosition> positions = wrappedObject
-            .getSamplePositionCollection();
+        Collection<AliquotPosition> positions = wrappedObject
+            .getAliquotPositionCollection();
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public SampleWrapper getSample(Integer row, Integer col)
+    public AliquotWrapper getSample(Integer row, Integer col)
         throws BiobankCheckException {
-        SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+        AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
-        samplePosition.setRow(row);
-        samplePosition.setCol(col);
-        samplePosition.checkPositionValid(this);
-        Map<RowColPos, SampleWrapper> samples = getSamples();
+        aliquotPosition.setRow(row);
+        aliquotPosition.setCol(col);
+        aliquotPosition.checkPositionValid(this);
+        Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
             return null;
         }
         return samples.get(new RowColPos(row, col));
     }
 
-    public void addSample(Integer row, Integer col, SampleWrapper sample)
+    public void addAliquot(Integer row, Integer col, AliquotWrapper aliquot)
         throws Exception {
-        SamplePositionWrapper samplePosition = new SamplePositionWrapper(
+        AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
-        samplePosition.setRow(row);
-        samplePosition.setCol(col);
-        samplePosition.checkPositionValid(this);
-        Map<RowColPos, SampleWrapper> samples = getSamples();
+        aliquotPosition.setRow(row);
+        aliquotPosition.setCol(col);
+        aliquotPosition.checkPositionValid(this);
+        Map<RowColPos, AliquotWrapper> samples = getSamples();
         if (samples == null) {
-            samples = new TreeMap<RowColPos, SampleWrapper>();
-            propertiesMap.put("samples", samples);
-        } else if (!canHoldSample(sample)) {
+            samples = new TreeMap<RowColPos, AliquotWrapper>();
+            propertiesMap.put("aliquots", samples);
+        } else if (!canHoldAliquot(aliquot)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
-                + sample.getSampleType().getName() + ".");
+                + aliquot.getSampleType().getName() + ".");
         } else {
-            SampleWrapper sampleAtPosition = getSample(row, col);
+            AliquotWrapper sampleAtPosition = getSample(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
-                    + " is already holding a sample at position "
+                    + " is already holding an aliquot at position "
                     + sampleAtPosition.getPositionString(false, false) + " ("
                     + row + ":" + col + ")");
             }
         }
-        sample.setPosition(row, col);
-        sample.setParent(this);
-        samples.put(new RowColPos(row, col), sample);
-        addedSamples.add(sample);
+        aliquot.setPosition(row, col);
+        aliquot.setParent(this);
+        samples.put(new RowColPos(row, col), aliquot);
+        addedAliquots.add(aliquot);
     }
 
     /**
@@ -658,8 +670,8 @@ public class ContainerWrapper extends
      * 
      * @throws Exception if the sample type is null.
      */
-    public boolean canHoldSample(SampleWrapper sample) throws Exception {
-        SampleTypeWrapper type = sample.getSampleType();
+    public boolean canHoldAliquot(AliquotWrapper aliquot) throws Exception {
+        SampleTypeWrapper type = aliquot.getSampleType();
         if (type == null) {
             throw new WrapperException("sample type is null");
         }
@@ -859,6 +871,8 @@ public class ContainerWrapper extends
             newContainer.setTemperature(getTemperature());
             newContainer.setPosition(i, j);
             newContainer.setParent(this);
+            newContainer.setActivityStatus(ActivityStatusWrapper
+                .getActivityStatus(appService, "Active"));
             newContainer.persist();
         }
     }
@@ -946,7 +960,7 @@ public class ContainerWrapper extends
     protected void resetInternalField() {
         super.resetInternalField();
         addedChildren.clear();
-        addedSamples.clear();
+        addedAliquots.clear();
     }
 
 }

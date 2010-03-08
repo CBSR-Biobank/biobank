@@ -13,9 +13,6 @@ public class FormConstants {
         "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan",
         "Yukon" };
 
-    public static final String[] ACTIVITY_STATUS = new String[] { "Active",
-        "Closed", "Disabled" };
-
     private FormConstants() {
     }
 

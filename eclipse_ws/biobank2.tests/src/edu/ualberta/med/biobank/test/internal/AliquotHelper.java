@@ -5,22 +5,22 @@ import java.util.Random;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
-public class SampleHelper extends DbHelper {
+public class AliquotHelper extends DbHelper {
 
-    public static SampleWrapper newSample(SampleTypeWrapper sampleType) {
-        SampleWrapper sample = new SampleWrapper(appService);
+    public static AliquotWrapper newSample(SampleTypeWrapper sampleType) {
+        AliquotWrapper sample = new AliquotWrapper(appService);
         sample.setSampleType(sampleType);
         sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
         return sample;
     }
 
-    public static SampleWrapper newSample(SampleTypeWrapper sampleType,
+    public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) {
-        SampleWrapper sample = new SampleWrapper(appService);
+        AliquotWrapper sample = new AliquotWrapper(appService);
         sample.setSampleType(sampleType);
         sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
         if (container != null) {
@@ -33,10 +33,10 @@ public class SampleHelper extends DbHelper {
         return sample;
     }
 
-    public static SampleWrapper addSample(SampleTypeWrapper sampleType,
+    public static AliquotWrapper addSample(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        SampleWrapper sample = newSample(sampleType, container, pv, row, col);
+        AliquotWrapper sample = newAliquot(sampleType, container, pv, row, col);
         sample.persist();
         return sample;
     }

@@ -7,10 +7,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.forms.input.FormInput;
 public class PatientVisitAdapter extends AdapterBase {
 
     /**
-     * Sample selected in this patient visit
+     * Aliquot selected in this patient visit
      */
-    private SampleWrapper selectedSample;
+    private AliquotWrapper selectedAliquot;
 
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
@@ -42,7 +42,7 @@ public class PatientVisitAdapter extends AdapterBase {
         if (wrapper.getShipment() != null) {
             name += " - " + wrapper.getShipment().getWaybill();
         }
-        Collection<SampleWrapper> samples = wrapper.getSampleCollection();
+        Collection<AliquotWrapper> samples = wrapper.getAliquotCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -59,7 +59,7 @@ public class PatientVisitAdapter extends AdapterBase {
             Assert.isNotNull(study, "study is null");
             SiteWrapper site = study.getSite();
             Assert.isNotNull(site, "site is null");
-            return site.getName() + " - " + study.getName() + " - "
+            return site.getNameShort() + " - " + study.getName() + " - "
                 + patient.getPnumber() + " - "
                 + getTooltipText("Patient Visit");
 
@@ -78,12 +78,12 @@ public class PatientVisitAdapter extends AdapterBase {
         addViewMenu(menu, "Visit", PatientVisitViewForm.ID);
     }
 
-    public void setSelectedSample(SampleWrapper sample) {
-        this.selectedSample = sample;
+    public void setSelectedAliquot(AliquotWrapper aliquot) {
+        this.selectedAliquot = aliquot;
     }
 
-    public SampleWrapper getSelectedSample() {
-        return selectedSample;
+    public AliquotWrapper getSelectedAliquot() {
+        return selectedAliquot;
     }
 
     @Override

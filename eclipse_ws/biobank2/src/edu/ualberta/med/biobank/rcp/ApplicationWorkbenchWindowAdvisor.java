@@ -58,7 +58,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
         if (page.getPerspective().getId()
-            .equals(SampleManagementPerspective.ID)) {
+            .equals(AliquotManagementPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
                 workbench.showPerspective(PatientsAdministrationPerspective.ID,

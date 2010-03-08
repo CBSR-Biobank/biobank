@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
@@ -10,9 +11,11 @@ public class SiteHelper extends DbHelper {
 
     public static List<SiteWrapper> createdSites = new ArrayList<SiteWrapper>();
 
-    public static SiteWrapper newSite(String name) {
+    public static SiteWrapper newSite(String name) throws Exception {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         site.setStreet1(Utils.getRandomString(32));
         site.setCity(Utils.getRandomString(32));
         return site;

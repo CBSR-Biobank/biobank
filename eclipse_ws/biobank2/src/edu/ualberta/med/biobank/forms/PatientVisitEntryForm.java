@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.PvSampleSourceEntryWidget;
+import edu.ualberta.med.biobank.widgets.PvSourceVesselEntryWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -66,7 +66,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private ComboViewer shipmentsComboViewer;
 
-    private PvSampleSourceEntryWidget pvSampleSourceEntryWidget;
+    private PvSourceVesselEntryWidget pvSourceVesselEntryWidget;
 
     @Override
     public void init() {
@@ -159,16 +159,16 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        pvSampleSourceEntryWidget = new PvSampleSourceEntryWidget(client,
+        pvSourceVesselEntryWidget = new PvSourceVesselEntryWidget(client,
             SWT.NONE, patientVisit, toolkit);
-        pvSampleSourceEntryWidget
+        pvSourceVesselEntryWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     setDirty(true);
                 }
             });
-        pvSampleSourceEntryWidget.addBinding(widgetCreator);
+        pvSourceVesselEntryWidget.addBinding(widgetCreator);
 
     }
 
@@ -257,10 +257,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setShipment((ShipmentWrapper) null);
         }
 
-        patientVisit.addPvSampleSources(pvSampleSourceEntryWidget
-            .getAddedPvSampleSources());
-        patientVisit.removePvSampleSources(pvSampleSourceEntryWidget
-            .getRemovedPvSampleSources());
+        patientVisit.addPvSourceVessels(pvSourceVesselEntryWidget
+            .getAddedPvSourceVessels());
+        patientVisit.removePvSourceVessels(pvSourceVesselEntryWidget
+            .getRemovedPvSourceVessels());
 
         setPvCustomInfo();
 
@@ -312,8 +312,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }
-        pvSampleSourceEntryWidget.setSelectedPvSampleSources(patientVisit
-            .getPvSampleSourceCollection());
+        pvSourceVesselEntryWidget.setSelectedPvSourceVessels(patientVisit
+            .getPvSourceVesselCollection());
         // FIXME also reset for pv infos
     }
 }

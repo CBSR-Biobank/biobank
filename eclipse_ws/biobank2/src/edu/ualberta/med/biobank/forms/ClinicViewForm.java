@@ -28,6 +28,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private Text siteLabel;
 
+    private Text nameLabel;
+
+    private Text nameShortLabel;
+
     private Text activityStatusLabel;
 
     private Text commentLabel;
@@ -49,7 +53,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         clinic = clinicAdapter.getWrapper();
         clinic.reload();
-        setPartName("Clinic: " + clinic.getName());
+        setPartName("Clinic: " + clinic.getNameShort());
     }
 
     @Override
@@ -76,6 +80,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
         siteLabel = createReadOnlyField(client, SWT.READ_ONLY,
             "Repository Site");
+        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
@@ -88,6 +94,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void setClinicValues() throws Exception {
+        setTextValue(nameLabel, clinic.getName());
+        setTextValue(nameShortLabel, clinic.getNameShort());
         setTextValue(siteLabel, clinic.getSite().getName());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());

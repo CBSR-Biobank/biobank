@@ -42,9 +42,9 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         }
         if (BioBankPlugin.isAskPrint()
             && page.getPerspective().getId().equals(
-                SampleManagementPerspective.ID)) {
+                AliquotManagementPerspective.ID)) {
             BioBankPlugin.openInformation("Can't close",
-                "Please end sample management session before closing");
+                "Please end aliquot management session before closing");
             return false;
         }
         return true;

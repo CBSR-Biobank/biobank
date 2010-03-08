@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Study;
@@ -73,9 +74,28 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         propertyChangeSupport.firePropertyChange("volume", oldVolume, volume);
     }
 
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
+    }
+
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "study", "sampleType", "quantity", "volume" };
+        return new String[] { "study", "sampleType", "quantity", "volume",
+            "activityStatus" };
     }
 
     @Override
@@ -91,6 +111,10 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the sample storage does not have an activity status");
+        }
     }
 
     @Override
