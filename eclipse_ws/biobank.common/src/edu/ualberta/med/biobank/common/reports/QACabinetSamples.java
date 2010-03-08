@@ -50,11 +50,6 @@ public class QACabinetSamples extends QueryObject {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);
-        return postProcess(results);
-    }
-
-    @Override
-    public List<Object> postProcess(List<Object> results) {
         ArrayList<Object> newList = new ArrayList<Object>();
         int max = Math.min(numResults, results.size());
         for (int i = 0; i < max; i++)

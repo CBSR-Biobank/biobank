@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.client.proxy.ListProxy;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class QueryObject {
@@ -115,16 +116,23 @@ public abstract class QueryObject {
         return description;
     }
 
+    public List<Object> generate(WritableApplicationService appService,
+        List<Object> params) {
+        try {
+            return ((ListProxy) executeQuery(appService, params))
+                .getListChunk();
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = appService.query(c);
-        return postProcess(results);
-    }
-
-    public List<Object> postProcess(List<Object> results) {
-        return results;
+        return appService.query(c);
     }
 
     public String[] getColumnNames() {

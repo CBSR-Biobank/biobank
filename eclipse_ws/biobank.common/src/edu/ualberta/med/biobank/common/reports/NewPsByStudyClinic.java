@@ -37,11 +37,6 @@ public class NewPsByStudyClinic extends QueryObject {
         queryString = MessageFormat.format(queryString, columnNames[2]);
         HQLCriteria c = new HQLCriteria(queryString);
         List<Object> results = appService.query(c);
-        return postProcess(results);
-    }
-
-    @Override
-    public List<Object> postProcess(List<Object> results) {
         List<Object> compressedDates = new ArrayList<Object>();
         if (columnNames[2].compareTo("Year") == 0) {
             for (Object ob : results) {

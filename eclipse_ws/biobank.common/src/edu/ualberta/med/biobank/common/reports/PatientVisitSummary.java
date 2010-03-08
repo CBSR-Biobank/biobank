@@ -69,11 +69,6 @@ public class PatientVisitSummary extends QueryObject {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);
-        return postProcess(results);
-    }
-
-    @Override
-    public List<Object> postProcess(List<Object> results) {
         if (results.size() == 0)
             return results;
         List<Object> totalledResults = new ArrayList<Object>();

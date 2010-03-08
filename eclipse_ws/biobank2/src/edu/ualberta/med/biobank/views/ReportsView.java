@@ -269,8 +269,13 @@ public class ReportsView extends ViewPart {
                         @Override
                         public void run() {
                             try {
-                                reportData = currentQuery.executeQuery(
+                                reportData = currentQuery.generate(
                                     SessionManager.getAppService(), params);
+                                if (reportData.size() >= 1000)
+                                    BioBankPlugin
+                                        .openAsyncError(
+                                            "Size Limit Exceeded",
+                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
                             } catch (Exception e) {
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
@@ -297,7 +302,7 @@ public class ReportsView extends ViewPart {
                         @Override
                         public void run() {
                             monitor.done();
-                            if (reportData.size() > 0) {
+                            if (!reportData.isEmpty()) {
                                 reportTable.dispose();
                                 reportTable = new SearchResultsInfoTable(top,
                                     reportData, currentQuery.getColumnNames(),

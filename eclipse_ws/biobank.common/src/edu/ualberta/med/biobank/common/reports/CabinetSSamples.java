@@ -35,7 +35,7 @@ public class CabinetSSamples extends QueryObject {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);
-        return postProcess(results);
+        return results;
     }
 
     @Override

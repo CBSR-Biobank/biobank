@@ -47,11 +47,6 @@ public class FreezerDSamples extends QueryObject {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         List<Object> results = appService.query(c);
-        return postProcess(results);
-    }
-
-    @Override
-    public List<Object> postProcess(List<Object> results) {
         List<Object> compressedDates = new ArrayList<Object>();
         if (columnNames[2].compareTo("Year") == 0) {
             for (Object ob : results) {
