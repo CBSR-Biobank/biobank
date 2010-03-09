@@ -59,7 +59,10 @@ public class ContainerWrapper extends
         checkSiteNotNull();
         checkContainerTypeNotNull();
         checkLabelUniqueForType();
-        checkProductBarcodeUnique();
+        checkNoDuplicatesInSite(Container.class, "productBarcode",
+            getProductBarcode(), getSite().getId(),
+            "A container with product barcode \"" + getProductBarcode()
+                + "\" already exists.");
         checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
@@ -169,27 +172,6 @@ public class ContainerWrapper extends
             containerPath.setContainer(this);
         }
         containerPath.persist();
-    }
-
-    private void checkProductBarcodeUnique() throws BiobankCheckException,
-        ApplicationException {
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSite().getId(), getProductBarcode() }));
-        String notSameContainer = "";
-        if (!isNew()) {
-            notSameContainer = " and id <> ?";
-            parameters.add(getId());
-        }
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id=? and productBarcode=?" + notSameContainer,
-            parameters);
-        List<Object> results = appService.query(criteria);
-        if (results.size() > 0) {
-            throw new BiobankCheckException(
-                "A container with product barcode \"" + getProductBarcode()
-                    + "\" already exists.");
-        }
     }
 
     private void checkLabelUniqueForType() throws BiobankCheckException,

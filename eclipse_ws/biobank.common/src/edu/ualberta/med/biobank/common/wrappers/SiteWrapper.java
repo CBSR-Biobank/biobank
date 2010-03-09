@@ -229,8 +229,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new BiobankCheckException(
                 "the site does not have an activity status");
         }
-        checkNoDuplicates(Site.class, "name", getName(), "Name");
-        checkNoDuplicates(Site.class, "nameShort", getNameShort(), "Short Name");
+        checkNoDuplicates(Site.class, "name", getName(), "A site with name \""
+            + getName() + "\" already exists.");
+        checkNoDuplicates(Site.class, "nameShort", getNameShort(),
+            "A site with short name \"" + getNameShort() + "\" already exists.");
     }
 
     @Override

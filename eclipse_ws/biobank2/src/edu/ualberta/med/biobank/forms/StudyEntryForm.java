@@ -371,7 +371,15 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        contactEntryTable.loadContacts(study);
+        ActivityStatusWrapper currentActivityStatus = study.getActivityStatus();
+        if (currentActivityStatus != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                currentActivityStatus));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
+
+        contactEntryTable.reload();
 
         List<SampleStorageWrapper> sampleStorages = study
             .getSampleStorageCollection();

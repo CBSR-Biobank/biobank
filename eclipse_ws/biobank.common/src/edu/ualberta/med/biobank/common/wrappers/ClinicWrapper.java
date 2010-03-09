@@ -233,9 +233,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         if (getSite() == null) {
             throw new BiobankCheckException("the clinic does not have a site");
         }
-        checkNoDuplicates(Clinic.class, "name", getName(), "Name");
-        checkNoDuplicates(Clinic.class, "nameShort", getNameShort(),
-            "Short Name");
+        checkNoDuplicatesInSite(Clinic.class, "name", getName(), getSite()
+            .getId(), "A clinic with name \"" + getName()
+            + "\" already exists.");
+        checkNoDuplicatesInSite(Clinic.class, "nameShort", getNameShort(),
+            getSite().getId(), "A clinic with short name \"" + getNameShort()
+                + "\" already exists.");
     }
 
     @Override

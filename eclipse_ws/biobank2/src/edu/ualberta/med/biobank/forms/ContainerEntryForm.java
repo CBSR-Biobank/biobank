@@ -4,10 +4,6 @@ import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,7 +14,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -57,6 +52,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ComboViewer containerTypeComboViewer;
 
     private String oldContainerLabel;
+
+    private ComboViewer activityStatusComboViewer;
 
     @Override
     public void init() {
@@ -129,8 +126,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (firstControl == null)
             firstControl = c;
 
-        createComboViewerWithNoSelectionValidator(client, "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService), container
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status", ActivityStatusWrapper
+                .getAllActivityStatuses(appService), container
                 .getActivityStatus(), "Container must have an activity status",
             true);
 
@@ -224,42 +222,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
             ContainerTypeWrapper containerType = (ContainerTypeWrapper) ((StructuredSelection) containerTypeComboViewer
                 .getSelection()).getFirstElement();
             container.setContainerType(containerType);
-            IRunnableContext context = new ProgressMonitorDialog(Display
-                .getDefault().getActiveShell());
-            context.run(true, false, new IRunnableWithProgress() {
-                @Override
-                public void run(final IProgressMonitor monitor) {
-                    Thread t = new Thread("Querying") {
-                        @Override
-                        public void run() {
-                            try {
-                                container.persist();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-                    monitor.beginTask("Saving...", IProgressMonitor.UNKNOWN);
-                    t.start();
-                    while (true) {
-                        if (!t.isAlive()) {
-                            Display.getDefault().syncExec(new Runnable() {
-                                public void run() {
-                                    monitor.done();
-                                }
-                            });
-                            break;
-                        } else
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                    }
-                }
-            });
-
+            ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+                .getSelection()).getFirstElement();
+            container.setActivityStatus(activity);
+            callPersistOnlyWithProgressDialog();
             if (newName) {
                 container.reload();
                 containerAdapter.rebuild();

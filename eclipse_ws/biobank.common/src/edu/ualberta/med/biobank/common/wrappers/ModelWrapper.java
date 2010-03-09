@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -275,6 +276,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (results.size() > 0) {
             throw new BiobankCheckException(errorName + " \"" + value
                 + "\" already exists.");
+        }
+    }
+
+    protected void checkNoDuplicatesInSite(Class<?> objectClass,
+        String propertyName, String value, Integer siteId, String errorMessage)
+        throws ApplicationException, BiobankCheckException {
+        List<Object> parameters = new ArrayList<Object>(Arrays
+            .asList(new Object[] { siteId, value }));
+        String notSameObject = "";
+        if (!isNew()) {
+            notSameObject = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("from " + objectClass.getName()
+            + " where site.id=? and " + propertyName + "=?" + notSameObject,
+            parameters);
+        List<Object> results = appService.query(criteria);
+        if (results.size() > 0) {
+            throw new BiobankCheckException(errorMessage);
         }
     }
 

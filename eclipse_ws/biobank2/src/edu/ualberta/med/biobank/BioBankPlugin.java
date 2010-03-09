@@ -285,6 +285,16 @@ public class BioBankPlugin extends AbstractUIPlugin {
             .getActiveWorkbenchWindow().getShell(), title, message);
     }
 
+    public static void openAsyncInformation(final String title,
+        final String message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openInformation(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), title, message);
+            }
+        });
+    }
+
     /**
      * Display an error message asynchronously
      */

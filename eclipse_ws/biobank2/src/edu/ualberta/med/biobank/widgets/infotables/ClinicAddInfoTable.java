@@ -98,13 +98,18 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         setCollection(selectedContacts);
     }
 
-    public void loadContacts(StudyWrapper studyWrapper) {
+    private void loadContacts(StudyWrapper studyWrapper) {
         selectedContacts = studyWrapper.getContactCollection();
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
         addedContacts = new ArrayList<ContactWrapper>();
         removedContacts = new ArrayList<ContactWrapper>();
+    }
+
+    public void reload() {
+        loadContacts(study);
+        setCollection(study.getContactCollection());
     }
 
 }

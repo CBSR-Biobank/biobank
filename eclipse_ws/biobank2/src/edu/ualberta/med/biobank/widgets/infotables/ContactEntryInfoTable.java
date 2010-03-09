@@ -107,4 +107,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     public List<ContactWrapper> getDeletedContacts() {
         return deletedContacts;
     }
+
+    public void reload() {
+        setCollection(clinic.getContactCollection());
+        setContacts(clinic);
+    }
 }

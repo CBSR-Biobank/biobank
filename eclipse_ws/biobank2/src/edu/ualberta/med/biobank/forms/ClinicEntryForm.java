@@ -175,4 +175,18 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     public String getNextOpenedFormID() {
         return ClinicViewForm.ID;
     }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        ActivityStatusWrapper currentActivityStatus = clinic
+            .getActivityStatus();
+        if (currentActivityStatus != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                currentActivityStatus));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
+        contactEntryWidget.reload();
+    }
 }

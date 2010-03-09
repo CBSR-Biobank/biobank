@@ -140,10 +140,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         checkNotEmpty(getName(), "Name");
-        checkNoDuplicates(Study.class, "name", getName(), "Name");
+        checkNoDuplicatesInSite(Study.class, "name", getName(), getSite()
+            .getId(), "A study with name \"" + getName() + "\" already exists.");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(Study.class, "nameShort", getNameShort(),
-            "Short Name");
+        checkNoDuplicatesInSite(Study.class, "nameShort", getNameShort(),
+            getSite().getId(), "A study with short name \"" + getNameShort()
+                + "\" already exists.");
         checkValidActivityStatus();
         checkContactsFromSameSite();
     }

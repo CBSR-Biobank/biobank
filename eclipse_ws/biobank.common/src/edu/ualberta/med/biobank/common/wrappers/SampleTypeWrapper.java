@@ -117,9 +117,11 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         ApplicationException {
         checkNotEmpty(getName(), "Name");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(SampleType.class, "name", getName(), "Name");
+        checkNoDuplicates(SampleType.class, "name", getName(),
+            "A sample type with name \"" + getName() + "\" already exists.");
         checkNoDuplicates(SampleType.class, "nameShort", getNameShort(),
-            "Short Name");
+            "A sample type with short name \"" + getNameShort()
+                + "\" already exists.");
     }
 
     /**
