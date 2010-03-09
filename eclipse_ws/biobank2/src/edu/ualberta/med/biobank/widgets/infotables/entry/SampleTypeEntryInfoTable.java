@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +18,11 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
+import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
 
 /**
  * Displays the current sample storage collection and allows the user to add
