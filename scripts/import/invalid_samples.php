@@ -66,6 +66,16 @@ join patient_visit on patient_visit.visit_nr=cabinet.visit_nr
 join study_list on study_list.study_nr=patient_visit.study_nr
 join sample_list on sample_list.sample_nr=cabinet.sample_nr
 where study_list.study_name_short='{study}'
+and sample_list.sample_name='{sample_type}'",
+
+"select * 
+from freezer_link
+left join freezer on freezer.inventory_id=freezer_link.inventory_id
+join patient_visit on patient_visit.visit_nr=freezer_link.visit_nr
+join study_list on study_list.study_nr=patient_visit.study_nr
+join sample_list on sample_list.sample_nr=freezer_link.sample_nr
+where freezer.inventory_id is null 
+and study_list.study_name_short='{study}'
 and sample_list.sample_name='{sample_type}'"
 );
 
