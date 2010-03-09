@@ -650,7 +650,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         if (pageInfo.page == 0) {
             firstButton.setEnabled(false);
             prevButton.setEnabled(false);
-        } else if (pageInfo.page == pageInfo.pageTotal - 2) {
+        }
+        if (pageInfo.page == pageInfo.pageTotal - 2) {
             lastButton.setEnabled(true);
             nextButton.setEnabled(true);
         }
@@ -665,7 +666,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         if (pageInfo.page == 1) {
             firstButton.setEnabled(true);
             prevButton.setEnabled(true);
-        } else if (pageInfo.page == pageInfo.pageTotal - 1) {
+        }
+        if (pageInfo.page == pageInfo.pageTotal - 1) {
             lastButton.setEnabled(false);
             nextButton.setEnabled(false);
         }
@@ -702,7 +704,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 }
 
 class PageInformation {
-    Integer pageTotal;
-    Integer page;
-    Integer rowsPerPage;
+    int pageTotal;
+    int page;
+    int rowsPerPage;
 }

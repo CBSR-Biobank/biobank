@@ -238,7 +238,7 @@ public class CbsrStudies {
         addSampleStorage("TCKS", "Z Urine", 3, 0.4);
         addSampleStorage("TCKS", "Serum B", 8, 0.4);
         addSampleStorage("TCKS", "Plasma", 12, 0.4);
-        addSampleStorage("TKCS", "Urine", null, null);
+        addSampleStorage("TCKS", "Urine", null, null);
         addSampleStorage("TCKS", "WBE", 4, 0.8);
         addSampleStorage("TCKS", "DNA(Blood)", 2, 0.4);
         addSampleStorage("VAS", "Cells", 10, 0.5);
