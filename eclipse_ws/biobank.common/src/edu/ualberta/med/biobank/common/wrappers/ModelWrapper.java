@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
@@ -254,6 +256,52 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 && !Collection.class.isAssignableFrom(method.getReturnType())) {
                 method.invoke(wrappedObject, (Object[]) null);
             }
+        }
+    }
+
+    protected void checkNoDuplicates(Class<?> objectClass, String propertyName,
+        String value, String errorName) throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c;
+        if (isNew()) {
+            c = new HQLCriteria("from " + objectClass.getName() + " where "
+                + propertyName + "= ?", Arrays.asList(new Object[] { value }));
+        } else {
+            c = new HQLCriteria("from " + objectClass.getName()
+                + " where id <> ? and " + propertyName + "= ?", Arrays
+                .asList(new Object[] { getId(), value }));
+        }
+
+        List<Object> results = appService.query(c);
+        if (results.size() > 0) {
+            throw new BiobankCheckException(errorName + " \"" + value
+                + "\" already exists.");
+        }
+    }
+
+    protected void checkNoDuplicatesInSite(Class<?> objectClass,
+        String propertyName, String value, Integer siteId, String errorMessage)
+        throws ApplicationException, BiobankCheckException {
+        List<Object> parameters = new ArrayList<Object>(Arrays
+            .asList(new Object[] { siteId, value }));
+        String notSameObject = "";
+        if (!isNew()) {
+            notSameObject = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("from " + objectClass.getName()
+            + " where site.id=? and " + propertyName + "=?" + notSameObject,
+            parameters);
+        List<Object> results = appService.query(criteria);
+        if (results.size() > 0) {
+            throw new BiobankCheckException(errorMessage);
+        }
+    }
+
+    protected void checkNotEmpty(String value, String errorName)
+        throws BiobankCheckException {
+        if (value == null || value.isEmpty()) {
+            throw new BiobankCheckException(errorName + " can't be empty");
         }
     }
 

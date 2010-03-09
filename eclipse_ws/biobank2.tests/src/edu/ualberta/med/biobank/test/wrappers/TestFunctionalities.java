@@ -68,7 +68,7 @@ public class TestFunctionalities extends TestDatabase {
 
         Container sc = getContainer();
 
-        // 1st test = sample not used in another sampleposition
+        // 1st test = sample not used in another aliquot position
         Aliquot sample = findNotUsedSampleInAliquotPosition();
 
         tryAliquotPositionInsert(sample, sc);

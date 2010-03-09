@@ -88,6 +88,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_STUDIES = "studies";
     public static final String IMG_STUDY = "study";
     public static final String IMG_USER_ADD = "userAdd";
+    public static final String IMG_EMAIL = "email";
+    public static final String IMG_EMAIL_BANNER = "emailBanner";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -191,6 +193,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
         registerImage(registry, IMG_STUDY, "study.png");
+        registerImage(registry, IMG_EMAIL, "email.png");
+        registerImage(registry, IMG_EMAIL_BANNER, "email_banner.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
@@ -281,6 +285,16 @@ public class BioBankPlugin extends AbstractUIPlugin {
             .getActiveWorkbenchWindow().getShell(), title, message);
     }
 
+    public static void openAsyncInformation(final String title,
+        final String message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                MessageDialog.openInformation(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), title, message);
+            }
+        });
+    }
+
     /**
      * Display an error message asynchronously
      */
@@ -360,11 +374,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
             return Boolean.valueOf(realScan);
         }
         return true;
-    }
-
-    public String getPrinter() {
-        return getPreferenceStore().getString(
-            PreferenceConstants.LINK_ASSIGN_PRINTER);
     }
 
     public Image getImage(Object element) {

@@ -16,7 +16,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     protected class TableRowData {
         ContactWrapper contact;
-        String clinicName;
+        String clinicNameShort;
         String name;
         String title;
         String emailAddress;
@@ -25,8 +25,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { clinicName, name, title,
-                emailAddress, phoneNumber, faxNumber }, "\t");
+            return StringUtils.join(new String[] { clinicNameShort, name,
+                title, emailAddress, phoneNumber, faxNumber }, "\t");
         }
     }
 
@@ -44,7 +44,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = compare(i1.clinicName, i2.clinicName);
+                rc = compare(i1.clinicNameShort, i2.clinicNameShort);
                 break;
             case 1:
                 rc = compare(i1.name, i2.name);
@@ -96,7 +96,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.clinicName;
+                    return item.clinicNameShort;
                 case 1:
                     return item.name;
                 case 2:
@@ -128,7 +128,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         info.contact = contact;
         ClinicWrapper clinic = contact.getClinic();
         Assert.isNotNull(clinic, "contact's clinic is null");
-        info.clinicName = clinic.getName();
+        info.clinicNameShort = clinic.getNameShort();
         info.name = contact.getName();
         info.title = contact.getTitle();
         if (info.title == null) {

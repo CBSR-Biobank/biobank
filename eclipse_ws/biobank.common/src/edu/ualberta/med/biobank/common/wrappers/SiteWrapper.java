@@ -229,26 +229,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             throw new BiobankCheckException(
                 "the site does not have an activity status");
         }
-
-        if (!checkSiteNameUnique()) {
-            throw new BiobankCheckException("A site with name \"" + getName()
-                + "\" already exists.");
-        }
-    }
-
-    private boolean checkSiteNameUnique() throws ApplicationException {
-        HQLCriteria c;
-        if (isNew()) {
-            c = new HQLCriteria("from " + Site.class.getName()
-                + " where name = ?", Arrays.asList(new Object[] { getName() }));
-        } else {
-            c = new HQLCriteria("from " + Site.class.getName()
-                + " where id <> ? and name = ?", Arrays.asList(new Object[] {
-                getId(), getName() }));
-        }
-
-        List<Object> results = appService.query(c);
-        return (results.size() == 0);
+        checkNoDuplicates(Site.class, "name", getName(), "A site with name \""
+            + getName() + "\" already exists.");
+        checkNoDuplicates(Site.class, "nameShort", getNameShort(),
+            "A site with short name \"" + getNameShort() + "\" already exists.");
     }
 
     @Override

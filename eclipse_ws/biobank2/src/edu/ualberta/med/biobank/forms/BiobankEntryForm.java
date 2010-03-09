@@ -15,6 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
@@ -399,5 +402,35 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * performed and the current form closed
      */
     public abstract String getNextOpenedFormID();
+
+    protected void callPersistOnlyWithProgressDialog() throws Exception {
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        context.run(true, false, new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) {
+                monitor.beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                try {
+                    adapter.getModelObject().persist();
+                } catch (final RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    setDirty(true);
+                } catch (final RemoteAccessException exp) {
+                    BioBankPlugin.openRemoteAccessErrorMessage();
+                    setDirty(true);
+                } catch (final AccessDeniedException ade) {
+                    BioBankPlugin.openAccessDeniedErrorMessage();
+                    setDirty(true);
+                } catch (BiobankCheckException bce) {
+                    setDirty(true);
+                    BioBankPlugin.openAsyncError("Save error", bce);
+                } catch (Exception e) {
+                    setDirty(true);
+                    throw new RuntimeException(e);
+                }
+                monitor.done();
+            }
+        });
+    }
 
 }

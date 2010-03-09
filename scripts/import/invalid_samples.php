@@ -49,7 +49,7 @@ mysql_connect("localhost", "dummy", "ozzy498") or die(mysql_error());
 mysql_select_db("bbpdb") or die(mysql_error());
 
 $headings = array('fnum', 'rack', 'box', 'cell', 'patient_nr', 'visit_nr', 
-    'date_received','inventory_id', 'study_num_name', 'sample_name');
+    'date_received','inventory_id', 'study_name_short', 'sample_name');
 
 $queries = array(
 "select * 
@@ -79,7 +79,7 @@ function getOldStudyName($name) {
 }
 
 function getOldSampleTypeName($name) {
-    global $old_study_name;
+    global $old_sample_type_name;
     
     if (isset($old_sample_type_name[$name])) {
         $sample_type_name = $old_sample_type_name[$name];

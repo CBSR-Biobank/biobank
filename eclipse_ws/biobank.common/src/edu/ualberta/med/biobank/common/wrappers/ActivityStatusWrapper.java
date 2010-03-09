@@ -97,4 +97,9 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return activityStatus;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
 }

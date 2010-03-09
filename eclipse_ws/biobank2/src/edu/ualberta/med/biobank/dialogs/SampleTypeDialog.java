@@ -74,9 +74,9 @@ public class SampleTypeDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        super.okPressed();
         origSampleType.setName(sampleType.getName());
         origSampleType.setNameShort(sampleType.getNameShort());
+        super.okPressed();
     }
 
     public SampleTypeWrapper getSampleType() {

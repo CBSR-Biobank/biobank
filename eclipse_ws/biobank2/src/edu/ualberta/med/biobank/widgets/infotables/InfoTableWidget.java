@@ -120,10 +120,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private List<T> collection;
 
+    private boolean reloadData;
+
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         List<T> collection, String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
+        reloadData = true;
         pageInfo.rowsPerPage = 0;
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
@@ -142,6 +145,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         table.setLayout(new TableLayout());
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        table.setLayoutData(gd);
 
         int index = 0;
         if (headings != null) {
@@ -307,6 +312,17 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         return tableViewer;
     }
 
+    /**
+     * Should be used by info tables that allow editing of data. Use this method
+     * instead of setCollection().
+     * 
+     * @param collection
+     */
+    public void reloadCollection(final List<T> collection) {
+        reloadData = true;
+        setCollection(collection);
+    }
+
     public void setCollection(final List<T> collection) {
         this.collection = collection;
         if ((collection == null)
@@ -365,7 +381,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                             return;
                         final BiobankCollectionModel item = model.get(i);
                         Assert.isNotNull(item != null);
-                        if (item.o == null) {
+                        if (reloadData || (item.o == null)) {
                             item.o = getCollectionModelObject(collection
                                 .get(item.index));
                         }
@@ -378,6 +394,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                             }
                         });
                     }
+                    reloadData = false;
                 } catch (Exception e) {
                     logger.error("setCollection error", e);
                 }
@@ -633,7 +650,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         if (pageInfo.page == 0) {
             firstButton.setEnabled(false);
             prevButton.setEnabled(false);
-        } else if (pageInfo.page == pageInfo.pageTotal - 2) {
+        }
+        if (pageInfo.page == pageInfo.pageTotal - 2) {
             lastButton.setEnabled(true);
             nextButton.setEnabled(true);
         }
@@ -648,7 +666,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         if (pageInfo.page == 1) {
             firstButton.setEnabled(true);
             prevButton.setEnabled(true);
-        } else if (pageInfo.page == pageInfo.pageTotal - 1) {
+        }
+        if (pageInfo.page == pageInfo.pageTotal - 1) {
             lastButton.setEnabled(false);
             nextButton.setEnabled(false);
         }
@@ -678,15 +697,14 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         rows = Math.max(rows, 1);
 
         Table table = getTableViewer().getTable();
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        GridData gd = (GridData) table.getLayoutData();
         gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
-        table.setLayoutData(gd);
         layout(true);
     }
 }
 
 class PageInformation {
-    Integer pageTotal;
-    Integer page;
-    Integer rowsPerPage;
+    int pageTotal;
+    int page;
+    int rowsPerPage;
 }

@@ -179,10 +179,12 @@ public class CbsrStudies {
         addSampleStorage("AHFEM", "Plasma", 5, 0.2);
         addSampleStorage("AHFEM", "Lith Hep Plasma", 20, 0.2);
         addSampleStorage("AHFEM", "PF Plasma", 2, 0.2);
+        addSampleStorage("BBPSP", "F Urine", null, null);
         addSampleStorage("BBPSP", "Paxgene", 11, 0.8);
         addSampleStorage("BBPSP", "Plasma", 16, 0.2);
         addSampleStorage("BBPSP", "DNA(Blood)", 2, 0.4);
         addSampleStorage("BBPSP", "CDPA Plasma", 3, 1.0);
+        addSampleStorage("BBPSP", "Urine", null, null);
         addSampleStorage("CEGIIR", "Z Urine", 6, 0.9);
         addSampleStorage("CEGIIR", "Cells", 5, 0.5);
         addSampleStorage("CEGIIR", "Serum B", 6, 0.8);
@@ -198,8 +200,10 @@ public class CbsrStudies {
         addSampleStorage("CHILD", "Meconium", null, null);
         addSampleStorage("CHILD", "Plasma SH", null, null);
         addSampleStorage("CHILD", "CBMC", null, null);
+        addSampleStorage("CHILD", "Serum B", null, null);
         addSampleStorage("ERCIN", "Z Urine", 12, 0.9);
         addSampleStorage("ERCIN", "C Urine", 6, 0.9);
+        addSampleStorage("ERCIN", "Serum", null, null);
         addSampleStorage("ERCIN", "Serum B", 12, 0.4);
         addSampleStorage("KDCS", "S Water", 3, 0.9);
         addSampleStorage("KDCS", "Cells", 10, 0.4);
@@ -215,6 +219,7 @@ public class CbsrStudies {
         addSampleStorage("KDCS", "WBE", 4, 0.8);
         addSampleStorage("KDCS", "DNA(Blood)", 2, 0.4);
         addSampleStorage("KDCS", "T Water", 3, 0.9);
+        addSampleStorage("KDCS", "Urine", null, null);
         addSampleStorage("KMS", "Plasma", 20, 0.1);
         addSampleStorage("MPS", "Plasma", 3, 1.0);
         addSampleStorage("NHS", "Cells", 10, 0.5);
@@ -233,6 +238,7 @@ public class CbsrStudies {
         addSampleStorage("TCKS", "Z Urine", 3, 0.4);
         addSampleStorage("TCKS", "Serum B", 8, 0.4);
         addSampleStorage("TCKS", "Plasma", 12, 0.4);
+        addSampleStorage("TCKS", "Urine", null, null);
         addSampleStorage("TCKS", "WBE", 4, 0.8);
         addSampleStorage("TCKS", "DNA(Blood)", 2, 0.4);
         addSampleStorage("VAS", "Cells", 10, 0.5);
@@ -241,6 +247,7 @@ public class CbsrStudies {
         addSampleStorage("VAS", "Serum", null, null);
         addSampleStorage("VAS", "Plasma", 12, 0.4);
         addSampleStorage("VAS", "WBE", 4, 0.8);
+        addSampleStorage("VAS", "Dialysate", null, null);
         addSampleStorage("VAS", "DNA(Blood)", 2, 0.4);
         addSampleStorage("CCCS", "WBE", 6, 0.9);
         addSampleStorage("CCCS", "Z Urine", 6, 0.9);

@@ -303,16 +303,16 @@ public class ReportsView extends ViewPart {
                         public void run() {
                             monitor.done();
                             if (!reportData.isEmpty()) {
-                                reportTable.dispose();
-                                reportTable = new SearchResultsInfoTable(top,
-                                    reportData, currentQuery.getColumnNames(),
-                                    columnWidths.get(currentQuery.getClass()));
                                 printButton.setEnabled(true);
                                 exportButton.setEnabled(true);
                             } else {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
+                            reportTable.dispose();
+                            reportTable = new SearchResultsInfoTable(top,
+                                reportData, currentQuery.getColumnNames(),
+                                columnWidths.get(currentQuery.getClass()));
                             setEnabled(true);
                             top.layout();
 

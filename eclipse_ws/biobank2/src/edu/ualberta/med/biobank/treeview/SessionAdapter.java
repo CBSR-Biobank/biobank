@@ -25,6 +25,10 @@ public class SessionAdapter extends AdapterBase {
 
     private String userName;
 
+    private static final String ADDSITE_COMMAND_ID = "edu.ualberta.med.biobank.commands.siteAdd";
+
+    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
+
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
@@ -69,11 +73,9 @@ public class SessionAdapter extends AdapterBase {
                     .getWorkbench().getService(IHandlerService.class);
 
                 try {
-                    handlerService.executeCommand(
-                        "edu.ualberta.med.biobank.commands.siteAdd", null);
+                    handlerService.executeCommand(ADDSITE_COMMAND_ID, null);
                 } catch (Exception ex) {
-                    throw new RuntimeException(
-                        "edu.ualberta.med.biobank.commands.addSite not found");
+                    throw new RuntimeException(ADDSITE_COMMAND_ID + " not found");
                 }
             }
         });
@@ -87,11 +89,9 @@ public class SessionAdapter extends AdapterBase {
                     .getWorkbench().getService(IHandlerService.class);
 
                 try {
-                    handlerService.executeCommand(
-                        "edu.ualberta.med.biobank.commands.logout", null);
+                    handlerService.executeCommand(LOGOUT_COMMAND_ID, null);
                 } catch (Exception ex) {
-                    throw new RuntimeException(
-                        "edu.ualberta.med.biobank.commands.logout not found");
+                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found");
                 }
             }
         });

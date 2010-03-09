@@ -229,7 +229,7 @@ public class PvSourceVesselEntryWidget extends BiobankWidget {
     }
 
     private void updateCollection() {
-        pvSourceVesselTable.setCollection(selectedPvSourceVessels);
+        pvSourceVesselTable.reloadCollection(selectedPvSourceVessels);
         sourceVesselsAdded.setValue(selectedPvSourceVessels.size() > 0);
     }
 

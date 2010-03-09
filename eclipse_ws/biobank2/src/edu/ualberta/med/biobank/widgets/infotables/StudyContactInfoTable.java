@@ -21,7 +21,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     protected class TableRowData {
         ContactWrapper contact;
-        String clinicName;
+        String clinicNameShort;
         Long patientCount;
         Long visitCount;
         String contactName;
@@ -29,7 +29,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { clinicName,
+            return StringUtils.join(new String[] { clinicNameShort,
                 (patientCount != null) ? patientCount.toString() : "",
                 (visitCount != null) ? visitCount.toString() : "", contactName,
                 contactTitle }, "\t");
@@ -50,7 +50,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
             int rc = 0;
             switch (propertyIndex) {
             case 0:
-                rc = compare(i1.clinicName, i2.clinicName);
+                rc = compare(i1.clinicNameShort, i2.clinicNameShort);
                 break;
             case 1:
                 rc = compare(i1.patientCount, i2.patientCount);
@@ -101,7 +101,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.clinicName;
+                    return item.clinicNameShort;
                 case 1:
                     return (item.patientCount != null) ? item.patientCount
                         .toString() : "";
@@ -131,7 +131,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         info.contact = contact;
         ClinicWrapper clinic = contact.getClinic();
         if (clinic != null) {
-            info.clinicName = clinic.getName();
+            info.clinicNameShort = clinic.getNameShort();
             info.patientCount = study.getPatientCountForClinic(clinic);
             info.visitCount = study.getPatientVisitCountForClinic(clinic);
         }

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -18,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.infotables.ContactEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -46,6 +48,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             setDirty(true);
         }
     };
+
+    private ComboViewer activityStatusComboViewer;
 
     @Override
     protected void init() throws Exception {
@@ -110,13 +114,14 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Name", null, BeansObservables.observeValue(clinic, "name"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Name Short",
+        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(clinic, "nameShort"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatuses(appService), clinic
-                .getActivityStatus(), "Clinic must have an activity status",
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status", ActivityStatusWrapper
+                .getAllActivityStatuses(appService),
+            clinic.getActivityStatus(), "Clinic must have an activity status",
             true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
@@ -158,6 +163,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getParentFromClass(SiteAdapter.class);
         clinic.setSite(siteAdapter.getWrapper());
         clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+            .getSelection()).getFirstElement();
+        clinic.setActivityStatus(activity);
         clinic.removeContacts(contactEntryWidget.getDeletedContacts());
         clinic.persist();
         clinicAdapter.getParent().performExpand();
@@ -166,5 +174,19 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public String getNextOpenedFormID() {
         return ClinicViewForm.ID;
+    }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        ActivityStatusWrapper currentActivityStatus = clinic
+            .getActivityStatus();
+        if (currentActivityStatus != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                currentActivityStatus));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
+        contactEntryWidget.reload();
     }
 }

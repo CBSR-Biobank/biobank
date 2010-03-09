@@ -11,7 +11,6 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
@@ -114,30 +113,30 @@ public class ContainerAdapter extends AdapterBase {
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());
         if (mc.open() == Dialog.OK) {
-            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                public void run() {
-                    try {
-                        setNewPositionFromLabel(mc.getNewLabel());
+            // BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            // public void run() {
+            try {
+                setNewPositionFromLabel(mc.getNewLabel());
 
-                        // update new parent
-                        ContainerWrapper newParentContainer = getContainer()
-                            .getParent();
-                        ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                            .searchNode(newParentContainer);
-                        if (parentAdapter != null) {
-                            parentAdapter.getContainer().reload();
-                            parentAdapter.performExpand();
-                        }
-                        // update old parent
-                        oldParent.getContainer().reload();
-                        oldParent.removeAll();
-                        oldParent.performExpand();
-                    } catch (Exception e) {
-                        BioBankPlugin.openError(e.getMessage(), e);
-                    }
+                // update new parent
+                ContainerWrapper newParentContainer = getContainer()
+                    .getParent();
+                ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
+                    .searchNode(newParentContainer);
+                if (parentAdapter != null) {
+                    parentAdapter.getContainer().reload();
+                    parentAdapter.performExpand();
                 }
-            });
+                // update old parent
+                oldParent.getContainer().reload();
+                oldParent.removeAll();
+                oldParent.performExpand();
+            } catch (Exception e) {
+                BioBankPlugin.openError(e.getMessage(), e);
+            }
         }
+        // });
+        // }
     }
 
     /**
@@ -186,38 +185,16 @@ public class ContainerAdapter extends AdapterBase {
         context.run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(final IProgressMonitor monitor) {
-                Thread t = new Thread("Querying") {
-                    @Override
-                    public void run() {
-                        try {
-                            container.persist();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
                 monitor.beginTask("Moving...", IProgressMonitor.UNKNOWN);
-                t.start();
-                while (true) {
-                    if (!t.isAlive()) {
-                        Display.getDefault().syncExec(new Runnable() {
-                            public void run() {
-                                monitor.done();
-                                BioBankPlugin.openInformation(
-                                    "Container moved", "The container "
-                                        + oldLabel + " has been moved to "
-                                        + container.getLabel());
-                            }
-                        });
-                        break;
-                    } else
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                try {
+                    container.persist();
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Move problem", e);
                 }
+                monitor.done();
+                BioBankPlugin.openAsyncInformation("Container moved",
+                    "The container " + oldLabel + " has been moved to "
+                        + container.getLabel());
             }
         });
 

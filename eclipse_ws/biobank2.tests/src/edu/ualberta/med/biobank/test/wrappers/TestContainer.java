@@ -19,6 +19,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -436,6 +437,25 @@ public class TestContainer extends TestDatabase {
         child.reload();
         String expectedPath = top.getId() + "/" + child.getId();
         Assert.assertEquals(expectedPath, child.getPath());
+    }
+
+    @Test
+    public void testActivityStatus() throws Exception {
+        ContainerWrapper container = ContainerHelper.addContainer("05",
+            TestCommon.getNewBarcode(r), null, site, containerTypeMap
+                .get("TopCT"));
+        container.setActivityStatus(null);
+
+        try {
+            container.persist();
+            Assert.fail("Should not be allowed: no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        container.persist();
     }
 
     @Test

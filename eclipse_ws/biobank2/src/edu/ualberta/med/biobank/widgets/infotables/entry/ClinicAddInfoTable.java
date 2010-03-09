@@ -1,12 +1,10 @@
-package edu.ualberta.med.biobank.widgets.infotables;
+package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
@@ -15,6 +13,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
 /**
  * Allows the user to select a clinic and a contact from a clinic. Note that
@@ -35,11 +37,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         this.study = study;
         SiteWrapper site = study.getSite();
         Assert.isNotNull(site, "site is null");
-
         loadContacts(study);
-
-        setLayout(new GridLayout(1, false));
-        setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         addDeleteSupport();
     }
 
@@ -104,13 +102,18 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         setCollection(selectedContacts);
     }
 
-    public void loadContacts(StudyWrapper studyWrapper) {
+    private void loadContacts(StudyWrapper studyWrapper) {
         selectedContacts = studyWrapper.getContactCollection();
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
         addedContacts = new ArrayList<ContactWrapper>();
         removedContacts = new ArrayList<ContactWrapper>();
+    }
+
+    public void reload() {
+        loadContacts(study);
+        setCollection(study.getContactCollection());
     }
 
 }

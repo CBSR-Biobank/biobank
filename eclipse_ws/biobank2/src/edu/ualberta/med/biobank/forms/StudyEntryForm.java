@@ -9,6 +9,8 @@ import java.util.List;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,8 +33,8 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
-import edu.ualberta.med.biobank.widgets.infotables.ClinicAddInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SampleStorageEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SampleStorageEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
@@ -64,6 +66,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             setDirty(true);
         }
     };
+
+    private ComboViewer activityStatusComboViewer;
 
     private class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
@@ -121,10 +125,10 @@ public class StudyEntryForm extends BiobankEntryForm {
             null, BeansObservables.observeValue(study, "nameShort"),
             new NonEmptyStringValidator("Study short name cannot be blank"));
 
-        createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatuses(appService), study
-                .getActivityStatus(), "Study must have an activity status",
-            true);
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status", ActivityStatusWrapper
+                .getAllActivityStatuses(appService), study.getActivityStatus(),
+            "Study must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
             SWT.MULTI, "Comments", null, BeansObservables.observeValue(study,
@@ -270,6 +274,10 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+            .getSelection()).getFirstElement();
+        study.setActivityStatus(activity);
+
         setSourceVessels();
 
         setStudyPvAttr();
@@ -363,7 +371,15 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        contactEntryTable.loadContacts(study);
+        ActivityStatusWrapper currentActivityStatus = study.getActivityStatus();
+        if (currentActivityStatus != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                currentActivityStatus));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
+
+        contactEntryTable.reload();
 
         List<SampleStorageWrapper> sampleStorages = study
             .getSampleStorageCollection();

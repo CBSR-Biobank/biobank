@@ -231,12 +231,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
                 "the clinic does not have an activity status");
         }
         if (getSite() == null) {
-            throw new BiobankCheckException("the clinic does not have an site");
+            throw new BiobankCheckException("the clinic does not have a site");
         }
-        if (!checkClinicNameUnique()) {
-            throw new BiobankCheckException("A clinic with name \"" + getName()
+        checkNoDuplicatesInSite(Clinic.class, "name", getName(), getSite()
+            .getId(), "A clinic with name \"" + getName()
+            + "\" already exists.");
+        checkNoDuplicatesInSite(Clinic.class, "nameShort", getNameShort(),
+            getSite().getId(), "A clinic with short name \"" + getNameShort()
                 + "\" already exists.");
-        }
     }
 
     @Override
@@ -246,23 +248,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
                 cw.delete();
             }
         }
-    }
-
-    public boolean checkClinicNameUnique() throws ApplicationException {
-        HQLCriteria c;
-
-        if (getWrappedObject().getId() == null) {
-            c = new HQLCriteria("from " + Clinic.class.getName()
-                + " where site.id = ? and name = ?", Arrays
-                .asList(new Object[] { getSite().getId(), getName() }));
-        } else {
-            c = new HQLCriteria("from " + Clinic.class.getName()
-                + " where site.id = ? and name = ? and id <> ?", Arrays
-                .asList(new Object[] { getSite().getId(), getName(), getId() }));
-        }
-
-        List<Clinic> results = appService.query(c);
-        return (results.size() == 0);
     }
 
     @Override

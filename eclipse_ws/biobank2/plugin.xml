@@ -190,6 +190,11 @@
             id="edu.ualberta.med.biobank.commands.sessionReload"
             name="Session Reload">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMail"
+            id="edu.ualberta.med.biobank.commands.sendErrorMail"
+            name="Send Error Mail">
+      </command>
       <command id="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
             name="Delete tree view selection">
       </command>
@@ -1373,11 +1378,6 @@
     <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="edu.ualberta.med.biobank.preferences.GeneralConfigurationPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.gereral"
-            name="General">
-      </page>
-      <page
           category="Scanner"
             class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.plateBarcodes"
@@ -1399,6 +1399,11 @@
             class="edu.ualberta.med.biobank.preferences.CabinetPreferencePage"
             id="edu.ualberta.med.biobank.preferences.cabinet"
             name="Cabinet">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.IssueTrackerPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="Issue Tracker">
       </page>
    </extension>
    <extension

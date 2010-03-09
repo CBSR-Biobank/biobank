@@ -139,55 +139,21 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        checkNameNotEmpty();
-        checkNameShortNotEmpty();
-        checkStudyNameUnique();
+        checkNotEmpty(getName(), "Name");
+        checkNoDuplicatesInSite(Study.class, "name", getName(), getSite()
+            .getId(), "A study with name \"" + getName() + "\" already exists.");
+        checkNotEmpty(getNameShort(), "Short Name");
+        checkNoDuplicatesInSite(Study.class, "nameShort", getNameShort(),
+            getSite().getId(), "A study with short name \"" + getNameShort()
+                + "\" already exists.");
+        checkValidActivityStatus();
         checkContactsFromSameSite();
     }
 
-    private void checkNameNotEmpty() throws BiobankCheckException {
-        if (getName() == null || getName().isEmpty()) {
-            throw new BiobankCheckException("Name can't be empty");
-        }
-    }
-
-    private void checkNameShortNotEmpty() throws BiobankCheckException {
-        if (getNameShort() == null || getNameShort().isEmpty()) {
-            throw new BiobankCheckException("Short Name can't be empty");
-        }
-    }
-
-    private void checkStudyNameUnique() throws BiobankCheckException,
-        ApplicationException {
-        String sameString = "";
-        if (getSite() != null) {
-            List<Object> params = new ArrayList<Object>(Arrays
-                .asList(new Object[] { getSite().getId(), getName() }));
-            if (!isNew()) {
-                sameString = " and id <> ?";
-                params.add(getId());
-            }
-            HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-                + " where site.id = ? and name = ?" + sameString, params);
-            List<Object> results = appService.query(c);
-            if (results.size() > 0) {
-                throw new BiobankCheckException("A study with name \""
-                    + getName() + "\" already exists.");
-            }
-
-            params = new ArrayList<Object>(Arrays.asList(new Object[] {
-                getSite().getId(), getNameShort() }));
-            if (!isNew()) {
-                sameString = " and id <> ?";
-                params.add(getId());
-            }
-            c = new HQLCriteria("from " + Study.class.getName()
-                + " where site.id = ? and nameShort = ?" + sameString, params);
-            results = appService.query(c);
-            if (results.size() > 0) {
-                throw new BiobankCheckException("A study with short name \""
-                    + getNameShort() + "\" already exists.");
-            }
+    private void checkValidActivityStatus() throws BiobankCheckException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the clinic does not have an activity status");
         }
     }
 
