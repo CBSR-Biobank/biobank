@@ -45,9 +45,6 @@ $old_sample_type_name = array(
     "RNAlater Biopsies" => "RNA Later"
 );
 
-mysql_connect("localhost", "dummy", "ozzy498") or die(mysql_error());
-mysql_select_db("bbpdb") or die(mysql_error());
-
 $headings = array('fnum', 'rack', 'box', 'cell', 'patient_nr', 'visit_nr', 
     'date_received','inventory_id', 'study_name_short', 'sample_name');
 
@@ -103,7 +100,8 @@ foreach ($invalid_samples as $invalid_sample) {
     echo "study \"{$study_name}\" has no sample storage for sample type \"{$sample_type_name}\"\n";
 }
 
-echo "\n";
+mysql_connect("localhost", "dummy", "ozzy498") or die(mysql_error());
+mysql_select_db("bbpdb") or die(mysql_error());
 
 echo implode(",", $headings), "\n";
 
