@@ -60,9 +60,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
         checkSite();
+        checkNotEmpty(getName(), "Name");
         checkNoDuplicatesInSite(ContainerType.class, "name", getName(),
             getSite().getId(), "A container type with name \"" + getName()
                 + "\" already exists.");
+        checkNotEmpty(getNameShort(), "Short Name");
         checkNoDuplicatesInSite(ContainerType.class, "nameShort",
             getNameShort(), getSite().getId(),
             "A container type with short name \"" + getNameShort()

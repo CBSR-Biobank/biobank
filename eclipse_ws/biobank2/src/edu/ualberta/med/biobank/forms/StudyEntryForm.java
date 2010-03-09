@@ -383,7 +383,26 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         setSourceVesselWidgetSelections();
 
-        // FIXME reset PV CUSTOM INFO
+        resetPvCustomInfo();
+
+    }
+
+    private void resetPvCustomInfo() throws Exception {
+        List<String> studyPvInfoLabels = Arrays.asList(study
+            .getStudyPvAttrLabels());
+
+        for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
+            boolean selected = false;
+            String label = studyPvAttrCustom.getLabel();
+            if (studyPvInfoLabels.contains(studyPvAttrCustom.getLabel())) {
+                studyPvAttrCustom.setPermissible(study
+                    .getStudyPvAttrPermissible(label));
+                selected = true;
+                studyPvAttrCustom.inStudy = true;
+            }
+            selected |= (studyPvAttrCustom.getAllowedValues() != null);
+            studyPvAttrCustom.widget.setSelected(selected);
+        }
 
     }
 }

@@ -91,7 +91,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         }
         ActivityStatusWrapper activityStatus = activityStatusMap.get(name);
         if (activityStatus == null) {
-            throw new Exception("activity status \"" + name
+            throw new BiobankCheckException("activity status \"" + name
                 + "\" does not exist");
         }
         return activityStatus;

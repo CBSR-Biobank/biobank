@@ -309,4 +309,8 @@ public class PvInfoWidget extends BiobankWidget {
         return null;
     }
 
+    public void setSelected(boolean selected) {
+        checkButton.setSelection(selected);
+    }
+
 }
