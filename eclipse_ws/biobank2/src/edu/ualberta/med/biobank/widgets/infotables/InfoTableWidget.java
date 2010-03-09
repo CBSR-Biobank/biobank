@@ -120,10 +120,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private List<T> collection;
 
+    private boolean reloadData;
+
     public InfoTableWidget(Composite parent, boolean multilineSelection,
         List<T> collection, String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
+        reloadData = true;
         pageInfo.rowsPerPage = 0;
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
@@ -307,6 +310,17 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         return tableViewer;
     }
 
+    /**
+     * Should be used by info tables that allow editing of data. Use this method
+     * instead of setCollection().
+     * 
+     * @param collection
+     */
+    public void reloadCollection(final List<T> collection) {
+        reloadData = true;
+        setCollection(collection);
+    }
+
     public void setCollection(final List<T> collection) {
         this.collection = collection;
         if ((collection == null)
@@ -365,7 +379,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                             return;
                         final BiobankCollectionModel item = model.get(i);
                         Assert.isNotNull(item != null);
-                        if (item.o == null) {
+                        if (reloadData || (item.o == null)) {
                             item.o = getCollectionModelObject(collection
                                 .get(item.index));
                         }
@@ -378,6 +392,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                             }
                         });
                     }
+                    reloadData = false;
                 } catch (Exception e) {
                     logger.error("setCollection error", e);
                 }
