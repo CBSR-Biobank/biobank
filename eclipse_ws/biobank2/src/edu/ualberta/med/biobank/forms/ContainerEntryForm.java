@@ -225,7 +225,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
                 .getSelection()).getFirstElement();
             container.setActivityStatus(activity);
-            callPersistOnlyWithProgressDialog();
+            callPersistWithProgressDialog();
             if (newName) {
                 container.reload();
                 containerAdapter.rebuild();
@@ -253,6 +253,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 currentContainerType));
         } else if (containerTypeComboViewer.getCombo().getItemCount() > 1) {
             containerTypeComboViewer.getCombo().deselectAll();
+        }
+        ActivityStatusWrapper activity = container.getActivityStatus();
+        if (activity != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                activity));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
         }
     }
 

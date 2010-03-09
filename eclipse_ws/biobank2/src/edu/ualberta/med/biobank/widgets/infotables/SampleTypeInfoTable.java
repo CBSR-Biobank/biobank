@@ -38,7 +38,7 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Aliquot Type",
+    private static final String[] HEADINGS = new String[] { "Sample Type",
         "Short Name" };
 
     private static final int[] BOUNDS = new int[] { 300, 130, -1, -1, -1, -1,

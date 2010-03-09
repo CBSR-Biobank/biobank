@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -20,12 +21,13 @@ public class SampleStorageInfoTable extends
         String typeName;
         Double volume;
         Integer quantity;
+        String status;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { typeName,
                 (volume != null) ? volume.toString() : "",
-                (quantity != null) ? quantity.toString() : "" }, "\t");
+                (quantity != null) ? quantity.toString() : "", status }, "\t");
         }
     }
 
@@ -50,6 +52,9 @@ public class SampleStorageInfoTable extends
             case 2:
                 rc = compare(i1.quantity, i2.quantity);
                 break;
+            case 3:
+                rc = compare(i1.status, i2.status);
+                break;
             default:
                 rc = 0;
             }
@@ -61,10 +66,10 @@ public class SampleStorageInfoTable extends
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Aliquot type",
-        "Volume (ml)", "Quantity" };
+    private static final String[] HEADINGS = new String[] { "Sample type",
+        "Volume (ml)", "Quantity", "Activity status" };
 
-    private static final int[] BOUNDS = new int[] { 300, 130, 100, -1, -1, -1,
+    private static final int[] BOUNDS = new int[] { 300, 130, 100, 100, -1, -1,
         -1 };
 
     public SampleStorageInfoTable(Composite parent, boolean multiSelectRows,
@@ -88,6 +93,9 @@ public class SampleStorageInfoTable extends
         info.typeName = type.getName();
         info.volume = sampleStorage.getVolume();
         info.quantity = sampleStorage.getQuantity();
+        ActivityStatusWrapper status = sampleStorage.getActivityStatus();
+        Assert.isNotNull(status, "sample storage - activity status is null");
+        info.status = status.getName();
         return info;
     }
 
@@ -111,6 +119,8 @@ public class SampleStorageInfoTable extends
                 case 2:
                     return (item.quantity != null) ? item.quantity.toString()
                         : "";
+                case 3:
+                    return item.status;
                 default:
                     return "";
                 }
