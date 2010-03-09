@@ -89,10 +89,10 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedSampleStorages.add(dlg.getSampleStorage());
+                selectedSampleStorages.add(sampleStorage);
             }
             reloadCollection(selectedSampleStorages);
-            addedOrModifiedSampleStorages.add(dlg.getSampleStorage());
+            addedOrModifiedSampleStorages.add(sampleStorage);
             notifyListeners();
         }
     }

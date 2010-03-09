@@ -32,7 +32,7 @@ public class SampleTypeDialog extends BiobankDialog {
         super(parent);
         Assert.isNotNull(sampleType);
         origSampleType = sampleType;
-        this.sampleType = new SampleTypeWrapper(sampleType.getAppService());
+        this.sampleType = new SampleTypeWrapper(null);
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
         this.message = message;
@@ -77,10 +77,6 @@ public class SampleTypeDialog extends BiobankDialog {
         origSampleType.setName(sampleType.getName());
         origSampleType.setNameShort(sampleType.getNameShort());
         super.okPressed();
-    }
-
-    public SampleTypeWrapper getSampleType() {
-        return sampleType;
     }
 
 }

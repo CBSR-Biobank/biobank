@@ -81,10 +81,10 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             if (addEditOk(sampleType, restrictedTypes)) {
                 if (add) {
                     // only add to the collection when adding and not editing
-                    selectedSampleTypes.add(dlg.getSampleType());
+                    selectedSampleTypes.add(sampleType);
                 }
-                setCollection(selectedSampleTypes);
-                addedOrModifiedSampleTypes.add(dlg.getSampleType());
+                reloadCollection(selectedSampleTypes);
+                addedOrModifiedSampleTypes.add(sampleType);
                 notifyListeners();
                 return true;
             }
