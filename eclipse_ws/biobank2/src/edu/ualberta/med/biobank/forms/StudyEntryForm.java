@@ -402,6 +402,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             }
             selected |= (studyPvAttrCustom.getAllowedValues() != null);
             studyPvAttrCustom.widget.setSelected(selected);
+            studyPvAttrCustom.widget.reloadAllowedValues(studyPvAttrCustom);
         }
 
     }
