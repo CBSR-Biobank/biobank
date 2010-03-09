@@ -315,7 +315,8 @@ public class ReportsView extends ViewPart {
                                 columnWidths.get(currentQuery.getClass()));
                             setEnabled(true);
                             top.layout();
-
+                            sc.setMinSize(top.computeSize(SWT.DEFAULT,
+                                SWT.DEFAULT));
                         }
                     });
 

@@ -30,7 +30,7 @@ public class BiobankWidget extends Composite {
     }
 
     public BiobankWidget(Composite parent, int style) {
-        super(parent, style);
+        super(parent, style); // | SWT.H_SCROLL | SWT.V_SCROLL);
         listeners = new ArrayList<BiobankEntryFormWidgetListener>();
     }
 
