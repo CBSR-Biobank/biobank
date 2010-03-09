@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -11,7 +13,6 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
@@ -42,9 +43,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private Text commentLabel;
 
-    private org.eclipse.swt.widgets.List sampleTypesList;
+    private ListViewer sampleTypesViewer;
 
-    private org.eclipse.swt.widgets.List childContainerTypesList;
+    private ListViewer childContainerTypesViewer;
 
     public ContainerTypeViewForm() {
         super();
@@ -129,31 +130,27 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createSampleTypesSection() {
-        Composite client = createSectionWithClient("Contains Samples");
+        Composite client = createSectionWithClient("Contains Aliquots");
         GridLayout layout = (GridLayout) client.getLayout();
         layout.numColumns = 2;
         layout.horizontalSpacing = 10;
         toolkit.paintBordersFor(client);
 
-        Label label = toolkit.createLabel(client, "Aliquot types:");
+        Label label = toolkit.createLabel(client, "Sample types:");
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
-        sampleTypesList = new org.eclipse.swt.widgets.List(client, SWT.BORDER
-            | SWT.V_SCROLL);
+        sampleTypesViewer = new ListViewer(client, SWT.BORDER | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
-        sampleTypesList.setLayoutData(gd);
+        sampleTypesViewer.getList().setLayoutData(gd);
+        sampleTypesViewer.setContentProvider(new ArrayContentProvider());
         setSampleTypesValues();
     }
 
     private void setSampleTypesValues() {
-        if (sampleTypesList != null) {
-            sampleTypesList.removeAll();
-            for (SampleTypeWrapper type : containerType
-                .getSampleTypeCollection()) {
-                sampleTypesList.add(type.getNameShort());
-            }
+        if (sampleTypesViewer != null) {
+            sampleTypesViewer.setInput(containerType.getSampleTypeCollection());
         }
     }
 
@@ -168,11 +165,15 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         label
             .setLayoutData(new GridData(SWT.LEFT, SWT.BEGINNING, false, false));
 
-        childContainerTypesList = new org.eclipse.swt.widgets.List(client,
-            SWT.BORDER | SWT.V_SCROLL);
+        childContainerTypesViewer = new ListViewer(client, SWT.BORDER
+            | SWT.V_SCROLL);
         GridData gd = new GridData(GridData.FILL_BOTH);
         gd.heightHint = 100;
-        childContainerTypesList.setLayoutData(gd);
+        childContainerTypesViewer.getList().setLayoutData(gd);
+        childContainerTypesViewer
+            .setContentProvider(new ArrayContentProvider());
+        childContainerTypesViewer
+            .addDoubleClickListener(collectionDoubleClickListener);
         setChildContainerTypesValues();
     }
 
@@ -182,12 +183,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void setChildContainerTypesValues() {
-        if (childContainerTypesList != null) {
-            childContainerTypesList.removeAll();
-            for (ContainerTypeWrapper type : containerType
-                .getChildContainerTypeCollection()) {
-                childContainerTypesList.add(type.getName());
-            }
+        if (childContainerTypesViewer != null) {
+            childContainerTypesViewer.setInput(containerType
+                .getChildContainerTypeCollection());
         }
     }
 

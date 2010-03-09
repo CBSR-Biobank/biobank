@@ -215,7 +215,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     @Override
     public String toString() {
-        return getName();
+        return getName() + " (" + getNameShort() + ")";
     }
 
     public boolean isUsedBySamples() throws ApplicationException,

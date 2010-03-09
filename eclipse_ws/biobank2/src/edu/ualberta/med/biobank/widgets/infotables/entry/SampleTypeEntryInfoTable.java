@@ -128,7 +128,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
                 try {
                     if (sampleType.isUsedBySamples()) {
-                        BioBankPlugin.openError("Aliquot Type Delete Error",
+                        BioBankPlugin.openError("Sample Type Delete Error",
                             "Cannot delete sample type \""
                                 + sampleType.getName()
                                 + "\" since there are samples of this "
@@ -138,7 +138,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
                     if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(),
-                        "Delete Aliquot Type",
+                        "Delete Sample Type",
                         "Are you sure you want to delete sample type \""
                             + sampleType.getName() + "\"?")) {
                         return;
@@ -193,7 +193,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 sampleTypeCollection);
         }
         Collections.sort(selectedSampleTypes);
-        setCollection(sampleTypeCollection);
+        reloadCollection(sampleTypeCollection);
         addedOrModifiedSampleTypes = new ArrayList<SampleTypeWrapper>();
         deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
     }

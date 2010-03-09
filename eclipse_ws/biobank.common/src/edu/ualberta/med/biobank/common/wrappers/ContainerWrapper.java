@@ -877,7 +877,9 @@ public class ContainerWrapper extends
         } else {
             for (RowColPos rcp : positions) {
                 ContainerWrapper child = getChild(rcp);
-                oneChildrenDeleted = deleteChild(type, child);
+                if (child != null) {
+                    oneChildrenDeleted = deleteChild(type, child);
+                }
             }
         }
         reload();

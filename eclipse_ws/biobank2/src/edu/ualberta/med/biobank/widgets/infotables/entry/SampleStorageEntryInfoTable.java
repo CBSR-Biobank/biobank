@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -42,6 +43,8 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
 
     private List<SampleStorageWrapper> deletedSampleStorages;
 
+    private StudyWrapper study;
+
     /**
      * 
      * @param parent a composite control which will be the parent of the new
@@ -54,10 +57,17 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
      *            form this parameter should be null.
      */
     public SampleStorageEntryInfoTable(Composite parent, SiteWrapper site,
-        List<SampleStorageWrapper> sampleStorageCollection) {
+        StudyWrapper study) {
         super(parent, false, null);
         getSampleTypes(site);
-        setSampleStorages(sampleStorageCollection);
+        this.study = study;
+        selectedSampleStorages = study.getSampleStorageCollection();
+        if (selectedSampleStorages == null) {
+            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        }
+        setCollection(selectedSampleStorages);
+        addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -141,13 +151,12 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         return deletedSampleStorages;
     }
 
-    public void setSampleStorages(List<SampleStorageWrapper> sampleStorages) {
-        if (sampleStorages == null) {
+    public void reload() {
+        selectedSampleStorages = study.getSampleStorageCollection();
+        if (selectedSampleStorages == null) {
             selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
-        } else {
-            selectedSampleStorages = sampleStorages;
         }
-        setCollection(selectedSampleStorages);
+        reloadCollection(selectedSampleStorages);
         addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
         deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
     }
