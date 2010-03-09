@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.reports.advanced;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -23,19 +22,19 @@ public class SearchUtils {
         List<String> opList = new ArrayList<String>();
         if (type == String.class) {
             opList.add("=");
+            opList.add("!=");
             opList.add("contains");
+            opList.add("doesn't contain");
             opList.add("starts with");
+            opList.add("doesn't start with");
             opList.add("ends with");
+            opList.add("doesn't end with");
         } else if (type == Integer.class) {
             opList.add("=");
             opList.add("<=");
             opList.add(">=");
             opList.add("<");
             opList.add(">");
-        } else if (type == Collection.class) {
-            opList.add("all");
-            opList.add("none");
-            opList.add("one or more");
         }
         return opList;
     }
