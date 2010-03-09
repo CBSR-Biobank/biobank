@@ -116,6 +116,7 @@ public abstract class QueryObject {
         return description;
     }
 
+    @SuppressWarnings("unchecked")
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) {
         List<Object> results = null;
