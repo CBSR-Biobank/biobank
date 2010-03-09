@@ -118,14 +118,15 @@ public abstract class QueryObject {
 
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) {
+        List<Object> results = null;
         try {
-            return ((ListProxy) executeQuery(appService, params))
-                .getListChunk();
+            results = postProcess(((ListProxy) executeQuery(appService, params))
+                .getListChunk());
         } catch (ApplicationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return null;
+        return results;
     }
 
     public List<Object> executeQuery(WritableApplicationService appService,
@@ -149,5 +150,9 @@ public abstract class QueryObject {
     }
 
     public abstract String getName();
+
+    public List<Object> postProcess(List<Object> results) {
+        return results;
+    }
 
 }

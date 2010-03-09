@@ -21,11 +21,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -34,7 +36,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -74,7 +75,6 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.SmartCombo;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 
 public class AdvancedReportsView extends ViewPart {
@@ -101,7 +101,7 @@ public class AdvancedReportsView extends ViewPart {
     private Button exportButton;
 
     private List<Class<? extends ModelWrapper<?>>> searchableModelObjects;
-    private SmartCombo objectSelector;
+    private ListViewer objectSelector;
 
     private QueryObject currentQuery;
     Class<? extends ModelWrapper<?>> type;
@@ -127,24 +127,29 @@ public class AdvancedReportsView extends ViewPart {
         header = new Composite(top, SWT.NONE);
         header.setLayout(new GridLayout(4, false));
 
-        objectSelector = createCombo(header);
-        objectSelector.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
+        String[] names = new String[searchableModelObjects.size()];
+        int i = 0;
+        for (Class<?> objClass : searchableModelObjects) {
+            names[i] = objClass.getSimpleName().replace("Wrapper", "");
+            i++;
+        }
 
-            }
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    comboChanged();
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Error",
-                        "There was an error while building page.");
+        objectSelector = new ListViewer(header, SWT.BORDER);
+        objectSelector.setContentProvider(new ArrayContentProvider());
+        objectSelector.setInput(names);
+        objectSelector
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    try {
+                        comboChanged();
+                    } catch (Exception ex) {
+                        BioBankPlugin.openAsyncError("Error",
+                            "There was an error while building page.");
+                    }
                 }
-            }
-        });
+            });
+        objectSelector.getList().select(0);
 
         generateButton = new Button(header, SWT.NONE);
         generateButton.setText("Generate");
@@ -284,7 +289,7 @@ public class AdvancedReportsView extends ViewPart {
 
     private void setEnabled(boolean enabled) {
         SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
-        objectSelector.setEnabled(enabled);
+        objectSelector.getList().setEnabled(enabled);
         generateButton.setEnabled(enabled);
         printButton.setEnabled(enabled);
         exportButton.setEnabled(enabled);
@@ -346,7 +351,8 @@ public class AdvancedReportsView extends ViewPart {
     }
 
     public void comboChanged() {
-        String typeSelection = objectSelector.getSelection();
+        String typeSelection = (String) ((IStructuredSelection) objectSelector
+            .getSelection()).getFirstElement();
         for (Class<? extends ModelWrapper<?>> searchableModelObject : searchableModelObjects)
             if (searchableModelObject.getSimpleName().startsWith(typeSelection))
                 type = searchableModelObject;
@@ -460,14 +466,14 @@ public class AdvancedReportsView extends ViewPart {
                     .getSelection()).getFirstElement();
                 if (element != null) {
                     MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText("Add OR Node");
+                    mi.setText("OR");
                     mi.addSelectionListener(new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent event) {
                             QueryTreeNode selectedNode = ((QueryTreeNode) element);
                             QueryTreeNode newOperator = new QueryTreeNode(
                                 new HQLField(selectedNode.getNodeInfo()
-                                    .getPath(), "OR", Boolean.class));
+                                    .getPath(), "OR", String.class));
                             QueryTreeNode parent = selectedNode.getParent();
                             parent.removeChild(selectedNode);
                             parent.addChild(newOperator);
@@ -480,9 +486,9 @@ public class AdvancedReportsView extends ViewPart {
                             tree.refresh(true);
                         }
                     });
-                    if (((QueryTreeNode) element).getLabel().compareTo("OR") == 0) {
+                    if (((QueryTreeNode) element).getNodeInfo().getType() == String.class) {
                         MenuItem mi2 = new MenuItem(menu, SWT.NONE);
-                        mi2.setText("Remove OR Node");
+                        mi2.setText("Remove Node");
                         mi2.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -495,6 +501,64 @@ public class AdvancedReportsView extends ViewPart {
                                 selectedNode.removeChild(child);
                                 parent.addChild(child);
                                 parent.removeChild(selectedNode);
+                                tree.refresh(true);
+                            }
+                        });
+                    }
+                    if (((QueryTreeNode) element).getNodeInfo().getFname()
+                        .contains("Collection")) {
+
+                        MenuItem mi3 = new MenuItem(menu, SWT.NONE);
+                        mi3.setText("All");
+                        mi3.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode newOperator = new QueryTreeNode(
+                                    new HQLField(selectedNode.getNodeInfo()
+                                        .getPath(), "All", String.class));
+                                QueryTreeNode parent = selectedNode.getParent();
+                                parent.removeChild(selectedNode);
+                                parent.addChild(newOperator);
+                                newOperator.setParent(parent);
+                                newOperator.addChild(selectedNode);
+                                selectedNode.setParent(newOperator);
+                                tree.refresh(true);
+                            }
+                        });
+                        MenuItem mi4 = new MenuItem(menu, SWT.NONE);
+                        mi4.setText("No");
+                        mi4.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode newOperator = new QueryTreeNode(
+                                    new HQLField(selectedNode.getNodeInfo()
+                                        .getPath(), "No", String.class));
+                                QueryTreeNode parent = selectedNode.getParent();
+                                parent.removeChild(selectedNode);
+                                parent.addChild(newOperator);
+                                newOperator.setParent(parent);
+                                newOperator.addChild(selectedNode);
+                                selectedNode.setParent(newOperator);
+                                tree.refresh(true);
+                            }
+                        });
+                        MenuItem mi5 = new MenuItem(menu, SWT.NONE);
+                        mi5.setText("One or more");
+                        mi5.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
+                                QueryTreeNode newOperator = new QueryTreeNode(
+                                    new HQLField(selectedNode.getNodeInfo()
+                                        .getPath(), "One or more", String.class));
+                                QueryTreeNode parent = selectedNode.getParent();
+                                parent.removeChild(selectedNode);
+                                parent.addChild(newOperator);
+                                newOperator.setParent(parent);
+                                newOperator.addChild(selectedNode);
+                                selectedNode.setParent(newOperator);
                                 tree.refresh(true);
                             }
                         });
@@ -527,7 +591,7 @@ public class AdvancedReportsView extends ViewPart {
         fieldSection = new Composite(subSection, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
-        gl.numColumns = 2;
+        gl.numColumns = 3;
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;
@@ -536,7 +600,7 @@ public class AdvancedReportsView extends ViewPart {
 
         Label headerLabel = new Label(fieldSection, SWT.NONE);
         GridData gdl = new GridData();
-        gdl.horizontalSpan = 2;
+        gdl.horizontalSpan = 3;
         headerLabel.setLayoutData(gdl);
         headerLabel.setText(node.getTreePath());
 
@@ -547,6 +611,10 @@ public class AdvancedReportsView extends ViewPart {
             Label fieldLabel = new Label(fieldSection, SWT.NONE);
             fieldLabel.setText(field.getFname() + ":");
             textLabels.add(fieldLabel);
+            Combo operatorCombo = new Combo(fieldSection, SWT.NONE);
+            operatorCombo.setItems(SearchUtils.getOperatorSet(field.getType())
+                .toArray(new String[] {}));
+            operatorCombo.select(0);
             Widget widget;
 
             if (field.getType() == Date.class)
@@ -580,22 +648,6 @@ public class AdvancedReportsView extends ViewPart {
                 null);
             reportData = new ArrayList<Object>();
         }
-    }
-
-    protected SmartCombo createCombo(Composite parent) {
-        SmartCombo combo = new SmartCombo(parent, SWT.NONE);
-
-        GridData combodata = new GridData();
-        combodata.widthHint = 250;
-        combo.setLayoutData(combodata);
-        String[] names = new String[searchableModelObjects.size()];
-        int i = 0;
-        for (Class<?> objClass : searchableModelObjects) {
-            names[i] = objClass.getSimpleName().replace("Wrapper", "");
-            i++;
-        }
-        combo.setInput(names);
-        return combo;
     }
 
     public boolean printTable(Boolean export) throws Exception {

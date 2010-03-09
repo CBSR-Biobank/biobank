@@ -14,9 +14,9 @@ public class CabinetSSamples extends QueryObject {
 
     public CabinetSSamples(String op, Integer siteId) {
         super(
-            "Displays the total number of cabinet samples per study.",
+            "Displays the total number of cabinet aliquots per study.",
 
-            "select sample.patientVisit.patient.study.nameShort, count(*) from "
+            "select aliquot.patientVisit.patient.study.nameShort, count(*) from "
                 + Aliquot.class.getName()
                 + " as aliquot where aliquot.aliquotPosition.container.id in (select path1.container.id from "
                 + ContainerPath.class.getName()
@@ -34,8 +34,7 @@ public class CabinetSSamples extends QueryObject {
         params.add("%Cabinet%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = appService.query(c);
-        return results;
+        return appService.query(c);
     }
 
     @Override

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.reports.advanced;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class QueryTreeNode extends Object {
     private HQLField nodeInfo;
     private List<HQLField> fieldData;
@@ -17,7 +16,7 @@ public class QueryTreeNode extends Object {
     }
 
     public String getLabel() {
-        return nodeInfo.getFname();
+        return nodeInfo.getFname().replace("Collection", "s");
     }
 
     public HQLField getNodeInfo() {

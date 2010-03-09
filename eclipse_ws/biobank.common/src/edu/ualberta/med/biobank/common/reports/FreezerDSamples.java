@@ -14,14 +14,14 @@ public class FreezerDSamples extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";
 
-    protected static final String query = "select sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name , year(sample.linkDate), {2}(sample.linkDate), count(sample.linkDate) from "
+    protected static final String query = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate), {2}(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
-        + " as aliquot where sample.aliquotPosition.container.id in (select path1.container.id from "
+        + " as aliquot where aliquot.aliquotPosition.container.id in (select path1.container.id from "
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site {0} {1}"
-        + " group by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name,  year(sample.linkDate), {2}(sample.linkDate)";
+        + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site {0} {1}"
+        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate), {2}(aliquot.linkDate)";
 
     public FreezerDSamples(String op, Integer siteId) {
         super(
@@ -46,7 +46,11 @@ public class FreezerDSamples extends QueryObject {
         params.set(0, "%Freezer%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = appService.query(c);
+        return appService.query(c);
+    }
+
+    @Override
+    public List<Object> postProcess(List<Object> results) {
         List<Object> compressedDates = new ArrayList<Object>();
         if (columnNames[2].compareTo("Year") == 0) {
             for (Object ob : results) {

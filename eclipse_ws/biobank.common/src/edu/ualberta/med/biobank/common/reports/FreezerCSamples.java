@@ -20,12 +20,13 @@ public class FreezerCSamples extends QueryObject {
                 + Aliquot.class.getName()
                 + " as aliquot where aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
-                + ContainerPath.class.getName() + " as path1, "
                 + ContainerPath.class.getName()
-                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and sample.patientVisit.patient.study.site"
+                + " as path1, "
+                + ContainerPath.class.getName()
+                + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site"
                 + op
                 + siteId
-                + " group by sample.patientVisit.patient.study.nameShort, sample.patientVisit.shipment.clinic.name",
+                + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name",
             new String[] { "Study", "Clinic", "Total" });
     }
 
@@ -35,8 +36,7 @@ public class FreezerCSamples extends QueryObject {
         params.add("%Freezer%");
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        List<Object> results = appService.query(c);
-        return results;
+        return appService.query(c);
     }
 
     @Override
