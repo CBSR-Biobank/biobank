@@ -173,7 +173,17 @@ public class ReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
-                            resetSearch();
+                            reportTable.dispose();
+                            reportTable = new SearchResultsInfoTable(top,
+                                reportData, query.getColumnNames(),
+                                columnWidths.get(query.getClass()));
+                            GridData gd = new GridData();
+                            gd.grabExcessHorizontalSpace = true;
+                            gd.grabExcessVerticalSpace = true;
+                            gd.horizontalSpan = 2;
+                            gd.horizontalAlignment = SWT.FILL;
+                            gd.verticalAlignment = SWT.FILL;
+                            reportTable.setLayoutData(gd);
                             setEnabled(true);
                             top.layout();
                         }
@@ -410,6 +420,7 @@ public class ReportsEditor extends EditorPart {
         throws PartInitException {
         setSite(site);
         setInput(input);
+
         reportData = new ArrayList<Object>();
         queryClass = ((ReportInput) input).query;
         SiteWrapper siteWrap = SessionManager.getInstance()
@@ -423,6 +434,9 @@ public class ReportsEditor extends EditorPart {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        this.setPartName(query.getName());
+
         columnWidths = new HashMap<Class<?>, int[]>();
         columnWidths.put(CabinetCSamples.class, new int[] { 100, 100, 100 });
         columnWidths.put(CabinetDSamples.class,
@@ -470,9 +484,7 @@ public class ReportsEditor extends EditorPart {
     @Override
     public void createPartControl(Composite parent) {
         top = new Composite(parent, SWT.NONE);
-        GridLayout gl = new GridLayout();
-        gl.numColumns = 2;
-        top.setLayout(gl);
+        top.setLayout(new GridLayout());
 
         SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
         List<Option> queryOptions = query.getOptions();
@@ -482,21 +494,17 @@ public class ReportsEditor extends EditorPart {
         if (parameterSection != null)
             parameterSection.dispose();
 
-        parameterSection = new Composite(top, SWT.BORDER);
+        parameterSection = new Composite(top, SWT.NONE);
         GridData pgd = new GridData();
         pgd.grabExcessHorizontalSpace = true;
-        pgd.grabExcessVerticalSpace = true;
-        pgd.verticalAlignment = SWT.FILL;
         pgd.horizontalAlignment = SWT.FILL;
         parameterSection.setLayout(new GridLayout());
         parameterSection.setLayoutData(pgd);
 
-        buttonSection = new Composite(top, SWT.BORDER);
-        GridData bgd = new GridData();
-        bgd.verticalAlignment = SWT.FILL;
-        bgd.grabExcessVerticalSpace = true;
-        buttonSection.setLayout(new GridLayout());
-        buttonSection.setLayoutData(bgd);
+        buttonSection = new Composite(top, SWT.NONE);
+        GridLayout gl = new GridLayout();
+        gl.numColumns = 3;
+        buttonSection.setLayout(gl);
 
         generateButton = new Button(buttonSection, SWT.NONE);
         generateButton.setText("Generate");

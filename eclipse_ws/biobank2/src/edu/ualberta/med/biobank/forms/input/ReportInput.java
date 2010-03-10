@@ -26,9 +26,7 @@ public class ReportInput implements IEditorInput {
 
     @Override
     public String getName() {
-        if (query == null)
-            return null;
-        return query.getName();
+        return "";
     }
 
     @Override
@@ -38,7 +36,7 @@ public class ReportInput implements IEditorInput {
 
     @Override
     public String getToolTipText() {
-        return getName();
+        return "";
     }
 
     @Override

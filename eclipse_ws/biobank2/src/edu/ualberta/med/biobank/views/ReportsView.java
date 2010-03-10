@@ -47,7 +47,7 @@ public class ReportsView extends ViewPart {
         sc.setExpandVertical(true);
 
         top = new Composite(sc, SWT.BORDER);
-        top.setLayout(new GridLayout(3, false));
+        top.setLayout(new GridLayout());
         top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         querySelect = new TreeViewer(top, SWT.BORDER);
