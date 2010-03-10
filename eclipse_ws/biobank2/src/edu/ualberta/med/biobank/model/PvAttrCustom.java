@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 public class PvAttrCustom {
     private Boolean isDefault;
     private String label;
@@ -7,12 +10,16 @@ public class PvAttrCustom {
     private String[] allowedValues;
     private String value;
 
+    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+        this);
+
     public Boolean getIsDefault() {
         return isDefault;
     }
 
     public void setIsDefault(Boolean isDefault) {
-        this.isDefault = isDefault;
+        propertyChangeSupport.firePropertyChange("isDefault", this.isDefault,
+            this.isDefault = isDefault);
     }
 
     public String getLabel() {
@@ -20,7 +27,8 @@ public class PvAttrCustom {
     }
 
     public void setLabel(String label) {
-        this.label = label;
+        propertyChangeSupport.firePropertyChange("label", this.label,
+            this.label = label);
     }
 
     public String getType() {
@@ -28,15 +36,17 @@ public class PvAttrCustom {
     }
 
     public void setType(String type) {
-        this.type = type;
+        propertyChangeSupport.firePropertyChange("type", this.type,
+            this.type = type);
     }
 
     public String[] getAllowedValues() {
         return allowedValues;
     }
 
-    public void setPermissible(String[] allowedValues) {
-        this.allowedValues = allowedValues;
+    public void setAllowedValues(String[] allowedValues) {
+        propertyChangeSupport.firePropertyChange("allowedValues",
+            this.allowedValues, this.allowedValues = allowedValues);
     }
 
     public String getValue() {
@@ -44,6 +54,17 @@ public class PvAttrCustom {
     }
 
     public void setValue(String value) {
-        this.value = value;
+        propertyChangeSupport.firePropertyChange("value", this.value,
+            this.value = value);
     }
+
+    public void addPropertyChangeListener(String propertyName,
+        PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
 };
