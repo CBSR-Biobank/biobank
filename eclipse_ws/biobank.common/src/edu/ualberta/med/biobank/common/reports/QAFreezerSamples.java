@@ -64,7 +64,6 @@ public class QAFreezerSamples extends QueryObject {
     @Override
     public List<Object> postProcess(List<Object> results) {
         ArrayList<Object> newList = new ArrayList<Object>();
-        results.subList(0, numResults);
         int max = Math.min(numResults, results.size());
         for (int i = 0; i < max; i++)
             newList.add(results.get(i));
