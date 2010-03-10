@@ -20,7 +20,7 @@ public class CabinetDSamples extends QueryObject {
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site {0} {1}"
+        + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site {0} {1,number,#}"
         + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate), {2}(aliquot.linkDate)";
 
     public CabinetDSamples(String op, Integer siteId) {
