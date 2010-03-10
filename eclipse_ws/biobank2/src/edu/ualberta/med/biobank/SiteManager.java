@@ -16,10 +16,13 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteManager {
@@ -39,7 +42,7 @@ public class SiteManager {
 
     private SiteWrapper currentSite;
 
-    private SiteWrapper allSitesObject;
+    private SiteWrapper allSitesWrapper;
 
     private SiteCombo siteCombo;
 
@@ -50,9 +53,14 @@ public class SiteManager {
         this.appService = appService;
         this.sessionName = sessionName;
         currentSites = new ArrayList<SiteWrapper>();
-        allSitesObject = new SiteWrapper(appService);
-        allSitesObject.setName("All Sites");
-        allSitesObject.setNameShort("All Sites");
+        allSitesWrapper = new SiteWrapper(appService) {
+            @Override
+            public Integer getId() {
+                return -9999;
+            }
+        };
+        allSitesWrapper.setName("All Sites");
+        allSitesWrapper.setNameShort("All Sites");
     }
 
     /*
@@ -115,11 +123,11 @@ public class SiteManager {
         Assert.isNotNull(sites, "sites collection is null");
 
         if (currentSite == null)
-            currentSite = allSitesObject;
+            currentSite = allSitesWrapper;
         logger.debug("site selected: " + currentSite.getName());
 
         currentSites.clear();
-        currentSites.add(0, allSitesObject);
+        currentSites.add(0, allSitesWrapper);
         for (SiteWrapper site : sites) {
             currentSites.add(site);
         }
@@ -157,6 +165,7 @@ public class SiteManager {
 
                         currentSite = siteWrapper;
                         setCurrentSite(currentSite);
+                        closeAllSitesEditor();
                         SessionManager.getInstance().rebuildSession();
                     }
                 });
@@ -190,7 +199,12 @@ public class SiteManager {
         if (currentSite == null) {
             return false;
         }
-        return allSitesObject == currentSite;
+        return allSitesWrapper == currentSite;
+    }
+
+    protected void closeAllSitesEditor() {
+        SiteAdapter sa = new SiteAdapter(null, allSitesWrapper);
+        AdapterBase.closeEditor(new FormInput(sa));
     }
 
 }
