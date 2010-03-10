@@ -142,6 +142,7 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
                 }
             }
         }
+        e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
     }
 
     @SuppressWarnings("unused")

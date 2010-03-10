@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -13,6 +14,7 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
@@ -75,15 +77,17 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             containerType.getName()));
 
         createContainerTypeSection();
+        boolean containsSamples = false;
         if (containerType.getSampleTypeCollection() != null
             && containerType.getSampleTypeCollection().size() > 0) {
             createSampleTypesSection();
+            containsSamples = true;
         }
         if (containerType.getChildContainerTypeCollection() != null
             && containerType.getChildContainerTypeCollection().size() > 0) {
             createChildContainerTypesSection();
         }
-        if (containerType.getChildContainerTypeCollection().size() > 0) {
+        if (!containsSamples) {
             createVisualizeContainer();
         }
         createButtons();
@@ -145,6 +149,13 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         gd.heightHint = 100;
         sampleTypesViewer.getList().setLayoutData(gd);
         sampleTypesViewer.setContentProvider(new ArrayContentProvider());
+        sampleTypesViewer.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                SampleTypeWrapper type = (SampleTypeWrapper) element;
+                return type.getName() + " (" + type.getNameShort() + ")";
+            }
+        });
         setSampleTypesValues();
     }
 

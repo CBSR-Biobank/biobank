@@ -1560,7 +1560,7 @@
                variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionId">
             <not>
                <equals
-                     value="null">
+                     value="-9999">
                </equals>
             </not>
          </with>

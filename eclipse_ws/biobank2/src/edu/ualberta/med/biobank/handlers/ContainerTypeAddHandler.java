@@ -18,7 +18,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-            .searchNode(SessionManager.getInstance().getCurrentSiteWrapper());
+            .searchNode(SessionManager.getInstance().getCurrentSite());
         Assert.isNotNull(siteAdapter);
 
         ContainerTypeWrapper containerType = new ContainerTypeWrapper(

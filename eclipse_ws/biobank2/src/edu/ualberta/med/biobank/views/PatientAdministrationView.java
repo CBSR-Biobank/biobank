@@ -36,7 +36,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     @Override
     protected Object search(String text) throws Exception {
         return PatientWrapper.getPatientInSite(SessionManager.getAppService(),
-            text, SessionManager.getInstance().getCurrentSiteWrapper());
+            text, SessionManager.getInstance().getCurrentSite());
     }
 
     @Override
@@ -49,7 +49,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         rootNode.removeAll();
         PatientWrapper patient = (PatientWrapper) searchedObject;
         SiteAdapter siteAdapter = new SiteAdapter(rootNode, SessionManager
-            .getInstance().getCurrentSiteWrapper(), false);
+            .getInstance().getCurrentSite(), false);
         rootNode.addChild(siteAdapter);
         StudyAdapter studyAdapter = new StudyAdapter(siteAdapter, patient
             .getStudy(), false);
