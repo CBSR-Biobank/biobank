@@ -179,6 +179,7 @@ public class CbsrStudies {
         addSampleStorage("AHFEM", "Plasma", 5, 0.2);
         addSampleStorage("AHFEM", "Lith Hep Plasma", 20, 0.2);
         addSampleStorage("AHFEM", "PF Plasma", 2, 0.2);
+        addSampleStorage("BBPSP", "Cells", null, null);
         addSampleStorage("BBPSP", "F Urine", null, null);
         addSampleStorage("BBPSP", "Paxgene", 11, 0.8);
         addSampleStorage("BBPSP", "Plasma", 16, 0.2);
