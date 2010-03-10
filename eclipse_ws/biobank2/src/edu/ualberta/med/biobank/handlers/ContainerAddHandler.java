@@ -25,7 +25,7 @@ public class ContainerAddHandler extends AbstractHandler {
         try {
             Collection<ContainerTypeWrapper> top = ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
-                    SessionManager.getInstance().getCurrentSiteWrapper());
+                    SessionManager.getInstance().getCurrentSite());
             if (top.size() == 0) {
                 MessageDialog
                     .openError(PlatformUI.getWorkbench()
@@ -37,7 +37,7 @@ public class ContainerAddHandler extends AbstractHandler {
 
             SiteAdapter siteAdapter = (SiteAdapter) SessionManager
                 .searchNode(SessionManager.getInstance()
-                    .getCurrentSiteWrapper());
+                    .getCurrentSite());
             Assert.isNotNull(siteAdapter);
 
             ContainerWrapper containerWrapper = new ContainerWrapper(

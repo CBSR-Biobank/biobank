@@ -37,22 +37,22 @@ public class SiteManager {
 
     private String sessionName;
 
-    private SiteWrapper currentSiteWrapper;
+    private SiteWrapper currentSite;
 
-    private SiteWrapper allSiteWrapper;
+    private SiteWrapper allSitesObject;
 
     private SiteCombo siteCombo;
 
-    private List<SiteWrapper> currentSiteWrappers;
+    private List<SiteWrapper> currentSites;
 
     protected void init(WritableApplicationService appService,
         String sessionName) {
         this.appService = appService;
         this.sessionName = sessionName;
-        currentSiteWrappers = new ArrayList<SiteWrapper>();
-        allSiteWrapper = new SiteWrapper(appService);
-        allSiteWrapper.setName("All Sites");
-        allSiteWrapper.setNameShort("All Sites");
+        currentSites = new ArrayList<SiteWrapper>();
+        allSitesObject = new SiteWrapper(appService);
+        allSitesObject.setName("All Sites");
+        allSitesObject.setNameShort("All Sites");
     }
 
     /*
@@ -60,7 +60,7 @@ public class SiteManager {
      * out if logged into same server and same site exists
      */
     public void getCurrentSite(String serverName, Collection<SiteWrapper> sites) {
-        if (currentSiteWrapper != null)
+        if (currentSite != null)
             return;
 
         Preferences prefs = new InstanceScope().getNode(Application.PLUGIN_ID);
@@ -77,13 +77,13 @@ public class SiteManager {
 
         for (SiteWrapper site : sites) {
             if (site.getId().equals(siteId))
-                currentSiteWrapper = site;
+                currentSite = site;
         }
     }
 
     public void setCurrentSite(SiteWrapper site) {
         try {
-            currentSiteWrapper = site;
+            currentSite = site;
             Integer saveVal = -1;
             if ((site != null) && (site.getId() != null))
                 saveVal = site.getId();
@@ -114,17 +114,17 @@ public class SiteManager {
     public void updateSites(Collection<SiteWrapper> sites) {
         Assert.isNotNull(sites, "sites collection is null");
 
-        if (currentSiteWrapper == null)
-            currentSiteWrapper = allSiteWrapper;
-        logger.debug("site selected: " + currentSiteWrapper.getName());
+        if (currentSite == null)
+            currentSite = allSitesObject;
+        logger.debug("site selected: " + currentSite.getName());
 
-        currentSiteWrappers.clear();
-        currentSiteWrappers.add(0, allSiteWrapper);
+        currentSites.clear();
+        currentSites.add(0, allSitesObject);
         for (SiteWrapper site : sites) {
-            currentSiteWrappers.add(site);
+            currentSites.add(site);
         }
-        siteCombo.setInput(currentSiteWrappers);
-        siteCombo.setSelection(currentSiteWrapper);
+        siteCombo.setInput(currentSites);
+        siteCombo.setSelection(currentSite);
     }
 
     public void updateSites() {
@@ -135,8 +135,8 @@ public class SiteManager {
         }
     }
 
-    public SiteWrapper getCurrentSiteWrapper() {
-        return currentSiteWrapper;
+    public SiteWrapper getCurrentSite() {
+        return currentSite;
     }
 
     public void setSiteCombo(SiteCombo combo) {
@@ -155,8 +155,8 @@ public class SiteManager {
                         if (siteWrapper == null)
                             return;
 
-                        currentSiteWrapper = siteWrapper;
-                        setCurrentSite(currentSiteWrapper);
+                        currentSite = siteWrapper;
+                        setCurrentSite(currentSite);
                         SessionManager.getInstance().rebuildSession();
                     }
                 });
@@ -171,8 +171,8 @@ public class SiteManager {
     public void setEnabled(boolean enabled) {
         Assert.isNotNull(siteCombo, "site manager is null");
         if (!enabled) {
-            currentSiteWrappers = new ArrayList<SiteWrapper>();
-            siteCombo.setInput(currentSiteWrappers);
+            currentSites = new ArrayList<SiteWrapper>();
+            siteCombo.setInput(currentSites);
             setSiteSelectionState(null);
         }
         siteCombo.setEnabled(enabled);
@@ -187,10 +187,10 @@ public class SiteManager {
     }
 
     public boolean isAllSitesSelected() {
-        if (currentSiteWrapper == null) {
+        if (currentSite == null) {
             return false;
         }
-        return allSiteWrapper.getName().equals(currentSiteWrapper.getName());
+        return allSitesObject == currentSite;
     }
 
 }

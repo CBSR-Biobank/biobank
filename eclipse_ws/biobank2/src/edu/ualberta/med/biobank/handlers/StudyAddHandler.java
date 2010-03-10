@@ -18,7 +18,7 @@ public class StudyAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addStudy";
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
+        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchNode(site);
         Assert.isNotNull(siteAdapter);
         StudyWrapper study = new StudyWrapper(SessionManager.getAppService());

@@ -21,7 +21,7 @@ public class EditSampleTypesHandler extends AbstractHandler {
             .getSession();
         Assert.isNotNull(sessionAdapter);
         SiteWrapper siteWrapper = SessionManager.getInstance()
-            .getCurrentSiteWrapper();
+            .getCurrentSite();
         SiteAdapter sa = new SiteAdapter(sessionAdapter, siteWrapper);
         AdapterBase.openForm(new FormInput(sa), SampleTypesEntryForm.ID);
         return null;

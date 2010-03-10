@@ -247,13 +247,11 @@ public class ReportsView extends ViewPart {
             Class<? extends QueryObject> cls = QueryObject
                 .getQueryObjectByName(typeSelection);
             Constructor<?> c = cls.getConstructor(String.class, Integer.class);
-            SiteWrapper site = SessionManager.getInstance()
-                .getCurrentSiteWrapper();
             String op = "=";
-            if (site.getName().compareTo("All Sites") == 0)
+            if (SessionManager.getInstance().isAllSitesSelected())
                 op = "!=";
             currentQuery = (QueryObject) c.newInstance(new Object[] { op,
-                site.getId() });
+                SessionManager.getInstance().getCurrentSite().getId() });
             final ArrayList<Object> params = getParams();
 
             // we dont want the user to change options while the search is in
@@ -392,9 +390,9 @@ public class ReportsView extends ViewPart {
 
     public void comboChanged() throws ApplicationException {
         String typeSelection = querySelect.getSelection();
-        SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
+        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         String op = "=";
-        if (site.getName().compareTo("All Sites") == 0)
+        if (SessionManager.getInstance().isAllSitesSelected())
             op = "!=";
         try {
             Class<? extends QueryObject> cls = QueryObject

@@ -121,7 +121,7 @@ public class SessionAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteWrapper currentSite = SessionManager.getInstance()
-            .getCurrentSiteWrapper();
+            .getCurrentSite();
         Integer siteId = null;
         if (currentSite != null) {
             siteId = currentSite.getId();
