@@ -60,7 +60,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
         checkSite();
-        checkNameUnique();
+        checkNotEmpty(getName(), "Name");
+        checkNoDuplicatesInSite(ContainerType.class, "name", getName(),
+            getSite().getId(), "A container type with name \"" + getName()
+                + "\" already exists.");
+        checkNotEmpty(getNameShort(), "Short Name");
+        checkNoDuplicatesInSite(ContainerType.class, "nameShort",
+            getNameShort(), getSite().getId(),
+            "A container type with short name \"" + getNameShort()
+                + "\" already exists.");
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
                 "the container type does not have an activity status");
@@ -149,25 +157,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         if (getSite() == null) {
             throw new BiobankCheckException(
                 "Should assign a site to this container type");
-        }
-    }
-
-    private void checkNameUnique() throws ApplicationException,
-        BiobankCheckException {
-        String notSameTypeString = "";
-        List<Object> params = new ArrayList<Object>(Arrays.asList(new Object[] {
-            getSite().getId(), getName() }));
-        if (!isNew()) {
-            notSameTypeString = " and id<>?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + ContainerType.class.getName()
-            + " where site.id = ? and name = ?" + notSameTypeString, params);
-
-        List<Object> results = appService.query(c);
-        if (results.size() != 0) {
-            throw new BiobankCheckException("A container type with name \""
-                + getName() + "\" already exists.");
         }
     }
 

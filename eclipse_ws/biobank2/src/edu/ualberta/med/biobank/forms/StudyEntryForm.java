@@ -23,7 +23,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -163,7 +162,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
         sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
-            study.getSite(), study.getSampleStorageCollection());
+            study.getSite(), study);
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);
         sampleStorageEntryTable.addSelectionChangedListener(listener);
 
@@ -380,16 +379,31 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
 
         contactEntryTable.reload();
-
-        List<SampleStorageWrapper> sampleStorages = study
-            .getSampleStorageCollection();
-        if (sampleStorages != null) {
-            sampleStorageEntryTable.setSampleStorages(sampleStorages);
-        }
+        sampleStorageEntryTable.reload();
 
         setSourceVesselWidgetSelections();
 
-        // TODO reset PV CUSTOM INFO
+        resetPvCustomInfo();
+
+    }
+
+    private void resetPvCustomInfo() throws Exception {
+        List<String> studyPvInfoLabels = Arrays.asList(study
+            .getStudyPvAttrLabels());
+
+        for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
+            boolean selected = false;
+            String label = studyPvAttrCustom.getLabel();
+            if (studyPvInfoLabels.contains(studyPvAttrCustom.getLabel())) {
+                studyPvAttrCustom.setPermissible(study
+                    .getStudyPvAttrPermissible(label));
+                selected = true;
+                studyPvAttrCustom.inStudy = true;
+            }
+            selected |= (studyPvAttrCustom.getAllowedValues() != null);
+            studyPvAttrCustom.widget.setSelected(selected);
+            studyPvAttrCustom.widget.reloadAllowedValues(studyPvAttrCustom);
+        }
 
     }
 }

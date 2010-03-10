@@ -113,11 +113,8 @@ public class ContainerAdapter extends AdapterBase {
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());
         if (mc.open() == Dialog.OK) {
-            // BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            // public void run() {
             try {
                 setNewPositionFromLabel(mc.getNewLabel());
-
                 // update new parent
                 ContainerWrapper newParentContainer = getContainer()
                     .getParent();
@@ -135,8 +132,6 @@ public class ContainerAdapter extends AdapterBase {
                 BioBankPlugin.openError(e.getMessage(), e);
             }
         }
-        // });
-        // }
     }
 
     /**

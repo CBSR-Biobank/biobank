@@ -322,11 +322,11 @@ public class TestContainer extends TestDatabase {
 
         // test getFullInfoLabel(): short name is null
         ContainerTypeWrapper topType2 = ContainerTypeHelper.addContainerType(
-            site, "Top Container Type 2", null, 2, 3, 10, true);
+            site, "Top Container Type 2", "TCT2", 2, 3, 10, true);
 
         ContainerWrapper top2 = ContainerHelper.addContainer("02", TestCommon
             .getNewBarcode(r), null, site, topType2);
-        Assert.assertEquals("02", top2.getFullInfoLabel());
+        Assert.assertEquals("02 (TCT2)", top2.getFullInfoLabel());
     }
 
     @Test

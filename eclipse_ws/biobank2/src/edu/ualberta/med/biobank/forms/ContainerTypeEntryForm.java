@@ -78,6 +78,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Button hasContainers;
 
+    private ComboViewer activityStatusComboViewer;
+
     public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new BiobankEntryFormWidgetListener() {
@@ -191,9 +193,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client, "Child Labeling Scheme", labelingSchemeMap.values(),
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
-        createComboViewerWithNoSelectionValidator(client, "Container Type",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            containerType.getActivityStatus(),
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity status", ActivityStatusWrapper
+                .getAllActivityStatuses(appService), containerType
+                .getActivityStatus(),
             "Container type must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
@@ -208,8 +211,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient("Contents");
         hasContainers = toolkit.createButton(client, "Contains Containers",
             SWT.RADIO);
-        hasSamples = toolkit
-            .createButton(client, "Contains samples", SWT.RADIO);
+        hasSamples = toolkit.createButton(client, "Contains aliquots",
+            SWT.RADIO);
         hasContainers.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -328,6 +331,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         // associate the storage type to it's site
         containerType.setSite(site);
 
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+            .getSelection()).getFirstElement();
+        containerType.setActivityStatus(activity);
+
         // set the labeling scheme
         String currentScheme = (String) ((StructuredSelection) labelingSchemeComboViewer
             .getSelection()).getFirstElement();
@@ -417,7 +424,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setChildContainerTypeSelection();
         setSampleTypesSelection();
         showContainersOrSamples();
-        setLabelilngScheme();
+        setLabelingScheme();
+        setActivityStatus();
     }
 
     private void showContainersOrSamples() {
@@ -428,13 +436,23 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         hasContainers.setSelection(!containsSamples);
     }
 
-    private void setLabelilngScheme() {
+    private void setLabelingScheme() {
         String currentScheme = containerType.getChildLabelingSchemeName();
         if (currentScheme == null) {
             labelingSchemeComboViewer.getCombo().deselectAll();
         } else {
             labelingSchemeComboViewer.setSelection(new StructuredSelection(
                 currentScheme));
+        }
+    }
+
+    private void setActivityStatus() {
+        ActivityStatusWrapper activity = containerType.getActivityStatus();
+        if (activity == null) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        } else {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                activity));
         }
     }
 }

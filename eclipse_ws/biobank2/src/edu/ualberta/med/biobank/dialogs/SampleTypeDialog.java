@@ -15,10 +15,10 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
 public class SampleTypeDialog extends BiobankDialog {
 
-    private static final String TITLE = "Aliquot Type ";
+    private static final String TITLE = "Sample Type ";
 
-    private static final String MSG_NO_ST_NAME = "Aliquot type must have a name.";
-    private static final String MSG_NO_ST_SNAME = "Aliquot type must have a short name.";
+    private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
+    private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
 
     private SampleTypeWrapper origSampleType;
 
@@ -32,7 +32,7 @@ public class SampleTypeDialog extends BiobankDialog {
         super(parent);
         Assert.isNotNull(sampleType);
         origSampleType = sampleType;
-        this.sampleType = new SampleTypeWrapper(sampleType.getAppService());
+        this.sampleType = new SampleTypeWrapper(null);
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
         this.message = message;
@@ -49,9 +49,9 @@ public class SampleTypeDialog extends BiobankDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         if (origSampleType.isNew()) {
-            setTitle("Add Aliquot Type");
+            setTitle("Add Sample Type");
         } else {
-            setTitle("Edit Aliquot Type");
+            setTitle("Edit Sample Type");
         }
         setMessage(message);
         return contents;
@@ -77,10 +77,6 @@ public class SampleTypeDialog extends BiobankDialog {
         origSampleType.setName(sampleType.getName());
         origSampleType.setNameShort(sampleType.getNameShort());
         super.okPressed();
-    }
-
-    public SampleTypeWrapper getSampleType() {
-        return sampleType;
     }
 
 }
