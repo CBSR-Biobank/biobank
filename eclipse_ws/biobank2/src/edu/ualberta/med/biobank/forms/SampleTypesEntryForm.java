@@ -7,6 +7,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -53,10 +54,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        if (!siteWrapper.getName().equals("All Sites"))
+        boolean allSiteSelected = SessionManager.getInstance()
+            .isAllSitesSelected();
+        if (!allSiteSelected) {
             createSiteSampleTypeSection();
+        }
         createGlobalSampleTypeSection();
-        if (!siteWrapper.getName().equals("All Sites"))
+        if (!allSiteSelected)
             firstControl = siteSampleWidget;
         else
             firstControl = globalSampleWidget;

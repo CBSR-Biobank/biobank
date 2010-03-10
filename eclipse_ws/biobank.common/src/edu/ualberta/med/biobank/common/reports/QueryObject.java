@@ -118,15 +118,10 @@ public abstract class QueryObject {
 
     @SuppressWarnings("unchecked")
     public List<Object> generate(WritableApplicationService appService,
-        List<Object> params) {
+        List<Object> params) throws ApplicationException {
         List<Object> results = null;
-        try {
-            results = postProcess(((ListProxy) executeQuery(appService, params))
-                .getListChunk());
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        results = postProcess(((ListProxy) executeQuery(appService, params))
+            .getListChunk());
         return results;
     }
 

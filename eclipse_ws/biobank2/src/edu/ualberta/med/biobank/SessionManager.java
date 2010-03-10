@@ -194,8 +194,8 @@ public class SessionManager {
         return rootNode;
     }
 
-    public SiteWrapper getCurrentSiteWrapper() {
-        return siteManager.getCurrentSiteWrapper();
+    public SiteWrapper getCurrentSite() {
+        return siteManager.getCurrentSite();
     }
 
     public void setSiteManagerEnabled(boolean enable) {

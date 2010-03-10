@@ -18,7 +18,7 @@ public class ClinicAddHandler extends AbstractHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-            .searchNode(SessionManager.getInstance().getCurrentSiteWrapper());
+            .searchNode(SessionManager.getInstance().getCurrentSite());
         Assert.isNotNull(siteAdapter);
 
         ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());

@@ -61,7 +61,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (ShipmentAdapter) adapter;
         shipmentWrapper = shipmentAdapter.getWrapper();
-        site = SessionManager.getInstance().getCurrentSiteWrapper();
+        site = SessionManager.getInstance().getCurrentSite();
         try {
             shipmentWrapper.reload();
         } catch (Exception e) {
