@@ -459,7 +459,8 @@ public class ReportsEditor extends EditorPart {
             100 });
         columnWidths.put(PatientVisitSummary.class, new int[] { 100, 100, 100,
             100, 100, 100, 100, 100, 100 });
-        columnWidths.put(PatientWBC.class, new int[] { 100, 100, 100, 100 });
+        columnWidths.put(PatientWBC.class,
+            new int[] { 100, 100, 100, 100, 100 });
         columnWidths.put(QACabinetSamples.class, new int[] { 100, 100, 100,
             100, 100, 100 });
         columnWidths.put(QAFreezerSamples.class, new int[] { 100, 100, 100,

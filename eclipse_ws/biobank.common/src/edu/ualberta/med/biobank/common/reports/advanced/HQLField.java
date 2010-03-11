@@ -37,7 +37,7 @@ public class HQLField {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
