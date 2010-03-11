@@ -126,7 +126,7 @@ public class ReportsEditor extends EditorPart {
                         public void run() {
                             try {
                                 SiteWrapper site = SessionManager.getInstance()
-                                    .getCurrentSiteWrapper();
+                                    .getCurrentSite();
                                 String op = "=";
                                 if (site.getName().compareTo("All Sites") == 0)
                                     op = "!=";
@@ -423,8 +423,7 @@ public class ReportsEditor extends EditorPart {
 
         reportData = new ArrayList<Object>();
         queryClass = ((ReportInput) input).query;
-        SiteWrapper siteWrap = SessionManager.getInstance()
-            .getCurrentSiteWrapper();
+        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
         String op = "=";
         if (siteWrap.getName().compareTo("All Sites") == 0)
             op = "!=";
@@ -486,7 +485,7 @@ public class ReportsEditor extends EditorPart {
         top = new Composite(parent, SWT.NONE);
         top.setLayout(new GridLayout());
 
-        SiteWrapper site = SessionManager.getInstance().getCurrentSiteWrapper();
+        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         List<Option> queryOptions = query.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
