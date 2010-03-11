@@ -198,6 +198,10 @@
       <command id="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
             name="Delete tree view selection">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.search"
+            name="Search">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -305,11 +309,9 @@
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
          <activeWhen>
-           <and>
             <reference
                   definitionId="biobank2.loggedIn">
             </reference>
-           </and>
          </activeWhen>
       </handler>
       <handler
@@ -470,22 +472,27 @@
             class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
             commandId="edu.ualberta.med.biobank.commands.sessionReload">
          <activeWhen>
-            <and>
                <reference
                      definitionId="biobank2.loggedIn">
                </reference>
-            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.SessionDeleteSelectionHandler"      
             commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection">
          <activeWhen>
-            <and>
                <reference
                      definitionId="biobank2.loggedIn">
                </reference>
-            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SearchHandler"
+            commandId="edu.ualberta.med.biobank.commands.search">
+         <activeWhen>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
          </activeWhen>
       </handler>
    </extension>
@@ -734,6 +741,12 @@
             <control
                   class="edu.ualberta.med.biobank.rcp.SiteCombo">
             </control>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  tooltip="Search">
+            </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -1468,6 +1481,13 @@
             icon="icons/shipmentPerpective.png"
             id="edu.ualberta.med.biobank.views.shipmentAdmin"
             name="Shipments administration"
+            restorable="true">
+      </view>
+      <view
+            class="edu.ualberta.med.biobank.views.SearchView"
+            icon="icons/search.png"
+            id="edu.ualberta.med.biobank.views.search"
+            name="Search"
             restorable="true">
       </view>
    </extension>
