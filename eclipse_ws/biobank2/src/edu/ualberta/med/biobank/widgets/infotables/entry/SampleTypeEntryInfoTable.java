@@ -150,7 +150,6 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
                     setCollection(selectedSampleTypes);
                     deletedSampleTypes.add(sampleType);
-                    notifyListeners();
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {

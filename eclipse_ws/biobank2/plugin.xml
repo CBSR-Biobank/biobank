@@ -1087,7 +1087,7 @@
                id="edu.ualberta.med.biobank.views.ReportsView"
                minimized="false"
                moveable="false"
-               ratio="0.95"
+               ratio="0.4"
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
@@ -1356,6 +1356,13 @@
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.ShipmentViewForm"
             name="Shipment View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ReportsEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.ReportsEditor"
+            name="Reports Editor">
       </editor>
    </extension>
    <extension

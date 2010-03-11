@@ -462,103 +462,82 @@ public class AdvancedReportsView extends ViewPart {
                     menuItem.dispose();
                 }
 
-                final Object element = ((StructuredSelection) tree
-                    .getSelection()).getFirstElement();
-                if (element != null) {
+                Object element = ((StructuredSelection) tree.getSelection())
+                    .getFirstElement();
+                final QueryTreeNode node = (QueryTreeNode) element;
+                if (node != null && node.getParent() != null) {
                     MenuItem mi = new MenuItem(menu, SWT.NONE);
                     mi.setText("OR");
                     mi.addSelectionListener(new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent event) {
-                            QueryTreeNode selectedNode = ((QueryTreeNode) element);
                             QueryTreeNode newOperator = new QueryTreeNode(
-                                new HQLField(selectedNode.getNodeInfo()
-                                    .getPath(), "OR", String.class));
-                            QueryTreeNode parent = selectedNode.getParent();
-                            parent.removeChild(selectedNode);
+                                new HQLField(node.getNodeInfo().getPath(),
+                                    "OR", String.class));
+                            QueryTreeNode parent = node.getParent();
+                            parent.removeChild(node);
                             parent.addChild(newOperator);
                             newOperator.setParent(parent);
-                            newOperator.addChild(selectedNode);
-                            selectedNode.setParent(newOperator);
-                            QueryTreeNode copy = selectedNode.clone();
+                            newOperator.addChild(node);
+                            node.setParent(newOperator);
+                            QueryTreeNode copy = node.clone();
                             newOperator.addChild(copy);
                             copy.setParent(newOperator);
                             tree.refresh(true);
                         }
                     });
-                    if (((QueryTreeNode) element).getNodeInfo().getType() == String.class) {
+                    if (node.getNodeInfo().getType() == String.class) {
                         MenuItem mi2 = new MenuItem(menu, SWT.NONE);
                         mi2.setText("Remove Node");
                         mi2.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
-                                QueryTreeNode parent = selectedNode.getParent();
-                                List<QueryTreeNode> children = selectedNode
+                                QueryTreeNode parent = node.getParent();
+                                List<QueryTreeNode> children = node
                                     .getChildren();
                                 QueryTreeNode child = children.get(0);
                                 child.setParent(parent);
-                                selectedNode.removeChild(child);
+                                node.removeChild(child);
                                 parent.addChild(child);
-                                parent.removeChild(selectedNode);
+                                parent.removeChild(node);
                                 tree.refresh(true);
                             }
                         });
                     }
-                    if (((QueryTreeNode) element).getNodeInfo().getFname()
-                        .contains("Collection")) {
-
+                    if (node.getNodeInfo().getFname().contains("Collection")
+                        && !((node.getParent().getLabel().compareTo("All") == 0) || (node
+                            .getParent().getLabel().compareTo("None") == 0))) {
                         MenuItem mi3 = new MenuItem(menu, SWT.NONE);
                         mi3.setText("All");
                         mi3.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
                                 QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(selectedNode.getNodeInfo()
-                                        .getPath(), "All", String.class));
-                                QueryTreeNode parent = selectedNode.getParent();
-                                parent.removeChild(selectedNode);
+                                    new HQLField(node.getNodeInfo().getPath(),
+                                        "All", String.class));
+                                QueryTreeNode parent = node.getParent();
+                                parent.removeChild(node);
                                 parent.addChild(newOperator);
                                 newOperator.setParent(parent);
-                                newOperator.addChild(selectedNode);
-                                selectedNode.setParent(newOperator);
+                                newOperator.addChild(node);
+                                node.setParent(newOperator);
                                 tree.refresh(true);
                             }
                         });
                         MenuItem mi4 = new MenuItem(menu, SWT.NONE);
-                        mi4.setText("No");
+                        mi4.setText("None");
                         mi4.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
                                 QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(selectedNode.getNodeInfo()
-                                        .getPath(), "No", String.class));
-                                QueryTreeNode parent = selectedNode.getParent();
-                                parent.removeChild(selectedNode);
+                                    new HQLField(node.getNodeInfo().getPath(),
+                                        "None", String.class));
+                                QueryTreeNode parent = node.getParent();
+                                parent.removeChild(node);
                                 parent.addChild(newOperator);
                                 newOperator.setParent(parent);
-                                newOperator.addChild(selectedNode);
-                                selectedNode.setParent(newOperator);
-                                tree.refresh(true);
-                            }
-                        });
-                        MenuItem mi5 = new MenuItem(menu, SWT.NONE);
-                        mi5.setText("One or more");
-                        mi5.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode selectedNode = ((QueryTreeNode) element);
-                                QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(selectedNode.getNodeInfo()
-                                        .getPath(), "One or more", String.class));
-                                QueryTreeNode parent = selectedNode.getParent();
-                                parent.removeChild(selectedNode);
-                                parent.addChild(newOperator);
-                                newOperator.setParent(parent);
-                                newOperator.addChild(selectedNode);
-                                selectedNode.setParent(newOperator);
+                                newOperator.addChild(node);
+                                node.setParent(newOperator);
                                 tree.refresh(true);
                             }
                         });
