@@ -49,7 +49,7 @@ public class PvInfoWidget extends BiobankWidget {
         private static final long serialVersionUID = 1L;
         {
             put(
-                "Visit",
+                "Visit Type",
                 new LabelDialogInfo("Visit Type Values",
                     "Please enter a visit type:",
                     "To enter multiple visit type values, separate with semicolon."));
