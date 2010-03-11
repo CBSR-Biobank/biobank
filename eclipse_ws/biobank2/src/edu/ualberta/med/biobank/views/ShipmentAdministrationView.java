@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class ShipmentAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.shipmentAdmin";
+    public static final String ID = "edu.ualberta.med.biobank.views.ShipmentAdminView";
 
     public static ShipmentAdministrationView currentInstance;
 

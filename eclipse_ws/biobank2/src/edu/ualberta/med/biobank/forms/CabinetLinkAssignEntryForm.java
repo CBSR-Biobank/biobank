@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
+public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
@@ -445,7 +445,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         appendLog("Getting informations for inventoryID "
             + sampleWrapper.getInventoryId());
-        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
             appService, sampleWrapper.getInventoryId(), SessionManager
                 .getInstance().getCurrentSite());
         if (samples.size() > 1) {

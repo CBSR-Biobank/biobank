@@ -57,7 +57,7 @@ import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
-public class ScanAssignEntryForm extends AbstractPatientAdminForm {
+public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ScanAssignEntryForm.class.getName());
@@ -439,7 +439,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 positionString, logMsg);
             return false;
         }
-        List<AliquotWrapper> aliquots = AliquotWrapper.getSamplesInSite(
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
             appService, value, SessionManager.getInstance()
                 .getCurrentSite());
         if (aliquots.size() == 0) {
