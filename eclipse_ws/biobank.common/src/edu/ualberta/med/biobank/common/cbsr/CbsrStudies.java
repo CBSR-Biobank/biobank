@@ -67,6 +67,8 @@ public class CbsrStudies {
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Disabled", "Precath visit - only urine is collected");
+        addStudy(site, "Heart failure Etiology and Analysis Research Team",
+            "HEART", "Active", null);
         addStudy(site, "Kidney Disease Cohort Study", "KDCS", "Active", null);
         addStudy(site, "Kingston Merger Study", "KMS", "Active", null);
         addStudy(site, "Man-Chui Poon Study", "MPS", "Active", null);
@@ -208,6 +210,21 @@ public class CbsrStudies {
         addSampleStorage("ERCIN", "C Urine", 6, 0.9);
         addSampleStorage("ERCIN", "Serum", null, null);
         addSampleStorage("ERCIN", "Serum B", 12, 0.4);
+
+        addSampleStorage("HEART", "LH PFP 200", null, null);
+        addSampleStorage("HEART", "UrineC900", null, null);
+        addSampleStorage("HEART", "PlasmaE800", null, null);
+        addSampleStorage("HEART", "P100 500", null, null);
+        addSampleStorage("HEART", "PlasmaL500", null, null);
+        addSampleStorage("HEART", "LH PFP 500", null, null);
+        addSampleStorage("HEART", "PlasmaE200", null, null);
+        addSampleStorage("HEART", "DNA L 1000", null, null);
+        addSampleStorage("HEART", "SerumG500", null, null);
+        addSampleStorage("HEART", "PlasmaL200", null, null);
+        addSampleStorage("HEART", "DNA E 1000", null, null);
+        addSampleStorage("HEART", "PlasmaE500", null, null);
+        addSampleStorage("HEART", "UrineSA900", null, null);
+
         addSampleStorage("KDCS", "S Water", 3, 0.9);
         addSampleStorage("KDCS", "Cells", 10, 0.4);
         addSampleStorage("KDCS", "Paxgene", 11, 0.8);
