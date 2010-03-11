@@ -22,6 +22,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -66,6 +67,7 @@ import edu.ualberta.med.biobank.common.reports.PatientWBC;
 import edu.ualberta.med.biobank.common.reports.QACabinetSamples;
 import edu.ualberta.med.biobank.common.reports.QAFreezerSamples;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.SampleCount;
 import edu.ualberta.med.biobank.common.reports.SampleInvoiceByClinic;
 import edu.ualberta.med.biobank.common.reports.SampleInvoiceByPatient;
@@ -77,6 +79,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
@@ -103,7 +106,7 @@ public class ReportsEditor extends EditorPart {
 
     private QueryObject query;
 
-    private Class<? extends QueryObject> queryClass;
+    private ReportTreeNode node;
 
     private static Map<Class<?>, int[]> columnWidths;
 
@@ -130,8 +133,9 @@ public class ReportsEditor extends EditorPart {
                                 String op = "=";
                                 if (site.getName().compareTo("All Sites") == 0)
                                     op = "!=";
-                                query = queryClass.getConstructor(String.class,
-                                    Integer.class).newInstance(
+                                query = (QueryObject) ((Class<?>) (node
+                                    .getObjClass())).getConstructor(
+                                    String.class, Integer.class).newInstance(
                                     new Object[] { op, site.getId() });
                                 reportData = query.generate(SessionManager
                                     .getAppService(), params);
@@ -422,15 +426,16 @@ public class ReportsEditor extends EditorPart {
         setInput(input);
 
         reportData = new ArrayList<Object>();
-        queryClass = ((ReportInput) input).query;
+        node = (ReportTreeNode) ((ReportInput) input).node;
         SiteWrapper siteWrap = SessionManager.getInstance()
             .getCurrentSiteWrapper();
         String op = "=";
         if (siteWrap.getName().compareTo("All Sites") == 0)
             op = "!=";
         try {
-            query = queryClass.getConstructor(String.class, Integer.class)
-                .newInstance(new Object[] { op, siteWrap.getId() });
+            query = (QueryObject) node.getObjClass().getConstructor(
+                String.class, Integer.class).newInstance(
+                new Object[] { op, siteWrap.getId() });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -595,8 +600,6 @@ public class ReportsEditor extends EditorPart {
 
     @Override
     public void setFocus() {
-        // TODO Auto-generated method stub
-
+        ReportsView.getTree().setSelection(new StructuredSelection(node));
     }
-
 }
