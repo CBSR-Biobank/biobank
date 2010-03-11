@@ -5,6 +5,15 @@
    * this script is used to test the information for samples selected at random.
    */
 
+$progname = basename($argv[0]);
+
+$usage = <<<USAGE_END
+  USAGE: {$progname} CSV_FILE
+
+  Retrieves inventory IDs from the 10th column in CSV_FILE and outputs the corresponding fields
+  in the BioBank2 database.
+USAGE_END;
+
 $cbsr = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
 function main() {
@@ -29,13 +38,11 @@ and study_pv_attr.label='Worksheet'
                      'worksheet', 'fnum', 'rack', 'box', 'cell', 'inventory_id');
 
    if ($GLOBALS['argc'] != 2) {
-      die("invalid arguments");
+      die($GLOBALS['usage']);
    }
 
    $csvfile = $GLOBALS['argv'][1];
    $inventory_ids = getInventoryIds($csvfile);
-   $chr2patientNr = getPatientNrs();
-   $chr2visitNr = getVisitNrs($inventory_ids);
 
    mysql_connect("localhost", "dummy", "ozzy498") or die(mysql_error());
    mysql_select_db("biobank2") or die(mysql_error());
@@ -43,7 +50,7 @@ and study_pv_attr.label='Worksheet'
    echo implode(",", $headings), "\n";
 
 
-   foreach ($inventory_ids as $inv_id) {
+   foreach (array_keys($inventory_ids) as $inv_id) {
       $query = str_replace(array('{inv_id}'), array($inv_id), $default_query);
       $result = mysql_query($query)  or die(mysql_error());
 
@@ -67,8 +74,8 @@ and study_pv_attr.label='Worksheet'
          }
 
          $data = array(
-            'patient_nr' => $chr2patientNr[$row['PNUMBER']],
-            'visit_nr' => $chr2visitNr[$row['INVENTORY_ID']],
+            'patient_nr' => $inventory_ids[$inv_id]['patient_nr'],
+            'visit_nr' => $inventory_ids[$inv_id]['visit_nr'],
             'date_taken' => date('d-M-y', strtotime($row['DATE_DRAWN'])),
             'date_received'=> date('d-M-y', strtotime($row['DATE_PROCESSED'])),
             'worksheet' => '"' . $row['VALUE'] . '"',
@@ -94,7 +101,7 @@ function getInventoryIds($filename) {
       if ($num != 10) {
          throw new Exception("invalid field count at line $row");
       }
-      $inventory_ids[] = $data[9];
+      $inventory_ids[$data[9]] = array('patient_nr' => $data[0], 'visit_nr' => $data[1]);
       $row++;
    }
    fclose($handle);
@@ -193,39 +200,6 @@ function getFrz4Label($hotel, $pallet) {
          break;
    }
    return array('hotel' => 3 * $group + $hotelOffset, 'pallet' => $pallet);
-}
-
-function getPatientNrs() {
-   mysql_connect("localhost", "dummy", "ozzy498") or die(mysql_error());
-   mysql_select_db("bbpdb") or die(mysql_error());
-   $result = mysql_query("select patient_nr, dec_chr_nr from patient")
-      or die(mysql_error());
-
-   $chr2patientNr = array();
-   while($row = mysql_fetch_array($result)) {
-      $chr2patientNr[$row['dec_chr_nr']] = $row['patient_nr'];
-   }
-   mysql_close();
-   return $chr2patientNr;
-}
-
-function getVisitNrs($inventory_ids) {
-   mysql_connect("localhost", "dummy", "ozzy498") or die(mysql_error());
-   mysql_select_db("bbpdb") or die(mysql_error());
-
-   $chr2visitNr = array();
-   foreach ($inventory_ids as $inv_id) {
-      $result = mysql_query("
-            select visit_nr, inventory_id from freezer
-            where inventory_id like binary '$inv_id'")
-         or die(mysql_error());
-
-      while($row = mysql_fetch_array($result)) {
-         $chr2visitNr[$row['inventory_id']] = $row['visit_nr'];
-      }
-   }
-   mysql_close();
-   return $chr2visitNr;
 }
 
 main();
