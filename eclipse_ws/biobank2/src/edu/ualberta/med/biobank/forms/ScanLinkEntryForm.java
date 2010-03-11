@@ -72,7 +72,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 /**
  * Link samples to a patient visit
  */
-public class ScanLinkEntryForm extends AbstractPatientAdminForm {
+public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm";
 
@@ -614,7 +614,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
+                List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
                     appService, value, SessionManager.getInstance()
                         .getCurrentSite());
                 if (samples.size() > 0) {

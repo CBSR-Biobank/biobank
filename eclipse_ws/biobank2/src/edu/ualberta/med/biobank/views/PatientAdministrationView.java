@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class PatientAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.patientsAdmin";
+    public static final String ID = "edu.ualberta.med.biobank.views.PatientsAdminView";
 
     public static PatientAdministrationView currentInstance;
 

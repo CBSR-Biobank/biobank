@@ -8,7 +8,7 @@ import org.eclipse.ui.IPerspectiveFactory;
  */
 public class AliquotManagementPerspective implements IPerspectiveFactory {
 
-    public final static String ID = "edu.ualberta.med.biobank.perspective.samplesManagement";
+    public final static String ID = "edu.ualberta.med.biobank.perspective.aliquotsManagement";
 
     @Override
     public void createInitialLayout(IPageLayout layout) {

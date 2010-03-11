@@ -1267,7 +1267,7 @@ public class Importer {
 
     public static boolean inventoryIdUnique(String inventoryId)
         throws Exception {
-        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
             appService, inventoryId, cbsrSite);
         if (samples.size() == 0)
             return true;

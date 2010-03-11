@@ -8,6 +8,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -42,6 +43,8 @@ public class AliquotViewForm extends BiobankViewForm {
     private Text visitLabel;
 
     private Text commentLabel;
+
+    private Text positionLabel;
 
     @Override
     public void init() {
@@ -90,15 +93,15 @@ public class AliquotViewForm extends BiobankViewForm {
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
         visitLabel = createReadOnlyField(client, SWT.NONE, "Patient Visit");
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
+        positionLabel = createReadOnlyField(client, SWT.WRAP, "Position");
     }
 
     private void createContainersSection() {
-        Composite containersComposite = toolkit.createComposite(form.getBody());
+        Section section = createSection("Containers Visualization");
+        Composite containersComposite = toolkit.createComposite(section);
+        section.setClient(containersComposite);
+        section.setExpanded(false);
         containersComposite.setLayout(new GridLayout(1, false));
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        containersComposite.setLayoutData(gd);
         toolkit.paintBordersFor(containersComposite);
 
         Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
@@ -144,6 +147,7 @@ public class AliquotViewForm extends BiobankViewForm {
         setTextValue(visitLabel, DateFormatter.formatAsDateTime(aliquot
             .getPatientVisit().getDateProcessed()));
         setTextValue(commentLabel, aliquot.getComment());
+        setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
 
     @Override

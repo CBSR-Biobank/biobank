@@ -33,7 +33,7 @@ public class AliquotHelper extends DbHelper {
         return sample;
     }
 
-    public static AliquotWrapper addSample(SampleTypeWrapper sampleType,
+    public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
         AliquotWrapper sample = newAliquot(sampleType, container, pv, row, col);

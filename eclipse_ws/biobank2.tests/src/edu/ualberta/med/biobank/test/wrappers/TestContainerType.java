@@ -564,8 +564,8 @@ public class TestContainerType extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null);
-        AliquotHelper.addSample(selectedSampleTypes.get(0), cont3, pv, 0, 0);
-        AliquotWrapper sample = AliquotHelper.addSample(selectedSampleTypes
+        AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
+        AliquotWrapper sample = AliquotHelper.addAliquot(selectedSampleTypes
             .get(1), cont3, pv, 0, 1);
 
         childTypeL3

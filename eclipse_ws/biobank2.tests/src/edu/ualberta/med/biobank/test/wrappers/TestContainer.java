@@ -905,7 +905,7 @@ public class TestContainer extends TestDatabase {
                     // attempt to add invalid sample type
                     sampleType = unselectedSampleTypes.get(r
                         .nextInt(unselectedSampleTypes.size()));
-                    Assert.assertNull(childL3.getSample(row, col));
+                    Assert.assertNull(childL3.getAliquot(row, col));
                     try {
                         childL3.addAliquot(row, col, AliquotHelper
                             .newSample(sampleType));
@@ -920,7 +920,7 @@ public class TestContainer extends TestDatabase {
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
                 childL3.addAliquot(row, col, AliquotHelper
                     .newSample(sampleType));
-                AliquotWrapper sample = childL3.getSample(row, col);
+                AliquotWrapper sample = childL3.getAliquot(row, col);
                 sample.setPatientVisit(pv);
                 sample.persist();
             }
@@ -955,17 +955,17 @@ public class TestContainer extends TestDatabase {
 
         for (int row = 0, maxRow = childL3.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
-                AliquotWrapper sample = childL3.getSample(row, col);
+                AliquotWrapper sample = childL3.getAliquot(row, col);
                 Assert.assertEquals(samplesTypesMap
                     .get(new RowColPos(row, col)), sample.getSampleType());
                 sample.delete();
                 childL3.reload();
-                Assert.assertNull(childL3.getSample(row, col));
+                Assert.assertNull(childL3.getAliquot(row, col));
             }
         }
 
         try {
-            childL3.getSample(CONTAINER_CHILD_L3_ROWS + 1,
+            childL3.getAliquot(CONTAINER_CHILD_L3_ROWS + 1,
                 CONTAINER_CHILD_L3_COLS);
             Assert.fail("should not be allowed to get children beyond limit");
         } catch (Exception e) {
@@ -973,7 +973,7 @@ public class TestContainer extends TestDatabase {
         }
 
         try {
-            childL3.getSample(CONTAINER_CHILD_L3_ROWS,
+            childL3.getAliquot(CONTAINER_CHILD_L3_ROWS,
                 CONTAINER_CHILD_L3_COLS + 1);
             Assert.fail("should not be allowed to get children beyond limit");
         } catch (Exception e) {
@@ -1353,7 +1353,7 @@ public class TestContainer extends TestDatabase {
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
         childL4.getContainerType().persist();
-        AliquotWrapper sample = AliquotHelper.addSample(sampleType, childL4,
+        AliquotWrapper sample = AliquotHelper.addAliquot(sampleType, childL4,
             pv, 0, 0);
 
         // attempt to delete the containers - should fail

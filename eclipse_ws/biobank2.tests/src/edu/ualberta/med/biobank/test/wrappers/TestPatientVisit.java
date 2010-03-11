@@ -205,7 +205,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        AliquotWrapper sample = AliquotHelper.addSample(allSampleTypes.get(0),
+        AliquotWrapper sample = AliquotHelper.addAliquot(allSampleTypes.get(0),
             containerMap.get("ChildL1"), visit, 0, 0);
         visit.reload();
 
@@ -249,7 +249,7 @@ public class TestPatientVisit extends TestDatabase {
                 if (r.nextGaussian() > 0.0)
                     continue;
                 // System.out.println("setting sample at: " + row + ", " + col);
-                sampleMap.put(row + col * rows, AliquotHelper.addSample(
+                sampleMap.put(row + col * rows, AliquotHelper.addAliquot(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
                     container, visit, row, col));
             }
