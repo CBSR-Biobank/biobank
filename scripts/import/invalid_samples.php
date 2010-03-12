@@ -5,40 +5,14 @@ main();
 
 function main() {
    $invalid_samples = array(
-      array("AHFEM", "RNA-Transverse Colon"),
-      array("BBPSP", "Cells"),
-      array("BBPSP", "DNA (White blood cells)"),
-      array("BBPSP", "Filtered Urine"),
-      array("BBPSP", "RNAlater Biopsies"),
-      array("BBPSP", "Serum"),
-      array("BBPSP", "Serum (Beige top)"),
-      array("BBPSP", "Urine"),
-      array("CCCS", "Serum"),
-      array("CEGIIR", "Centrifuged Urine"),
-      array("CEGIIR", "Hemodialysate"),
-      array("CEGIIR", "Serum"),
-      array("CEGIIR", "Urine"),
-      array("CEGIIR", "Whole Blood EDTA"),
-      array("CHILD", "Cells"),
-      array("CHILD", "Serum (Beige top)"),
-      array("ERCIN", "Serum"),
-      array("KDCS", "Filtered Urine"),
-      array("KDCS", "RNAlater Biopsies"),
-      array("KDCS", "Urine"),
-      array("RVS", "Centrifuged Urine"),
-      array("RVS", "RNAlater Biopsies"),
-      array("RVS", "Serum (Beige top)"),
-      array("RVS", "Whole Blood EDTA"),
-      array("SPARK", "Urine"),
-      array("TCKS", "Centrifuged Urine"),
-      array("TCKS", "Filtered Urine"),
-      array("TCKS", "Hemodialysate"),
-      array("TCKS", "Serum"),
-      array("TCKS", "Urine"),
-      array("TCKS", "WB DMSO"),
-      array("VAS", "Finger Nails"),
-      array("VAS", "Hemodialysate"),
-      array("VAS", "Toe Nails")
+      array("BBPSP","DNA (White blood cells)"),
+      array("BBPSP","RNAlater Biopsies"),
+      array("CEGIIR","Whole Blood EDTA"),
+      array("KDCS","RNAlater Biopsies"),
+      array("RVS","RNAlater Biopsies"),
+      array("VAS","Finger Nails"),
+      array("VAS","Hair"),
+      array("VAS","Toe Nails")
       );
 
    $old_study_name = array("BBPSP" => "BBP");
@@ -53,7 +27,6 @@ function main() {
       'inventory_id', 'study_name_short', 'sample_name');
 
    $queries = array(
-      /*
       "select *
 from freezer
 join patient_visit on patient_visit.visit_nr=freezer.visit_nr
@@ -69,7 +42,6 @@ join study_list on study_list.study_nr=patient_visit.study_nr
 join sample_list on sample_list.sample_nr=cabinet.sample_nr
 where study_list.study_name_short='{study}'
 and sample_list.sample_name='{sample_type}'",
-      */
 
       "select fnum, rack, box, cell, patient_visit.patient_nr,
 patient_visit.visit_nr, date_received, freezer_link.inventory_id,

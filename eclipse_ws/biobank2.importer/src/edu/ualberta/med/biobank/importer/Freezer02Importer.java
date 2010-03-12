@@ -37,6 +37,7 @@ public class Freezer02Importer extends FreezerImporter {
         PreparedStatement ps;
         String hotelLabel;
         String dateProcessedStr;
+        String dateTakenStr;
         String palletPos;
         String sampleTypeNameShort;
         String inventoryId;
@@ -73,6 +74,7 @@ public class Freezer02Importer extends FreezerImporter {
                 studyNameShort = rs.getString(3);
                 patientNr = cipher.decode(rs.getBytes(17));
                 dateProcessedStr = rs.getString(1);
+                dateTakenStr = rs.getString(2);
                 palletNr = rs.getInt(7);
                 palletPos = rs.getString(15);
                 inventoryId = rs.getString(11);
@@ -95,8 +97,8 @@ public class Freezer02Importer extends FreezerImporter {
                     .length() - 2));
 
                 importSample(studyNameShort, patientNr, dateProcessedStr,
-                    newHotel, newPalletNr, palletPos, inventoryId,
-                    sampleTypeNameShort, linkDateStr, quantity);
+                    dateTakenStr, newHotel, newPalletNr, palletPos,
+                    inventoryId, sampleTypeNameShort, linkDateStr, quantity);
             }
         }
 
@@ -122,6 +124,7 @@ public class Freezer02Importer extends FreezerImporter {
                 studyNameShort = rs.getString(3);
                 patientNr = cipher.decode(rs.getBytes(17));
                 dateProcessedStr = rs.getString(1);
+                dateTakenStr = rs.getString(2);
                 palletNr = rs.getInt(7);
                 palletPos = rs.getString(15);
                 inventoryId = rs.getString(11);
@@ -144,8 +147,8 @@ public class Freezer02Importer extends FreezerImporter {
                     .length() - 2));
 
                 importSample(studyNameShort, patientNr, dateProcessedStr,
-                    newHotel, newPalletNr, palletPos, inventoryId,
-                    sampleTypeNameShort, linkDateStr, quantity);
+                    dateTakenStr, newHotel, newPalletNr, palletPos,
+                    inventoryId, sampleTypeNameShort, linkDateStr, quantity);
             }
         }
 
