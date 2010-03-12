@@ -378,6 +378,7 @@ public class TestSite extends TestDatabase {
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        site.setNameShort(name);
         site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
 
@@ -412,7 +413,7 @@ public class TestSite extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        site.setName("Other Name");
+        site.setName("Other Name" + r.nextInt());
         site.persist();
         int newTotal = SiteWrapper.getSites(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
@@ -424,6 +425,7 @@ public class TestSite extends TestDatabase {
         String name = "testPersistFailNoAddress" + r.nextInt();
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        site.setNameShort(name);
         site.setCity("Vesoul");
 
         try {
