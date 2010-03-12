@@ -140,13 +140,15 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     /**
      * Search patient visits with the given date processed.
      */
-    public List<PatientVisitWrapper> getVisits(Date dateProcessed)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select visits from "
-            + Patient.class.getName()
-            + " as p left join p.patientVisitCollection as visits"
-            + " where p.id = ? and visits.dateProcessed = ?", Arrays
-            .asList(new Object[] { getId(), dateProcessed }));
+    public List<PatientVisitWrapper> getVisits(Date dateProcessed,
+        Date dateDrawn) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select visits from "
+                + Patient.class.getName()
+                + " as p left join p.patientVisitCollection as visits"
+                + " join visits.pvSourceVesselCollection as ss"
+                + " where p.id = ? and visits.dateProcessed = ? and ss.dateDrawn = ?",
+            Arrays.asList(new Object[] { getId(), dateProcessed, dateDrawn }));
         List<PatientVisit> visits = appService.query(criteria);
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
         for (PatientVisit visit : visits) {

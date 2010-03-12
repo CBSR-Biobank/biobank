@@ -23,6 +23,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -100,6 +101,8 @@ public class ReportsEditor extends EditorPart {
 
     private Button printButton;
     private Button exportButton;
+
+    private ScrolledComposite sc;
 
     private QueryObject query;
 
@@ -186,6 +189,7 @@ public class ReportsEditor extends EditorPart {
                             reportTable.setLayoutData(gd);
                             setEnabled(true);
                             top.layout();
+                            updateScrollBars();
                         }
                     });
 
@@ -482,7 +486,13 @@ public class ReportsEditor extends EditorPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        top = new Composite(parent, SWT.NONE);
+        sc = new ScrolledComposite(parent, SWT.V_SCROLL);
+        sc.setLayout(new GridLayout(1, false));
+        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        sc.setExpandHorizontal(true);
+        sc.setExpandVertical(true);
+
+        top = new Composite(sc, SWT.NONE);
         top.setLayout(new GridLayout());
 
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
@@ -590,6 +600,15 @@ public class ReportsEditor extends EditorPart {
         parameterSection.moveAbove(buttonSection);
         top.layout(true, true);
 
+        top.layout();
+        sc.setContent(top);
+        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
+    }
+
+    public void updateScrollBars() {
+        sc.layout(true, true);
+        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     @Override

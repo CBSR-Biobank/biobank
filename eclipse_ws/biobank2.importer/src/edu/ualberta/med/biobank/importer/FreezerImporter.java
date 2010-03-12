@@ -102,6 +102,7 @@ public class FreezerImporter {
     protected void processResultSet(ResultSet rs, ContainerWrapper hotel)
         throws Exception {
         String dateProcessedStr;
+        String dateTakenStr;
         String palletPos;
         String sampleTypeNameShort;
         String inventoryId;
@@ -116,6 +117,7 @@ public class FreezerImporter {
             studyNameShort = rs.getString(3);
             patientNr = cipher.decode(rs.getBytes(17));
             dateProcessedStr = rs.getString(1);
+            dateTakenStr = rs.getString(2);
             palletNr = rs.getInt(7);
             palletPos = rs.getString(15);
             inventoryId = rs.getString(11);
@@ -123,16 +125,17 @@ public class FreezerImporter {
             linkDateStr = rs.getString(12);
             volume = rs.getDouble(16);
 
-            importSample(studyNameShort, patientNr, dateProcessedStr, hotel,
-                palletNr, palletPos, inventoryId, sampleTypeNameShort,
-                linkDateStr, volume);
+            importSample(studyNameShort, patientNr, dateProcessedStr,
+                dateTakenStr, hotel, palletNr, palletPos, inventoryId,
+                sampleTypeNameShort, linkDateStr, volume);
         }
     }
 
     protected void importSample(String studyNameShort, String patientNr,
-        String dateProcessedStr, ContainerWrapper hotel, int palletNr,
-        String palletPos, String inventoryId, String sampleTypeNameShort,
-        String linkDateStr, Double quantity) throws Exception {
+        String dateProcessedStr, String dateTakenStr, ContainerWrapper hotel,
+        int palletNr, String palletPos, String inventoryId,
+        String sampleTypeNameShort, String linkDateStr, Double quantity)
+        throws Exception {
 
         if (palletNr > hotel.getRowCapacity()) {
             logger.error("pallet number is invalid: " + " hotel/"
@@ -178,12 +181,15 @@ public class FreezerImporter {
         study.getSampleStorageCollection();
 
         Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
+        Date dateTaken = Importer.getDateFromStr(dateTakenStr);
 
-        List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed);
+        List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed,
+            dateTaken);
 
         if (visits.size() == 0) {
             logger.error("patient " + patientNr + ", visit not found for date "
-                + DateFormatter.formatAsDateTime(dateProcessed));
+                + DateFormatter.formatAsDateTime(dateProcessed) + " "
+                + DateFormatter.formatAsDateTime(dateTaken));
             return;
         } else if (visits.size() > 1) {
             logger.info("patient " + patientNr + ", multiple visits for date "

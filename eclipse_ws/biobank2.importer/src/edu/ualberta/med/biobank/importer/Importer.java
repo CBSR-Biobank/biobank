@@ -1023,6 +1023,8 @@ public class Importer {
         List<PatientVisitWrapper> visits;
         String dateProcessedStr;
         Date dateProcessed;
+        String dateTakenStr;
+        Date dateTaken;
         SampleTypeWrapper sampleType;
         String binLabel;
         RowColPos binPos;
@@ -1147,9 +1149,11 @@ public class Importer {
 
                     dateProcessedStr = rs.getString(2);
                     dateProcessed = getDateFromStr(dateProcessedStr);
+                    dateTakenStr = rs.getString(3);
+                    dateTaken = getDateFromStr(dateTakenStr);
 
                     // always get the first visit
-                    visits = patient.getVisits(dateProcessed);
+                    visits = patient.getVisits(dateProcessed, dateTaken);
 
                     if (visits.size() == 0) {
                         logger.error("patient " + patientNr
