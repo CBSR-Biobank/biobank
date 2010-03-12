@@ -559,8 +559,8 @@
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
+                     icon="icons/clinics_add.png"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
-                  icon="icons/clinics_add.png"
                      label="Add Clinic"
                      style="push">
                </command>
