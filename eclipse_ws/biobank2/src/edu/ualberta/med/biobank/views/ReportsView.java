@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -37,7 +36,6 @@ public class ReportsView extends ViewPart {
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
     public static ReportsView reportsView;
 
-    private ScrolledComposite sc;
     private Composite top;
 
     private TreeViewer querySelect;
@@ -52,13 +50,7 @@ public class ReportsView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        sc = new ScrolledComposite(parent, SWT.V_SCROLL);
-        sc.setLayout(new GridLayout(1, false));
-        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        sc.setExpandHorizontal(true);
-        sc.setExpandVertical(true);
-
-        top = new Composite(sc, SWT.BORDER);
+        top = new Composite(parent, SWT.BORDER);
         top.setLayout(new GridLayout());
         top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -183,16 +175,6 @@ public class ReportsView extends ViewPart {
         qgd.grabExcessHorizontalSpace = true;
         qgd.grabExcessVerticalSpace = true;
         querySelect.getTree().setLayoutData(qgd);
-
-        top.layout();
-        sc.setContent(top);
-        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-    }
-
-    public void updateScrollBars() {
-        sc.layout(true, true);
-        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     @Override

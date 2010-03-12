@@ -577,9 +577,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         });
 
         pageLabel = new Label(paginationWidget, SWT.NONE);
-        GridData gd = new GridData(SWT.END, SWT.CENTER, false, false);
-        gd.widthHint = 80;
-        pageLabel.setLayoutData(gd);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -605,7 +602,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
-        gd = new GridData(SWT.END, SWT.TOP, true, true);
+        GridData gd = new GridData(SWT.END, SWT.TOP, true, true);
         gd.exclude = true;
         paginationWidget.setLayoutData(gd);
     }
@@ -673,12 +670,12 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         }
         setPageLabelText();
         setCollection(collection);
+        paginationWidget.layout(true);
     }
 
     private void setPageLabelText() {
         pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
             + pageInfo.pageTotal);
-        layout(true, true);
     }
 
     private void resizeTable() {

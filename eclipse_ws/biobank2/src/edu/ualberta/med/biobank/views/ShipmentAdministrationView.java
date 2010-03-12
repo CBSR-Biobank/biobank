@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class ShipmentAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.shipmentAdmin";
+    public static final String ID = "edu.ualberta.med.biobank.views.ShipmentAdminView";
 
     public static ShipmentAdministrationView currentInstance;
 
@@ -38,7 +38,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     protected Object search(String text) throws Exception {
         List<ShipmentWrapper> shipments = ShipmentWrapper.getShipmentsInSite(
             SessionManager.getAppService(), text, SessionManager.getInstance()
-                .getCurrentSiteWrapper());
+                .getCurrentSite());
         if (shipments.size() == 1) {
             return shipments.get(0);
         }
@@ -63,7 +63,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         rootNode.removeAll();
         ShipmentWrapper shipment = (ShipmentWrapper) searchedObject;
         currentSiteAdapter = new SiteAdapter(rootNode, SessionManager
-            .getInstance().getCurrentSiteWrapper(), false);
+            .getInstance().getCurrentSite(), false);
         rootNode.addChild(currentSiteAdapter);
         ClinicAdapter clinicAdapter = new ClinicAdapter(currentSiteAdapter,
             shipment.getClinic(), false);

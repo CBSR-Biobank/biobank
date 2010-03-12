@@ -59,3 +59,8 @@ FIND DUPLICATE INVENTORY IDS IN BBPDB
   where A.inv_id_count > 1 and fnum=3
   order by freezer.inventory_id
   
+ SAMPLE TYPES NOT USED BY STUDIES
+  select * from sample_type 
+  left join sample_storage on sample_storage.SAMPLE_TYPE_ID=sample_type.ID 
+  where sample_storage.id is null order by sample_type.NAME_SHORT
+  

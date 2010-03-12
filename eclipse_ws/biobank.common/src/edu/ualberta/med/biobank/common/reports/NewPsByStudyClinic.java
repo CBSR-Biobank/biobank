@@ -12,7 +12,7 @@ public class NewPsByStudyClinic extends QueryObject {
 
     protected static final String NAME = "New Patients per Study per Clinic by Date";
 
-    protected static final String query = "select pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed), count(*) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.dateProcessed=(select min(pvCollection.dateProcessed) from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection as pvCollection where p=pv.patient) and pv.patient.study.site {0} {1} group by pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed)";
+    protected static final String query = "select pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed), count(*) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.dateProcessed=(select min(pvCollection.dateProcessed) from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection as pvCollection where p=pv.patient) and pv.patient.study.site {0} {1,number,#} group by pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed)";
 
     public NewPsByStudyClinic(String op, Integer siteId) {
         super(

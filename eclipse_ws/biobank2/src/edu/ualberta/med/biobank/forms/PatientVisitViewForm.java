@@ -16,8 +16,8 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.widgets.infotables.PvSourceVesselInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.PvSourceVesselInfoTable;
 
 public class PatientVisitViewForm extends BiobankViewForm {
 
@@ -32,7 +32,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Text siteLabel;
 
-    private AliquotListInfoTable samplesWidget;
+    private AliquotListInfoTable aliquotWidget;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
@@ -165,12 +165,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void createSamplesSection() {
-        Composite parent = createSectionWithClient("Samples");
-        samplesWidget = new AliquotListInfoTable(parent, patientVisit
+        Composite parent = createSectionWithClient("Aliquots");
+        aliquotWidget = new AliquotListInfoTable(parent, patientVisit
             .getAliquotCollection());
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
-        samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotWidget.adaptToToolkit(toolkit, true);
+        aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
+        aliquotWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override

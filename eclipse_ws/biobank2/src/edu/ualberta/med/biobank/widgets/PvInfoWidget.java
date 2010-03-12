@@ -49,7 +49,7 @@ public class PvInfoWidget extends BiobankWidget {
         private static final long serialVersionUID = 1L;
         {
             put(
-                "Visit",
+                "Visit Type",
                 new LabelDialogInfo("Visit Type Values",
                     "Please enter a visit type:",
                     "To enter multiple visit type values, separate with semicolon."));
@@ -307,6 +307,21 @@ public class PvInfoWidget extends BiobankWidget {
             return StringUtils.join(itemList.getItems(), ";");
         }
         return null;
+    }
+
+    public void setSelected(boolean selected) {
+        checkButton.setSelection(selected);
+    }
+
+    public void reloadAllowedValues(PvAttrCustom pvCustomInfo) {
+        if (itemList != null) {
+            itemList.removeAll();
+            if (pvCustomInfo.getAllowedValues() != null) {
+                for (String item : pvCustomInfo.getAllowedValues()) {
+                    itemList.add(item);
+                }
+            }
+        }
     }
 
 }

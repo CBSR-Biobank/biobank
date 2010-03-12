@@ -17,7 +17,7 @@ public class NewPVsByStudyClinic extends QueryObject {
         + "Alias.shipment.clinic.name, Year(Alias.dateProcessed), "
         + "{2}(Alias.dateProcessed), count(*) from "
         + PatientVisit.class.getName()
-        + " as Alias where Alias.patient.study.site {0} {1}"
+        + " as Alias where Alias.patient.study.site {0} {1,number,#}"
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
         + "Year(Alias.dateProcessed), {2}(Alias.dateProcessed)";
 

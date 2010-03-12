@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
+public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm";
 
@@ -143,7 +143,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService, SessionManager.getInstance()
-                .getCurrentSiteWrapper(), cabinetNameContains, false);
+                .getCurrentSite(), cabinetNameContains, false);
         ContainerTypeWrapper cabinetType = null;
         ContainerTypeWrapper drawerType = null;
         if (types.size() == 0) {
@@ -289,7 +289,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         throws ApplicationException {
         List<SampleTypeWrapper> sampleTypes;
         sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
-            appService, SessionManager.getInstance().getCurrentSiteWrapper(),
+            appService, SessionManager.getInstance().getCurrentSite(),
             cabinetNameContains);
         if (sampleTypes.size() == 0) {
             BioBankPlugin.openAsyncError("Aliquot types",
@@ -349,7 +349,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
         try {
             String pNumber = patientNumberText.getText();
             currentPatient = PatientWrapper.getPatientInSite(appService,
-                pNumber, SessionManager.getInstance().getCurrentSiteWrapper());
+                pNumber, SessionManager.getInstance().getCurrentSite());
 
             if (currentPatient == null)
                 return;
@@ -445,9 +445,9 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
 
         appendLog("Getting informations for inventoryID "
             + sampleWrapper.getInventoryId());
-        List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
+        List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
             appService, sampleWrapper.getInventoryId(), SessionManager
-                .getInstance().getCurrentSiteWrapper());
+                .getInstance().getCurrentSite());
         if (samples.size() > 1) {
             throw new Exception(
                 "Error while retrieving aliquot with inventoryId "
@@ -508,7 +508,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             + sampleWrapper.getSampleType().getName());
         List<ContainerWrapper> containers = ContainerWrapper
             .getContainersHoldingSampleType(appService, SessionManager
-                .getInstance().getCurrentSiteWrapper(), binLabel, sampleWrapper
+                .getInstance().getCurrentSite(), binLabel, sampleWrapper
                 .getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
@@ -516,7 +516,7 @@ public class CabinetLinkAssignEntryForm extends AbstractPatientAdminForm {
             cabinet = drawer.getParent();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
-                SessionManager.getInstance().getCurrentSiteWrapper(), binLabel);
+                SessionManager.getInstance().getCurrentSite(), binLabel);
             String errorMsg = null;
             if (containers.size() > 0) {
                 errorMsg = "Bin labelled " + binLabel

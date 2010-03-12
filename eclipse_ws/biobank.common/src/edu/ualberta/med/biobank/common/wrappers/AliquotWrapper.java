@@ -71,7 +71,7 @@ public class AliquotWrapper extends
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<AliquotWrapper> aliquots = getSamplesInSite(appService,
+        List<AliquotWrapper> aliquots = getAliquotsInSite(appService,
             getInventoryId(), getSite());
         boolean alreadyExists = false;
         if (aliquots.size() > 0 && isNew()) {
@@ -288,7 +288,7 @@ public class AliquotWrapper extends
         ApplicationException {
     }
 
-    public static List<AliquotWrapper> getSamplesInSite(
+    public static List<AliquotWrapper> getAliquotsInSite(
         WritableApplicationService appService, String inventoryId,
         SiteWrapper siteWrapper) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
@@ -304,6 +304,55 @@ public class AliquotWrapper extends
             }
         }
         return list;
+    }
+
+    public static List<AliquotWrapper> getAliquotsInSiteWithPositionLabel(
+        WritableApplicationService appService, SiteWrapper site,
+        String positionString) throws ApplicationException,
+        BiobankCheckException {
+        // assume that the aliquot label position is 2 or 3 letters
+        // will search with both possible positions
+        String lastContainerLabel = positionString.substring(0, positionString
+            .length() - 2);
+        String aliquotPositionLabel = positionString.replace(
+            lastContainerLabel, "");
+        List<AliquotWrapper> aliquots = getAliquotsInSiteWithPositionLabel(
+            appService, site, lastContainerLabel, aliquotPositionLabel);
+        lastContainerLabel = positionString.substring(0, positionString
+            .length() - 3);
+        aliquotPositionLabel = positionString.replace(lastContainerLabel, "");
+        aliquots.addAll(getAliquotsInSiteWithPositionLabel(appService, site,
+            lastContainerLabel, aliquotPositionLabel));
+        return aliquots;
+    }
+
+    private static List<AliquotWrapper> getAliquotsInSiteWithPositionLabel(
+        WritableApplicationService appService, SiteWrapper site,
+        String containerString, String aliquotString)
+        throws ApplicationException, BiobankCheckException {
+        List<ContainerWrapper> containers = ContainerWrapper
+            .getContainersInSite(appService, site, containerString);
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        for (ContainerWrapper container : containers) {
+            RowColPos rcp = null;
+            try {
+                rcp = LabelingScheme.getRowColFromPositionString(aliquotString,
+                    container.getContainerType());
+            } catch (Exception e) {
+                // do nothing. The positionString doesn't fit the current
+                // container.
+            }
+            if (rcp != null) {
+                if ((rcp.row > -1) && (rcp.col > -1)) {
+                    AliquotWrapper aliquot = container.getAliquot(rcp.row,
+                        rcp.col);
+                    if (aliquot != null) {
+                        aliquots.add(aliquot);
+                    }
+                }
+            }
+        }
+        return aliquots;
     }
 
     @Override
@@ -335,4 +384,5 @@ public class AliquotWrapper extends
     public String toString() {
         return getInventoryId();
     }
+
 }

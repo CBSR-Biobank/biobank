@@ -50,5 +50,18 @@ INSERT INTO `SAMPLE_TYPE` (ID, NAME, NAME_SHORT, SITE_ID) VALUES
 (49, "WB Plasma - BABY",             "WB Plasma",       NULL),
 (50, "WB RNA - BABY",                "WB RNA",          NULL),
 (51, "WB Serum - BABY",              "WB Serum",        NULL),
-(52, "Whole Blood EDTA",             "WBE",             NULL);
+(52, "Whole Blood EDTA",             "WBE",             NULL),
+(53, "LH PFP 200",                   "LH PFP 200",      NULL),
+(54, "UrineC900",                    "UrineC900",       NULL),
+(55,"PlasmaE800",                    "PlasmaE800",      NULL),
+(56, "P100 500",                     "P100 500",        NULL),
+(57, "PlasmaL500",                   "PlasmaL500",      NULL),
+(58, "LH PFP 500",                   "LH PFP 500",      NULL),
+(59, "PlasmaE200",                   "PlasmaE200",      NULL),
+(60, "DNA L 1000",                   "DNA L 1000",      NULL),
+(61, "SerumG500",                    "SerumG500",       NULL),
+(62, "PlasmaL200",                   "PlasmaL200",      NULL),
+(63, "DNA E 1000",                   "DNA E 1000",      NULL),
+(64, "PlasmaE500",                   "PlasmaE500",      NULL),
+(65, "UrineSA900",                   "UrineSA900",      NULL);
 UNLOCK TABLES;

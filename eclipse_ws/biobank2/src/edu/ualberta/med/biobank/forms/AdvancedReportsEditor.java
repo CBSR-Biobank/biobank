@@ -571,7 +571,7 @@ public class AdvancedReportsEditor extends EditorPart {
         setSite(site);
         setInput(input);
 
-        node = (ReportTreeNode) ((ReportInput) input).node;
+        node = ((ReportInput) input).node;
 
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());

@@ -7,11 +7,14 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -29,9 +32,9 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
@@ -291,38 +294,62 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void initSelection(final ContainerTypeWrapper type) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                boolean initDone = true;
-                try {
-                    Set<RowColPos> positions = containerWidget
-                        .getMultiSelectionManager().getSelectedPositions();
-                    container.initChildrenWithType(type, positions);
-                } catch (Exception e) {
-                    initDone = false;
-                    BioBankPlugin.openAsyncError(
-                        "Error while creating children", e);
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        try {
+            context.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    monitor.beginTask("Initializing...",
+                        IProgressMonitor.UNKNOWN);
+                    boolean initDone = true;
+                    try {
+                        final Set<RowColPos> positions = containerWidget
+                            .getMultiSelectionManager().getSelectedPositions();
+                        container.initChildrenWithType(type, positions);
+                    } catch (Exception e) {
+                        initDone = false;
+                        BioBankPlugin.openAsyncError(
+                            "Error while creating children", e);
+                    }
+                    refresh(initDone, false);
+                    monitor.done();
                 }
-                refresh(initDone, false);
-            }
-        });
+            });
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Error while creating children", e);
+            refresh(false, false);
+        }
     }
 
     private void deleteSelection(final ContainerTypeWrapper type) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                boolean deleteDones = false;
-                try {
-                    Set<RowColPos> positions = containerWidget
-                        .getMultiSelectionManager().getSelectedPositions();
-                    deleteDones = container.deleteChildrenWithType(type,
-                        positions);
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Can't Delete Containers", ex);
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        try {
+            context.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    monitor.beginTask("D    eleting...",
+                        IProgressMonitor.UNKNOWN);
+                    boolean deleteDones = false;
+                    try {
+
+                        Set<RowColPos> positions = containerWidget
+                            .getMultiSelectionManager().getSelectedPositions();
+                        deleteDones = container.deleteChildrenWithType(type,
+                            positions);
+                    } catch (Exception ex) {
+                        BioBankPlugin.openAsyncError("Can't Delete Containers",
+                            ex);
+                    }
+                    refresh(deleteDones, true);
+                    monitor.done();
                 }
-                refresh(deleteDones, true);
-            }
-        });
+            });
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Can't Delete Containers", e);
+            refresh(false, false);
+        }
     }
 
     private void refresh(boolean initDone, final boolean rebuild) {

@@ -31,7 +31,12 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
         super(parent, false, clinic.getContactCollection(true));
         this.clinic = clinic;
-        setContacts(clinic);
+        selectedContacts = clinic.getContactCollection();
+        if (selectedContacts == null) {
+            selectedContacts = new ArrayList<ContactWrapper>();
+        }
+        addedOrModifiedContacts = new ArrayList<ContactWrapper>();
+        deletedContacts = new ArrayList<ContactWrapper>();
 
         addAddItemListener(new IInfoTableAddItemListener() {
             @Override
@@ -75,19 +80,11 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         });
     }
 
-    private void setContacts(ClinicWrapper clinic) {
-        selectedContacts = clinic.getContactCollection();
-        if (selectedContacts == null) {
-            selectedContacts = new ArrayList<ContactWrapper>();
-        }
-        addedOrModifiedContacts = new ArrayList<ContactWrapper>();
-        deletedContacts = new ArrayList<ContactWrapper>();
-    }
-
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {
         ContactAddDialog dlg = new ContactAddDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), contactWrapper);
-        if (dlg.open() == Dialog.OK) {
+        int res = dlg.open();
+        if (res == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
                 ContactWrapper contact = dlg.getContactWrapper();
@@ -97,6 +94,13 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             }
             reloadCollection(selectedContacts);
             notifyListeners();
+        } else if (!add && res == Dialog.CANCEL) {
+            try {
+                contactWrapper.reload();
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Cancel error", e);
+            }
+            reloadCollection(selectedContacts);
         }
     }
 
@@ -114,7 +118,12 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     }
 
     public void reload() {
-        setCollection(clinic.getContactCollection());
-        setContacts(clinic);
+        selectedContacts = clinic.getContactCollection();
+        if (selectedContacts == null) {
+            selectedContacts = new ArrayList<ContactWrapper>();
+        }
+        addedOrModifiedContacts = new ArrayList<ContactWrapper>();
+        deletedContacts = new ArrayList<ContactWrapper>();
+        reloadCollection(selectedContacts);
     }
 }

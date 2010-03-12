@@ -75,7 +75,8 @@ public class SessionAdapter extends AdapterBase {
                 try {
                     handlerService.executeCommand(ADDSITE_COMMAND_ID, null);
                 } catch (Exception ex) {
-                    throw new RuntimeException(ADDSITE_COMMAND_ID + " not found");
+                    throw new RuntimeException(ADDSITE_COMMAND_ID
+                        + " not found");
                 }
             }
         });
@@ -120,10 +121,10 @@ public class SessionAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper currentSite = SessionManager.getInstance()
-            .getCurrentSiteWrapper();
         Integer siteId = null;
-        if (currentSite != null) {
+        if (!SessionManager.getInstance().isAllSitesSelected()) {
+            SiteWrapper currentSite = SessionManager.getInstance()
+                .getCurrentSite();
             siteId = currentSite.getId();
         }
         return new ArrayList<SiteWrapper>(SiteWrapper.getSites(appService,

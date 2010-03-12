@@ -55,7 +55,7 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Shipment", ShipmentEntryForm.ID);
-        addViewMenu(menu, "Shipment", ShipmentEntryForm.ID);
+        addViewMenu(menu, "Shipment", ShipmentViewForm.ID);
     }
 
     @Override

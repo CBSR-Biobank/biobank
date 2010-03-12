@@ -403,7 +403,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      */
     public abstract String getNextOpenedFormID();
 
-    protected void callPersistOnlyWithProgressDialog() throws Exception {
+    protected void callPersistWithProgressDialog() throws Exception {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         context.run(true, false, new IRunnableWithProgress() {

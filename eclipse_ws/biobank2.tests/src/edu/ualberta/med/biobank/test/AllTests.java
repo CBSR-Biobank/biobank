@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
+import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
 import edu.ualberta.med.biobank.test.wrappers.TestAliquot;
 import edu.ualberta.med.biobank.test.wrappers.TestClinic;
 import edu.ualberta.med.biobank.test.wrappers.TestContact;
@@ -26,10 +27,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 @RunWith(Suite.class)
 @SuiteClasses( { /* TestSite.class, TestPatient.class, TestPatientVisit.class, */
 TestStudy.class, TestContainerLabelingScheme.class, TestPvSourceVessel.class,
-    TestAliquot.class, TestClinic.class, TestSampleStorage.class,
-    TestSourceVessel.class, TestSampleType.class, TestContainer.class,
-    TestContainerType.class, TestShipment.class, TestContact.class,
-    TestShippingCompany.class })
+    TestActivityStatus.class, TestAliquot.class, TestClinic.class,
+    TestSampleStorage.class, TestSourceVessel.class, TestSampleType.class,
+    TestContainer.class, TestContainerType.class, TestShipment.class,
+    TestContact.class, TestShippingCompany.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

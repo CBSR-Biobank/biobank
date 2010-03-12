@@ -57,7 +57,7 @@ import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
-public class ScanAssignEntryForm extends AbstractPatientAdminForm {
+public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ScanAssignEntryForm.class.getName());
@@ -163,7 +163,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     palletFoundWithProductBarcode = ContainerWrapper
                         .getContainerWithProductBarcodeInSite(appService,
                             SessionManager.getInstance()
-                                .getCurrentSiteWrapper(), currentPalletWrapper
+                                .getCurrentSite(), currentPalletWrapper
                                 .getProductBarcode());
                     if (palletFoundWithProductBarcode == null) {
                         palletTypesViewer.getCombo().setEnabled(true);
@@ -349,11 +349,11 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                     if (linkedAssignButton.getSelection()) {
                         cells = PalletCell.getRandomSamplesNotAssigned(
                             appService, SessionManager.getInstance()
-                                .getCurrentSiteWrapper().getId());
+                                .getCurrentSite().getId());
                     } else if (linkedOnlyButton.getSelection()) {
                         cells = PalletCell.getRandomSamplesAlreadyAssigned(
                             appService, SessionManager.getInstance()
-                                .getCurrentSiteWrapper().getId());
+                                .getCurrentSite().getId());
                     }
                 }
                 boolean result = true;
@@ -439,9 +439,9 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
                 positionString, logMsg);
             return false;
         }
-        List<AliquotWrapper> aliquots = AliquotWrapper.getSamplesInSite(
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
             appService, value, SessionManager.getInstance()
-                .getCurrentSiteWrapper());
+                .getCurrentSite());
         if (aliquots.size() == 0) {
             // aliquot not found in site (not yet linked ?)
             String logMsg = "aliquot " + value + " not linked to any patient";
@@ -633,7 +633,7 @@ public class ScanAssignEntryForm extends AbstractPatientAdminForm {
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActivityStatus(appService, "Active"));
             currentPalletWrapper.setSite(SessionManager.getInstance()
-                .getCurrentSiteWrapper());
+                .getCurrentSite());
         } catch (Exception e) {
             logger.error("Error while reseting pallet values", e);
         }

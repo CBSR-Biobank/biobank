@@ -200,6 +200,7 @@ public class TestClinic extends TestDatabase {
 
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
+        clinic.setNameShort(name);
         clinic.setSite(site);
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
@@ -222,6 +223,7 @@ public class TestClinic extends TestDatabase {
         String name = "testPersistFailSiteNotNul" + r.nextInt();
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
+        clinic.setNameShort(name);
         clinic.setCity("Rupt");
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
@@ -244,6 +246,7 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setSite(site);
         clinic.setName(name);
+        clinic.setNameShort(name);
         clinic.setCity("Rupt");
 
         try {
@@ -265,6 +268,7 @@ public class TestClinic extends TestDatabase {
         int oldTotal = site.getClinicCollection().size();
 
         ClinicWrapper clinic = ClinicHelper.newClinic(site, name);
+        clinic.setNameShort(name + "_NS");
         try {
             clinic.persist();
             Assert

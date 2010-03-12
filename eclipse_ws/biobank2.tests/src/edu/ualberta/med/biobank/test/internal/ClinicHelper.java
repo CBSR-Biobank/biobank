@@ -10,6 +10,13 @@ public class ClinicHelper extends DbHelper {
         throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
+        if (name != null) {
+            if (name.length() <= 50) {
+                clinic.setNameShort(name);
+            } else {
+                clinic.setNameShort(name.substring(50));
+            }
+        }
         clinic.setCity("");
         clinic.setSite(site);
         clinic.setActivityStatus(CbsrSite.getActivityStatus("Active"));

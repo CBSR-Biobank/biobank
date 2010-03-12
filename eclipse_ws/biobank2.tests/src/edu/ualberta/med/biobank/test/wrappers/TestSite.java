@@ -912,7 +912,7 @@ public class TestSite extends TestDatabase {
             for (PatientVisitWrapper visit : patient
                 .getPatientVisitCollection()) {
                 for (int i = 0; i < 2; ++i) {
-                    AliquotHelper.addSample(allSampleTypes.get(r
+                    AliquotHelper.addAliquot(allSampleTypes.get(r
                         .nextInt(sampleTypeCount)), container, visit,
                         sampleCount / 12, sampleCount % 12);
                     ++sampleCount;

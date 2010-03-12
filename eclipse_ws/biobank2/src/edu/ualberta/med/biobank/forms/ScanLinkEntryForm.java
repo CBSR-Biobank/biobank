@@ -72,7 +72,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 /**
  * Link samples to a patient visit
  */
-public class ScanLinkEntryForm extends AbstractPatientAdminForm {
+public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm";
 
@@ -275,7 +275,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
 
         List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
             .getSampleTypeForContainerTypes(appService, SessionManager
-                .getInstance().getCurrentSiteWrapper(), palletNameContains);
+                .getInstance().getCurrentSite(), palletNameContains);
         if (sampleTypes.size() == 0) {
             BioBankPlugin.openAsyncError("Aliquot Types",
                 "No sample type found for containers of container type containing '"
@@ -533,7 +533,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         try {
             currentPatient = PatientWrapper.getPatientInSite(appService,
                 patientNumberText.getText(), SessionManager.getInstance()
-                    .getCurrentSiteWrapper());
+                    .getCurrentSite());
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Error getting the patient", e);
         }
@@ -573,7 +573,7 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
                             cells = PalletCell
                                 .getRandomScanLinkWithSamplesAlreadyLinked(
                                     appService, SessionManager.getInstance()
-                                        .getCurrentSiteWrapper().getId());
+                                        .getCurrentSite().getId());
                         }
                     }
                     scannedValue.setValue(true);
@@ -614,9 +614,9 @@ public class ScanLinkEntryForm extends AbstractPatientAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                List<AliquotWrapper> samples = AliquotWrapper.getSamplesInSite(
+                List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
                     appService, value, SessionManager.getInstance()
-                        .getCurrentSiteWrapper());
+                        .getCurrentSite());
                 if (samples.size() > 0) {
                     cell.setStatus(AliquotCellStatus.ERROR);
                     String msg = "Aliquot already in database";
