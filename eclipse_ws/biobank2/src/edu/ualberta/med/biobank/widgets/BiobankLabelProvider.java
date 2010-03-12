@@ -56,24 +56,24 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return String.valueOf(study.getPatientCollection().size());
             }
         } else if (element instanceof AliquotWrapper) {
-            final AliquotWrapper sample = (AliquotWrapper) element;
+            final AliquotWrapper aliquot = (AliquotWrapper) element;
             switch (columnIndex) {
             case 0:
-                return sample.getInventoryId();
+                return aliquot.getInventoryId();
             case 1:
-                return sample.getSampleType() == null ? "" : sample
+                return aliquot.getSampleType() == null ? "" : aliquot
                     .getSampleType().getName();
             case 2:
-                String position = sample.getPositionString();
+                String position = aliquot.getPositionString();
                 return (position != null) ? position : "none";
             case 3:
-                return sample.getLinkDate() == null ? "" : DateFormatter
-                    .formatAsDateTime(sample.getLinkDate());
+                return aliquot.getLinkDate() == null ? "" : DateFormatter
+                    .formatAsDateTime(aliquot.getLinkDate());
             case 4:
-                return sample.getQuantity() == null ? "" : sample.getQuantity()
+                return aliquot.getQuantity() == null ? "" : aliquot.getQuantity()
                     .toString();
             case 6:
-                return sample.getComment() == null ? "" : sample.getComment();
+                return aliquot.getComment() == null ? "" : aliquot.getComment();
             }
         } else if (element instanceof SampleTypeWrapper) {
             final SampleTypeWrapper st = (SampleTypeWrapper) element;

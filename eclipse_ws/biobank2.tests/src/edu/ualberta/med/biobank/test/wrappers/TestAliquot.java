@@ -170,10 +170,10 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         ContainerWrapper container = new ContainerWrapper(appService);
-        AliquotWrapper sample = new AliquotWrapper(appService);
-        sample.setParent(container);
+        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        aliquot.setParent(container);
         try {
-            sample.persist();
+            aliquot.persist();
             Assert.fail("container has no container type");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -265,8 +265,8 @@ public class TestAliquot extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        AliquotWrapper sample = new AliquotWrapper(appService);
-        Assert.assertNull(sample.getPositionString());
+        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        Assert.assertNull(aliquot.getPositionString());
     }
 
     @Test
@@ -315,11 +315,11 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         // check to make sure gone from old parent
         oldParent.reload();
-        Assert.assertTrue(oldParent.getSamples().size() == 0);
+        Assert.assertTrue(oldParent.getAliquots().size() == 0);
         // check to make sure added to new parent
         parent.reload();
         Assert.assertTrue(aliquot.getParent() != null);
-        Collection<AliquotWrapper> sampleWrappers = parent.getSamples()
+        Collection<AliquotWrapper> sampleWrappers = parent.getAliquots()
             .values();
         boolean found = false;
         for (AliquotWrapper sampleWrapper : sampleWrappers) {
@@ -429,16 +429,16 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper sample = AliquotHelper.newAliquot(sampleType, container,
+        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType, container,
             pv, 2, 3);
-        sample.setInventoryId(Utils.getRandomString(5));
-        sample.persist();
+        aliquot.setInventoryId(Utils.getRandomString(5));
+        aliquot.persist();
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
 
         List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
-            appService, sample.getInventoryId(), site);
+            appService, aliquot.getInventoryId(), site);
         Assert.assertEquals(1, samples.size());
-        Assert.assertEquals(samples.get(0), sample);
+        Assert.assertEquals(samples.get(0), aliquot);
     }
 
     @Test
@@ -529,14 +529,14 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper sample = AliquotHelper.newAliquot(sampleType, container,
+        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType, container,
             pv, 2, 3);
-        sample.setInventoryId(Utils.getRandomString(5));
-        sample.persist();
+        aliquot.setInventoryId(Utils.getRandomString(5));
+        aliquot.persist();
         AliquotHelper.addAliquot(sampleType, null, pv, null, null);
 
-        DebugUtil.getRandomSamplesAlreadyLinked(appService, siteId);
-        DebugUtil.getRandomSamplesAlreadyAssigned(appService, siteId);
-        DebugUtil.getRandomSamplesNotAssigned(appService, siteId);
+        DebugUtil.getRandomAliquotsAlreadyLinked(appService, siteId);
+        DebugUtil.getRandomAliquotsAlreadyAssigned(appService, siteId);
+        DebugUtil.getRandomAliquotsNotAssigned(appService, siteId);
     }
 }

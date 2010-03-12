@@ -926,8 +926,8 @@ public class TestSite extends TestDatabase {
 
         // delete patient 1 and all it's visits and samples
         for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
-            for (AliquotWrapper sample : visit.getAliquotCollection()) {
-                sample.delete();
+            for (AliquotWrapper aliquot : visit.getAliquotCollection()) {
+                aliquot.delete();
             }
         }
         patient1.delete();

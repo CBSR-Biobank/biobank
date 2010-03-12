@@ -70,7 +70,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Link samples to a patient visit
+ * Link aliquots to a patient visit
  */
 public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
@@ -147,12 +147,12 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected String getOkMessage() {
-        return "Adding samples.";
+        return "Adding Aliquots.";
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Link samples to patient visit using the scanner");
+        form.setText("Link aliquots to patient visit using the scanner");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -277,7 +277,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             .getSampleTypeForContainerTypes(appService, SessionManager
                 .getInstance().getCurrentSite(), palletNameContains);
         if (sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Aliquot Types",
+            BioBankPlugin.openAsyncError("Sample Types",
                 "No sample type found for containers of container type containing '"
                     + palletNameContains + "'...");
         }
@@ -337,7 +337,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
     }
 
     /**
-     * Give a sample type to selected samples
+     * Give a sample type to selected aliquots
      */
     private void createTypeSelectionCustom(Composite parent,
         List<SampleTypeWrapper> sampleTypes) {
@@ -347,7 +347,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         toolkit.paintBordersFor(typesSelectionCustomComposite);
 
         Label label = toolkit.createLabel(typesSelectionCustomComposite,
-            "Choose type for selected samples:");
+            "Choose type for selected aliquots:");
         GridData gd = new GridData();
         gd.horizontalSpan = 3;
         label.setLayoutData(gd);
@@ -471,7 +471,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 SWT.RADIO);
             randomScan.setSelection(true);
             existsScan = toolkit.createButton(comp,
-                "Get random and already linked samples", SWT.RADIO);
+                "Get random and already linked aliquots", SWT.RADIO);
             scanButtonTitle = "Fake scan";
         }
         scanButton = toolkit.createButton(fieldsComposite, scanButtonTitle,
@@ -571,7 +571,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                             cells = PalletCell.getRandomScanLink();
                         } else if (existsScan.getSelection()) {
                             cells = PalletCell
-                                .getRandomScanLinkWithSamplesAlreadyLinked(
+                                .getRandomScanLinkWithAliquotsAlreadyLinked(
                                     appService, SessionManager.getInstance()
                                         .getCurrentSite().getId());
                         }
@@ -585,8 +585,8 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                             typesRowsCount = 0;
                             sampleTypeWidgets.get(rcp.row).resetValues(true);
                         }
-                        boolean addSampleNumber = setCellStatus(cells.get(rcp));
-                        if (addSampleNumber) {
+                        boolean addAliquotNumber = setCellStatus(cells.get(rcp));
+                        if (addAliquotNumber) {
                             typesRowsCount++;
                             typesRows.put(rcp.row, typesRowsCount);
                         }
@@ -614,15 +614,15 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
-                List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
-                    appService, value, SessionManager.getInstance()
-                        .getCurrentSite());
-                if (samples.size() > 0) {
+                List<AliquotWrapper> aliquots = AliquotWrapper
+                    .getAliquotsInSite(appService, value, SessionManager
+                        .getInstance().getCurrentSite());
+                if (aliquots.size() > 0) {
                     cell.setStatus(AliquotCellStatus.ERROR);
                     String msg = "Aliquot already in database";
                     cell.setInformation(msg);
                     scanOk = false;
-                    AliquotWrapper aliquot = samples.get(0);
+                    AliquotWrapper aliquot = aliquots.get(0);
                     appendLog("ERROR: " + value + " - " + msg + " see visit "
                         + aliquot.getPatientVisit().getFormattedDateProcessed()
                         + " of patient "
@@ -654,18 +654,18 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 && cell.getStatus() == AliquotCellStatus.TYPE) {
                 patientVisit.addNewAliquot(cell.getValue(), cell.getType(),
                     sampleStorages);
-                appendSampleLogMessage(sb, patientVisit, cell.getValue(), cell
+                appendAliquotLogMessage(sb, patientVisit, cell.getValue(), cell
                     .getType());
                 nber++;
             }
         }
         appendLog("----");
         appendLog(sb.toString());
-        appendLog("SCAN-LINK: " + nber + " samples linked to visit");
+        appendLog("SCAN-LINK: " + nber + " aliquots linked to visit");
         setSaved(true);
     }
 
-    private void appendSampleLogMessage(StringBuffer sb,
+    private void appendAliquotLogMessage(StringBuffer sb,
         PatientVisitWrapper patientVisit, String cellValue,
         SampleTypeWrapper cellType) {
         sb.append("\nLINKED: ").append(cellValue);
@@ -693,7 +693,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
     }
 
     /**
-     * set the sample type to the samples of the given row
+     * set the sample type to the aliquots of the given row
      */
     @SuppressWarnings("unchecked")
     private void setTypeForRow(SampleTypeSelectionWidget typeWidget,

@@ -203,7 +203,7 @@ public class CbsrSite {
 
     private static void containerDeleteSubObjects(ContainerWrapper container)
         throws Exception {
-        Map<RowColPos, AliquotWrapper> samples = container.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = container.getAliquots();
         if (samples.size() > 0) {
             // samples should be deleted when patient visits are deleted
             throw new Exception(

@@ -85,7 +85,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private IObservableValue selectedSampleTypeValue = new WritableValue("",
         String.class);
 
-    private AliquotWrapper sampleWrapper;
+    private AliquotWrapper aliquot;
     private ContainerWrapper cabinet;
     private ContainerWrapper drawer;
     private ContainerWrapper bin;
@@ -102,7 +102,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     protected void init() {
         super.init();
         setPartName("Cabinet Link/Assign");
-        sampleWrapper = new AliquotWrapper(appService);
+        aliquot = new AliquotWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
@@ -111,7 +111,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Link and Assign Cabinet Samples");
+        form.setText("Link and Assign Cabinet Aliquots");
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -228,7 +228,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         inventoryIDValidator = new CabinetInventoryIDValidator();
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, "Inventory ID", new String[0],
-            BeansObservables.observeValue(sampleWrapper, "inventoryId"),
+            BeansObservables.observeValue(aliquot, "inventoryId"),
             inventoryIDValidator);
 
         inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -261,7 +261,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         checkPositionButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                checkPositionAndSample();
+                checkPositionAndAliquot();
             }
         });
     }
@@ -305,13 +305,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 public void selectionChanged(SelectionChangedEvent event) {
                     IStructuredSelection stSelection = (IStructuredSelection) viewerSampleTypes
                         .getSelection();
-                    sampleWrapper.setSampleType((SampleTypeWrapper) stSelection
+                    aliquot.setSampleType((SampleTypeWrapper) stSelection
                         .getFirstElement());
                 }
             });
         if (sampleTypes.size() == 1) {
             viewerSampleTypes.getCombo().select(0);
-            sampleWrapper.setSampleType(sampleTypes.get(0));
+            aliquot.setSampleType(sampleTypes.get(0));
         }
     }
 
@@ -368,20 +368,20 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
-    protected void checkPositionAndSample() {
+    protected void checkPositionAndAliquot() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
                     appendLog("----");
                     PatientVisitWrapper pv = getSelectedPatientVisit();
-                    sampleWrapper.setPatientVisit(pv);
+                    aliquot.setPatientVisit(pv);
                     appendLog("Visit selected "
                         + pv.getFormattedDateProcessed() + " - "
                         + pv.getShipment().getClinic().getName());
                     if (radioNew.getSelection()) {
                         appendLog("Checking inventoryID "
-                            + sampleWrapper.getInventoryId());
-                        sampleWrapper.checkInventoryIdUnique();
+                            + aliquot.getInventoryId());
+                        aliquot.checkInventoryIdUnique();
                     }
                     String positionString = positionText.getText();
                     initParentContainersFromPosition(positionString);
@@ -391,10 +391,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         return;
                     }
                     appendLog("Checking position " + positionString);
-                    sampleWrapper.setAliquotPositionFromString(positionString,
-                        bin);
-                    if (sampleWrapper.isPositionFree(bin)) {
-                        sampleWrapper.setParent(bin);
+                    aliquot.setAliquotPositionFromString(positionString, bin);
+                    if (aliquot.isPositionFree(bin)) {
+                        aliquot.setParent(bin);
 
                         showPositions();
 
@@ -434,46 +433,46 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             return;
         }
         if (inventoryId.length() == 4) {
-            // compatibility with old samples imported
-            // 4 letters samples ares now C+4letters
+            // compatibility with old aliquots imported
+            // 4 letters aliquots are now C+4letters
             inventoryId = "C" + inventoryId;
         }
         resultShownValue.setValue(false);
         reset();
-        sampleWrapper.setInventoryId(inventoryId);
+        aliquot.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
 
         appendLog("Getting informations for inventoryID "
-            + sampleWrapper.getInventoryId());
-        List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
-            appService, sampleWrapper.getInventoryId(), SessionManager
-                .getInstance().getCurrentSite());
-        if (samples.size() > 1) {
+            + aliquot.getInventoryId());
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
+            appService, aliquot.getInventoryId(), SessionManager.getInstance()
+                .getCurrentSite());
+        if (aliquots.size() > 1) {
             throw new Exception(
                 "Error while retrieving aliquot with inventoryId "
-                    + sampleWrapper.getInventoryId()
+                    + aliquot.getInventoryId()
                     + ": more than one aliquot found.");
         }
-        if (samples.size() == 0) {
+        if (aliquots.size() == 0) {
             throw new Exception("No aliquot found with inventoryId "
-                + sampleWrapper.getInventoryId());
+                + aliquot.getInventoryId());
         }
-        sampleWrapper = samples.get(0);
-        currentPatient = sampleWrapper.getPatientVisit().getPatient();
+        aliquot = aliquots.get(0);
+        currentPatient = aliquot.getPatientVisit().getPatient();
         patientNumberText.setText(currentPatient.getPnumber());
         List<PatientVisitWrapper> collection = currentPatient
             .getPatientVisitCollection();
         viewerVisits.setInput(collection);
-        viewerVisits.setSelection(new StructuredSelection(sampleWrapper
+        viewerVisits.setSelection(new StructuredSelection(aliquot
             .getPatientVisit()));
-        positionText.setText(sampleWrapper.getPositionString(true, false));
-        viewerSampleTypes.setSelection(new StructuredSelection(sampleWrapper
+        positionText.setText(aliquot.getPositionString(true, false));
+        viewerSampleTypes.setSelection(new StructuredSelection(aliquot
             .getSampleType()));
-        String posStr = sampleWrapper.getPositionString();
+        String posStr = aliquot.getPositionString();
         if (posStr == null) {
             posStr = "none";
         }
-        appendLog("Aliquot " + sampleWrapper.getInventoryId()
+        appendLog("Aliquot " + aliquot.getInventoryId()
             + ": current position = " + posStr);
     }
 
@@ -505,10 +504,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         bin = null;
         String binLabel = positionString.substring(0, 6);
         appendLog("Checking parent container " + binLabel + " for type "
-            + sampleWrapper.getSampleType().getName());
+            + aliquot.getSampleType().getName());
         List<ContainerWrapper> containers = ContainerWrapper
             .getContainersHoldingSampleType(appService, SessionManager
-                .getInstance().getCurrentSite(), binLabel, sampleWrapper
+                .getInstance().getCurrentSite(), binLabel, aliquot
                 .getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
@@ -520,8 +519,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             String errorMsg = null;
             if (containers.size() > 0) {
                 errorMsg = "Bin labelled " + binLabel
-                    + " cannot hold samples of type "
-                    + sampleWrapper.getSampleType().getName();
+                    + " cannot hold aliquots that contain a sample of type "
+                    + aliquot.getSampleType().getName();
             } else {
                 errorMsg = "Can't find bin labelled " + binLabel;
             }
@@ -538,7 +537,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     public void reset() throws Exception {
-        sampleWrapper.resetToNewObject();
+        aliquot.resetToNewObject();
         cabinet = null;
         drawer = null;
         bin = null;
@@ -558,21 +557,21 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     protected void saveForm() throws Exception {
         if (radioNew.getSelection()) {
-            sampleWrapper.setLinkDate(new Date());
-            sampleWrapper.setQuantityFromType();
+            aliquot.setLinkDate(new Date());
+            aliquot.setQuantityFromType();
         }
-        sampleWrapper.persist();
-        String posStr = sampleWrapper.getPositionString();
+        aliquot.persist();
+        String posStr = aliquot.getPositionString();
         if (posStr == null) {
             posStr = "none";
         }
         if (radioNew.getSelection()) {
-            appendLog("Aliquot " + sampleWrapper.getInventoryId()
+            appendLog("Aliquot " + aliquot.getInventoryId()
                 + " saved in position " + posStr + " for visit "
-                + sampleWrapper.getPatientVisit().getFormattedDateProcessed()
+                + aliquot.getPatientVisit().getFormattedDateProcessed()
                 + "(patient " + currentPatient.getPnumber() + ")");
         } else {
-            appendLog("Aliquot " + sampleWrapper.getInventoryId()
+            appendLog("Aliquot " + aliquot.getInventoryId()
                 + " moved to position " + posStr);
         }
         setSaved(true);
@@ -591,7 +590,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected String getOkMessage() {
-        return "Add cabinet samples.";
+        return "Add cabinet aliquots.";
     }
 
     @Override

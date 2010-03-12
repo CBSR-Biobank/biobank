@@ -162,9 +162,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                 try {
                     palletFoundWithProductBarcode = ContainerWrapper
                         .getContainerWithProductBarcodeInSite(appService,
-                            SessionManager.getInstance()
-                                .getCurrentSite(), currentPalletWrapper
-                                .getProductBarcode());
+                            SessionManager.getInstance().getCurrentSite(),
+                            currentPalletWrapper.getProductBarcode());
                     if (palletFoundWithProductBarcode == null) {
                         palletTypesViewer.getCombo().setEnabled(true);
                     } else {
@@ -216,10 +215,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             gd.horizontalSpan = 2;
             comp.setLayoutData(gd);
             linkedAssignButton = toolkit.createButton(comp,
-                "Select linked only samples", SWT.RADIO);
+                "Select linked only aliquots", SWT.RADIO);
             linkedAssignButton.setSelection(true);
             linkedOnlyButton = toolkit.createButton(comp,
-                "Select linked and assigned samples", SWT.RADIO);
+                "Select linked and assigned aliquots", SWT.RADIO);
             scanButtonTitle = "Fake scan";
         }
 
@@ -347,25 +346,25 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                         .scan(plateNum));
                 } else {
                     if (linkedAssignButton.getSelection()) {
-                        cells = PalletCell.getRandomSamplesNotAssigned(
+                        cells = PalletCell.getRandomAliquotsNotAssigned(
                             appService, SessionManager.getInstance()
                                 .getCurrentSite().getId());
                     } else if (linkedOnlyButton.getSelection()) {
-                        cells = PalletCell.getRandomSamplesAlreadyAssigned(
+                        cells = PalletCell.getRandomAliquotsAlreadyAssigned(
                             appService, SessionManager.getInstance()
                                 .getCurrentSite().getId());
                     }
                 }
                 boolean result = true;
-                Map<RowColPos, AliquotWrapper> samples = currentPalletWrapper
-                    .getSamples();
+                Map<RowColPos, AliquotWrapper> aliquots = currentPalletWrapper
+                    .getAliquots();
                 for (RowColPos rcp : cells.keySet()) {
-                    AliquotWrapper expectedSample = null;
-                    if (samples != null) {
-                        expectedSample = samples.get(rcp);
+                    AliquotWrapper expectedAliquot = null;
+                    if (aliquots != null) {
+                        expectedAliquot = aliquots.get(rcp);
                     }
                     PalletCell cell = cells.get(rcp);
-                    cell.setExpectedSample(expectedSample);
+                    cell.setExpectedAliquot(expectedAliquot);
                     result = setStatus(cell) && result;
                 }
                 scanValidValue.setValue(result);
@@ -417,31 +416,30 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     protected boolean setStatus(PalletCell scanCell) throws Exception {
-        AliquotWrapper expectedSample = scanCell.getExpectedSample();
+        AliquotWrapper expectedAliquot = scanCell.getExpectedAliquot();
         String value = scanCell.getValue();
         String positionString = LabelingScheme.rowColToSbs(new RowColPos(
             scanCell.getRow(), scanCell.getCol()));
         if (value == null) {
-            // no sample scanned
-            if (expectedSample == null) {
-                // no existing sample should be there
+            // no aliquot scanned
+            if (expectedAliquot == null) {
+                // no existing aliquot should be there
                 return true;
             }
-            // sample missing
-            String logMsg = "aliquot " + expectedSample.getInventoryId()
+            // aliquot missing
+            String logMsg = "aliquot " + expectedAliquot.getInventoryId()
                 + " from visit "
-                + expectedSample.getPatientVisit().getFormattedDateProcessed()
+                + expectedAliquot.getPatientVisit().getFormattedDateProcessed()
                 + " (patient "
-                + expectedSample.getPatientVisit().getPatient().getPnumber()
+                + expectedAliquot.getPatientVisit().getPatient().getPnumber()
                 + ") missing";
             setStatusWithLogMessage(scanCell, AliquotCellStatus.MISSING,
-                "Aliquot " + expectedSample.getInventoryId() + " missing", "?",
-                positionString, logMsg);
+                "Aliquot " + expectedAliquot.getInventoryId() + " missing",
+                "?", positionString, logMsg);
             return false;
         }
         List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
-            appService, value, SessionManager.getInstance()
-                .getCurrentSite());
+            appService, value, SessionManager.getInstance().getCurrentSite());
         if (aliquots.size() == 0) {
             // aliquot not found in site (not yet linked ?)
             String logMsg = "aliquot " + value + " not linked to any patient";
@@ -450,13 +448,13 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             return false;
         } else if (aliquots.size() == 1) {
             AliquotWrapper foundAliquot = aliquots.get(0);
-            if (expectedSample != null
-                && !foundAliquot.getId().equals(expectedSample.getId())) {
+            if (expectedAliquot != null
+                && !foundAliquot.getId().equals(expectedAliquot.getId())) {
                 // aliquot found but another aliquot already at this position
                 String logMsg = "Expected inventoryId "
-                    + expectedSample.getInventoryId()
+                    + expectedAliquot.getInventoryId()
                     + " from patient "
-                    + expectedSample.getPatientVisit().getPatient()
+                    + expectedAliquot.getPatientVisit().getPatient()
                         .getPnumber() + " -- Found inventoryId "
                     + foundAliquot.getInventoryId() + " from patient "
                     + foundAliquot.getPatientVisit().getPatient().getPnumber();
@@ -468,11 +466,11 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                 return false;
             }
             scanCell.setAliquot(foundAliquot);
-            if (expectedSample != null) {
+            if (expectedAliquot != null) {
                 // aliquot scanned is already registered at this position
                 // (everything is ok !)
                 scanCell.setStatus(AliquotCellStatus.FILLED);
-                scanCell.setAliquot(expectedSample);
+                scanCell.setAliquot(expectedAliquot);
             } else {
                 scanCell.setStatus(AliquotCellStatus.NEW);
                 scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
@@ -499,7 +497,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                     // pallet can't hold this aliquot type
                     String logMsg = "This pallet type "
                         + currentPalletWrapper.getContainerType().getName()
-                        + " can't hold this sample of type "
+                        + " can't hold a aliquot that contains a sample of type "
                         + foundAliquot.getSampleType().getName();
                     setStatusWithLogMessage(scanCell, AliquotCellStatus.ERROR,
                         logMsg, null, positionString, logMsg);
@@ -666,7 +664,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected String getOkMessage() {
-        return "Assigning samples location.";
+        return "Assigning aliquots location.";
     }
 
     /**
@@ -722,8 +720,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                     return false;
                 }
             }
-            // get the existing samples to be able to check added an missing
-            // samples
+            // get the existing aliquots to be able to check added an missing
+            // aliquots
             appendLog("Pallet container type used: "
                 + currentPalletWrapper.getContainerType().getName());
         }

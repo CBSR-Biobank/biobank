@@ -489,8 +489,8 @@ public class TestContainerType extends TestDatabase {
         childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
         Assert.assertEquals(selectedSampleTypes.size(), childTypeL3SampleTypes
             .size());
-        for (SampleTypeWrapper sample : selectedSampleTypes) {
-            Assert.assertTrue(childTypeL3SampleTypes.contains(sample));
+        for (SampleTypeWrapper type : selectedSampleTypes) {
+            Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
 
         childTypeL3.removeSampleTypes(childTypeL3.getSampleTypeCollection());
@@ -516,8 +516,8 @@ public class TestContainerType extends TestDatabase {
             .getSampleTypeCollection();
         Assert.assertEquals(selectedSampleTypes.size(), childTypeL3SampleTypes
             .size());
-        for (SampleTypeWrapper sample : selectedSampleTypes) {
-            Assert.assertTrue(childTypeL3SampleTypes.contains(sample));
+        for (SampleTypeWrapper type : selectedSampleTypes) {
+            Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
 
         childTypeL3.removeSampleTypes(childTypeL3.getSampleTypeCollection());
@@ -565,7 +565,7 @@ public class TestContainerType extends TestDatabase {
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null);
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
-        AliquotWrapper sample = AliquotHelper.addAliquot(selectedSampleTypes
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(selectedSampleTypes
             .get(1), cont3, pv, 0, 1);
 
         childTypeL3
@@ -581,7 +581,7 @@ public class TestContainerType extends TestDatabase {
         childTypeL3
             .removeSampleTypes(Arrays.asList(selectedSampleTypes.get(1)));
 
-        sample.delete();
+        aliquot.delete();
         childTypeL3.persist();
     }
 
@@ -607,8 +607,8 @@ public class TestContainerType extends TestDatabase {
         topType.reload();
         collection = topType.getSampleTypesRecursively();
         Assert.assertEquals(selectedSampleTypes.size(), collection.size());
-        for (SampleTypeWrapper sample : selectedSampleTypes) {
-            Assert.assertTrue(collection.contains(sample));
+        for (SampleTypeWrapper type : selectedSampleTypes) {
+            Assert.assertTrue(collection.contains(type));
         }
 
         childTypeL3.removeSampleTypes(childTypeL3.getSampleTypeCollection());

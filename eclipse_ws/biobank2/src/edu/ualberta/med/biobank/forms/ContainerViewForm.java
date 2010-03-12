@@ -415,7 +415,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
         List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
-            .getSamples().values());
+            .getAliquots().values());
         samplesWidget = new AliquotListInfoTable(parent, samples);
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);

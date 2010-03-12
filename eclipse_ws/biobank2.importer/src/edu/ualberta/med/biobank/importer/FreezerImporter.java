@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -201,13 +201,13 @@ public class FreezerImporter {
         }
 
         RowColPos pos = LabelingScheme.sbsToRowCol(palletPos);
-        AliquotWrapper sample = pallet.getAliquot(pos.row, pos.col);
-        if ((sample != null)
-            && sample.getSampleType().getNameShort()
-                .equals(sampleTypeNameShort)
-            && sample.getInventoryId().equals(inventoryId)) {
-            logger.debug("freezer already contains sample " + pallet.getLabel()
-                + palletPos);
+        AliquotWrapper aliquot = pallet.getAliquot(pos.row, pos.col);
+        if ((aliquot != null)
+            && aliquot.getSampleType().getNameShort().equals(
+                sampleTypeNameShort)
+            && aliquot.getInventoryId().equals(inventoryId)) {
+            logger.debug("freezer already contains aliquot "
+                + pallet.getLabel() + palletPos);
             return;
         }
 
@@ -219,26 +219,27 @@ public class FreezerImporter {
             return;
         }
 
-        sample = new AliquotWrapper(appService);
-        sample.setParent(pallet);
-        sample.setSampleType(sampleType);
-        sample.setInventoryId(inventoryId);
-        sample.setLinkDate(Importer.getDateFromStr(linkDateStr));
-        sample.setPosition(pos);
-        sample.setPatientVisit(visit);
+        aliquot = new AliquotWrapper(appService);
+        aliquot.setParent(pallet);
+        aliquot.setSampleType(sampleType);
+        aliquot.setInventoryId(inventoryId);
+        aliquot.setLinkDate(Importer.getDateFromStr(linkDateStr));
+        aliquot.setPosition(pos);
+        aliquot.setPatientVisit(visit);
 
         if (quantity != 0.0) {
-            sample.setQuantity(quantity);
+            aliquot.setQuantity(quantity);
         } else {
-            sample.setQuantity(ss.getVolume());
+            aliquot.setQuantity(ss.getVolume());
         }
 
-        if (!pallet.canHoldAliquot(sample)) {
+        if (!pallet.canHoldAliquot(aliquot)) {
             logger.error("pallet " + pallet.getLabel()
-                + " cannot hold sample of type " + sampleType.getName());
+                + " cannot hold aliquot with a sample of type "
+                + sampleType.getName());
             return;
         }
-        sample.persist();
+        aliquot.persist();
 
         if (currentPalletNr != palletNr) {
             logger.debug("importing freezer samples into pallet "
@@ -246,7 +247,7 @@ public class FreezerImporter {
             currentPalletNr = palletNr;
         }
 
-        logger.trace("importing freezer sample " + pallet.getLabel()
+        logger.trace("importing freezer aliquot " + pallet.getLabel()
             + palletPos);
         ++sampleImportCount;
 

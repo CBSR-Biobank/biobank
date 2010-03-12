@@ -130,7 +130,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         info.aliquot = sample;
         info.inventoryId = sample.getInventoryId();
         SampleTypeWrapper type = sample.getSampleType();
-        Assert.isNotNull(type, "sample with null for sample type");
+        Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
         info.position = sample.getPositionString();
         info.linkDate = DateFormatter.formatAsDateTime(sample.getLinkDate());

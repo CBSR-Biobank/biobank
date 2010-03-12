@@ -26,7 +26,7 @@ public class PalletCell extends Cell {
 
     private ScanCell scanCell;
 
-    private AliquotWrapper expectedSample;
+    private AliquotWrapper expectedAliquot;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -47,53 +47,53 @@ public class PalletCell extends Cell {
         return convertArray(ScanCell.getRandom());
     }
 
-    public static Map<RowColPos, PalletCell> getRandomScanLinkWithSamplesAlreadyLinked(
+    public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<AliquotWrapper> samples = DebugUtil
-            .getRandomSamplesAlreadyLinked(appService, siteId);
-        if (samples.size() > 1) {
+        List<AliquotWrapper> aliquots = DebugUtil
+            .getRandomAliquotsAlreadyLinked(appService, siteId);
+        if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;
-            ScanCell scanCell = new ScanCell(row, col, samples.get(0)
+            ScanCell scanCell = new ScanCell(row, col, aliquots.get(0)
                 .getInventoryId());
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
             row = 3;
             col = 1;
-            scanCell = new ScanCell(row, col, samples.get(1).getInventoryId());
+            scanCell = new ScanCell(row, col, aliquots.get(1).getInventoryId());
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
         }
         return cells;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomSamplesAlreadyAssigned(
+    public static Map<RowColPos, PalletCell> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> palletScanned = initArray();
-        List<AliquotWrapper> randomSamples = DebugUtil
-            .getRandomSamplesAlreadyAssigned(appService, siteId);
-        if (randomSamples.size() > 0) {
+        List<AliquotWrapper> randomAliquots = DebugUtil
+            .getRandomAliquotsAlreadyAssigned(appService, siteId);
+        if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-                0, 0, randomSamples.get(0).getInventoryId())));
+                0, 0, randomAliquots.get(0).getInventoryId())));
         }
-        if (randomSamples.size() > 1) {
+        if (randomAliquots.size() > 1) {
             palletScanned.put(new RowColPos(2, 4), new PalletCell(new ScanCell(
-                2, 4, randomSamples.get(1).getInventoryId())));
+                2, 4, randomAliquots.get(1).getInventoryId())));
         }
         return palletScanned;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomSamplesNotAssigned(
+    public static Map<RowColPos, PalletCell> getRandomAliquotsNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = initArray();
-        List<AliquotWrapper> randomSamples = DebugUtil
-            .getRandomSamplesNotAssigned(appService, siteId);
-        if (randomSamples.size() > 1) {
+        List<AliquotWrapper> randomAliquots = DebugUtil
+            .getRandomAliquotsNotAssigned(appService, siteId);
+        if (randomAliquots.size() > 1) {
             // Random r = new Random();
             // int sample1 = r.nextInt(samples.size());
             // int sample2 = r.nextInt(samples.size());
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-                0, 0, randomSamples.get(0).getInventoryId())));
+                0, 0, randomAliquots.get(0).getInventoryId())));
             // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
             // .get(1).getInventoryId()));
         }
@@ -184,12 +184,12 @@ public class PalletCell extends Cell {
         return cell != null && cell.getValue() != null;
     }
 
-    public void setExpectedSample(AliquotWrapper expectedSample) {
-        this.expectedSample = expectedSample;
+    public void setExpectedAliquot(AliquotWrapper expectedAliquot) {
+        this.expectedAliquot = expectedAliquot;
     }
 
-    public AliquotWrapper getExpectedSample() {
-        return expectedSample;
+    public AliquotWrapper getExpectedAliquot() {
+        return expectedAliquot;
     }
 
 }

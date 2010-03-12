@@ -19,7 +19,7 @@ public class AliquotAdapter extends AdapterBase {
         super(parent, sample);
     }
 
-    public AliquotWrapper getSample() {
+    public AliquotWrapper getAliquot() {
         return (AliquotWrapper) modelObject;
     }
 
@@ -30,9 +30,9 @@ public class AliquotAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        AliquotWrapper sample = getSample();
-        Assert.isNotNull(sample, "sample is null");
-        return sample.getInventoryId();
+        AliquotWrapper aliquot = getAliquot();
+        Assert.isNotNull(aliquot, "sample is null");
+        return aliquot.getInventoryId();
     }
 
     @Override

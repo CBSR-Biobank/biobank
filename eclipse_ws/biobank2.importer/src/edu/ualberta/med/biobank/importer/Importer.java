@@ -41,12 +41,12 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Container;
@@ -1112,7 +1112,7 @@ public class Importer {
                                 .getColCapacity(), bin.getContainerType()
                                 .getName());
                     } catch (Exception e) {
-                        logger.error("invalid sample position in bin \""
+                        logger.error("invalid aliquot position in bin \""
                             + binPosLabel + "\" for drawer " + drawerLabel);
                         continue;
                     }
@@ -1191,12 +1191,12 @@ public class Importer {
 
                     if (!bin.canHoldAliquot(aliquot)) {
                         logger.error("bin " + bin.getLabel()
-                            + " cannot hold sample of type "
+                            + " cannot hold aliquot with a sample of type "
                             + sampleType.getName());
                         continue;
                     }
 
-                    logger.debug("importing cabinet sample " + bin.getLabel()
+                    logger.debug("importing cabinet aliquot " + bin.getLabel()
                         + binPosLabel);
                     ++importCounts.samples;
                     aliquot.persist();
@@ -1276,7 +1276,7 @@ public class Importer {
         for (AliquotWrapper samp : samples) {
             labels += samp.getPositionString(true, true) + ", ";
         }
-        logger.error("a sample with inventory id " + inventoryId
+        logger.error("a aliquot with inventory id " + inventoryId
             + " already exists at " + labels);
         return false;
     }

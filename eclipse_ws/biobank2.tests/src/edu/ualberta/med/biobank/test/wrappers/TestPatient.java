@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -20,20 +21,19 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -189,8 +189,9 @@ public class TestPatient extends TestDatabase {
         visits = patient.getPatientVisitCollection();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        AliquotWrapper sample = AliquotHelper.addAliquot(allSampleTypes.get(0),
-            containerMap.get("ChildL1"), visits.get(0), 0, 0);
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(
+            allSampleTypes.get(0), containerMap.get("ChildL1"), visits.get(0),
+            0, 0);
         patient.reload();
 
         try {
@@ -200,8 +201,8 @@ public class TestPatient extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        // delete sample and patient
-        sample.delete();
+        // delete aliquot and patient
+        aliquot.delete();
         patient.delete();
     }
 
@@ -461,8 +462,8 @@ public class TestPatient extends TestDatabase {
                 .getPatientVisitCollection()) {
                 samples = visit.getAliquotCollection();
                 while (samples.size() > 0) {
-                    AliquotWrapper sample = samples.get(0);
-                    sample.delete();
+                    AliquotWrapper aliquot = samples.get(0);
+                    aliquot.delete();
                     visit.reload();
                     patient.reload();
                     samples = visit.getAliquotCollection();

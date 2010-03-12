@@ -13,7 +13,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DebugUtil {
 
-    public static List<AliquotWrapper> getRandomSamplesAlreadyLinked(
+    public static List<AliquotWrapper> getRandomAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -34,7 +34,7 @@ public class DebugUtil {
         return list;
     }
 
-    public static List<AliquotWrapper> getRandomSamplesAlreadyAssigned(
+    public static List<AliquotWrapper> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -57,7 +57,7 @@ public class DebugUtil {
         return list;
     }
 
-    public static List<AliquotWrapper> getRandomSamplesNotAssigned(
+    public static List<AliquotWrapper> getRandomAliquotsNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
