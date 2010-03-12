@@ -110,6 +110,7 @@ public class Importer {
         aMap.put("VAS", "VAS");
         aMap.put("A", "KDCS");
         aMap.put("C", "CCCS");
+        aMap.put("D", "HEART");
         aMap.put("E", "ERCIN");
         aMap.put("G", "CEGIIR");
         aMap.put("H", "AHFEM");
@@ -132,6 +133,7 @@ public class Importer {
         aMap.put("AB", "CL1-KDCS");
         aMap.put("AC", "VN1");
         aMap.put("CC", "ED1");
+        aMap.put("DA", "ED1");
         aMap.put("ER", "SF1");
         aMap.put("EA", "ED1");
         aMap.put("GR", "ED1");
@@ -228,7 +230,7 @@ public class Importer {
             logger.info("visits imported: " + importCounts.visits);
             logger.info("samples imported: " + importCounts.samples);
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(e.toString());
             e.printStackTrace();
         }
     }
@@ -659,6 +661,17 @@ public class Importer {
 
         while (rs.next()) {
             String patientNr = cipher.decode(rs.getBytes(2));
+
+            // update BBPDB with the decoded CHR number
+            String decChrNr = rs.getString(5);
+            if (decChrNr == null) {
+                PreparedStatement ps = con
+                    .prepareStatement("update patient set dec_chr_nr = ? where patient_nr = ?");
+                ps.setString(1, patientNr);
+                ps.setInt(2, rs.getInt(1));
+                ps.executeUpdate();
+            }
+
             studyNameShort = getStudyNameShort(patientNr, rs.getString(6));
 
             if (studyNameShort == null) {
@@ -682,16 +695,6 @@ public class Importer {
             patient.persist();
             ++importCounts.patients;
             ++count;
-
-            // update the BBPDB with the decoded CHR number
-            String decChrNr = rs.getString(5);
-            if (decChrNr == null) {
-                PreparedStatement ps = con
-                    .prepareStatement("update patient set dec_chr_nr = ? where patient_nr = ?");
-                ps.setString(1, patientNr);
-                ps.setInt(2, rs.getInt(1));
-                ps.executeUpdate();
-            }
         }
     }
 
