@@ -430,7 +430,7 @@ public class ReportsEditor extends EditorPart {
         setInput(input);
 
         reportData = new ArrayList<Object>();
-        queryClass = ((ReportInput) input).query;
+        node = ((ReportInput) input).node;
         SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
         String op = "=";
         if (siteWrap.getName().compareTo("All Sites") == 0)
