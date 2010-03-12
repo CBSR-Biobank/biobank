@@ -14,6 +14,13 @@ public class SiteHelper extends DbHelper {
     public static SiteWrapper newSite(String name) throws Exception {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
+        if (name != null) {
+            if (name.length() <= 50) {
+                site.setNameShort(name);
+            } else {
+                site.setNameShort(name.substring(50));
+            }
+        }
         site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         site.setStreet1(Utils.getRandomString(32));

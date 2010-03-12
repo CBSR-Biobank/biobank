@@ -7,7 +7,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.AbstractPatientAdminForm;
+import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class BiobankPartListener implements IPartListener {
@@ -26,9 +26,9 @@ public class BiobankPartListener implements IPartListener {
     @Override
     public void partClosed(IWorkbenchPart part) {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        if (!workbench.isClosing() && part instanceof AbstractPatientAdminForm) {
+        if (!workbench.isClosing() && part instanceof AbstractAliquotAdminForm) {
             // when the form is closed, call the method onClose
-            boolean reallyClose = ((AbstractPatientAdminForm) part).onClose();
+            boolean reallyClose = ((AbstractAliquotAdminForm) part).onClose();
             if (reallyClose) {
                 try {
                     workbench.showPerspective(
@@ -48,7 +48,7 @@ public class BiobankPartListener implements IPartListener {
 
     @Override
     public void partOpened(IWorkbenchPart part) {
-        if (part instanceof AbstractPatientAdminForm) {
+        if (part instanceof AbstractAliquotAdminForm) {
             SessionManager.getInstance().lockSite();
         }
     }

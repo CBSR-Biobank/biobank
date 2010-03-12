@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -59,7 +59,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private PatientWrapper patient;
 
     private class FormPvCustomInfo extends PvAttrCustom {
-        Control control;
+        private Control control;
     }
 
     private List<FormPvCustomInfo> pvCustomInfoList;
@@ -184,7 +184,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
             pvCustomInfo.setType(study.getStudyPvAttrType(label));
-            pvCustomInfo.setPermissible(study.getStudyPvAttrPermissible(label));
+            pvCustomInfo.setAllowedValues(study
+                .getStudyPvAttrPermissible(label));
             pvCustomInfo.setValue(patientVisit.getPvAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
@@ -194,15 +195,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
         Control control;
+        IObservableValue valueObserved = BeansObservables.observeValue(
+            pvCustomInfo, "value");
         if (pvCustomInfo.getType().equals("number")) {
             control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                pvCustomInfo.getLabel(), null, PojoObservables.observeValue(
-                    pvCustomInfo, "value"), new DoubleNumberValidator(
-                    "You should select a valid number"));
+                pvCustomInfo.getLabel(), null, valueObserved,
+                new DoubleNumberValidator("You should select a valid number"));
         } else if (pvCustomInfo.getType().equals("text")) {
             control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                pvCustomInfo.getLabel(), null, PojoObservables.observeValue(
-                    pvCustomInfo, "value"), null);
+                pvCustomInfo.getLabel(), null, valueObserved, null);
         } else if (pvCustomInfo.getType().equals("date_time")) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
@@ -210,7 +211,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         } else if (pvCustomInfo.getType().equals("select_single")) {
             control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),
-                PojoObservables.observeValue(pvCustomInfo, "value"), null);
+                valueObserved, null);
         } else if (pvCustomInfo.getType().equals("select_multiple")) {
             createFieldLabel(client, pvCustomInfo.getLabel());
             SelectMultipleWidget s = new SelectMultipleWidget(client,
@@ -314,6 +315,29 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         pvSourceVesselEntryWidget.setSelectedPvSourceVessels(patientVisit
             .getPvSourceVesselCollection());
-        // FIXME also reset for pv infos
+
+        resetPvCustomInfo();
+    }
+
+    private void resetPvCustomInfo() throws Exception {
+        StudyWrapper study = patient.getStudy();
+        String[] labels = study.getStudyPvAttrLabels();
+        if (labels == null)
+            return;
+
+        for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
+            pvCustomInfo.setValue(patientVisit.getPvAttrValue(pvCustomInfo
+                .getLabel()));
+            if (pvCustomInfo.getType().equals("date_time")) {
+                DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;
+                dateWidget.setDate(DateFormatter.parseToDateTime(pvCustomInfo
+                    .getValue()));
+            } else if (pvCustomInfo.getType().equals("select_multiple")) {
+                SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
+                if (pvCustomInfo.getValue() != null) {
+                    s.setSelections(pvCustomInfo.getValue().split(";"));
+                }
+            }
+        }
     }
 }

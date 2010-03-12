@@ -101,7 +101,7 @@ public class MultiSelectWidget extends BiobankWidget {
             destTree.reveal(node);
             srcTree.refresh();
         }
-
+        notifyListeners();
     }
 
     private TreeViewer createLabelledTree(Composite parent, String label) {

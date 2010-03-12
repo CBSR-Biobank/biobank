@@ -201,7 +201,7 @@ public class FreezerImporter {
         }
 
         RowColPos pos = LabelingScheme.sbsToRowCol(palletPos);
-        AliquotWrapper sample = pallet.getSample(pos.row, pos.col);
+        AliquotWrapper sample = pallet.getAliquot(pos.row, pos.col);
         if ((sample != null)
             && sample.getSampleType().getNameShort()
                 .equals(sampleTypeNameShort)

@@ -67,6 +67,8 @@ public class CbsrStudies {
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Disabled", "Precath visit - only urine is collected");
+        addStudy(site, "Heart failure Etiology and Analysis Research Team",
+            "HEART", "Active", null);
         addStudy(site, "Kidney Disease Cohort Study", "KDCS", "Active", null);
         addStudy(site, "Kingston Merger Study", "KMS", "Active", null);
         addStudy(site, "Man-Chui Poon Study", "MPS", "Active", null);
@@ -179,6 +181,7 @@ public class CbsrStudies {
         addSampleStorage("AHFEM", "Plasma", 5, 0.2);
         addSampleStorage("AHFEM", "Lith Hep Plasma", 20, 0.2);
         addSampleStorage("AHFEM", "PF Plasma", 2, 0.2);
+        addSampleStorage("BBPSP", "Cells", null, null);
         addSampleStorage("BBPSP", "F Urine", null, null);
         addSampleStorage("BBPSP", "Paxgene", 11, 0.8);
         addSampleStorage("BBPSP", "Plasma", 16, 0.2);
@@ -191,20 +194,37 @@ public class CbsrStudies {
         addSampleStorage("CEGIIR", "Plasma", 5, 0.4);
         addSampleStorage("CEGIIR", "WB DMSO", 2, 0.8);
         addSampleStorage("CEGIIR", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("CHILD", "Cells", null, null);
         addSampleStorage("CHILD", "WB Serum", null, null);
         addSampleStorage("CHILD", "WB RNA", null, null);
         addSampleStorage("CHILD", "WB Plasma", null, null);
         addSampleStorage("CHILD", "WBlood", null, null);
+        addSampleStorage("CHILD", "Serum", null, null);
+        addSampleStorage("CHILD", "Serum B", null, null);
         addSampleStorage("CHILD", "Serum Pel", null, null);
         addSampleStorage("CHILD", "CBMC RNA", null, null);
         addSampleStorage("CHILD", "Meconium", null, null);
         addSampleStorage("CHILD", "Plasma SH", null, null);
         addSampleStorage("CHILD", "CBMC", null, null);
-        addSampleStorage("CHILD", "Serum B", null, null);
         addSampleStorage("ERCIN", "Z Urine", 12, 0.9);
         addSampleStorage("ERCIN", "C Urine", 6, 0.9);
         addSampleStorage("ERCIN", "Serum", null, null);
         addSampleStorage("ERCIN", "Serum B", 12, 0.4);
+
+        addSampleStorage("HEART", "LH PFP 200", null, null);
+        addSampleStorage("HEART", "UrineC900", null, null);
+        addSampleStorage("HEART", "PlasmaE800", null, null);
+        addSampleStorage("HEART", "P100 500", null, null);
+        addSampleStorage("HEART", "PlasmaL500", null, null);
+        addSampleStorage("HEART", "LH PFP 500", null, null);
+        addSampleStorage("HEART", "PlasmaE200", null, null);
+        addSampleStorage("HEART", "DNA L 1000", null, null);
+        addSampleStorage("HEART", "SerumG500", null, null);
+        addSampleStorage("HEART", "PlasmaL200", null, null);
+        addSampleStorage("HEART", "DNA E 1000", null, null);
+        addSampleStorage("HEART", "PlasmaE500", null, null);
+        addSampleStorage("HEART", "UrineSA900", null, null);
+
         addSampleStorage("KDCS", "S Water", 3, 0.9);
         addSampleStorage("KDCS", "Cells", 10, 0.4);
         addSampleStorage("KDCS", "Paxgene", 11, 0.8);
@@ -258,46 +278,46 @@ public class CbsrStudies {
         addSampleStorage("SPARK", "C Urine", 5, 0.5);
         addSampleStorage("SPARK", "WB DMSO", 1, 0.5);
 
-        addPvAttr("AHFEM", "PBMC Count", "number");
-        addPvAttr("AHFEM", "Worksheet", "text");
-        addPvAttr("BBPSP", "Consent", "select_multiple",
+        addPvAttr(site, "AHFEM", "PBMC Count", "number");
+        addPvAttr(site, "AHFEM", "Worksheet", "text");
+        addPvAttr(site, "BBPSP", "Consent", "select_multiple",
             "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
-        addPvAttr("BBPSP", "Worksheet", "text");
-        addPvAttr("BBPSP", "PBMC Count", "number");
-        addPvAttr("BBPSP", "Phlebotomist", "text");
-        addPvAttr("CCCS", "PBMC Count", "number");
-        addPvAttr("CCCS", "Worksheet", "text");
-        addPvAttr("CEGIIR", "Worksheet", "text");
-        addPvAttr("CEGIIR", "PBMC Count", "number");
-        addPvAttr("CHILD", "PBMC Count", "number");
-        addPvAttr("CHILD", "Worksheet", "text");
-        addPvAttr("ERCIN", "Worksheet", "text");
-        addPvAttr("ERCIN", "PBMC Count", "number");
-        addPvAttr("ERCIN", "Visit Type", "select_single",
+        addPvAttr(site, "BBPSP", "Worksheet", "text");
+        addPvAttr(site, "BBPSP", "PBMC Count", "number");
+        addPvAttr(site, "BBPSP", "Phlebotomist", "text");
+        addPvAttr(site, "CCCS", "PBMC Count", "number");
+        addPvAttr(site, "CCCS", "Worksheet", "text");
+        addPvAttr(site, "CEGIIR", "Worksheet", "text");
+        addPvAttr(site, "CEGIIR", "PBMC Count", "number");
+        addPvAttr(site, "CHILD", "PBMC Count", "number");
+        addPvAttr(site, "CHILD", "Worksheet", "text");
+        addPvAttr(site, "ERCIN", "Worksheet", "text");
+        addPvAttr(site, "ERCIN", "PBMC Count", "number");
+        addPvAttr(site, "ERCIN", "Visit Type", "select_single",
             "Baseline;Precath;6hr Post;24hr Post;48-72hr Post");
-        addPvAttr("KDCS", "Worksheet", "text");
-        addPvAttr("KDCS", "Consent", "select_multiple", "Genetic");
-        addPvAttr("KDCS", "PBMC Count", "number");
-        addPvAttr("KMS", "PBMC Count", "number");
-        addPvAttr("KMS", "Worksheet", "text");
-        addPvAttr("LCS", "PBMC Count", "number");
-        addPvAttr("LCS", "Worksheet", "text");
-        addPvAttr("MPS", "PBMC Count", "number");
-        addPvAttr("MPS", "PBMC Count", "number");
-        addPvAttr("MPS", "Worksheet", "text");
-        addPvAttr("NHS", "PBMC Count", "number");
-        addPvAttr("NHS", "Worksheet", "text");
-        addPvAttr("NHS", "Visit Type", "select_single",
+        addPvAttr(site, "KDCS", "Worksheet", "text");
+        addPvAttr(site, "KDCS", "Consent", "select_multiple", "Genetic");
+        addPvAttr(site, "KDCS", "PBMC Count", "number");
+        addPvAttr(site, "KMS", "PBMC Count", "number");
+        addPvAttr(site, "KMS", "Worksheet", "text");
+        addPvAttr(site, "LCS", "PBMC Count", "number");
+        addPvAttr(site, "LCS", "Worksheet", "text");
+        addPvAttr(site, "MPS", "PBMC Count", "number");
+        addPvAttr(site, "MPS", "PBMC Count", "number");
+        addPvAttr(site, "MPS", "Worksheet", "text");
+        addPvAttr(site, "NHS", "PBMC Count", "number");
+        addPvAttr(site, "NHS", "Worksheet", "text");
+        addPvAttr(site, "NHS", "Visit Type", "select_single",
             "D0;D2;D4;Wk2;Wk4;M2;M8;M12;M18;M24");
-        addPvAttr("NHS", "Biopsy Length", "number");
-        addPvAttr("RVS", "PBMC Count", "number");
-        addPvAttr("RVS", "Worksheet", "text");
-        addPvAttr("SPARK", "PBMC Count", "number");
-        addPvAttr("SPARK", "Worksheet", "text");
-        addPvAttr("TCKS", "PBMC Count", "number");
-        addPvAttr("TCKS", "Worksheet", "text");
-        addPvAttr("VAS", "PBMC Count", "number");
-        addPvAttr("VAS", "Worksheet", "text");
+        addPvAttr(site, "NHS", "Biopsy Length", "number");
+        addPvAttr(site, "RVS", "PBMC Count", "number");
+        addPvAttr(site, "RVS", "Worksheet", "text");
+        addPvAttr(site, "SPARK", "PBMC Count", "number");
+        addPvAttr(site, "SPARK", "Worksheet", "text");
+        addPvAttr(site, "TCKS", "PBMC Count", "number");
+        addPvAttr(site, "TCKS", "Worksheet", "text");
+        addPvAttr(site, "VAS", "PBMC Count", "number");
+        addPvAttr(site, "VAS", "Worksheet", "text");
 
         addContact("Dr. Justin Ezekowitz", "ED1", "AHFEM");
         addContact("Morna Brown", "CL1", "BBPSP");
@@ -327,6 +347,7 @@ public class CbsrStudies {
         addContact("Dellanee Kahlke", "ED1", "CHILD");
         addContact("Candace Dando", "ED1", "ERCIN");
         addContact("Daisy Gibbons", "SF1", "ERCIN");
+        addContact("Elizabeth Taylor", "ED1", "HEART");
         addContact("Dawn Opgenorth", "ED1", "KDCS");
         addContact("Ann Chala", "VN1", "KDCS");
         addContact("Sharon Gulewich", "CL1-KDCS", "KDCS");
@@ -403,8 +424,8 @@ public class CbsrStudies {
 
     }
 
-    private static void addPvAttr(String studyNameShort, String label,
-        String type, String permissible) throws Exception {
+    private static void addPvAttr(SiteWrapper site, String studyNameShort,
+        String label, String type, String permissible) throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
         if ((permissible != null) && (permissible.length() > 0)) {
             study.setStudyPvAttr(label, type, permissible.split(";"));
@@ -415,11 +436,20 @@ public class CbsrStudies {
             .getActivityStatus(study.getAppService(), "Active"));
         study.persist();
         study.reload();
+
+        List<String> sitePvAttrs = SiteWrapper.getPvAttrTypeNames(site
+            .getAppService());
+        if (!sitePvAttrs.contains(label)) {
+            // add this pv attr to the site
+            site.setSitePvAttr(label, type);
+            site.persist();
+            site.reload();
+        }
     }
 
-    private static void addPvAttr(String studyNameShort, String label,
-        String type) throws Exception {
-        addPvAttr(studyNameShort, label, type, null);
+    private static void addPvAttr(SiteWrapper site, String studyNameShort,
+        String label, String type) throws Exception {
+        addPvAttr(site, studyNameShort, label, type, null);
     }
 
     private static void addContact(String contactName, String clinicName,

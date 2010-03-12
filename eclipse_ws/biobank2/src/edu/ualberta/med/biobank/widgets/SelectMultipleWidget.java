@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.widgets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
@@ -38,12 +40,12 @@ public class SelectMultipleWidget extends BiobankWidget {
     public void setSelections(String[] values) {
         if (values == null)
             return;
-
-        for (String value : values) {
+        List<String> valuesToSelect = Arrays.asList(values);
+        for (String value : checkBoxes.keySet()) {
             Button b = checkBoxes.get(value);
             if (b == null)
                 continue;
-            b.setSelection(true);
+            b.setSelection(valuesToSelect.contains(value));
         }
     }
 

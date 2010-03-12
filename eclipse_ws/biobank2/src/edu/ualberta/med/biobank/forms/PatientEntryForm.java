@@ -86,7 +86,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         Text labelSite = createReadOnlyField(client, SWT.NONE, "Site");
-        siteWrapper = SessionManager.getInstance().getCurrentSiteWrapper();
+        siteWrapper = SessionManager.getInstance().getCurrentSite();
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();

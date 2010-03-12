@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
-public abstract class AbstractPatientAdminForm extends BiobankEntryForm {
+public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
     /**
      * Indicate if this form has been saved

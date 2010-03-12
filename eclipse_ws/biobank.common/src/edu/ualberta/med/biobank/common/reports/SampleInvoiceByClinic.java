@@ -14,7 +14,7 @@ public class SampleInvoiceByClinic extends QueryObject {
         + "Alias.linkDate, Alias.sampleType.name  from "
         + Aliquot.class.getName()
         + " as Alias where Alias.linkDate > ? and Alias.linkDate < ? and "
-        + "Alias.patientVisit.patient.study.site.id {1} {0} ORDER BY "
+        + "Alias.patientVisit.patient.study.site.id {1} {0,number,#} ORDER BY "
         + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
 
     public SampleInvoiceByClinic(String op, Integer siteId) {

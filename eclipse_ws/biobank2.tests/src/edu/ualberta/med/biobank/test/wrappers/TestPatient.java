@@ -189,7 +189,7 @@ public class TestPatient extends TestDatabase {
         visits = patient.getPatientVisitCollection();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        AliquotWrapper sample = AliquotHelper.addSample(allSampleTypes.get(0),
+        AliquotWrapper sample = AliquotHelper.addAliquot(allSampleTypes.get(0),
             containerMap.get("ChildL1"), visits.get(0), 0, 0);
         patient.reload();
 
@@ -442,7 +442,7 @@ public class TestPatient extends TestDatabase {
             for (PatientVisitWrapper visit : patient
                 .getPatientVisitCollection()) {
                 for (int i = 0; i < 2; ++i) {
-                    samples.add(AliquotHelper.addSample(allSampleTypes.get(r
+                    samples.add(AliquotHelper.addAliquot(allSampleTypes.get(r
                         .nextInt(sampleTypeCount)), childL1, visit, sampleCount
                         / maxCols, sampleCount % maxCols));
                     patient1.reload();

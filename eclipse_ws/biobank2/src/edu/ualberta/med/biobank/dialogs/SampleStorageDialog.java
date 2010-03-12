@@ -155,8 +155,4 @@ public class SampleStorageDialog extends BiobankDialog {
         super.okPressed();
     }
 
-    public SampleStorageWrapper getSampleStorage() {
-        return sampleStorage;
-    }
-
 }

@@ -80,7 +80,7 @@ public class ContainerTypeHelper extends DbHelper {
      */
     public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
         String name, boolean topContainer) throws Exception {
-        return addContainerType(site, name, "", 1, r.nextInt(10) + 1, r
+        return addContainerType(site, name, name, 1, r.nextInt(10) + 1, r
             .nextInt(10) + 1, topContainer);
     }
 

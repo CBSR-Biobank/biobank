@@ -176,7 +176,7 @@ public class StudyViewForm extends BiobankViewForm {
             combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
             combinedPvInfo.setType(study.getStudyPvAttrType(label));
-            combinedPvInfo.setPermissible(study
+            combinedPvInfo.setAllowedValues(study
                 .getStudyPvAttrPermissible(label));
             pvCustomInfoList.add(combinedPvInfo);
         }

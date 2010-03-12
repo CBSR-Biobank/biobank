@@ -433,7 +433,7 @@ public class ContainerWrapper extends
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public AliquotWrapper getSample(Integer row, Integer col)
+    public AliquotWrapper getAliquot(Integer row, Integer col)
         throws BiobankCheckException {
         AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
@@ -463,7 +463,7 @@ public class ContainerWrapper extends
                 + " does not allow inserts of type "
                 + aliquot.getSampleType().getName() + ".");
         } else {
-            AliquotWrapper sampleAtPosition = getSample(row, col);
+            AliquotWrapper sampleAtPosition = getAliquot(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
@@ -877,7 +877,9 @@ public class ContainerWrapper extends
         } else {
             for (RowColPos rcp : positions) {
                 ContainerWrapper child = getChild(rcp);
-                oneChildrenDeleted = deleteChild(type, child);
+                if (child != null) {
+                    oneChildrenDeleted = deleteChild(type, child);
+                }
             }
         }
         reload();

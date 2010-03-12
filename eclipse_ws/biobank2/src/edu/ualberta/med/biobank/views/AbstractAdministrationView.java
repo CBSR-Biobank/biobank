@@ -89,12 +89,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     protected abstract Object search(String text) throws Exception;
 
     private void setSiteManagement() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        ISourceProvider siteSelectionStateSourceProvider = service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
         Integer siteId = (Integer) siteSelectionStateSourceProvider
             .getCurrentState().get(SiteSelectionState.SITE_SELECTION_ID);
         setTextEnablement(siteId);
@@ -120,7 +115,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     }
 
     protected void setTextEnablement(Integer siteId) {
-        treeText.setEnabled(siteId != null);
+        treeText.setEnabled(siteId != null && siteId >= 0);
         rootNode.removeAll();
     }
 
@@ -175,14 +170,18 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     @Override
     public void dispose() {
         super.dispose();
+        getSiteSelectionStateSourceProvider().removeSourceProviderListener(
+            siteStateListener);
+    }
+
+    private ISourceProvider getSiteSelectionStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         ISourceProvider siteSelectionStateSourceProvider = service
             .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
-        siteSelectionStateSourceProvider
-            .removeSourceProviderListener(siteStateListener);
+        return siteSelectionStateSourceProvider;
     }
 
     @Override

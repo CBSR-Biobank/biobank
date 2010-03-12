@@ -87,7 +87,7 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.AliquotManagementPerspective"
-            id="edu.ualberta.med.biobank.perspective.samplesManagement"
+            id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
             name="Samples Management Perspective">
       </perspective>
       <perspective
@@ -198,6 +198,14 @@
       <command id="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
             name="Delete tree view selection">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.search"
+            name="Search">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:false"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -305,11 +313,9 @@
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
          <activeWhen>
-           <and>
             <reference
                   definitionId="biobank2.loggedIn">
             </reference>
-           </and>
          </activeWhen>
       </handler>
       <handler
@@ -470,22 +476,43 @@
             class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
             commandId="edu.ualberta.med.biobank.commands.sessionReload">
          <activeWhen>
-            <and>
                <reference
                      definitionId="biobank2.loggedIn">
                </reference>
-            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.SessionDeleteSelectionHandler"      
             commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection">
          <activeWhen>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.SearchHandler"
+            commandId="edu.ualberta.med.biobank.commands.search">
+         <activeWhen>
             <and>
                <reference
                      definitionId="biobank2.loggedIn">
                </reference>
-            </and>
+               <reference
+                     definitionId="biobank2.siteSelected">
+               </reference>
+               <or>
+               <reference
+                     definitionId="biobank2.mainPerpectiveSelected">
+               </reference>
+               <reference
+                     definitionId="biobank2.patientsPerpectiveSelected">
+               </reference>
+               <reference
+                     definitionId="biobank2.shipmentsPerpectiveSelected">
+               </reference>
+			   </or>
+             </and>
          </activeWhen>
       </handler>
    </extension>
@@ -734,6 +761,28 @@
             <control
                   class="edu.ualberta.med.biobank.rcp.SiteCombo">
             </control>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="toggle"
+                  tooltip="Search">
+               <visibleWhen
+                     checkEnabled="false">
+                  <and>
+                     <not>
+                        <reference
+                              definitionId="biobank2.sampleManagementPerspectiveSelected">
+                        </reference>
+                     </not>
+                     <not>
+                        <reference
+                              definitionId="biobank2.reportsPerpectiveSelected">
+                        </reference>
+                     </not>
+                  </and>
+               </visibleWhen>
+            </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -904,7 +953,7 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.patientsAdmin">
+               id="edu.ualberta.med.biobank.views.PatientsAdminView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
@@ -1007,7 +1056,18 @@
                standalone="false"
                visible="true">
          </view>
-         
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               ratio="0.15"
+               relationship="top"
+               relative="edu.ualberta.med.biobank.views.SessionsView"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.reports">
@@ -1062,7 +1122,7 @@
          </view>
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.views.patientsAdmin"
+               id="edu.ualberta.med.biobank.views.PatientsAdminView"
                minimized="false"
                moveable="false"
                ratio="0.20"
@@ -1072,9 +1132,21 @@
                standalone="false"
                visible="true">
          </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               ratio="0.15"
+               relationship="top"
+               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.samplesManagement">
+            targetID="edu.ualberta.med.biobank.perspective.aliquotsManagement">
          <view
                closeable="false"
                id="org.eclipse.ui.console.ConsoleView"
@@ -1114,7 +1186,7 @@
          </view>
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.views.shipmentAdmin"
+               id="edu.ualberta.med.biobank.views.ShipmentAdminView"
                minimized="false"
                moveable="false"
                ratio="0.20"
@@ -1123,6 +1195,18 @@
                showTitle="false"
                standalone="false"
                visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               ratio="0.15"
+               relationship="top"
+               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
+               showTitle="true"
+               standalone="false"
+               visible="false">
          </view>
       </perspectiveExtension>
       </extension>
@@ -1465,15 +1549,22 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
             icon="icons/patientPerspective.png"
-            id="edu.ualberta.med.biobank.views.patientsAdmin"
+            id="edu.ualberta.med.biobank.views.PatientsAdminView"
             name="Patients administration"
             restorable="true">
       </view>
       <view
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
             icon="icons/shipmentPerpective.png"
-            id="edu.ualberta.med.biobank.views.shipmentAdmin"
+            id="edu.ualberta.med.biobank.views.ShipmentAdminView"
             name="Shipments administration"
+            restorable="true">
+      </view>
+      <view
+            class="edu.ualberta.med.biobank.views.SearchView"
+            icon="icons/search.png"
+            id="edu.ualberta.med.biobank.views.SearchView"
+            name="Search"
             restorable="true">
       </view>
    </extension>
@@ -1520,7 +1611,7 @@
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
-                  value="edu.ualberta.med.biobank.perspective.samplesManagement">
+                  value="edu.ualberta.med.biobank.perspective.aliquotsManagement">
             </equals>
          </with>
       </definition>
@@ -1566,7 +1657,7 @@
                variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionId">
             <not>
                <equals
-                     value="null">
+                     value="-9999">
                </equals>
             </not>
          </with>
