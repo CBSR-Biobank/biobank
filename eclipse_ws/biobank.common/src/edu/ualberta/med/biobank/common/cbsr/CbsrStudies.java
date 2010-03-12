@@ -347,6 +347,7 @@ public class CbsrStudies {
         addContact("Dellanee Kahlke", "ED1", "CHILD");
         addContact("Candace Dando", "ED1", "ERCIN");
         addContact("Daisy Gibbons", "SF1", "ERCIN");
+        addContact("Elizabeth Taylor", "ED1", "HEART");
         addContact("Dawn Opgenorth", "ED1", "KDCS");
         addContact("Ann Chala", "VN1", "KDCS");
         addContact("Sharon Gulewich", "CL1-KDCS", "KDCS");
