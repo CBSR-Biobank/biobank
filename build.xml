@@ -4,9 +4,13 @@
      Overall build file
      use command "ant -projecthelp" to display the targets.
     -->
+  <exec executable="hostname" outputproperty="host.name">
+    <arg value="-f"/>
+  </exec>
+
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
-  <property name="${host}/" value="" />
+  <!--property name="${host}/" value="" /-->
   <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
@@ -103,6 +107,14 @@
       <equals arg1="${ENABLE_SECURITY}" arg2="yes" casesensitive="false"
               trim="true" />
     </or>
+  </condition>
+  <condition property="isHostAicmlMed">
+    <equals arg1="${host.name}" arg2="aicml-med.cs.uablerta.ca"
+            casesensitive="true" trim="true" />
+  </condition>
+  <condition property="isHostCbsr">
+    <equals arg1="${host.name}" arg2="cbsr.biochem.uablerta.ca"
+            casesensitive="true" trim="true" />
   </condition>
   <!-- end of copied part -->
   <target name="check-jars-available">
@@ -267,8 +279,20 @@
               targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
               srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
   </target>
-  <target name="deploy-jboss" depends="package-webapp-orm,check-jboss-uptodate"
-          description="deploys the caCORE SDK webapp to JBoss" unless="jboss.uptodate">
+  <target name="hostAicmlMed" if="isHostAicmlMed">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="hostCbsr" if="isHostCbsr">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="deploy-jboss"
+          depends="package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr"
+          description="deploys the caCORE SDK webapp to JBoss"
+          unless="jboss.uptodate">
     <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
@@ -297,6 +321,7 @@
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
           overwrite="true" />
   </target>
+
   <target name="deploy" description="deploys to JBoss and Eclipse project">
     <antcall target="jars-download" />
     <antcall target="deploy-eclipse" />
