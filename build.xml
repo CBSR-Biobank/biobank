@@ -113,7 +113,7 @@
             casesensitive="true" trim="true" />
   </condition>
   <condition property="isHostCbsr">
-    <equals arg1="${host.name}" arg2="cbsr.biochem.uablerta.ca"
+    <equals arg1="${host.name}" arg2="cbsr.biochem.ualberta.ca"
             casesensitive="true" trim="true" />
   </condition>
   <!-- end of copied part -->
@@ -294,6 +294,7 @@
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
+    <echo message="host ${host.name}" />
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
           overwrite="true" />
