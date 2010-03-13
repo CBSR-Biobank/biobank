@@ -1156,14 +1156,20 @@ public class Importer {
                     visits = patient.getVisits(dateProcessed, dateTaken);
 
                     if (visits.size() == 0) {
-                        logger.error("patient " + patientNr
-                            + ", visit not found for date "
-                            + DateFormatter.formatAsDateTime(dateProcessed));
+                        logger.error("patient/" + patientNr + "inventory_id/"
+                            + inventoryId
+                            + " visit not found for dateProcessed/"
+                            + DateFormatter.formatAsDate(dateProcessed)
+                            + " DateTaken/"
+                            + DateFormatter.formatAsDate(dateTaken));
                         continue;
                     } else if (visits.size() > 1) {
-                        logger.info("patient " + patientNr
-                            + ", multiple visits for date "
-                            + DateFormatter.formatAsDateTime(dateProcessed));
+                        logger.info("patient/" + patientNr + "inventory_id/"
+                            + inventoryId
+                            + " multiple visits for dateProcessed/"
+                            + DateFormatter.formatAsDate(dateProcessed)
+                            + " DateTaken/"
+                            + DateFormatter.formatAsDate(dateTaken));
                     }
 
                     visit = visits.get(0);
