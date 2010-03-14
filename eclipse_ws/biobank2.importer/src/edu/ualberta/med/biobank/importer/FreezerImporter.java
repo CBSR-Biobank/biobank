@@ -5,8 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -19,7 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FreezerImporter {
 
@@ -187,13 +185,13 @@ public class FreezerImporter {
             dateTaken);
 
         if (visits.size() == 0) {
-            logger.error("patient/" + patientNr + "inventory_id/" + inventoryId
-                + " visit not found for dateProcessed/"
+            logger.error("patient/" + patientNr + " inventory_id/"
+                + inventoryId + " visit not found for dateProcessed/"
                 + DateFormatter.formatAsDate(dateProcessed) + " DateTaken/"
                 + DateFormatter.formatAsDate(dateTaken));
             return;
         } else if (visits.size() > 1) {
-            logger.info("patient/" + patientNr + "inventory_id/" + inventoryId
+            logger.info("patient/" + patientNr + " inventory_id/" + inventoryId
                 + " multiple visits for dateProcessed/"
                 + DateFormatter.formatAsDate(dateProcessed) + " DateTaken/"
                 + DateFormatter.formatAsDate(dateTaken));
