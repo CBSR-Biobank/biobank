@@ -1156,7 +1156,7 @@ public class Importer {
                     visits = patient.getVisits(dateProcessed, dateTaken);
 
                     if (visits.size() == 0) {
-                        logger.error("patient/" + patientNr + "inventory_id/"
+                        logger.error("patient/" + patientNr + " inventory_id/"
                             + inventoryId
                             + " visit not found for dateProcessed/"
                             + DateFormatter.formatAsDate(dateProcessed)
@@ -1164,7 +1164,7 @@ public class Importer {
                             + DateFormatter.formatAsDate(dateTaken));
                         continue;
                     } else if (visits.size() > 1) {
-                        logger.info("patient/" + patientNr + "inventory_id/"
+                        logger.info("patient/" + patientNr + " inventory_id/"
                             + inventoryId
                             + " multiple visits for dateProcessed/"
                             + DateFormatter.formatAsDate(dateProcessed)
