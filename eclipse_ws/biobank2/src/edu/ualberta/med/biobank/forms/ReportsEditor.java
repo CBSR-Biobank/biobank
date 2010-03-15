@@ -32,7 +32,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -118,10 +117,6 @@ public class ReportsEditor extends EditorPart {
 
         final ArrayList<Object> params = getParams();
 
-        // we dont want the user to change options while the search is in
-        // progress
-        setEnabled(false);
-
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {
@@ -192,7 +187,6 @@ public class ReportsEditor extends EditorPart {
                             gd.horizontalAlignment = SWT.FILL;
                             gd.verticalAlignment = SWT.FILL;
                             reportTable.setLayoutData(gd);
-                            setEnabled(true);
                             top.layout();
                             updateScrollBars();
                         }
@@ -227,15 +221,6 @@ public class ReportsEditor extends EditorPart {
 
         printButton.setEnabled(false);
         exportButton.setEnabled(false);
-    }
-
-    private void setEnabled(boolean enabled) {
-        SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
-        generateButton.setEnabled(enabled);
-        printButton.setEnabled(enabled);
-        exportButton.setEnabled(enabled);
-        for (int i = 0; i < widgetFields.size(); i++)
-            ((Control) widgetFields.get(i)).setEnabled(enabled);
     }
 
     private ArrayList<Object> getParams() {
