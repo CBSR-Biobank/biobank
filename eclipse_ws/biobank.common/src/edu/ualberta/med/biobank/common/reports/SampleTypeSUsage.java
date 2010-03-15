@@ -19,12 +19,12 @@ public class SampleTypeSUsage extends QueryObject {
         + "ss.study.nameShort from "
         + SampleStorage.class.getName()
         + " ss "
-        + "where st.site = {0} OR st.site is null  ORDER BY ss.sampleType.nameShort";
+        + "where ss.study.site = {0,number,#} OR {0,number,#}=-9999 ORDER BY ss.sampleType.nameShort";
     private static String query2 = "select st.nameShort from "
         + SampleType.class.getName()
         + " st where st not in (select ss.sampleType from "
         + SampleStorage.class.getName()
-        + " ss) and st.site = {0} OR st.site is null";
+        + " ss) and st.site = {0,number,#} OR {0,number,#}=-9999";
 
     public SampleTypeSUsage(String op, Integer siteId) {
         super(
@@ -46,20 +46,18 @@ public class SampleTypeSUsage extends QueryObject {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c1 = new HQLCriteria(query1);
         c1.setParameters(params);
-        results = appService.query(c1);
+        results = ((ListProxy) appService.query(c1)).getListChunk();
         HQLCriteria c2 = new HQLCriteria(query2);
         c2.setParameters(params);
-        results.addAll(postProcess(appService.query(c2)));
-        return ((ListProxy) results).getListChunk();
+        results.addAll(specialPostProcess(appService.query(c2)));
+        return results;
     }
 
-    @Override
-    protected List<Object> postProcess(List<Object> results) {
+    protected List<Object> specialPostProcess(List<Object> results) {
         List<Object> expandedResults = new ArrayList<Object>();
         for (Object ob : results) {
             expandedResults.add(new Object[] { ob, "Unused" });
         }
         return expandedResults;
     }
-
 }

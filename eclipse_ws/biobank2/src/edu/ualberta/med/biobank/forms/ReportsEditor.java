@@ -74,6 +74,7 @@ import edu.ualberta.med.biobank.common.reports.SampleInvoiceByClinic;
 import edu.ualberta.med.biobank.common.reports.SampleInvoiceByPatient;
 import edu.ualberta.med.biobank.common.reports.SampleRequest;
 import edu.ualberta.med.biobank.common.reports.SampleSCount;
+import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -476,6 +477,7 @@ public class ReportsEditor extends EditorPart {
         columnWidths.put(SampleRequest.class, new int[] { 100, 100, 100, 100,
             100 });
         columnWidths.put(SampleSCount.class, new int[] { 100, 100, 100 });
+        columnWidths.put(SampleTypeSUsage.class, new int[] { 100, 100 });
         columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
