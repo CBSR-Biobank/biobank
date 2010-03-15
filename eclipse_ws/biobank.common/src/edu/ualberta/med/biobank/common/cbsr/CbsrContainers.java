@@ -130,7 +130,7 @@ public class CbsrContainers {
     private static void createSentSamplesFreezer(SiteWrapper site)
         throws Exception {
         ContainerWrapper hotel;
-        ContainerWrapper freezer05 = addTopLevelContainer(site, "Sent Samples",
+        ContainerWrapper freezer05 = addTopLevelContainer(site, "SS",
             CbsrContainerTypes.getContainerType("Freezer 4x6"));
         ContainerTypeWrapper h13Type = CbsrContainerTypes
             .getContainerType("Hotel 13");

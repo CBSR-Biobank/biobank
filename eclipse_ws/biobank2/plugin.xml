@@ -150,7 +150,7 @@
       </command>
       <category
             id="edu.ualberta.med.biobank.category.patientsAdmin"
-            name="Patients Administration">
+            name="Patient Administration">
       </category>
       <command
             id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
@@ -1527,7 +1527,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Sessions"
+            name="Administration"
             restorable="true">
       </view>
       <view
@@ -1551,14 +1551,14 @@
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.PatientsAdminView"
-            name="Patients administration"
+            name="Patient administration"
             restorable="true">
       </view>
       <view
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
             icon="icons/shipmentPerpective.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
-            name="Shipments administration"
+            name="Shipment Administration"
             restorable="true">
       </view>
       <view
