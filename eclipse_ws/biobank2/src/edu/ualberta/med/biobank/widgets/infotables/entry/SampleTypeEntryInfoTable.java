@@ -104,59 +104,67 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
-            @Override
-            public void addItem(InfoTableEvent event) {
-                addSampleType();
-            }
-        });
-
-        addEditItemListener(new IInfoTableEditItemListener() {
-            @Override
-            public void editItem(InfoTableEvent event) {
-                SampleTypeWrapper type = getSelection();
-                Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
-                restrictedTypes.remove(type);
-                addOrEditSampleType(false, type, restrictedTypes, editMessage);
-            }
-        });
-
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
-            @Override
-            public void deleteItem(InfoTableEvent event) {
-                SampleTypeWrapper sampleType = getSelection();
-
-                try {
-                    if (sampleType.isUsedBySamples()) {
-                        BioBankPlugin.openError("Sample Type Delete Error",
-                            "Cannot delete sample type \""
-                                + sampleType.getName()
-                                + "\" since there are samples of this "
-                                + "type already in the database.");
-                        return;
-                    }
-
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Sample Type",
-                        "Are you sure you want to delete sample type \""
-                            + sampleType.getName() + "\"?")) {
-                        return;
-                    }
-
-                    // equals method now compare toString() results if both
-                    // ids are null.
-                    selectedSampleTypes.remove(sampleType);
-
-                    setCollection(selectedSampleTypes);
-                    deletedSampleTypes.add(sampleType);
-                } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                } catch (Exception e) {
-                    logger.error("BioBankFormBase.createPartControl Error", e);
+        if (SessionManager.canCreate(SampleTypeWrapper.class)) {
+            addAddItemListener(new IInfoTableAddItemListener() {
+                @Override
+                public void addItem(InfoTableEvent event) {
+                    addSampleType();
                 }
-            }
-        });
+            });
+        }
+
+        if (SessionManager.canUpdate(SampleTypeWrapper.class)) {
+            addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(InfoTableEvent event) {
+                    SampleTypeWrapper type = getSelection();
+                    Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
+                    restrictedTypes.remove(type);
+                    addOrEditSampleType(false, type, restrictedTypes,
+                        editMessage);
+                }
+            });
+        }
+
+        if (SessionManager.canDelete(SampleTypeWrapper.class)) {
+            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    SampleTypeWrapper sampleType = getSelection();
+
+                    try {
+                        if (sampleType.isUsedBySamples()) {
+                            BioBankPlugin.openError("Sample Type Delete Error",
+                                "Cannot delete sample type \""
+                                    + sampleType.getName()
+                                    + "\" since there are samples of this "
+                                    + "type already in the database.");
+                            return;
+                        }
+
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Sample Type",
+                            "Are you sure you want to delete sample type \""
+                                + sampleType.getName() + "\"?")) {
+                            return;
+                        }
+
+                        // equals method now compare toString() results if both
+                        // ids are null.
+                        selectedSampleTypes.remove(sampleType);
+
+                        setCollection(selectedSampleTypes);
+                        deletedSampleTypes.add(sampleType);
+                    } catch (final RemoteConnectFailureException exp) {
+                        BioBankPlugin.openRemoteConnectErrorMessage();
+                    } catch (Exception e) {
+                        logger.error("BioBankFormBase.createPartControl Error",
+                            e);
+                    }
+                }
+            });
+        }
     }
 
     private boolean addEditOk(SampleTypeWrapper type,
