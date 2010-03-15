@@ -27,7 +27,7 @@ public class SampleRequest extends QueryObject {
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
+    protected List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;

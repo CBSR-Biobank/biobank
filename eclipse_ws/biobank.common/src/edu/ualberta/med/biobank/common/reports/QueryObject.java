@@ -33,6 +33,7 @@ public abstract class QueryObject {
         aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
         aMap.put(SampleRequest.NAME, SampleRequest.class);
         aMap.put(SampleSCount.NAME, SampleSCount.class);
+        aMap.put(SampleTypeSUsage.NAME, SampleTypeSUsage.class);
         aMap.put(QACabinetSamples.NAME, QACabinetSamples.class);
         aMap.put(QAFreezerSamples.NAME, QAFreezerSamples.class);
         QUERIES = Collections.unmodifiableMap(aMap);
@@ -116,20 +117,25 @@ public abstract class QueryObject {
         return description;
     }
 
-    @SuppressWarnings("unchecked")
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
-        List<Object> results = null;
-        results = postProcess(((ListProxy) executeQuery(appService, params))
-            .getListChunk());
-        return results;
+        return postProcess(executeQuery(appService, preProcess(params)));
     }
 
-    public List<Object> executeQuery(WritableApplicationService appService,
+    @SuppressWarnings("unchecked")
+    protected List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        return appService.query(c);
+        return ((ListProxy) appService.query(c)).getListChunk();
+    }
+
+    protected List<Object> preProcess(List<Object> params) {
+        return params;
+    }
+
+    protected List<Object> postProcess(List<Object> results) {
+        return results;
     }
 
     public String[] getColumnNames() {
@@ -146,9 +152,5 @@ public abstract class QueryObject {
     }
 
     public abstract String getName();
-
-    public List<Object> postProcess(List<Object> results) {
-        return results;
-    }
 
 }
