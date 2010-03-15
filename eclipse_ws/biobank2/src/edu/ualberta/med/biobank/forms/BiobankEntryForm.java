@@ -168,6 +168,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         throws PartInitException {
         super.init(editorSite, input);
         setDirty(false);
+        checkEditAccess();
+    }
+
+    protected void checkEditAccess() {
+        if (adapter != null && adapter.getModelObject() != null
+            && !adapter.getModelObject().canEdit()) {
+            BioBankPlugin.openAccessDeniedErrorMessage();
+            throw new RuntimeException("Cannot edit. Access Denied.");
+        }
     }
 
     @Override

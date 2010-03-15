@@ -47,15 +47,17 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add a Container");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addContainer(ContainerGroup.this
-                    .getParentFromClass(SiteAdapter.class));
-            }
-        });
+        if (SessionManager.canCreate(ContainerWrapper.class)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add a Container");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    addContainer(ContainerGroup.this
+                        .getParentFromClass(SiteAdapter.class));
+                }
+            });
+        }
     }
 
     @Override

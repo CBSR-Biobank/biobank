@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -37,15 +38,17 @@ public class ContainerTypeGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Container Type");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addContainerType(ContainerTypeGroup.this
-                    .getParentFromClass(SiteAdapter.class));
-            }
-        });
+        if (SessionManager.canCreate(ContainerTypeWrapper.class)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add Container Type");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    addContainerType(ContainerTypeGroup.this
+                        .getParentFromClass(SiteAdapter.class));
+                }
+            });
+        }
     }
 
     @Override

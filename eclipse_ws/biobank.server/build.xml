@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="biobank.server">
+	<property environment="env" />
+	<property name="debuglevel" value="source,lines,vars" />
+	<property name="target" value="1.6" />
+	<property name="source" value="1.6" />
+	<property name="cacore.sdk.dir" location="../../caCORE_SDK/sdk" />
+
+	<path id="biobank.server.classpath">
+		<pathelement location="bin" />
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<mkdir dir="bin" />
+		<mkdir dir="output" />
+		<copy includeemptydirs="false" todir="bin">
+			<fileset dir="src">
+				<exclude name="**/*.launch" />
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+
+	<target name="cleanall" depends="clean" />
+
+	<target name="build" depends="init">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+			<src path="src" />
+			<classpath refid="biobank.server.classpath" />
+		</javac>
+	</target>
+
+	<target name="build-remote-lib" depends="build">
+		<jar destfile="output/biobank-remote.jar" basedir="bin">
+			<manifest>
+				<attribute name="Generated-By" value="AICML Ant build file" />
+			</manifest>
+			<include name="**/applicationservice/*.*" />
+			<include name="**/query/*.*" />
+			<exclude name="**/*Impl.*" />
+		</jar>
+	</target>
+	
+	<target name="build-validator-lib">
+		<jar destfile="output/biobank-validators.jar" basedir="bin">
+			<manifest>
+				<attribute name="Generated-By" value="AICML Ant build file" />
+			</manifest>
+			<include name="**/validator/*.*" />
+		</jar>
+	</target>
+
+
+</project>

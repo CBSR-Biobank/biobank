@@ -478,7 +478,7 @@ public abstract class AdapterBase {
 
     protected void addDeleteMenu(Menu menu, String objectName,
         final String question) {
-        if (enableActions) {
+        if (isEditable() && enableActions) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -612,7 +612,7 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable;
+        return editable && modelObject.canEdit();
     }
 
     public void setEditable(boolean editable) {

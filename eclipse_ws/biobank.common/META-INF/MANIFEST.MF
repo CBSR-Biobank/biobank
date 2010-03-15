@@ -27,7 +27,9 @@ Bundle-ClassPath: conf/,
  lib/sdk-security.jar,
  lib/sdk-writable-client-framework.jar,
  lib/spring.jar,
- lib/xercesImpl.jar
+ lib/xercesImpl.jar,
+ lib/biobank-remote.jar,
+ .
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,
@@ -55,6 +57,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.formatters,
  edu.ualberta.med.biobank.common.reports;uses:="gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.common.reports.advanced,
+ edu.ualberta.med.biobank.common.security,
  edu.ualberta.med.biobank.common.wrappers;
   uses:="edu.ualberta.med.biobank.common,
    edu.ualberta.med.biobank.model,

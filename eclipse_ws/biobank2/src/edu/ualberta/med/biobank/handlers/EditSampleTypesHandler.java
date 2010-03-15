@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SampleTypesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -28,6 +29,8 @@ public class EditSampleTypesHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.getInstance().getSession() != null);
+        return (SessionManager.canCreate(SampleTypeWrapper.class) || SessionManager
+            .canUpdate(SampleTypeWrapper.class))
+            && SessionManager.getInstance().getSession() != null;
     }
 }

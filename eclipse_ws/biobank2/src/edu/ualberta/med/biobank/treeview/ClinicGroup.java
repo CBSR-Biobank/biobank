@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -36,15 +37,17 @@ public class ClinicGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Clinic");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addClinic(ClinicGroup.this
-                    .getParentFromClass(SiteAdapter.class));
-            }
-        });
+        if (SessionManager.canCreate(ClinicWrapper.class)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add Clinic");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    addClinic(ClinicGroup.this
+                        .getParentFromClass(SiteAdapter.class));
+                }
+            });
+        }
     }
 
     @Override

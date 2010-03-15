@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-dependency-check="none" default-autowire="no">
+
+	<bean name="ApplicationServiceImpl" class="@SERVICE_IMPL@" singleton="true">
+		<constructor-arg ref="ClassCache" index="0"></constructor-arg>
+	</bean>
+
+	<!-- Bean Definitions -->
+	<bean name="ClassCache" class="gov.nih.nci.system.util.ClassCache" singleton="true">
+		<property name="daoList">
+			<list>
+				<!--  Add any DAO's here -->
+				<ref bean="ORMDAO" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean name="WebSystemProperties" class="java.util.Properties">
+		<constructor-arg>
+			<props>
+				<prop key="resultOutputFormatter">resultOutputFormatter.xsl</prop>
+				<prop key="rowCounter">200</prop>
+				<prop key="securityEnabled">@SECURITY_ENABLED@</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+
+	<bean name="ORMDAO" class="@DAO_IMPL@">
+		<property name="caseSensitive" value="false" />
+		<property name="resultCountPerQuery" value="1000" />
+		<property name="securityHelper">
+			<ref bean="SecurityInitializationHelper" />
+		</property>
+		<property name="sessionFactory" ref="SessionFactory" />
+		<property name="config">
+			<bean factory-bean="HibernateConfigHolder" factory-method="getConfiguration" />
+		</property>
+	</bean>
+
+	<bean name="HibernateConfigHolder" class="gov.nih.nci.system.dao.orm.HibernateConfigurationHolder" />
+
+	<bean name="SessionFactory" class="gov.nih.nci.system.dao.orm.SessionFactoryBean">
+		<property name="configLocation" value="classpath:hibernate.cfg.xml" />
+		<property name="configHolder" ref="HibernateConfigHolder" />
+		<property name="securityHelper" ref="SecurityInitializationHelper"/>
+		<property name="entityInterceptor">
+			<bean class="gov.nih.nci.security.authorization.attributeLevel.GenericSecurityInterceptor">
+				<constructor-arg>
+					<list>
+						@ENABLE_EMPTY_INTERCEPTOR_START@<bean class="org.hibernate.EmptyInterceptor"/>@ENABLE_EMPTY_INTERCEPTOR_END@
+						@ATTRIBUTE_LEVEL_SECURITY_START@
+						<bean class="gov.nih.nci.security.authorization.attributeLevel.AttributeSecuritySessionInterceptor">
+							<constructor-arg value="false"/>
+						</bean>
+						@ATTRIBUTE_LEVEL_SECURITY_END@
+						@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<bean class="gov.nih.nci.logging.api.logger.hibernate.ObjectStateInterceptor"/>@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+					</list>		
+				</constructor-arg>
+			</bean>
+		</property>
+		<property name="eventListeners">
+			<map>
+				@ENABLE_HIBERNATE_VALIDATOR_START@
+				<entry key="pre-insert">
+					<bean class="org.hibernate.validator.event.ValidateEventListener" />
+				</entry>
+				<entry key="pre-update">
+					<bean class="org.hibernate.validator.event.ValidateEventListener" />
+				</entry>
+				@ENABLE_HIBERNATE_VALIDATOR_END@
+			</map>
+		</property>
+	</bean>
+
+	<bean name="SecurityInitializationHelper" class="gov.nih.nci.system.security.helper.SecurityInitializationHelper">
+		<property name="securityEnabled" value="@SECURITY_ENABLED@"/>
+		<property name="instanceLevelSecurityEnabled" value="@INSTANCE_LEVEL_SECURITY_ENABLED@"/>
+		<property name="attributeLevelSecurityEnabled" value="@ATTRIBUTE_LEVEL_SECURITY_ENABLED@"/>
+		<!--@SECURITY_START@-->
+		<property name="authorizationManager">
+			<bean factory-bean="userDetailsService" factory-method="authorizationManagerInstance" />
+		</property>
+		<!--@SECURITY_END@-->
+	</bean>
+
+	<bean id="HibernateTransactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="SessionFactory" />
+	</bean>
+
+	<bean id="TxInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager">
+			<ref bean="HibernateTransactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="execute*">
+					PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException
+				</prop>
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="ApplicationService" class="org.springframework.aop.framework.ProxyFactoryBean" singleton="true">
+		<property name="target" ref="ApplicationServiceImpl" />
+		<property name="interfaces" value="@SERVICE_INTERFACE@" />
+		<property name="interceptorNames">
+			<list>
+				<idref local="exceptionHandler" />
+				<idref local="TxInterceptor" />
+				@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<idref local="CLMInterceptor" />@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+			</list>
+		</property>
+	</bean>
+
+	@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<bean id="CLMInterceptor" class="gov.nih.nci.system.client.proxy.CLMProxy"/>@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+
+	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
+</beans>

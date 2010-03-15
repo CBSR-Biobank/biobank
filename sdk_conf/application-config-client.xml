@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<import resource="application-config.xml"/>
+	<import resource="application-config-security.xml"/>	
+	
+	<!-- Used only by the client and not the server components -->
+	<bean id="ServiceInfo" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="APPLICATION_SERVICE_BEAN" value-ref="ApplicationService" />
+				<!--@SECURITY_START@-->
+				<entry key="AUTHENTICATION_SERVICE_BEAN" value-ref="authenticationManager"/>
+				<!--@SECURITY_END@-->
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="Interceptor" class="gov.nih.nci.system.client.proxy.ApplicationServiceProxy" singleton="false">
+		<property name="proxyFactory">
+			<bean class="gov.nih.nci.system.client.proxy.ProxyHelperImpl" singleton="false"/>
+		</property>
+	</bean>
+
+	<bean id="ApplicationService" class="org.springframework.aop.framework.ProxyFactoryBean" singleton="true">
+		<property name="target" ref="ApplicationServiceImpl" />
+		<property name="interfaces" value="@SERVICE_INTERFACE@" />
+		<property name="interceptorNames">
+			<list>
+				<idref local="exceptionHandler" />
+				<idref local="Interceptor" />
+				<idref bean="TxInterceptor" />
+				@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<idref bean="CLMInterceptor" />@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+			</list>
+		</property>		
+	</bean>
+
+	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
+
+</beans>
