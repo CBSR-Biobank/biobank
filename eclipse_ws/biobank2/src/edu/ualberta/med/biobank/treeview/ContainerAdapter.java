@@ -139,7 +139,8 @@ public class ContainerAdapter extends AdapterBase {
      * if address exists and if address is not full and if type is valid for
      * slot: modify this object's position, label and the label of children
      */
-    public boolean setNewPositionFromLabel(String newLabel) throws Exception {
+    public boolean setNewPositionFromLabel(final String newLabel)
+        throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
         String newParentContainerLabel = newLabel.substring(0, newLabel
@@ -181,7 +182,8 @@ public class ContainerAdapter extends AdapterBase {
         context.run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(final IProgressMonitor monitor) {
-                monitor.beginTask("Moving...", IProgressMonitor.UNKNOWN);
+                monitor.beginTask("Moving container " + oldLabel + " to "
+                    + newLabel, IProgressMonitor.UNKNOWN);
                 try {
                     container.persist();
                 } catch (Exception e) {
