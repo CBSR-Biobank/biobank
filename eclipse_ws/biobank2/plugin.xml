@@ -80,7 +80,6 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
-            fixed="true"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.perspective.patients"
             name="Patients View">
