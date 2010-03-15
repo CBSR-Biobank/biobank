@@ -114,20 +114,21 @@ public class ContainerAdapter extends AdapterBase {
             getContainer());
         if (mc.open() == Dialog.OK) {
             try {
-                setNewPositionFromLabel(mc.getNewLabel());
-                // update new parent
-                ContainerWrapper newParentContainer = getContainer()
-                    .getParent();
-                ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                    .searchNode(newParentContainer);
-                if (parentAdapter != null) {
-                    parentAdapter.getContainer().reload();
-                    parentAdapter.performExpand();
+                if (setNewPositionFromLabel(mc.getNewLabel())) {
+                    // update new parent
+                    ContainerWrapper newParentContainer = getContainer()
+                        .getParent();
+                    ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
+                        .searchNode(newParentContainer);
+                    if (parentAdapter != null) {
+                        parentAdapter.getContainer().reload();
+                        parentAdapter.performExpand();
+                    }
+                    // update old parent
+                    oldParent.getContainer().reload();
+                    oldParent.removeAll();
+                    oldParent.performExpand();
                 }
-                // update old parent
-                oldParent.getContainer().reload();
-                oldParent.removeAll();
-                oldParent.performExpand();
             } catch (Exception e) {
                 BioBankPlugin.openError(e.getMessage(), e);
             }
@@ -138,7 +139,7 @@ public class ContainerAdapter extends AdapterBase {
      * if address exists and if address is not full and if type is valid for
      * slot: modify this object's position, label and the label of children
      */
-    public void setNewPositionFromLabel(String newLabel) throws Exception {
+    public boolean setNewPositionFromLabel(String newLabel) throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
         String newParentContainerLabel = newLabel.substring(0, newLabel
@@ -149,7 +150,7 @@ public class ContainerAdapter extends AdapterBase {
             BioBankPlugin.openError("Move Error",
                 "A parent container with label \"" + newParentContainerLabel
                     + "\" does not exist.");
-            return;
+            return false;
         }
 
         ContainerWrapper newParent;
@@ -158,7 +159,7 @@ public class ContainerAdapter extends AdapterBase {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
                 newParentContainers);
             if (dlg.open() != Dialog.OK) {
-                return;
+                return false;
             }
             newParent = dlg.getSelectedContainer();
         } else {
@@ -169,8 +170,8 @@ public class ContainerAdapter extends AdapterBase {
         if (currentChild != null) {
             BioBankPlugin.openError("Move Error", "Container position \""
                 + newLabel
-                + "\" is not empty. Please chose a different location.");
-            return;
+                + "\" is not empty. Please choose a different location.");
+            return false;
         }
 
         newParent.addChild(newLabel, container);
@@ -192,7 +193,7 @@ public class ContainerAdapter extends AdapterBase {
                         + container.getLabel());
             }
         });
-
+        return true;
     }
 
     @Override
