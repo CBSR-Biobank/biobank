@@ -1249,7 +1249,7 @@ public class Importer {
             .getLabel(), containerNr, containerPos);
 
         RowColPos pos = LabelingScheme.getRowColFromPositionString(
-            aliquotLabel, container.getContainerType());
+            containerPos, container.getContainerType());
         AliquotWrapper aliquot = container.getAliquot(pos.row, pos.col);
         if (aliquot != null) {
             logger.debug("container already contains aliquot at "
