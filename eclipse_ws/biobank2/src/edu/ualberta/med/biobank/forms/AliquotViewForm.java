@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
@@ -11,9 +12,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -41,6 +42,8 @@ public class AliquotViewForm extends BiobankViewForm {
     private Text patientLabel;
 
     private Text visitLabel;
+
+    private Text dateDrawnLabel;
 
     private Text commentLabel;
 
@@ -92,6 +95,7 @@ public class AliquotViewForm extends BiobankViewForm {
             "Shipment Waybill");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
         visitLabel = createReadOnlyField(client, SWT.NONE, "Patient Visit");
+        dateDrawnLabel = createReadOnlyField(client, SWT.NONE, "Date Drawn");
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
         positionLabel = createReadOnlyField(client, SWT.WRAP, "Position");
     }
@@ -144,8 +148,16 @@ public class AliquotViewForm extends BiobankViewForm {
             .getShipment().getWaybill());
         setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
             .getPnumber());
-        setTextValue(visitLabel, DateFormatter.formatAsDateTime(aliquot
-            .getPatientVisit().getDateProcessed()));
+        setTextValue(visitLabel, aliquot.getPatientVisit()
+            .getFormattedDateProcessed());
+        List<PvSourceVesselWrapper> sourceVessels = aliquot.getPatientVisit()
+            .getPvSourceVesselCollection();
+        if (sourceVessels.isEmpty()) {
+            setTextValue(dateDrawnLabel, "");
+        } else if (sourceVessels.size() == 1) {
+            setTextValue(dateDrawnLabel, sourceVessels.get(0)
+                .getFormattedDateDrawn());
+        }
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
