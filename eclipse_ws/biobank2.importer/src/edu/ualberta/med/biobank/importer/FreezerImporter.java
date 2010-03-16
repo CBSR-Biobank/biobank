@@ -3,22 +3,11 @@ package edu.ualberta.med.biobank.importer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FreezerImporter {
@@ -28,8 +17,8 @@ public class FreezerImporter {
 
     protected static String DEFAULT_QUERY = "select patient_visit.date_received, "
         + "patient_visit.date_taken, study_list.study_name_short, "
-        + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
-        + "from freezer "
+        + "sample_list.sample_name_short, freezer.*, patient.dec_chr_nr, "
+        + "patient_visit.bb2_pv_id from freezer "
         + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
         + "join patient_visit on patient_visit.visit_nr=freezer.visit_nr "
         + "join patient on patient.patient_nr=patient_visit.patient_nr "
@@ -106,16 +95,16 @@ public class FreezerImporter {
         String palletPos;
         String sampleTypeNameShort;
         String inventoryId;
-        BlowfishCipher cipher = new BlowfishCipher();
         String studyNameShort;
         int palletNr;
         String patientNr;
         String linkDateStr;
         double volume;
+        int visitId;
 
         while (rs.next()) {
             studyNameShort = rs.getString(3);
-            patientNr = cipher.decode(rs.getBytes(17));
+            patientNr = rs.getString(17);
             dateProcessedStr = rs.getString(1);
             dateTakenStr = rs.getString(2);
             palletNr = rs.getInt(7);
@@ -124,142 +113,23 @@ public class FreezerImporter {
             sampleTypeNameShort = rs.getString(4);
             linkDateStr = rs.getString(12);
             volume = rs.getDouble(16);
+            visitId = rs.getInt(18);
 
-            importSample(studyNameShort, patientNr, dateProcessedStr,
-                dateTakenStr, hotel, palletNr, palletPos, inventoryId,
-                sampleTypeNameShort, linkDateStr, volume);
+            Importer.importSample(site, studyNameShort, patientNr, visitId,
+                dateProcessedStr, dateTakenStr, hotel, palletNr, palletPos,
+                inventoryId, sampleTypeNameShort, linkDateStr, volume);
+
+            if (currentPalletNr != palletNr) {
+                logger.debug(String.format(
+                    "importing freezer samples into pallet %s%02d", hotel
+                        .getLabel(), palletNr));
+                currentPalletNr = palletNr;
+            }
+
+            logger.trace(String.format("importing freezer aliquot %s%02d%s",
+                hotel.getLabel(), palletNr, palletPos));
+            ++sampleImportCount;
         }
-    }
-
-    protected void importSample(String studyNameShort, String patientNr,
-        String dateProcessedStr, String dateTakenStr, ContainerWrapper hotel,
-        int palletNr, String palletPos, String inventoryId,
-        String sampleTypeNameShort, String linkDateStr, Double quantity)
-        throws Exception {
-
-        if (palletNr > hotel.getRowCapacity()) {
-            logger.error("pallet number is invalid: " + " hotel/"
-                + hotel.getLabel() + " pallet/" + palletNr);
-            return;
-        }
-
-        ContainerWrapper pallet = hotel.getChild(palletNr - 1, 0);
-
-        if (pallet == null) {
-            logger.error("pallet not initialized: " + " hotel/"
-                + hotel.getLabel() + " pallet/" + palletNr);
-            return;
-        }
-
-        // make sure inventory id is unique
-        if (!Importer.inventoryIdUnique(inventoryId)) {
-            return;
-        }
-
-        PatientWrapper patient = PatientWrapper.getPatientInSite(appService,
-            patientNr, site);
-
-        if (patient == null) {
-            logger.error("no patient with number " + patientNr);
-            return;
-        }
-
-        studyNameShort = Importer.getStudyNameShort(patientNr, studyNameShort);
-
-        if (studyNameShort == null) {
-            logger.error("no study for patient " + patientNr);
-            return;
-        }
-
-        StudyWrapper study = Importer.getStudyFromOldShortName(studyNameShort);
-        if (!patient.getStudy().equals(study)) {
-            logger.error("patient and study do not match: "
-                + patient.getPnumber() + ",  " + studyNameShort);
-            return;
-        }
-
-        study.getSampleStorageCollection();
-
-        Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
-        Date dateTaken = Importer.getDateFromStr(dateTakenStr);
-
-        List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed,
-            dateTaken);
-
-        if (visits.size() == 0) {
-            logger.error("patient/" + patientNr + " inventory_id/"
-                + inventoryId + " visit not found for dateProcessed/"
-                + DateFormatter.formatAsDate(dateProcessed) + " DateTaken/"
-                + DateFormatter.formatAsDate(dateTaken));
-            return;
-        } else if (visits.size() > 1) {
-            logger.info("patient/" + patientNr + " inventory_id/" + inventoryId
-                + " multiple visits for dateProcessed/"
-                + DateFormatter.formatAsDate(dateProcessed) + " DateTaken/"
-                + DateFormatter.formatAsDate(dateTaken));
-        }
-
-        PatientVisitWrapper visit = visits.get(0);
-
-        SampleTypeWrapper sampleType = Importer
-            .getSampleType(sampleTypeNameShort);
-
-        if (sampleType == null) {
-            logger.error("sample type not in database: " + sampleTypeNameShort);
-            return;
-        }
-
-        RowColPos pos = LabelingScheme.sbsToRowCol(palletPos);
-        AliquotWrapper aliquot = pallet.getAliquot(pos.row, pos.col);
-        if ((aliquot != null)
-            && aliquot.getSampleType().getNameShort().equals(
-                sampleTypeNameShort)
-            && aliquot.getInventoryId().equals(inventoryId)) {
-            logger.debug("freezer already contains aliquot "
-                + pallet.getLabel() + palletPos);
-            return;
-        }
-
-        SampleStorageWrapper ss = Importer.getSampleStorage(study, sampleType);
-        if (ss == null) {
-            logger.error("study \"" + study.getNameShort()
-                + "\" has no sample storage for sample type \""
-                + sampleType.getName() + "\"");
-            return;
-        }
-
-        aliquot = new AliquotWrapper(appService);
-        aliquot.setParent(pallet);
-        aliquot.setSampleType(sampleType);
-        aliquot.setInventoryId(inventoryId);
-        aliquot.setLinkDate(Importer.getDateFromStr(linkDateStr));
-        aliquot.setPosition(pos);
-        aliquot.setPatientVisit(visit);
-
-        if (quantity != 0.0) {
-            aliquot.setQuantity(quantity);
-        } else {
-            aliquot.setQuantity(ss.getVolume());
-        }
-
-        if (!pallet.canHoldAliquot(aliquot)) {
-            logger.error("pallet " + pallet.getLabel()
-                + " cannot hold aliquot with a sample of type "
-                + sampleType.getName());
-            return;
-        }
-        aliquot.persist();
-
-        if (currentPalletNr != palletNr) {
-            logger.debug("importing freezer samples into pallet "
-                + pallet.getLabel());
-            currentPalletNr = palletNr;
-        }
-
-        logger.trace("importing freezer aliquot " + pallet.getLabel()
-            + palletPos);
-        ++sampleImportCount;
-
     }
 
     public int getSamplesImported() {

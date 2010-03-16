@@ -116,6 +116,13 @@
     <equals arg1="${host.name}" arg2="cbsr.biochem.ualberta.ca"
             casesensitive="true" trim="true" />
   </condition>
+  <condition property="isHostLocal">
+    <and>
+      <isfalse value="isHostAicmlMed" />
+      <isfalse value="isHostCbsr" />
+    </and>
+  </condition>
+
   <!-- end of copied part -->
   <target name="check-jars-available">
     <available file="${req.jars.dir}" type="dir" property="jars.available" />
@@ -289,20 +296,23 @@
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+  <target name="hostLocal" if="isHostLocal">
+    <copy file="${secu-log.dir}/jboss/localhost.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="jboss.home.env">
+    <fail unless="env.JBOSS_HOME" message="JBOSS_HOME environment variable not defined" />
+  </target>
   <target name="deploy-jboss"
-          depends="package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr"
+          depends="jboss.home.env,sdk,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
-    <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
-    <echo message="host ${host.name}" />
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
           overwrite="true" />
     <copy file="${secu-log.dir}/jboss/server${debugMode}.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
-          overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/localhost.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
@@ -323,7 +333,8 @@
           overwrite="true" />
   </target>
 
-  <target name="deploy" description="deploys to JBoss and Eclipse project">
+  <target name="deploy"
+          description="deploys to JBoss and Eclipse project">
     <antcall target="jars-download" />
     <antcall target="deploy-eclipse" />
     <antcall target="deploy-jboss" />
@@ -460,6 +471,7 @@
   </target>
 
   <target name="clean"
+          depends="tests-clean,clean-jars"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
     <ant target="clean-jars" />
