@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.server.applicationservice.helper.BiobankApiApplicationServiceMethodHelper;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
@@ -8,11 +7,20 @@ import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
+import gov.nih.nci.system.query.example.ExampleQuery;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 
 import org.acegisecurity.context.SecurityContextHolder;
+import org.apache.log4j.Logger;
 
 /**
  * Implementation of the BiobankApplicationService interface. This class will be
@@ -24,9 +32,14 @@ import org.acegisecurity.context.SecurityContextHolder;
 public class BiobankApplicationServiceImpl extends
     WritableApplicationServiceImpl implements BiobankApplicationService {
 
+    private static Logger log = Logger
+        .getLogger(BiobankApplicationServiceImpl.class.getName());
+
     public static final String SITE_CLASS_NAME = "edu.ualberta.med.biobank.model.Site";
 
     private static final String APPLICATION_CONTEXT_NAME = "biobank2";
+
+    private static final String SITE_ADMIN_PG_ID = "11";
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -99,13 +112,57 @@ public class BiobankApplicationServiceImpl extends
         // return privateQuery(sqlCriteria, targetClassName);
     }
 
-    /**
-     * @see BiobankApiApplicationServiceMethodHelper#getDomainObjectName(org.aopalliance.intercept.MethodInvocation)
-     *      for limitation access to this method
-     */
     @Override
-    public void newSite(Integer id, String name) throws ApplicationException {
+    public SDKQueryResult executeQuery(SDKQuery query)
+        throws ApplicationException {
+        SDKQueryResult res = super.executeQuery(query);
+        if (query instanceof ExampleQuery) {
+            Object queryObject = ((ExampleQuery) query).getExample();
+            if (queryObject != null
+                && SITE_CLASS_NAME.equals(queryObject.getClass().getName())) {
+                if (query instanceof InsertExampleQuery) {
+                    newSiteSecurity(res.getObjectResult()); // need the result
+                    // to get the object id
+                } else if (query instanceof DeleteExampleQuery) {
+                    deleteSiteSecurity(queryObject);
+                }
+            }
+        }
+        return res;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void deleteSiteSecurity(Object siteObject)
+        throws ApplicationException {
+        Object id = null;
+        String name = null;
         try {
+            id = getSiteObjectId(siteObject);
+            name = getSiteObjectName(siteObject);
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+            Set<ProtectionElement> siteAdminPEs = upm
+                .getProtectionElements(SITE_ADMIN_PG_ID);
+            for (ProtectionElement pe : siteAdminPEs) {
+                if (pe.getValue().equals(id.toString())) {
+                    upm.removeProtectionElement(pe.getProtectionElementId()
+                        .toString());
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            throw new ApplicationException("Error deleting site " + id + ":"
+                + name + "security: " + e.getMessage());
+        }
+
+    }
+
+    private void newSiteSecurity(Object siteObject) throws ApplicationException {
+        Object id = null;
+        String name = null;
+        try {
+            id = getSiteObjectId(siteObject);
+            name = getSiteObjectName(siteObject);
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             // Create protection element for the site
@@ -120,11 +177,27 @@ public class BiobankApplicationServiceImpl extends
             upm.createProtectionElement(pe);
             // Add the new protection element to the protection group
             // "Site Admin PG"
-            upm.addProtectionElements("11", new String[] { pe
+            upm.addProtectionElements(SITE_ADMIN_PG_ID, new String[] { pe
                 .getProtectionElementId().toString() });
         } catch (Exception e) {
-            throw new ApplicationException("Error addind new Site " + id + ":"
-                + name + "security: " + e.getMessage());
+            log.error("error adding new site security", e);
+            throw new ApplicationException("Error adding new site " + id + ":"
+                + name + "security:" + e.getMessage());
         }
+    }
+
+    private String getSiteObjectName(Object siteObject)
+        throws SecurityException, NoSuchMethodException,
+        IllegalArgumentException, IllegalAccessException,
+        InvocationTargetException {
+        Method getNameMethod = siteObject.getClass().getMethod("getName");
+        return (String) getNameMethod.invoke(siteObject);
+    }
+
+    private Object getSiteObjectId(Object siteObject) throws SecurityException,
+        NoSuchMethodException, IllegalArgumentException,
+        IllegalAccessException, InvocationTargetException {
+        Method getIdMethod = siteObject.getClass().getMethod("getId");
+        return getIdMethod.invoke(siteObject);
     }
 }

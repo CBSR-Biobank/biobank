@@ -183,7 +183,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             origObject = getObjectFromDatabase();
         }
         persistDependencies(origObject);
-        SDKQueryResult result = appService.executeQuery(query);
+        SDKQueryResult result = ((BiobankApplicationService) appService)
+            .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
         resetInternalField();

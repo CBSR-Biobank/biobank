@@ -37,9 +37,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public boolean hasPrivilege(Class<?> clazz, Integer id, String privilege)
         throws ApplicationException;
 
-    public void newSite(Integer id, String name) throws ApplicationException;
-
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
-
 }

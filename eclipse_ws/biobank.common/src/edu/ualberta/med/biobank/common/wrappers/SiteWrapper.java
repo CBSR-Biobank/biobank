@@ -221,16 +221,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    public void persist() throws Exception {
-        boolean newSite = isNew();
-        super.persist();
-        if (newSite) {
-            ((BiobankApplicationService) appService)
-                .newSite(getId(), getName());
-        }
-    }
-
-    @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         if (getAddress() == null) {
