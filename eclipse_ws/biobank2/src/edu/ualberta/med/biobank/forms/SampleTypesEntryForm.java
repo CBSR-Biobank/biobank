@@ -83,7 +83,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
                 public void widgetSelected(SelectionEvent e) {
                     siteSampleWidget.addSampleType();
                 }
-            });
+            }, SampleTypeWrapper.class);
         section.setClient(siteSampleWidget);
     }
 
@@ -102,7 +102,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
                 public void widgetSelected(SelectionEvent e) {
                     globalSampleWidget.addSampleType();
                 }
-            });
+            }, SampleTypeWrapper.class);
         section.setClient(globalSampleWidget);
     }
 
