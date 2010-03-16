@@ -1094,18 +1094,6 @@
                standalone="false"
                visible="true">
          </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.AdvancedReportsView"
-               minimized="false"
-               moveable="false"
-               ratio="0.95"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.ReportsView"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.patients">

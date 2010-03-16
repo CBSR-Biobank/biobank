@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -147,9 +148,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
     private void generate() {
 
-        // we dont want the user to change options while the search is in
-        // progress
-        setEnabled(false);
+        System.out.println(compileQuery());
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -252,6 +251,51 @@ public class AdvancedReportsEditor extends EditorPart {
 
         printButton.setEnabled(false);
         exportButton.setEnabled(false);
+    }
+
+    private String compileQuery() {
+        QueryTreeNode root = (QueryTreeNode) tree.getInput();
+        QueryTreeNode objRoot = root.getChildren().get(0);
+        Class<?> type = objRoot.getNodeInfo().getType();
+        String fromClause = "from " + type.getName();
+        String whereClause = "";
+        compileQueryForTreeNode(objRoot, fromClause, whereClause);
+        String clauses = getClauses(objRoot);
+        if (whereClause != null) {
+            if (clauses != null)
+                whereClause = " where " + clauses + " and " + whereClause;
+            else
+                whereClause = " where " + whereClause;
+        } else {
+            if (clauses != null)
+                whereClause = " where " + clauses;
+        }
+        return fromClause + whereClause;
+    }
+
+    private void compileQueryForTreeNode(QueryTreeNode node, String fromClause,
+        String whereClause) {
+        List<QueryTreeNode> children = node.getChildren();
+        for (QueryTreeNode child : children) {
+            if (child.getNodeInfo().getType() == Collection.class) {
+                fromClause += " join " + child.getNodeInfo().getPath()
+                    + child.getNodeInfo().getFname() + " as "
+                    + child.getNodeInfo().getPath()
+                    + child.getNodeInfo().getFname();
+            } else
+                whereClause += " and " + getClauses(child);
+            compileQueryForTreeNode(child, fromClause, whereClause);
+        }
+    }
+
+    private String getClauses(QueryTreeNode node) {
+        List<HQLField> fields = node.getFieldData();
+        String clause = fields.get(0).getClause();
+        for (int i = 1; i < fields.size(); i++) {
+            HQLField field = fields.get(i);
+            clause += " and " + field.getClause();
+        }
+        return clause;
     }
 
     private void setEnabled(boolean enabled) {
