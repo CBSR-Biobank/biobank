@@ -67,7 +67,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (getWaybill() == null) {
+        if (getWaybill() == null || getWaybill().isEmpty()) {
             throw new BiobankCheckException(
                 "A waybill should be set on this shipment");
         }

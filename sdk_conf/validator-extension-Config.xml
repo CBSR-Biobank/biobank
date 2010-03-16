@@ -79,6 +79,25 @@
                     </constructor-arg>
                   </bean>
                 </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of site should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
               </map>
             </constructor-arg>
             <constructor-arg index="2">
@@ -198,37 +217,6 @@
             </constructor-arg>
           </bean>
         </entry>
-        <entry key="edu.ualberta.med.biobank.model.Container">
-          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
-            <constructor-arg value="edu.ualberta.med.biobank.model.Container" />
-            <constructor-arg index="1">
-              <map>
-                <entry key="label">
-                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
-                    <constructor-arg value="label" />
-                    <constructor-arg index="1">
-                      <list>
-                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
-                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
-                          <constructor-arg index="1">
-                            <map>
-                              <entry key="message">
-                                <value>"Label of container should not be null or empty"</value>
-                              </entry>
-                            </map>
-                          </constructor-arg>
-                        </bean>
-                      </list>
-                    </constructor-arg>
-                  </bean>
-                </entry>
-              </map>
-            </constructor-arg>
-            <constructor-arg index="2">
-              <list />
-            </constructor-arg>
-          </bean>
-        </entry>
         <entry key="edu.ualberta.med.biobank.model.ContainerType">
           <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
             <constructor-arg value="edu.ualberta.med.biobank.model.ContainerType" />
@@ -245,6 +233,25 @@
                             <map>
                               <entry key="message">
                                 <value>"Name of container type should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of container type should not be null or empty"</value>
                               </entry>
                             </map>
                           </constructor-arg>
@@ -284,70 +291,17 @@
                     </constructor-arg>
                   </bean>
                 </entry>
-              </map>
-            </constructor-arg>
-            <constructor-arg index="2">
-              <list />
-            </constructor-arg>
-          </bean>
-        </entry>
-        <entry key="edu.ualberta.med.biobank.model.AbstractPosition">
-          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
-            <constructor-arg value="edu.ualberta.med.biobank.model.AbstractPosition" />
-            <constructor-arg index="1">
-              <map>
-                <entry key="row">
+                <entry key="nameShort">
                   <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
-                    <constructor-arg value="row" />
+                    <constructor-arg value="nameShort" />
                     <constructor-arg index="1">
                       <list>
                         <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
-                          <constructor-arg value="org.hibernate.validator.NotNull" />
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
                           <constructor-arg index="1">
                             <map>
                               <entry key="message">
-                                <value>"Row of position should not be null"</value>
-                              </entry>
-                            </map>
-                          </constructor-arg>
-                        </bean>
-                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
-                          <constructor-arg value="org.hibernate.validator.Min" />
-                          <constructor-arg index="1">
-                            <map>
-                              <entry key="value" value="0" />
-                              <entry key="message">
-                                <value>"Position row must be greater than or equal to 0"</value>
-                              </entry>
-                            </map>
-                          </constructor-arg>
-                        </bean>
-                      </list>
-                    </constructor-arg>
-                  </bean>
-                </entry>
-                <entry key="col">
-                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
-                    <constructor-arg value="col" />
-                    <constructor-arg index="1">
-                      <list>
-                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
-                          <constructor-arg value="org.hibernate.validator.NotNull" />
-                          <constructor-arg index="1">
-                            <map>
-                              <entry key="message">
-                                <value>"Col of position should not be null"</value>
-                              </entry>
-                            </map>
-                          </constructor-arg>
-                        </bean>
-                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
-                          <constructor-arg value="org.hibernate.validator.Min" />
-                          <constructor-arg index="1">
-                            <map>
-                              <entry key="value" value="0" />
-                              <entry key="message">
-                                <value>"Position col must be greater than or equal to 0"</value>
+                                <value>"Short name of clinic should not be null or empty"</value>
                               </entry>
                             </map>
                           </constructor-arg>
@@ -389,7 +343,7 @@
                             <map>
                               <entry key="value" value="0" />
                               <entry key="message">
-                                <value>"Capacity row must be greater than or equal to 0"</value>
+                                <value>"Row of capacity must be greater than or equal to 0"</value>
                               </entry>
                             </map>
                           </constructor-arg>
@@ -419,7 +373,7 @@
                             <map>
                               <entry key="value" value="0" />
                               <entry key="message">
-                                <value>"Capacity col must be greater than or equal to 0"</value>
+                                <value>"Col of capacity must be greater than or equal to 0"</value>
                               </entry>
                             </map>
                           </constructor-arg>
