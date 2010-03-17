@@ -109,7 +109,7 @@
     </or>
   </condition>
   <condition property="isHostAicmlMed">
-    <equals arg1="${host.name}" arg2="aicml-med.cs.uablerta.ca"
+    <equals arg1="${host.name}" arg2="aicml-med"
             casesensitive="true" trim="true" />
   </condition>
   <condition property="isHostCbsr">
@@ -118,8 +118,8 @@
   </condition>
   <condition property="isHostLocal">
     <and>
-      <isfalse value="isHostAicmlMed" />
-      <isfalse value="isHostCbsr" />
+      <isfalse value="${isHostAicmlMed}" />
+      <isfalse value="${isHostCbsr}" />
     </and>
   </condition>
 
@@ -131,7 +131,6 @@
           unless="jars.available"
           description="downloads required jars from the host machine">
     <mkdir dir="${req.jars.dir}" />
-    <echo message="downloading biobank jars..." />
     <exec executable="curl">
       <arg value="--silent" />
       <arg value="-obiobank_jars.tar.bz2" />
@@ -287,7 +286,7 @@
               srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
   </target>
   <target name="hostAicmlMed" if="isHostAicmlMed">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>

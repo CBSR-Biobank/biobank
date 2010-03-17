@@ -200,10 +200,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
-         <state
-               class="org.eclipse.ui.handlers.RegistryToggleState:false"
-               id="org.eclipse.ui.commands.toggleState">
-         </state>
       </command>
    </extension>
    <extension
@@ -764,7 +760,7 @@
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
                   label="Search"
-                  style="toggle"
+                  style="push"
                   tooltip="Search">
                <visibleWhen
                      checkEnabled="false">
@@ -1056,7 +1052,7 @@
                visible="true">
          </view>
          <view
-               closeable="false"
+               closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
@@ -1132,7 +1128,7 @@
                visible="true">
          </view>
          <view
-               closeable="false"
+               closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
@@ -1196,7 +1192,7 @@
                visible="true">
          </view>
          <view
-               closeable="false"
+               closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
