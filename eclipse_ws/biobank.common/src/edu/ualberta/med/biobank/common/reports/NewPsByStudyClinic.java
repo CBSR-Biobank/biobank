@@ -4,10 +4,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
 public class NewPsByStudyClinic extends QueryObject {
 
     protected static final String NAME = "New Patients per Study per Clinic by Date";
@@ -23,9 +19,7 @@ public class NewPsByStudyClinic extends QueryObject {
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
-
+    public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
@@ -35,8 +29,7 @@ public class NewPsByStudyClinic extends QueryObject {
         }
         columnNames[2] = (String) params.get(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
-        HQLCriteria c = new HQLCriteria(queryString);
-        return appService.query(c);
+        return params;
     }
 
     @Override

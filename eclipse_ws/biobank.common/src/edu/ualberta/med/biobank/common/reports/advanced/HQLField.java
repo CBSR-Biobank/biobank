@@ -13,6 +13,12 @@ public class HQLField {
         this.path = path;
     }
 
+    public HQLField(HQLField nodeInfo) {
+        this.fname = new String(nodeInfo.getFname());
+        this.type = nodeInfo.getType();
+        this.path = new String(nodeInfo.getPath());
+    }
+
     public String getFname() {
         return fname;
     }
@@ -37,8 +43,17 @@ public class HQLField {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
+    }
+
+    public void setFname(String newName) {
+        this.fname = newName;
+    }
+
+    public String getClause() {
+        return SearchUtils.getHQLExpression(getPath() + getFname(),
+            getOperator(), getValue());
     }
 
 }

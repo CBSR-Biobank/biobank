@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.PatientVisit;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class NewPVsByStudyClinic extends QueryObject {
 
@@ -30,9 +27,7 @@ public class NewPVsByStudyClinic extends QueryObject {
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
-
+    public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
@@ -42,8 +37,7 @@ public class NewPVsByStudyClinic extends QueryObject {
         }
         columnNames[2] = (String) params.get(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
-        HQLCriteria c = new HQLCriteria(queryString);
-        return appService.query(c);
+        return params;
     }
 
     @Override

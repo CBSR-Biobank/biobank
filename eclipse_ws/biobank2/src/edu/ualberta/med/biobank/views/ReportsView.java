@@ -1,11 +1,13 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.List;
+
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -18,6 +20,10 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.ReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -28,12 +34,18 @@ public class ReportsView extends ViewPart {
         .getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
+    public static ReportsView reportsView;
 
     private Composite top;
 
     private TreeViewer querySelect;
 
     public ReportsView() {
+        reportsView = this;
+    }
+
+    public static TreeViewer getTree() {
+        return reportsView.querySelect;
     }
 
     @Override
@@ -43,23 +55,33 @@ public class ReportsView extends ViewPart {
         top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         querySelect = new TreeViewer(top, SWT.BORDER);
-        querySelect
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
+        querySelect.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
+                    .getSelection()).getFirstElement();
+                if (node.getParent().isRoot())
+                    ;
+                else if (node.getParent().getLabel().compareTo("Advanced") == 0)
                     try {
-                        Class<? extends QueryObject> q = QueryObject
-                            .getQueryObjectByName((String) ((IStructuredSelection) event
-                                .getSelection()).getFirstElement());
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().openEditor(new ReportInput(q),
+                            .getActivePage().openEditor(new ReportInput(node),
+                                AdvancedReportsEditor.ID);
+                    } catch (Exception ex) {
+                        BioBankPlugin.openAsyncError("Error opening editor.",
+                            ex);
+                    }
+                else
+                    try {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().openEditor(new ReportInput(node),
                                 ReportsEditor.ID);
                     } catch (Exception ex) {
                         BioBankPlugin.openAsyncError("Error",
                             "There was an error while building page.");
                     }
-                }
-            });
+            }
+        });
         querySelect.setContentProvider(new ITreeContentProvider() {
 
             @Override
@@ -74,22 +96,22 @@ public class ReportsView extends ViewPart {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return (Object[]) inputElement;
+                return ((ReportTreeNode) inputElement).getChildren().toArray();
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return false;
+                return !((ReportTreeNode) element).isLeaf();
             }
 
             @Override
             public Object getParent(Object element) {
-                return null;
+                return !((ReportTreeNode) element).isRoot();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                return new Object[] {};
+                return ((ReportTreeNode) parentElement).getChildren().toArray();
             }
         });
         querySelect.setLabelProvider(new ILabelProvider() {
@@ -100,7 +122,7 @@ public class ReportsView extends ViewPart {
 
             @Override
             public String getText(Object element) {
-                return element.toString();
+                return ((ReportTreeNode) element).getLabel();
             }
 
             @Override
@@ -120,7 +142,33 @@ public class ReportsView extends ViewPart {
             public void removeListener(ILabelProviderListener listener) {
             }
         });
-        querySelect.setInput(QueryObject.getQueryObjectNames());
+        ReportTreeNode root = new ReportTreeNode("", null);
+        ReportTreeNode standard = new ReportTreeNode("Standard", null);
+        ReportTreeNode advanced = new ReportTreeNode("Advanced", null);
+        String[] names = QueryObject.getQueryObjectNames();
+        for (int i = 0; i < names.length; i++)
+            try {
+                ReportTreeNode child = new ReportTreeNode(names[i], QueryObject
+                    .getQueryObjectByName(names[i]));
+                standard.addChild(child);
+                child.setParent(standard);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        List<Class<? extends ModelWrapper<?>>> advancedObjs = SearchUtils
+            .getSearchableObjs();
+        for (Class<? extends ModelWrapper<?>> obj : advancedObjs) {
+            ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
+                .replace("Wrapper", ""), obj);
+            advanced.addChild(child);
+            child.setParent(advanced);
+        }
+        root.addChild(standard);
+        standard.setParent(root);
+        root.addChild(advanced);
+        advanced.setParent(root);
+        querySelect.setInput(root);
+
         GridData qgd = new GridData();
         qgd.verticalAlignment = SWT.FILL;
         qgd.horizontalAlignment = SWT.FILL;

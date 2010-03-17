@@ -6,9 +6,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class CabinetDSamples extends QueryObject {
 
@@ -32,8 +29,7 @@ public class CabinetDSamples extends QueryObject {
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
+    public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
@@ -44,9 +40,7 @@ public class CabinetDSamples extends QueryObject {
         columnNames[2] = (String) params.get(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
         params.set(0, "%Cabinet%");
-        HQLCriteria c = new HQLCriteria(queryString);
-        c.setParameters(params);
-        return appService.query(c);
+        return params;
     }
 
     @Override

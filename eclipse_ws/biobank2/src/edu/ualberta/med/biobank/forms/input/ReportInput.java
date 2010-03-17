@@ -4,14 +4,14 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 
 public class ReportInput implements IEditorInput {
 
-    public Class<? extends QueryObject> query;
+    public ReportTreeNode node;
 
-    public ReportInput(Class<? extends QueryObject> q) {
-        this.query = q;
+    public ReportInput(ReportTreeNode node) {
+        this.node = node;
     }
 
     @Override
@@ -39,6 +39,7 @@ public class ReportInput implements IEditorInput {
         return "";
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(Class adapter) {
         return null;
