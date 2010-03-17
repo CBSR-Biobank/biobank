@@ -24,6 +24,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperAdapter;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -102,6 +104,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                         patient = new PatientWrapper(SessionManager
                             .getAppService());
                         patient.setPnumber(patientNumber);
+                        addPatientListener(patient);
                         ShipmentAdministrationView.currentInstance
                             .displayPatient(patient);
                         return true;
@@ -115,6 +118,15 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             }
         }
         return false;
+    }
+
+    private void addPatientListener(final PatientWrapper patient) {
+        patient.addWrapperListener(new WrapperAdapter() {
+            @Override
+            public void inserted(WrapperEvent event) {
+                addPatient(patient);
+            }
+        });
     }
 
     private void addPatient(PatientWrapper patient) {

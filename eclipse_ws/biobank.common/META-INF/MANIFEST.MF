@@ -60,6 +60,7 @@ Export-Package: antlr;
    edu.ualberta.med.biobank.model,
    edu.ualberta.med.biobank.common.wrappers.internal,
    gov.nih.nci.system.applicationservice",
+ edu.ualberta.med.biobank.common.wrappers.listener,
  gov.nih.nci.system.applicationservice;
   uses:="gov.nih.nci.system.query,
    gov.nih.nci.system.query.hibernate,
@@ -70,19 +71,6 @@ Export-Package: antlr;
  gov.nih.nci.system.query,
  gov.nih.nci.system.query.example;uses:="gov.nih.nci.system.query",
  gov.nih.nci.system.query.hibernate,
- org.acegisecurity;uses:="org.springframework.core,org.springframework.context.support",
- org.acegisecurity.providers.rcp;
-  uses:="org.springframework.core,
-   org.acegisecurity.providers,
-   org.acegisecurity,
-   org.springframework.beans.factory",
- org.apache.commons.collections;uses:="org.apache.commons.collections.keyvalue,new org.apache.commons.collections",
- org.apache.commons.collections.map;
-  uses:="org.apache.commons.collections.iterators,
-   org.apache.commons.collections.keyvalue,
-   org.apache.commons.collections,
-   org.apache.commons.collections.set",
- org.apache.commons.lang;uses:="org.apache.commons.lang.exception",
  org.acegisecurity,
  org.acegisecurity.providers.rcp,
  org.apache.commons.collections,
