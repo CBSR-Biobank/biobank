@@ -39,6 +39,24 @@ public class SearchUtils {
         return opList;
     }
 
+    public static String getHQLExpression(String fname, String operator,
+        Object value) {
+        if (operator.compareTo("contains") == 0)
+            return fname + " like %" + value + "%";
+        else if (operator.compareTo("doesn't contain") == 0)
+            return fname + " not like %" + value + "%";
+        else if (operator.compareTo("starts with") == 0)
+            return fname + " like " + value + "%";
+        else if (operator.compareTo("doesn't start with") == 0)
+            return fname + " not like " + value + "%";
+        else if (operator.compareTo("ends with") == 0)
+            return fname + " like %" + value;
+        else if (operator.compareTo("doesn't end with") == 0)
+            return fname + " not like %" + value;
+        // return
+        return operator + value;
+    }
+
     public static List<Class<? extends ModelWrapper<?>>> getSearchableObjs() {
         ArrayList<Class<? extends ModelWrapper<?>>> objList = new ArrayList<Class<? extends ModelWrapper<?>>>();
         objList.add(AliquotWrapper.class);
