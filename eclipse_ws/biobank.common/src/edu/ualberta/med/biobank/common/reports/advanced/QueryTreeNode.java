@@ -76,15 +76,17 @@ public class QueryTreeNode extends Object {
 
     @Override
     public QueryTreeNode clone() {
-        QueryTreeNode node = new QueryTreeNode(this.getNodeInfo());
+        QueryTreeNode node = new QueryTreeNode(new HQLField(this.getNodeInfo()));
         List<HQLField> fields = this.getFieldData();
         for (HQLField field : fields)
-            node.addField(field);
+            node.addField(new HQLField(field));
         node.setParent(this.getParent());
         List<QueryTreeNode> children = this.getChildren();
-        for (QueryTreeNode child : children)
-            node.addChild(child.clone());
+        for (QueryTreeNode child : children) {
+            QueryTreeNode childClone = child.clone();
+            node.addChild(childClone);
+            childClone.setParent(node);
+        }
         return node;
     }
-
 }

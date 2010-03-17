@@ -13,7 +13,6 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -93,8 +92,10 @@ public class AdvancedReportsEditor extends EditorPart {
     private ReportTreeNode node;
 
     private ArrayList<Widget> widgetFields;
+    private ArrayList<Combo> operatorFields;
 
     private ArrayList<Label> textLabels;
+    private QueryTreeNode selectedNode;
 
     private static Map<Class<?>, int[]> columnWidths;
 
@@ -118,23 +119,33 @@ public class AdvancedReportsEditor extends EditorPart {
         headerLabel.setText(node.getTreePath());
 
         widgetFields = new ArrayList<Widget>();
+        operatorFields = new ArrayList<Combo>();
         textLabels = new ArrayList<Label>();
         fields = node.getFieldData();
         for (HQLField field : fields) {
-            PojoObservables.observeValue(field, "value");
             Label fieldLabel = new Label(parameterSection, SWT.NONE);
             fieldLabel.setText(field.getFname() + ":");
             textLabels.add(fieldLabel);
-            Combo operatorCombo = new Combo(parameterSection, SWT.NONE);
-            operatorCombo.setItems(SearchUtils.getOperatorSet(field.getType())
-                .toArray(new String[] {}));
+            Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
+            String[] operators = SearchUtils.getOperatorSet(field.getType())
+                .toArray(new String[] {});
+            operatorCombo.setItems(operators);
             operatorCombo.select(0);
+            if (field.getOperator() != null) {
+                for (int i = 0; i < operators.length; i++)
+                    if (operators[i].compareTo(field.getOperator()) == 0) {
+                        operatorCombo.select(i);
+                        break;
+                    }
+            }
+            operatorFields.add(operatorCombo);
             Widget widget;
-
             if (field.getType() == Date.class)
                 widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
             else if (field.getType() == String.class) {
                 widget = new Text(parameterSection, SWT.BORDER);
+                if (field.getValue() != null)
+                    ((Text) widget).setText((String) field.getValue());
             } else if (field.getType() == Integer.class) {
                 widget = new Text(parameterSection, SWT.BORDER);
             } else
@@ -380,9 +391,11 @@ public class AdvancedReportsEditor extends EditorPart {
         tree.setInput(SearchUtils.constructTree(new HQLField("", node
             .getLabel(), node.getObjClass())));
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
+
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                QueryTreeNode selectedNode = (QueryTreeNode) ((IStructuredSelection) event
+                saveFields();
+                selectedNode = (QueryTreeNode) ((IStructuredSelection) event
                     .getSelection()).getFirstElement();
                 if (selectedNode != null)
                     displayFields(selectedNode);
@@ -546,6 +559,16 @@ public class AdvancedReportsEditor extends EditorPart {
         createEmptyReportTable();
         top.layout(true, true);
 
+    }
+
+    protected void saveFields() {
+        if (selectedNode != null) {
+            List<HQLField> fields = selectedNode.getFieldData();
+            for (int i = 0; i < widgetFields.size(); i++) {
+                fields.get(i).setValue(((Text) widgetFields.get(i)).getText());
+                fields.get(i).setOperator(operatorFields.get(i).getText());
+            }
+        }
     }
 
     protected void printTable(boolean b) {

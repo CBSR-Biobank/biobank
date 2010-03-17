@@ -13,6 +13,12 @@ public class HQLField {
         this.path = path;
     }
 
+    public HQLField(HQLField nodeInfo) {
+        this.fname = new String(nodeInfo.getFname());
+        this.type = nodeInfo.getType();
+        this.path = new String(nodeInfo.getPath());
+    }
+
     public String getFname() {
         return fname;
     }
