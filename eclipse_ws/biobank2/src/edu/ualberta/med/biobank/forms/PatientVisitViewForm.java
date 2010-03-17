@@ -40,6 +40,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Text shipmentWaybillLabel;
 
+    private Text shipmentDateReceivedLabel;
+
     private Text patientLabel;
 
     private Text dateProcessedLabel;
@@ -90,6 +92,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
+        shipmentDateReceivedLabel = createReadOnlyField(client, SWT.NONE,
+            "Shipment Date Received");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyField(client, SWT.NONE,
             "Date Processed");
@@ -145,6 +149,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
             : patientVisit.getShipment().getClinic().getName());
         setTextValue(shipmentWaybillLabel, patientVisit.getShipment()
             .getWaybill());
+        setTextValue(shipmentDateReceivedLabel, patientVisit.getShipment()
+            .getFormattedDateReceived());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel, patientVisit
             .getFormattedDateProcessed());
