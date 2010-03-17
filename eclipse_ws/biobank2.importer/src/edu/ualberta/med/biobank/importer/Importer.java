@@ -1086,11 +1086,15 @@ public class Importer {
                     dateTakenStr = rs.getString(3);
                     binNr = rs.getInt(8);
                     binPos = rs.getString(9);
-                    inventoryId = rs.getString(13);
                     sampleTypeNameShort = rs.getString(5);
                     linkDateStr = rs.getString(14);
                     volume = null;
                     visitId = rs.getInt(19);
+
+                    inventoryId = rs.getString(13);
+                    if (inventoryId.length() == 4) {
+                        inventoryId = "C" + inventoryId;
+                    }
 
                     Importer.importSample(cbsrSite, studyNameShort, patientNr,
                         visitId, dateProcessedStr, dateTakenStr, drawer, binNr,
