@@ -194,6 +194,7 @@ public class CbsrStudies {
         addSampleStorage("CEGIIR", "Plasma", 5, 0.4);
         addSampleStorage("CEGIIR", "WB DMSO", 2, 0.8);
         addSampleStorage("CEGIIR", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("CEGIIR", "WBE", null, null);
         addSampleStorage("CHILD", "Cells", null, null);
         addSampleStorage("CHILD", "WB Serum", null, null);
         addSampleStorage("CHILD", "WB RNA", null, null);
@@ -261,6 +262,7 @@ public class CbsrStudies {
         addSampleStorage("TCKS", "Urine", null, null);
         addSampleStorage("TCKS", "WBE", 4, 0.8);
         addSampleStorage("TCKS", "DNA(Blood)", 2, 0.4);
+
         addSampleStorage("VAS", "Cells", 10, 0.5);
         addSampleStorage("VAS", "Paxgene", 11, 0.8);
         addSampleStorage("VAS", "Serum B", 8, 0.4);
@@ -269,6 +271,10 @@ public class CbsrStudies {
         addSampleStorage("VAS", "WBE", 4, 0.8);
         addSampleStorage("VAS", "Dialysate", null, null);
         addSampleStorage("VAS", "DNA(Blood)", 2, 0.4);
+        addSampleStorage("VAS", "F Nails", null, null);
+        addSampleStorage("VAS", "T Nails", null, null);
+        addSampleStorage("VAS", "Hair", null, null);
+
         addSampleStorage("CCCS", "WBE", 6, 0.9);
         addSampleStorage("CCCS", "Z Urine", 6, 0.9);
         addSampleStorage("CCCS", "C Urine", 6, 0.9);

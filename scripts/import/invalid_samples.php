@@ -1,25 +1,25 @@
 #!/usr/bin/env php
 <?php
 
+$old_study_name = array("BBPSP" => "BBP");
+
+$old_sample_type_name = array(
+   "DNA (White blood cells)" => "DNA (WBC)",
+   "RNAlater Biopsies" => "RNA Later"
+   );
+
 main();
 
 function main() {
    $invalid_samples = array(
       array("BBPSP","DNA (White blood cells)"),
       array("BBPSP","RNAlater Biopsies"),
-      array("CEGIIR","Whole Blood EDTA"),
+      //array("CEGIIR","Whole Blood EDTA"),
       array("KDCS","RNAlater Biopsies"),
       array("RVS","RNAlater Biopsies"),
-      array("VAS","Finger Nails"),
-      array("VAS","Hair"),
-      array("VAS","Toe Nails")
-      );
-
-   $old_study_name = array("BBPSP" => "BBP");
-
-   $old_sample_type_name = array(
-      "DNA (White blood cells)" => "DNA (WBC)",
-      "RNAlater Biopsies" => "RNA Later"
+      //array("VAS","Finger Nails"),
+      //array("VAS","Hair"),
+      //array("VAS","Toe Nails")
       );
 
    $headings = array(
@@ -76,12 +76,11 @@ and sample_list.sample_name='{sample_type}'"
                               array($study_name, $sample_type_name),
                               $query);
          $result = mysql_query($query)  or die(mysql_error());
-
          $num_rows = mysql_num_rows($result);
 
          if ($num_rows == 0) {
-            //error_log("zero rows for " . $key . ' - ' . $study_name
-            //          . ' - ' . $sample_type_name);
+            error_log("zero rows for " . $key . ' - ' . $study_name
+                      . ' - ' . $sample_type_name);
             continue;
          }
 
@@ -109,7 +108,7 @@ function getOldSampleTypeName($name) {
    global $old_sample_type_name;
 
    if (isset($old_sample_type_name[$name])) {
-      $sample_type_name = $old_sample_type_name[$name];
+      return $old_sample_type_name[$name];
    }
    return $name;
 }
