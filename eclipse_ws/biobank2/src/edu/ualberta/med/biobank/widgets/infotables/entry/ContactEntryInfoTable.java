@@ -29,7 +29,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     private ClinicWrapper clinic;
 
     public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, false, clinic.getContactCollection(true));
+        super(parent, clinic.getContactCollection(true));
         this.clinic = clinic;
         selectedContacts = clinic.getContactCollection();
         if (selectedContacts == null) {
@@ -78,6 +78,11 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 notifyListeners();
             }
         });
+    }
+
+    @Override
+    protected boolean isEditMode() {
+        return true;
     }
 
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {

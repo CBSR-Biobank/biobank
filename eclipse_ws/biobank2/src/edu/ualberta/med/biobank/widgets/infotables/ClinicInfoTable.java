@@ -79,7 +79,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         130 };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override

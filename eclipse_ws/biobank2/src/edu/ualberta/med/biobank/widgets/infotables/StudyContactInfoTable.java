@@ -83,7 +83,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
-        super(parent, true, study.getContactCollection(), HEADINGS, BOUNDS, 10);
+        super(parent, study.getContactCollection(), HEADINGS, BOUNDS, 10);
         this.study = study;
     }
 

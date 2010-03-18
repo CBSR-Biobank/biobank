@@ -84,8 +84,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(InfoTableWidget.class.getName());
 
-    private static final int DEFAULT_NUM_ROWS = 10;
-
     protected TableViewer tableViewer;
 
     protected List<BiobankCollectionModel> model;
@@ -122,8 +120,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private boolean reloadData;
 
-    public InfoTableWidget(Composite parent, boolean multilineSelection,
-        List<T> collection, String[] headings, int[] columnWidths) {
+    public InfoTableWidget(Composite parent, List<T> collection,
+        String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
         reloadData = true;
@@ -135,7 +133,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;
-        if (multilineSelection) {
+        if (isEditMode()) {
             style |= SWT.MULTI;
         }
 
@@ -199,20 +197,18 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths) {
-        this(parent, false, collection, headings, columnWidths);
-    }
-
-    public InfoTableWidget(Composite parent, boolean multilineSelection,
-        List<T> collection, String[] headings, int[] columnWidths,
-        int rowsPerPage) {
-        this(parent, multilineSelection, null, headings, columnWidths);
+        String[] headings, int[] columnWidths, int rowsPerPage) {
+        this(parent, null, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
         if (collection != null) {
             initModel(collection);
             setCollection(collection);
-            resizeTable();
         }
+        resizeTable();
+    }
+
+    protected boolean isEditMode() {
+        return false;
     }
 
     private void initModel(List<T> collection) {
@@ -329,7 +325,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             return;
         }
 
-        if ((pageInfo.rowsPerPage != 0)
+        if (!isEditMode() && (pageInfo.rowsPerPage != 0)
             && (collection.size() > pageInfo.rowsPerPage)
             && !paginationWidget.getVisible()) {
             pageInfo.page = 0;
@@ -706,19 +702,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     private void resizeTable() {
-        int rows;
-        if (pageInfo.rowsPerPage != 0) {
-            rows = pageInfo.rowsPerPage;
-            if (collection != null) {
-                rows = Math.min(pageInfo.rowsPerPage, collection.size());
-            }
-        } else if (collection != null) {
-            rows = Math.min(DEFAULT_NUM_ROWS, collection.size());
-        } else {
-            rows = DEFAULT_NUM_ROWS;
+        int rows = pageInfo.rowsPerPage;
+        if (!isEditMode() && (collection != null)) {
+            rows = Math.min(collection.size(), pageInfo.rowsPerPage);
         }
-
-        rows = Math.max(rows, 1);
 
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();

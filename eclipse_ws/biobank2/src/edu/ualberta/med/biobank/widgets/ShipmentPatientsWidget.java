@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.PatientEntryInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentPatientsWidget extends BiobankWidget {
@@ -79,8 +80,14 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             });
         }
 
-        patientTable = new PatientInfoTable(this, !editable, shipment
-            .getPatientCollection());
+        if (editable) {
+            patientTable = new PatientEntryInfoTable(this, shipment
+                .getPatientCollection());
+        } else {
+            patientTable = new PatientInfoTable(this, shipment
+                .getPatientCollection());
+
+        }
         patientTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;

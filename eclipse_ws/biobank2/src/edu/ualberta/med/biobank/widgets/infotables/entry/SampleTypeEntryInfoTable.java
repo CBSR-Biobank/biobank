@@ -63,6 +63,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         addEditSupport();
     }
 
+    @Override
+    protected boolean isEditMode() {
+        return true;
+    }
+
     /**
      * 
      * @param message The message to display in the SampleTypeDialog.

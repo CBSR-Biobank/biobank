@@ -82,7 +82,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection) {
-        super(parent, true, aliquotCollection, HEADINGS, BOUNDS, 20);
+        super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
     }
 
     @Override

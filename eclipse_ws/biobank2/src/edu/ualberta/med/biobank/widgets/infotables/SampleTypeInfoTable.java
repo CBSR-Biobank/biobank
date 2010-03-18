@@ -12,6 +12,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
 
+    private static final int PAGE_SIZE_ROWS = 10;
+
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -46,7 +48,7 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
 
     public SampleTypeInfoTable(Composite parent,
         List<SampleTypeWrapper> sampleTypeCollection) {
-        super(parent, sampleTypeCollection, HEADINGS, BOUNDS);
+        super(parent, sampleTypeCollection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
     }
 
     @Override

@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SampleStorageInfoTable extends
     InfoTableWidget<SampleStorageWrapper> {
 
+    private static final int PAGE_SIZE_ROWS = 5;
+
     protected class TableRowData {
         SampleStorageWrapper sampleStorage;
         String typeName;
@@ -72,15 +74,9 @@ public class SampleStorageInfoTable extends
     private static final int[] BOUNDS = new int[] { 300, 130, 100, 100, -1, -1,
         -1 };
 
-    public SampleStorageInfoTable(Composite parent, boolean multiSelectRows,
-        List<SampleStorageWrapper> sampleStorageCollection) {
-        super(parent, multiSelectRows, sampleStorageCollection, HEADINGS,
-            BOUNDS, 10);
-    }
-
     public SampleStorageInfoTable(Composite parent,
         List<SampleStorageWrapper> sampleStorageCollection) {
-        this(parent, true, sampleStorageCollection);
+        super(parent, sampleStorageCollection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
     }
 
     @Override

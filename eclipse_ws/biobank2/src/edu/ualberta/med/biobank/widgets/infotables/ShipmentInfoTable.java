@@ -69,8 +69,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     private static final int[] BOUNDS = new int[] { 180, 140, 140, 100, -1 };
 
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, true, clinic.getShipmentCollection(), HEADINGS, BOUNDS,
-            10);
+        super(parent, clinic.getShipmentCollection(), HEADINGS, BOUNDS, 10);
     }
 
     @Override

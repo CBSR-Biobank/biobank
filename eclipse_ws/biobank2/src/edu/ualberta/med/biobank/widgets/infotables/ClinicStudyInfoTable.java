@@ -71,7 +71,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic)
         throws ApplicationException {
-        super(parent, true, null, HEADINGS, BOUNDS, 10);
+        super(parent, null, HEADINGS, BOUNDS, 10);
         this.clinic = clinic;
         setCollection(clinic.getStudyCollection());
     }

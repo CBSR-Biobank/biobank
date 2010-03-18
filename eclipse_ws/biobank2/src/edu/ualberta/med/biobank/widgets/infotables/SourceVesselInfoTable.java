@@ -44,7 +44,7 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
 
     public SourceVesselInfoTable(Composite parent,
         List<SourceVesselWrapper> sampleStorageCollection) {
-        super(parent, true, sampleStorageCollection, HEADINGS, BOUNDS, 10);
+        super(parent, sampleStorageCollection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
