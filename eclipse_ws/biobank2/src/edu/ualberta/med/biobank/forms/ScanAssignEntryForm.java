@@ -470,6 +470,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                 // aliquot scanned is already registered at this position
                 // (everything is ok !)
                 scanCell.setStatus(AliquotCellStatus.FILLED);
+                scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+                    .getPnumber());
                 scanCell.setAliquot(expectedAliquot);
             } else {
                 scanCell.setStatus(AliquotCellStatus.NEW);
