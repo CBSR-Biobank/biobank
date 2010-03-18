@@ -377,7 +377,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                 scanValidValue.setValue(false);
             }
             showPalletPosition();
-            scanButton.traverse(SWT.TRAVERSE_TAB_NEXT);
+            cancelConfirmWidget.setFocus();
             form.layout(true, true);
         } catch (RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
