@@ -74,7 +74,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm"; //$NON-NLS-1$
 
     private Button scanButton;
 
@@ -84,9 +84,9 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     private List<SampleTypeSelectionWidget> sampleTypeWidgets;
 
-    private IObservableValue patientNumberValue = new WritableValue("",
+    private IObservableValue patientNumberValue = new WritableValue("", //$NON-NLS-1$
         String.class);
-    private IObservableValue plateToScanValue = new WritableValue("",
+    private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
     private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
         Boolean.class);
@@ -119,7 +119,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
     @Override
     protected void init() {
         super.init();
-        setPartName("Scan Link");
+        setPartName("Scan Link"); 
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         palletNameContains = store
@@ -147,12 +147,12 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected String getOkMessage() {
-        return "Adding Aliquots.";
+        return "Adding Aliquots."; //$NON-NLS-1$
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Link aliquots to patient visit using the scanner");
+        form.setText("Link aliquots to patient visit using the scanner"); //$NON-NLS-1$
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -165,7 +165,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             @Override
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error("Scanner should be launched");
+                    return ValidationStatus.error("Scanner should be launched"); //$NON-NLS-1$
                 } else {
                     return Status.OK_STATUS;
                 }
@@ -179,7 +179,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             @Override
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error("Errors in scan !");
+                    return ValidationStatus.error("Errors in scan !"); //$NON-NLS-1$
                 } else {
                     return Status.OK_STATUS;
                 }
@@ -203,7 +203,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
                     return ValidationStatus
-                        .error("Give a type to each aliquot");
+                        .error("Give a type to each aliquot"); //$NON-NLS-1$
                 } else {
                     return Status.OK_STATUS;
                 }
@@ -256,9 +256,9 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
         // radio button to choose how the sample types are selected
         final Button radioRowSelection = toolkit.createButton(radioComponents,
-            "Row choice", SWT.RADIO);
+            "Row choice", SWT.RADIO); //$NON-NLS-1$
         final Button radioCustomSelection = toolkit.createButton(
-            radioComponents, "Custom Selection choice", SWT.RADIO);
+            radioComponents, "Custom Selection choice", SWT.RADIO); //$NON-NLS-1$
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         boolean hideRadio = store
@@ -277,9 +277,9 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             .getSampleTypeForContainerTypes(appService, SessionManager
                 .getInstance().getCurrentSite(), palletNameContains);
         if (sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError("Sample Types",
-                "No sample type found for containers of container type containing '"
-                    + palletNameContains + "'...");
+            BioBankPlugin.openAsyncError("Sample Types", //$NON-NLS-1$
+                "No sample type found for containers of container type containing '" //$NON-NLS-1$
+                    + palletNameContains + "'..."); //$NON-NLS-1$
         }
         createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
         createTypeSelectionCustom(selectionComp, sampleTypes);
@@ -347,7 +347,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         toolkit.paintBordersFor(typesSelectionCustomComposite);
 
         Label label = toolkit.createLabel(typesSelectionCustomComposite,
-            "Choose type for selected aliquots:");
+            "Choose type for selected aliquots:"); //$NON-NLS-1$
         GridData gd = new GridData();
         gd.horizontalSpan = 3;
         label.setLayoutData(gd);
@@ -357,7 +357,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         customSelection.resetValues(true);
 
         Button applyType = toolkit.createButton(typesSelectionCustomComposite,
-            "Apply", SWT.PUSH);
+            "Apply", SWT.PUSH); //$NON-NLS-1$
         applyType.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -427,9 +427,9 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         fieldsComposite.setLayoutData(gd);
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, "Patient Number", new String[0],
+            Text.class, SWT.NONE, "Patient Number", new String[0], //$NON-NLS-1$
             patientNumberValue, new NonEmptyStringValidator(
-                "Enter a patient number"));
+                "Enter a patient number")); //$NON-NLS-1$
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -448,9 +448,9 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         createVisitCombo(fieldsComposite);
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, "Plate to Scan", new String[0],
+            Text.class, SWT.NONE, "Plate to Scan", new String[0], //$NON-NLS-1$
             plateToScanValue, new ScannerBarcodeValidator(
-                "Enter a valid plate barcode"));
+                "Enter a valid plate barcode")); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {
@@ -459,7 +459,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        String scanButtonTitle = "Launch scan";
+        String scanButtonTitle = "Launch scan"; //$NON-NLS-1$
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 400;
             Composite comp = toolkit.createComposite(fieldsComposite);
@@ -467,12 +467,12 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             gd = new GridData();
             gd.horizontalSpan = 2;
             comp.setLayoutData(gd);
-            randomScan = toolkit.createButton(comp, "Get random scan values",
+            randomScan = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
                 SWT.RADIO);
             randomScan.setSelection(true);
             existsScan = toolkit.createButton(comp,
-                "Get random and already linked aliquots", SWT.RADIO);
-            scanButtonTitle = "Fake scan";
+                "Get random and already linked aliquots", SWT.RADIO); //$NON-NLS-1$
+            scanButtonTitle = "Fake scan"; //$NON-NLS-1$
         }
         scanButton = toolkit.createButton(fieldsComposite, scanButtonTitle,
             SWT.PUSH);
@@ -491,8 +491,8 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     private void createVisitCombo(Composite compositeFields) {
         viewerVisits = createComboViewerWithNoSelectionValidator(
-            compositeFields, "Visit date processed", null, null,
-            "A visit should be selected");
+            compositeFields, "Visit date processed", null, null, //$NON-NLS-1$
+            "A visit should be selected"); //$NON-NLS-1$
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -502,7 +502,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             @Override
             public String getText(Object element) {
                 PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed() + " - "
+                return pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
                     + pv.getShipment().getWaybill();
             }
         });
@@ -520,8 +520,8 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             public void focusLost(FocusEvent e) {
                 PatientVisitWrapper pv = getSelectedPatientVisit();
                 if (pv != null) {
-                    appendLog("Visit selected "
-                        + pv.getFormattedDateProcessed() + " - "
+                    appendLog("Visit selected " //$NON-NLS-1$
+                        + pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
                         + pv.getShipment().getClinic().getName());
                 }
             }
@@ -535,11 +535,11 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 patientNumberText.getText(), SessionManager.getInstance()
                     .getCurrentSite());
         } catch (ApplicationException e) {
-            BioBankPlugin.openError("Error getting the patient", e);
+            BioBankPlugin.openError("Error getting the patient", e); //$NON-NLS-1$
         }
         if (currentPatient != null) {
-            appendLog("-----");
-            appendLog("Found patient with number "
+            appendLog("-----"); //$NON-NLS-1$
+            appendLog("Found patient with number " //$NON-NLS-1$
                 + currentPatient.getPnumber());
             // show visits list
             List<PatientVisitWrapper> collection = currentPatient
@@ -558,8 +558,8 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 try {
                     scanOk = true;
                     Map<RowColPos, PalletCell> cells = null;
-                    appendLog("----");
-                    appendLog("Scanning plate "
+                    appendLog("----"); //$NON-NLS-1$
+                    appendLog("Scanning plate " //$NON-NLS-1$
                         + plateToScanValue.getValue().toString());
                     int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                         plateToScanValue.getValue().toString());
@@ -604,7 +604,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    BioBankPlugin.openError("Error while scanning", e);
+                    BioBankPlugin.openError("Error while scanning", e); //$NON-NLS-1$
                 }
             }
         });
@@ -619,13 +619,13 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                         .getInstance().getCurrentSite());
                 if (aliquots.size() > 0) {
                     cell.setStatus(AliquotCellStatus.ERROR);
-                    String msg = "Aliquot already in database";
+                    String msg = "Aliquot already in database"; //$NON-NLS-1$
                     cell.setInformation(msg);
                     scanOk = false;
                     AliquotWrapper aliquot = aliquots.get(0);
-                    appendLog("ERROR: " + value + " - " + msg + " see visit "
+                    appendLog("ERROR: " + value + " - " + msg + " see visit " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         + aliquot.getPatientVisit().getFormattedDateProcessed()
-                        + " of patient "
+                        + " of patient " //$NON-NLS-1$
                         + aliquot.getPatientVisit().getPatient().getPnumber());
                 } else {
                     cell.setStatus(AliquotCellStatus.NO_TYPE);
@@ -644,7 +644,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
             .getCells();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
-        StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:");
+        StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:"); //$NON-NLS-1$
         int nber = 0;
         StudyWrapper study = patientVisit.getPatient().getStudy();
         List<SampleStorageWrapper> sampleStorages = study
@@ -659,23 +659,23 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 nber++;
             }
         }
-        appendLog("----");
+        appendLog("----"); //$NON-NLS-1$
         appendLog(sb.toString());
-        appendLog("SCAN-LINK: " + nber + " aliquots linked to visit");
+        appendLog("SCAN-LINK: " + nber + " aliquots linked to visit"); //$NON-NLS-1$ //$NON-NLS-2$
         setSaved(true);
     }
 
     private void appendAliquotLogMessage(StringBuffer sb,
         PatientVisitWrapper patientVisit, String cellValue,
         SampleTypeWrapper cellType) {
-        sb.append("\nLINKED: ").append(cellValue);
-        sb.append(" - patient: ")
+        sb.append("\nLINKED: ").append(cellValue); //$NON-NLS-1$
+        sb.append(" - patient: ") //$NON-NLS-1$
             .append(patientVisit.getPatient().getPnumber());
-        sb.append(" - Visit: ")
+        sb.append(" - Visit: ") //$NON-NLS-1$
             .append(patientVisit.getFormattedDateProcessed());
-        sb.append(" - ").append(
+        sb.append(" - ").append( //$NON-NLS-1$
             patientVisit.getShipment().getClinic().getName());
-        sb.append(" - ").append(cellType.getName());
+        sb.append(" - ").append(cellType.getName()); //$NON-NLS-1$
     }
 
     /**
@@ -731,9 +731,9 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         scanButton.setEnabled(false);
         scannedValue.setValue(Boolean.FALSE);
         if (resetAll) {
-            patientNumberText.setText("");
-            plateToScanText.setText("");
-            plateToScanValue.setValue("");
+            patientNumberText.setText(""); //$NON-NLS-1$
+            plateToScanText.setText(""); //$NON-NLS-1$
+            plateToScanValue.setValue(""); //$NON-NLS-1$
             spw.setCells(null);
             for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
                 stw.resetValues(true);
@@ -749,7 +749,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected String getActivityTitle() {
-        return "Scan link activity";
+        return "Scan link activity"; //$NON-NLS-1$
     }
 
 }

@@ -84,6 +84,10 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         }
     }
 
+    public void appendLogNLS(String key, Object... params) {
+        appendLog(Messages.getFormattedString(key, params));
+    }
+
     protected void setSaved(boolean saved) {
         this.isSaved = saved;
     }
