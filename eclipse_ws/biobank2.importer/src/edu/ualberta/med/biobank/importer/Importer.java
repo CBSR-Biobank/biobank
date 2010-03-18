@@ -952,7 +952,7 @@ public class Importer {
             logger.debug("importing patient visit: " + importCounts.visits
                 + " patient/" + patient.getPnumber() + " study/"
                 + study.getNameShort() + " dateProcessed/"
-                + DateFormatter.formatAsDateTime(dateProcessed) + " (" + count
+                + DateFormatter.formatAsDate(dateProcessed) + " (" + count
                 + "/" + numPatientVisits + ")");
 
             // now set corresponding patient visit info data
@@ -1123,8 +1123,7 @@ public class Importer {
                 freezersMap.put(3, container);
             } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
                 freezersMap.put(5, container);
-            } else if (label.equals("Sent Samples")
-                && typeNameShort.equals("F4x6")) {
+            } else if (label.equals("SS") && typeNameShort.equals("F4x6")) {
                 freezersMap.put(99, container);
             }
         }
