@@ -127,33 +127,36 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
-        if (!confirmAction.isEnabled())
+        if (!confirmAction.isEnabled()) {
             monitor.setCanceled(true);
-        doSaveInternal();
+            setDirty(true);
+            BioBankPlugin.openAsyncError("Form state",
+                "Form in invalid state, save failed.");
+            return;
+        }
+        doSaveInternal(monitor);
     }
 
-    protected void doSaveInternal() {
+    protected void doSaveInternal(final IProgressMonitor monitor) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
-                    if (confirmAction.isEnabled())
-                        saveForm();
-                    else {
-                        setDirty(true);
-                        throw new BiobankCheckException(
-                            "Form in invalid state, save failed.");
-                    }
+                    saveForm();
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (BiobankCheckException bce) {
                     setDirty(true);
+                    monitor.setCanceled(true);
                     BioBankPlugin.openAsyncError("Save error", bce);
                 } catch (Exception e) {
                     setDirty(true);
