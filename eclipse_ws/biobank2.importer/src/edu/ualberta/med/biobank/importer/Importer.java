@@ -264,7 +264,7 @@ public class Importer {
         checkSourceVessels();
         checkShippingCompanies();
         checkSampleTypes();
-        // checkContainerConfiguration();
+        checkContainerConfiguration();
 
         defaultDateShipped = getDateFromStr("1900-01-01");
 
