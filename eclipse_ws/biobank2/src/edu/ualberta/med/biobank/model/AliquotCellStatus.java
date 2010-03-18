@@ -7,8 +7,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 
 public enum AliquotCellStatus {
     EMPTY(SWT.COLOR_WHITE, "Empty"), FILLED(SWT.COLOR_DARK_GRAY, "Filled"), NEW(
-        SWT.COLOR_DARK_GREEN, "New"), MOVED(87, 129, 0, "Moved"), MISSING(
-        SWT.COLOR_CYAN, "Missing"), ERROR(SWT.COLOR_YELLOW, "Error"), NO_TYPE(
+        SWT.COLOR_DARK_GREEN, "New"), MOVED(217, 161, 65, "Moved"), MISSING(
+        SWT.COLOR_CYAN, "Missing"), ERROR(SWT.COLOR_RED, "Error"), NO_TYPE(
         SWT.COLOR_DARK_GREEN, "No type"), TYPE(SWT.COLOR_DARK_GRAY, "Type");
 
     private Color color;
