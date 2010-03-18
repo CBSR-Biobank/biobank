@@ -6,8 +6,8 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -71,10 +71,10 @@ public class PalletCell extends Cell {
         Map<RowColPos, PalletCell> palletScanned = initArray();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsAlreadyAssigned(appService, siteId);
-        if (randomAliquots.size() > 0) {
-            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-                0, 0, randomAliquots.get(0).getInventoryId())));
-        }
+        // if (randomAliquots.size() > 0) {
+        // palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+        // 0, 0, randomAliquots.get(0).getInventoryId())));
+        // }
         if (randomAliquots.size() > 1) {
             palletScanned.put(new RowColPos(2, 4), new PalletCell(new ScanCell(
                 2, 4, randomAliquots.get(1).getInventoryId())));

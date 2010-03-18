@@ -33,4 +33,26 @@ public enum AliquotCellStatus {
     public String getLegend() {
         return legend;
     }
+
+    public AliquotCellStatus mergeWith(AliquotCellStatus newStatus) {
+        switch (this) {
+        case EMPTY:
+            return newStatus;
+        case FILLED:
+        case MOVED:
+            if (newStatus == MISSING || newStatus == ERROR) {
+                return newStatus;
+            }
+        case ERROR:
+            return ERROR;
+        case MISSING:
+            if (newStatus == ERROR) {
+                return ERROR;
+            }
+            return MISSING;
+        default:
+            break;
+        }
+        return AliquotCellStatus.EMPTY;
+    }
 }
