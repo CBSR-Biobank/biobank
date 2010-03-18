@@ -365,7 +365,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
             if (currentPatient == null)
                 return;
-
+            appendLog("--------");
             appendLogNLS("linkAssign.activitylog.patient", currentPatient
                 .getPnumber());
             // show visits list

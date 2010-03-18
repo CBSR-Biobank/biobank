@@ -625,12 +625,11 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         AliquotWrapper aliquot, String posStr) {
         PatientVisitWrapper visit = aliquot.getPatientVisit();
-        String logMsg = Messages.getFormattedString(
+        sb.append(Messages.getFormattedString(
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, cell.getValue(), aliquot.getSampleType().getName(), visit
                 .getPatient().getPnumber(), visit.getFormattedDateProcessed(),
-            visit.getShipment().getClinic().getName());
-        sb.append(logMsg).append("\n"); //$NON-NLS-1$
+            visit.getShipment().getClinic().getName()));
     }
 
     private boolean saveEvenIfAliquotsMissing() {

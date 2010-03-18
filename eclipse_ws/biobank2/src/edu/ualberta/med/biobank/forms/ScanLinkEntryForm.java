@@ -548,6 +548,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 .getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$
         }
         if (currentPatient != null) {
+            appendLog("--------");
             appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
                 currentPatient.getPnumber());
             // show visits list
@@ -655,7 +656,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
             .getCells();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
-        StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:\n"); //$NON-NLS-1$
+        StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:"); //$NON-NLS-1$
         int nber = 0;
         StudyWrapper study = patientVisit.getPatient().getStudy();
         List<SampleStorageWrapper> sampleStorages = study
@@ -684,7 +685,6 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             cellValue, patientVisit.getPatient().getPnumber(), patientVisit
                 .getFormattedDateProcessed(), patientVisit.getShipment()
                 .getClinic().getName(), cellType.getName()));
-        sb.append("\n");
     }
 
     /**
