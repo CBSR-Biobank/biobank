@@ -130,8 +130,12 @@ public class CbsrContainers {
     private static void createSentSamplesFreezer(SiteWrapper site)
         throws Exception {
         ContainerWrapper hotel;
-        ContainerWrapper freezer05 = addTopLevelContainer(site, "SS",
+        ContainerWrapper freezerSS = addTopLevelContainer(site, "SS",
             CbsrContainerTypes.getContainerType("Freezer 4x6"));
+        freezerSS
+            .setComment("This freezer holds samples that have been sent out.");
+        freezerSS.persist();
+        freezerSS.reload();
         ContainerTypeWrapper h13Type = CbsrContainerTypes
             .getContainerType("Hotel 13");
         ContainerTypeWrapper h19Type = CbsrContainerTypes
@@ -147,7 +151,7 @@ public class CbsrContainers {
         for (ContainerTypeWrapper hotelType : hotelTypes) {
             pos.row = count % 4;
             pos.col = count / 4;
-            hotel = addContainer(site, hotelType, freezer05, pos.row, pos.col);
+            hotel = addContainer(site, hotelType, freezerSS, pos.row, pos.col);
 
             for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
                 addContainer(site, palletType, hotel, j, 0);

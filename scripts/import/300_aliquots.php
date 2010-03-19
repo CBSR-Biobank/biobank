@@ -58,8 +58,8 @@ and study_pv_attr.label='Worksheet'
          //print_r($row);
 
          $label = $row['LABEL'];
-         if (strpos($label, 'Sent Samples') !== FALSE) {
-            $label = str_replace('Sent Samples', '99', $label);
+         if (strpos($label, 'SS') !== FALSE) {
+            $label = str_replace('SS', '99', $label);
          }
 
          $frz = intval(substr($label, 0, 2));

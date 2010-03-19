@@ -12,14 +12,7 @@ main();
 
 function main() {
    $invalid_samples = array(
-      array("BBPSP","DNA (White blood cells)"),
-      array("BBPSP","RNAlater Biopsies"),
-      //array("CEGIIR","Whole Blood EDTA"),
-      array("KDCS","RNAlater Biopsies"),
-      array("RVS","RNAlater Biopsies"),
-      //array("VAS","Finger Nails"),
-      //array("VAS","Hair"),
-      //array("VAS","Toe Nails")
+      array("RVS","Peritoneal Dialysate"),
       );
 
    $headings = array(
