@@ -3,18 +3,17 @@ package edu.ualberta.med.biobank.common.reports.advanced;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 
 public class SearchUtils {
 
@@ -39,68 +38,34 @@ public class SearchUtils {
         return opList;
     }
 
-    public static String getHQLExpression(String fname, String operator,
-        Object value) {
-        if (operator.compareTo("contains") == 0)
-            return fname + " like %" + value + "%";
-        else if (operator.compareTo("doesn't contain") == 0)
-            return fname + " not like %" + value + "%";
-        else if (operator.compareTo("starts with") == 0)
-            return fname + " like " + value + "%";
-        else if (operator.compareTo("doesn't start with") == 0)
-            return fname + " not like " + value + "%";
-        else if (operator.compareTo("ends with") == 0)
-            return fname + " like %" + value;
-        else if (operator.compareTo("doesn't end with") == 0)
-            return fname + " not like %" + value;
-        // return
-        return operator + value;
-    }
-
-    public static List<Class<? extends ModelWrapper<?>>> getSearchableObjs() {
-        ArrayList<Class<? extends ModelWrapper<?>>> objList = new ArrayList<Class<? extends ModelWrapper<?>>>();
-        objList.add(AliquotWrapper.class);
-        objList.add(ContainerWrapper.class);
-        objList.add(SiteWrapper.class);
-        objList.add(ClinicWrapper.class);
-        objList.add(StudyWrapper.class);
-        objList.add(PatientWrapper.class);
-        objList.add(PatientVisitWrapper.class);
-        objList.add(ContactWrapper.class);
+    public static List<Class<?>> getSearchableObjs() {
+        ArrayList<Class<?>> objList = new ArrayList<Class<?>>();
+        objList.add(Aliquot.class);
+        objList.add(Container.class);
+        objList.add(Site.class);
+        objList.add(Clinic.class);
+        objList.add(Study.class);
+        objList.add(Patient.class);
+        objList.add(PatientVisit.class);
+        objList.add(Contact.class);
         return objList;
     }
 
-    public static QueryTreeNode constructTree(HQLField root) {
-        QueryTreeNode dummy = new QueryTreeNode(new HQLField("", "", null));
-        QueryTreeNode rootNode = new QueryTreeNode(root);
-        expand(rootNode);
-        dummy.addChild(rootNode);
-        return dummy;
-    }
-
-    public static void expand(QueryTreeNode node) {
-        List<HQLField> fields = getSimpleFields(node.getNodeInfo().getType(),
-            node.getNodeInfo().getPath());
-        for (HQLField field : fields)
-            node.addField(field);
-        List<HQLField> children = getComplexFields(
-            node.getNodeInfo().getType(), node.getNodeInfo().getPath());
-        for (HQLField child : children) {
-            QueryTreeNode nodeChild = new QueryTreeNode(child);
-            nodeChild.setParent(node);
-            expand(nodeChild);
-            node.addChild(nodeChild);
-        }
-    }
-
-    public static List<HQLField> getSimpleFields(Class<?> c, String path) {
+    public static List<HQLField> getSimpleFields(Class<?> c, String path,
+        boolean collection) {
         ArrayList<HQLField> searchableFields = new ArrayList<HQLField>();
-        if (c == SiteWrapper.class) {
-            path = path + "site.";
+        if (c == Site.class) {
+            if (collection)
+                path = path.replace('.', '_') + "siteCollection.";
+            else
+                path = path + "site.";
             add(searchableFields, path, "name", String.class);
             add(searchableFields, path, "activityStatus", String.class);
-        } else if (c == ClinicWrapper.class) {
-            path = path + "clinic.";
+        } else if (c == Clinic.class) {
+            if (collection)
+                path = path.replace('.', '_') + "clinicCollection.";
+            else
+                path = path + "clinic.";
             add(searchableFields, path, "name", String.class);
         } else if (c == Address.class) {
             path = path + "address.";
@@ -113,26 +78,30 @@ public class SearchUtils {
         return searchableFields;
     }
 
-    public static List<HQLField> getComplexFields(Class<?> c, String path) {
+    public static List<HQLField> getComplexFields(Class<?> c, String path,
+        boolean collection) {
         ArrayList<HQLField> searchableFields = new ArrayList<HQLField>();
-        if (c == SiteWrapper.class) {
-            path = path + "site.";
+        if (c == Site.class) {
+            if (collection)
+                path = path.replace('.', '_') + "siteCollection.";
+            else
+                path = path + "site.";
             add(searchableFields, path, "address", Address.class);
-            add(searchableFields, path, "clinicCollection", ClinicWrapper.class);
-            add(searchableFields, path, "containerCollection",
-                ContainerWrapper.class);
+            add(searchableFields, path, "clinicCollection", Clinic.class);
+            add(searchableFields, path, "containerCollection", Container.class);
             add(searchableFields, path, "sampleTypeCollection",
-                SampleTypeWrapper.class);
-        } else if (c == ClinicWrapper.class) {
-            path = path + "clinic.";
+                SampleType.class);
+        } else if (c == Clinic.class) {
+            if (collection)
+                path = path.replace('.', '_') + "clinicCollection.";
+            else
+                path = path + "clinic.";
             add(searchableFields, path, "address", Address.class);
-            add(searchableFields, path, "site", SiteWrapper.class);
-            add(searchableFields, path, "contactCollection",
-                ContactWrapper.class);
-            add(searchableFields, path, "shipmentCollection",
-                ShipmentWrapper.class);
+            add(searchableFields, path, "site", Site.class);
+            add(searchableFields, path, "contactCollection", Contact.class);
+            add(searchableFields, path, "shipmentCollection", Shipment.class);
             add(searchableFields, path, "patientVisitCollection",
-                PatientVisitWrapper.class);
+                PatientVisit.class);
         }
         return searchableFields;
     }

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,36 +18,25 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
@@ -64,11 +52,15 @@ import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AdvancedReportsEditor extends EditorPart {
 
@@ -78,282 +70,39 @@ public class AdvancedReportsEditor extends EditorPart {
     private Composite buttonSection;
     private Composite parameterSection;
 
-    private SearchResultsInfoTable reportTable;
-
     private Button generateButton;
-    private List<Object> reportData;
-
     private Button printButton;
     private Button exportButton;
 
     private List<HQLField> fields;
-
-    private TreeViewer tree;
-
-    private ReportTreeNode node;
-
     private ArrayList<Widget> widgetFields;
     private ArrayList<Combo> operatorFields;
-
     private ArrayList<Label> textLabels;
+
+    private SearchResultsInfoTable reportTable;
+    private List<Object> reportData;
+    private ReportTreeNode node;
+
+    private QueryTree tree;
     private QueryTreeNode selectedNode;
 
     private static Map<Class<?>, int[]> columnWidths;
 
-    public void displayFields(QueryTreeNode node) {
-        if (parameterSection != null)
-            parameterSection.dispose();
-        parameterSection = new Composite(top, SWT.NONE);
-        GridLayout gl = new GridLayout();
-        gl.marginWidth = 0;
-        gl.numColumns = 3;
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.FILL;
-        gd.verticalAlignment = SWT.TOP;
-        parameterSection.setLayout(gl);
-        parameterSection.setLayoutData(gd);
+    @Override
+    public void init(IEditorSite site, IEditorInput input)
+        throws PartInitException {
+        setSite(site);
+        setInput(input);
 
-        Label headerLabel = new Label(parameterSection, SWT.NONE);
-        GridData gdl = new GridData();
-        gdl.horizontalSpan = 3;
-        headerLabel.setLayoutData(gdl);
-        headerLabel.setText(node.getTreePath());
+        node = ((ReportInput) input).node;
 
-        widgetFields = new ArrayList<Widget>();
-        operatorFields = new ArrayList<Combo>();
-        textLabels = new ArrayList<Label>();
-        fields = node.getFieldData();
-        for (HQLField field : fields) {
-            Label fieldLabel = new Label(parameterSection, SWT.NONE);
-            fieldLabel.setText(field.getFname() + ":");
-            textLabels.add(fieldLabel);
-            Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
-            String[] operators = SearchUtils.getOperatorSet(field.getType())
-                .toArray(new String[] {});
-            operatorCombo.setItems(operators);
-            operatorCombo.select(0);
-            if (field.getOperator() != null) {
-                for (int i = 0; i < operators.length; i++)
-                    if (operators[i].compareTo(field.getOperator()) == 0) {
-                        operatorCombo.select(i);
-                        break;
-                    }
-            }
-            operatorFields.add(operatorCombo);
-            Widget widget;
-            if (field.getType() == Date.class)
-                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
-            else if (field.getType() == String.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-                if (field.getValue() != null)
-                    ((Text) widget).setText((String) field.getValue());
-            } else if (field.getType() == Integer.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-            } else
-                widget = null;
-            widgetFields.add(widget);
-        }
-        parameterSection.moveBelow(tree.getTree());
-        top.layout(true, true);
-    }
-
-    private void generate() {
-
-        System.out.println(compileQuery());
-
-        IRunnableContext context = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
-        try {
-            context.run(true, true, new IRunnableWithProgress() {
-                @Override
-                public void run(final IProgressMonitor monitor) {
-                    Thread t = new Thread("Querying") {
-                        @Override
-                        public void run() {
-                            try {
-                                // reportData = query.generate(SessionManager
-                                // .getAppService(), params);
-                                if (reportData.size() >= 1000)
-                                    BioBankPlugin
-                                        .openAsyncError(
-                                            "Size Limit Exceeded",
-                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
-                            } catch (Exception e) {
-                                BioBankPlugin.openAsyncError(
-                                    "Error while querying for results", e);
-                            }
-                        }
-                    };
-                    monitor.beginTask("Generating Report...",
-                        IProgressMonitor.UNKNOWN);
-                    t.start();
-                    while (true) {
-                        if (monitor.isCanceled()) {
-                            // TODO t.stop(); we need a safe way to kill query
-                            reportData = new ArrayList<Object>();
-                            break;
-                        } else if (!t.isAlive())
-                            break;
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
-                    }
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            monitor.done();
-                            if (!reportData.isEmpty()) {
-                                printButton.setEnabled(true);
-                                exportButton.setEnabled(true);
-                            } else {
-                                printButton.setEnabled(false);
-                                exportButton.setEnabled(false);
-                            }
-                            reportTable.dispose();
-                            reportTable = new SearchResultsInfoTable(top,
-                                reportData, getColumnNames(), columnWidths
-                                    .get(node.getObjClass()));
-                            GridData gd = new GridData();
-                            gd.grabExcessHorizontalSpace = true;
-                            gd.grabExcessVerticalSpace = true;
-                            gd.horizontalSpan = 2;
-                            gd.horizontalAlignment = SWT.FILL;
-                            gd.verticalAlignment = SWT.FILL;
-                            reportTable.setLayoutData(gd);
-                            setEnabled(true);
-                            top.layout();
-                        }
-
-                    });
-
-                }
-            });
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Query Error", e);
-        }
-    }
-
-    private String[] getColumnNames() {
-        // modelObj.getColumnNames();
-        return null;
-    }
-
-    private void createEmptyReportTable() {
-        if (reportTable != null) {
-            reportTable.dispose();
-        }
-        reportTable = new SearchResultsInfoTable(top, null,
-            new String[] { " " }, new int[] { 500 });
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.grabExcessVerticalSpace = true;
-        gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.FILL;
-        gd.verticalAlignment = SWT.FILL;
-        reportTable.setLayoutData(gd);
-    }
-
-    public void resetSearch() {
-        Assert.isNotNull(reportTable);
-        createEmptyReportTable();
         reportData = new ArrayList<Object>();
+        this.setPartName(node.getLabel());
 
-        printButton.setEnabled(false);
-        exportButton.setEnabled(false);
-    }
-
-    private String compileQuery() {
-        QueryTreeNode root = (QueryTreeNode) tree.getInput();
-        QueryTreeNode objRoot = root.getChildren().get(0);
-        Class<?> type = objRoot.getNodeInfo().getType();
-        String fromClause = "from " + type.getName();
-        String whereClause = "";
-        compileQueryForTreeNode(objRoot, fromClause, whereClause);
-        String clauses = getClauses(objRoot);
-        if (whereClause != null) {
-            if (clauses != null)
-                whereClause = " where " + clauses + " and " + whereClause;
-            else
-                whereClause = " where " + whereClause;
-        } else {
-            if (clauses != null)
-                whereClause = " where " + clauses;
-        }
-        return fromClause + whereClause;
-    }
-
-    private void compileQueryForTreeNode(QueryTreeNode node, String fromClause,
-        String whereClause) {
-        List<QueryTreeNode> children = node.getChildren();
-        for (QueryTreeNode child : children) {
-            if (child.getNodeInfo().getType() == Collection.class) {
-                fromClause += " join " + child.getNodeInfo().getPath()
-                    + child.getNodeInfo().getFname() + " as "
-                    + child.getNodeInfo().getPath()
-                    + child.getNodeInfo().getFname();
-            } else
-                whereClause += " and " + getClauses(child);
-            compileQueryForTreeNode(child, fromClause, whereClause);
-        }
-    }
-
-    private String getClauses(QueryTreeNode node) {
-        List<HQLField> fields = node.getFieldData();
-        String clause = fields.get(0).getClause();
-        for (int i = 1; i < fields.size(); i++) {
-            HQLField field = fields.get(i);
-            clause += " and " + field.getClause();
-        }
-        return clause;
-    }
-
-    private void setEnabled(boolean enabled) {
-        SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
-        generateButton.setEnabled(enabled);
-        printButton.setEnabled(enabled);
-        exportButton.setEnabled(enabled);
-    }
-
-    public JasperPrint createDynamicReport(String reportName,
-        List<Object[]> params, List<String> columnInfo, List<?> list)
-        throws Exception {
-
-        FastReportBuilder drb = new FastReportBuilder();
-        for (int i = 0; i < columnInfo.size(); i++) {
-            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
-                40, false).setPrintBackgroundOnOddRows(true)
-                .setUseFullPageWidth(true);
-        }
-
-        Map<String, Object> fields = new HashMap<String, Object>();
-        String paramString = "";
-        for (int i = 0; i < params.size(); i++) {
-            paramString += params.get(i)[0] + " : " + params.get(i)[1] + "\n";
-        }
-        fields.put("title", reportName);
-        fields.put("infos", paramString);
-        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
-        if (reportURL == null) {
-            throw new Exception("No report available with name BasicReport");
-        }
-        drb.setTemplateFile(reportURL.getFile());
-        Style headerStyle = new Style();
-        headerStyle.setFont(ReportingUtils.sansSerifBold);
-        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
-        headerStyle.setBorderBottom(Border.THIN);
-        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
-        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
-        headerStyle.setTransparency(Transparency.OPAQUE);
-        Style detailStyle = new Style();
-        detailStyle.setFont(ReportingUtils.sansSerif);
-        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
-
-        JRDataSource ds = new JRBeanCollectionDataSource(list);
-        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
-            new ClassicLayoutManager(), ds, fields);
-        return jp;
+        columnWidths = new HashMap<Class<?>, int[]>();
+        columnWidths.put(ClinicWrapper.class, new int[] { 100, 100 });
+        columnWidths.put(SiteWrapper.class, new int[] { 100, 100 });
+        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
@@ -367,75 +116,8 @@ public class AdvancedReportsEditor extends EditorPart {
         top.setLayout(layout);
         top.setLayoutData(gdfill);
 
-        tree = new TreeViewer(top, SWT.BORDER);
-        tree.setContentProvider(new ITreeContentProvider() {
-
-            @Override
-            public void inputChanged(Viewer viewer, Object oldInput,
-                Object newInput) {
-
-            }
-
-            @Override
-            public void dispose() {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public Object[] getElements(Object inputElement) {
-                return ((QueryTreeNode) inputElement).getChildren().toArray();
-            }
-
-            @Override
-            public boolean hasChildren(Object element) {
-                return !((QueryTreeNode) element).isLeaf();
-            }
-
-            @Override
-            public Object getParent(Object element) {
-                return ((QueryTreeNode) element).getParent();
-            }
-
-            @Override
-            public Object[] getChildren(Object parentElement) {
-                return ((QueryTreeNode) parentElement).getChildren().toArray();
-            }
-        });
-        tree.setLabelProvider(new ILabelProvider() {
-
-            @Override
-            public Image getImage(Object element) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public String getText(Object element) {
-                return ((QueryTreeNode) element).getLabel();
-            }
-
-            @Override
-            public void addListener(ILabelProviderListener listener) {
-            }
-
-            @Override
-            public void dispose() {
-            }
-
-            @Override
-            public boolean isLabelProperty(Object element, String property) {
-                return false;
-            }
-
-            @Override
-            public void removeListener(ILabelProviderListener listener) {
-            }
-        });
-        tree.setInput(SearchUtils.constructTree(new HQLField("", node
-            .getLabel(), node.getObjClass())));
+        tree = new QueryTree(top, SWT.BORDER, node);
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
-
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 saveFields();
@@ -445,101 +127,6 @@ public class AdvancedReportsEditor extends EditorPart {
                     displayFields(selectedNode);
             }
         });
-
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        menu.addListener(SWT.Show, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                Menu menu = tree.getTree().getMenu();
-                for (MenuItem menuItem : menu.getItems()) {
-                    menuItem.dispose();
-                }
-
-                Object element = ((StructuredSelection) tree.getSelection())
-                    .getFirstElement();
-                final QueryTreeNode node = (QueryTreeNode) element;
-                if (node != null && node.getParent() != null) {
-                    MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText("OR");
-                    mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-                        public void widgetSelected(SelectionEvent event) {
-                            QueryTreeNode newOperator = new QueryTreeNode(
-                                new HQLField(node.getNodeInfo().getPath(),
-                                    "OR", String.class));
-                            QueryTreeNode parent = node.getParent();
-                            parent.removeChild(node);
-                            parent.addChild(newOperator);
-                            newOperator.setParent(parent);
-                            newOperator.addChild(node);
-                            node.setParent(newOperator);
-                            QueryTreeNode copy = node.clone();
-                            newOperator.addChild(copy);
-                            copy.setParent(newOperator);
-                            tree.refresh(true);
-                        }
-                    });
-                    if (node.getNodeInfo().getType() == String.class) {
-                        MenuItem mi2 = new MenuItem(menu, SWT.NONE);
-                        mi2.setText("Remove Node");
-                        mi2.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode parent = node.getParent();
-                                List<QueryTreeNode> children = node
-                                    .getChildren();
-                                QueryTreeNode child = children.get(0);
-                                child.setParent(parent);
-                                node.removeChild(child);
-                                parent.addChild(child);
-                                parent.removeChild(node);
-                                tree.refresh(true);
-                            }
-                        });
-                    }
-                    if (node.getNodeInfo().getFname().contains("Collection")
-                        && !((node.getParent().getLabel().compareTo("All") == 0) || (node
-                            .getParent().getLabel().compareTo("None") == 0))) {
-                        MenuItem mi3 = new MenuItem(menu, SWT.NONE);
-                        mi3.setText("All");
-                        mi3.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(node.getNodeInfo().getPath(),
-                                        "All", String.class));
-                                QueryTreeNode parent = node.getParent();
-                                parent.removeChild(node);
-                                parent.addChild(newOperator);
-                                newOperator.setParent(parent);
-                                newOperator.addChild(node);
-                                node.setParent(newOperator);
-                                tree.refresh(true);
-                            }
-                        });
-                        MenuItem mi4 = new MenuItem(menu, SWT.NONE);
-                        mi4.setText("None");
-                        mi4.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(node.getNodeInfo().getPath(),
-                                        "None", String.class));
-                                QueryTreeNode parent = node.getParent();
-                                parent.removeChild(node);
-                                parent.addChild(newOperator);
-                                newOperator.setParent(parent);
-                                newOperator.addChild(node);
-                                node.setParent(newOperator);
-                                tree.refresh(true);
-                            }
-                        });
-                    }
-                }
-            }
-        });
-        tree.getTree().setMenu(menu);
 
         GridData gd = new GridData();
         gd.minimumHeight = 600;
@@ -605,6 +192,217 @@ public class AdvancedReportsEditor extends EditorPart {
 
     }
 
+    public void displayFields(QueryTreeNode node) {
+        if (parameterSection != null)
+            parameterSection.dispose();
+        parameterSection = new Composite(top, SWT.NONE);
+        GridLayout gl = new GridLayout();
+        gl.marginWidth = 0;
+        gl.numColumns = 3;
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        gd.verticalAlignment = SWT.TOP;
+        parameterSection.setLayout(gl);
+        parameterSection.setLayoutData(gd);
+
+        Label headerLabel = new Label(parameterSection, SWT.NONE);
+        GridData gdl = new GridData();
+        gdl.horizontalSpan = 3;
+        headerLabel.setLayoutData(gdl);
+        headerLabel.setText(node.getTreePath());
+
+        widgetFields = new ArrayList<Widget>();
+        operatorFields = new ArrayList<Combo>();
+        textLabels = new ArrayList<Label>();
+        fields = node.getFieldData();
+        for (HQLField field : fields) {
+            Label fieldLabel = new Label(parameterSection, SWT.NONE);
+            fieldLabel.setText(field.getFname() + ":");
+            textLabels.add(fieldLabel);
+            Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
+            String[] operators = SearchUtils.getOperatorSet(field.getType())
+                .toArray(new String[] {});
+            operatorCombo.setItems(operators);
+            operatorCombo.select(0);
+            if (field.getOperator() != null) {
+                for (int i = 0; i < operators.length; i++)
+                    if (operators[i].compareTo(field.getOperator()) == 0) {
+                        operatorCombo.select(i);
+                        break;
+                    }
+            }
+            operatorFields.add(operatorCombo);
+            Widget widget;
+            if (field.getType() == Date.class)
+                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+            else if (field.getType() == String.class) {
+                widget = new Text(parameterSection, SWT.BORDER);
+                if (field.getValue() != null)
+                    ((Text) widget).setText((String) field.getValue());
+            } else if (field.getType() == Integer.class) {
+                widget = new Text(parameterSection, SWT.BORDER);
+            } else
+                widget = null;
+            widgetFields.add(widget);
+        }
+        parameterSection.moveBelow(tree.getTree());
+        top.layout(true, true);
+    }
+
+    private void generate() {
+
+        saveFields();
+
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        try {
+            context.run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    Thread t = new Thread("Querying") {
+                        @Override
+                        public void run() {
+                            try {
+                                reportData = SessionManager
+                                    .getAppService()
+                                    .query(new HQLCriteria(tree.compileQuery()));
+                                if (reportData.size() >= 1000)
+                                    BioBankPlugin
+                                        .openAsyncError(
+                                            "Size Limit Exceeded",
+                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError(
+                                    "Error while querying for results", e);
+                            }
+                        }
+                    };
+                    monitor.beginTask("Generating Report...",
+                        IProgressMonitor.UNKNOWN);
+                    t.start();
+                    while (true) {
+                        if (monitor.isCanceled()) {
+                            // TODO t.stop(); we need a safe way to kill query
+                            reportData = new ArrayList<Object>();
+                            break;
+                        } else if (!t.isAlive())
+                            break;
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            monitor.done();
+                            if (!reportData.isEmpty()) {
+                                printButton.setEnabled(true);
+                                exportButton.setEnabled(true);
+                            } else {
+                                printButton.setEnabled(false);
+                                exportButton.setEnabled(false);
+                            }
+                            reportTable.dispose();
+                            reportTable = new SearchResultsInfoTable(top,
+                                reportData, getColumnNames(), columnWidths
+                                    .get(node.getObjClass()));
+                            GridData gd = new GridData();
+                            gd.grabExcessHorizontalSpace = true;
+                            gd.grabExcessVerticalSpace = true;
+                            gd.horizontalSpan = 2;
+                            gd.horizontalAlignment = SWT.FILL;
+                            gd.verticalAlignment = SWT.FILL;
+                            reportTable.setLayoutData(gd);
+                            setEnabled(true);
+                            top.layout();
+                        }
+
+                    });
+
+                }
+            });
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Query Error", e);
+        }
+    }
+
+    private String[] getColumnNames() {
+        return new String[] { "ID", "Name" };
+    }
+
+    private void createEmptyReportTable() {
+        if (reportTable != null) {
+            reportTable.dispose();
+        }
+        reportTable = new SearchResultsInfoTable(top, null,
+            new String[] { " " }, new int[] { 500 });
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
+        gd.horizontalSpan = 2;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.verticalAlignment = SWT.FILL;
+        reportTable.setLayoutData(gd);
+    }
+
+    public void resetSearch() {
+        Assert.isNotNull(reportTable);
+        createEmptyReportTable();
+        reportData = new ArrayList<Object>();
+
+        printButton.setEnabled(false);
+        exportButton.setEnabled(false);
+    }
+
+    private void setEnabled(boolean enabled) {
+        SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
+        generateButton.setEnabled(enabled);
+        printButton.setEnabled(enabled);
+        exportButton.setEnabled(enabled);
+    }
+
+    public JasperPrint createDynamicReport(String reportName,
+        List<Object[]> params, List<String> columnInfo, List<?> list)
+        throws Exception {
+
+        FastReportBuilder drb = new FastReportBuilder();
+        for (int i = 0; i < columnInfo.size(); i++) {
+            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
+                40, false).setPrintBackgroundOnOddRows(true)
+                .setUseFullPageWidth(true);
+        }
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+        String paramString = "";
+        for (int i = 0; i < params.size(); i++) {
+            paramString += params.get(i)[0] + " : " + params.get(i)[1] + "\n";
+        }
+        fields.put("title", reportName);
+        fields.put("infos", paramString);
+        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
+        if (reportURL == null) {
+            throw new Exception("No report available with name BasicReport");
+        }
+        drb.setTemplateFile(reportURL.getFile());
+        Style headerStyle = new Style();
+        headerStyle.setFont(ReportingUtils.sansSerifBold);
+        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
+        headerStyle.setBorderBottom(Border.THIN);
+        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
+        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
+        headerStyle.setTransparency(Transparency.OPAQUE);
+        Style detailStyle = new Style();
+        detailStyle.setFont(ReportingUtils.sansSerif);
+        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
+
+        JRDataSource ds = new JRBeanCollectionDataSource(list);
+        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
+            new ClassicLayoutManager(), ds, fields);
+        return jp;
+    }
+
     protected void saveFields() {
         if (selectedNode != null) {
             List<HQLField> fields = selectedNode.getFieldData();
@@ -630,22 +428,6 @@ public class AdvancedReportsEditor extends EditorPart {
     public void doSaveAs() {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public void init(IEditorSite site, IEditorInput input)
-        throws PartInitException {
-        setSite(site);
-        setInput(input);
-
-        node = ((ReportInput) input).node;
-
-        reportData = new ArrayList<Object>();
-        this.setPartName(node.getLabel());
-
-        columnWidths = new HashMap<Class<?>, int[]>();
-
-        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
