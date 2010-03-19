@@ -75,7 +75,7 @@ import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
 import edu.ualberta.med.biobank.common.reports.AliquotRequest;
 import edu.ualberta.med.biobank.common.reports.AliquotSCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
-import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
+import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -568,9 +568,9 @@ public class ReportsEditor extends EditorPart {
             textLabels.add(fieldLabel);
             Widget widget;
 
-            if (option.getType() == DateRange.class) {
+            if (option.getType() == DateGroup.class) {
                 widget = new Combo(parameterSection, SWT.READ_ONLY);
-                Object values[] = DateRange.values();
+                Object values[] = DateGroup.values();
                 for (int j = 0; j < values.length; j++)
                     ((Combo) widget).add(values[j].toString());
                 ((Combo) widget).select(0);

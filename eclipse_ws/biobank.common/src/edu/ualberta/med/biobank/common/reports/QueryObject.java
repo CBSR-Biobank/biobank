@@ -39,7 +39,7 @@ public abstract class QueryObject {
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
-    public enum DateRange {
+    public enum DateGroup {
         Week, Month, Quarter, Year
     }
 
