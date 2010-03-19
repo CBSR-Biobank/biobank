@@ -45,6 +45,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.AutoText;
 import ar.com.fdvs.dj.domain.Style;
 import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
 import ar.com.fdvs.dj.domain.constants.Border;
@@ -380,6 +381,11 @@ public class ReportsEditor extends EditorPart {
             throw new Exception("No report available with name BasicReport");
         }
         drb.setTemplateFile(reportURL.getFile());
+        drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
+        drb.addAutoText(DateFormatter.formatAsDateTime(new Date()),
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
+
         Style headerStyle = new Style();
         headerStyle.setFont(ReportingUtils.sansSerifBold);
         // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
