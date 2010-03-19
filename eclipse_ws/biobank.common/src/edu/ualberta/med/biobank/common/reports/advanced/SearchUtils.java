@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.reports.advanced;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Address;
@@ -10,7 +11,7 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -32,6 +33,9 @@ public class SearchUtils {
             opList.add("=");
             opList.add("<=");
             opList.add(">=");
+            opList.add("<");
+            opList.add(">");
+        } else if (type == Date.class) {
             opList.add("<");
             opList.add(">");
         }
@@ -61,6 +65,8 @@ public class SearchUtils {
                 path = path + "site.";
             add(searchableFields, path, "name", String.class);
             add(searchableFields, path, "activityStatus", String.class);
+            add(searchableFields, path, "sampleTypeCollection.name",
+                String.class);
         } else if (c == Clinic.class) {
             if (collection)
                 path = path.replace('.', '_') + "clinicCollection.";
@@ -74,7 +80,86 @@ public class SearchUtils {
             add(searchableFields, path, "city", String.class);
             add(searchableFields, path, "province", String.class);
             add(searchableFields, path, "postalCode", String.class);
+        } else if (c == Aliquot.class) {
+            if (collection)
+                path = path.replace('.', '_') + "aliquotCollection.";
+            else
+                path = path + "aliquot.";
+            add(searchableFields, path, "inventoryId", String.class);
+            add(searchableFields, path, "position", String.class);
+            add(searchableFields, path, "linkDate", Date.class);
+            add(searchableFields, path, "quantity", Integer.class);
+            add(searchableFields, path, "oldComment", String.class);
+            add(searchableFields, path, "sampleType.name", String.class);
+        } else if (c == Patient.class) {
+            if (collection)
+                path = path.replace('.', '_') + "patientCollection.";
+            else
+                path = path + "patient.";
+            add(searchableFields, path, "pnumber", String.class);
+        } else if (c == Study.class) {
+            if (collection)
+                path = path.replace('.', '_') + "studyCollection.";
+            else
+                path = path + "study.";
+            add(searchableFields, path, "name", String.class);
+            add(searchableFields, path, "nameShort", String.class);
+            add(searchableFields, path, "comment", String.class);
+            add(searchableFields, path, "activityStatus", String.class);
+        } else if (c == PatientVisit.class) {
+            if (collection)
+                path = path.replace('.', '_') + "patientVisitCollection.";
+            else
+                path = path + "patientVisit.";
+            add(searchableFields, path, "dateProcessed", Date.class);
+            add(searchableFields, path, "comment", String.class);
+            add(searchableFields, path, "username", String.class);
+            add(searchableFields, path, "shipment", String.class);
+        } else if (c == Contact.class) {
+            if (collection)
+                path = path.replace('.', '_') + "contactCollection.";
+            else
+                path = path + "contact.";
+            add(searchableFields, path, "name", String.class);
+            add(searchableFields, path, "title", String.class);
+            add(searchableFields, path, "phoneNumber", String.class);
+            add(searchableFields, path, "faxNumber", String.class);
+            add(searchableFields, path, "faxNumber", String.class);
+            add(searchableFields, path, "emailAddress", String.class);
+        } else if (c == Shipment.class) {
+            if (collection)
+                path = path.replace('.', '_') + "shipmentCollection.";
+            else
+                path = path + "shipment.";
+            add(searchableFields, path, "dateShipped", Date.class);
+            add(searchableFields, path, "dateReceived", Date.class);
+            add(searchableFields, path, "comment", String.class);
+            add(searchableFields, path, "waybill", String.class);
+            add(searchableFields, path, "boxNumber", String.class);
+            add(searchableFields, path, "shippingCompany", String.class);
+        } else if (c == Container.class) {
+            if (collection)
+                path = path.replace('.', '_') + "containerCollection.";
+            else
+                path = path + "container.";
+            add(searchableFields, path, "productBarcode", String.class);
+            add(searchableFields, path, "position", String.class);
+            add(searchableFields, path, "activityStatus", String.class);
+            add(searchableFields, path, "label", String.class);
+            add(searchableFields, path, "temperature", Integer.class);
+            add(searchableFields, path, "comment", String.class);
+            add(searchableFields, path, "containerType.name", String.class);
+        } else if (c == SampleStorage.class) {
+            if (collection)
+                path = path.replace('.', '_') + "sampleStorageCollection.";
+            else
+                path = path + "sampleStorage.";
+            add(searchableFields, path, "sampleType.name", String.class);
+            add(searchableFields, path, "quantity", Integer.class);
+            add(searchableFields, path, "volume", Integer.class);
+            add(searchableFields, path, "activityStatus", String.class);
         }
+
         return searchableFields;
     }
 
@@ -89,8 +174,6 @@ public class SearchUtils {
             add(searchableFields, path, "address", Address.class);
             add(searchableFields, path, "clinicCollection", Clinic.class);
             add(searchableFields, path, "containerCollection", Container.class);
-            add(searchableFields, path, "sampleTypeCollection",
-                SampleType.class);
         } else if (c == Clinic.class) {
             if (collection)
                 path = path.replace('.', '_') + "clinicCollection.";
@@ -102,7 +185,68 @@ public class SearchUtils {
             add(searchableFields, path, "shipmentCollection", Shipment.class);
             add(searchableFields, path, "patientVisitCollection",
                 PatientVisit.class);
+        } else if (c == Aliquot.class) {
+            if (collection)
+                path = path.replace('.', '_') + "aliquotCollection.";
+            else
+                path = path + "aliquot.";
+            add(searchableFields, path, "patientVisit", PatientVisit.class);
+        } else if (c == Patient.class) {
+            if (collection)
+                path = path.replace('.', '_') + "patientCollection.";
+            else
+                path = path + "patient.";
+            add(searchableFields, path, "study", Study.class);
+            add(searchableFields, path, "patientVisitCollection",
+                PatientVisit.class);
+            add(searchableFields, path, "shipmentCollection", Shipment.class);
+        } else if (c == Study.class) {
+            if (collection)
+                path = path.replace('.', '_') + "studyCollection.";
+            else
+                path = path + "study.";
+            add(searchableFields, path, "site", Site.class);
+            add(searchableFields, path, "contactCollection", Contact.class);
+            add(searchableFields, path, "sampleStorageCollection",
+                SampleStorage.class);
+            add(searchableFields, path, "patientCollection", Patient.class);
+        } else if (c == PatientVisit.class) {
+            if (collection)
+                path = path.replace('.', '_') + "patientVisitCollection.";
+            else
+                path = path + "patientVisit.";
+            add(searchableFields, path, "patient", Patient.class);
+            add(searchableFields, path, "aliquotCollection", Aliquot.class);
+        } else if (c == PatientVisit.class) {
+            if (collection)
+                path = path.replace('.', '_') + "contactCollection.";
+            else
+                path = path + "contact.";
+            add(searchableFields, path, "clinic", Clinic.class);
+            add(searchableFields, path, "studyCollection", Study.class);
+        } else if (c == Shipment.class) {
+            if (collection)
+                path = path.replace('.', '_') + "shipmentCollection.";
+            else
+                path = path + "shipment.";
+            add(searchableFields, path, "clinic", Clinic.class);
+            add(searchableFields, path, "patientCollection", Patient.class);
+            add(searchableFields, path, "patientVisitCollection",
+                PatientVisit.class);
+        } else if (c == Container.class) {
+            if (collection)
+                path = path.replace('.', '_') + "containerCollection.";
+            else
+                path = path + "container.";
+            add(searchableFields, path, "site", Site.class);
+        } else if (c == SampleStorage.class) {
+            if (collection)
+                path = path.replace('.', '_') + "sampleStorageCollection.";
+            else
+                path = path + "sampleStorage.";
+            add(searchableFields, path, "study", Study.class);
         }
+
         return searchableFields;
     }
 

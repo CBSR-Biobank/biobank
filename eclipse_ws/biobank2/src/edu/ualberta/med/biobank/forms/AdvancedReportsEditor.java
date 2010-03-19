@@ -220,6 +220,9 @@ public class AdvancedReportsEditor extends EditorPart {
             fieldLabel.setText(field.getFname() + ":");
             textLabels.add(fieldLabel);
             Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
+            GridData ogd = new GridData();
+            ogd.widthHint = 150;
+            operatorCombo.setLayoutData(ogd);
             String[] operators = SearchUtils.getOperatorSet(field.getType())
                 .toArray(new String[] {});
             operatorCombo.setItems(operators);
@@ -233,16 +236,28 @@ public class AdvancedReportsEditor extends EditorPart {
             }
             operatorFields.add(operatorCombo);
             Widget widget;
-            if (field.getType() == Date.class)
+            GridData wgd = new GridData();
+            wgd.widthHint = 200;
+            if (field.getType() == Date.class) {
                 widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
-            else if (field.getType() == String.class) {
+                wgd.widthHint = 211;
+                ((DateTimeWidget) widget).setLayoutData(wgd);
+                if (field.getValue() != null)
+                    ((DateTimeWidget) widget).setDate((Date) field.getValue());
+            } else if (field.getType() == String.class) {
                 widget = new Text(parameterSection, SWT.BORDER);
+                ((Text) widget).setLayoutData(wgd);
                 if (field.getValue() != null)
                     ((Text) widget).setText((String) field.getValue());
             } else if (field.getType() == Integer.class) {
                 widget = new Text(parameterSection, SWT.BORDER);
+                ((Text) widget).setLayoutData(wgd);
+                if (field.getValue() != null)
+                    ((Text) widget).setText(((Integer) field.getValue())
+                        .toString());
             } else
                 widget = null;
+
             widgetFields.add(widget);
         }
         parameterSection.moveBelow(tree.getTree());
@@ -407,8 +422,15 @@ public class AdvancedReportsEditor extends EditorPart {
         if (selectedNode != null) {
             List<HQLField> fields = selectedNode.getFieldData();
             for (int i = 0; i < widgetFields.size(); i++) {
-                fields.get(i).setValue(((Text) widgetFields.get(i)).getText());
-                fields.get(i).setOperator(operatorFields.get(i).getText());
+                if (widgetFields.get(i) instanceof DateTimeWidget) {
+                    fields.get(i).setValue(
+                        ((DateTimeWidget) widgetFields.get(i)).getDate());
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                } else {
+                    fields.get(i).setValue(
+                        ((Text) widgetFields.get(i)).getText());
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                }
             }
         }
     }
