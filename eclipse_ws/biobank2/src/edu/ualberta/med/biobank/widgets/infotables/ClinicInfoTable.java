@@ -168,4 +168,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         Assert.isNotNull(row);
         return row.clinic;
     }
+
+    @Override
+    public void setSelection(ClinicWrapper item) {
+
+    }
 }

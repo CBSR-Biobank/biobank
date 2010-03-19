@@ -445,6 +445,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     public abstract T getSelection();
 
+    public abstract void setSelection(T item);
+
     protected BiobankCollectionModel getSelectionInternal() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
             "widget is disposed");
@@ -702,9 +704,11 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     private void resizeTable() {
-        int rows = pageInfo.rowsPerPage;
-        if (!isEditMode() && (collection != null)) {
+        int rows = 5;
+        if (!isEditMode() && (pageInfo.rowsPerPage > 0) && (collection != null)) {
             rows = Math.min(collection.size(), pageInfo.rowsPerPage);
+        } else if (!isEditMode() && (collection != null)) {
+            rows = Math.min(collection.size(), rows);
         }
 
         Table table = getTableViewer().getTable();
