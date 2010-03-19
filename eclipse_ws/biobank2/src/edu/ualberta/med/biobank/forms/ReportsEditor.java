@@ -316,11 +316,11 @@ public class ReportsEditor extends EditorPart {
                 fd.setText("Export as");
                 String[] filterExt = { "*.csv", "*.pdf" };
                 fd.setFilterExtensions(filterExt);
-                fd.setFileName(query.getName() + "_"
+                fd.setFileName(query.getName().replaceAll(" ", "_") + "_"
                     + DateFormatter.formatAsDate(new Date()));
                 String path = fd.open();
                 if (path == null)
-                    throw new Exception("Printing Canceled.");
+                    throw new Exception("Exporting canceled.");
                 if (path.endsWith(".pdf"))
                     ReportingUtils.saveReport(createDynamicReport(query
                         .getName(), params, columnInfo, listData), path);
