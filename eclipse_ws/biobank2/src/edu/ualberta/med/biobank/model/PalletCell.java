@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -68,7 +69,7 @@ public class PalletCell extends Cell {
 
     public static Map<RowColPos, PalletCell> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
-        Map<RowColPos, PalletCell> palletScanned = initArray();
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsAlreadyAssigned(appService, siteId);
         // if (randomAliquots.size() > 0) {
@@ -85,7 +86,7 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomAliquotsNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned = initArray();
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsNotAssigned(appService, siteId);
         if (randomAliquots.size() > 1) {
@@ -96,17 +97,6 @@ public class PalletCell extends Cell {
                 0, 0, randomAliquots.get(0).getInventoryId())));
             // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
             // .get(1).getInventoryId()));
-        }
-        return palletScanned;
-    }
-
-    private static Map<RowColPos, PalletCell> initArray() {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        for (int indexRow = 0; indexRow < ScanCell.ROW_MAX; indexRow++) {
-            for (int indexCol = 0; indexCol < ScanCell.COL_MAX; indexCol++) {
-                palletScanned.put(new RowColPos(indexRow, indexCol),
-                    new PalletCell(new ScanCell(indexRow, indexCol, null)));
-            }
         }
         return palletScanned;
     }

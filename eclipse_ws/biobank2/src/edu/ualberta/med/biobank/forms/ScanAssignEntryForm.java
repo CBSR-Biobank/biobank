@@ -109,7 +109,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     protected void init() {
         super.init();
-        setPartName(Messages.getString("ScanAssignEntryForm.tabTitle")); //$NON-NLS-1$
+        setPartName(Messages.getString("ScanAssign.tabTitle")); //$NON-NLS-1$
         currentPalletWrapper = new ContainerWrapper(appService);
         initPalletValues();
         IPreferenceStore store = BioBankPlugin.getDefault()
@@ -120,7 +120,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ScanAssignEntryForm.formTitle")); //$NON-NLS-1$
+        form.setText(Messages.getString("ScanAssign.formTitle")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
 
@@ -133,10 +133,9 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             scanLaunchedValue, Messages
-                .getString("ScanAssignEntryForm.scanLaunchValidationMsg")); //$NON-NLS-1$
+                .getString("linkAssign.scanLaunchValidationMsg")); //$NON-NLS-1$
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-            scanValidValue, Messages
-                .getString("ScanAssignEntryForm.scanErrorMsg")); //$NON-NLS-1$
+            scanValidValue, Messages.getString("ScanAssign.scanErrorMsg")); //$NON-NLS-1$
     }
 
     private void createFieldsSection() throws Exception {
@@ -150,16 +149,12 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 
-        palletCodeText = (Text) createBoundWidgetWithLabel(
-            fieldsComposite,
-            Text.class,
-            SWT.NONE,
-            Messages.getString("ScanAssignEntryForm.productBarcode.label"), //$NON-NLS-1$
-            null,
-            BeansObservables.observeValue(currentPalletWrapper,
+        palletCodeText = (Text) createBoundWidgetWithLabel(fieldsComposite,
+            Text.class, SWT.NONE, Messages
+                .getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
+            null, BeansObservables.observeValue(currentPalletWrapper,
                 "productBarcode"), new NonEmptyStringValidator( //$NON-NLS-1$
-                Messages
-                    .getString("ScanAssignEntryForm.productBarcode.validationMsg"))); //$NON-NLS-1$
+                Messages.getString("ScanAssign.productBarcode.validationMsg"))); //$NON-NLS-1$
         palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -191,10 +186,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, Messages
-                .getString("ScanAssignEntryForm.palletLabel.label"), null, //$NON-NLS-1$
+                .getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
             BeansObservables.observeValue(currentPalletWrapper, "label"), //$NON-NLS-1$
             new PalletBarCodeValidator(Messages
-                .getString("ScanAssignEntryForm.palletLabel.validationMsg"))); //$NON-NLS-1$
+                .getString("ScanAssign.palletLabel.validationMsg"))); //$NON-NLS-1$
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -203,11 +198,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         createContainerTypeSection(fieldsComposite);
 
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE,
-            Messages.getString("ScanAssignEntryForm.plateToScan.label"), //$NON-NLS-1$
-            new String[0], plateToScanValue,
-            new ScannerBarcodeValidator(Messages
-                .getString("ScanAssignEntryForm.plateToScan.validationMsg"))); //$NON-NLS-1$
+            Text.class, SWT.NONE, Messages
+                .getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
+            new String[0], plateToScanValue, new ScannerBarcodeValidator(
+                Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {
@@ -220,7 +214,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         plateToScanText.setLayoutData(gd);
 
         String scanButtonTitle = Messages
-            .getString("ScanAssignEntryForm.scanButton.text"); //$NON-NLS-1$
+            .getString("linkAssign.scanButton.text"); //$NON-NLS-1$
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 200;
             Composite comp = toolkit.createComposite(fieldsComposite);
@@ -254,7 +248,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                             BioBankPlugin
                                 .openError(
                                     Messages
-                                        .getString("ScanAssignEntryForm.dialog.scanError.title"), //$NON-NLS-1$
+                                        .getString("ScanAssign.dialog.scanError.title"), //$NON-NLS-1$
                                     e);
                             scanValidValue.setValue(false);
                         }
@@ -324,18 +318,15 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             .getContainerTypesInSite(appService,
                 currentPalletWrapper.getSite(), palletNameContains, false);
         if (palletContainerTypes.size() == 0) {
-            BioBankPlugin
-                .openAsyncError(
-                    Messages
-                        .getString("ScanAssignEntryForm.dialog.noPalletFoundError.title"), //$NON-NLS-1$
-                    Messages
-                        .getString("ScanAssignEntryForm.dialog.noPalletFoundError.msg") //$NON-NLS-1$
-                        + palletNameContains);
+            BioBankPlugin.openAsyncError(Messages
+                .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
+                Messages.getString("ScanAssign.dialog.noPalletFoundError.msg") //$NON-NLS-1$
+                    + palletNameContains);
         }
         palletTypesViewer = createComboViewerWithNoSelectionValidator(parent,
-            Messages.getString("ScanAssignEntryForm.palletType.label"), //$NON-NLS-1$
+            Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
             palletContainerTypes, null, Messages
-                .getString("ScanAssignEntryForm.palletType.validationMsg")); //$NON-NLS-1$
+                .getString("ScanAssign.palletType.validationMsg")); //$NON-NLS-1$
         palletTypesViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -358,8 +349,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             reset(true);
             boolean showResult = checkPallet();
             if (showResult) {
-                appendLogNLS("ScanAssignEntryForm.activitylog.newScanMsg"); //$NON-NLS-1$
-                appendLogNLS("ScanAssignEntryForm.activitylog.scanning", //$NON-NLS-1$
+                appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
                     plateToScanValue.getValue().toString());
                 showOnlyPallet(false);
                 if (BioBankPlugin.isRealScanEnabled()) {
@@ -378,6 +368,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                                 .getCurrentSite().getId());
                     }
                 }
+                appendLogNLS("ScanAssign.activitylog.scanRes.total", //$NON-NLS-1$
+                    cells.keySet().size());
                 currentScanState = AliquotCellStatus.EMPTY;
                 Map<RowColPos, AliquotWrapper> aliquots = currentPalletWrapper
                     .getAliquots();
@@ -443,8 +435,9 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     protected AliquotCellStatus setStatus(PalletCell scanCell) throws Exception {
         AliquotWrapper expectedAliquot = scanCell.getExpectedAliquot();
         String value = scanCell.getValue();
-        String positionString = LabelingScheme.rowColToSbs(new RowColPos(
-            scanCell.getRow(), scanCell.getCol()));
+        String positionString = currentPalletWrapper.getLabel()
+            + LabelingScheme.rowColToSbs(new RowColPos(scanCell.getRow(),
+                scanCell.getCol()));
         if (value == null) {
             // no aliquot scanned
             if (expectedAliquot == null) {
@@ -510,13 +503,11 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         String cellValue = scanCell.getValue();
 
         scanCell.setStatus(AliquotCellStatus.ERROR);
-        scanCell
-            .setInformation(Messages
-                .getFormattedString(
-                    "ScanAssignEntryForm.scanStatus.aliquot.inventoryIdError", cellValue)); //$NON-NLS-1$
+        scanCell.setInformation(Messages.getFormattedString(
+            "ScanAssign.scanStatus.aliquot.inventoryIdError", cellValue)); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.aliquot.inventoryIdError", position, cellValue); //$NON-NLS-1$
+            "ScanAssign.activitylog.aliquot.inventoryIdError", position, cellValue); //$NON-NLS-1$
         return AliquotCellStatus.ERROR;
     }
 
@@ -526,12 +517,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         String sampleType = foundAliquot.getSampleType().getName();
 
         scanCell.setStatus(AliquotCellStatus.ERROR);
-        scanCell
-            .setInformation(Messages
-                .getFormattedString(
-                    "ScanAssignEntryForm.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
+        scanCell.setInformation(Messages.getFormattedString(
+            "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.aliquot.typeError", position, palletType, //$NON-NLS-1$
+            "ScanAssign.activitylog.aliquot.typeError", position, palletType, //$NON-NLS-1$
             sampleType);
         return AliquotCellStatus.ERROR;
     }
@@ -545,10 +534,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
         scanCell.setStatus(AliquotCellStatus.MOVED);
         scanCell.setInformation(Messages.getFormattedString(
-            "ScanAssignEntryForm.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
+            "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
 
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
+            "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
             expectedPosition);
         return AliquotCellStatus.MOVED;
     }
@@ -557,12 +546,11 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         PalletCell scanCell, AliquotWrapper expectedAliquot,
         AliquotWrapper foundAliquot) {
         scanCell.setStatus(AliquotCellStatus.ERROR);
-        scanCell
-            .setInformation(Messages
-                .getString("ScanAssignEntryForm.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
+        scanCell.setInformation(Messages
+            .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
+            "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
                 .getInventoryId(), expectedAliquot.getPatientVisit()
                 .getPatient().getPnumber(), foundAliquot.getInventoryId(),
             foundAliquot.getPatientVisit().getPatient().getPnumber());
@@ -573,9 +561,9 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         PalletCell scanCell) {
         scanCell.setStatus(AliquotCellStatus.ERROR);
         scanCell.setInformation(Messages
-            .getString("ScanAssignEntryForm.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
+            .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.aliquot.notlinked", position, scanCell.getValue()); //$NON-NLS-1$
+            "ScanAssign.activitylog.aliquot.notlinked", position, scanCell.getValue()); //$NON-NLS-1$
         return AliquotCellStatus.ERROR;
     }
 
@@ -585,10 +573,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         scanCell
             .setInformation(Messages
                 .getFormattedString(
-                    "ScanAssignEntryForm.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
+                    "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
         scanCell.setTitle("?"); //$NON-NLS-1$
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
+            "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
                 .getInventoryId(), missingAliquot.getPatientVisit()
                 .getFormattedDateProcessed(), missingAliquot.getPatientVisit()
                 .getPatient().getPnumber());
@@ -601,7 +589,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             currentPalletWrapper.persist();
             displayPalletPositionInfo();
             int totalNb = 0;
-            StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:"); //$NON-NLS-1$
+            StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:\n"); //$NON-NLS-1$
             try {
                 for (RowColPos rcp : cells.keySet()) {
                     PalletCell cell = cells.get(rcp);
@@ -613,7 +601,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                             aliquot.setPosition(rcp);
                             aliquot.setParent(currentPalletWrapper);
                             aliquot.persist();
-                            String posStr = aliquot.getPositionString();
+                            String posStr = aliquot.getPositionString(true,
+                                false);
                             if (posStr == null) {
                                 posStr = "none"; //$NON-NLS-1$
                             }
@@ -627,8 +616,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                 throw ex;
             }
             appendLog(sb.toString());
-            appendLogNLS(
-                "ScanAssignEntryForm.activitylog.save.summary", totalNb, //$NON-NLS-1$
+            appendLogNLS("ScanAssign.activitylog.save.summary", totalNb, //$NON-NLS-1$
                 currentPalletWrapper.getLabel());
             setSaved(true);
         }
@@ -637,22 +625,18 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         AliquotWrapper aliquot, String posStr) {
         PatientVisitWrapper visit = aliquot.getPatientVisit();
-        String logMsg = Messages.getFormattedString(
-            "ScanAssignEntryForm.activitylog.aliquot.assigned", //$NON-NLS-1$
+        sb.append(Messages.getFormattedString(
+            "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, cell.getValue(), aliquot.getSampleType().getName(), visit
                 .getPatient().getPnumber(), visit.getFormattedDateProcessed(),
-            visit.getShipment().getClinic().getName());
-        sb.append(logMsg);
+            visit.getShipment().getClinic().getName()));
     }
 
     private boolean saveEvenIfAliquotsMissing() {
         if (currentScanState == AliquotCellStatus.MISSING) {
-            boolean save = BioBankPlugin
-                .openConfirm(
-                    Messages
-                        .getString("ScanAssignEntryForm.dialog.reallySave.title"), //$NON-NLS-1$
-                    Messages
-                        .getString("ScanAssignEntryForm.dialog.saveWithMissing.msg")); //$NON-NLS-1$
+            boolean save = BioBankPlugin.openConfirm(Messages
+                .getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
+                Messages.getString("ScanAssign.dialog.saveWithMissing.msg")); //$NON-NLS-1$
             if (save) {
                 return true;
             } else {
@@ -669,10 +653,10 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             .getName();
         String palletLabel = currentPalletWrapper.getLabel();
         if (oldPalletPosition != null) {
-            appendLogNLS("ScanAssignEntryForm.activitylog.pallet.moved", //$NON-NLS-1$
+            appendLogNLS("ScanAssign.activitylog.pallet.moved", //$NON-NLS-1$
                 productBarcode, containerType, oldPalletPosition, palletLabel);
         } else if (newPallet) {
-            appendLogNLS("ScanAssignEntryForm.activitylog.pallet.added", //$NON-NLS-1$
+            appendLogNLS("ScanAssign.activitylog.pallet.added", //$NON-NLS-1$
                 productBarcode, containerType, palletLabel);
         }
     }
@@ -754,7 +738,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected String getOkMessage() {
-        return "Assigning aliquots location."; //$NON-NLS-1$
+        return Messages.getString("ScanAssign.okMessage"); //$NON-NLS-1$
     }
 
     /**
@@ -765,13 +749,12 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         oldPalletPosition = null;
         newPallet = true;
         boolean needToCheckPosition = true;
-        appendLogNLS("ScanAssignEntryForm.activitylog.checkingProductBarcode", //$NON-NLS-1$
+        appendLogNLS("ScanAssign.activitylog.pallet.checkingProductBarcode", //$NON-NLS-1$
             currentPalletWrapper.getProductBarcode());
         if (palletFoundWithProductBarcode != null) {
             // a pallet with this product barcode already exists in the
             // database.
-            appendLogNLS(
-                "ScanAssignEntryForm.activitylog.pallet.checkProductPosition", //$NON-NLS-1$
+            appendLogNLS("ScanAssign.activitylog.pallet.checkLabel", //$NON-NLS-1$
                 currentPalletWrapper.getLabel());
             if (palletFoundWithProductBarcode.getLabel().equals(
                 currentPalletWrapper.getLabel())) {
@@ -794,7 +777,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                     currentPalletWrapper
                         .initObjectWith(palletFoundWithProductBarcode);
                     appendLogNLS(
-                        "ScanAssignEntryForm.activitylog.pallet.moveInfo", //$NON-NLS-1$
+                        "ScanAssign.activitylog.pallet.moveInfo", //$NON-NLS-1$
                         currentPalletWrapper.getProductBarcode(),
                         palletFoundWithProductBarcode.getLabel(),
                         currentPalletWrapper.getLabel());
@@ -802,7 +785,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                     return false;
                 }
             }
-            appendLogNLS("ScanAssignEntryForm.activitylog.pallet.typeUsed",
+            appendLogNLS("ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
                 currentPalletWrapper.getContainerType().getName());
         }
         if (needToCheckPosition) {
@@ -815,7 +798,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         return MessageDialog.openConfirm(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), "Pallet product barcode", //$NON-NLS-1$
             Messages.getFormattedString(
-                "ScanAssignEntryForm.dialog.checkPallet.otherPosition",
+                "ScanAssign.dialog.checkPallet.otherPosition", //$NON-NLS-1$
                 palletFoundWithProductBarcode.getLabel(), currentPalletWrapper
                     .getLabel()));
     }
@@ -828,7 +811,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
      */
     private boolean checkAndSetPosition() throws Exception {
         appendLogNLS(
-            "ScanAssignEntryForm.activitylog.checkingPosition", currentPalletWrapper.getLabel()); //$NON-NLS-1$
+            "ScanAssign.activitylog.pallet.checkingPosition", currentPalletWrapper.getLabel()); //$NON-NLS-1$
 
         ContainerWrapper containerAtPosition = currentPalletWrapper
             .getContainer(currentPalletWrapper.getLabel(), currentPalletWrapper
@@ -849,12 +832,11 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             barcode = "[none]"; //$NON-NLS-1$
         }
         BioBankPlugin.openError(Messages
-            .getString("ScanAssignEntryForm.dialog.positionUsed.title"), //$NON-NLS-1$
+            .getString("ScanAssign.dialog.positionUsed.title"), //$NON-NLS-1$
             Messages.getFormattedString(
-                "ScanAssignEntryForm.dialog.positionUsed.msg", barcode)); //$NON-NLS-1$
+                "ScanAssign.dialog.positionUsed.msg", barcode)); //$NON-NLS-1$
 
-        appendLogNLS(
-            "ScanAssignEntryForm.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
+        appendLogNLS("ScanAssign.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
             currentPalletWrapper.getLabel()); //$NON-NLS-1$
     }
 

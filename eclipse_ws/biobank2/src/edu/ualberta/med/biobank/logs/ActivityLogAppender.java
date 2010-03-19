@@ -36,7 +36,7 @@ public class ActivityLogAppender extends AppenderSkeleton {
         ConsolePlugin.getDefault().getConsoleManager().addConsoles(
             new IConsole[] { messageConsole });
         consoleStream = messageConsole.newMessageStream();
-        setLayout(new PatternLayout("%d{ABSOLUTE} %m%n"));
+        setLayout(new PatternLayout("%d{HH:mm:ss} %m%n"));
         logsList = new ArrayList<LogInfo>();
     }
 
