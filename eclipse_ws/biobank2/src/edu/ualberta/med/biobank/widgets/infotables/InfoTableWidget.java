@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -207,6 +208,12 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         resizeTable();
     }
 
+    /**
+     * Derived classes should override this method if info table support editing
+     * of items in the table.
+     * 
+     * @return true if editing is allowed.
+     */
     protected boolean isEditMode() {
         return false;
     }
@@ -313,12 +320,16 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
      * 
      * @param collection
      */
-    public void reloadCollection(final List<T> collection) {
+    public void reloadCollection(final List<T> collection, T selection) {
         reloadData = true;
-        setCollection(collection);
+        setCollection(collection, selection);
     }
 
     public void setCollection(final List<T> collection) {
+        setCollection(collection, null);
+    }
+
+    public void setCollection(final List<T> collection, final T selection) {
         this.collection = collection;
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
@@ -374,7 +385,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 });
 
                 try {
-
+                    BiobankCollectionModel selItem = null;
                     for (int i = start; i < end; ++i) {
                         if (table.isDisposed())
                             return;
@@ -392,14 +403,25 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                                 }
                             }
                         });
+
+                        if ((selection != null) && selection.equals(item.o)) {
+                            selItem = item;
+                        }
                     }
                     reloadData = false;
 
+                    final BiobankCollectionModel selectedItem = selItem;
                     display.syncExec(new Runnable() {
                         public void run() {
                             if (!table.isDisposed()) {
                                 if (paginationRequired) {
                                     enablePaginationWidget(true);
+                                }
+
+                                if (selectedItem != null) {
+                                    tableViewer
+                                        .setSelection(new StructuredSelection(
+                                            selectedItem));
                                 }
                             }
                         }
@@ -444,8 +466,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     public abstract T getSelection();
-
-    public abstract void setSelection(T item);
 
     protected BiobankCollectionModel getSelectionInternal() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
