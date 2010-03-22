@@ -61,17 +61,8 @@ and study_pv_attr.label='Worksheet'
          if (strpos($label, 'SS') !== FALSE) {
             $label = str_replace('SS', '99', $label);
          }
-
-         $frz = intval(substr($label, 0, 2));
-         $hotel = substr($label, 2, 2);
-         $pallet  = intval(substr($label, 4, 2));
-
-         if (($frz == 2) && ($pallet >= 13)) {
-            $label = Frz02::getOldLabel($label);
-            $frz = intval(substr($label, 0, 2));
-            $hotel = substr($label, 2, 2);
-            $pallet  = intval(substr($label, 4, 2));
-         }
+         
+         $pos = Freezer::getPosition($label);
 
          $data = array(
             'patient_nr' => $inventory_ids[$inv_id]['patient_nr'],
@@ -79,10 +70,10 @@ and study_pv_attr.label='Worksheet'
             'date_taken' => date('d-M-y', strtotime($row['DATE_DRAWN'])),
             'date_received'=> date('d-M-y', strtotime($row['DATE_PROCESSED'])),
             'worksheet' => '"' . $row['VALUE'] . '"',
-            'fnum' => $frz,
-            'rack' => '"' . $hotel . '"',
-            'box' => $pallet,
-            'cell' => sprintf("\"%s%d\"", substr($cbsr, $row['ROW'], 1),  $row['COL'] + 1),
+            'fnum' => $pos['frz'],
+            'rack' => '"' . $pos['hotel'] . '"',
+            'box' => $pos['pallet'],
+            'cell' =>  Freezer::getCell($row['ROW'], $row['COL']),
             'inventory_id' => '"' . $row['INVENTORY_ID'] . '"'
             );
          echo implode(",", $data), "\n";
