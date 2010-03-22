@@ -5,6 +5,17 @@ require_once "config.php";
 
 $scriptname = basename($argv[0]);
 
+/*
+ * Aliquot clinic errors:
+ * use bbpdb;
+ * select * from freezer
+ * join patient_visit on patient_visit.visit_nr=freezer.visit_nr
+ * where (freezer.patient_nr=7189 and freezer.visit_nr=10011)
+ * or (freezer.patient_nr=129 and freezer.visit_nr=10010)
+ * order by fnum, rack, box, cell
+ * 
+ */
+
 $usage = <<<USAGE_END
   USAGE: {$scriptname} CSV_FILE
 
