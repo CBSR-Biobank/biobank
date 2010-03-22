@@ -116,6 +116,8 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
 
     private Button existsScan;
 
+    private List<SampleTypeWrapper> allContainerSampleTypes;
+
     @Override
     protected void init() {
         super.init();
@@ -276,18 +278,19 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         gd.horizontalSpan = 2;
         selectionComp.setLayoutData(gd);
 
-        List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
+        allContainerSampleTypes = SampleTypeWrapper
             .getSampleTypeForContainerTypes(appService, SessionManager
                 .getInstance().getCurrentSite(), palletNameContains);
-        if (sampleTypes.size() == 0) {
+        if (allContainerSampleTypes.size() == 0) {
             BioBankPlugin.openAsyncError(Messages
                 .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
                 Messages.getFormattedString(
                     "ScanLink.dialog.sampleTypesError.msg", //$NON-NLS-1$
                     palletNameContains));
         }
-        createTypeSelectionPerRowComposite(selectionComp, sampleTypes);
-        createTypeSelectionCustom(selectionComp, sampleTypes);
+        createTypeSelectionPerRowComposite(selectionComp,
+            allContainerSampleTypes);
+        createTypeSelectionCustom(selectionComp, allContainerSampleTypes);
         radioRowSelection.setSelection(true);
         selectionStackLayout.topControl = typesSelectionPerRowComposite;
 
@@ -600,9 +603,12 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                             typesRows.put(rcp.row, typesRowsCount);
                         }
                     }
+                    List<SampleTypeWrapper> studiesSampleTypes = getStudyOnlySampleTypes();
                     for (Integer row : typesRows.keySet()) {
-                        sampleTypeWidgets.get(row)
-                            .setNumber(typesRows.get(row));
+                        SampleTypeSelectionWidget widget = sampleTypeWidgets
+                            .get(row);
+                        widget.setNumber(typesRows.get(row));
+                        widget.setTypes(studiesSampleTypes);
                     }
                     scanOkValue.setValue(scanOk);
                     radioComponents.setEnabled(scanOk);
@@ -617,6 +623,20 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 }
             }
         });
+    }
+
+    protected List<SampleTypeWrapper> getStudyOnlySampleTypes() {
+        List<SampleTypeWrapper> types = new ArrayList<SampleTypeWrapper>();
+        for (SampleStorageWrapper ss : currentPatient.getStudy()
+            .getSampleStorageCollection()) {
+            if (ss.getActivityStatus().isActive()) {
+                SampleTypeWrapper type = ss.getSampleType();
+                if (allContainerSampleTypes.contains(type)) {
+                    types.add(type);
+                }
+            }
+        }
+        return types;
     }
 
     private boolean setCellStatus(PalletCell cell) throws ApplicationException {

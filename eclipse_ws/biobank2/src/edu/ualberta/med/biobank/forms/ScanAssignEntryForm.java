@@ -703,7 +703,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         try {
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
-                .getActivityStatus(appService, "Active")); //$NON-NLS-1$
+                .getActiveActivityStatus(appService));
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSite());
         } catch (Exception e) {

@@ -22,6 +22,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     private static Map<String, ActivityStatusWrapper> activityStatusMap = new HashMap<String, ActivityStatusWrapper>();
 
+    public static final String ACTIVE_STATUS_STRING = "Active";
+
     public ActivityStatusWrapper(WritableApplicationService appService,
         ActivityStatus wrappedObject) {
         super(appService, wrappedObject);
@@ -95,6 +97,23 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
                 + "\" does not exist");
         }
         return activityStatus;
+    }
+
+    /**
+     * return activity status "Active". Facility method to avoid using "Active"
+     * string everywhere
+     */
+    public static ActivityStatusWrapper getActiveActivityStatus(
+        WritableApplicationService appService) throws Exception {
+        return getActivityStatus(appService, ACTIVE_STATUS_STRING);
+    }
+
+    /**
+     * return true if this Activity status name is "Active". Facility method to
+     * avoid using "Active" string everywhere
+     */
+    public boolean isActive() {
+        return getName() != null && getName().equals(ACTIVE_STATUS_STRING);
     }
 
     @Override
