@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
+import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -56,6 +57,7 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
@@ -105,6 +107,12 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     private String oldPalletPosition;
 
     private AliquotCellStatus currentScanState;
+
+    private String scanButtonTitle;
+
+    private boolean rescanMode = false;
+
+    private Composite containersComposite;
 
     @Override
     protected void init() {
@@ -213,8 +221,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         gd.horizontalAlignment = SWT.FILL;
         plateToScanText.setLayoutData(gd);
 
-        String scanButtonTitle = Messages
-            .getString("linkAssign.scanButton.text"); //$NON-NLS-1$
+        scanButtonTitle = Messages.getString("linkAssign.scanButton.text"); //$NON-NLS-1$
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 200;
             Composite comp = toolkit.createComposite(fieldsComposite);
@@ -238,28 +245,13 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        try {
-                            scan();
-                        } catch (RemoteConnectFailureException exp) {
-                            BioBankPlugin.openRemoteConnectErrorMessage();
-                        } catch (Exception e) {
-                            BioBankPlugin
-                                .openError(
-                                    Messages
-                                        .getString("ScanAssign.dialog.scanError.title"), //$NON-NLS-1$
-                                    e);
-                            scanValidValue.setValue(false);
-                        }
-                    }
-                });
+                scan();
             }
         });
     }
 
     private void createContainersSection() {
-        Composite containersComposite = toolkit.createComposite(form.getBody());
+        containersComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = getNeutralGridLayout();
         layout.numColumns = 2;
         containersComposite.setLayout(layout);
@@ -343,69 +335,94 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     protected void scan() {
-        try {
-            // if another scan has been done on this same form, need to reset
-            // values set before
-            reset(true);
-            boolean showResult = checkPallet();
-            if (showResult) {
-                appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
-                    plateToScanValue.getValue().toString());
-                showOnlyPallet(false);
-                if (BioBankPlugin.isRealScanEnabled()) {
-                    int plateNum = BioBankPlugin.getDefault().getPlateNumber(
-                        plateToScanValue.getValue().toString());
-                    cells = PalletCell.convertArray(ScannerConfigPlugin
-                        .scan(plateNum));
-                } else {
-                    if (linkedAssignButton.getSelection()) {
-                        cells = PalletCell.getRandomAliquotsNotAssigned(
-                            appService, SessionManager.getInstance()
-                                .getCurrentSite().getId());
-                    } else if (linkedOnlyButton.getSelection()) {
-                        cells = PalletCell.getRandomAliquotsAlreadyAssigned(
-                            appService, SessionManager.getInstance()
-                                .getCurrentSite().getId());
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                try {
+                    // if another scan has been done on this same form, need to
+                    // reset values set before
+                    reset(true);
+                    boolean canLaunchScan = checkPallet();
+                    if (canLaunchScan) {
+                        showOnlyPallet(false);
+                        launchScan();
+                        currentScanState = AliquotCellStatus.EMPTY;
+                        initCellsStatus();
+                        palletWidget.setCells(cells);
+                        scanLaunchedValue.setValue(true);
+                        setDirty(true);
+                    } else {
+                        palletWidget
+                            .setCells(new TreeMap<RowColPos, PalletCell>());
+                        showOnlyPallet(true);
+                        scanValidValue.setValue(false);
                     }
-                }
-                appendLogNLS("ScanAssign.activitylog.scanRes.total", //$NON-NLS-1$
-                    cells.keySet().size());
-                currentScanState = AliquotCellStatus.EMPTY;
-                Map<RowColPos, AliquotWrapper> aliquots = currentPalletWrapper
-                    .getAliquots();
-                for (RowColPos rcp : cells.keySet()) {
-                    AliquotWrapper expectedAliquot = null;
-                    if (aliquots != null) {
-                        expectedAliquot = aliquots.get(rcp);
+                    showPalletPosition();
+                    cancelConfirmWidget.setFocus();
+                    setRescanMode();
+                    containersComposite.layout(true, true);
+                } catch (RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    scanValidValue.setValue(false);
+                } catch (Exception e) {
+                    BioBankPlugin.openError(Messages
+                        .getString("ScanAssign.dialog.scanError.title"), //$NON-NLS-1$
+                        e);
+                    scanValidValue.setValue(false);
+                    String msg = e.getMessage();
+                    if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+                        msg = e.getCause().getMessage();
                     }
-                    PalletCell cell = cells.get(rcp);
-                    cell.setExpectedAliquot(expectedAliquot);
-                    AliquotCellStatus newStatus = setStatus(cell);
-                    currentScanState = currentScanState.mergeWith(newStatus);
+                    appendLog("ERROR: " + msg); //$NON-NLS-1$
                 }
-                scanValidValue
-                    .setValue(currentScanState != AliquotCellStatus.ERROR);
-                palletWidget.setCells(cells);
-                scanLaunchedValue.setValue(true);
-                setDirty(true);
-            } else {
-                palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
-                showOnlyPallet(true);
-                scanValidValue.setValue(false);
             }
-            showPalletPosition();
-            cancelConfirmWidget.setFocus();
-            form.layout(true, true);
-        } catch (RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            BioBankPlugin.openError("Error while scanning", e); //$NON-NLS-1$
-            String msg = e.getMessage();
-            if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
-                msg = e.getCause().getMessage();
+        });
+    }
+
+    private void launchScan() throws Exception, ApplicationException {
+        appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
+            plateToScanValue.getValue().toString());
+        if (BioBankPlugin.isRealScanEnabled()) {
+            int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+                plateToScanValue.getValue().toString());
+            cells = PalletCell.convertArray(ScannerConfigPlugin.scan(plateNum));
+        } else {
+            if (linkedAssignButton.getSelection()) {
+                cells = PalletCell.getRandomAliquotsNotAssigned(appService,
+                    SessionManager.getInstance().getCurrentSite().getId());
+            } else if (linkedOnlyButton.getSelection()) {
+                cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
+                    SessionManager.getInstance().getCurrentSite().getId());
             }
-            appendLog("ERROR: " + msg); //$NON-NLS-1$
         }
+        appendLogNLS("ScanAssign.activitylog.scanRes.total", //$NON-NLS-1$
+            cells.keySet().size());
+    }
+
+    private void initCellsStatus() throws Exception {
+        Map<RowColPos, AliquotWrapper> registeredAliquots = currentPalletWrapper
+            .getAliquots();
+        Map<RowColPos, ? extends Cell> alreadyScannedCells = palletWidget
+            .getCells();
+        for (RowColPos rcp : cells.keySet()) {
+            PalletCell cell = null;
+            AliquotCellStatus newStatus = null;
+            if (rescanMode) {
+                cell = (PalletCell) alreadyScannedCells.get(rcp);
+            }
+            if (cell == null) {
+                AliquotWrapper expectedAliquot = null;
+                if (registeredAliquots != null) {
+                    expectedAliquot = registeredAliquots.get(rcp);
+                }
+                cell = cells.get(rcp);
+                cell.setExpectedAliquot(expectedAliquot);
+                newStatus = setStatus(cell);
+            } else {
+                newStatus = cell.getStatus();
+            }
+            currentScanState = currentScanState.mergeWith(newStatus);
+        }
+        scanValidValue.setValue(currentScanState != AliquotCellStatus.ERROR);
     }
 
     private void showOnlyPallet(boolean show) {
@@ -670,7 +687,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         String productBarcode = ""; //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
 
-        if (beforeScan) {
+        if (beforeScan) { // keep fields values
             productBarcode = currentPalletWrapper.getProductBarcode();
             label = currentPalletWrapper.getLabel();
             currentPalletWrapper.resetToNewObject();
@@ -678,10 +695,12 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             if (palletTypesViewer != null) {
                 palletTypesViewer.getCombo().deselectAll();
             }
+            scanButton.setText(scanButtonTitle);
+            rescanMode = false;
+            freezerWidget.setSelection(null);
+            hotelWidget.setSelection(null);
+            palletWidget.setCells(null);
         }
-        freezerWidget.setSelection(null);
-        hotelWidget.setSelection(null);
-        palletWidget.setCells(null);
         cells = null;
         scanLaunchedValue.setValue(false);
         initPalletValues();
@@ -691,7 +710,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             setContainerType();
         }
 
-        if (beforeScan) {
+        if (beforeScan) { // re-apply fields values
             currentPalletWrapper.setProductBarcode(productBarcode);
             currentPalletWrapper.setLabel(label);
         } else {
@@ -699,11 +718,16 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
+    protected void setRescanMode() {
+        scanButton.setText("Rescan");
+        rescanMode = true;
+    }
+
     private void initPalletValues() {
         try {
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
-                .getActivityStatus(appService, "Active")); //$NON-NLS-1$
+                .getActiveActivityStatus(appService));
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSite());
         } catch (Exception e) {

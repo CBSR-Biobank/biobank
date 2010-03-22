@@ -57,39 +57,46 @@ public class CbsrStudies {
             site,
             "A phase II randomized blinded controlled trial of the effect of "
                 + "furoSemide in cricially ill Patients with eARly acute Kidney injury",
-            "SPARK", "Active", null);
+            "SPARK", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Acute Heart Failure-Emergency Management", "AHFEM",
-            "Active", null);
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Blood Borne Pathogens Surveillance Project", "BBPSP",
-            "Active", null);
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Canadian Health Infant Longitudinal Development Study",
-            "CHILD", "Active", null);
+            "CHILD", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(
             site,
             "Centre of Excellence for Gastrointestinal Inflammation and Immunity Research",
-            "CEGIIR", "Active", null);
+            "CEGIIR", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Critical Care Cohort Study", "CCCS", "Closed", null);
         addStudy(site,
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Disabled", "Precath visit - only urine is collected");
         addStudy(site, "Heart failure Etiology and Analysis Research Team",
-            "HEART", "Active", null);
-        addStudy(site, "Kidney Disease Cohort Study", "KDCS", "Active", null);
-        addStudy(site, "Kingston Merger Study", "KMS", "Active", null);
+            "HEART", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
+        addStudy(site, "Kidney Disease Cohort Study", "KDCS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
+        addStudy(site, "Kingston Merger Study", "KMS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(
             site,
             "Laboratory Controls Study",
             "LCS",
-            "Active",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             "Created so that we could give locations/track samples that we "
                 + "use as controls. Also used to store leftover aliquots of staff "
                 + "blood  used in experiments");
-        addStudy(site, "Man-Chui Poon Study", "MPS", "Active", null);
-        addStudy(site, "Novartis Hepatitis C Study", "NHS", "Active", null);
-        addStudy(site, "Retroviral Study", "RVS", "Active", null);
-        addStudy(site, "Tonelli Chronic Kidney Study", "TCKS", "Active", null);
-        addStudy(site, "Vascular Access Study", "VAS", "Active", null);
+        addStudy(site, "Man-Chui Poon Study", "MPS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
+        addStudy(site, "Novartis Hepatitis C Study", "NHS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
+        addStudy(site, "Retroviral Study", "RVS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
+        addStudy(site, "Tonelli Chronic Kidney Study", "TCKS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
+        addStudy(site, "Vascular Access Study", "VAS",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
 
         addSourceVessel("AHFEM", "5mL gold top serum tube");
         addSourceVessel("AHFEM", "6ml light green top lithium heparin tube");
@@ -419,7 +426,7 @@ public class CbsrStudies {
         ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
         ss.setQuantity(quantity);
         ss.setVolume(volume);
-        ss.setActivityStatus(CbsrSite.getActivityStatus("Active"));
+        ss.setActivityStatus(CbsrSite.getActiveActivityStatus());
 
         study.addSampleStorage(Arrays.asList(ss));
         study.persist();
@@ -436,7 +443,8 @@ public class CbsrStudies {
             study.setStudyPvAttr(label, type);
         }
         study.setStudyPvAttrActivityStatus(label, ActivityStatusWrapper
-            .getActivityStatus(study.getAppService(), "Active"));
+            .getActivityStatus(study.getAppService(),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         study.persist();
         study.reload();
 
