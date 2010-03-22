@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
@@ -211,6 +214,9 @@ public class QueryTree extends TreeViewer {
             else if (operator.compareTo("doesn't end with") == 0)
                 return fname + " not like '%" + value + "'";
             return fname + operator + "'" + value + "'";
+        } else if (value instanceof Date) {
+            return fname + operator + "'"
+                + DateFormatter.formatAsDateTime((Date) value) + "'";
         }
         return fname + operator + value;
 
@@ -243,21 +249,29 @@ public class QueryTree extends TreeViewer {
         }
     }
 
-    public String compileQuery() {
+    public String compileQuery(Collection<String> properties) {
         HashSet<String> fromClauses = new HashSet<String>();
         List<String> whereClauses = new ArrayList<String>();
 
         QueryTreeNode root = (QueryTreeNode) this.getInput();
         QueryTreeNode objRoot = root.getChildren().get(0);
         Class<?> type = objRoot.getNodeInfo().getType();
-        String selectClause = "select " + type.getSimpleName().toLowerCase()
-            + ".id, " + type.getSimpleName().toLowerCase() + ".name from "
-            + type.getName() + " " + type.getSimpleName().toLowerCase();
+        String selectClause = "select ";
+        for (String property : properties) {
+            selectClause += type.getSimpleName().toLowerCase() + "." + property
+                + ", ";
+        }
+        selectClause = selectClause.substring(0, selectClause.length() - 2)
+            + " from " + type.getName() + " "
+            + type.getSimpleName().toLowerCase();
+        addClausesForNode(objRoot, whereClauses);
         generateSubClauses(objRoot, whereClauses, fromClauses);
-        System.out.println(selectClause + compileFromClause(fromClauses)
-            + " where " + compileWhereClause(whereClauses));
-        return selectClause + compileFromClause(fromClauses) + " where "
-            + compileWhereClause(whereClauses);
+        String hqlString = selectClause + compileFromClause(fromClauses);
+        String where = compileWhereClause(whereClauses);
+        if (where != null)
+            hqlString = hqlString + " where " + where;
+        System.out.println(hqlString);
+        return hqlString;
     }
 
     private String compileFromClause(HashSet<String> fromClauses) {
@@ -330,10 +344,17 @@ public class QueryTree extends TreeViewer {
         boolean addedClause = false;
         for (int i = 0; i < fields.size(); i++) {
             field = fields.get(i);
-            if (field.getValue() != null
-                && ((String) field.getValue()).compareTo("") != 0) {
-                addClause(field, clauseList);
-                addedClause = true;
+            if (field.getType() == String.class) {
+                if (field.getValue() != null
+                    && ((String) field.getValue()).compareTo("") != 0) {
+                    addClause(field, clauseList);
+                    addedClause = true;
+                }
+            } else {
+                if (field.getValue() != null) {
+                    addClause(field, clauseList);
+                    addedClause = true;
+                }
             }
         }
         return addedClause;

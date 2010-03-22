@@ -198,7 +198,7 @@ public class AdvancedReportsEditor extends EditorPart {
         parameterSection = new Composite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
-        gl.numColumns = 3;
+        gl.numColumns = 4;
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.TOP;
@@ -207,7 +207,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
         Label headerLabel = new Label(parameterSection, SWT.NONE);
         GridData gdl = new GridData();
-        gdl.horizontalSpan = 3;
+        gdl.horizontalSpan = 4;
         headerLabel.setLayoutData(gdl);
         headerLabel.setText(node.getTreePath());
 
@@ -216,57 +216,76 @@ public class AdvancedReportsEditor extends EditorPart {
         textLabels = new ArrayList<Label>();
         fields = node.getFieldData();
         for (HQLField field : fields) {
-            Label fieldLabel = new Label(parameterSection, SWT.NONE);
-            fieldLabel.setText(field.getFname() + ":");
-            textLabels.add(fieldLabel);
-            Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
-            GridData ogd = new GridData();
-            ogd.widthHint = 150;
-            operatorCombo.setLayoutData(ogd);
-            String[] operators = SearchUtils.getOperatorSet(field.getType())
-                .toArray(new String[] {});
-            operatorCombo.setItems(operators);
-            operatorCombo.select(0);
-            if (field.getOperator() != null) {
-                for (int i = 0; i < operators.length; i++)
-                    if (operators[i].compareTo(field.getOperator()) == 0) {
-                        operatorCombo.select(i);
-                        break;
-                    }
-            }
-            operatorFields.add(operatorCombo);
-            Widget widget;
-            GridData wgd = new GridData();
-            wgd.widthHint = 200;
-            if (field.getType() == Date.class) {
-                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
-                wgd.widthHint = 211;
-                ((DateTimeWidget) widget).setLayoutData(wgd);
-                if (field.getValue() != null)
-                    ((DateTimeWidget) widget).setDate((Date) field.getValue());
-            } else if (field.getType() == String.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-                ((Text) widget).setLayoutData(wgd);
-                if (field.getValue() != null)
-                    ((Text) widget).setText((String) field.getValue());
-            } else if (field.getType() == Integer.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-                ((Text) widget).setLayoutData(wgd);
-                if (field.getValue() != null)
-                    ((Text) widget).setText(((Integer) field.getValue())
-                        .toString());
-            } else
-                widget = null;
-
-            widgetFields.add(widget);
+            drawField(field);
         }
         parameterSection.moveBelow(tree.getTree());
         top.layout(true, true);
     }
 
+    private void drawField(final HQLField field) {
+        Label fieldLabel = new Label(parameterSection, SWT.NONE);
+        fieldLabel.setText(field.getFname().replaceAll(".name", "") + ":");
+        textLabels.add(fieldLabel);
+        Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
+        GridData ogd = new GridData();
+        ogd.widthHint = 150;
+        operatorCombo.setLayoutData(ogd);
+        String[] operators = SearchUtils.getOperatorSet(field.getType())
+            .toArray(new String[] {});
+        operatorCombo.setItems(operators);
+        operatorCombo.select(0);
+        if (field.getOperator() != null) {
+            for (int i = 0; i < operators.length; i++)
+                if (operators[i].compareTo(field.getOperator()) == 0) {
+                    operatorCombo.select(i);
+                    break;
+                }
+        }
+        operatorFields.add(operatorCombo);
+        Widget widget;
+        GridData wgd = new GridData();
+        wgd.widthHint = 200;
+        if (field.getType() == Date.class) {
+            widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+            wgd.widthHint = 211;
+            ((DateTimeWidget) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((DateTimeWidget) widget).setDate((Date) field.getValue());
+        } else if (field.getType() == String.class) {
+            widget = new Text(parameterSection, SWT.BORDER);
+            ((Text) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((Text) widget).setText((String) field.getValue());
+        } else if (field.getType() == Integer.class) {
+            widget = new Text(parameterSection, SWT.BORDER);
+            ((Text) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((Text) widget)
+                    .setText(((Integer) field.getValue()).toString());
+        } else
+            widget = null;
+
+        widgetFields.add(widget);
+        Button plusButton = new Button(parameterSection, SWT.NONE);
+        plusButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        plusButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                saveFields();
+                HQLField addedField = new HQLField(field);
+                selectedNode.insertField(selectedNode.getFieldData().indexOf(
+                    field), addedField);
+                displayFields(selectedNode);
+            }
+        });
+    }
+
     private void generate() {
 
         saveFields();
+        final HashMap<String, String> colInfo = SearchUtils.getColumnInfo(node
+            .getObjClass());
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -278,9 +297,10 @@ public class AdvancedReportsEditor extends EditorPart {
                         @Override
                         public void run() {
                             try {
-                                reportData = SessionManager
-                                    .getAppService()
-                                    .query(new HQLCriteria(tree.compileQuery()));
+                                reportData = SessionManager.getAppService()
+                                    .query(
+                                        new HQLCriteria(tree
+                                            .compileQuery(colInfo.values())));
                                 if (reportData.size() >= 1000)
                                     BioBankPlugin
                                         .openAsyncError(
@@ -321,8 +341,9 @@ public class AdvancedReportsEditor extends EditorPart {
                             }
                             reportTable.dispose();
                             reportTable = new SearchResultsInfoTable(top,
-                                reportData, getColumnNames(), columnWidths
-                                    .get(node.getObjClass()));
+                                reportData, colInfo.keySet().toArray(
+                                    new String[] {}), columnWidths.get(node
+                                    .getObjClass()));
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;
@@ -341,10 +362,6 @@ public class AdvancedReportsEditor extends EditorPart {
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Query Error", e);
         }
-    }
-
-    private String[] getColumnNames() {
-        return new String[] { "ID", "Name" };
     }
 
     private void createEmptyReportTable() {
@@ -425,6 +442,16 @@ public class AdvancedReportsEditor extends EditorPart {
                 if (widgetFields.get(i) instanceof DateTimeWidget) {
                     fields.get(i).setValue(
                         ((DateTimeWidget) widgetFields.get(i)).getDate());
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                } else if (fields.get(i).getType() == Integer.class) {
+                    Integer val;
+                    try {
+                        val = Integer.parseInt(((Text) widgetFields.get(i))
+                            .getText());
+                    } catch (NumberFormatException e) {
+                        val = null;
+                    }
+                    fields.get(i).setValue(val);
                     fields.get(i).setOperator(operatorFields.get(i).getText());
                 } else {
                     fields.get(i).setValue(

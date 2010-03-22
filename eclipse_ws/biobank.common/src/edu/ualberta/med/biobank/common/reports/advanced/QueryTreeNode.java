@@ -89,4 +89,8 @@ public class QueryTreeNode extends Object {
         }
         return node;
     }
+
+    public void insertField(int index, HQLField addedField) {
+        fieldData.add(index + 1, addedField);
+    }
 }

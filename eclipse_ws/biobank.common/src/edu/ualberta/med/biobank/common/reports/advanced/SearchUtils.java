@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.reports.advanced;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Address;
@@ -17,6 +18,36 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 
 public class SearchUtils {
+
+    public static HashMap<String, String> getColumnInfo(Class<?> type) {
+        HashMap<String, String> properties = new HashMap<String, String>();
+        if (type == Aliquot.class) {
+            properties.put("Inventory Id", "inventoryId");
+            properties.put("Link Date", "linkDate");
+            properties.put("Sample Type", "sampleType.name");
+        } else if (type == Container.class) {
+            properties.put("Label", "label");
+            properties.put("Container Type", "containerType.name");
+        } else if (type == Site.class)
+            properties.put("Name", "name");
+        else if (type == Clinic.class)
+            properties.put("Name", "name");
+        else if (type == Study.class) {
+            properties.put("Name", "name");
+            properties.put("Short Name", "nameShort");
+        } else if (type == Patient.class)
+            properties.put("Patient Number", "pnumber");
+        else if (type == PatientVisit.class) {
+            properties.put("Patient", "patient.pnumber");
+            properties.put("Date Processed", "dateProcessed");
+        } else if (type == Contact.class) {
+            properties.put("Name", "name");
+            properties.put("Title", "title");
+            properties.put("Phone", "phoneNumber");
+            properties.put("Email", "emailAddress");
+        }
+        return properties;
+    }
 
     public static List<String> getOperatorSet(Class<?> type) {
         List<String> opList = new ArrayList<String>();
