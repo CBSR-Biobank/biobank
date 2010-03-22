@@ -90,11 +90,8 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         String.class);
     private IObservableValue scannedValue = new WritableValue(Boolean.FALSE,
         Boolean.class);
-    private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
-        Boolean.class);
     private IObservableValue typesFilledValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
-    private boolean scanOk;
 
     private Text patientNumberText;
     private Text plateToScanText;
@@ -117,6 +114,10 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
     private Button existsScan;
 
     private List<SampleTypeWrapper> allContainerSampleTypes;
+
+    private String scanButtonTitle;
+
+    private boolean rescanMode = false;
 
     @Override
     protected void init() {
@@ -177,21 +178,6 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
             scannedValue, uvs, uvs);
         scannedValue.setValue(false);
-
-        uvs.setAfterConvertValidator(new IValidator() {
-            @Override
-            public IStatus validate(Object value) {
-                if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error(Messages
-                        .getString("ScanLink.scanError.validationMsg")); //$NON-NLS-1$
-                } else {
-                    return Status.OK_STATUS;
-                }
-            }
-        });
-        bindValue(new WritableValue(Boolean.FALSE, Boolean.class), scanOkValue,
-            uvs, uvs);
-        scanOkValue.setValue(false);
 
         createPalletSection();
 
@@ -469,8 +455,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        String scanButtonTitle = Messages
-            .getString("ScanLink.button.scan.text"); //$NON-NLS-1$
+        scanButtonTitle = Messages.getString("ScanLink.button.scan.text"); //$NON-NLS-1$
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 400;
             Composite comp = toolkit.createComposite(fieldsComposite);
@@ -569,60 +554,91 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
-                    scanOk = true;
-                    Map<RowColPos, PalletCell> cells = null;
                     appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
                         plateToScanValue.getValue().toString());
-                    int plateNum = BioBankPlugin.getDefault().getPlateNumber(
-                        plateToScanValue.getValue().toString());
-                    if (BioBankPlugin.isRealScanEnabled()) {
-                        cells = PalletCell.convertArray(ScannerConfigPlugin
-                            .scan(plateNum));
-                    } else {
-                        if (randomScan.getSelection()) {
-                            cells = PalletCell.getRandomScanLink();
-                        } else if (existsScan.getSelection()) {
-                            cells = PalletCell
-                                .getRandomScanLinkWithAliquotsAlreadyLinked(
-                                    appService, SessionManager.getInstance()
-                                        .getCurrentSite().getId());
-                        }
-                    }
+                    Map<RowColPos, PalletCell> cells = launchScan();
                     scannedValue.setValue(true);
                     radioComponents.setEnabled(true);
-                    Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-                    for (RowColPos rcp : cells.keySet()) {
-                        Integer typesRowsCount = typesRows.get(rcp.row);
-                        if (typesRowsCount == null) {
-                            typesRowsCount = 0;
-                            sampleTypeWidgets.get(rcp.row).resetValues(true);
-                        }
-                        boolean addAliquotNumber = setCellStatus(cells.get(rcp));
-                        if (addAliquotNumber) {
-                            typesRowsCount++;
-                            typesRows.put(rcp.row, typesRowsCount);
-                        }
-                    }
-                    List<SampleTypeWrapper> studiesSampleTypes = getStudyOnlySampleTypes();
-                    for (Integer row : typesRows.keySet()) {
-                        SampleTypeSelectionWidget widget = sampleTypeWidgets
-                            .get(row);
-                        widget.setNumber(typesRows.get(row));
-                        widget.setTypes(studiesSampleTypes);
-                    }
-                    scanOkValue.setValue(scanOk);
-                    radioComponents.setEnabled(scanOk);
-                    typesSelectionPerRowComposite.setEnabled(scanOk);
+                    boolean everythingOk = initCellsAndTypes(cells);
+                    radioComponents.setEnabled(everythingOk);
+                    typesSelectionPerRowComposite.setEnabled(everythingOk);
 
                     // Show result in grid
                     spw.setCells(cells);
+                    setRescanMode();
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
                     BioBankPlugin.openError("Error while scanning", e); //$NON-NLS-1$
                 }
             }
+
         });
+    }
+
+    private Map<RowColPos, PalletCell> launchScan() throws Exception {
+        Map<RowColPos, PalletCell> cells = new HashMap<RowColPos, PalletCell>();
+        int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+            plateToScanValue.getValue().toString());
+        if (BioBankPlugin.isRealScanEnabled()) {
+            cells = PalletCell.convertArray(ScannerConfigPlugin.scan(plateNum));
+        } else {
+            if (randomScan.getSelection()) {
+                cells = PalletCell.getRandomScanLink();
+            } else if (existsScan.getSelection()) {
+                cells = PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
+                    appService, SessionManager.getInstance().getCurrentSite()
+                        .getId());
+            }
+        }
+        return cells;
+    }
+
+    private boolean initCellsAndTypes(Map<RowColPos, PalletCell> cells)
+        throws ApplicationException {
+        boolean everythingOk = true;
+        Map<RowColPos, ? extends Cell> previousScanCells = spw.getCells();
+        Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+        for (RowColPos rcp : cells.keySet()) {
+            Integer typesRowsCount = typesRows.get(rcp.row);
+            if (typesRowsCount == null) {
+                typesRowsCount = 0;
+                sampleTypeWidgets.get(rcp.row).resetValues(true);
+            }
+            PalletCell cell = null;
+            boolean getRescannedValue = true;
+            if (rescanMode) {
+                cell = (PalletCell) previousScanCells.get(rcp);
+                if (cell.getStatus() != AliquotCellStatus.EMPTY
+                    && cell.getStatus() != AliquotCellStatus.MISSING) {
+                    getRescannedValue = false;
+                    cells.put(rcp, cell);
+                    if (cell.getStatus() == AliquotCellStatus.ERROR) {
+                        everythingOk = false;
+                    }
+                }
+            }
+            if (getRescannedValue) {
+                cell = cells.get(rcp);
+                everythingOk = everythingOk && setCellStatus(cell);
+            }
+            if (PalletCell.hasValue(cell)) {
+                typesRowsCount++;
+                typesRows.put(rcp.row, typesRowsCount);
+            }
+        }
+        List<SampleTypeWrapper> studiesSampleTypes = null;
+        if (!rescanMode) { // already done at first scan
+            studiesSampleTypes = getStudyOnlySampleTypes();
+        }
+        for (Integer row : typesRows.keySet()) {
+            SampleTypeSelectionWidget widget = sampleTypeWidgets.get(row);
+            widget.setNumber(typesRows.get(row));
+            if (!rescanMode) {
+                widget.setTypes(studiesSampleTypes);
+            }
+        }
+        return everythingOk;
     }
 
     protected List<SampleTypeWrapper> getStudyOnlySampleTypes() {
@@ -640,6 +656,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
     }
 
     private boolean setCellStatus(PalletCell cell) throws ApplicationException {
+        boolean everythingOk = true;
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
@@ -651,7 +668,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                     cell
                         .setInformation(Messages
                             .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
-                    scanOk = false;
+                    everythingOk = false;
                     AliquotWrapper aliquot = aliquots.get(0);
                     String palletPosition = LabelingScheme
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
@@ -662,12 +679,11 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 } else {
                     cell.setStatus(AliquotCellStatus.NO_TYPE);
                 }
-                return true;
             } else {
                 cell.setStatus(AliquotCellStatus.EMPTY);
             }
         }
-        return false;
+        return everythingOk;
     }
 
     @SuppressWarnings("unchecked")
@@ -757,6 +773,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         viewerVisits.setInput(null);
         currentPatient = null;
         cancelConfirmWidget.reset();
+        scanButton.setText(scanButtonTitle);
         scanButton.setEnabled(false);
         scannedValue.setValue(Boolean.FALSE);
         if (resetAll) {
@@ -768,7 +785,13 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
                 stw.resetValues(true);
             }
         }
+        rescanMode = false;
         setFocus();
+    }
+
+    protected void setRescanMode() {
+        scanButton.setText("Rescan");
+        rescanMode = true;
     }
 
     @Override
