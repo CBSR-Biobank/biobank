@@ -54,9 +54,9 @@ class Frz02 {
 
    private static function getFrz4Label($hotel, $pallet) {
       $hotel2 = strpos(LabelingScheme::ALPHA, substr($hotel, 0, 1))
-         * strlen(LabelingScheme::ALPHA)
-         + strpos(LabelingScheme::ALPHA, substr($hotel, 1))
-         - strpos(LabelingScheme::ALPHA, 'L');
+      * strlen(LabelingScheme::ALPHA)
+      + strpos(LabelingScheme::ALPHA, substr($hotel, 1))
+      - strpos(LabelingScheme::ALPHA, 'L');
       $group = intval($hotel2 / 5);
       $withinGroup = $hotel2 % 5;
       switch ($withinGroup) {
@@ -93,6 +93,6 @@ class Frz02 {
       }
       return array('hotel' => 3 * $group + $hotelOffset, 'pallet' => $pallet);
    }
-  }
+}
 
 ?>
