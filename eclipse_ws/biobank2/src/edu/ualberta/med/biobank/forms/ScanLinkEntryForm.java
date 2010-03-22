@@ -609,8 +609,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             boolean getRescannedValue = true;
             if (rescanMode) {
                 cell = (PalletCell) previousScanCells.get(rcp);
-                if (cell.getStatus() != AliquotCellStatus.EMPTY
-                    && cell.getStatus() != AliquotCellStatus.MISSING) {
+                if (cell.getStatus() != AliquotCellStatus.EMPTY) {
                     getRescannedValue = false;
                     cells.put(rcp, cell);
                     if (cell.getStatus() == AliquotCellStatus.ERROR) {
@@ -621,10 +620,10 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             if (getRescannedValue) {
                 cell = cells.get(rcp);
                 everythingOk = everythingOk && setCellStatus(cell);
-            }
-            if (PalletCell.hasValue(cell)) {
-                typesRowsCount++;
-                typesRows.put(rcp.row, typesRowsCount);
+                if (PalletCell.hasValue(cell)) {
+                    typesRowsCount++;
+                    typesRows.put(rcp.row, typesRowsCount);
+                }
             }
         }
         List<SampleTypeWrapper> studiesSampleTypes = null;
