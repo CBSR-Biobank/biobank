@@ -38,9 +38,9 @@
   <property name="req.jars.dir" value="jars" />
   <property name="biobank2.jar.files"
             value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar, org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, commons-lang-2.4.jar,iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
-  <property name="biobank.common.jar.files" value="commons-lang-2.4.jar" />
+  <property name="biobank.common.jar.files" value="commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.importer.jar.files"
-            value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
+            value="commons-collections-3.2.jar,commons-logging-1.1.jar,mysql-connector-java-5.1.7-bin.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
   <property name="test.output" location="testing" />
@@ -194,14 +194,14 @@
                       files="${cacore.system.jar.files}" />
     </dependset>
     <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir}/lib"
-                      files="${biobank2.jar.files}" />
-    </dependset>
-    <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
                       files="${biobank.common.jar.files}" />
+    </dependset>
+    <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir}/lib"
+                      files="${biobank2.jar.files}" />
     </dependset>
     <dependset>
       <srcfilelist dir="${req.jars.dir}"
@@ -234,49 +234,22 @@
                       files="${sdk.jar.files.basename}" />
     </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-lang-2.4.jar" />
-      </fileset>
+      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+      <filelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
+      <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
+      <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.common}/conf">
+      <fileslist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
+                 files="application-config-client*.xml" />
     </copy>
     <copy todir="${eclipse.proj.dir}/lib">
-      <fileset dir="${req.jars.dir}">
-        <include name="org.eclipse.nebula.cwt_0.9.0.HEAD.jar" />
-        <include name="org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar" />
-        <include name="gluegen.jar" />
-        <include name="ini4j-0.5.1.jar" />
-        <include name="jdom.jar" />
-        <include name="scanlib.jar" />
-        <include name="commons-beanutils-1.8.0.jar" />
-        <include name="commons-digester-1.7.jar" />
-        <include name="commons-lang-2.4.jar" />
-        <include name="iText-2.1.0.jar" />
-        <include name="jasperreports-3.7.0.jar" />
-        <include name="DynamicJasper-3.0.14.jar" />
-        <include name="jdt-compiler-3.1.1.jar" />
-        <include name="mail.jar" />
-      </fileset>
+      <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
     <copy todir="${eclipse.proj.dir.importer}/lib">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-lang-2.4.jar" />
-        <include name="mysql-connector-java-5.1.7-bin.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib"
-          file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-    <copy todir="${eclipse.proj.dir.importer}/lib"
-          file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-    <copy todir="${eclipse.proj.dir.common}/conf">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-
-        <include name="application-config-client*.xml" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib">
+      <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}" />
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.importer}/lib">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+      <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
     </copy>
   </target>
   <!-- JBoss -->
