@@ -1,5 +1,10 @@
 package edu.ualberta.med.biobank.common.reports.advanced;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,10 +101,18 @@ public class QueryTreeNode extends Object {
         fieldData.add(index + 1, addedField);
     }
 
-    public void saveTree() {
+    public void saveTree() throws IOException {
         XStream xStream = new XStream();
         xStream.alias("QueryTreeNode", QueryTreeNode.class);
-        System.out.println(xStream.toXML(this));
-        xStream.fromXML(xStream.toXML(this));
+        FileWriter fw = new FileWriter("tree.xml");
+        fw.write(xStream.toXML(this));
+        fw.close();
+    }
+
+    public static QueryTreeNode getTreeFromFile(String fileName)
+        throws FileNotFoundException {
+        XStream xStream = new XStream();
+        return (QueryTreeNode) xStream.fromXML(new FileReader(
+            new File(fileName)));
     }
 }

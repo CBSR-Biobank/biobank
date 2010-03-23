@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -23,15 +24,15 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 
 public class QueryTree extends TreeViewer {
 
-    public QueryTree(Composite parent, int style, ReportTreeNode node) {
+    public QueryTree(Composite parent, int style, QueryTreeNode node) {
         super(parent, style);
 
         this.setContentProvider(new ITreeContentProvider() {
@@ -98,8 +99,7 @@ public class QueryTree extends TreeViewer {
             public void removeListener(ILabelProviderListener listener) {
             }
         });
-        this.setInput(constructTree(new HQLField("", node.getLabel(), node
-            .getObjClass())));
+        this.setInput(node);
 
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
@@ -367,7 +367,11 @@ public class QueryTree extends TreeViewer {
     }
 
     public void saveTree() {
-        ((QueryTreeNode) getInput()).saveTree();
+        try {
+            ((QueryTreeNode) getInput()).saveTree();
+        } catch (IOException e) {
+            BioBankPlugin.openAsyncError("Save Failed", e);
+        }
     }
 
 }

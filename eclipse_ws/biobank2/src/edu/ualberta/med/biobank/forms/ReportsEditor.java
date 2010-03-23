@@ -54,6 +54,11 @@ import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.AliquotCount;
+import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
+import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
+import edu.ualberta.med.biobank.common.reports.AliquotRequest;
+import edu.ualberta.med.biobank.common.reports.AliquotSCount;
 import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
@@ -61,7 +66,9 @@ import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
+import edu.ualberta.med.biobank.common.reports.NewPVsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.NewPsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
 import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
 import edu.ualberta.med.biobank.common.reports.PatientWBC;
@@ -69,11 +76,6 @@ import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
 import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.AliquotCount;
-import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
-import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
-import edu.ualberta.med.biobank.common.reports.AliquotRequest;
-import edu.ualberta.med.biobank.common.reports.AliquotSCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
@@ -133,9 +135,9 @@ public class ReportsEditor extends EditorPart {
                                 String op = "=";
                                 if (site.getName().compareTo("All Sites") == 0)
                                     op = "!=";
-                                query = (QueryObject) ((Class<?>) (node
-                                    .getObjClass())).getConstructor(
-                                    String.class, Integer.class).newInstance(
+                                query = (QueryObject) ((Class<?>) node
+                                    .getQuery()).getConstructor(String.class,
+                                    Integer.class).newInstance(
                                     new Object[] { op, site.getId() });
                                 reportData = query.generate(SessionManager
                                     .getAppService(), params);
@@ -428,7 +430,7 @@ public class ReportsEditor extends EditorPart {
         if (siteWrap.getName().compareTo("All Sites") == 0)
             op = "!=";
         try {
-            query = (QueryObject) node.getObjClass().getConstructor(
+            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
                 String.class, Integer.class).newInstance(
                 new Object[] { op, siteWrap.getId() });
         } catch (Exception e) {
@@ -452,6 +454,8 @@ public class ReportsEditor extends EditorPart {
             100 });
         columnWidths.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100,
             100 });
+        columnWidths.put(NewPsByStudy.class, new int[] { 100, 100, 100 });
+        columnWidths.put(NewPVsByStudy.class, new int[] { 100, 100, 100 });
         columnWidths.put(PatientVisitSummary.class, new int[] { 100, 100, 100,
             100, 100, 100, 100, 100, 100 });
         columnWidths.put(PatientWBC.class,
