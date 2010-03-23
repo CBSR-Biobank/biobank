@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.ReportsEditor;
@@ -163,6 +164,15 @@ public class ReportsView extends ViewPart {
                 "", obj.getSimpleName(), obj)));
             advanced.addChild(child);
             child.setParent(advanced);
+        }
+        try {
+            ReportTreeNode custom = new ReportTreeNode("Custom", QueryTreeNode
+                .getTreeFromFile("tree.xml"));
+            custom.setParent(advanced);
+            advanced.addChild(custom);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         root.addChild(standard);
         standard.setParent(root);

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.reports.advanced;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class QueryTreeNode extends Object {
     private HQLField nodeInfo;
@@ -110,9 +110,14 @@ public class QueryTreeNode extends Object {
     }
 
     public static QueryTreeNode getTreeFromFile(String fileName)
-        throws FileNotFoundException {
-        XStream xStream = new XStream();
-        return (QueryTreeNode) xStream.fromXML(new FileReader(
-            new File(fileName)));
+        throws IOException {
+        XStream xStream = new XStream(new DomDriver());
+        xStream.alias("QueryTreeNode", QueryTreeNode.class);
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        String xml = "";
+        while (reader.ready()) {
+            xml += reader.readLine();
+        }
+        return (QueryTreeNode) xStream.fromXML(xml);
     }
 }

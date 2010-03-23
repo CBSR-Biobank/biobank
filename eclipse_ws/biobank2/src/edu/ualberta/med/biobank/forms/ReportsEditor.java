@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -329,25 +329,25 @@ public class ReportsEditor extends EditorPart {
                         .getName(), params, columnInfo, listData), path);
                 else {
                     // csv
-                    File file = new File(path);
-                    FileWriter bw = new FileWriter(file);
+                    PrintWriter bw = new PrintWriter(new FileWriter(path));
                     // write title
-                    bw.write("#" + query.getName() + "\r");
+                    bw.println("#" + query.getName());
                     // write params
                     for (Object[] ob : params)
-                        bw.write("#" + ob[0] + ":" + ob[1] + "\r");
+                        bw.println("#" + ob[0] + ":" + ob[1]);
                     // write columnnames
-                    bw.write("#\r#" + columnInfo.get(0));
+                    bw.println("#");
+                    bw.print("#" + columnInfo.get(0));
                     for (int j = 1; j < columnInfo.size(); j++) {
                         bw.write("," + columnInfo.get(j));
                     }
-                    bw.write("\r");
+                    bw.println();
                     for (Map<String, String> ob : listData) {
                         bw.write("\"" + ob.get(columnInfo.get(0)) + "\"");
                         for (int j = 1; j < columnInfo.size(); j++) {
                             bw.write(",\"" + ob.get(columnInfo.get(j)) + "\"");
                         }
-                        bw.write("\r");
+                        bw.println();
                     }
                     bw.close();
                 }
