@@ -27,7 +27,7 @@ public class NewPsByStudyClinic extends QueryObject {
             if (option.type.equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
-        columnNames[2] = (String) params.get(0);
+        columnNames[2] = (String) params.remove(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
         return params;
     }

@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.reports.advanced;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.XStream;
+
 public class QueryTreeNode extends Object {
     private HQLField nodeInfo;
     private List<HQLField> fieldData;
@@ -92,5 +94,12 @@ public class QueryTreeNode extends Object {
 
     public void insertField(int index, HQLField addedField) {
         fieldData.add(index + 1, addedField);
+    }
+
+    public void saveTree() {
+        XStream xStream = new XStream();
+        xStream.alias("QueryTreeNode", QueryTreeNode.class);
+        System.out.println(xStream.toXML(this));
+        xStream.fromXML(xStream.toXML(this));
     }
 }

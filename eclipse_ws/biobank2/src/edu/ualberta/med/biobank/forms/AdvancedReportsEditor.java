@@ -69,6 +69,7 @@ public class AdvancedReportsEditor extends EditorPart {
     private Composite parameterSection;
 
     private Button generateButton;
+    private Button saveButton;
     private Button printButton;
     private Button exportButton;
 
@@ -139,7 +140,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
         buttonSection = new Composite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
-        gl.numColumns = 3;
+        gl.numColumns = 4;
         buttonSection.setLayout(gl);
 
         generateButton = new Button(buttonSection, SWT.NONE);
@@ -148,6 +149,15 @@ public class AdvancedReportsEditor extends EditorPart {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 generate();
+            }
+        });
+
+        saveButton = new Button(buttonSection, SWT.NONE);
+        saveButton.setText("Save");
+        saveButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                tree.saveTree();
             }
         });
 
@@ -387,6 +397,7 @@ public class AdvancedReportsEditor extends EditorPart {
     private void setEnabled(boolean enabled) {
         SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
         generateButton.setEnabled(enabled);
+        saveButton.setEnabled(enabled);
         printButton.setEnabled(enabled);
         exportButton.setEnabled(enabled);
     }

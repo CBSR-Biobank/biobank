@@ -366,4 +366,8 @@ public class QueryTree extends TreeViewer {
             field.getOperator(), field.getValue()));
     }
 
+    public void saveTree() {
+        ((QueryTreeNode) getInput()).saveTree();
+    }
+
 }
