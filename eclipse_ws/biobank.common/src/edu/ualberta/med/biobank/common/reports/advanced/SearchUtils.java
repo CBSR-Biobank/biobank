@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -28,16 +29,19 @@ public class SearchUtils {
         } else if (type == Container.class) {
             properties.put("Label", "label");
             properties.put("Container Type", "containerType.name");
-        } else if (type == Site.class)
+        } else if (type == Site.class) {
             properties.put("Name", "name");
-        else if (type == Clinic.class)
+            properties.put("Status", "activityStatus.name");
+        } else if (type == Clinic.class) {
             properties.put("Name", "name");
-        else if (type == Study.class) {
+            properties.put("Status", "activityStatus.name");
+        } else if (type == Study.class) {
             properties.put("Name", "name");
             properties.put("Short Name", "nameShort");
-        } else if (type == Patient.class)
+        } else if (type == Patient.class) {
             properties.put("Patient Number", "pnumber");
-        else if (type == PatientVisit.class) {
+            properties.put("Study", "study.nameShort");
+        } else if (type == PatientVisit.class) {
             properties.put("Patient", "patient.pnumber");
             properties.put("Date Processed", "dateProcessed");
         } else if (type == Contact.class) {
@@ -291,6 +295,19 @@ public class SearchUtils {
         if (path.contains(name))
             return true;
         return false;
+    }
+
+    public static Map<Class<?>, int[]> getColumnWidths() {
+        HashMap<Class<?>, int[]> columnWidths = new HashMap<Class<?>, int[]>();
+        columnWidths.put(Clinic.class, new int[] { 100, 100 });
+        columnWidths.put(Site.class, new int[] { 100, 100 });
+        columnWidths.put(Aliquot.class, new int[] { 100, 100, 100 });
+        columnWidths.put(Container.class, new int[] { 100, 100 });
+        columnWidths.put(Study.class, new int[] { 100, 100 });
+        columnWidths.put(Patient.class, new int[] { 100, 100 });
+        columnWidths.put(PatientVisit.class, new int[] { 100, 100 });
+        columnWidths.put(Contact.class, new int[] { 100, 100, 100, 100 });
+        return columnWidths;
     }
 
 }

@@ -52,8 +52,6 @@ import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.treeview.QueryTree;
@@ -99,9 +97,7 @@ public class AdvancedReportsEditor extends EditorPart {
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
 
-        columnWidths = new HashMap<Class<?>, int[]>();
-        columnWidths.put(ClinicWrapper.class, new int[] { 100, 100 });
-        columnWidths.put(SiteWrapper.class, new int[] { 100, 100 });
+        columnWidths = SearchUtils.getColumnWidths();
         columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 

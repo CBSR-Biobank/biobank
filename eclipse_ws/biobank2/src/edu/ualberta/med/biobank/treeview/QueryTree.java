@@ -223,9 +223,11 @@ public class QueryTree extends TreeViewer {
     }
 
     public static QueryTreeNode constructTree(HQLField root) {
-        QueryTreeNode dummy = new QueryTreeNode(new HQLField("", "", null));
+        QueryTreeNode dummy = new QueryTreeNode(new HQLField("", "", root
+            .getType()));
         QueryTreeNode rootNode = new QueryTreeNode(root);
         expand(rootNode);
+        rootNode.setParent(dummy);
         dummy.addChild(rootNode);
         return dummy;
     }
@@ -254,8 +256,7 @@ public class QueryTree extends TreeViewer {
         List<String> whereClauses = new ArrayList<String>();
 
         QueryTreeNode root = (QueryTreeNode) this.getInput();
-        QueryTreeNode objRoot = root.getChildren().get(0);
-        Class<?> type = objRoot.getNodeInfo().getType();
+        Class<?> type = root.getNodeInfo().getType();
         String selectClause = "select ";
         for (String property : properties) {
             selectClause += type.getSimpleName().toLowerCase() + "." + property
@@ -264,8 +265,8 @@ public class QueryTree extends TreeViewer {
         selectClause = selectClause.substring(0, selectClause.length() - 2)
             + " from " + type.getName() + " "
             + type.getSimpleName().toLowerCase();
-        addClausesForNode(objRoot, whereClauses);
-        generateSubClauses(objRoot, whereClauses, fromClauses);
+        addClausesForNode(root, whereClauses);
+        generateSubClauses(root, whereClauses, fromClauses);
         String hqlString = selectClause + compileFromClause(fromClauses);
         String where = compileWhereClause(whereClauses);
         if (where != null)
