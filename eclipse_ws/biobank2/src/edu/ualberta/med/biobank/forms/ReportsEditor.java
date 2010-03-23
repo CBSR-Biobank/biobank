@@ -66,7 +66,9 @@ import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
+import edu.ualberta.med.biobank.common.reports.NewPVsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.NewPsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
 import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
 import edu.ualberta.med.biobank.common.reports.PatientWBC;
@@ -126,6 +128,8 @@ public class ReportsEditor extends EditorPart {
         aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100 });
         aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
         aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(NewPsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(NewPVsByStudy.class, new int[] { 100, 100, 100 });
         aMap.put(PatientVisitSummary.class, new int[] { 100, 100, 100, 100,
             100, 100, 100, 100, 100 });
         aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100 });
