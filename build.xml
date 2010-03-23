@@ -240,8 +240,9 @@
       <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/conf">
-      <fileslist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
-                 files="application-config-client*.xml" />
+      <filelist
+         dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
+         files="application-config-client.xml,application-config-client-info.xml" />
     </copy>
     <copy todir="${eclipse.proj.dir}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
