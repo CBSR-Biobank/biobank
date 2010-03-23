@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -61,9 +62,8 @@ public class ReportsView extends ViewPart {
             public void doubleClick(DoubleClickEvent event) {
                 ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
                     .getSelection()).getFirstElement();
-                if (node.getParent().isRoot())
-                    ;
-                else if (node.getParent().getLabel().compareTo("Advanced") == 0)
+                Assert.isTrue(!node.getParent().isRoot());
+                if (node.getParent().getLabel().compareTo("Advanced") == 0)
                     try {
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().openEditor(new ReportInput(node),
