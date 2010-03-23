@@ -13,7 +13,7 @@ $scriptname = basename($argv[0]);
  * where (freezer.patient_nr=7189 and freezer.visit_nr=10011)
  * or (freezer.patient_nr=129 and freezer.visit_nr=10010)
  * order by fnum, rack, box, cell
- * 
+ *
  */
 
 $usage = <<<USAGE_END
@@ -33,13 +33,18 @@ join pv_source_vessel on pv_source_vessel.patient_visit_id=patient_visit.id
 join aliquot_position on aliquot_position.aliquot_ID=aliquot.id
 join abstract_position on abstract_position.ID=aliquot_position.ABSTRACT_POSITION_ID
 join container on container.id=aliquot_position.CONTAINER_ID
-join container_type on container_type.id=container.container_type_id
+join container_path on container_path.container_id=container.id
 join sample_type on sample_type.id=aliquot.sample_type_id
 join study on study.id=patient.study_id
 join shipment on shipment.id=patient_visit.shipment_id
 join clinic on clinic.id=shipment.clinic_id
-where study.name_short like binary '{study_short_name}'
-and container_type.name_short not like binary '%Bin%'
+where study.name_short like binary '{study_name_short}'
+and locate('/', path)<>0 
+and substr(path, 1, locate('/', path)-1) in 
+(SELECT container.id
+  FROM container
+  join container_type on container_type.id=container.container_type_id
+  where name like 'Freezer%')
 ";
 
    const ALIQUOT_QUERY = "
@@ -63,80 +68,82 @@ and label like '{frz_label}%'
 
     private $con = null;
 
+    private $fp;
+
 
     public function __construct() {
        $this->con = mysqli_connect("localhost", "dummy", "ozzy498", "biobank2");
        if (mysqli_connect_errno()) {
           die(mysqli_connect_error());
        }
-       $this->showAliquots();
-       echo "\n";
-       $this->showTotals();
-    }
 
-    private function showTotals() {
-       echo "Freezer,Total Aliquots\n";
        foreach (self::$studies as $study) {
-          for ($i = 1; $i <= 5; ++$i) {
-             $frz = sprintf("%02d", $i);
-
-             $query = str_replace('{study_short_name}', $study,
-             self::BASE_QUERY);
-
-             $query = str_replace(array('{BASE_QUERY}', '{frz_label}'),
-             array($query, $frz), self::COUNT_QUERY);
-
-             $result = $this->con->query($query);
-             if ($result === FALSE) {
-                die("query error: {$this->con->error}");
-             }
-              
-             while ($row = $result->fetch_object()) {
-                echo $i, ",", $row->count, "\n";
-             }
-          }
+          $this->fp = fopen(Utils::getOldStudyName($study) . '_frz01_05.csv', 'w');
+          $this->showAliquots($study);
+          fputcsv($this->fp, array("\n"));
+          $this->showTotals($study);
+          fclose($this->fp);
        }
     }
 
-    private function showAliquots() {
-       echo implode(",", self::$headings), "\n";
+    private function showTotals($study) {
+       for ($i = 1; $i <= 5; ++$i) {
+          $frz = sprintf("%02d", $i);
 
-       foreach (self::$studies as $study) {
-          $query = str_replace('{study_short_name}', $study,
+          $query = str_replace('{study_name_short}', $study,
           self::BASE_QUERY);
 
-          $query = str_replace('{BASE_QUERY}', $query, self::ALIQUOT_QUERY);
+          $query = str_replace(array('{BASE_QUERY}', '{frz_label}'),
+          array($query, $frz), self::COUNT_QUERY);
 
           $result = $this->con->query($query);
           if ($result === FALSE) {
              die("query error: {$this->con->error}");
           }
-          
-          $patientNrs = Utils::getBbpdbPatientNrs();
 
           while ($row = $result->fetch_object()) {
-             //print_r($row);
-
-             $pos = Freezer::getPosition($row->label);
-             $cell = Freezer::getCell($row->row, $row->col);
-             $label = sprintf("%02d%s%02d%s", $pos['frz'], $pos['hotel'], $pos['pallet'], $cell);
-
-             $data = array(
-                'patient_nr' => $patientNrs[$row->pnumber], 
-                'study_name_short' => '"' . Utils::getOldStudyName($row->study_name_short) . '"',
-                'sample_name_short' => '"' . $row->sample_name_short . '"', 
-                'date_taken' => '"' . date('d-M-y', strtotime($row->date_drawn)) . '"', 
-                'fnum' => $pos['frz'],
-                'rack' => '"' . $pos['hotel'] . '"',
-                'box' => $pos['pallet'],
-                'cell' =>  '"' . $cell . '"',
-                'inventory_id' => '"' . $row->inventory_id . '"', 
-                'clinic_site' => '"' . $row->clinic_site . '"',
-                'fullpos' => $label
-             );
-
-             echo implode(',', $data), "\n";
+             fputcsv($this->fp, array($i, $row->count));
           }
+       }
+    }
+
+    private function showAliquots($study) {
+       fputcsv($this->fp, self::$headings);
+
+       $query = str_replace('{study_name_short}', $study,
+       self::BASE_QUERY);
+
+       $query = str_replace('{BASE_QUERY}', $query, self::ALIQUOT_QUERY);
+
+       $result = $this->con->query($query);
+       if ($result === FALSE) {
+          die("query error: {$this->con->error}");
+       }
+
+       $patientNrs = Utils::getBbpdbPatientNrs();
+
+       while ($row = $result->fetch_object()) {
+          //print_r($row);
+
+          $pos = Freezer::getPosition($row->label);
+          $cell = Freezer::getCell($row->row, $row->col);
+          $label = sprintf("%02d%s%02d%s", $pos['frz'], $pos['hotel'], $pos['pallet'], $cell);
+
+          $data = array(
+                'patient_nr' => $patientNrs[$row->pnumber], 
+                'study_name_short' => Utils::getOldStudyName($row->study_name_short),
+                'sample_name_short' => $row->sample_name_short, 
+                'date_taken' => date('d-M-y', strtotime($row->date_drawn)), 
+                'fnum' => $pos['frz'],
+                'rack' => $pos['hotel'],
+                'box' => $pos['pallet'],
+                'cell' =>  $cell,
+                'inventory_id' => $row->inventory_id, 
+                'clinic_site' => $row->clinic_site,
+                'fullpos' => $label
+          );
+
+          fputcsv($this->fp, array_values($data));
        }
     }
 }
