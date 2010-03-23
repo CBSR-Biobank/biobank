@@ -9,8 +9,8 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -19,22 +19,15 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -53,26 +46,20 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
-import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
+public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
+
+    public static final String ID = "edu.ualberta.med.biobank.forms.ScanAssignEntryForm"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ScanAssignEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ScanAssignEntryForm"; //$NON-NLS-1$
-
-    private ComboViewer palletTypesViewer;
-    private Text plateToScanText;
-    private Text palletCodeText;
+    private Text palletproductBarcodeText;
     private Text palletPositionText;
-    private Button scanButton;
+    private ComboViewer palletTypesViewer;
 
     private Label freezerLabel;
     private GridContainerWidget freezerWidget;
@@ -81,40 +68,32 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
     private Label hotelLabel;
     private GridContainerWidget hotelWidget;
 
-    private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
-        String.class);
-    private IObservableValue scanLaunchedValue = new WritableValue(
-        Boolean.FALSE, Boolean.class);
+    // true if no errors in aliquots scan and process
     private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
-    private Map<RowColPos, PalletCell> cells;
-
     protected ContainerWrapper currentPalletWrapper;
 
-    private ContainerTypeWrapper onlyTypePossible;
-
     // for debugging only (fake scan) :
-    private Button linkedOnlyButton;
-    private Button linkedAssignButton;
-
-    private String palletNameContains = ""; //$NON-NLS-1$
-
-    private CancelConfirmWidget cancelConfirmWidget;
-
-    protected ContainerWrapper palletFoundWithProductBarcode;
-
-    private boolean newPallet;
-
-    private String oldPalletPosition;
-
-    private AliquotCellStatus currentScanState;
-
-    private String scanButtonTitle;
-
-    private boolean rescanMode = false;
+    private Button fakeScanLinkedOnlyButton;
+    private Button fakeScanLinkedAssignButton;
 
     private Composite containersComposite;
+
+    // the pallet container type name contains this text
+    private String palletNameContains = ""; //$NON-NLS-1$
+
+    // pallet found with given product barcode
+    protected ContainerWrapper palletFoundWithProductBarcode;
+
+    // true if the pallet is a new one
+    private boolean newPallet;
+
+    // if the pallet was already in another position, this is its old label
+    private String oldPalletLabel;
+
+    // global state of the pallet process
+    private AliquotCellStatus currentScanState;
 
     private Map<RowColPos, PalletCell> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, PalletCell>();
 
@@ -140,12 +119,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
         createContainersSection();
 
-        cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
-            true);
+        createCancelConfirmWidget();
 
-        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            scanLaunchedValue, Messages
-                .getString("linkAssign.scanLaunchValidationMsg")); //$NON-NLS-1$
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue, Messages.getString("ScanAssign.scanErrorMsg")); //$NON-NLS-1$
     }
@@ -161,38 +136,22 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
 
-        palletCodeText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
+        palletproductBarcodeText = (Text) createBoundWidgetWithLabel(
+            fieldsComposite, Text.class, SWT.NONE, Messages
                 .getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
             null, BeansObservables.observeValue(currentPalletWrapper,
                 "productBarcode"), new NonEmptyStringValidator( //$NON-NLS-1$
                 Messages.getString("ScanAssign.productBarcode.validationMsg"))); //$NON-NLS-1$
-        palletCodeText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        palletproductBarcodeText
+            .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
-        palletCodeText.setLayoutData(gd);
-        firstControl = palletCodeText;
-        palletCodeText.addFocusListener(new FocusAdapter() {
+        palletproductBarcodeText.setLayoutData(gd);
+        firstControl = palletproductBarcodeText;
+        palletproductBarcodeText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                try {
-                    palletFoundWithProductBarcode = ContainerWrapper
-                        .getContainerWithProductBarcodeInSite(appService,
-                            SessionManager.getInstance().getCurrentSite(),
-                            currentPalletWrapper.getProductBarcode());
-                    if (palletFoundWithProductBarcode == null) {
-                        palletTypesViewer.getCombo().setEnabled(true);
-                    } else {
-                        palletPositionText
-                            .setText(palletFoundWithProductBarcode.getLabel());
-                        palletPositionText.selectAll();
-                        palletTypesViewer.getCombo().setEnabled(false);
-                        palletTypesViewer.setSelection(new StructuredSelection(
-                            palletFoundWithProductBarcode.getContainerType()));
-                    }
-                } catch (Exception ex) {
-                    BioBankPlugin.openError("Product barcode", ex); //$NON-NLS-1$
-                }
+                getExistingPalletFromProductBarcode();
             }
         });
 
@@ -209,49 +168,44 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
         createContainerTypeSection(fieldsComposite);
 
-        plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
-                .getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
-            new String[0], plateToScanValue, new ScannerBarcodeValidator(
-                Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
-        plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
-            public void handleEvent(Event e) {
-                if (scanButton.isEnabled()) {
-                    scan();
-                }
-            }
-        });
-        gd = new GridData();
-        gd.horizontalAlignment = SWT.FILL;
-        plateToScanText.setLayoutData(gd);
+        createScanComponents(fieldsComposite);
+    }
 
-        scanButtonTitle = Messages.getString("linkAssign.scanButton.text"); //$NON-NLS-1$
-        if (!BioBankPlugin.isRealScanEnabled()) {
-            gd.widthHint = 200;
-            Composite comp = toolkit.createComposite(fieldsComposite);
-            comp.setLayout(new GridLayout());
-            gd = new GridData();
-            gd.horizontalSpan = 2;
-            comp.setLayoutData(gd);
-            linkedAssignButton = toolkit.createButton(comp,
-                "Select linked only aliquots", SWT.RADIO); //$NON-NLS-1$
-            linkedAssignButton.setSelection(true);
-            linkedOnlyButton = toolkit.createButton(comp,
-                "Select linked and assigned aliquots", SWT.RADIO); //$NON-NLS-1$
-            scanButtonTitle = "Fake scan"; //$NON-NLS-1$
+    private void getExistingPalletFromProductBarcode() {
+        try {
+            palletFoundWithProductBarcode = ContainerWrapper
+                .getContainerWithProductBarcodeInSite(appService,
+                    SessionManager.getInstance().getCurrentSite(),
+                    currentPalletWrapper.getProductBarcode());
+            if (palletFoundWithProductBarcode == null) {
+                // no pallet found with this barcode
+                palletTypesViewer.getCombo().setEnabled(true);
+            } else {
+                // a pallet has been found
+                palletPositionText.setText(palletFoundWithProductBarcode
+                    .getLabel());
+                palletPositionText.selectAll();
+                palletTypesViewer.getCombo().setEnabled(false);
+                palletTypesViewer.setSelection(new StructuredSelection(
+                    palletFoundWithProductBarcode.getContainerType()));
+            }
+        } catch (Exception ex) {
+            BioBankPlugin.openError("Product barcode", ex); //$NON-NLS-1$
         }
+    }
 
-        scanButton = toolkit.createButton(fieldsComposite, scanButtonTitle,
-            SWT.PUSH);
-        gd = new GridData();
+    @Override
+    protected void createFakeOptions(Composite fieldsComposite) {
+        Composite comp = toolkit.createComposite(fieldsComposite);
+        comp.setLayout(new GridLayout());
+        GridData gd = new GridData();
         gd.horizontalSpan = 2;
-        scanButton.setLayoutData(gd);
-        scanButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                scan();
-            }
-        });
+        comp.setLayoutData(gd);
+        fakeScanLinkedAssignButton = toolkit.createButton(comp,
+            "Select linked only aliquots", SWT.RADIO); //$NON-NLS-1$
+        fakeScanLinkedAssignButton.setSelection(true);
+        fakeScanLinkedOnlyButton = toolkit.createButton(comp,
+            "Select linked and assigned aliquots", SWT.RADIO); //$NON-NLS-1$
     }
 
     private void createContainersSection() {
@@ -327,8 +281,15 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    setContainerType();
-                    scanLaunchedValue.setValue(false);
+                    IStructuredSelection selection = (IStructuredSelection) palletTypesViewer
+                        .getSelection();
+                    if (selection.size() > 0) {
+                        currentPalletWrapper
+                            .setContainerType((ContainerTypeWrapper) selection
+                                .getFirstElement());
+                    }
+                    setScanNotLauched();
+                    removeRescanMode();
                 }
             });
         if (palletContainerTypes.size() == 1) {
@@ -338,71 +299,53 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
-    protected void scan() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            public void run() {
-                try {
-                    // if another scan has been done on this same form, need to
-                    // reset values set before
-                    reset(true);
-                    boolean canLaunchScan = checkPallet();
-                    if (canLaunchScan) {
-                        showOnlyPallet(false);
-                        launchScan();
-                        currentScanState = AliquotCellStatus.EMPTY;
-                        initCellsStatus();
-                        palletWidget.setCells(cells);
-                        scanLaunchedValue.setValue(true);
-                        setDirty(true);
-                    } else {
-                        palletWidget
-                            .setCells(new TreeMap<RowColPos, PalletCell>());
-                        showOnlyPallet(true);
-                        scanValidValue.setValue(false);
-                    }
-                    showPalletPosition();
-                    cancelConfirmWidget.setFocus();
-                    setRescanMode();
-                    containersComposite.layout(true, true);
-                } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                    scanValidValue.setValue(false);
-                } catch (Exception e) {
-                    BioBankPlugin.openError(Messages
-                        .getString("ScanAssign.dialog.scanError.title"), //$NON-NLS-1$
-                        e);
-                    scanValidValue.setValue(false);
-                    String msg = e.getMessage();
-                    if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
-                        msg = e.getCause().getMessage();
-                    }
-                    appendLog("ERROR: " + msg); //$NON-NLS-1$
-                }
-            }
-        });
-    }
-
-    private void launchScan() throws Exception, ApplicationException {
-        appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
-            plateToScanValue.getValue().toString());
-        if (BioBankPlugin.isRealScanEnabled()) {
-            int plateNum = BioBankPlugin.getDefault().getPlateNumber(
-                plateToScanValue.getValue().toString());
-            cells = PalletCell.convertArray(ScannerConfigPlugin.scan(plateNum));
+    @Override
+    protected void scanAndProcessResult(IProgressMonitor monitor)
+        throws Exception {
+        // if another scan has been done on this same form, need to
+        // reset values set before
+        reset(true);
+        boolean canLaunchScan = false;
+        if (isRescanMode()) {
+            canLaunchScan = true;
         } else {
-            if (linkedAssignButton.getSelection()) {
-                cells = PalletCell.getRandomAliquotsNotAssigned(appService,
-                    SessionManager.getInstance().getCurrentSite().getId());
-            } else if (linkedOnlyButton.getSelection()) {
-                cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
-                    SessionManager.getInstance().getCurrentSite().getId());
-            }
+            canLaunchScan = checkPallet();
         }
-        appendLogNLS("ScanAssign.activitylog.scanRes.total", //$NON-NLS-1$
-            cells.keySet().size());
+        if (canLaunchScan) {
+            showOnlyPallet(false);
+            launchScan(monitor);
+            currentScanState = AliquotCellStatus.EMPTY;
+            processScanResult(monitor);
+            palletWidget.setCells(cells);
+            setDirty(true);
+        } else {
+            palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
+            showOnlyPallet(true);
+            scanValidValue.setValue(false);
+        }
+        showPalletPosition();
+        focusOnCancelConfirmText();
+        setRescanMode();
+        containersComposite.layout(true, true);
     }
 
-    private void initCellsStatus() throws Exception {
+    @Override
+    protected void setScanOk(boolean scanOk) {
+        scanValidValue.setValue(scanOk);
+    }
+
+    @Override
+    protected void launchFakeScan() throws Exception {
+        if (fakeScanLinkedAssignButton.getSelection()) {
+            cells = PalletCell.getRandomAliquotsNotAssigned(appService,
+                SessionManager.getInstance().getCurrentSite().getId());
+        } else if (fakeScanLinkedOnlyButton.getSelection()) {
+            cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
+                SessionManager.getInstance().getCurrentSite().getId());
+        }
+    }
+
+    private void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, AliquotWrapper> registeredAliquots = currentPalletWrapper
             .getAliquots();
         Map<RowColPos, ? extends Cell> alreadyScannedCells = palletWidget
@@ -410,9 +353,11 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         for (int row = 0; row < currentPalletWrapper.getRowCapacity(); row++) {
             for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {
                 RowColPos rcp = new RowColPos(row, col);
+                monitor.subTask("Processing position "
+                    + LabelingScheme.rowColToSbs(rcp));
                 PalletCell cell = null;
                 AliquotCellStatus newStatus = null;
-                if (rescanMode) {
+                if (isRescanMode()) {
                     cell = (PalletCell) alreadyScannedCells.get(rcp);
                 }
                 if (cell == null || cell.getStatus() == AliquotCellStatus.EMPTY
@@ -428,7 +373,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                         cells.put(rcp, cell);
                     }
                     cell.setExpectedAliquot(expectedAliquot);
-                    newStatus = setStatus(cell);
+                    newStatus = processCellStatus(cell);
                 } else {
                     cells.put(rcp, cell);
                     newStatus = cell.getStatus();
@@ -463,7 +408,8 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
-    protected AliquotCellStatus setStatus(PalletCell scanCell) throws Exception {
+    protected AliquotCellStatus processCellStatus(PalletCell scanCell)
+        throws Exception {
         AliquotWrapper expectedAliquot = scanCell.getExpectedAliquot();
         String value = scanCell.getValue();
         String positionString = currentPalletWrapper.getLabel()
@@ -673,7 +619,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                     }
                 }
             } catch (Exception ex) {
-                scanLaunchedValue.setValue(false);
+                setScanNotLauched();
                 throw ex;
             }
             appendLog(sb.toString());
@@ -714,9 +660,9 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         String containerType = currentPalletWrapper.getContainerType()
             .getName();
         String palletLabel = currentPalletWrapper.getLabel();
-        if (oldPalletPosition != null) {
+        if (oldPalletLabel != null) {
             appendLogNLS("ScanAssign.activitylog.pallet.moved", //$NON-NLS-1$
-                productBarcode, containerType, oldPalletPosition, palletLabel);
+                productBarcode, containerType, oldPalletLabel, palletLabel);
         } else if (newPallet) {
             appendLogNLS("ScanAssign.activitylog.pallet.added", //$NON-NLS-1$
                 productBarcode, containerType, palletLabel);
@@ -740,21 +686,15 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
             if (palletTypesViewer != null) {
                 palletTypesViewer.getCombo().deselectAll();
             }
-            scanButton.setText(scanButtonTitle);
-            rescanMode = false;
+            removeRescanMode();
             freezerWidget.setSelection(null);
             hotelWidget.setSelection(null);
             palletWidget.setCells(null);
         }
         movedAndMissingAliquotsFromPallet.clear();
         cells = null;
-        scanLaunchedValue.setValue(false);
+        setScanNotLauched();
         initPalletValues();
-        if (onlyTypePossible != null) {
-            currentPalletWrapper.setContainerType(onlyTypePossible);
-        } else {
-            setContainerType();
-        }
 
         if (beforeScan) { // re-apply fields values
             currentPalletWrapper.setProductBarcode(productBarcode);
@@ -762,11 +702,6 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         } else {
             setDirty(false);
         }
-    }
-
-    protected void setRescanMode() {
-        scanButton.setText("Rescan");
-        rescanMode = true;
     }
 
     private void initPalletValues() {
@@ -783,25 +718,15 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected void handleStatusChanged(IStatus status) {
-        if (status.getSeverity() == IStatus.OK) {
-            form.setMessage(getOkMessage(), IMessageProvider.NONE);
-            cancelConfirmWidget.setConfirmEnabled(true);
-            setConfirmEnabled(true);
-            scanButton.setEnabled(true);
-        } else {
-            form.setMessage(status.getMessage(), IMessageProvider.ERROR);
-            cancelConfirmWidget.setConfirmEnabled(false);
-            setConfirmEnabled(false);
-            if (!BioBankPlugin.getDefault().isValidPlateBarcode(
-                plateToScanText.getText())) {
-                scanButton.setEnabled(false);
-            } else {
-                scanButton.setEnabled(!palletCodeText.getText().isEmpty()
+        super.handleStatusChanged(status);
+        if (status.getSeverity() != IStatus.OK) {
+            if (isPlateValid()) {
+                enableScan(!palletproductBarcodeText.getText().isEmpty()
                     && !palletPositionText.getText().isEmpty());
             }
             if (palletTypesViewer != null
                 && palletTypesViewer.getCombo().getSelectionIndex() == -1) {
-                scanButton.setEnabled(false);
+                enableScan(false);
             }
         }
     }
@@ -816,7 +741,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
      */
     private boolean checkPallet() throws Exception {
         boolean canContinue = true;
-        oldPalletPosition = null;
+        oldPalletLabel = null;
         newPallet = true;
         boolean needToCheckPosition = true;
         appendLogNLS("ScanAssign.activitylog.pallet.checkingProductBarcode", //$NON-NLS-1$
@@ -840,8 +765,7 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
                 if (canContinue) {
                     // Move the pallet.
                     // Need to use exact same retrieved wrappedObject.
-                    oldPalletPosition = palletFoundWithProductBarcode
-                        .getLabel();
+                    oldPalletLabel = palletFoundWithProductBarcode.getLabel();
                     palletFoundWithProductBarcode.setLabel(currentPalletWrapper
                         .getLabel());
                     currentPalletWrapper
@@ -920,13 +844,4 @@ public class ScanAssignEntryForm extends AbstractAliquotAdminForm {
         return "Scan assign activity"; //$NON-NLS-1$
     }
 
-    private void setContainerType() {
-        IStructuredSelection selection = (IStructuredSelection) palletTypesViewer
-            .getSelection();
-        if (selection.size() > 0) {
-            currentPalletWrapper
-                .setContainerType((ContainerTypeWrapper) selection
-                    .getFirstElement());
-        }
-    }
 }

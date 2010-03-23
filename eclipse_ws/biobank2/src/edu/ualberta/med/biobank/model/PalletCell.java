@@ -38,7 +38,7 @@ public class PalletCell extends Cell {
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             for (int j = 0; j < ScanCell.COL_MAX; j++) {
                 ScanCell scanCell = scancells[i][j];
-                if (scanCell.getValue() != null) {
+                if (scanCell != null && scanCell.getValue() != null) {
                     palletScanned.put(new RowColPos(i, j), new PalletCell(
                         scanCell));
                 }
