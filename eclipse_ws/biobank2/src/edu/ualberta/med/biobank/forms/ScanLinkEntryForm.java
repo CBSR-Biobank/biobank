@@ -455,7 +455,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        scanButtonTitle = Messages.getString("ScanLink.button.scan.text"); //$NON-NLS-1$
+        scanButtonTitle = Messages.getString("linkAssign.scanButton.text"); //$NON-NLS-1$
         if (!BioBankPlugin.isRealScanEnabled()) {
             gd.widthHint = 400;
             Composite comp = toolkit.createComposite(fieldsComposite);
@@ -554,6 +554,7 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
+                    scannedValue.setValue(false);
                     appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
                         plateToScanValue.getValue().toString());
                     Map<RowColPos, PalletCell> cells = launchScan();
@@ -620,10 +621,12 @@ public class ScanLinkEntryForm extends AbstractAliquotAdminForm {
             if (getRescannedValue) {
                 cell = cells.get(rcp);
                 everythingOk = everythingOk && setCellStatus(cell);
-                if (PalletCell.hasValue(cell)) {
-                    typesRowsCount++;
-                    typesRows.put(rcp.row, typesRowsCount);
-                }
+            } else {
+                cells.put(rcp, cell);
+            }
+            if (PalletCell.hasValue(cell)) {
+                typesRowsCount++;
+                typesRows.put(rcp.row, typesRowsCount);
             }
         }
         List<SampleTypeWrapper> studiesSampleTypes = null;
