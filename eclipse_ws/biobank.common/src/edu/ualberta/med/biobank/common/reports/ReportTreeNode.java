@@ -6,12 +6,12 @@ import java.util.List;
 public class ReportTreeNode extends Object {
     private ReportTreeNode parent;
     private List<ReportTreeNode> children;
-    private Class<?> objClass;
+    private Object query;
     private String name;
 
-    public ReportTreeNode(String name, Class<?> objClass) {
+    public ReportTreeNode(String name, Object query) {
         this.name = name;
-        this.objClass = objClass;
+        this.query = query;
         this.children = new ArrayList<ReportTreeNode>();
     }
 
@@ -19,8 +19,8 @@ public class ReportTreeNode extends Object {
         return name;
     }
 
-    public Class<?> getObjClass() {
-        return objClass;
+    public Object getQuery() {
+        return query;
     }
 
     public ReportTreeNode getParent() {

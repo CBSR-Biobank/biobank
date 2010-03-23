@@ -113,7 +113,7 @@ public class AdvancedReportsEditor extends EditorPart {
         top.setLayout(layout);
         top.setLayoutData(gdfill);
 
-        tree = new QueryTree(top, SWT.BORDER, node);
+        tree = new QueryTree(top, SWT.BORDER, (QueryTreeNode) node.getQuery());
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -157,6 +157,7 @@ public class AdvancedReportsEditor extends EditorPart {
         saveButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                saveFields();
                 tree.saveTree();
             }
         });
@@ -290,8 +291,9 @@ public class AdvancedReportsEditor extends EditorPart {
     private void generate() {
 
         saveFields();
-        final HashMap<String, String> colInfo = SearchUtils.getColumnInfo(node
-            .getObjClass());
+        final HashMap<String, String> colInfo = SearchUtils
+            .getColumnInfo(((QueryTreeNode) node.getQuery()).getNodeInfo()
+                .getType());
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -348,8 +350,9 @@ public class AdvancedReportsEditor extends EditorPart {
                             reportTable.dispose();
                             reportTable = new SearchResultsInfoTable(top,
                                 reportData, colInfo.keySet().toArray(
-                                    new String[] {}), columnWidths.get(node
-                                    .getObjClass()));
+                                    new String[] {}), columnWidths
+                                    .get(((QueryTreeNode) node.getQuery())
+                                        .getNodeInfo().getType()));
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;
