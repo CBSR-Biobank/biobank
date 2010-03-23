@@ -7,12 +7,12 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
-public class QACabinetSamples extends QueryObject {
+public class QACabinetAliquots extends QueryObject {
 
     protected static final String NAME = "Cabinet Aliquot QA";
     int numResults;
 
-    public QACabinetSamples(String op, Integer siteId) {
+    public QACabinetAliquots(String op, Integer siteId) {
         super(
             "Retrieves a list of aliquots, at random, within a date range, by aliquot type.",
             "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "

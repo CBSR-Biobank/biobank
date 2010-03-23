@@ -5,14 +5,15 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
-public class FreezerSSamples extends QueryObject {
+public class FreezerCAliquots extends QueryObject {
 
-    protected static final String NAME = "Freezer Aliquots per Study";
+    protected static final String NAME = "Freezer Aliquots per Study per Clinic";
 
-    public FreezerSSamples(String op, Integer siteId) {
+    public FreezerCAliquots(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer aliquots per study.",
-            "select aliquot.patientVisit.patient.study.nameShort, count(*) from "
+            "Displays the total number of freezer aliquots per study per clinic.",
+            "select aliquot.patientVisit.patient.study.nameShort, "
+                + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
                 + Aliquot.class.getName()
                 + " as aliquot where aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
@@ -20,9 +21,10 @@ public class FreezerSSamples extends QueryObject {
                 + " as path1, "
                 + ContainerPath.class.getName()
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site"
-                + op + siteId
-                + " group by aliquot.patientVisit.patient.study.nameShort",
-            new String[] { "Study", "Total" });
+                + op
+                + siteId
+                + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name",
+            new String[] { "Study", "Clinic", "Total" });
     }
 
     @Override

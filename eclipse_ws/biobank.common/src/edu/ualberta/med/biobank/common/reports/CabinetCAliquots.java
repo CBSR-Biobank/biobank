@@ -5,11 +5,11 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
-public class CabinetCSamples extends QueryObject {
+public class CabinetCAliquots extends QueryObject {
 
     public static final String NAME = "Cabinet Aliquots per Study per Clinic";
 
-    public CabinetCSamples(String op, Integer siteId) {
+    public CabinetCAliquots(String op, Integer siteId) {
         super(
             "Displays the total number of cabinet aliquots per study per clinic.",
 

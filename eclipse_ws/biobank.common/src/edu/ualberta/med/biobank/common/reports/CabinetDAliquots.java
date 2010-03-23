@@ -7,25 +7,25 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
-public class FreezerDSamples extends QueryObject {
+public class CabinetDAliquots extends QueryObject {
 
-    protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";
+    protected static final String NAME = "Cabinet Aliquots per Study per Clinic by Date";
 
-    protected static final String query = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate), {2}(aliquot.linkDate), count(aliquot.linkDate) from "
+    protected static final String query = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate), {2}(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition.container.id in (select path1.container.id from "
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site {0} {1,number,#}"
-        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate), {2}(aliquot.linkDate)";
+        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate), {2}(aliquot.linkDate)";
 
-    public FreezerDSamples(String op, Integer siteId) {
+    public CabinetDAliquots(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer samples per study per clinic by date range.",
+            "Displays the total number of cabinet aliquots per study per clinic grouped by date range.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
-        addOption("Date Range", DateRange.class, DateRange.Week);
+        addOption("Date Range", DateGroup.class, DateGroup.Week);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FreezerDSamples extends QueryObject {
         }
         columnNames[2] = (String) params.get(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
-        params.set(0, "%Freezer%");
+        params.set(0, "%Cabinet%");
         return params;
     }
 
@@ -66,4 +66,5 @@ public class FreezerDSamples extends QueryObject {
     public String getName() {
         return NAME;
     }
+
 }
