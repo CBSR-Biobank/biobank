@@ -364,7 +364,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 reset(false);
-                System.out.println("text modified");
                 patientNumberTextModified = true;
             }
         });
