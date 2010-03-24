@@ -478,13 +478,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     /**
-     * go through cells retrieved from scan, set status and update the
-     * typecombos components
+     * go through cells retrieved from scan, set status and update the types
+     * combos components
      */
     private boolean processScanResult(IProgressMonitor monitor)
         throws ApplicationException {
         boolean everythingOk = true;
-        Map<RowColPos, ? extends Cell> previousScanCells = spw.getCells();
         Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
         for (RowColPos rcp : cells.keySet()) {
             monitor.subTask("Processing position "
@@ -495,19 +494,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 sampleTypeWidgets.get(rcp.row).resetValues(true);
             }
             PalletCell cell = null;
-            boolean useRescannedValue = true;
-            if (isRescanMode()) {
-                cell = (PalletCell) previousScanCells.get(rcp);
-                if (cell != null
-                    && (cell.getStatus() == AliquotCellStatus.TYPE || cell
-                        .getStatus() == AliquotCellStatus.NO_TYPE)) {
-                    useRescannedValue = false;
-                }
+            cell = cells.get(rcp);
+            if (!isRescanMode()
+                || (cell != null && cell.getStatus() != AliquotCellStatus.TYPE && cell
+                    .getStatus() != AliquotCellStatus.NO_TYPE)) {
+                processCellStatus(cell);
             }
-            if (useRescannedValue) {
-                cell = cells.get(rcp);
-                everythingOk = everythingOk && processCellStatus(cell);
-            }
+            everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
+                && everythingOk;
             if (PalletCell.hasValue(cell)) {
                 typesRowsCount++;
                 typesRows.put(rcp.row, typesRowsCount);
@@ -547,9 +541,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     /**
      * Process the cell: apply a status and set correct information
      */
-    private boolean processCellStatus(PalletCell cell)
-        throws ApplicationException {
-        boolean everythingOk = true;
+    private void processCellStatus(PalletCell cell) throws ApplicationException {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
@@ -561,7 +553,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     cell
                         .setInformation(Messages
                             .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
-                    everythingOk = false;
                     AliquotWrapper aliquot = aliquots.get(0);
                     String palletPosition = LabelingScheme
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
@@ -576,7 +567,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 cell.setStatus(AliquotCellStatus.EMPTY);
             }
         }
-        return everythingOk;
     }
 
     @SuppressWarnings("unchecked")

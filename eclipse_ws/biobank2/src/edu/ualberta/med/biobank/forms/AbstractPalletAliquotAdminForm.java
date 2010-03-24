@@ -127,6 +127,11 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 monitor.beginTask("Scan and process...",
                     IProgressMonitor.UNKNOWN);
                 try {
+                    if (isRescanMode()) {
+                        appendLog("--- Rescan ---");
+                    } else {
+                        appendLog("--- New Scan session ---");
+                    }
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
@@ -151,7 +156,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     protected void setScanOk(@SuppressWarnings("unused") boolean scanOk) {
@@ -183,6 +187,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                     && PalletCell.hasValue(newScannedCell)
                     && !oldScannedCell.getValue().equals(
                         newScannedCell.getValue())) {
+                    cells = oldCells;
                     throw new Exception(
                         "Found different aliquot in previously scanned position. "
                             + "Are you sure this is a rescan. If any doubt, reset page and restart process.");
