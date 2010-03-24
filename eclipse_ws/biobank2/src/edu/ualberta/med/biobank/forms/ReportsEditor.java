@@ -66,12 +66,12 @@ import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
-import edu.ualberta.med.biobank.common.reports.PVsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
-import edu.ualberta.med.biobank.common.reports.PsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.PVsByStudy;
 import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
 import edu.ualberta.med.biobank.common.reports.PatientWBC;
+import edu.ualberta.med.biobank.common.reports.PsByStudy;
 import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
 import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
@@ -115,6 +115,38 @@ public class ReportsEditor extends EditorPart {
     private ReportTreeNode node;
 
     private static Map<Class<?>, int[]> columnWidths;
+
+    static {
+        Map<Class<?>, int[]> aMap = new HashMap<Class<?>, int[]>();
+        aMap = new HashMap<Class<?>, int[]>();
+        aMap.put(CabinetCAliquots.class, new int[] { 100, 100, 100 });
+        aMap.put(CabinetDAliquots.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(CabinetSAliquots.class, new int[] { 100, 100 });
+        aMap.put(FreezerCAliquots.class, new int[] { 100, 100, 100 });
+        aMap.put(FreezerDAliquots.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(FreezerSAliquots.class, new int[] { 100, 100 });
+        aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(PsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(PVsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(PatientVisitSummary.class, new int[] { 100, 100, 100, 100,
+            100, 100, 100, 100, 100 });
+        aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(QACabinetAliquots.class, new int[] { 100, 100, 100, 100, 100,
+            100 });
+        aMap.put(QAFreezerAliquots.class, new int[] { 100, 100, 100, 100, 100,
+            100 });
+        aMap.put(AliquotCount.class, new int[] { 100, 100 });
+        aMap
+            .put(AliquotInvoiceByClinic.class, new int[] { 100, 100, 150, 100 });
+        aMap.put(AliquotInvoiceByPatient.class,
+            new int[] { 100, 100, 150, 100 });
+        aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(AliquotSCount.class, new int[] { 100, 150, 100 });
+        aMap.put(SampleTypeSUsage.class, new int[] { 150, 100 });
+        columnWidths = Collections.unmodifiableMap(aMap);
+    }
 
     private void generate() {
 
@@ -185,7 +217,7 @@ public class ReportsEditor extends EditorPart {
                                 columnWidths.get(query.getClass()));
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
-                            gd.grabExcessVerticalSpace = true;
+                            gd.grabExcessVerticalSpace = false;
                             gd.horizontalSpan = 2;
                             gd.horizontalAlignment = SWT.FILL;
                             gd.verticalAlignment = SWT.FILL;
@@ -438,42 +470,6 @@ public class ReportsEditor extends EditorPart {
         }
 
         this.setPartName(query.getName());
-
-        columnWidths = new HashMap<Class<?>, int[]>();
-        columnWidths.put(CabinetCAliquots.class, new int[] { 100, 100, 100 });
-        columnWidths.put(CabinetDAliquots.class,
-            new int[] { 100, 100, 100, 100 });
-        columnWidths.put(CabinetSAliquots.class, new int[] { 100, 100 });
-        columnWidths.put(FreezerCAliquots.class, new int[] { 100, 100, 100 });
-        columnWidths.put(FreezerDAliquots.class,
-            new int[] { 100, 100, 100, 100 });
-        columnWidths.put(FreezerSAliquots.class, new int[] { 100, 100 });
-        columnWidths.put(FvLPatientVisits.class,
-            new int[] { 100, 100, 100, 100 });
-        columnWidths.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100,
-            100 });
-        columnWidths.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100,
-            100 });
-        columnWidths.put(PsByStudy.class, new int[] { 100, 100, 100 });
-        columnWidths.put(PVsByStudy.class, new int[] { 100, 100, 100 });
-        columnWidths.put(PatientVisitSummary.class, new int[] { 100, 100, 100,
-            100, 100, 100, 100, 100, 100 });
-        columnWidths.put(PatientWBC.class,
-            new int[] { 100, 100, 100, 100, 100 });
-        columnWidths.put(QACabinetAliquots.class, new int[] { 100, 100, 100,
-            100, 100, 100 });
-        columnWidths.put(QAFreezerAliquots.class, new int[] { 100, 100, 100,
-            100, 100, 100 });
-        columnWidths.put(AliquotCount.class, new int[] { 100, 100 });
-        columnWidths.put(AliquotInvoiceByClinic.class, new int[] { 100, 100,
-            100, 100 });
-        columnWidths.put(AliquotInvoiceByPatient.class, new int[] { 100, 100,
-            100, 100 });
-        columnWidths.put(AliquotRequest.class, new int[] { 100, 100, 100, 100,
-            100 });
-        columnWidths.put(AliquotSCount.class, new int[] { 100, 100, 100 });
-        columnWidths.put(SampleTypeSUsage.class, new int[] { 100, 100 });
-        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
