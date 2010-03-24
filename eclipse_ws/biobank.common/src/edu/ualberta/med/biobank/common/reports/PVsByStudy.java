@@ -4,17 +4,24 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewPsByStudy extends QueryObject {
+import edu.ualberta.med.biobank.model.PatientVisit;
 
-    protected static final String NAME = "New Patients per Study by Date";
+public class PVsByStudy extends QueryObject {
 
-    protected static final String query = "select pv.patient.study.nameShort, year(pv.dateProcessed), {2}(pv.dateProcessed), count(*) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.dateProcessed=(select min(pvCollection.dateProcessed) from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection as pvCollection where p=pv.patient) and pv.patient.study.site {0} {1,number,#} group by pv.patient.study.nameShort, year(pv.dateProcessed), {2}(pv.dateProcessed)";
+    protected static final String NAME = "Patient Visits per Study by Date";
 
-    public NewPsByStudy(String op, Integer siteId) {
-        super(
-            "Displays the total number of patients added per study grouped by date range.",
-            MessageFormat.format(query, op, siteId, "{0}"), new String[] {
-                "Study", "", "Total" });
+    protected static final String query = "Select Alias.patient.study.nameShort, "
+        + " Year(Alias.dateProcessed), "
+        + "{2}(Alias.dateProcessed), count(*) from "
+        + PatientVisit.class.getName()
+        + " as Alias where Alias.patient.study.site {0} {1,number,#}"
+        + " GROUP BY Alias.patient.study.nameShort, "
+        + "Year(Alias.dateProcessed), {2}(Alias.dateProcessed)";
+
+    public PVsByStudy(String op, Integer siteId) {
+        super("Displays the total number of patient visits per study"
+            + " grouped by date range.", MessageFormat.format(query, op,
+            siteId, "{0}"), new String[] { "Study", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
     }
 
@@ -55,4 +62,5 @@ public class NewPsByStudy extends QueryObject {
     public String getName() {
         return NAME;
     }
+
 }

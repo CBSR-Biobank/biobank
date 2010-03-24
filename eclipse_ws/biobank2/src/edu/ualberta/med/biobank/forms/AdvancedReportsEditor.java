@@ -15,6 +15,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -158,7 +159,8 @@ public class AdvancedReportsEditor extends EditorPart {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 saveFields();
-                tree.saveTree();
+                tree.saveTree(Platform.getInstanceLocation().getURL().getPath()
+                    + "/saved_reports/", "asd");
             }
         });
 

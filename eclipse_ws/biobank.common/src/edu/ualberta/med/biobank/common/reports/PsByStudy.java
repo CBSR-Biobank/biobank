@@ -4,24 +4,18 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.PatientVisit;
+public class PsByStudy extends QueryObject {
 
-public class NewPVsByStudy extends QueryObject {
+    protected static final String NAME = "Patients per Study by Date";
 
-    protected static final String NAME = "New Patient Visits per Study by Date";
+    protected static final String query = "select pv.patient.study.nameShort, year(pv.dateProcessed), {2}(pv.dateProcessed), "
+        + "count(distinct pv.patient) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.patient.study.site {0} {1,number,#} group by pv.patient.study.nameShort, year(pv.dateProcessed), {2}(pv.dateProcessed)";
 
-    protected static final String query = "Select Alias.patient.study.nameShort, "
-        + " Year(Alias.dateProcessed), "
-        + "{2}(Alias.dateProcessed), count(*) from "
-        + PatientVisit.class.getName()
-        + " as Alias where Alias.patient.study.site {0} {1,number,#}"
-        + " GROUP BY Alias.patient.study.nameShort, "
-        + "Year(Alias.dateProcessed), {2}(Alias.dateProcessed)";
-
-    public NewPVsByStudy(String op, Integer siteId) {
-        super("Displays the total number of patient visits added per study"
-            + " grouped by date range.", MessageFormat.format(query, op,
-            siteId, "{0}"), new String[] { "Study", "", "Total" });
+    public PsByStudy(String op, Integer siteId) {
+        super(
+            "Displays the total number of patients per study with a patient visit in a given date range.",
+            MessageFormat.format(query, op, siteId, "{0}"), new String[] {
+                "Study", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
     }
 
@@ -62,5 +56,4 @@ public class NewPVsByStudy extends QueryObject {
     public String getName() {
         return NAME;
     }
-
 }
