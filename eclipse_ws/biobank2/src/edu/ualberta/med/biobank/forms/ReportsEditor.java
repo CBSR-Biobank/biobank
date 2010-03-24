@@ -66,9 +66,9 @@ import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
-import edu.ualberta.med.biobank.common.reports.NewPVsByStudy;
+import edu.ualberta.med.biobank.common.reports.PVsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
-import edu.ualberta.med.biobank.common.reports.NewPsByStudy;
+import edu.ualberta.med.biobank.common.reports.PsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
 import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
 import edu.ualberta.med.biobank.common.reports.PatientWBC;
@@ -454,8 +454,8 @@ public class ReportsEditor extends EditorPart {
             100 });
         columnWidths.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100,
             100 });
-        columnWidths.put(NewPsByStudy.class, new int[] { 100, 100, 100 });
-        columnWidths.put(NewPVsByStudy.class, new int[] { 100, 100, 100 });
+        columnWidths.put(PsByStudy.class, new int[] { 100, 100, 100 });
+        columnWidths.put(PVsByStudy.class, new int[] { 100, 100, 100 });
         columnWidths.put(PatientVisitSummary.class, new int[] { 100, 100, 100,
             100, 100, 100, 100, 100, 100 });
         columnWidths.put(PatientWBC.class,

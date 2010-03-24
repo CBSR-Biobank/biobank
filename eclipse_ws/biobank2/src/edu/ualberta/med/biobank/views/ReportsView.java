@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.views;
 
+import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -166,10 +168,19 @@ public class ReportsView extends ViewPart {
             child.setParent(advanced);
         }
         try {
-            ReportTreeNode custom = new ReportTreeNode("Custom", QueryTreeNode
-                .getTreeFromFile("tree.xml"));
-            custom.setParent(advanced);
-            advanced.addChild(custom);
+            File dir = new File(Platform.getInstanceLocation().getURL()
+                .getPath()
+                + "/saved_reports");
+            File[] files = dir.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].getName().contains(".xml")) {
+                    ReportTreeNode custom = new ReportTreeNode(files[i]
+                        .getName().replace(".xml", ""), QueryTreeNode
+                        .getTreeFromFile(files[i]));
+                    custom.setParent(advanced);
+                    advanced.addChild(custom);
+                }
+            }
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
