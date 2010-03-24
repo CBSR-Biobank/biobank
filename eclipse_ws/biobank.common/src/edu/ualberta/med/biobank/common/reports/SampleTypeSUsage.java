@@ -26,7 +26,8 @@ public class SampleTypeSUsage extends QueryObject {
         + SampleStorage.class.getName()
         + " ss) and st.site = {0,number,#} OR {0,number,#}=-9999";
 
-    public SampleTypeSUsage(String op, Integer siteId) {
+    public SampleTypeSUsage(@SuppressWarnings("unused") String op,
+        Integer siteId) {
         super(
             "Lists sample types, and the associated studies permitting them as valid sample storage.",
             "", new String[] { "Sample Type", "Study" });

@@ -17,29 +17,31 @@ public abstract class QueryObject {
 
     static {
         Map<String, Class<? extends QueryObject>> aMap = new TreeMap<String, Class<? extends QueryObject>>();
-        aMap.put(CabinetCSamples.NAME, CabinetCSamples.class);
-        aMap.put(CabinetDSamples.NAME, CabinetDSamples.class);
-        aMap.put(CabinetSSamples.NAME, CabinetSSamples.class);
-        aMap.put(FreezerCSamples.NAME, FreezerCSamples.class);
-        aMap.put(FreezerDSamples.NAME, FreezerDSamples.class);
-        aMap.put(FreezerSSamples.NAME, FreezerSSamples.class);
+        aMap.put(CabinetCAliquots.NAME, CabinetCAliquots.class);
+        aMap.put(CabinetDAliquots.NAME, CabinetDAliquots.class);
+        aMap.put(CabinetSAliquots.NAME, CabinetSAliquots.class);
+        aMap.put(FreezerCAliquots.NAME, FreezerCAliquots.class);
+        aMap.put(FreezerDAliquots.NAME, FreezerDAliquots.class);
+        aMap.put(FreezerSAliquots.NAME, FreezerSAliquots.class);
         aMap.put(FvLPatientVisits.NAME, FvLPatientVisits.class);
         aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
         aMap.put(NewPsByStudyClinic.NAME, NewPsByStudyClinic.class);
+        aMap.put(NewPsByStudy.NAME, NewPsByStudy.class);
+        aMap.put(NewPVsByStudy.NAME, NewPsByStudy.class);
         aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
         aMap.put(PatientWBC.NAME, PatientWBC.class);
-        aMap.put(SampleCount.NAME, SampleCount.class);
-        aMap.put(SampleInvoiceByClinic.NAME, SampleInvoiceByClinic.class);
-        aMap.put(SampleInvoiceByPatient.NAME, SampleInvoiceByPatient.class);
-        aMap.put(SampleRequest.NAME, SampleRequest.class);
-        aMap.put(SampleSCount.NAME, SampleSCount.class);
+        aMap.put(AliquotCount.NAME, AliquotCount.class);
+        aMap.put(AliquotInvoiceByClinic.NAME, AliquotInvoiceByClinic.class);
+        aMap.put(AliquotInvoiceByPatient.NAME, AliquotInvoiceByPatient.class);
+        aMap.put(AliquotRequest.NAME, AliquotRequest.class);
+        aMap.put(AliquotSCount.NAME, AliquotSCount.class);
         aMap.put(SampleTypeSUsage.NAME, SampleTypeSUsage.class);
-        aMap.put(QACabinetSamples.NAME, QACabinetSamples.class);
-        aMap.put(QAFreezerSamples.NAME, QAFreezerSamples.class);
+        aMap.put(QACabinetAliquots.NAME, QACabinetAliquots.class);
+        aMap.put(QAFreezerAliquots.NAME, QAFreezerAliquots.class);
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
-    public enum DateRange {
+    public enum DateGroup {
         Week, Month, Quarter, Year
     }
 

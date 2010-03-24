@@ -51,9 +51,4 @@ public class HQLField {
         this.fname = newName;
     }
 
-    public String getClause() {
-        return SearchUtils.getHQLExpression(getPath() + getFname(),
-            getOperator(), getValue());
-    }
-
 }

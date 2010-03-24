@@ -4,13 +4,13 @@ import java.util.Date;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 
-public class SampleInvoiceByPatient extends QueryObject {
+public class AliquotInvoiceByPatient extends QueryObject {
 
     protected static final String NAME = "Aliquots per Patient by Date";
 
-    public SampleInvoiceByPatient(String op, Integer siteId) {
+    public AliquotInvoiceByPatient(String op, Integer siteId) {
         super(
-            "Lists all samples linked in a particular date range, ordered by patient.",
+            "Lists all aliquots linked in a particular date range, ordered by patient.",
             "Select Alias.patientVisit.patient.pnumber, Alias.patientVisit.shipment.clinic.name,  Alias.linkDate, Alias.sampleType.name from "
                 + Aliquot.class.getName()
                 + " as Alias where Alias.linkDate > ? and Alias.linkDate < ? and Alias.patientVisit.patient.study.site "

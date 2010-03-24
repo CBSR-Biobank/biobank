@@ -36,27 +36,6 @@
 		<band height="20"/>
 	</detail>
 	<pageFooter>
-		<band height="20">
-			<staticText>
-				<reportElement x="0" y="6" width="50" height="14"/>
-				<textElement verticalAlignment="Bottom"/>
-				<text><![CDATA[Printed on ]]></text>
-			</staticText>
-			<textField pattern="yyyy-MM-dd HH:mm">
-				<reportElement x="49" y="6" width="217" height="14"/>
-				<textElement verticalAlignment="Bottom"/>
-				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="423" y="0" width="80" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
-				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report">
-				<reportElement x="503" y="0" width="40" height="20"/>
-				<textElement verticalAlignment="Bottom"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-		</band>
+		<band height="20"/>
 	</pageFooter>
 </jasperReport>

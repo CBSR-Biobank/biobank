@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -21,12 +22,13 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.ReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.QueryTree;
 
 public class ReportsView extends ViewPart {
 
@@ -60,9 +62,8 @@ public class ReportsView extends ViewPart {
             public void doubleClick(DoubleClickEvent event) {
                 ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
                     .getSelection()).getFirstElement();
-                if (node.getParent().isRoot())
-                    ;
-                else if (node.getParent().getLabel().compareTo("Advanced") == 0)
+                Assert.isTrue(!node.getParent().isRoot());
+                if (node.getParent().getLabel().compareTo("Advanced") == 0)
                     try {
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().openEditor(new ReportInput(node),
@@ -155,11 +156,11 @@ public class ReportsView extends ViewPart {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        List<Class<? extends ModelWrapper<?>>> advancedObjs = SearchUtils
-            .getSearchableObjs();
-        for (Class<? extends ModelWrapper<?>> obj : advancedObjs) {
+        List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs();
+        for (Class<?> obj : advancedObjs) {
             ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
-                .replace("Wrapper", ""), obj);
+                .replace("Wrapper", ""), QueryTree.constructTree(new HQLField(
+                "", obj.getSimpleName(), obj)));
             advanced.addChild(child);
             child.setParent(advanced);
         }

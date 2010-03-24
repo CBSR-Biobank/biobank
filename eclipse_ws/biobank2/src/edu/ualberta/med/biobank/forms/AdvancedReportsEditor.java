@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,36 +18,25 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
@@ -66,9 +54,11 @@ import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AdvancedReportsEditor extends EditorPart {
 
@@ -78,27 +68,136 @@ public class AdvancedReportsEditor extends EditorPart {
     private Composite buttonSection;
     private Composite parameterSection;
 
-    private SearchResultsInfoTable reportTable;
-
     private Button generateButton;
-    private List<Object> reportData;
-
+    private Button saveButton;
     private Button printButton;
     private Button exportButton;
 
     private List<HQLField> fields;
-
-    private TreeViewer tree;
-
-    private ReportTreeNode node;
-
     private ArrayList<Widget> widgetFields;
     private ArrayList<Combo> operatorFields;
-
     private ArrayList<Label> textLabels;
+
+    private SearchResultsInfoTable reportTable;
+    private List<Object> reportData;
+    private ReportTreeNode node;
+
+    private QueryTree tree;
     private QueryTreeNode selectedNode;
 
     private static Map<Class<?>, int[]> columnWidths;
+
+    @Override
+    public void init(IEditorSite site, IEditorInput input)
+        throws PartInitException {
+        setSite(site);
+        setInput(input);
+
+        node = ((ReportInput) input).node;
+
+        reportData = new ArrayList<Object>();
+        this.setPartName(node.getLabel());
+
+        columnWidths = SearchUtils.getColumnWidths();
+        columnWidths = Collections.unmodifiableMap(columnWidths);
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+
+        top = new Composite(parent, SWT.BORDER);
+        GridData gdfill = new GridData();
+        gdfill.horizontalAlignment = SWT.FILL;
+        GridLayout layout = new GridLayout();
+        layout.numColumns = 2;
+        top.setLayout(layout);
+        top.setLayoutData(gdfill);
+
+        tree = new QueryTree(top, SWT.BORDER, (QueryTreeNode) node.getQuery());
+        tree.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                saveFields();
+                selectedNode = (QueryTreeNode) ((IStructuredSelection) event
+                    .getSelection()).getFirstElement();
+                if (selectedNode != null)
+                    displayFields(selectedNode);
+            }
+        });
+
+        GridData gd = new GridData();
+        gd.minimumHeight = 600;
+        gd.minimumWidth = 300;
+        gd.heightHint = 300;
+        gd.widthHint = 250;
+        tree.getTree().setLayoutData(gd);
+
+        parameterSection = new Composite(top, SWT.NONE);
+        GridData pgd = new GridData();
+        pgd.horizontalAlignment = SWT.FILL;
+        pgd.grabExcessHorizontalSpace = true;
+        parameterSection.setLayoutData(pgd);
+
+        buttonSection = new Composite(top, SWT.NONE);
+        GridLayout gl = new GridLayout();
+        gl.numColumns = 4;
+        buttonSection.setLayout(gl);
+
+        generateButton = new Button(buttonSection, SWT.NONE);
+        generateButton.setText("Generate");
+        generateButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                generate();
+            }
+        });
+
+        saveButton = new Button(buttonSection, SWT.NONE);
+        saveButton.setText("Save");
+        saveButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                saveFields();
+                tree.saveTree();
+            }
+        });
+
+        printButton = new Button(buttonSection, SWT.NONE);
+        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PRINTER));
+        printButton.setText("Print");
+        printButton.setEnabled(false);
+        printButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                try {
+                    printTable(false);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError(
+                        "Error while printing the results", ex);
+                }
+            }
+        });
+
+        exportButton = new Button(buttonSection, SWT.NONE);
+        exportButton.setText("Export");
+        exportButton.setEnabled(false);
+        exportButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                try {
+                    printTable(true);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError(
+                        "Error while exporting the results", ex);
+                }
+            }
+        });
+
+        createEmptyReportTable();
+        top.layout(true, true);
+
+    }
 
     public void displayFields(QueryTreeNode node) {
         if (parameterSection != null)
@@ -106,7 +205,7 @@ public class AdvancedReportsEditor extends EditorPart {
         parameterSection = new Composite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
-        gl.numColumns = 3;
+        gl.numColumns = 4;
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.TOP;
@@ -115,7 +214,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
         Label headerLabel = new Label(parameterSection, SWT.NONE);
         GridData gdl = new GridData();
-        gdl.horizontalSpan = 3;
+        gdl.horizontalSpan = 4;
         headerLabel.setLayoutData(gdl);
         headerLabel.setText(node.getTreePath());
 
@@ -124,42 +223,77 @@ public class AdvancedReportsEditor extends EditorPart {
         textLabels = new ArrayList<Label>();
         fields = node.getFieldData();
         for (HQLField field : fields) {
-            Label fieldLabel = new Label(parameterSection, SWT.NONE);
-            fieldLabel.setText(field.getFname() + ":");
-            textLabels.add(fieldLabel);
-            Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
-            String[] operators = SearchUtils.getOperatorSet(field.getType())
-                .toArray(new String[] {});
-            operatorCombo.setItems(operators);
-            operatorCombo.select(0);
-            if (field.getOperator() != null) {
-                for (int i = 0; i < operators.length; i++)
-                    if (operators[i].compareTo(field.getOperator()) == 0) {
-                        operatorCombo.select(i);
-                        break;
-                    }
-            }
-            operatorFields.add(operatorCombo);
-            Widget widget;
-            if (field.getType() == Date.class)
-                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
-            else if (field.getType() == String.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-                if (field.getValue() != null)
-                    ((Text) widget).setText((String) field.getValue());
-            } else if (field.getType() == Integer.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-            } else
-                widget = null;
-            widgetFields.add(widget);
+            drawField(field);
         }
         parameterSection.moveBelow(tree.getTree());
         top.layout(true, true);
     }
 
+    private void drawField(final HQLField field) {
+        Label fieldLabel = new Label(parameterSection, SWT.NONE);
+        fieldLabel.setText(field.getFname().replaceAll(".name", "") + ":");
+        textLabels.add(fieldLabel);
+        Combo operatorCombo = new Combo(parameterSection, SWT.READ_ONLY);
+        GridData ogd = new GridData();
+        ogd.widthHint = 150;
+        operatorCombo.setLayoutData(ogd);
+        String[] operators = SearchUtils.getOperatorSet(field.getType())
+            .toArray(new String[] {});
+        operatorCombo.setItems(operators);
+        operatorCombo.select(0);
+        if (field.getOperator() != null) {
+            for (int i = 0; i < operators.length; i++)
+                if (operators[i].compareTo(field.getOperator()) == 0) {
+                    operatorCombo.select(i);
+                    break;
+                }
+        }
+        operatorFields.add(operatorCombo);
+        Widget widget;
+        GridData wgd = new GridData();
+        wgd.widthHint = 200;
+        if (field.getType() == Date.class) {
+            widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+            wgd.widthHint = 211;
+            ((DateTimeWidget) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((DateTimeWidget) widget).setDate((Date) field.getValue());
+        } else if (field.getType() == String.class) {
+            widget = new Text(parameterSection, SWT.BORDER);
+            ((Text) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((Text) widget).setText((String) field.getValue());
+        } else if (field.getType() == Integer.class) {
+            widget = new Text(parameterSection, SWT.BORDER);
+            ((Text) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((Text) widget)
+                    .setText(((Integer) field.getValue()).toString());
+        } else
+            widget = null;
+
+        widgetFields.add(widget);
+        Button plusButton = new Button(parameterSection, SWT.NONE);
+        plusButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        plusButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                saveFields();
+                HQLField addedField = new HQLField(field);
+                selectedNode.insertField(selectedNode.getFieldData().indexOf(
+                    field), addedField);
+                displayFields(selectedNode);
+            }
+        });
+    }
+
     private void generate() {
 
-        System.out.println(compileQuery());
+        saveFields();
+        final HashMap<String, String> colInfo = SearchUtils
+            .getColumnInfo(((QueryTreeNode) node.getQuery()).getNodeInfo()
+                .getType());
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -171,8 +305,10 @@ public class AdvancedReportsEditor extends EditorPart {
                         @Override
                         public void run() {
                             try {
-                                // reportData = query.generate(SessionManager
-                                // .getAppService(), params);
+                                reportData = SessionManager.getAppService()
+                                    .query(
+                                        new HQLCriteria(tree
+                                            .compileQuery(colInfo.values())));
                                 if (reportData.size() >= 1000)
                                     BioBankPlugin
                                         .openAsyncError(
@@ -213,8 +349,10 @@ public class AdvancedReportsEditor extends EditorPart {
                             }
                             reportTable.dispose();
                             reportTable = new SearchResultsInfoTable(top,
-                                reportData, getColumnNames(), columnWidths
-                                    .get(node.getObjClass()));
+                                reportData, colInfo.keySet().toArray(
+                                    new String[] {}), columnWidths
+                                    .get(((QueryTreeNode) node.getQuery())
+                                        .getNodeInfo().getType()));
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;
@@ -233,11 +371,6 @@ public class AdvancedReportsEditor extends EditorPart {
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Query Error", e);
         }
-    }
-
-    private String[] getColumnNames() {
-        // modelObj.getColumnNames();
-        return null;
     }
 
     private void createEmptyReportTable() {
@@ -264,54 +397,10 @@ public class AdvancedReportsEditor extends EditorPart {
         exportButton.setEnabled(false);
     }
 
-    private String compileQuery() {
-        QueryTreeNode root = (QueryTreeNode) tree.getInput();
-        QueryTreeNode objRoot = root.getChildren().get(0);
-        Class<?> type = objRoot.getNodeInfo().getType();
-        String fromClause = "from " + type.getName();
-        String whereClause = "";
-        compileQueryForTreeNode(objRoot, fromClause, whereClause);
-        String clauses = getClauses(objRoot);
-        if (whereClause != null) {
-            if (clauses != null)
-                whereClause = " where " + clauses + " and " + whereClause;
-            else
-                whereClause = " where " + whereClause;
-        } else {
-            if (clauses != null)
-                whereClause = " where " + clauses;
-        }
-        return fromClause + whereClause;
-    }
-
-    private void compileQueryForTreeNode(QueryTreeNode node, String fromClause,
-        String whereClause) {
-        List<QueryTreeNode> children = node.getChildren();
-        for (QueryTreeNode child : children) {
-            if (child.getNodeInfo().getType() == Collection.class) {
-                fromClause += " join " + child.getNodeInfo().getPath()
-                    + child.getNodeInfo().getFname() + " as "
-                    + child.getNodeInfo().getPath()
-                    + child.getNodeInfo().getFname();
-            } else
-                whereClause += " and " + getClauses(child);
-            compileQueryForTreeNode(child, fromClause, whereClause);
-        }
-    }
-
-    private String getClauses(QueryTreeNode node) {
-        List<HQLField> fields = node.getFieldData();
-        String clause = fields.get(0).getClause();
-        for (int i = 1; i < fields.size(); i++) {
-            HQLField field = fields.get(i);
-            clause += " and " + field.getClause();
-        }
-        return clause;
-    }
-
     private void setEnabled(boolean enabled) {
         SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
         generateButton.setEnabled(enabled);
+        saveButton.setEnabled(enabled);
         printButton.setEnabled(enabled);
         exportButton.setEnabled(enabled);
     }
@@ -356,261 +445,29 @@ public class AdvancedReportsEditor extends EditorPart {
         return jp;
     }
 
-    @Override
-    public void createPartControl(Composite parent) {
-
-        top = new Composite(parent, SWT.BORDER);
-        GridData gdfill = new GridData();
-        gdfill.horizontalAlignment = SWT.FILL;
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 2;
-        top.setLayout(layout);
-        top.setLayoutData(gdfill);
-
-        tree = new TreeViewer(top, SWT.BORDER);
-        tree.setContentProvider(new ITreeContentProvider() {
-
-            @Override
-            public void inputChanged(Viewer viewer, Object oldInput,
-                Object newInput) {
-
-            }
-
-            @Override
-            public void dispose() {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public Object[] getElements(Object inputElement) {
-                return ((QueryTreeNode) inputElement).getChildren().toArray();
-            }
-
-            @Override
-            public boolean hasChildren(Object element) {
-                return !((QueryTreeNode) element).isLeaf();
-            }
-
-            @Override
-            public Object getParent(Object element) {
-                return ((QueryTreeNode) element).getParent();
-            }
-
-            @Override
-            public Object[] getChildren(Object parentElement) {
-                return ((QueryTreeNode) parentElement).getChildren().toArray();
-            }
-        });
-        tree.setLabelProvider(new ILabelProvider() {
-
-            @Override
-            public Image getImage(Object element) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
-            public String getText(Object element) {
-                return ((QueryTreeNode) element).getLabel();
-            }
-
-            @Override
-            public void addListener(ILabelProviderListener listener) {
-            }
-
-            @Override
-            public void dispose() {
-            }
-
-            @Override
-            public boolean isLabelProperty(Object element, String property) {
-                return false;
-            }
-
-            @Override
-            public void removeListener(ILabelProviderListener listener) {
-            }
-        });
-        tree.setInput(SearchUtils.constructTree(new HQLField("", node
-            .getLabel(), node.getObjClass())));
-        tree.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                saveFields();
-                selectedNode = (QueryTreeNode) ((IStructuredSelection) event
-                    .getSelection()).getFirstElement();
-                if (selectedNode != null)
-                    displayFields(selectedNode);
-            }
-        });
-
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        menu.addListener(SWT.Show, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                Menu menu = tree.getTree().getMenu();
-                for (MenuItem menuItem : menu.getItems()) {
-                    menuItem.dispose();
-                }
-
-                Object element = ((StructuredSelection) tree.getSelection())
-                    .getFirstElement();
-                final QueryTreeNode node = (QueryTreeNode) element;
-                if (node != null && node.getParent() != null) {
-                    MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText("OR");
-                    mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-                        public void widgetSelected(SelectionEvent event) {
-                            QueryTreeNode newOperator = new QueryTreeNode(
-                                new HQLField(node.getNodeInfo().getPath(),
-                                    "OR", String.class));
-                            QueryTreeNode parent = node.getParent();
-                            parent.removeChild(node);
-                            parent.addChild(newOperator);
-                            newOperator.setParent(parent);
-                            newOperator.addChild(node);
-                            node.setParent(newOperator);
-                            QueryTreeNode copy = node.clone();
-                            newOperator.addChild(copy);
-                            copy.setParent(newOperator);
-                            tree.refresh(true);
-                        }
-                    });
-                    if (node.getNodeInfo().getType() == String.class) {
-                        MenuItem mi2 = new MenuItem(menu, SWT.NONE);
-                        mi2.setText("Remove Node");
-                        mi2.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode parent = node.getParent();
-                                List<QueryTreeNode> children = node
-                                    .getChildren();
-                                QueryTreeNode child = children.get(0);
-                                child.setParent(parent);
-                                node.removeChild(child);
-                                parent.addChild(child);
-                                parent.removeChild(node);
-                                tree.refresh(true);
-                            }
-                        });
-                    }
-                    if (node.getNodeInfo().getFname().contains("Collection")
-                        && !((node.getParent().getLabel().compareTo("All") == 0) || (node
-                            .getParent().getLabel().compareTo("None") == 0))) {
-                        MenuItem mi3 = new MenuItem(menu, SWT.NONE);
-                        mi3.setText("All");
-                        mi3.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(node.getNodeInfo().getPath(),
-                                        "All", String.class));
-                                QueryTreeNode parent = node.getParent();
-                                parent.removeChild(node);
-                                parent.addChild(newOperator);
-                                newOperator.setParent(parent);
-                                newOperator.addChild(node);
-                                node.setParent(newOperator);
-                                tree.refresh(true);
-                            }
-                        });
-                        MenuItem mi4 = new MenuItem(menu, SWT.NONE);
-                        mi4.setText("None");
-                        mi4.addSelectionListener(new SelectionAdapter() {
-                            @Override
-                            public void widgetSelected(SelectionEvent event) {
-                                QueryTreeNode newOperator = new QueryTreeNode(
-                                    new HQLField(node.getNodeInfo().getPath(),
-                                        "None", String.class));
-                                QueryTreeNode parent = node.getParent();
-                                parent.removeChild(node);
-                                parent.addChild(newOperator);
-                                newOperator.setParent(parent);
-                                newOperator.addChild(node);
-                                node.setParent(newOperator);
-                                tree.refresh(true);
-                            }
-                        });
-                    }
-                }
-            }
-        });
-        tree.getTree().setMenu(menu);
-
-        GridData gd = new GridData();
-        gd.minimumHeight = 600;
-        gd.minimumWidth = 300;
-        gd.heightHint = 300;
-        gd.widthHint = 250;
-        tree.getTree().setLayoutData(gd);
-
-        parameterSection = new Composite(top, SWT.NONE);
-        GridData pgd = new GridData();
-        pgd.horizontalAlignment = SWT.FILL;
-        pgd.grabExcessHorizontalSpace = true;
-        parameterSection.setLayoutData(pgd);
-
-        buttonSection = new Composite(top, SWT.NONE);
-        GridLayout gl = new GridLayout();
-        gl.numColumns = 3;
-        buttonSection.setLayout(gl);
-
-        generateButton = new Button(buttonSection, SWT.NONE);
-        generateButton.setText("Generate");
-        generateButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                generate();
-            }
-        });
-
-        printButton = new Button(buttonSection, SWT.NONE);
-        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PRINTER));
-        printButton.setText("Print");
-        printButton.setEnabled(false);
-        printButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    printTable(false);
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError(
-                        "Error while printing the results", ex);
-                }
-            }
-        });
-
-        exportButton = new Button(buttonSection, SWT.NONE);
-        exportButton.setText("Export");
-        exportButton.setEnabled(false);
-        exportButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                try {
-                    printTable(true);
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError(
-                        "Error while exporting the results", ex);
-                }
-            }
-        });
-
-        createEmptyReportTable();
-        top.layout(true, true);
-
-    }
-
     protected void saveFields() {
         if (selectedNode != null) {
             List<HQLField> fields = selectedNode.getFieldData();
             for (int i = 0; i < widgetFields.size(); i++) {
-                fields.get(i).setValue(((Text) widgetFields.get(i)).getText());
-                fields.get(i).setOperator(operatorFields.get(i).getText());
+                if (widgetFields.get(i) instanceof DateTimeWidget) {
+                    fields.get(i).setValue(
+                        ((DateTimeWidget) widgetFields.get(i)).getDate());
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                } else if (fields.get(i).getType() == Integer.class) {
+                    Integer val;
+                    try {
+                        val = Integer.parseInt(((Text) widgetFields.get(i))
+                            .getText());
+                    } catch (NumberFormatException e) {
+                        val = null;
+                    }
+                    fields.get(i).setValue(val);
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                } else {
+                    fields.get(i).setValue(
+                        ((Text) widgetFields.get(i)).getText());
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                }
             }
         }
     }
@@ -630,22 +487,6 @@ public class AdvancedReportsEditor extends EditorPart {
     public void doSaveAs() {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public void init(IEditorSite site, IEditorInput input)
-        throws PartInitException {
-        setSite(site);
-        setInput(input);
-
-        node = ((ReportInput) input).node;
-
-        reportData = new ArrayList<Object>();
-        this.setPartName(node.getLabel());
-
-        columnWidths = new HashMap<Class<?>, int[]>();
-
-        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
