@@ -176,7 +176,21 @@ public abstract class AbstractPalletAliquotAdminForm extends
         if (isRescanMode()) {
             // rescan: merge previous scan with new in case the scanner wasn't
             // able to scan well
-            cells.putAll(oldCells);
+            for (RowColPos rcp : oldCells.keySet()) {
+                PalletCell oldScannedCell = oldCells.get(rcp);
+                PalletCell newScannedCell = cells.get(rcp);
+                if (PalletCell.hasValue(oldScannedCell)
+                    && PalletCell.hasValue(newScannedCell)
+                    && !oldScannedCell.getValue().equals(
+                        newScannedCell.getValue())) {
+                    throw new Exception(
+                        "Found different aliquot in previously scanned position. "
+                            + "Are you sure this is a rescan. If any doubt, reset page and restart process.");
+                }
+                if (PalletCell.hasValue(oldScannedCell)) {
+                    cells.put(rcp, oldScannedCell);
+                }
+            }
         }
         setScanHasBeenLauched();
         appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
