@@ -164,21 +164,34 @@ public class AdvancedReportsEditor extends EditorPart {
                 saveFields();
                 SaveReportDialog dlg = new SaveReportDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell());
-                if (dlg.open() == Dialog.OK)
+                if (dlg.open() == Dialog.OK) {
+                    List<ReportTreeNode> children = node.getChildren();
+                    if (children.size() == 0)
+                        children = node.getParent().getChildren();
+                    for (ReportTreeNode sibling : children) {
+                        if (sibling.getLabel().compareTo(dlg.getName()) == 0) {
+                            BioBankPlugin
+                                .openAsyncError(
+                                    "Duplicate Name",
+                                    "A report already exists with that name. Please choose a different name or remove the duplicate first.");
+                            return;
+                        }
+                    }
                     tree.saveTree(Platform.getInstanceLocation().getURL()
                         .getPath()
                         + "/saved_reports/", dlg.getName());
-                ReportTreeNode child = new ReportTreeNode(dlg.getName(), tree
-                    .getInput());
-                if (node.getParent().getLabel().startsWith("Advanced")) {
-                    child.setParent(node);
-                    node.addChild(child);
-                } else {
-                    child.setParent(node.getParent());
-                    node.getParent().addChild(child);
+                    ReportTreeNode child = new ReportTreeNode(dlg.getName(),
+                        tree.getInput());
+                    if (node.getParent().getLabel().startsWith("Advanced")) {
+                        child.setParent(node);
+                        node.addChild(child);
+                    } else {
+                        child.setParent(node.getParent());
+                        node.getParent().addChild(child);
+                    }
+                    ReportsView.getTree().refresh();
+                    ReportsView.getTree().reveal(child);
                 }
-                ReportsView.getTree().refresh();
-                ReportsView.getTree().reveal(child);
             }
         });
 
