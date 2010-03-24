@@ -16,6 +16,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -38,6 +39,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
@@ -53,6 +55,7 @@ import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.treeview.QueryTree;
@@ -159,8 +162,23 @@ public class AdvancedReportsEditor extends EditorPart {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 saveFields();
-                tree.saveTree(Platform.getInstanceLocation().getURL().getPath()
-                    + "/saved_reports/", "asd");
+                SaveReportDialog dlg = new SaveReportDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell());
+                if (dlg.open() == Dialog.OK)
+                    tree.saveTree(Platform.getInstanceLocation().getURL()
+                        .getPath()
+                        + "/saved_reports/", dlg.getName());
+                ReportTreeNode child = new ReportTreeNode(dlg.getName(), tree
+                    .getInput());
+                if (node.getParent().getLabel().startsWith("Advanced")) {
+                    child.setParent(node);
+                    node.addChild(child);
+                } else {
+                    child.setParent(node.getParent());
+                    node.getParent().addChild(child);
+                }
+                ReportsView.getTree().refresh();
+                ReportsView.getTree().reveal(child);
             }
         });
 
