@@ -189,7 +189,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                         newScannedCell.getValue())) {
                     cells = oldCells;
                     throw new Exception(
-                        "Found different aliquot in previously scanned position. "
+                        "Scan canceled: found different aliquot in previously scanned position. "
                             + "Are you sure this is a rescan. If any doubt, reset page and restart process.");
                 }
                 if (PalletCell.hasValue(oldScannedCell)) {

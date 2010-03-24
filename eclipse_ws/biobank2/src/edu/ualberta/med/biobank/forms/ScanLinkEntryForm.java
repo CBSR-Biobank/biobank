@@ -93,6 +93,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     // sampleTypes for containers of type that contains 'palletNameContains'
     private List<SampleTypeWrapper> authorizedSampleTypes;
 
+    private boolean patientNumberTextModified = false;
+
     @Override
     protected void init() {
         super.init();
@@ -352,13 +354,18 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setVisitsList();
+                if (patientNumberTextModified) {
+                    setVisitsList();
+                }
+                patientNumberTextModified = false;
             }
         });
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 reset(false);
+                System.out.println("text modified");
+                patientNumberTextModified = true;
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);

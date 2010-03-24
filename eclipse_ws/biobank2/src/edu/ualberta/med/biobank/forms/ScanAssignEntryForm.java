@@ -545,7 +545,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void updateCellAsMoved(String position, PalletCell scanCell,
         AliquotWrapper foundAliquot) {
-        String expectedPosition = foundAliquot.getPositionString();
+        String expectedPosition = foundAliquot.getPositionString(true, false);
         if (expectedPosition == null) {
             expectedPosition = "none"; //$NON-NLS-1$
         }
