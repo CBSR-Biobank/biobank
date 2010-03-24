@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,6 +25,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
@@ -45,6 +47,18 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private boolean rescanMode = false;
 
     protected Map<RowColPos, PalletCell> cells;
+
+    // the pallet container type name contains this text
+    protected String palletNameContains = ""; //$NON-NLS-1$
+
+    @Override
+    protected void init() {
+        super.init();
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        palletNameContains = store
+            .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
+    }
 
     protected void setRescanMode() {
         scanButton.setText("Rescan");
@@ -165,7 +179,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             cells.putAll(oldCells);
         }
         setScanHasBeenLauched();
-        appendLogNLS("ScanAssign.activitylog.scanRes.total", //$NON-NLS-1$
+        appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
             cells.keySet().size());
     }
 

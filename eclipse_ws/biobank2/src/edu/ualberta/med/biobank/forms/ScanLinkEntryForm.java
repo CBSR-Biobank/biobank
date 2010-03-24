@@ -86,23 +86,17 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     // currentPatient
     private PatientWrapper currentPatient;
 
-    private String palletNameContains;
-
     // button to choose a fake scan - debug only
     private Button fakeScanRandom;
     private Button fakeScanExists;
 
     // sampleTypes for containers of type that contains 'palletNameContains'
-    private List<SampleTypeWrapper> allContainerSampleTypes;
+    private List<SampleTypeWrapper> authorizedSampleTypes;
 
     @Override
     protected void init() {
         super.init();
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
-        IPreferenceStore store = BioBankPlugin.getDefault()
-            .getPreferenceStore();
-        palletNameContains = store
-            .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
     }
 
     @Override
@@ -191,19 +185,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         selectionComp.setLayoutData(gd);
 
-        allContainerSampleTypes = SampleTypeWrapper
-            .getSampleTypeForContainerTypes(appService, SessionManager
-                .getInstance().getCurrentSite(), palletNameContains);
-        if (allContainerSampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError(Messages
-                .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
-                Messages.getFormattedString(
-                    "ScanLink.dialog.sampleTypesError.msg", //$NON-NLS-1$
-                    palletNameContains));
-        }
-        createTypeSelectionPerRowComposite(selectionComp,
-            allContainerSampleTypes);
-        createTypeSelectionCustom(selectionComp, allContainerSampleTypes);
+        initAuthorizedSampleTypeList();
+        createTypeSelectionPerRowComposite(selectionComp, authorizedSampleTypes);
+        createTypeSelectionCustom(selectionComp, authorizedSampleTypes);
         radioRowSelection.setSelection(true);
         selectionStackLayout.topControl = typesSelectionPerRowComposite;
 
@@ -255,6 +239,19 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 }
             }
         });
+    }
+
+    private void initAuthorizedSampleTypeList() throws ApplicationException {
+        authorizedSampleTypes = SampleTypeWrapper
+            .getSampleTypeForContainerTypes(appService, SessionManager
+                .getInstance().getCurrentSite(), palletNameContains);
+        if (authorizedSampleTypes.size() == 0) {
+            BioBankPlugin.openAsyncError(Messages
+                .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
+                Messages.getFormattedString(
+                    "ScanLink.dialog.sampleTypesError.msg", //$NON-NLS-1$
+                    palletNameContains));
+        }
     }
 
     /**
@@ -501,8 +498,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             boolean useRescannedValue = true;
             if (isRescanMode()) {
                 cell = (PalletCell) previousScanCells.get(rcp);
-                if (cell.getStatus() == AliquotCellStatus.TYPE
-                    || cell.getStatus() == AliquotCellStatus.NO_TYPE) {
+                if (cell != null
+                    && (cell.getStatus() == AliquotCellStatus.TYPE || cell
+                        .getStatus() == AliquotCellStatus.NO_TYPE)) {
                     useRescannedValue = false;
                 }
             }
@@ -519,6 +517,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         return everythingOk;
     }
 
+    /**
+     * Get sample types only defined in the patient's study. Then set these
+     * types to the types combos
+     */
     private void setTypeCombosLists(Map<Integer, Integer> typesRows) {
         List<SampleTypeWrapper> studiesSampleTypes = null;
         if (!isRescanMode()) { // already done at first scan
@@ -527,7 +529,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 .getSampleStorageCollection()) {
                 if (ss.getActivityStatus().isActive()) {
                     SampleTypeWrapper type = ss.getSampleType();
-                    if (allContainerSampleTypes.contains(type)) {
+                    if (authorizedSampleTypes.contains(type)) {
                         studiesSampleTypes.add(type);
                     }
                 }
@@ -542,6 +544,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
     }
 
+    /**
+     * Process the cell: apply a status and set correct information
+     */
     private boolean processCellStatus(PalletCell cell)
         throws ApplicationException {
         boolean everythingOk = true;
@@ -620,7 +625,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     /**
-     * set the sample type to the aliquots of the given row
+     * update sample type of aliquots of one given row
      */
     @SuppressWarnings("unchecked")
     private void updateRowType(SampleTypeSelectionWidget typeWidget,
