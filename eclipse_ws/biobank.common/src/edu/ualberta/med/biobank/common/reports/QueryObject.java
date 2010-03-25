@@ -27,7 +27,7 @@ public abstract class QueryObject {
         aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
         aMap.put(NewPsByStudyClinic.NAME, NewPsByStudyClinic.class);
         aMap.put(PsByStudy.NAME, PsByStudy.class);
-        aMap.put(PVsByStudy.NAME, PsByStudy.class);
+        aMap.put(PVsByStudy.NAME, PVsByStudy.class);
         aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
         aMap.put(PatientWBC.NAME, PatientWBC.class);
         aMap.put(AliquotCount.NAME, AliquotCount.class);
