@@ -64,14 +64,21 @@ and label like '{frz_label}%'
    private static $container_types = array('Freezer', 'Cabinet');
 
    private static $headings = array(
-      'patient_nr', 'study_name_short', 'sample_name_short', 'date_taken', 'fnum',
-      'rack', 'box', 'cell', 'inventory_id', 'clinic_site');
+      'patient_nr', 'visit_nr', 'study_name_short', 'sample_name_short', 'date_taken',
+      'fnum', 'rack', 'box', 'cell', 'inventory_id', 'clinic_site');
 
    private $con = null;
 
    private $fp;
 
+   private $patientNrs;
+
+   private $visitNrs;
+
    public function __construct() {
+      $this->patientNrs = Utils::getBbpdbPatientNrs();
+      $this->visitNrs = Utils::getBbpdbVisitNrs();
+
       $this->con = mysqli_connect("localhost", "dummy", "ozzy498", "biobank2");
       if (mysqli_connect_errno()) {
          die(mysqli_connect_error());
@@ -84,7 +91,7 @@ and label like '{frz_label}%'
             $this->fp = fopen($filename, 'w');
             $this->showAliquots($study, $container_type);
             fclose($this->fp);
-            system("tail -n+2 $filename | sort -t, -k 11,11  | cut -d, -f1-10 > $tmpfile");
+            system("tail -n+2 $filename | sort -t, -k 12,12  | cut -d, -f1-11 > $tmpfile");
             system("head -n1 $filename > {$tmpfile}2");
             system("cat {$tmpfile}2 $tmpfile > $filename");
 
@@ -132,8 +139,6 @@ and label like '{frz_label}%'
          die("query error: {$this->con->error}");
       }
 
-      $patientNrs = Utils::getBbpdbPatientNrs();
-
       while ($row = $result->fetch_object()) {
          //print_r($row);
 
@@ -142,11 +147,15 @@ and label like '{frz_label}%'
          $label = sprintf("%02d%s%02d%s", $pos['top'], $pos['childL1'], $pos['childL2'],
                           $cell);
 
+         $patient_nr = $this->patientNrs[$row->pnumber];
+         $date_taken = date('d-M-y', strtotime($row->date_drawn));
+
          $data = array(
-            'patient_nr' => $patientNrs[$row->pnumber],
+            'patient_nr' => $patient_nr,
+            'viist_nr' => $this->visitNrs[$patient_nr][$date_taken],
             'study_name_short' => Utils::getOldStudyName($row->study_name_short),
             'sample_name_short' => $row->sample_name_short,
-            'date_taken' => date('d-M-y', strtotime($row->date_drawn)),
+            'date_taken' => $date_taken,
             'fnum' => $pos['top'],
             'rack' => $pos['childL1'],
             'box' => $pos['childL2'],
