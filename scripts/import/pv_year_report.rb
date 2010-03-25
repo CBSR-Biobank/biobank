@@ -32,16 +32,31 @@ order by name_short
 
   def initialize
     getDbConnection
-    printReport getVisitTotalsByYear
-    printReport getPatientTotalsByYear
+    years = getYears
+
+    report = getVisitTotalsByYear years
+    printReport report, years, "Patient Visits"
+
+    report = getPatientTotalsByYear years
+    printReport report, years, "\nPatients"
   end
 
   private
 
-  def getVisitTotalsByYear
-    report = Hash.new
+  def getYears
+    # should get years from patient visit table
+    years = Array.new
     year = 2010
     while year >= 2000 do
+      years[2010 - year] = year
+      year = year - 1
+    end
+    years
+  end
+
+  def getVisitTotalsByYear(years)
+    report = Hash.new
+    years.each do |year|
       res = @dbh.query(PV_QUERY.gsub("{year}", year.to_s()));
       while row = res.fetch_row do
         if (report[row[0]] == nil)
@@ -51,13 +66,12 @@ order by name_short
       end
       year = year - 1
     end
-    p report
+    report
   end
 
-  def getPatientTotalsByYear
+  def getPatientTotalsByYear(years)
     report = Hash.new
-    year = 2010
-    while year >= 2000 do
+    years.each do |year|
       res = @dbh.query(PATIENT_QUERY.gsub("{year}", year.to_s()));
       while row = res.fetch_row do
         if (report[row[0]] == nil)
@@ -67,11 +81,15 @@ order by name_short
       end
       year = year - 1
     end
-    p report
+    report
   end
 
-  def printReport(data)
-    data.keys.
+  def printReport(data, years, heading)
+    puts heading
+    print "study,", years.join(","), "\n"
+    data.keys.each do |study|
+      print study, data[study].join(",")
+    end
   end
 
   def getDbConnection
