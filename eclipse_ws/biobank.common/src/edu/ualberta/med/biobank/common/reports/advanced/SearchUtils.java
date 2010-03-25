@@ -218,8 +218,6 @@ public class SearchUtils {
             add(searchableFields, path, "site", Site.class);
             add(searchableFields, path, "contactCollection", Contact.class);
             add(searchableFields, path, "shipmentCollection", Shipment.class);
-            add(searchableFields, path, "patientVisitCollection",
-                PatientVisit.class);
         } else if (c == Aliquot.class) {
             if (collection)
                 path = path.replace('.', '_') + "aliquotCollection.";

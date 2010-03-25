@@ -51,7 +51,9 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.advanced.CustomQueryObject;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
@@ -62,7 +64,6 @@ import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AdvancedReportsEditor extends EditorPart {
 
@@ -339,10 +340,11 @@ public class AdvancedReportsEditor extends EditorPart {
                         @Override
                         public void run() {
                             try {
-                                reportData = SessionManager.getAppService()
-                                    .query(
-                                        new HQLCriteria(tree
-                                            .compileQuery(colInfo.values())));
+                                QueryObject tempQuery = new CustomQueryObject(
+                                    null, tree.compileQuery(colInfo.values()),
+                                    new String[] {});
+                                reportData = tempQuery.generate(SessionManager
+                                    .getAppService(), null);
                                 if (reportData.size() >= 1000)
                                     BioBankPlugin
                                         .openAsyncError(

@@ -300,18 +300,24 @@ public class QueryTree extends TreeViewer {
         boolean addedChildren = false;
         List<QueryTreeNode> children = parent.getChildren();
         for (QueryTreeNode child : children) {
-            if (child.getLabel().compareTo("All") == 0) {
+            if ((child.getLabel().compareTo("All") == 0)
+                || (child.getLabel().compareTo("None") == 0)) {
                 QueryTreeNode childCollection = child.getChildren().get(0);
                 String collectionName = childCollection.getNodeInfo().getPath()
                     + childCollection.getNodeInfo().getFname();
                 String name = childCollection.getNodeInfo().getPath().replace(
                     '.', '_')
                     + childCollection.getNodeInfo().getFname();
-                fromClauses.add(collectionName + " as " + name + "1");
-                String newSelect = collectionName
-                    + ".size = (select count(*) from "
-                    + childCollection.getNodeInfo().getType().getName() + " "
-                    + name;
+                String newSelect;
+                if (child.getLabel().compareTo("All") == 0)
+                    newSelect = collectionName
+                        + ".size = (select count(*) from "
+                        + childCollection.getNodeInfo().getType().getName()
+                        + " " + name;
+                else
+                    newSelect = "0 = (select count(*) from "
+                        + childCollection.getNodeInfo().getType().getName()
+                        + " " + name;
                 List<String> collectionWhereClauses = new ArrayList<String>();
                 HashSet<String> collectionFromClauses = new HashSet<String>();
                 Boolean addedSubFields = addClausesForNode(childCollection,
@@ -320,7 +326,8 @@ public class QueryTree extends TreeViewer {
                     collectionWhereClauses, collectionFromClauses);
                 String hqlString = newSelect
                     + compileFromClause(collectionFromClauses);
-                collectionWhereClauses.add(name + "=" + name + "1");
+                collectionWhereClauses.add(name + " in elements("
+                    + collectionName + ")");
                 String where = compileWhereClause(collectionWhereClauses);
                 hqlString = hqlString + " where " + where;
                 whereClauses.add(hqlString + ")");
