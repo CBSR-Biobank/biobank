@@ -14,7 +14,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 /**
  * This wrapper does not allow new activity status objects to be added to the
  * database. Therefore, when either getActivityStatus() or
- * getAllActivityStatuses() are called the first time a map of the exisiting
+ * getAllActivityStatuses() are called the first time, a map of the existing
  * statuses in the database is created.
  * 
  */
