@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,12 +66,12 @@ import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
 import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
-import edu.ualberta.med.biobank.common.reports.NewPVsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
-import edu.ualberta.med.biobank.common.reports.NewPsByStudy;
 import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.PVsByStudy;
 import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
 import edu.ualberta.med.biobank.common.reports.PatientWBC;
+import edu.ualberta.med.biobank.common.reports.PsByStudy;
 import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
 import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
@@ -128,8 +128,8 @@ public class ReportsEditor extends EditorPart {
         aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100 });
         aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
         aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
-        aMap.put(NewPsByStudy.class, new int[] { 100, 100, 100 });
-        aMap.put(NewPVsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(PsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(PVsByStudy.class, new int[] { 100, 100, 100 });
         aMap.put(PatientVisitSummary.class, new int[] { 100, 100, 100, 100,
             100, 100, 100, 100, 100 });
         aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100 });
@@ -361,25 +361,25 @@ public class ReportsEditor extends EditorPart {
                         .getName(), params, columnInfo, listData), path);
                 else {
                     // csv
-                    File file = new File(path);
-                    FileWriter bw = new FileWriter(file);
+                    PrintWriter bw = new PrintWriter(new FileWriter(path));
                     // write title
-                    bw.write("#" + query.getName() + "\r");
+                    bw.println("#" + query.getName());
                     // write params
                     for (Object[] ob : params)
-                        bw.write("#" + ob[0] + ":" + ob[1] + "\r");
+                        bw.println("#" + ob[0] + ":" + ob[1]);
                     // write columnnames
-                    bw.write("#\r#" + columnInfo.get(0));
+                    bw.println("#");
+                    bw.print("#" + columnInfo.get(0));
                     for (int j = 1; j < columnInfo.size(); j++) {
                         bw.write("," + columnInfo.get(j));
                     }
-                    bw.write("\r");
+                    bw.println();
                     for (Map<String, String> ob : listData) {
                         bw.write("\"" + ob.get(columnInfo.get(0)) + "\"");
                         for (int j = 1; j < columnInfo.size(); j++) {
                             bw.write(",\"" + ob.get(columnInfo.get(j)) + "\"");
                         }
-                        bw.write("\r");
+                        bw.println();
                     }
                     bw.close();
                 }

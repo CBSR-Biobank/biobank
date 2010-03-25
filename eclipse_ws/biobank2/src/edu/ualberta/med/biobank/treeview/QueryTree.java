@@ -366,9 +366,9 @@ public class QueryTree extends TreeViewer {
             field.getOperator(), field.getValue()));
     }
 
-    public void saveTree() {
+    public void saveTree(String path, String name) {
         try {
-            ((QueryTreeNode) getInput()).saveTree();
+            ((QueryTreeNode) getInput()).saveTree(path, name);
         } catch (IOException e) {
             BioBankPlugin.openAsyncError("Save Failed", e);
         }
