@@ -854,7 +854,7 @@ public class ContainerWrapper extends
             newContainer.setPosition(i, j);
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
-                .getActivityStatus(appService, "Active"));
+                .getActiveActivityStatus(appService));
             newContainer.persist();
         }
     }

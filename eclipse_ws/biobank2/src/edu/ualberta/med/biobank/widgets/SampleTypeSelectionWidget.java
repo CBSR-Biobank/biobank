@@ -196,4 +196,8 @@ public class SampleTypeSelectionWidget {
     public void setNextWidget(Object nextWidget) {
         this.nextWidget = nextWidget;
     }
+
+    public void setTypes(List<SampleTypeWrapper> types) {
+        cv.setInput(types);
+    }
 }
