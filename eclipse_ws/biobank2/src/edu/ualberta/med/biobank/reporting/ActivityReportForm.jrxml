@@ -29,7 +29,7 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="14">
+		<band height="13">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="572" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box padding="0">

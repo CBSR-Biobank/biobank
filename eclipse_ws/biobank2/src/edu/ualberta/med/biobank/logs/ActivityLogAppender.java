@@ -29,6 +29,8 @@ public class ActivityLogAppender extends AppenderSkeleton {
     private MessageConsole messageConsole;
     private MessageConsoleStream consoleStream;
     private List<LogInfo> logsList;
+    private static final char[] SYSTEM_LINE_SEPARATOR = System.getProperty(
+        "line.separator").toCharArray();
 
     public ActivityLogAppender(String name) {
         setName(name);
@@ -42,9 +44,28 @@ public class ActivityLogAppender extends AppenderSkeleton {
 
     @Override
     protected void append(LoggingEvent event) {
-        String text = this.layout.format(event);
+        String text = layout.format(event);
         consoleStream.print(text);
-        logsList.add(new LogInfo(text.substring(0, text.lastIndexOf("\n"))));
+        boolean shouldRemoveLineSeparator = false;
+        for (int i = 0; i < SYSTEM_LINE_SEPARATOR.length; i++) {
+            char c = SYSTEM_LINE_SEPARATOR[i];
+            int positionFromEnd = SYSTEM_LINE_SEPARATOR.length - i;
+            if (text.length() >= positionFromEnd) {
+                char charAtPosition = text.charAt(text.length()
+                    - positionFromEnd);
+                if (charAtPosition == c) {
+                    shouldRemoveLineSeparator = true;
+                } else {
+                    shouldRemoveLineSeparator = false;
+                    break;
+                }
+            }
+        }
+        if (shouldRemoveLineSeparator) {
+            text = text.substring(0, text.length()
+                - SYSTEM_LINE_SEPARATOR.length);
+        }
+        logsList.add(new LogInfo(text));
     }
 
     @Override

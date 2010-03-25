@@ -43,6 +43,7 @@ public enum AliquotCellStatus {
             if (newStatus == MISSING || newStatus == ERROR) {
                 return newStatus;
             }
+            return this;
         case ERROR:
             return ERROR;
         case MISSING:

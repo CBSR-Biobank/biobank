@@ -417,7 +417,8 @@ public class ReportsEditor extends EditorPart {
         drb.setTemplateFile(reportURL.getFile());
         drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
-        drb.addAutoText(DateFormatter.formatAsDateTime(new Date()),
+        drb.addAutoText("Printed on "
+            + DateFormatter.formatAsDateTime(new Date()),
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
 
         Style headerStyle = new Style();
