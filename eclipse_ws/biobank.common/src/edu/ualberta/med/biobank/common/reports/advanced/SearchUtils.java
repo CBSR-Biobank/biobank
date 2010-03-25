@@ -252,7 +252,7 @@ public class SearchUtils {
                 path = path + "patientVisit.";
             add(searchableFields, path, "patient", Patient.class);
             add(searchableFields, path, "aliquotCollection", Aliquot.class);
-        } else if (c == PatientVisit.class) {
+        } else if (c == Contact.class) {
             if (collection)
                 path = path.replace('.', '_') + "contactCollection.";
             else

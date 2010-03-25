@@ -24,7 +24,15 @@ public class QueryTreeNode extends Object {
     }
 
     public String getLabel() {
-        return nodeInfo.getFname().replace("Collection", "s");
+        if (nodeInfo.getFname().contains("Collection")) {
+            String newName = nodeInfo.getFname().replace("Collection", "");
+            if (newName.endsWith("y")) {
+                newName = newName.replace("y", "ies");
+            } else
+                newName += "s";
+            return newName;
+        }
+        return nodeInfo.getFname();
     }
 
     public HQLField getNodeInfo() {
@@ -107,9 +115,7 @@ public class QueryTreeNode extends Object {
         xStream.alias("QueryTreeNode", QueryTreeNode.class);
         File file = new File(path);
         file.mkdirs();
-        FileWriter fw = new FileWriter(file + "/"
-            + this.getNodeInfo().getType().getSimpleName() + "_" + name
-            + ".xml");
+        FileWriter fw = new FileWriter(file + "/" + name + ".xml");
 
         fw.write(xStream.toXML(this));
         fw.close();
