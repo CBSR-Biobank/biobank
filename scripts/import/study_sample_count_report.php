@@ -17,37 +17,39 @@ join aliquot_position on aliquot_position.aliquot_id=aliquot.id
 join abstract_position on abstract_position.id=aliquot_position.abstract_position_id
 join container on container.id=aliquot_position.container_id
 join container_path on container_path.container_id=container.id
-where study.name_short='{study_name_short}' 
-and locate('/', path)<>0 
-and substr(path, 1, locate('/', path)-1) in 
-(SELECT container.id
-  FROM container
-  join container_type on container_type.id=container.container_type_id
-  where name like 'Freezer%')
-";   
+where study.name_short='{study_name_short}'
+and locate('/', path)<>0
+and substr(path, 1, locate('/', path)-1) not in
+(SELECT container.id FROM container where label='SS')
+";
 
    const ALIQUOT_QUERY = "
-select pnumber, patient_visit.id as visit_id, 
-sample_type.name_short as sample_name_short, count(*) as count, 
+select pnumber, patient_visit.id as visit_id, count(*) as count,
 date_processed, study.name_short as study_name_short
 {BASE_QUERY}
-group by patient_visit.id,aliquot.sample_type_id
+group by patient_visit.id
 order by date_processed,patient.id,study.name_short
-   
-"; 
+";
 
    const COUNT_QUERY = "select count(*) as count {BASE_QUERY}";
 
    private static $studies = array('BBPSP', 'CEGIIR', 'KDCS', 'RVS');
 
-   private static $headings = array('patient_nr', 'visit_id', 'sample_name_short',
-   'count', 'date_received', 'study_name_short');
+   private static $headings = array('patient_nr', 'visit_nr',
+   'CountOfinventory_id', 'date_received', 'study_name_short');
 
    private $con = null;
 
    private $fp;
 
+   private $patientNrs;
+
+   private $visitNrs;
+
    public function __construct() {
+      $this->patientNrs = Utils::getBbpdbPatientNrs();
+      $this->visitNrs = Utils::getBbpdbVisitNrs();
+
       $this->con = mysqli_connect("localhost", "dummy", "ozzy498", "biobank2");
       if (mysqli_connect_errno()) {
          die(mysqli_connect_error());
@@ -55,7 +57,7 @@ order by date_processed,patient.id,study.name_short
       foreach (self::$studies as $study) {
          $this->fp = fopen(Utils::getOldStudyName($study) . '_total_samples.csv', 'w');
          $this->showAliquots($study);
-         fputcsv($this->fp, array("\n"));
+         fputcsv($this->fp, array(""));
          $this->showTotals($study);
          fclose($this->fp);
       }
@@ -91,16 +93,16 @@ order by date_processed,patient.id,study.name_short
          die("query error: {$this->con->error}");
       }
 
-      $patientNrs = Utils::getBbpdbPatientNrs();
-
       while ($row = $result->fetch_object()) {
          //print_r($row);
 
+         $patient_nr = $this->patientNrs[$row->pnumber];
+         $date_received = date('d-M-y', strtotime($row->date_processed));
+
          $data = array(
-            'pnumber' => $patientNrs[$row->pnumber], 
-            'visit_id' => $row->visit_id,
-            'sample_name_short' => $row->sample_name_short,
-            'count' => $row->count, 
+            'pnumber' => $patient_nr,
+            'visit_id' => $this->visitNrs[$patient_nr][$date_received],
+            'count' => $row->count,
             'date_received' => date('d-M-y', strtotime($row->date_processed)),
             'study_name_short' => Utils::getOldStudyName($row->study_name_short),
          );

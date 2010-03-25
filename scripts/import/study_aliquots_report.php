@@ -50,7 +50,7 @@ and substr(path, 1, locate('/', path)-1) in
    const ALIQUOT_QUERY = "
 select pnumber,study.name_short as study_name_short,
 sample_type.name_short as sample_name_short,
-date_drawn,label,row,col,inventory_id,clinic.name as clinic_site
+date_drawn,date_processed,label,row,col,inventory_id,clinic.name as clinic_site
 {BASE_QUERY}
 ";
 
@@ -148,11 +148,11 @@ and label like '{frz_label}%'
                           $cell);
 
          $patient_nr = $this->patientNrs[$row->pnumber];
-         $date_taken = date('d-M-y', strtotime($row->date_drawn));
+         $date_received = date('d-M-y', strtotime($row->date_processed));
 
          $data = array(
             'patient_nr' => $patient_nr,
-            'viist_nr' => $this->visitNrs[$patient_nr][$date_taken],
+            'viist_nr' => $this->visitNrs[$patient_nr][$date_received],
             'study_name_short' => Utils::getOldStudyName($row->study_name_short),
             'sample_name_short' => $row->sample_name_short,
             'date_taken' => $date_taken,

@@ -45,13 +45,13 @@ class Utils {
       }
 
       $visitNrs = array();
-      $result = $con->query("select patient_nr, date_taken, visit_nr from patient_visit");
+      $result = $con->query("select patient_nr, date_received, visit_nr from patient_visit");
       while ($row = $result->fetch_object()) {
          if (empty($visitNrs[$row->patient_nr])) {
             $visitNrs[$row->patient_nr] = array();
          }
-         $date_taken = date('d-M-y', strtotime($row->date_taken));
-         $visitNrs[$row->patient_nr][$date_taken] = $row->visit_nr;
+         $date_received = date('d-M-y', strtotime($row->date_received));
+         $visitNrs[$row->patient_nr][$date_received] = $row->visit_nr;
       }
       return $visitNrs;
    }
