@@ -373,11 +373,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 monitor.subTask("Processing position "
                     + LabelingScheme.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                if (!isRescanMode()
-                    || (cell == null
-                        || cell.getStatus() == AliquotCellStatus.EMPTY
-                        || cell.getStatus() == AliquotCellStatus.ERROR || cell
-                        .getStatus() == AliquotCellStatus.MISSING)) {
+                if (!isRescanMode() || cell == null || cell.getStatus() == null
+                    || cell.getStatus() == AliquotCellStatus.EMPTY
+                    || cell.getStatus() == AliquotCellStatus.ERROR
+                    || cell.getStatus() == AliquotCellStatus.MISSING) {
                     AliquotWrapper expectedAliquot = null;
                     if (expectedAliquots != null) {
                         expectedAliquot = expectedAliquots.get(rcp);
