@@ -177,7 +177,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         } else {
             launchFakeScan();
         }
-        if (isRescanMode()) {
+        if (isRescanMode() && oldCells != null) {
             // rescan: merge previous scan with new in case the scanner wasn't
             // able to scan well
             for (RowColPos rcp : oldCells.keySet()) {
