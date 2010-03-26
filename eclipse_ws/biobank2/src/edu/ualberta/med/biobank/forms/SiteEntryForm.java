@@ -39,8 +39,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private ComboViewer activityStatusComboViewer;
 
-    // private ActivityStatusWrapper currentActivityStatus;
-
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof SiteAdapter),

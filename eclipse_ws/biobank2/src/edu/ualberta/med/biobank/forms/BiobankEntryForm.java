@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
@@ -374,30 +375,44 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
             if (!isDirty()) {
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getActivePage().closeEditor(this, true);
-                if (getNextOpenedFormID() != null) {
-                    AdapterBase.openForm(new FormInput(getAdapter()),
-                        getNextOpenedFormID());
-                }
+                closeEntryOpenView(true, true);
             }
         } catch (Exception e) {
             logger.error("Can't save the form", e);
         }
     }
 
+    private void closeEntryOpenView(boolean saveOnClose, boolean openView) {
+        int entryIndex = linkedForms.indexOf(this);
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+            .closeEditor(this, saveOnClose);
+        if (openView && getNextOpenedFormID() != null) {
+            AdapterBase.openForm(new FormInput(getAdapter()),
+                getNextOpenedFormID());
+
+            int previousFormIndex = entryIndex - 1;
+            if (previousFormIndex >= 0 && previousFormIndex < linkedForms.size()) {
+                BiobankFormBase form = linkedForms.get(previousFormIndex);
+                IWorkbenchPage page = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage();
+                page.bringToTop(form);
+            }
+        }
+    }
+
     public void cancel() {
         try {
             adapter.resetObject();
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().closeEditor(this, false);
+            boolean openView = !adapter.getModelObject().isNew();
+            closeEntryOpenView(false, openView);
         } catch (Exception e) {
-            logger.error("Can't close the form", e);
+            logger.error("Can't cancel the form", e);
         }
     }
 
     public void reset() throws Exception {
         adapter.resetObject();
+        setDirty(false);
     }
 
     /**
