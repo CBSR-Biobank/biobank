@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 
 public class AliquotSCount extends QueryObject {
 
-    protected static final String NAME = "Aliquot Types by Study";
+    protected static final String NAME = "Sample Types by Study";
 
     public AliquotSCount(String op, Integer siteId) {
         super(

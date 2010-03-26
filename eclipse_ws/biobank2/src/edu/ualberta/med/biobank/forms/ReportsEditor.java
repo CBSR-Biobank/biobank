@@ -507,7 +507,7 @@ public class ReportsEditor extends EditorPart {
         GridData pgd = new GridData();
         pgd.grabExcessHorizontalSpace = true;
         pgd.horizontalAlignment = SWT.FILL;
-        parameterSection.setLayout(new GridLayout());
+        parameterSection.setLayout(new GridLayout(2, false));
         parameterSection.setLayoutData(pgd);
 
         buttonSection = new Composite(top, SWT.NONE);
@@ -578,7 +578,7 @@ public class ReportsEditor extends EditorPart {
             } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
             else if (option.getType() == String.class) {
-                if (option.getName().compareTo("Aliquot Type") == 0)
+                if (option.getName().compareTo("Sample Type") == 0)
                     try {
                         widget = new AutoTextWidget(parameterSection, SWT.None,
                             site.getAllSampleTypeCollection(true),
