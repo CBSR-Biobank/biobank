@@ -262,14 +262,17 @@ public class QueryTree extends TreeViewer {
         QueryTreeNode root = (QueryTreeNode) this.getInput();
         Class<?> type = root.getNodeInfo().getType();
 
-        extraSelectClauses.putAll(SearchUtils.getColumnInfo(root.getNodeInfo()
-            .getType()));
         addClausesForNode(root, whereClauses);
         generateSubClauses(root, whereClauses, fromClauses);
 
+        HashMap<String, String> basicSelects = SearchUtils.getColumnInfo(root
+            .getNodeInfo().getType());
+        basicSelects.putAll(extraSelectClauses);
+        extraSelectClauses = basicSelects;
+
         String selectClause = "select ";
         for (String key : extraSelectClauses.keySet()) {
-            selectClause += key + "." + extraSelectClauses.get(key) + ", ";
+            selectClause += extraSelectClauses.get(key) + ", ";
         }
         selectClause = selectClause.substring(0, selectClause.length() - 2)
             + " from " + type.getName() + " "
@@ -287,7 +290,7 @@ public class QueryTree extends TreeViewer {
     private String compileFromClause(HashSet<String> fromClauses) {
         String fromClause = "";
         for (String clause : fromClauses) {
-            fromClause += " join " + clause;
+            fromClause = " join " + clause + fromClause;
         }
         return fromClause;
     }
@@ -412,7 +415,8 @@ public class QueryTree extends TreeViewer {
         if (field.getDisplay())
             extraSelectClauses.put(field.getFname().substring(0, 1)
                 .toUpperCase()
-                + field.getFname().substring(1), field.getFname());
+                + field.getFname().substring(1), field.getPath()
+                + field.getFname());
     }
 
     public void saveTree(String path, String name) {

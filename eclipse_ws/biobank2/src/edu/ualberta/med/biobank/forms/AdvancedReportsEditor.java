@@ -80,6 +80,7 @@ public class AdvancedReportsEditor extends EditorPart {
     private List<HQLField> fields;
     private ArrayList<Widget> widgetFields;
     private ArrayList<Combo> operatorFields;
+    protected ArrayList<Button> includedFields;
     private ArrayList<Label> textLabels;
 
     private SearchResultsInfoTable reportTable;
@@ -250,6 +251,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
         widgetFields = new ArrayList<Widget>();
         operatorFields = new ArrayList<Combo>();
+        includedFields = new ArrayList<Button>();
         textLabels = new ArrayList<Label>();
         fields = node.getFieldData();
         for (HQLField field : fields) {
@@ -319,12 +321,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
         final Button box = new Button(parameterSection, SWT.CHECK);
         box.setText("Include in results");
-        box.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                field.setDisplay(box.getSelection());
-            }
-        });
+        includedFields.add(box);
 
     }
 
@@ -502,10 +499,14 @@ public class AdvancedReportsEditor extends EditorPart {
                     }
                     fields.get(i).setValue(val);
                     fields.get(i).setOperator(operatorFields.get(i).getText());
+                    fields.get(i).setDisplay(
+                        includedFields.get(i).getSelection());
                 } else {
                     fields.get(i).setValue(
                         ((Text) widgetFields.get(i)).getText());
                     fields.get(i).setOperator(operatorFields.get(i).getText());
+                    fields.get(i).setDisplay(
+                        includedFields.get(i).getSelection());
                 }
             }
         }
