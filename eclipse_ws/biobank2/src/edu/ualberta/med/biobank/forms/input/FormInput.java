@@ -8,9 +8,15 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class FormInput implements IEditorInput {
     private AdapterBase node;
+    private boolean hasPreviousForm;
 
     public FormInput(AdapterBase o) {
+        this(o, false);
+    }
+
+    public FormInput(AdapterBase o, boolean hasPreviousForm) {
         node = o;
+        this.hasPreviousForm = hasPreviousForm;
     }
 
     public int getIndex() {
@@ -74,6 +80,14 @@ public class FormInput implements IEditorInput {
             return ((myIndex != -1) && (oIndex != -1) && (myIndex == oIndex));
         }
         return false;
+    }
+
+    public boolean hasPreviousForm() {
+        return hasPreviousForm;
+    }
+
+    public void setHasPreviousForm(boolean hasPreviousForm) {
+        this.hasPreviousForm = hasPreviousForm;
     }
 
 }

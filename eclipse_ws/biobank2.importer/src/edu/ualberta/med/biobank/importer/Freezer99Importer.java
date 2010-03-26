@@ -15,8 +15,8 @@ public class Freezer99Importer extends FreezerImporter {
 
     protected static String DEFAULT_QUERY = "select patient_visit.date_received, "
         + "patient_visit.date_taken, study_list.study_name_short, "
-        + "sample_list.sample_name_short, freezer.*, patient.chr_nr  "
-        + "from freezer "
+        + "sample_list.sample_name_short, freezer.*, patient.dec_chr_nr,  "
+        + "patient_visit.bb2_pv_id from freezer "
         + "join patient_visit on patient_visit.visit_nr=freezer.visit_nr "
         + "join patient on patient.patient_nr=patient_visit.patient_nr "
         + "join study_list on study_list.study_nr=patient_visit.study_nr "

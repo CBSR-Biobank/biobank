@@ -24,6 +24,8 @@ public class PatientViewForm extends BiobankViewForm {
 
     private Text siteLabel;
 
+    private Text studyLabel;
+
     private Text visitCountLabel;
 
     private Text sampleCountLabel;
@@ -68,6 +70,7 @@ public class PatientViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
+        studyLabel = createReadOnlyField(client, SWT.NONE, "Study");
         visitCountLabel = createReadOnlyField(client, SWT.NONE, "Total Visits");
         sampleCountLabel = createReadOnlyField(client, SWT.NONE,
             "Total Samples");
@@ -85,6 +88,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     private void setValues() throws ApplicationException, BiobankCheckException {
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
+        setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel, patient.getPatientVisitCollection()
             .size());
         setTextValue(sampleCountLabel, patient.getSampleCount());
@@ -99,8 +103,4 @@ public class PatientViewForm extends BiobankViewForm {
         visitsTable.setCollection(patient.getPatientVisitCollection());
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return PatientEntryForm.ID;
-    }
 }

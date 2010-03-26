@@ -17,7 +17,7 @@ public class PatientVisitHelper extends DbHelper {
      * 
      * @param patient The patient that the patient visit belongs to.
      * @param shipment The shipment that the samples where received in.
-     * @param dateProcessed The date the sample was processed.
+     * @param dateProcessed The date the aliquot was processed.
      * @return A new patient visit wrapper.
      */
     public static PatientVisitWrapper newPatientVisit(PatientWrapper patient,
@@ -34,7 +34,7 @@ public class PatientVisitHelper extends DbHelper {
      * 
      * @param patient The patient that the patient visit belongs to.
      * @param shipment The shipment that the samples where received in.
-     * @param dateProcessed The date the sample was processed.
+     * @param dateProcessed The date the aliquot was processed.
      * @return A new patient visit wrapper.
      * @throws Exception if the object could not be saved to the database.
      */

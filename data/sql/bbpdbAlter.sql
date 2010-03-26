@@ -3,6 +3,8 @@
 
 alter table patient add dec_chr_nr varchar(32);
 
+alter table patient_visit add bb2_pv_id int(11);
+
 CREATE TABLE FRZ_99_INV_ID (
        INVENTORY_ID varchar(255),
        index(INVENTORY_ID)

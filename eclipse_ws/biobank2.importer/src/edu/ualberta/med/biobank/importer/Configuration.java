@@ -131,11 +131,11 @@ public class Configuration {
         }
 
         String configValue;
-        if (hotelLabel.length() == 4) {
+        if (hotelLabel.startsWith("SS")) {
+            configValue = importFreezers.get(99);
+        } else if (hotelLabel.length() == 4) {
             configValue = importFreezers.get(Integer.valueOf(hotelLabel
                 .substring(0, 2)));
-        } else if (hotelLabel.startsWith("Sent Samples")) {
-            configValue = importFreezers.get(99);
         } else {
             throw new Exception("invalid hotel label: " + hotelLabel);
         }

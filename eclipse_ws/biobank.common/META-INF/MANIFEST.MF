@@ -63,6 +63,7 @@ Export-Package: antlr;
    edu.ualberta.med.biobank.model,
    edu.ualberta.med.biobank.common.wrappers.internal,
    gov.nih.nci.system.applicationservice",
+ edu.ualberta.med.biobank.common.wrappers.listener,
  gov.nih.nci.system.applicationservice;
   uses:="gov.nih.nci.system.query,
    gov.nih.nci.system.query.hibernate,

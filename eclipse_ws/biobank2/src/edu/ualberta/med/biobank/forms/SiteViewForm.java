@@ -138,7 +138,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         addSectionToolbar(section, "Add Study", new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                StudyGroup.addStudy(siteAdapter);
+                StudyGroup.addStudy(siteAdapter, true);
             }
         });
 
@@ -148,12 +148,12 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setClient(studiesTable);
     }
 
-    public void createClinicSection() {
+    private void createClinicSection() {
         Section section = createSection("Clinics");
         addSectionToolbar(section, "Add Clinic", new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ClinicGroup.addClinic(siteAdapter);
+                ClinicGroup.addClinic(siteAdapter, true);
             }
         });
 
@@ -170,7 +170,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    ContainerTypeGroup.addContainerType(siteAdapter);
+                    ContainerTypeGroup.addContainerType(siteAdapter, true);
                 }
             });
 
@@ -188,7 +188,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         addSectionToolbar(section, "Add Container", new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ContainerGroup.addContainer(siteAdapter);
+                ContainerGroup.addContainer(siteAdapter, true);
             }
         });
 
@@ -224,8 +224,4 @@ public class SiteViewForm extends AddressViewFormCommon {
         }
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return SiteEntryForm.ID;
-    }
 }

@@ -7,10 +7,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.AliquotViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AliquotAdapter extends AdapterBase {
@@ -19,7 +18,7 @@ public class AliquotAdapter extends AdapterBase {
         super(parent, sample);
     }
 
-    public AliquotWrapper getSample() {
+    public AliquotWrapper getAliquot() {
         return (AliquotWrapper) modelObject;
     }
 
@@ -30,9 +29,9 @@ public class AliquotAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        AliquotWrapper sample = getSample();
-        Assert.isNotNull(sample, "sample is null");
-        return sample.getInventoryId();
+        AliquotWrapper aliquot = getAliquot();
+        Assert.isNotNull(aliquot, "sample is null");
+        return aliquot.getInventoryId();
     }
 
     @Override
@@ -46,13 +45,8 @@ public class AliquotAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        openForm(new FormInput(this), AliquotViewForm.ID);
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Aliquot", AliquotViewForm.ID);
+        addViewMenu(menu, "Aliquot");
     }
 
     @Override
@@ -74,6 +68,16 @@ public class AliquotAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return AliquotViewForm.ID;
     }
 
 }

@@ -40,6 +40,7 @@ public class SelectMultipleWidget extends BiobankWidget {
     public void setSelections(String[] values) {
         if (values == null)
             return;
+
         List<String> valuesToSelect = Arrays.asList(values);
         for (String value : checkBoxes.keySet()) {
             Button b = checkBoxes.get(value);

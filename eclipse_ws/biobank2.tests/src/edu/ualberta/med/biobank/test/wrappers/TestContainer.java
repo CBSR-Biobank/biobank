@@ -844,22 +844,22 @@ public class TestContainer extends TestDatabase {
         // reload because we changed container type
         childL3.reload();
         PatientVisitWrapper pv = addPatientVisit();
-        AliquotWrapper sample;
+        AliquotWrapper aliquot;
 
         for (SampleTypeWrapper st : allSampleTypes) {
-            sample = AliquotHelper.newAliquot(st, childL3, pv, 0, 0);
+            aliquot = AliquotHelper.newAliquot(st, childL3, pv, 0, 0);
             if (selectedSampleTypes.contains(st)) {
-                Assert.assertTrue(childL3.canHoldAliquot(sample));
+                Assert.assertTrue(childL3.canHoldAliquot(aliquot));
             } else {
-                Assert.assertTrue(!childL3.canHoldAliquot(sample));
+                Assert.assertTrue(!childL3.canHoldAliquot(aliquot));
             }
         }
 
-        sample = AliquotHelper.newAliquot(null, childL3, pv, 0, 0);
+        aliquot = AliquotHelper.newAliquot(null, childL3, pv, 0, 0);
         try {
-            childL3.canHoldAliquot(sample);
+            childL3.canHoldAliquot(aliquot);
             Assert
-                .fail("should not be allowed to add sample with null sample type");
+                .fail("should not be allowed to add aliquot with null sample type");
         } catch (WrapperException e) {
             Assert.assertTrue(true);
         }
@@ -908,7 +908,7 @@ public class TestContainer extends TestDatabase {
                     Assert.assertNull(childL3.getAliquot(row, col));
                     try {
                         childL3.addAliquot(row, col, AliquotHelper
-                            .newSample(sampleType));
+                            .newAliquot(sampleType));
                         Assert
                             .fail("should not be allowed to add invalid sample type");
                     } catch (Exception e) {
@@ -919,20 +919,20 @@ public class TestContainer extends TestDatabase {
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
                 childL3.addAliquot(row, col, AliquotHelper
-                    .newSample(sampleType));
-                AliquotWrapper sample = childL3.getAliquot(row, col);
-                sample.setPatientVisit(pv);
-                sample.persist();
+                    .newAliquot(sampleType));
+                AliquotWrapper aliquot = childL3.getAliquot(row, col);
+                aliquot.setPatientVisit(pv);
+                aliquot.persist();
             }
         }
         childL3.persist();
         childL3.reload();
 
-        // attempt to add sample where there already is one
+        // attempt to add aliquot where there already is one
         sampleType = selectedSampleTypes.get(r.nextInt(selectedSampleTypes
             .size()));
         try {
-            childL3.addAliquot(0, 0, AliquotHelper.newSample(sampleType));
+            childL3.addAliquot(0, 0, AliquotHelper.newAliquot(sampleType));
             Assert
                 .fail("should not be allowed to add second sample type in same position");
         } catch (Exception e) {
@@ -941,24 +941,24 @@ public class TestContainer extends TestDatabase {
 
         // force samples to be loaded from DB
         childL3 = containerMap.get("ChildL2").getChild(0, 0);
-        Map<RowColPos, AliquotWrapper> samples = childL3.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = childL3.getAliquots();
         Assert.assertEquals(samplesTypesMap.size(), samples.size());
         for (RowColPos pos : samples.keySet()) {
-            AliquotWrapper sample = samples.get(pos);
+            AliquotWrapper aliquot = samples.get(pos);
             Assert.assertTrue((pos.row >= 0)
                 && (pos.row < CONTAINER_CHILD_L3_ROWS));
             Assert.assertTrue((pos.col >= 0)
                 && (pos.col < CONTAINER_CHILD_L3_COLS));
-            Assert.assertEquals(samplesTypesMap.get(pos), sample
+            Assert.assertEquals(samplesTypesMap.get(pos), aliquot
                 .getSampleType());
         }
 
         for (int row = 0, maxRow = childL3.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = childL3.getColCapacity(); col < maxCol; ++col) {
-                AliquotWrapper sample = childL3.getAliquot(row, col);
+                AliquotWrapper aliquot = childL3.getAliquot(row, col);
                 Assert.assertEquals(samplesTypesMap
-                    .get(new RowColPos(row, col)), sample.getSampleType());
-                sample.delete();
+                    .get(new RowColPos(row, col)), aliquot.getSampleType());
+                aliquot.delete();
                 childL3.reload();
                 Assert.assertNull(childL3.getAliquot(row, col));
             }
@@ -1345,7 +1345,7 @@ public class TestContainer extends TestDatabase {
     public void testDelete() throws Exception {
         addContainerHierarchy(containerMap.get("Top"));
 
-        // add a sample to childL4
+        // add a aliquot to childL4
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
         PatientVisitWrapper pv = addPatientVisit();
@@ -1353,7 +1353,7 @@ public class TestContainer extends TestDatabase {
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
         childL4.getContainerType().persist();
-        AliquotWrapper sample = AliquotHelper.addAliquot(sampleType, childL4,
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType, childL4,
             pv, 0, 0);
 
         // attempt to delete the containers - should fail
@@ -1374,7 +1374,7 @@ public class TestContainer extends TestDatabase {
         }
 
         // now delete again - should work this time
-        sample.delete();
+        aliquot.delete();
         for (String name : names) {
             ContainerWrapper container = containerMap.get(name);
             container.reload();

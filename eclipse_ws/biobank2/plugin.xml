@@ -80,7 +80,6 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
-            fixed="true"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.perspective.patients"
             name="Patients View">
@@ -150,7 +149,7 @@
       </command>
       <category
             id="edu.ualberta.med.biobank.category.patientsAdmin"
-            name="Patients Administration">
+            name="Patient Administration">
       </category>
       <command
             id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
@@ -201,10 +200,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
-         <state
-               class="org.eclipse.ui.handlers.RegistryToggleState:false"
-               id="org.eclipse.ui.commands.toggleState">
-         </state>
       </command>
    </extension>
    <extension
@@ -559,8 +554,8 @@
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
+                     icon="icons/clinics_add.png"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
-                  icon="icons/clinics_add.png"
                      label="Add Clinic"
                      style="push">
                </command>
@@ -765,7 +760,7 @@
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
                   label="Search"
-                  style="toggle"
+                  style="push"
                   tooltip="Search">
                <visibleWhen
                      checkEnabled="false">
@@ -1057,12 +1052,12 @@
                visible="true">
          </view>
          <view
-               closeable="false"
+               closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
-               ratio="0.15"
-               relationship="top"
+               ratio="0.85"
+               relationship="bottom"
                relative="edu.ualberta.med.biobank.views.SessionsView"
                showTitle="true"
                standalone="false"
@@ -1121,12 +1116,12 @@
                visible="true">
          </view>
          <view
-               closeable="false"
+               closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
-               ratio="0.15"
-               relationship="top"
+               ratio="0.85"
+               relationship="bottom"
                relative="edu.ualberta.med.biobank.views.PatientsAdminView"
                showTitle="true"
                standalone="false"
@@ -1185,12 +1180,12 @@
                visible="true">
          </view>
          <view
-               closeable="false"
+               closeable="true"
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
-               ratio="0.15"
-               relationship="top"
+               ratio="0.85"
+               relationship="bottom"
                relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
                showTitle="true"
                standalone="false"
@@ -1522,7 +1517,7 @@
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.SessionsView"
             id="edu.ualberta.med.biobank.views.SessionsView"
-            name="Sessions"
+            name="Administration"
             restorable="true">
       </view>
       <view
@@ -1538,14 +1533,14 @@
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.PatientsAdminView"
-            name="Patients administration"
+            name="Patient administration"
             restorable="true">
       </view>
       <view
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
             icon="icons/shipmentPerpective.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
-            name="Shipments administration"
+            name="Shipment Administration"
             restorable="true">
       </view>
       <view

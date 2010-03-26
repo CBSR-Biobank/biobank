@@ -24,19 +24,19 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
      */
     private boolean isSaved = false;
 
-    private static Logger logger;
+    private static Logger activityLogger;
     private static ActivityLogAppender appender;
 
     @Override
     protected void init() {
-        if (logger == null) {
-            logger = Logger.getLogger(ActivityLogAppender.class.getPackage()
-                .getName());
-            logger.setLevel(Level.TRACE);
+        if (activityLogger == null) {
+            activityLogger = Logger.getLogger(ActivityLogAppender.class
+                .getPackage().getName());
+            activityLogger.setLevel(Level.TRACE);
         }
         if (appender == null) {
             appender = new ActivityLogAppender(getActivityTitle());
-            logger.addAppender(appender);
+            activityLogger.addAppender(appender);
         }
     }
 
@@ -50,7 +50,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
                     print();
                 }
             }
-            logger.removeAppender(appender);
+            activityLogger.removeAppender(appender);
             appender.close();
             appender = null;
             return true;
@@ -79,9 +79,13 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     protected abstract String getActivityTitle();
 
     public void appendLog(String message) {
-        if (logger != null) {
-            logger.trace(message);
+        if (activityLogger != null) {
+            activityLogger.trace(message);
         }
+    }
+
+    public void appendLogNLS(String key, Object... params) {
+        appendLog(Messages.getFormattedString(key, params));
     }
 
     protected void setSaved(boolean saved) {

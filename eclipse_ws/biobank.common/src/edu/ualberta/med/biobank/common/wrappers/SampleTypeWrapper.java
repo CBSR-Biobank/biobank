@@ -126,17 +126,17 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     /**
      * get all sample types in a site for containers which type name contains
-     * "typeNameContains"
+     * "typeNameContains" (go recursively inside found containers)
      */
     public static List<SampleTypeWrapper> getSampleTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
-        List<ContainerTypeWrapper> types = ContainerTypeWrapper
+        List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
                 false);
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
-        for (ContainerTypeWrapper type : types) {
-            sampleTypes.addAll(type.getSampleTypesRecursively());
+        for (ContainerTypeWrapper containerType : containerTypes) {
+            sampleTypes.addAll(containerType.getSampleTypesRecursively());
         }
         return new ArrayList<SampleTypeWrapper>(sampleTypes);
     }

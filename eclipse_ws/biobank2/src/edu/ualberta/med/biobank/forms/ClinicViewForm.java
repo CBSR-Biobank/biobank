@@ -143,8 +143,4 @@ public class ClinicViewForm extends AddressViewFormCommon {
         studiesTable.setCollection(clinic.getStudyCollection());
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return ClinicEntryForm.ID;
-    }
 }

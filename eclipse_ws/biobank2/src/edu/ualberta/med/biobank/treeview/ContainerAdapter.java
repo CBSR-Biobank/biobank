@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -74,13 +73,13 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void executeDoubleClick() {
         performExpand();
-        openForm(new FormInput(this), ContainerViewForm.ID);
+        openViewForm();
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Container", ContainerEntryForm.ID);
-        addViewMenu(menu, "Container", ContainerViewForm.ID);
+        addEditMenu(menu, "Container");
+        addViewMenu(menu, "Container");
 
         Boolean topLevel = getContainer().getContainerType().getTopLevel();
         if (topLevel == null || !topLevel) {
@@ -217,6 +216,16 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
         return getContainer().getChildren().values();
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return ContainerEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return ContainerViewForm.ID;
     }
 
 }

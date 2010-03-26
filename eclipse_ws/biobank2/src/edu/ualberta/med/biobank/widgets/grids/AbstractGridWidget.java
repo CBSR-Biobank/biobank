@@ -123,7 +123,7 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
         int indexRow, int indexCol) {
         if (selection != null && selection.row == indexRow
             && selection.col == indexCol) {
-            Color color = e.display.getSystemColor(SWT.COLOR_RED);
+            Color color = e.display.getSystemColor(SWT.COLOR_YELLOW);
             e.gc.setBackground(color);
             e.gc.fillRectangle(rectangle);
         }

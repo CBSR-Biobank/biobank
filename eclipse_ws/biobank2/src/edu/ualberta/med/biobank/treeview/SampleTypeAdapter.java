@@ -29,10 +29,6 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
 
     }
@@ -60,6 +56,16 @@ public class SampleTypeAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
+        return null;
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
         return null;
     }
 

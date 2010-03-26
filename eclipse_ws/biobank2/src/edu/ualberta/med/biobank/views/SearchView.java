@@ -8,12 +8,16 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
@@ -59,6 +63,14 @@ public class SearchView extends ViewPart {
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         searchText.setLayoutData(gd);
+        searchText.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.keyCode == 13) {
+                    search();
+                }
+            }
+        });
 
         searchButton = new Button(parent, SWT.PUSH);
         searchButton.setText("Search");
@@ -120,32 +132,42 @@ public class SearchView extends ViewPart {
     }
 
     private void search() {
-        String searchString = searchText.getText();
-        SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
-            .getSelection()).getFirstElement();
-        try {
-            List<? extends ModelWrapper<?>> res = type.search(searchString);
-            if (res != null && res.size() > 0) {
-                int size = res.size();
-                if (size == 1) {
-                    openResult(res.get(0));
-                } else {
-                    boolean open = MessageDialog.openQuestion(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        "Search Result", "Found " + size
-                            + " results. Do you want to open all of them ?");
-                    if (open) {
-                        for (ModelWrapper<?> wrapper : res) {
-                            openResult(wrapper);
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                String searchString = searchText.getText();
+                SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
+                    .getSelection()).getFirstElement();
+                try {
+                    List<? extends ModelWrapper<?>> res = type
+                        .search(searchString);
+                    if (res != null && res.size() > 0) {
+                        int size = res.size();
+                        if (size == 1) {
+                            openResult(res.get(0));
+                        } else {
+                            boolean open = MessageDialog
+                                .openQuestion(
+                                    PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow().getShell(),
+                                    "Search Result",
+                                    "Found "
+                                        + size
+                                        + " results. Do you want to open all of them ?");
+                            if (open) {
+                                for (ModelWrapper<?> wrapper : res) {
+                                    openResult(wrapper);
+                                }
+                            }
                         }
+                    } else {
+                        BioBankPlugin.openInformation("Search Result",
+                            "no result");
                     }
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Search error", ex);
                 }
-            } else {
-                BioBankPlugin.openInformation("Search Result", "no result");
             }
-        } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Search error", ex);
-        }
+        });
     }
 
     public void openResult(ModelWrapper<?> wrapper) {
