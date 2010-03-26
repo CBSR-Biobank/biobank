@@ -95,6 +95,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private boolean patientNumberTextModified = false;
 
+    private Composite fieldsComposite;
+
     @Override
     protected void init() {
         super.init();
@@ -336,7 +338,11 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createFieldsComposite() throws Exception {
-        Composite fieldsComposite = toolkit.createComposite(form.getBody());
+        Composite leftSideComposite = toolkit.createComposite(form.getBody());
+        leftSideComposite.setLayout(new GridLayout(2, false));
+        toolkit.paintBordersFor(leftSideComposite);
+
+        fieldsComposite = toolkit.createComposite(leftSideComposite);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         fieldsComposite.setLayout(layout);
@@ -344,6 +350,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         GridData gd = new GridData();
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
+        gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
         patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -363,7 +370,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                reset(false);
                 patientNumberTextModified = true;
             }
         });
@@ -372,9 +378,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
         createVisitCombo(fieldsComposite);
 
-        createScanComponents(fieldsComposite);
+        createPlateToScanField(fieldsComposite);
 
-        createTypesSelectionSection(fieldsComposite);
+        createScanButton(leftSideComposite);
+
+        createTypesSelectionSection(leftSideComposite);
+
     }
 
     @Override
@@ -650,6 +659,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     public void reset() throws Exception {
         reset(true);
+        fieldsComposite.setEnabled(true);
     }
 
     public void reset(boolean resetAll) {
@@ -678,6 +688,11 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     protected String getActivityTitle() {
         return "Scan link activity"; //$NON-NLS-1$
+    }
+
+    @Override
+    protected void disableFields() {
+        fieldsComposite.setEnabled(false);
     }
 
 }
