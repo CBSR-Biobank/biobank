@@ -38,7 +38,7 @@ public class PatientVisitSummary extends QueryObject {
         + " as patients where patients.shipment.clinic=c.clinic and patients.patient.study=s and patients.dateProcessed between ? and ?)"
         + " from "
         + Study.class.getName()
-        + " as s inner join s.contactCollection as c where s.site.id {1} {0,number,#}";
+        + " as s inner join s.contactCollection as c where s.site.id {1} {0,number,#} ORDER BY s.nameShort";
 
     public PatientVisitSummary(String op, Integer siteId) {
         super(
