@@ -269,6 +269,7 @@ public class QueryTree extends TreeViewer {
             .getNodeInfo().getType());
         basicSelects.putAll(extraSelectClauses);
         extraSelectClauses = basicSelects;
+        // Random comment
 
         String selectClause = "select ";
         for (String key : extraSelectClauses.keySet()) {
