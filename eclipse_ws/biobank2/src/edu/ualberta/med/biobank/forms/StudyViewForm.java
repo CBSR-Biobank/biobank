@@ -226,8 +226,4 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.setCollection(study.getContactCollection());
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return StudyEntryForm.ID;
-    }
 }

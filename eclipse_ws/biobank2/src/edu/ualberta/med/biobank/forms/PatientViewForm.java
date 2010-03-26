@@ -103,8 +103,4 @@ public class PatientViewForm extends BiobankViewForm {
         visitsTable.setCollection(patient.getPatientVisitCollection());
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return PatientEntryForm.ID;
-    }
 }

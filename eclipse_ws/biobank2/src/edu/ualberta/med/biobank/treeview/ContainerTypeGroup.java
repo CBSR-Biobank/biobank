@@ -15,8 +15,6 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ContainerTypeGroup extends AdapterBase {
@@ -43,7 +41,7 @@ public class ContainerTypeGroup extends AdapterBase {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 addContainerType(ContainerTypeGroup.this
-                    .getParentFromClass(SiteAdapter.class));
+                    .getParentFromClass(SiteAdapter.class), false);
             }
         });
     }
@@ -84,13 +82,24 @@ public class ContainerTypeGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addContainerType(SiteAdapter siteAdapter) {
+    public static void addContainerType(SiteAdapter siteAdapter,
+        boolean hasPreviousForm) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(siteAdapter
             .getAppService());
         ct.setSite(siteAdapter.getWrapper());
         ContainerTypeAdapter adapter = new ContainerTypeAdapter(siteAdapter
             .getContainerTypesGroupNode(), ct);
-        openForm(new FormInput(adapter), ContainerTypeEntryForm.ID);
+        adapter.openEntryForm(hasPreviousForm);
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return null;
     }
 
 }

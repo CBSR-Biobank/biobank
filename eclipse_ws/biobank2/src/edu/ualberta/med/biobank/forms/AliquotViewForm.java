@@ -170,9 +170,4 @@ public class AliquotViewForm extends BiobankViewForm {
         form.setText("Aliquot: " + aliquot.getInventoryId());
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return null;
-    }
-
 }

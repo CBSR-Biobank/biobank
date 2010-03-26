@@ -59,10 +59,6 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Add Repository Site");
@@ -129,6 +125,16 @@ public class SessionAdapter extends AdapterBase {
         }
         return new ArrayList<SiteWrapper>(SiteWrapper.getSites(appService,
             siteId));
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return null;
     }
 
 }

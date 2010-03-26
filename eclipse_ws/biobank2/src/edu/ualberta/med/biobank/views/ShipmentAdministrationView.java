@@ -10,12 +10,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
-import edu.ualberta.med.biobank.forms.PatientEntryForm;
-import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
@@ -86,19 +81,18 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 .getAppService());
             shipment.setWaybill(text);
             ShipmentAdapter adapter = new ShipmentAdapter(rootNode, shipment);
-            AdapterBase.openForm(new FormInput(adapter), ShipmentEntryForm.ID);
+            adapter.openEntryForm();
         }
     }
 
     public void displayPatient(PatientWrapper patient) {
         PatientAdapter patientAdapter = new PatientAdapter(
             currentInstance.rootNode, patient, false);
-        FormInput input = new FormInput(patientAdapter);
         if (patient.isNew()) {
-            AdapterBase.openForm(input, PatientEntryForm.ID);
+            patientAdapter.openEntryForm(true);
         } else {
             patientAdapter.setEditable(false);
-            AdapterBase.openForm(input, PatientViewForm.ID);
+            patientAdapter.openViewForm();
         }
     }
 
