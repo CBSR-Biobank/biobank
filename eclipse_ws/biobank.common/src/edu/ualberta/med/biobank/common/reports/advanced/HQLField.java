@@ -6,11 +6,13 @@ public class HQLField {
     private String path;
     private Object value;
     private String operator;
+    private Boolean display;
 
     public HQLField(String path, String fname, Class<?> type) {
         this.fname = fname;
         this.type = type;
         this.path = path;
+        this.display = false;
     }
 
     public HQLField(HQLField nodeInfo) {
@@ -49,6 +51,14 @@ public class HQLField {
 
     public void setFname(String newName) {
         this.fname = newName;
+    }
+
+    public void setDisplay(Boolean display) {
+        this.display = display;
+    }
+
+    public Boolean getDisplay() {
+        return display;
     }
 
 }

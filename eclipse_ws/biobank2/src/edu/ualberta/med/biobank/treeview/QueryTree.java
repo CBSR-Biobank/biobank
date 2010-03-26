@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -32,8 +32,12 @@ import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 
 public class QueryTree extends TreeViewer {
 
+    private HashMap<String, String> extraSelectClauses;
+
     public QueryTree(Composite parent, int style, QueryTreeNode node) {
         super(parent, style);
+
+        extraSelectClauses = new HashMap<String, String>();
 
         this.setContentProvider(new ITreeContentProvider() {
 
@@ -251,26 +255,31 @@ public class QueryTree extends TreeViewer {
         }
     }
 
-    public String compileQuery(Collection<String> properties) {
+    public String compileQuery() {
         HashSet<String> fromClauses = new HashSet<String>();
         List<String> whereClauses = new ArrayList<String>();
 
         QueryTreeNode root = (QueryTreeNode) this.getInput();
         Class<?> type = root.getNodeInfo().getType();
+
+        extraSelectClauses.putAll(SearchUtils.getColumnInfo(root.getNodeInfo()
+            .getType()));
+        addClausesForNode(root, whereClauses);
+        generateSubClauses(root, whereClauses, fromClauses);
+
         String selectClause = "select ";
-        for (String property : properties) {
-            selectClause += type.getSimpleName().toLowerCase() + "." + property
-                + ", ";
+        for (String key : extraSelectClauses.keySet()) {
+            selectClause += key + "." + extraSelectClauses.get(key) + ", ";
         }
         selectClause = selectClause.substring(0, selectClause.length() - 2)
             + " from " + type.getName() + " "
             + type.getSimpleName().toLowerCase();
-        addClausesForNode(root, whereClauses);
-        generateSubClauses(root, whereClauses, fromClauses);
+
         String hqlString = selectClause + compileFromClause(fromClauses);
         String where = compileWhereClause(whereClauses);
         if (where != null)
             hqlString = hqlString + " where " + where;
+
         System.out.println(hqlString);
         return hqlString;
     }
@@ -400,6 +409,10 @@ public class QueryTree extends TreeViewer {
     public void addClause(HQLField field, List<String> clauseList) {
         clauseList.add(getHQLExpression(field.getPath() + field.getFname(),
             field.getOperator(), field.getValue()));
+        if (field.getDisplay())
+            extraSelectClauses.put(field.getFname().substring(0, 1)
+                .toUpperCase()
+                + field.getFname().substring(1), field.getFname());
     }
 
     public void saveTree(String path, String name) {
@@ -410,4 +423,7 @@ public class QueryTree extends TreeViewer {
         }
     }
 
+    public HashMap<String, String> getSelectClauses() {
+        return extraSelectClauses;
+    }
 }

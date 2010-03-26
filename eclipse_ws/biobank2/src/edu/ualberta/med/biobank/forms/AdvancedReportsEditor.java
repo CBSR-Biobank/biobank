@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,8 +89,6 @@ public class AdvancedReportsEditor extends EditorPart {
     private QueryTree tree;
     private QueryTreeNode selectedNode;
 
-    private static Map<Class<?>, int[]> columnWidths;
-
     @Override
     public void init(IEditorSite site, IEditorInput input)
         throws PartInitException {
@@ -103,8 +100,6 @@ public class AdvancedReportsEditor extends EditorPart {
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
 
-        columnWidths = SearchUtils.getColumnWidths();
-        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
@@ -240,7 +235,7 @@ public class AdvancedReportsEditor extends EditorPart {
         parameterSection = new Composite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
-        gl.numColumns = 4;
+        gl.numColumns = 5;
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.TOP;
@@ -249,7 +244,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
         Label headerLabel = new Label(parameterSection, SWT.NONE);
         GridData gdl = new GridData();
-        gdl.horizontalSpan = 4;
+        gdl.horizontalSpan = 5;
         headerLabel.setLayoutData(gdl);
         headerLabel.setText(node.getTreePath());
 
@@ -321,14 +316,21 @@ public class AdvancedReportsEditor extends EditorPart {
                 displayFields(selectedNode);
             }
         });
+
+        final Button box = new Button(parameterSection, SWT.CHECK);
+        box.setText("Include in results");
+        box.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                field.setDisplay(box.getSelection());
+            }
+        });
+
     }
 
     private void generate() {
 
         saveFields();
-        final HashMap<String, String> colInfo = SearchUtils
-            .getColumnInfo(((QueryTreeNode) node.getQuery()).getNodeInfo()
-                .getType());
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -341,8 +343,7 @@ public class AdvancedReportsEditor extends EditorPart {
                         public void run() {
                             try {
                                 QueryObject tempQuery = new CustomQueryObject(
-                                    null, tree.compileQuery(colInfo.values()),
-                                    new String[] {});
+                                    null, tree.compileQuery(), new String[] {});
                                 reportData = tempQuery.generate(SessionManager
                                     .getAppService(), null);
                                 if (reportData.size() >= 1000)
@@ -383,12 +384,14 @@ public class AdvancedReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
+                            String[] names = tree.getSelectClauses().keySet()
+                                .toArray(new String[] {});
                             reportTable.dispose();
+                            int[] headingSizes = new int[names.length];
+                            for (int i = 0; i < names.length; i++)
+                                headingSizes[i] = 100;
                             reportTable = new SearchResultsInfoTable(top,
-                                reportData, colInfo.keySet().toArray(
-                                    new String[] {}), columnWidths
-                                    .get(((QueryTreeNode) node.getQuery())
-                                        .getNodeInfo().getType()));
+                                reportData, names, headingSizes);
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;
