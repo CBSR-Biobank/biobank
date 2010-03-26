@@ -581,7 +581,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
             .getCells();
         PatientVisitWrapper patientVisit = getSelectedPatientVisit();
-        StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:"); //$NON-NLS-1$
+        StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:\n"); //$NON-NLS-1$
         int nber = 0;
         StudyWrapper study = patientVisit.getPatient().getStudy();
         List<SampleStorageWrapper> sampleStorages = study

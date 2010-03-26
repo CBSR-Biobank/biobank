@@ -382,7 +382,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     }
 
-    private void closeEntryOpenView(boolean saveOnClose, boolean openView) {
+    protected void closeEntryOpenView(boolean saveOnClose, boolean openView) {
         int entryIndex = linkedForms.indexOf(this);
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
             .closeEditor(this, saveOnClose);
@@ -391,7 +391,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 getNextOpenedFormID());
 
             int previousFormIndex = entryIndex - 1;
-            if (previousFormIndex >= 0 && previousFormIndex < linkedForms.size()) {
+            if (previousFormIndex >= 0
+                && previousFormIndex < linkedForms.size()) {
                 BiobankFormBase form = linkedForms.get(previousFormIndex);
                 IWorkbenchPage page = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage();
@@ -403,7 +404,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public void cancel() {
         try {
             adapter.resetObject();
-            boolean openView = !adapter.getModelObject().isNew();
+            boolean openView = adapter.getModelObject() != null
+                && !adapter.getModelObject().isNew();
             closeEntryOpenView(false, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e);
