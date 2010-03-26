@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 
 public class AliquotCount extends QueryObject {
 
-    protected static final String NAME = "Aliquot Type Totals";
+    protected static final String NAME = "Sample Type Totals";
 
     public AliquotCount(String op, Integer siteId) {
         super("Lists the total number of aliquots per sample type.",
