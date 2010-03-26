@@ -18,8 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class PatientAdapter extends AdapterBase {
 
@@ -61,13 +59,13 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public void executeDoubleClick() {
         performExpand();
-        openForm(new FormInput(this), PatientViewForm.ID);
+        openViewForm();
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Patient", PatientEntryForm.ID);
-        addViewMenu(menu, "Patient", PatientViewForm.ID);
+        addEditMenu(menu, "Patient");
+        addViewMenu(menu, "Patient");
 
         if (enableActions) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -79,7 +77,7 @@ public class PatientAdapter extends AdapterBase {
                         PatientAdapter.this, new PatientVisitWrapper(
                             getAppService()));
                     adapter.getWrapper().setPatient(getWrapper());
-                    openForm(new FormInput(adapter), PatientVisitEntryForm.ID);
+                    adapter.openEntryForm();
                 }
             });
         }
@@ -106,5 +104,15 @@ public class PatientAdapter extends AdapterBase {
         throws Exception {
         getWrapper().reload();
         return getWrapper().getPatientVisitCollection();
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return PatientEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return PatientViewForm.ID;
     }
 }

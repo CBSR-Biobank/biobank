@@ -107,7 +107,10 @@ public class QueryTreeNode extends Object {
         xStream.alias("QueryTreeNode", QueryTreeNode.class);
         File file = new File(path);
         file.mkdirs();
-        FileWriter fw = new FileWriter(file + "/" + name + ".xml");
+        FileWriter fw = new FileWriter(file + "/"
+            + this.getNodeInfo().getType().getSimpleName() + "_" + name
+            + ".xml");
+
         fw.write(xStream.toXML(this));
         fw.close();
     }
@@ -120,6 +123,8 @@ public class QueryTreeNode extends Object {
         while (reader.ready()) {
             xml += reader.readLine();
         }
+        reader.close();
         return (QueryTreeNode) xStream.fromXML(xml);
+
     }
 }

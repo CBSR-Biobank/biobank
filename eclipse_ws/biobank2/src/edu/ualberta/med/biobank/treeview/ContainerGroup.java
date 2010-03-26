@@ -21,8 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.ContainerEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -53,7 +51,7 @@ public class ContainerGroup extends AdapterBase {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 addContainer(ContainerGroup.this
-                    .getParentFromClass(SiteAdapter.class));
+                    .getParentFromClass(SiteAdapter.class), false);
             }
         });
     }
@@ -93,7 +91,8 @@ public class ContainerGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addContainer(SiteAdapter siteAdapter) {
+    public static void addContainer(SiteAdapter siteAdapter,
+        boolean hasPreviousForm) {
         try {
             List<ContainerTypeWrapper> top = ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
@@ -110,12 +109,22 @@ public class ContainerGroup extends AdapterBase {
                 c.setSite(siteAdapter.getWrapper());
                 ContainerAdapter adapter = new ContainerAdapter(siteAdapter
                     .getContainersGroupNode(), c);
-                openForm(new FormInput(adapter), ContainerEntryForm.ID);
+                adapter.openEntryForm(hasPreviousForm);
             }
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return null;
     }
 }

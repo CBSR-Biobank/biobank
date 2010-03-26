@@ -320,19 +320,22 @@ public class QueryTree extends TreeViewer {
                         whereClauses.addAll(leftList);
                 } else if (rightList.size() > 0)
                     whereClauses.addAll(rightList);
-                addedFields = addedLFields || addedRFields;
-                addedChildren = addedLChildren || addedRChildren;
+                addedFields = addedFields || addedLFields || addedRFields;
+                addedChildren = addedChildren || addedLChildren
+                    || addedRChildren;
             } else {
-                addedFields = addClausesForNode(child, whereClauses);
-                addedChildren = generateSubClauses(child, whereClauses,
-                    fromClauses);
-                if ((addedFields || addedChildren)
+                Boolean addedSubFields = addClausesForNode(child, whereClauses);
+                Boolean addedSubChildren = generateSubClauses(child,
+                    whereClauses, fromClauses);
+                if ((addedSubFields || addedSubChildren)
                     && child.getNodeInfo().getFname().contains("Collection")) {
                     fromClauses.add(child.getNodeInfo().getPath()
                         + child.getNodeInfo().getFname() + " as "
                         + child.getNodeInfo().getPath().replace(".", "_")
                         + child.getNodeInfo().getFname());
                 }
+                addedFields = addedFields || addedSubFields;
+                addedChildren = addedChildren || addedSubChildren;
             }
         }
         return (addedFields || addedChildren);

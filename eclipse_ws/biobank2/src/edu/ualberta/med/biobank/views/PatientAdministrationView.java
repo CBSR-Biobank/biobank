@@ -5,10 +5,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.forms.PatientEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -75,7 +72,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
                 .getAppService());
             patient.setPnumber(text);
             PatientAdapter adapter = new PatientAdapter(rootNode, patient);
-            AdapterBase.openForm(new FormInput(adapter), PatientEntryForm.ID);
+            adapter.openEntryForm();
         }
     }
 

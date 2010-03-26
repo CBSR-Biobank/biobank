@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.listener;
 
-public class WrapperAdapter implements WrapperListener {
+public class WrapperListenerAdapter implements WrapperListener {
 
     @Override
     public void deleted(WrapperEvent event) {

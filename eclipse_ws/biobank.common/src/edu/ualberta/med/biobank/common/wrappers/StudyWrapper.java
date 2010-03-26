@@ -568,8 +568,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
         deletedStudyPvAttr.remove(studyPvAttr);
 
-        studyPvAttr.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        studyPvAttr.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
         studyPvAttrMap.put(label, studyPvAttr);
     }

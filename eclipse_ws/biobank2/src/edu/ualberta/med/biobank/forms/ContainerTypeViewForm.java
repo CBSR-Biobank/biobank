@@ -216,8 +216,4 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setChildContainerTypesValues();
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return ContainerTypeEntryForm.ID;
-    }
 }

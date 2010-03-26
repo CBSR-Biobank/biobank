@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class SiteAdapter extends AdapterBase {
 
@@ -71,16 +70,9 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        if (enableActions) {
-            openForm(new FormInput(this), SiteViewForm.ID);
-        }
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Site", SiteEntryForm.ID);
-        addViewMenu(menu, "Site", SiteViewForm.ID);
+        addEditMenu(menu, "Site");
+        addViewMenu(menu, "Site");
         addDeleteMenu(menu, "Site", DEL_CONFIRM_MSG);
     }
 
@@ -113,6 +105,16 @@ public class SiteAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return SiteEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return SiteViewForm.ID;
     }
 
 }

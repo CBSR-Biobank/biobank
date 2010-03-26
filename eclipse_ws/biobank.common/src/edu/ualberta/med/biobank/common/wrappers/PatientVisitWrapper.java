@@ -88,8 +88,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             if (children != null) {
                 aliquotCollection = new ArrayList<AliquotWrapper>();
                 for (Aliquot aliquot : children) {
-                    aliquotCollection
-                        .add(new AliquotWrapper(appService, aliquot));
+                    aliquotCollection.add(new AliquotWrapper(appService,
+                        aliquot));
                 }
                 propertiesMap.put("aliquotCollection", aliquotCollection);
             }
@@ -254,7 +254,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         }
 
-        if (!studyPvAttr.getActivityStatus().getName().equals("Active")) {
+        if (!studyPvAttr.getActivityStatus().isActive()) {
             throw new Exception("attribute for label \"" + label
                 + "\" is locked, changes not premitted");
         }
