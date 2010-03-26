@@ -241,7 +241,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyPvAttrCustom.setLabel(label);
             studyPvAttrCustom.setType(site.getSitePvAttrTypeName(label));
             if (studyPvInfoLabels.contains(label)) {
-                studyPvAttrCustom.setPermissible(study
+                studyPvAttrCustom.setAllowedValues(study
                     .getStudyPvAttrPermissible(label));
                 selected = true;
             }
@@ -395,7 +395,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             boolean selected = false;
             String label = studyPvAttrCustom.getLabel();
             if (studyPvInfoLabels.contains(studyPvAttrCustom.getLabel())) {
-                studyPvAttrCustom.setPermissible(study
+                studyPvAttrCustom.setAllowedValues(study
                     .getStudyPvAttrPermissible(label));
                 selected = true;
                 studyPvAttrCustom.inStudy = true;
@@ -404,6 +404,5 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyPvAttrCustom.widget.setSelected(selected);
             studyPvAttrCustom.widget.reloadAllowedValues(studyPvAttrCustom);
         }
-
     }
 }

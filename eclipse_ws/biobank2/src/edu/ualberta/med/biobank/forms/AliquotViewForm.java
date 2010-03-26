@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
@@ -8,11 +9,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -41,7 +43,11 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text visitLabel;
 
+    private Text dateDrawnLabel;
+
     private Text commentLabel;
+
+    private Text positionLabel;
 
     @Override
     public void init() {
@@ -50,7 +56,7 @@ public class AliquotViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         aliquotAdapter = (AliquotAdapter) adapter;
-        aliquot = aliquotAdapter.getSample();
+        aliquot = aliquotAdapter.getAliquot();
         retrieveAliquot();
         setPartName("Aliquot: " + aliquot.getInventoryId());
     }
@@ -89,16 +95,17 @@ public class AliquotViewForm extends BiobankViewForm {
             "Shipment Waybill");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
         visitLabel = createReadOnlyField(client, SWT.NONE, "Patient Visit");
+        dateDrawnLabel = createReadOnlyField(client, SWT.NONE, "Date Drawn");
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
+        positionLabel = createReadOnlyField(client, SWT.WRAP, "Position");
     }
 
     private void createContainersSection() {
-        Composite containersComposite = toolkit.createComposite(form.getBody());
+        Section section = createSection("Containers Visualization");
+        Composite containersComposite = toolkit.createComposite(section);
+        section.setClient(containersComposite);
+        section.setExpanded(false);
         containersComposite.setLayout(new GridLayout(1, false));
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        containersComposite.setLayoutData(gd);
         toolkit.paintBordersFor(containersComposite);
 
         Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
@@ -141,9 +148,18 @@ public class AliquotViewForm extends BiobankViewForm {
             .getShipment().getWaybill());
         setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
             .getPnumber());
-        setTextValue(visitLabel, DateFormatter.formatAsDateTime(aliquot
-            .getPatientVisit().getDateProcessed()));
+        setTextValue(visitLabel, aliquot.getPatientVisit()
+            .getFormattedDateProcessed());
+        List<PvSourceVesselWrapper> sourceVessels = aliquot.getPatientVisit()
+            .getPvSourceVesselCollection();
+        if (sourceVessels.isEmpty()) {
+            setTextValue(dateDrawnLabel, "");
+        } else if (sourceVessels.size() == 1) {
+            setTextValue(dateDrawnLabel, sourceVessels.get(0)
+                .getFormattedDateDrawn());
+        }
         setTextValue(commentLabel, aliquot.getComment());
+        setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
 
     @Override
@@ -152,11 +168,6 @@ public class AliquotViewForm extends BiobankViewForm {
         setValues();
         setPartName("Aliquot: " + aliquot.getInventoryId());
         form.setText("Aliquot: " + aliquot.getInventoryId());
-    }
-
-    @Override
-    protected String getEntryFormId() {
-        return null;
     }
 
 }

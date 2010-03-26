@@ -176,7 +176,7 @@ public class StudyViewForm extends BiobankViewForm {
             combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
             combinedPvInfo.setType(study.getStudyPvAttrType(label));
-            combinedPvInfo.setPermissible(study
+            combinedPvInfo.setAllowedValues(study
                 .getStudyPvAttrPermissible(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
@@ -226,8 +226,4 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.setCollection(study.getContactCollection());
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return StudyEntryForm.ID;
-    }
 }

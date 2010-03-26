@@ -79,4 +79,8 @@ public class SampleTypeDialog extends BiobankDialog {
         super.okPressed();
     }
 
+    public SampleTypeWrapper getSampleType() {
+        return origSampleType;
+    }
+
 }

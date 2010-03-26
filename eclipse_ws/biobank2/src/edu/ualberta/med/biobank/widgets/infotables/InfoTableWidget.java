@@ -208,7 +208,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         int rowsPerPage) {
         this(parent, multilineSelection, null, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
-        addPaginationWidget();
         if (collection != null) {
             initModel(collection);
             setCollection(collection);
@@ -338,9 +337,13 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
             Double pageSize = new Double(pageInfo.rowsPerPage);
             pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
                 .intValue();
-            enablePaginationWidget();
             setPageLabelText();
+            showPaginationWidget();
             paginationRequired = true;
+        }
+
+        if (paginationRequired) {
+            enablePaginationWidget(false);
         }
 
         resizeTable();
@@ -395,6 +398,16 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                         });
                     }
                     reloadData = false;
+
+                    display.syncExec(new Runnable() {
+                        public void run() {
+                            if (!table.isDisposed()) {
+                                if (paginationRequired) {
+                                    enablePaginationWidget(true);
+                                }
+                            }
+                        }
+                    });
                 } catch (Exception e) {
                     logger.error("setCollection error", e);
                 }
@@ -556,7 +569,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_2_ARROW_LEFT));
+            BioBankPlugin.IMG_RESULTSET_FIRST));
         firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -567,7 +580,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_ARROW_LEFT));
+            BioBankPlugin.IMG_RESULTSET_PREV));
         prevButton.setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -577,13 +590,10 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         });
 
         pageLabel = new Label(paginationWidget, SWT.NONE);
-        GridData gd = new GridData(SWT.END, SWT.CENTER, false, false);
-        gd.widthHint = 80;
-        pageLabel.setLayoutData(gd);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_ARROW_RIGHT));
+            BioBankPlugin.IMG_RESULTSET_NEXT));
         nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -594,7 +604,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_2_ARROW_RIGHT));
+            BioBankPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -605,21 +615,35 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
-        gd = new GridData(SWT.END, SWT.TOP, true, true);
+        GridData gd = new GridData(SWT.END, SWT.TOP, true, true);
         gd.exclude = true;
         paginationWidget.setLayoutData(gd);
     }
 
-    private void enablePaginationWidget() {
-        if (paginationWidget.getVisible())
-            return;
-
+    private void showPaginationWidget() {
         GridData gd = (GridData) paginationWidget.getLayoutData();
         gd.exclude = false;
         paginationWidget.setVisible(true);
-        paginationWidget.setEnabled(true);
-        firstButton.setEnabled(false);
-        prevButton.setEnabled(false);
+    }
+
+    private void enablePaginationWidget(boolean enable) {
+        paginationWidget.setEnabled(enable);
+
+        if (enable && (pageInfo.page > 0)) {
+            firstButton.setEnabled(true);
+            prevButton.setEnabled(true);
+        } else {
+            firstButton.setEnabled(false);
+            prevButton.setEnabled(false);
+        }
+
+        if (enable && (pageInfo.page < pageInfo.pageTotal - 1)) {
+            lastButton.setEnabled(true);
+            nextButton.setEnabled(true);
+        } else {
+            lastButton.setEnabled(false);
+            nextButton.setEnabled(false);
+        }
         layout(true);
     }
 
@@ -673,12 +697,12 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         }
         setPageLabelText();
         setCollection(collection);
+        paginationWidget.layout(true);
     }
 
     private void setPageLabelText() {
         pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
             + pageInfo.pageTotal);
-        layout(true, true);
     }
 
     private void resizeTable() {

@@ -408,7 +408,7 @@ public class ContainerWrapper extends
     }
 
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, AliquotWrapper> getSamples() {
+    public Map<RowColPos, AliquotWrapper> getAliquots() {
         Map<RowColPos, AliquotWrapper> samples = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("samples");
         if (samples == null) {
@@ -433,14 +433,14 @@ public class ContainerWrapper extends
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public AliquotWrapper getSample(Integer row, Integer col)
+    public AliquotWrapper getAliquot(Integer row, Integer col)
         throws BiobankCheckException {
         AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
         aliquotPosition.setRow(row);
         aliquotPosition.setCol(col);
         aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, AliquotWrapper> samples = getSamples();
+        Map<RowColPos, AliquotWrapper> samples = getAliquots();
         if (samples == null) {
             return null;
         }
@@ -454,7 +454,7 @@ public class ContainerWrapper extends
         aliquotPosition.setRow(row);
         aliquotPosition.setCol(col);
         aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, AliquotWrapper> samples = getSamples();
+        Map<RowColPos, AliquotWrapper> samples = getAliquots();
         if (samples == null) {
             samples = new TreeMap<RowColPos, AliquotWrapper>();
             propertiesMap.put("aliquots", samples);
@@ -463,7 +463,7 @@ public class ContainerWrapper extends
                 + " does not allow inserts of type "
                 + aliquot.getSampleType().getName() + ".");
         } else {
-            AliquotWrapper sampleAtPosition = getSample(row, col);
+            AliquotWrapper sampleAtPosition = getAliquot(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
@@ -854,7 +854,7 @@ public class ContainerWrapper extends
             newContainer.setPosition(i, j);
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
-                .getActivityStatus(appService, "Active"));
+                .getActiveActivityStatus(appService));
             newContainer.persist();
         }
     }

@@ -1,7 +1,15 @@
 package edu.ualberta.med.biobank.common.reports.advanced;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class QueryTreeNode extends Object {
     private HQLField nodeInfo;
@@ -76,15 +84,47 @@ public class QueryTreeNode extends Object {
 
     @Override
     public QueryTreeNode clone() {
-        QueryTreeNode node = new QueryTreeNode(this.getNodeInfo());
+        QueryTreeNode node = new QueryTreeNode(new HQLField(this.getNodeInfo()));
         List<HQLField> fields = this.getFieldData();
         for (HQLField field : fields)
-            node.addField(field);
+            node.addField(new HQLField(field));
         node.setParent(this.getParent());
         List<QueryTreeNode> children = this.getChildren();
-        for (QueryTreeNode child : children)
-            node.addChild(child.clone());
+        for (QueryTreeNode child : children) {
+            QueryTreeNode childClone = child.clone();
+            node.addChild(childClone);
+            childClone.setParent(node);
+        }
         return node;
     }
 
+    public void insertField(int index, HQLField addedField) {
+        fieldData.add(index + 1, addedField);
+    }
+
+    public void saveTree(String path, String name) throws IOException {
+        XStream xStream = new XStream();
+        xStream.alias("QueryTreeNode", QueryTreeNode.class);
+        File file = new File(path);
+        file.mkdirs();
+        FileWriter fw = new FileWriter(file + "/"
+            + this.getNodeInfo().getType().getSimpleName() + "_" + name
+            + ".xml");
+
+        fw.write(xStream.toXML(this));
+        fw.close();
+    }
+
+    public static QueryTreeNode getTreeFromFile(File file) throws IOException {
+        XStream xStream = new XStream(new DomDriver());
+        xStream.alias("QueryTreeNode", QueryTreeNode.class);
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String xml = "";
+        while (reader.ready()) {
+            xml += reader.readLine();
+        }
+        reader.close();
+        return (QueryTreeNode) xStream.fromXML(xml);
+
+    }
 }

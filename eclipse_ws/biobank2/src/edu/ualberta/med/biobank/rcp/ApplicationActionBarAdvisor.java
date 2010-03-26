@@ -37,6 +37,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     private IWorkbenchAction aboutAction;
 
+    private IWorkbenchAction resetPerspectiveAction;
+
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
     }
@@ -50,6 +52,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         // about action
         aboutAction = ActionFactory.ABOUT.create(window);
         register(aboutAction);
+
+        resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
+        register(resetPerspectiveAction);
     }
 
     private void createSendErrorMailAction(IWorkbenchWindow window) {
@@ -117,6 +122,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         helpMenu.add(new Separator("group.assist"));
         helpMenu.add(sendErrorMailAction);
         helpMenu.add(showDlgAction);
+        helpMenu.add(resetPerspectiveAction);
         helpMenu.add(new Separator());
         helpMenu.add(aboutAction);
     }

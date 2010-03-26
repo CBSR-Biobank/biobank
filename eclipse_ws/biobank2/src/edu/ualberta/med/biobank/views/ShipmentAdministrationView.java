@@ -10,12 +10,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
-import edu.ualberta.med.biobank.forms.PatientEntryForm;
-import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
@@ -23,7 +18,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class ShipmentAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.shipmentAdmin";
+    public static final String ID = "edu.ualberta.med.biobank.views.ShipmentAdminView";
 
     public static ShipmentAdministrationView currentInstance;
 
@@ -38,7 +33,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     protected Object search(String text) throws Exception {
         List<ShipmentWrapper> shipments = ShipmentWrapper.getShipmentsInSite(
             SessionManager.getAppService(), text, SessionManager.getInstance()
-                .getCurrentSiteWrapper());
+                .getCurrentSite());
         if (shipments.size() == 1) {
             return shipments.get(0);
         }
@@ -63,7 +58,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         rootNode.removeAll();
         ShipmentWrapper shipment = (ShipmentWrapper) searchedObject;
         currentSiteAdapter = new SiteAdapter(rootNode, SessionManager
-            .getInstance().getCurrentSiteWrapper(), false);
+            .getInstance().getCurrentSite(), false);
         rootNode.addChild(currentSiteAdapter);
         ClinicAdapter clinicAdapter = new ClinicAdapter(currentSiteAdapter,
             shipment.getClinic(), false);
@@ -86,19 +81,18 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 .getAppService());
             shipment.setWaybill(text);
             ShipmentAdapter adapter = new ShipmentAdapter(rootNode, shipment);
-            AdapterBase.openForm(new FormInput(adapter), ShipmentEntryForm.ID);
+            adapter.openEntryForm();
         }
     }
 
     public void displayPatient(PatientWrapper patient) {
         PatientAdapter patientAdapter = new PatientAdapter(
             currentInstance.rootNode, patient, false);
-        FormInput input = new FormInput(patientAdapter);
         if (patient.isNew()) {
-            AdapterBase.openForm(input, PatientEntryForm.ID);
+            patientAdapter.openEntryForm(true);
         } else {
             patientAdapter.setEditable(false);
-            AdapterBase.openForm(input, PatientViewForm.ID);
+            patientAdapter.openViewForm();
         }
     }
 

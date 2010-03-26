@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.events.SelectionAdapter;
@@ -7,6 +8,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -45,7 +47,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
         globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
             true);
+        if (globalSampleTypes == null) {
+            globalSampleTypes = new ArrayList<SampleTypeWrapper>();
+        }
         siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
+        if (siteSampleTypes == null) {
+            siteSampleTypes = new ArrayList<SampleTypeWrapper>();
+        }
         setPartName("Sample Types Entry");
     }
 
@@ -53,10 +61,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        if (!siteWrapper.getName().equals("All Sites"))
+        boolean allSiteSelected = SessionManager.getInstance()
+            .isAllSitesSelected();
+        if (!allSiteSelected) {
             createSiteSampleTypeSection();
+        }
         createGlobalSampleTypeSection();
-        if (!siteWrapper.getName().equals("All Sites"))
+        if (!allSiteSelected)
             firstControl = siteSampleWidget;
         else
             firstControl = globalSampleWidget;
@@ -103,7 +114,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        if (siteWrapper != null) {
+        if (!SessionManager.getInstance().isAllSitesSelected()) {
             siteWrapper.reload();
             siteWrapper.addSampleTypes(siteSampleWidget
                 .getAddedOrModifiedSampleTypes());

@@ -13,27 +13,29 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -189,8 +191,9 @@ public class TestPatient extends TestDatabase {
         visits = patient.getPatientVisitCollection();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        AliquotWrapper sample = AliquotHelper.addSample(allSampleTypes.get(0),
-            containerMap.get("ChildL1"), visits.get(0), 0, 0);
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(
+            allSampleTypes.get(0), containerMap.get("ChildL1"), visits.get(0),
+            0, 0);
         patient.reload();
 
         try {
@@ -200,8 +203,8 @@ public class TestPatient extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        // delete sample and patient
-        sample.delete();
+        // delete aliquot and patient
+        aliquot.delete();
         patient.delete();
     }
 
@@ -356,34 +359,67 @@ public class TestPatient extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient1,
             patient2);
 
-        Date date1 = Utils.getRandomDate();
+        Date dateProcessed1 = Utils.getRandomDate();
+        Date dateDrawn1 = Utils.getRandomDate();
+        Date dateDrawn1_1 = Utils.getRandomDate();
+        Date dateProcessed2 = Utils.getRandomDate();
+        Date dateDrawn2 = Utils.getRandomDate();
+        Date dateProcessed3 = Utils.getRandomDate();
+        Date dateDrawn3 = Utils.getRandomDate();
+
         PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
-            patient1, shipment, date1);
+            patient1, shipment, dateProcessed1);
         PatientVisitWrapper visit1_1 = PatientVisitHelper.addPatientVisit(
-            patient1, shipment, date1);
-        Date date2 = Utils.getRandomDate();
+            patient1, shipment, dateProcessed1);
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
-            patient1, shipment, date2);
-        Date date3 = Utils.getRandomDate();
+            patient1, shipment, dateProcessed2);
         PatientVisitWrapper visit3 = PatientVisitHelper.addPatientVisit(
-            patient2, shipment, date3);
+            patient2, shipment, dateProcessed3);
+
+        PvSourceVesselWrapper pvSourceVessel = PvSourceVesselHelper
+            .newPvSourceVessel(Utils.getRandomString(5, 10), visit1);
+        pvSourceVessel.setDateDrawn(dateDrawn1);
+        visit1.addPvSourceVessels(Arrays.asList(pvSourceVessel));
+        visit1.persist();
+
+        pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
+            .getRandomString(5, 10), visit1_1);
+        pvSourceVessel.setDateDrawn(dateDrawn1_1);
+        visit1_1.addPvSourceVessels(Arrays.asList(pvSourceVessel));
+        visit1_1.persist();
+
+        pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
+            .getRandomString(5, 10), visit2);
+        pvSourceVessel.setDateDrawn(dateDrawn2);
+        visit2.addPvSourceVessels(Arrays.asList(pvSourceVessel));
+        visit2.persist();
+
+        pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
+            .getRandomString(5, 10), visit3);
+        pvSourceVessel.setDateDrawn(dateDrawn3);
+        visit3.addPvSourceVessels(Arrays.asList(pvSourceVessel));
+        visit3.persist();
 
         patient1.reload();
         patient2.reload();
 
-        List<PatientVisitWrapper> visitsFound = patient1.getVisits(date1);
-        Assert.assertTrue(visitsFound.size() == 2);
+        List<PatientVisitWrapper> visitsFound = patient1.getVisits(
+            dateProcessed1, dateDrawn1);
+        Assert.assertTrue(visitsFound.size() == 1);
         Assert.assertTrue(visitsFound.contains(visit1));
+
+        visitsFound = patient1.getVisits(dateProcessed1, dateDrawn1_1);
+        Assert.assertTrue(visitsFound.size() == 1);
         Assert.assertTrue(visitsFound.contains(visit1_1));
 
-        visitsFound = patient1.getVisits(date2);
+        visitsFound = patient1.getVisits(dateProcessed2, dateDrawn2);
         Assert.assertTrue(visitsFound.size() == 1);
         Assert.assertEquals(visit2, visitsFound.get(0));
 
-        visitsFound = patient1.getVisits(date3);
+        visitsFound = patient1.getVisits(dateProcessed3, dateDrawn3);
         Assert.assertEquals(0, visitsFound.size());
 
-        visitsFound = patient2.getVisits(date3);
+        visitsFound = patient2.getVisits(dateProcessed3, dateDrawn3);
         Assert.assertTrue(visitsFound.size() == 1);
         Assert.assertEquals(visit3, visitsFound.get(0));
     }
@@ -442,7 +478,7 @@ public class TestPatient extends TestDatabase {
             for (PatientVisitWrapper visit : patient
                 .getPatientVisitCollection()) {
                 for (int i = 0; i < 2; ++i) {
-                    samples.add(AliquotHelper.addSample(allSampleTypes.get(r
+                    samples.add(AliquotHelper.addAliquot(allSampleTypes.get(r
                         .nextInt(sampleTypeCount)), childL1, visit, sampleCount
                         / maxCols, sampleCount % maxCols));
                     patient1.reload();
@@ -461,8 +497,8 @@ public class TestPatient extends TestDatabase {
                 .getPatientVisitCollection()) {
                 samples = visit.getAliquotCollection();
                 while (samples.size() > 0) {
-                    AliquotWrapper sample = samples.get(0);
-                    sample.delete();
+                    AliquotWrapper aliquot = samples.get(0);
+                    aliquot.delete();
                     visit.reload();
                     patient.reload();
                     samples = visit.getAliquotCollection();

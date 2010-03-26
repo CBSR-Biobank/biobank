@@ -35,12 +35,10 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -383,8 +381,7 @@ public class ContainerViewForm extends BiobankViewForm {
             containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
                 .getCol()));
             newAdapter = new ContainerAdapter(containerAdapter, containerToOpen);
-            AdapterBase.openForm(new FormInput(newAdapter),
-                ContainerEntryForm.ID);
+            newAdapter.openEntryForm(true);
         } else {
             ContainerWrapper child = cell.getContainer();
             Assert.isNotNull(child);
@@ -415,7 +412,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Samples");
         List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
-            .getSamples().values());
+            .getAliquots().values());
         samplesWidget = new AliquotListInfoTable(parent, samples);
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
@@ -432,11 +429,6 @@ public class ContainerViewForm extends BiobankViewForm {
                 refreshVis();
             setContainerValues();
         }
-    }
-
-    @Override
-    protected String getEntryFormId() {
-        return ContainerEntryForm.ID;
     }
 
 }

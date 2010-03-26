@@ -37,10 +37,10 @@ public class Freezer02Importer extends FreezerImporter {
         PreparedStatement ps;
         String hotelLabel;
         String dateProcessedStr;
+        String dateTakenStr;
         String palletPos;
         String sampleTypeNameShort;
         String inventoryId;
-        BlowfishCipher cipher = new BlowfishCipher();
         String studyNameShort;
         int palletNr;
         String patientNr;
@@ -50,6 +50,7 @@ public class Freezer02Importer extends FreezerImporter {
         String newLabel;
         int newPalletNr;
         ContainerWrapper newHotel;
+        int visitId;
 
         for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
             .indexOf('J'); h++) {
@@ -71,14 +72,16 @@ public class Freezer02Importer extends FreezerImporter {
 
             while (rs.next()) {
                 studyNameShort = rs.getString(3);
-                patientNr = cipher.decode(rs.getBytes(17));
+                patientNr = rs.getString(17);
                 dateProcessedStr = rs.getString(1);
+                dateTakenStr = rs.getString(2);
                 palletNr = rs.getInt(7);
                 palletPos = rs.getString(15);
                 inventoryId = rs.getString(11);
                 sampleTypeNameShort = rs.getString(4);
                 linkDateStr = rs.getString(12);
                 quantity = rs.getDouble(16);
+                visitId = rs.getInt(18);
 
                 oldLabel = String.format("02%s%02d", hotelLabel, palletNr);
                 newLabel = getNewLabel(oldLabel);
@@ -94,9 +97,10 @@ public class Freezer02Importer extends FreezerImporter {
                 newPalletNr = Integer.valueOf(newLabel.substring(newLabel
                     .length() - 2));
 
-                importSample(studyNameShort, patientNr, dateProcessedStr,
-                    newHotel, newPalletNr, palletPos, inventoryId,
-                    sampleTypeNameShort, linkDateStr, quantity);
+                Importer.importSample(site, studyNameShort, patientNr, visitId,
+                    dateProcessedStr, dateTakenStr, newHotel, newPalletNr,
+                    palletPos, inventoryId, sampleTypeNameShort, linkDateStr,
+                    quantity);
             }
         }
 
@@ -120,14 +124,16 @@ public class Freezer02Importer extends FreezerImporter {
 
             while (rs.next()) {
                 studyNameShort = rs.getString(3);
-                patientNr = cipher.decode(rs.getBytes(17));
+                patientNr = rs.getString(17);
                 dateProcessedStr = rs.getString(1);
+                dateTakenStr = rs.getString(2);
                 palletNr = rs.getInt(7);
                 palletPos = rs.getString(15);
                 inventoryId = rs.getString(11);
                 sampleTypeNameShort = rs.getString(4);
                 linkDateStr = rs.getString(12);
                 quantity = rs.getDouble(16);
+                visitId = rs.getInt(18);
 
                 oldLabel = String.format("04%s%02d", hotelLabel, palletNr);
                 newLabel = getNewLabel(oldLabel);
@@ -143,9 +149,10 @@ public class Freezer02Importer extends FreezerImporter {
                 newPalletNr = Integer.valueOf(newLabel.substring(newLabel
                     .length() - 2));
 
-                importSample(studyNameShort, patientNr, dateProcessedStr,
-                    newHotel, newPalletNr, palletPos, inventoryId,
-                    sampleTypeNameShort, linkDateStr, quantity);
+                Importer.importSample(site, studyNameShort, patientNr, visitId,
+                    dateProcessedStr, dateTakenStr, newHotel, newPalletNr,
+                    palletPos, inventoryId, sampleTypeNameShort, linkDateStr,
+                    quantity);
             }
         }
 

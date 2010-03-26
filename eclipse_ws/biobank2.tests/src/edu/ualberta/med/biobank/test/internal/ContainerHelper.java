@@ -141,7 +141,7 @@ public class ContainerHelper extends DbHelper {
     public static ContainerWrapper addTopContainerRandom(SiteWrapper site,
         String name, int typeCapacityRow, int typeCapacityCol) throws Exception {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            name, "", 1, typeCapacityRow, typeCapacityCol, true);
+            name, name, 1, typeCapacityRow, typeCapacityCol, true);
         ContainerWrapper container = addContainer(name, name, null, site, type);
         return container;
     }

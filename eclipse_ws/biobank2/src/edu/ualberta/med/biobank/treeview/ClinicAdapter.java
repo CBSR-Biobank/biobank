@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ClinicAdapter extends AdapterBase {
 
@@ -49,14 +48,9 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        openForm(new FormInput(this), ClinicViewForm.ID);
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Clinic", ClinicEntryForm.ID);
-        addViewMenu(menu, "Clinic", ClinicViewForm.ID);
+        addEditMenu(menu, "Clinic");
+        addViewMenu(menu, "Clinic");
         addDeleteMenu(menu, "Clinic", DEL_CONFIRM_MSG);
     }
 
@@ -89,6 +83,16 @@ public class ClinicAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return ClinicEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return ClinicViewForm.ID;
     }
 
 }

@@ -44,17 +44,12 @@ public class CbsrSite {
         cbsrSite = new SiteWrapper(appService);
         cbsrSite.setName("Canadian BioSample Repository");
         cbsrSite.setNameShort("CBSR");
-        cbsrSite.setActivityStatus(getActivityStatus("Active"));
+        cbsrSite.setActivityStatus(getActiveActivityStatus());
         cbsrSite.setStreet1("471 Medical Sciences Building");
         cbsrSite.setStreet2("University of Alberta");
         cbsrSite.setCity("Edmonton");
         cbsrSite.setProvince("Alberta");
         cbsrSite.setPostalCode("T6G2H7");
-        cbsrSite.setSitePvAttr("PBMC Count", "number");
-        cbsrSite.setSitePvAttr("Worksheet", "text");
-        cbsrSite.setSitePvAttr("Phlebotomist", "text");
-        cbsrSite.setSitePvAttr("Consent", "select_multiple");
-        cbsrSite.setSitePvAttr("Visit", "select_single");
         cbsrSite.persist();
         cbsrSite.reload();
         return cbsrSite;
@@ -94,6 +89,11 @@ public class CbsrSite {
     public static ActivityStatusWrapper getActivityStatus(String name)
         throws Exception {
         return ActivityStatusWrapper.getActivityStatus(appService, name);
+    }
+
+    public static ActivityStatusWrapper getActiveActivityStatus()
+        throws Exception {
+        return ActivityStatusWrapper.getActivityStatus(appService, "Active");
     }
 
     public static void deleteConfiguration(WritableApplicationService appServ)
@@ -208,7 +208,7 @@ public class CbsrSite {
 
     private static void containerDeleteSubObjects(ContainerWrapper container)
         throws Exception {
-        Map<RowColPos, AliquotWrapper> samples = container.getSamples();
+        Map<RowColPos, AliquotWrapper> samples = container.getAliquots();
         if (samples.size() > 0) {
             // samples should be deleted when patient visits are deleted
             throw new Exception(

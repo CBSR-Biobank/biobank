@@ -205,8 +205,8 @@ public class TestPatientVisit extends TestDatabase {
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getGlobalSampleTypes(appService, true);
-        AliquotWrapper sample = AliquotHelper.addSample(allSampleTypes.get(0),
-            containerMap.get("ChildL1"), visit, 0, 0);
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(
+            allSampleTypes.get(0), containerMap.get("ChildL1"), visit, 0, 0);
         visit.reload();
 
         try {
@@ -216,8 +216,8 @@ public class TestPatientVisit extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        // delete sample and visit
-        sample.delete();
+        // delete aliquot and visit
+        aliquot.delete();
         visit.reload();
         visit.delete();
     }
@@ -248,8 +248,9 @@ public class TestPatientVisit extends TestDatabase {
             for (int col = 0; col < cols; ++col) {
                 if (r.nextGaussian() > 0.0)
                     continue;
-                // System.out.println("setting sample at: " + row + ", " + col);
-                sampleMap.put(row + col * rows, AliquotHelper.addSample(
+                // System.out.println("setting aliquot at: " + row + ", " +
+                // col);
+                sampleMap.put(row + col * rows, AliquotHelper.addAliquot(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
                     container, visit, row, col));
             }
@@ -260,21 +261,21 @@ public class TestPatientVisit extends TestDatabase {
         Collection<AliquotWrapper> visitSamples = visit.getAliquotCollection();
         Assert.assertEquals(sampleMap.size(), visitSamples.size());
 
-        for (AliquotWrapper sample : visitSamples) {
-            RowColPos pos = sample.getPosition();
-            // System.out.println("getting sample from: " + pos.row + ", "
+        for (AliquotWrapper aliquot : visitSamples) {
+            RowColPos pos = aliquot.getPosition();
+            // System.out.println("getting aliquot from: " + pos.row + ", "
             // + pos.col);
             Assert.assertNotNull(pos);
             Assert.assertNotNull(pos.row);
             Assert.assertNotNull(pos.col);
             Assert.assertNotNull(sampleMap.get(pos.row + pos.col * rows));
-            Assert
-                .assertEquals(sample, sampleMap.get(pos.row + pos.col * rows));
+            Assert.assertEquals(aliquot, sampleMap
+                .get(pos.row + pos.col * rows));
         }
 
         // delete all samples now
-        for (AliquotWrapper sample : visitSamples) {
-            sample.delete();
+        for (AliquotWrapper aliquot : visitSamples) {
+            aliquot.delete();
         }
         visit.reload();
         visitSamples = visit.getAliquotCollection();

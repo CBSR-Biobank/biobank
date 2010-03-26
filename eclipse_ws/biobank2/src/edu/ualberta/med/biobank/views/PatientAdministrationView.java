@@ -5,10 +5,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.forms.PatientEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -16,7 +13,7 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class PatientAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.patientsAdmin";
+    public static final String ID = "edu.ualberta.med.biobank.views.PatientsAdminView";
 
     public static PatientAdministrationView currentInstance;
 
@@ -36,7 +33,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     @Override
     protected Object search(String text) throws Exception {
         return PatientWrapper.getPatientInSite(SessionManager.getAppService(),
-            text, SessionManager.getInstance().getCurrentSiteWrapper());
+            text, SessionManager.getInstance().getCurrentSite());
     }
 
     @Override
@@ -49,7 +46,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         rootNode.removeAll();
         PatientWrapper patient = (PatientWrapper) searchedObject;
         SiteAdapter siteAdapter = new SiteAdapter(rootNode, SessionManager
-            .getInstance().getCurrentSiteWrapper(), false);
+            .getInstance().getCurrentSite(), false);
         rootNode.addChild(siteAdapter);
         StudyAdapter studyAdapter = new StudyAdapter(siteAdapter, patient
             .getStudy(), false);
@@ -75,7 +72,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
                 .getAppService());
             patient.setPnumber(text);
             PatientAdapter adapter = new PatientAdapter(rootNode, patient);
-            AdapterBase.openForm(new FormInput(adapter), PatientEntryForm.ID);
+            adapter.openEntryForm();
         }
     }
 

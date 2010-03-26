@@ -2,43 +2,43 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Random;
 
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class AliquotHelper extends DbHelper {
 
-    public static AliquotWrapper newSample(SampleTypeWrapper sampleType) {
-        AliquotWrapper sample = new AliquotWrapper(appService);
-        sample.setSampleType(sampleType);
-        sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
-        return sample;
+    public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType) {
+        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        aliquot.setSampleType(sampleType);
+        aliquot.setInventoryId(TestCommon.getNewInventoryId(new Random()));
+        return aliquot;
     }
 
     public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) {
-        AliquotWrapper sample = new AliquotWrapper(appService);
-        sample.setSampleType(sampleType);
-        sample.setInventoryId(TestCommon.getNewInventoryId(new Random()));
+        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        aliquot.setSampleType(sampleType);
+        aliquot.setInventoryId(TestCommon.getNewInventoryId(new Random()));
         if (container != null) {
-            sample.setParent(container);
+            aliquot.setParent(container);
         }
-        sample.setPatientVisit(pv);
+        aliquot.setPatientVisit(pv);
         if ((row != null) && (col != null)) {
-            sample.setPosition(row, col);
+            aliquot.setPosition(row, col);
         }
-        return sample;
+        return aliquot;
     }
 
-    public static AliquotWrapper addSample(SampleTypeWrapper sampleType,
+    public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        AliquotWrapper sample = newAliquot(sampleType, container, pv, row, col);
-        sample.persist();
-        return sample;
+        AliquotWrapper aliquot = newAliquot(sampleType, container, pv, row, col);
+        aliquot.persist();
+        return aliquot;
     }
 
 }

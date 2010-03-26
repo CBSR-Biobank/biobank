@@ -80,6 +80,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_RELOAD_FORM = "reloadForm";
     public static final String IMG_REPORTS = "reports";
     public static final String IMG_RESET_FORM = "resetForm";
+    public static final String IMG_RESULTSET_FIRST = "resultsetFirst";
+    public static final String IMG_RESULTSET_LAST = "resultsetLast";
+    public static final String IMG_RESULTSET_NEXT = "resultsetNext";
+    public static final String IMG_RESULTSET_PREV = "resultsetPrev";
     public static final String IMG_SCAN_ASSIGN = "scanAssign";
     public static final String IMG_SCAN_LINK = "scanLink";
     public static final String IMG_SESSIONS = "sessions";
@@ -186,6 +190,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_RELOAD_FORM, "reload.png");
         registerImage(registry, IMG_REPORTS, "reports.png");
         registerImage(registry, IMG_RESET_FORM, "reset.png");
+        registerImage(registry, IMG_RESULTSET_FIRST, "resultset_first.png");
+        registerImage(registry, IMG_RESULTSET_LAST, "resultset_last.png");
+        registerImage(registry, IMG_RESULTSET_NEXT, "resultset_next.png");
+        registerImage(registry, IMG_RESULTSET_PREV, "resultset_previous.png");
         registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
         registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
@@ -345,7 +353,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public int getPlateNumber(String barcode) {
         for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
             if (isRealScanEnabled()
-                && !ScannerConfigPlugin.getDefault().getPalletEnabled(i + 1))
+                && !ScannerConfigPlugin.getDefault().getPlateEnabled(i + 1))
                 continue;
 
             String pref = getPreferenceStore().getString(

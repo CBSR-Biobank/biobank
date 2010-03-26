@@ -130,7 +130,8 @@ public class SampleStorageDialog extends BiobankDialog {
                             .setActivityStatus((ActivityStatusWrapper) asSelection
                                 .getFirstElement());
                     } catch (Exception e) {
-                        System.out.println(e);
+                        BioBankPlugin.openAsyncError(
+                            "Error setting activity status", e);
                     }
                 }
             });

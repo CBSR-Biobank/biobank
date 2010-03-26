@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class PatientVisitAdapter extends AdapterBase {
 
@@ -68,14 +67,9 @@ public class PatientVisitAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        openForm(new FormInput(this), PatientVisitViewForm.ID);
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Visit", PatientVisitEntryForm.ID);
-        addViewMenu(menu, "Visit", PatientVisitViewForm.ID);
+        addEditMenu(menu, "Visit");
+        addViewMenu(menu, "Visit");
     }
 
     public void setSelectedAliquot(AliquotWrapper aliquot) {
@@ -105,6 +99,16 @@ public class PatientVisitAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return PatientVisitEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return PatientVisitViewForm.ID;
     }
 
 }
