@@ -15,25 +15,25 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 /**
  * Query to generate studies:
- * 
+ *
  * select name, name_short, comment from study
- * 
+ *
  * Query to generate sources vessels:
- * 
+ *
  * select study.name_short, sample_source.name from study join
  * study_sample_source on study.id=study_sample_source.study_id join
  * sample_source on sample_source.id=study_sample_source.sample_source_id order
  * by study.name_short
- * 
+ *
  * Query to generate study pv attributes:
- * 
+ *
  * select study.name_short, study_pv_attr.label, pv_attr_type.name,
  * study_pv_attr.permissible from study join study_pv_attr on
  * study_pv_attr.study_id=study.id join pv_attr_type on
  * pv_attr_type.id=study_pv_attr.pv_attr_type_id order by study.name_short
- * 
+ *
  * Query to generate study contacts:
- * 
+ *
  * select contact.name, study.name_short from contact join clinic on
  * clinic.id=contact.clinic_id left join study_contact on contact.id=contact_id
  * join study on study.id=study_contact.study_id order by study.name_short
@@ -207,6 +207,21 @@ public class CbsrStudies {
         addSampleStorage("CEGIIR", "Serum B", 6, 0.8);
         addSampleStorage("CEGIIR", "WB DMSO", 2, 0.8);
         addSampleStorage("CEGIIR", "WBE", null, null);
+        addSampleStorage("CEGIIR", "Colon, A", null, null);
+        addSampleStorage("CEGIIR", "Colon, D", null, null);
+        addSampleStorage("CEGIIR", "Duodenum", null, null);
+        addSampleStorage("CEGIIR", "Ileum", null, null);
+        addSampleStorage("CEGIIR", "Jejunum", null, null);
+        addSampleStorage("CEGIIR", "R-ColonA", null, null);
+        addSampleStorage("CEGIIR", "R-ColonD", null, null);
+        addSampleStorage("CEGIIR", "R-Duodenum", null, null);
+        addSampleStorage("CEGIIR", "R-Ilieum", null, null);
+        addSampleStorage("CEGIIR", "R-StomachA", null, null);
+        addSampleStorage("CEGIIR", "R-StomachB", null, null);
+        addSampleStorage("CEGIIR", "R-ColonT", null, null);
+        addSampleStorage("CEGIIR", "Stomach, A", null, null);
+        addSampleStorage("CEGIIR", "Stomach, B", null, null);
+        addSampleStorage("CEGIIR", "Colon, T", null, null);
         addSampleStorage("CEGIIR", "Z Urine", 6, 0.9);
         addSampleStorage("CHILD", "CBMC RNA", null, null);
         addSampleStorage("CHILD", "CBMC", null, null);
