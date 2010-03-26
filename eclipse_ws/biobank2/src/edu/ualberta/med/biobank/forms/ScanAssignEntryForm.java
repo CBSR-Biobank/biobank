@@ -110,6 +110,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 noFieldModification = false;
+                removeRescanMode();
                 setScanNotLauched();
             }
         };
@@ -197,6 +198,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                                 .getFirstElement());
                     }
                     setScanNotLauched();
+                    removeRescanMode();
                     noFieldModification = false;
                 }
             });
