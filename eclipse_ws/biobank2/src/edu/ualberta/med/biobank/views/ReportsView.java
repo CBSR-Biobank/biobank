@@ -1,32 +1,44 @@
 package edu.ualberta.med.biobank.views;
 
+import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.ReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.QueryTree;
 
 public class ReportsView extends ViewPart {
 
@@ -62,7 +74,7 @@ public class ReportsView extends ViewPart {
                     .getSelection()).getFirstElement();
                 if (node.getParent().isRoot())
                     ;
-                else if (node.getParent().getLabel().compareTo("Advanced") == 0)
+                else if (node.getParent().getLabel().compareTo("Standard") != 0)
                     try {
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().openEditor(new ReportInput(node),
@@ -106,7 +118,7 @@ public class ReportsView extends ViewPart {
 
             @Override
             public Object getParent(Object element) {
-                return !((ReportTreeNode) element).isRoot();
+                return ((ReportTreeNode) element).getParent();
             }
 
             @Override
@@ -142,6 +154,41 @@ public class ReportsView extends ViewPart {
             public void removeListener(ILabelProviderListener listener) {
             }
         });
+        Menu menu = new Menu(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                Menu menu = querySelect.getTree().getMenu();
+                for (MenuItem menuItem : menu.getItems()) {
+                    menuItem.dispose();
+                }
+
+                Object element = ((StructuredSelection) querySelect
+                    .getSelection()).getFirstElement();
+                final ReportTreeNode node = (ReportTreeNode) element;
+                if (node != null && node.getParent().getQuery() != null) {
+                    MenuItem mi = new MenuItem(menu, SWT.NONE);
+                    mi.setText("Delete");
+                    mi.addSelectionListener(new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent event) {
+                            File file = new File(Platform.getInstanceLocation()
+                                .getURL().getPath()
+                                + "/saved_reports/"
+                                + node.getParent().getLabel()
+                                + "_"
+                                + node.getLabel() + ".xml");
+                            file.delete();
+                            node.getParent().removeChild(node);
+                            querySelect.refresh();
+                        }
+                    });
+                }
+            }
+        });
+        querySelect.getTree().setMenu(menu);
+
         ReportTreeNode root = new ReportTreeNode("", null);
         ReportTreeNode standard = new ReportTreeNode("Standard", null);
         ReportTreeNode advanced = new ReportTreeNode("Advanced", null);
@@ -155,14 +202,37 @@ public class ReportsView extends ViewPart {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        List<Class<? extends ModelWrapper<?>>> advancedObjs = SearchUtils
-            .getSearchableObjs();
-        for (Class<? extends ModelWrapper<?>> obj : advancedObjs) {
+
+        File dir = new File(Platform.getInstanceLocation().getURL().getPath()
+            + "/saved_reports");
+        File[] files = dir.listFiles();
+
+        List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs();
+        for (Class<?> obj : advancedObjs) {
             ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
-                .replace("Wrapper", ""), obj);
+                .replace("Wrapper", ""), QueryTree.constructTree(new HQLField(
+                "", obj.getSimpleName(), obj)));
+            if (files != null)
+                try {
+                    for (int i = 0; i < files.length; i++) {
+                        if (files[i].getName().contains(".xml")
+                            && files[i].getName().startsWith(child.getLabel())) {
+                            ReportTreeNode custom = new ReportTreeNode(files[i]
+                                .getName().replace(".xml", "").substring(
+                                    child.getLabel().length() + 1),
+                                QueryTreeNode.getTreeFromFile(files[i]));
+                            custom.setParent(child);
+                            child.addChild(custom);
+                        }
+                    }
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Error loading saved reports",
+                        e);
+                }
             advanced.addChild(child);
             child.setParent(advanced);
         }
+
         root.addChild(standard);
         standard.setParent(root);
         root.addChild(advanced);

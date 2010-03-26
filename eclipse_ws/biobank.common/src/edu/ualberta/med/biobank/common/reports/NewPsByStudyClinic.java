@@ -12,10 +12,10 @@ public class NewPsByStudyClinic extends QueryObject {
 
     public NewPsByStudyClinic(String op, Integer siteId) {
         super(
-            "Displays the total number of patients added per study per clinic by date range.",
+            "Displays the total number of patients added per study per clinic grouped by date range.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
-        addOption("Date Range", DateRange.class, DateRange.Month);
+        addOption("Date Range", DateGroup.class, DateGroup.Month);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class NewPsByStudyClinic extends QueryObject {
             if (option.type.equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
-        columnNames[2] = (String) params.get(0);
+        columnNames[2] = (String) params.remove(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
         return params;
     }

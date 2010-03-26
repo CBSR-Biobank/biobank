@@ -5,7 +5,7 @@ import java.util.Date;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 
-public class SampleInvoiceByClinic extends QueryObject {
+public class AliquotInvoiceByClinic extends QueryObject {
 
     protected static final String NAME = "Aliquots per Clinic by Date";
 
@@ -17,9 +17,9 @@ public class SampleInvoiceByClinic extends QueryObject {
         + "Alias.patientVisit.patient.study.site.id {1} {0,number,#} ORDER BY "
         + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
 
-    public SampleInvoiceByClinic(String op, Integer siteId) {
+    public AliquotInvoiceByClinic(String op, Integer siteId) {
         super(
-            "Lists all samples linked in a particular date range, ordered by clinic.",
+            "Lists all aliquots linked in a particular date range, ordered by clinic.",
             MessageFormat.format(QUERY_STRING, siteId, op), new String[] {
                 "Clinic", "Patient Number", "Link Date", "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));

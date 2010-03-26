@@ -202,8 +202,4 @@ public class PatientVisitViewForm extends BiobankViewForm {
         }
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return PatientVisitEntryForm.ID;
-    }
 }

@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.awt.Color;
-import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +45,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.AutoText;
 import ar.com.fdvs.dj.domain.Style;
 import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
 import ar.com.fdvs.dj.domain.constants.Border;
@@ -53,28 +54,30 @@ import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.CabinetCSamples;
-import edu.ualberta.med.biobank.common.reports.CabinetDSamples;
-import edu.ualberta.med.biobank.common.reports.CabinetSSamples;
-import edu.ualberta.med.biobank.common.reports.FreezerCSamples;
-import edu.ualberta.med.biobank.common.reports.FreezerDSamples;
-import edu.ualberta.med.biobank.common.reports.FreezerSSamples;
+import edu.ualberta.med.biobank.common.reports.AliquotCount;
+import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
+import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
+import edu.ualberta.med.biobank.common.reports.AliquotRequest;
+import edu.ualberta.med.biobank.common.reports.AliquotSCount;
+import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
+import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
+import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
+import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
+import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
+import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
 import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
 import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
+import edu.ualberta.med.biobank.common.reports.PVsByStudy;
 import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
 import edu.ualberta.med.biobank.common.reports.PatientWBC;
-import edu.ualberta.med.biobank.common.reports.QACabinetSamples;
-import edu.ualberta.med.biobank.common.reports.QAFreezerSamples;
+import edu.ualberta.med.biobank.common.reports.PsByStudy;
+import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
+import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.SampleCount;
-import edu.ualberta.med.biobank.common.reports.SampleInvoiceByClinic;
-import edu.ualberta.med.biobank.common.reports.SampleInvoiceByPatient;
-import edu.ualberta.med.biobank.common.reports.SampleRequest;
-import edu.ualberta.med.biobank.common.reports.SampleSCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
-import edu.ualberta.med.biobank.common.reports.QueryObject.DateRange;
+import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -113,6 +116,38 @@ public class ReportsEditor extends EditorPart {
 
     private static Map<Class<?>, int[]> columnWidths;
 
+    static {
+        Map<Class<?>, int[]> aMap = new HashMap<Class<?>, int[]>();
+        aMap = new HashMap<Class<?>, int[]>();
+        aMap.put(CabinetCAliquots.class, new int[] { 100, 100, 100 });
+        aMap.put(CabinetDAliquots.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(CabinetSAliquots.class, new int[] { 100, 100 });
+        aMap.put(FreezerCAliquots.class, new int[] { 100, 100, 100 });
+        aMap.put(FreezerDAliquots.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(FreezerSAliquots.class, new int[] { 100, 100 });
+        aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(PsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(PVsByStudy.class, new int[] { 100, 100, 100 });
+        aMap.put(PatientVisitSummary.class, new int[] { 100, 100, 100, 100,
+            100, 100, 100, 100, 100 });
+        aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(QACabinetAliquots.class, new int[] { 100, 100, 100, 100, 100,
+            100 });
+        aMap.put(QAFreezerAliquots.class, new int[] { 100, 100, 100, 100, 100,
+            100 });
+        aMap.put(AliquotCount.class, new int[] { 100, 100 });
+        aMap
+            .put(AliquotInvoiceByClinic.class, new int[] { 100, 100, 150, 100 });
+        aMap.put(AliquotInvoiceByPatient.class,
+            new int[] { 100, 100, 150, 100 });
+        aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(AliquotSCount.class, new int[] { 100, 150, 100 });
+        aMap.put(SampleTypeSUsage.class, new int[] { 150, 100 });
+        columnWidths = Collections.unmodifiableMap(aMap);
+    }
+
     private void generate() {
 
         final ArrayList<Object> params = getParams();
@@ -132,9 +167,9 @@ public class ReportsEditor extends EditorPart {
                                 String op = "=";
                                 if (site.getName().compareTo("All Sites") == 0)
                                     op = "!=";
-                                query = (QueryObject) ((Class<?>) (node
-                                    .getObjClass())).getConstructor(
-                                    String.class, Integer.class).newInstance(
+                                query = (QueryObject) ((Class<?>) node
+                                    .getQuery()).getConstructor(String.class,
+                                    Integer.class).newInstance(
                                     new Object[] { op, site.getId() });
                                 reportData = query.generate(SessionManager
                                     .getAppService(), params);
@@ -182,7 +217,7 @@ public class ReportsEditor extends EditorPart {
                                 columnWidths.get(query.getClass()));
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
-                            gd.grabExcessVerticalSpace = true;
+                            gd.grabExcessVerticalSpace = false;
                             gd.horizontalSpan = 2;
                             gd.horizontalAlignment = SWT.FILL;
                             gd.verticalAlignment = SWT.FILL;
@@ -316,35 +351,35 @@ public class ReportsEditor extends EditorPart {
                 fd.setText("Export as");
                 String[] filterExt = { "*.csv", "*.pdf" };
                 fd.setFilterExtensions(filterExt);
-                fd.setFileName(query.getName() + "_"
+                fd.setFileName(query.getName().replaceAll(" ", "_") + "_"
                     + DateFormatter.formatAsDate(new Date()));
                 String path = fd.open();
                 if (path == null)
-                    throw new Exception("Printing Canceled.");
+                    throw new Exception("Exporting canceled.");
                 if (path.endsWith(".pdf"))
                     ReportingUtils.saveReport(createDynamicReport(query
                         .getName(), params, columnInfo, listData), path);
                 else {
                     // csv
-                    File file = new File(path);
-                    FileWriter bw = new FileWriter(file);
+                    PrintWriter bw = new PrintWriter(new FileWriter(path));
                     // write title
-                    bw.write("#" + query.getName() + "\r");
+                    bw.println("#" + query.getName());
                     // write params
                     for (Object[] ob : params)
-                        bw.write("#" + ob[0] + ":" + ob[1] + "\r");
+                        bw.println("#" + ob[0] + ":" + ob[1]);
                     // write columnnames
-                    bw.write("#\r#" + columnInfo.get(0));
+                    bw.println("#");
+                    bw.print("#" + columnInfo.get(0));
                     for (int j = 1; j < columnInfo.size(); j++) {
                         bw.write("," + columnInfo.get(j));
                     }
-                    bw.write("\r");
+                    bw.println();
                     for (Map<String, String> ob : listData) {
                         bw.write("\"" + ob.get(columnInfo.get(0)) + "\"");
                         for (int j = 1; j < columnInfo.size(); j++) {
                             bw.write(",\"" + ob.get(columnInfo.get(j)) + "\"");
                         }
-                        bw.write("\r");
+                        bw.println();
                     }
                     bw.close();
                 }
@@ -380,6 +415,12 @@ public class ReportsEditor extends EditorPart {
             throw new Exception("No report available with name BasicReport");
         }
         drb.setTemplateFile(reportURL.getFile());
+        drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
+        drb.addAutoText("Printed on "
+            + DateFormatter.formatAsDateTime(new Date()),
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
+
         Style headerStyle = new Style();
         headerStyle.setFont(ReportingUtils.sansSerifBold);
         // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
@@ -422,7 +463,7 @@ public class ReportsEditor extends EditorPart {
         if (siteWrap.getName().compareTo("All Sites") == 0)
             op = "!=";
         try {
-            query = (QueryObject) node.getObjClass().getConstructor(
+            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
                 String.class, Integer.class).newInstance(
                 new Object[] { op, siteWrap.getId() });
         } catch (Exception e) {
@@ -430,40 +471,6 @@ public class ReportsEditor extends EditorPart {
         }
 
         this.setPartName(query.getName());
-
-        columnWidths = new HashMap<Class<?>, int[]>();
-        columnWidths.put(CabinetCSamples.class, new int[] { 100, 100, 100 });
-        columnWidths.put(CabinetDSamples.class,
-            new int[] { 100, 100, 100, 100 });
-        columnWidths.put(CabinetSSamples.class, new int[] { 100, 100 });
-        columnWidths.put(FreezerCSamples.class, new int[] { 100, 100, 100 });
-        columnWidths.put(FreezerDSamples.class,
-            new int[] { 100, 100, 100, 100 });
-        columnWidths.put(FreezerSSamples.class, new int[] { 100, 100 });
-        columnWidths.put(FvLPatientVisits.class,
-            new int[] { 100, 100, 100, 100 });
-        columnWidths.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100,
-            100 });
-        columnWidths.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100,
-            100 });
-        columnWidths.put(PatientVisitSummary.class, new int[] { 100, 100, 100,
-            100, 100, 100, 100, 100, 100 });
-        columnWidths.put(PatientWBC.class,
-            new int[] { 100, 100, 100, 100, 100 });
-        columnWidths.put(QACabinetSamples.class, new int[] { 100, 100, 100,
-            100, 100, 100 });
-        columnWidths.put(QAFreezerSamples.class, new int[] { 100, 100, 100,
-            100, 100, 100 });
-        columnWidths.put(SampleCount.class, new int[] { 100, 100 });
-        columnWidths.put(SampleInvoiceByClinic.class, new int[] { 100, 100,
-            100, 100 });
-        columnWidths.put(SampleInvoiceByPatient.class, new int[] { 100, 100,
-            100, 100 });
-        columnWidths.put(SampleRequest.class, new int[] { 100, 100, 100, 100,
-            100 });
-        columnWidths.put(SampleSCount.class, new int[] { 100, 100, 100 });
-        columnWidths.put(SampleTypeSUsage.class, new int[] { 100, 100 });
-        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
@@ -500,7 +507,7 @@ public class ReportsEditor extends EditorPart {
         GridData pgd = new GridData();
         pgd.grabExcessHorizontalSpace = true;
         pgd.horizontalAlignment = SWT.FILL;
-        parameterSection.setLayout(new GridLayout());
+        parameterSection.setLayout(new GridLayout(2, false));
         parameterSection.setLayoutData(pgd);
 
         buttonSection = new Composite(top, SWT.NONE);
@@ -562,16 +569,16 @@ public class ReportsEditor extends EditorPart {
             textLabels.add(fieldLabel);
             Widget widget;
 
-            if (option.getType() == DateRange.class) {
+            if (option.getType() == DateGroup.class) {
                 widget = new Combo(parameterSection, SWT.READ_ONLY);
-                Object values[] = DateRange.values();
+                Object values[] = DateGroup.values();
                 for (int j = 0; j < values.length; j++)
                     ((Combo) widget).add(values[j].toString());
                 ((Combo) widget).select(0);
             } else if (option.getType() == Date.class)
                 widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
             else if (option.getType() == String.class) {
-                if (option.getName().compareTo("Aliquot Type") == 0)
+                if (option.getName().compareTo("Sample Type") == 0)
                     try {
                         widget = new AutoTextWidget(parameterSection, SWT.None,
                             site.getAllSampleTypeCollection(true),

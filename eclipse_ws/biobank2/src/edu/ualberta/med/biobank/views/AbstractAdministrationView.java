@@ -129,10 +129,6 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             }
 
             @Override
-            public void executeDoubleClick() {
-            }
-
-            @Override
             public String getTooltipText() {
                 return null;
             }
@@ -159,6 +155,16 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             @Override
             protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
                 throws Exception {
+                return null;
+            }
+
+            @Override
+            public String getEntryFormId() {
+                return null;
+            }
+
+            @Override
+            public String getViewFormId() {
                 return null;
             }
         };

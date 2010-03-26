@@ -27,7 +27,9 @@ Bundle-ClassPath: conf/,
  lib/sdk-security.jar,
  lib/sdk-writable-client-framework.jar,
  lib/spring.jar,
- lib/xercesImpl.jar
+ lib/xercesImpl.jar,
+ lib/xstream-1.3.1.jar,
+ .
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,
@@ -49,6 +51,7 @@ Export-Package: antlr;
    antlr.collections,
    javax.swing.event",
  antlr.preprocessor;uses:="antlr.collections.impl,antlr",
+ com.thoughtworks.xstream,
  edu.ualberta.med.biobank.common,
  edu.ualberta.med.biobank.common.cbsr,
  edu.ualberta.med.biobank.common.debug,

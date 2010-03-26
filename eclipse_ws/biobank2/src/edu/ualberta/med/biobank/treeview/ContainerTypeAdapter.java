@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ContainerTypeAdapter extends AdapterBase {
 
@@ -46,14 +45,9 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        openForm(new FormInput(this), ContainerTypeViewForm.ID);
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Container Type", ContainerTypeEntryForm.ID);
-        addViewMenu(menu, "Container Type", ContainerTypeViewForm.ID);
+        addEditMenu(menu, "Container Type");
+        addViewMenu(menu, "Container Type");
         addDeleteMenu(menu, "Container Type", DEL_CONFIRM_MSG);
     }
 
@@ -86,6 +80,16 @@ public class ContainerTypeAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return ContainerTypeEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return ContainerTypeViewForm.ID;
     }
 
 }

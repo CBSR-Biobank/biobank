@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 
-public class SampleCount extends QueryObject {
+public class AliquotCount extends QueryObject {
 
-    protected static final String NAME = "Aliquot Type Totals";
+    protected static final String NAME = "Sample Type Totals";
 
-    public SampleCount(String op, Integer siteId) {
+    public AliquotCount(String op, Integer siteId) {
         super("Lists the total number of aliquots per sample type.",
             "Select Alias.sampleType.name, count(*) from "
                 + Aliquot.class.getName()

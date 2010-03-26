@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,8 +25,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperAdapter;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -44,6 +45,8 @@ public class ShipmentPatientsWidget extends BiobankWidget {
     private SiteWrapper currentSite;
 
     private boolean editable;
+
+    private List<PatientAddListener> patientListeners;
 
     public ShipmentPatientsWidget(Composite parent, int style,
         ShipmentWrapper ship, final SiteWrapper site, FormToolkit toolkit,
@@ -97,6 +100,16 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         addDeleteSupport();
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (patientListeners != null) {
+            for (PatientAddListener listener : patientListeners) {
+                listener.removeListener();
+            }
+        }
+    }
+
     private boolean addPatient() {
         String patientNumber = newPatientText.getText().trim();
         if (!patientNumber.isEmpty()) {
@@ -127,13 +140,13 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         return false;
     }
 
-    private void addPatientListener(final PatientWrapper patient) {
-        patient.addWrapperListener(new WrapperAdapter() {
-            @Override
-            public void inserted(WrapperEvent event) {
-                addPatient(patient);
-            }
-        });
+    private void addPatientListener(PatientWrapper patient) {
+        PatientAddListener listener = new PatientAddListener(patient);
+        patient.addWrapperListener(listener);
+        if (patientListeners == null) {
+            patientListeners = new ArrayList<PatientAddListener>();
+        }
+        patientListeners.add(listener);
     }
 
     private void addPatient(PatientWrapper patient) {
@@ -177,5 +190,24 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
         patientTable.addDoubleClickListener(listener);
+    }
+
+    public class PatientAddListener extends WrapperListenerAdapter {
+        private PatientWrapper patient;
+
+        public PatientAddListener(PatientWrapper patient) {
+            this.patient = patient;
+        }
+
+        public void removeListener() {
+            patient.removeWrapperListener(this);
+        }
+
+        @Override
+        public void inserted(WrapperEvent event) {
+            if (!ShipmentPatientsWidget.this.isDisposed()) {
+                addPatient(patient);
+            }
+        }
     }
 }

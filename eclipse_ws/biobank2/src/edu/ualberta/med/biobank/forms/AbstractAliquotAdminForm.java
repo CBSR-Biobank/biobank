@@ -30,8 +30,8 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     @Override
     protected void init() {
         if (activityLogger == null) {
-            activityLogger = Logger.getLogger(ActivityLogAppender.class.getPackage()
-                .getName());
+            activityLogger = Logger.getLogger(ActivityLogAppender.class
+                .getPackage().getName());
             activityLogger.setLevel(Level.TRACE);
         }
         if (appender == null) {

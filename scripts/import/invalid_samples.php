@@ -1,25 +1,11 @@
 #!/usr/bin/env php
 <?php
 
-$old_study_name = array("BBPSP" => "BBP");
-
-$old_sample_type_name = array(
-   "DNA (White blood cells)" => "DNA (WBC)",
-   "RNAlater Biopsies" => "RNA Later"
-   );
-
 main();
 
 function main() {
    $invalid_samples = array(
-      array("BBPSP","DNA (White blood cells)"),
-      array("BBPSP","RNAlater Biopsies"),
-      //array("CEGIIR","Whole Blood EDTA"),
-      array("KDCS","RNAlater Biopsies"),
-      array("RVS","RNAlater Biopsies"),
-      //array("VAS","Finger Nails"),
-      //array("VAS","Hair"),
-      //array("VAS","Toe Nails")
+      array("RVS","Peritoneal Dialysate"),
       );
 
    $headings = array(
@@ -57,8 +43,8 @@ and sample_list.sample_name='{sample_type}'"
       );
 
    foreach ($invalid_samples as $invalid_sample) {
-      $study_name = getOldStudyName($invalid_sample[0]);
-      $sample_type_name = getOldSampleTypeName($invalid_sample[1]);
+      $study_name = Utils::getOldStudyName($invalid_sample[0]);
+      $sample_type_name = Utils::getOldSampleTypeName($invalid_sample[1]);
       echo "study \"{$study_name}\" has no sample storage for sample type \"{$sample_type_name}\"\n";
    }
 
@@ -68,8 +54,8 @@ and sample_list.sample_name='{sample_type}'"
    echo implode(",", $headings), "\n";
 
    foreach ($invalid_samples as $invalid_sample) {
-      $study_name = getOldStudyName($invalid_sample[0]);
-      $sample_type_name = getOldSampleTypeName($invalid_sample[1]);
+      $study_name = Utils::getOldStudyName($invalid_sample[0]);
+      $sample_type_name = Utils::getOldSampleTypeName($invalid_sample[1]);
 
       foreach ($queries as $key => $query) {
          $query = str_replace(array('{study}', '{sample_type}'),
@@ -93,24 +79,6 @@ and sample_list.sample_name='{sample_type}'"
          }
       }
    }
-}
-
-function getOldStudyName($name) {
-   global $old_study_name;
-
-   if (isset($old_study_name[$name])) {
-      return $old_study_name[$name];
-   }
-   return $name;
-}
-
-function getOldSampleTypeName($name) {
-   global $old_sample_type_name;
-
-   if (isset($old_sample_type_name[$name])) {
-      return $old_sample_type_name[$name];
-   }
-   return $name;
 }
 
 ?>
