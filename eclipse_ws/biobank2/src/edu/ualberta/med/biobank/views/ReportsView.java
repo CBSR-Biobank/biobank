@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.views;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;

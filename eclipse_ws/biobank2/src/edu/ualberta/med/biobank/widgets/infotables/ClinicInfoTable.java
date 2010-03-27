@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
@@ -170,18 +169,12 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         return row.clinic;
     }
 
-    @Override
-    public void setSelection(ClinicWrapper item) {
-        BiobankCollectionModel modelItem = null;
-        for (BiobankCollectionModel m : model) {
-            if (item.equals(m.o)) {
-                modelItem = m;
-                break;
-            }
-        }
-        if (modelItem == null)
-            return;
-
-        tableViewer.setSelection(new StructuredSelection(modelItem));
-    }
+    /*
+     * @Override public void setSelection(ClinicWrapper item) {
+     * BiobankCollectionModel modelItem = null; for (BiobankCollectionModel m :
+     * model) { if (item.equals(m.o)) { modelItem = m; break; } } if (modelItem
+     * == null) return;
+     * 
+     * tableViewer.setSelection(new StructuredSelection(modelItem)); }
+     */
 }
