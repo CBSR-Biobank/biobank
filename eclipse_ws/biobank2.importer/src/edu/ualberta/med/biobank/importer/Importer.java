@@ -431,7 +431,7 @@ public class Importer {
     private static void checkSourceVessels() throws ApplicationException {
         for (SourceVesselWrapper sourceVessel : SourceVesselWrapper
             .getAllSourceVessels(appService)) {
-            if (sourceVessel.getName().equals("Unknown - import")) {
+            if (sourceVessel.getName().equals("Unknown / import")) {
                 importSourceVessel = sourceVessel;
             }
         }
