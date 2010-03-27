@@ -103,8 +103,3 @@ located within the /output/<<project name>>/src/ sub-folders.
 BBPDB EXPORT
 - use Bullzip Access to Mysql to export data to MySQL
 
-
-CORRUPTION TEST
-CORRUPTION TEST2
-CORRUPTION TEST3
-CORRUPTION TEST4
