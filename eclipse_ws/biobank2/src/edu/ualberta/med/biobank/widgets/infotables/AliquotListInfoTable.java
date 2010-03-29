@@ -120,7 +120,8 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

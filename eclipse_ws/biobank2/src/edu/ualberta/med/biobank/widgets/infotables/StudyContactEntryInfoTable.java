@@ -118,7 +118,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

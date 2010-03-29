@@ -102,7 +102,8 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     /**

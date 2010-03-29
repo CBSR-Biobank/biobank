@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common;
 
+import java.net.URL;
+
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
 
@@ -13,14 +15,13 @@ public class ServiceConnection {
     public static WritableApplicationService getAppService(String serverUrl,
         String userName, String password) throws Exception {
         if (serverUrl.startsWith("https")) {
-            // URL url =
-            // ServiceConnection.class.getResource("cert/all.keystore");
-            // if (url != null) {
-            // if (resourceResolver != null) {
-            // url = resourceResolver.resolveURL(url);
-            // }
-            // System.setProperty("javax.net.ssl.trustStore", url.getFile());
-            // }
+            URL url = ServiceConnection.class.getResource("cert/all.keystore");
+            if (url != null) {
+                if (resourceResolver != null) {
+                    url = resourceResolver.resolveURL(url);
+                }
+                System.setProperty("javax.net.ssl.trustStore", url.getFile());
+            }
         }
         if (userName == null) {
             return (WritableApplicationService) ApplicationServiceProvider

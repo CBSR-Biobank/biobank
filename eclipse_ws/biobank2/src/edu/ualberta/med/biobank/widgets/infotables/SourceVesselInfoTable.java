@@ -71,7 +71,8 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

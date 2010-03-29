@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.importer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
@@ -59,7 +60,11 @@ public class FreezerImporter {
         sampleImportCount = 0;
         currentPalletNr = 0;
 
-        doImport();
+        if (configuration.importDewar()) {
+            doImportDewar();
+        } else {
+            doImport();
+        }
     }
 
     protected void doImport() throws Exception {
@@ -76,6 +81,43 @@ public class FreezerImporter {
             ps = con.prepareStatement(query);
             ps.setInt(1, bbpdbFreezerNum);
             String hotelLabel = hotel.getLabel();
+            int len = hotelLabel.length();
+            ps.setString(2, hotelLabel.substring(len - 2));
+
+            rs = ps.executeQuery();
+            if (rs == null) {
+                throw new Exception("Database query returned null");
+            }
+
+            processResultSet(rs, hotel);
+        }
+    }
+
+    protected void doImportDewar() throws Exception {
+        ResultSet rs;
+        PreparedStatement ps;
+
+        query = "select patient_visit.date_received, "
+            + "patient_visit.date_taken, study_list.study_name_short, "
+            + "sample_list.sample_name_short, freezer.*, patient.dec_chr_nr, "
+            + "patient_visit.bb2_pv_id from freezer "
+            + "left join frz_99_inv_id on frz_99_inv_id.inventory_id=freezer.inventory_id "
+            + "join patient_visit on patient_visit.visit_nr=freezer.visit_nr "
+            + "join patient on patient.patient_nr=patient_visit.patient_nr "
+            + "join study_list on study_list.study_nr=patient_visit.study_nr "
+            + "join sample_list on freezer.sample_nr=sample_list.sample_nr "
+            + "where freezer.fnum = ? and freezer.rack= ? "
+            + "and frz_99_inv_id.inventory_id is null "
+            + "and sample_name_short in ('Colon, D', 'Stomach, B', "
+            + "'Stomach, A','Duodenum','Jejunum', 'Ileum','Colon, A', "
+            + "'Colon, T') order by freezer.box, freezer.cell";
+
+        for (String hotelLabel : Arrays.asList("05BJ", "05BK")) {
+            ContainerWrapper hotel = ContainerWrapper.getContainersInSite(
+                appService, site, hotelLabel).get(0);
+
+            ps = con.prepareStatement(query);
+            ps.setInt(1, bbpdbFreezerNum);
             int len = hotelLabel.length();
             ps.setString(2, hotelLabel.substring(len - 2));
 

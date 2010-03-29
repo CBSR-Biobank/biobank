@@ -305,6 +305,10 @@ public class Importer {
         } else {
             logger.info("not configured for importing samples from containers");
         }
+
+        if (configuration.importDewar()) {
+            importDewar();
+        }
     }
 
     private static SiteWrapper getCbsrSite() throws Exception {
@@ -1161,6 +1165,22 @@ public class Importer {
         }
     }
 
+    private static void importDewar() throws Exception {
+        ContainerWrapper freezer05 = null;
+
+        for (ContainerWrapper container : cbsrSite.getTopContainerCollection()) {
+            String label = container.getLabel();
+            String typeNameShort = container.getContainerType().getNameShort();
+            if (label.equals("05") && typeNameShort.equals("F6x12")) {
+                freezer05 = container;
+            }
+        }
+
+        new FreezerImporter(appService, con, configuration, cbsrSite,
+            freezer05, 5);
+
+    }
+
     public static void importSample(SiteWrapper site, String studyNameShort,
         String patientNr, int visitId, String dateProcessedStr,
         String dateTakenStr, ContainerWrapper parentContainer, int containerNr,
@@ -1304,7 +1324,7 @@ public class Importer {
         for (AliquotWrapper samp : samples) {
             labels += samp.getPositionString(true, true) + ", ";
         }
-        logger.error("a aliquot with inventory id " + inventoryId
+        logger.error("an aliquot with inventory id " + inventoryId
             + " already exists at " + labels);
         return false;
     }

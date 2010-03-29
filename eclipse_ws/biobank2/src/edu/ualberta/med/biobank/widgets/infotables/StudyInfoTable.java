@@ -111,7 +111,8 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override
