@@ -30,6 +30,7 @@ public class PvSourceVesselInfoTable extends
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
