@@ -232,6 +232,7 @@ INSERT INTO `csm_pg_pe` VALUES (312,24,4,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (313,24,3,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (314,7,21,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (315,7,3,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (316,11,43,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -330,6 +331,7 @@ INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (33,'edu.ualberta.med.biobank.model.PvSourceVessel','edu.ualberta.med.biobank.model.PvSourceVessel','edu.ualberta.med.biobank.model.PvSourceVessel','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','','','',2,'2010-01-11');
 INSERT INTO `csm_protection_element` VALUES (42,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
+INSERT INTO `csm_protection_element` VALUES (43,'edu.ualberta.med.biobank.model.Site/ID=2/Name=Canadian BioSample Repository','Canadian BioSample Repository','edu.ualberta.med.biobank.model.Site','id','1','',2,'2010-03-30');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
