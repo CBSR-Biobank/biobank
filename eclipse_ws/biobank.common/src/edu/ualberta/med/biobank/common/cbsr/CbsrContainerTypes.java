@@ -43,7 +43,10 @@ public class CbsrContainerTypes {
         "R-StomachA", "R-StomachB", "R-StomachB", "RNA Biopsy", "RNA Biopsy",
         "S Water", "Serum B", "Serum Pel", "Serum", "Stomach, A", "Stomach, B",
         "T Nails", "T Water", "Urine", "WB DMSO", "WB Plasma", "WB RNA",
-        "WB Serum", "WBE", "WBlood", "Z Urine", };
+        "WB Serum", "WBE", "WBlood", "Z Urine",
+
+        "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
+        "Colon, A", "Colon, T", };
 
     public static ContainerTypeWrapper getContainerType(String name)
         throws Exception {

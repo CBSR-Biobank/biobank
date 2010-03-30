@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> {
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -71,7 +72,8 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

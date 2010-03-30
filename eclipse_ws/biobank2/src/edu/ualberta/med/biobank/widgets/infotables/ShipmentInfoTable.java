@@ -30,6 +30,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -102,7 +103,8 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     /**
