@@ -321,7 +321,11 @@ public abstract class AdapterBase {
         deltaListener.remove(new DeltaEvent(removed));
     }
 
-    public abstract void executeDoubleClick();
+    public void executeDoubleClick() {
+        if (enableActions) {
+            openViewForm();
+        }
+    }
 
     public void performDoubleClick() {
         if (!haveModelObject || (modelObject != null)) {
@@ -448,29 +452,27 @@ public abstract class AdapterBase {
 
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
 
-    protected void addEditMenu(Menu menu, String objectName,
-        final String editFormId) {
+    protected void addEditMenu(Menu menu, String objectName) {
         if (isEditable() && enableActions) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Edit " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    openForm(new FormInput(AdapterBase.this), editFormId);
+                    AdapterBase.this.openEntryForm();
                 }
             });
         }
     }
 
-    protected void addViewMenu(Menu menu, String objectName,
-        final String viewFormId) {
+    protected void addViewMenu(Menu menu, String objectName) {
         if (enableActions) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("View " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    openForm(new FormInput(AdapterBase.this), viewFormId);
+                    AdapterBase.this.openViewForm();
                 }
             });
         }
@@ -519,22 +521,24 @@ public abstract class AdapterBase {
     protected abstract Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception;
 
-    public static void closeEditor(FormInput input) {
+    public static boolean closeEditor(FormInput input) {
         IWorkbenchPage page = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getActivePage();
         IEditorPart part = page.findEditor(input);
         if (part != null) {
-            page.closeEditor(part, true);
+            return page.closeEditor(part, true);
         }
+        return false;
     }
 
-    public static void openForm(FormInput input, String id) {
+    public static IEditorPart openForm(FormInput input, String id) {
         closeEditor(input);
         try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, id, true);
         } catch (PartInitException e) {
             logger.error("Can't open form with id " + id, e);
+            return null;
         }
     }
 
@@ -550,6 +554,22 @@ public abstract class AdapterBase {
         }
         return null;
     }
+
+    public void openViewForm() {
+        openForm(new FormInput(this), getViewFormId());
+    }
+
+    public void openEntryForm() {
+        openEntryForm(false);
+    }
+
+    public void openEntryForm(boolean hasPreviousForm) {
+        openForm(new FormInput(this, hasPreviousForm), getEntryFormId());
+    }
+
+    public abstract String getViewFormId();
+
+    public abstract String getEntryFormId();
 
     public abstract AdapterBase accept(NodeSearchVisitor visitor);
 

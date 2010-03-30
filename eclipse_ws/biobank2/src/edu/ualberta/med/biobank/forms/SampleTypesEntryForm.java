@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.events.SelectionAdapter;
@@ -47,7 +48,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
         globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(appService,
             true);
+        if (globalSampleTypes == null) {
+            globalSampleTypes = new ArrayList<SampleTypeWrapper>();
+        }
         siteSampleTypes = siteWrapper.getSampleTypeCollection(true);
+        if (siteSampleTypes == null) {
+            siteSampleTypes = new ArrayList<SampleTypeWrapper>();
+        }
         setPartName("Sample Types Entry");
     }
 
@@ -108,7 +115,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        if (siteWrapper != null) {
+        if (!SessionManager.getInstance().isAllSitesSelected()) {
             siteWrapper.reload();
             siteWrapper.addSampleTypes(siteSampleWidget
                 .getAddedOrModifiedSampleTypes());

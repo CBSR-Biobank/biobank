@@ -41,9 +41,9 @@
   <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank2.jar.files"
             value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar, org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, commons-lang-2.4.jar,iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
-  <property name="biobank.common.jar.files" value="commons-lang-2.4.jar" />
+  <property name="biobank.common.jar.files" value="commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.importer.jar.files"
-            value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
+            value="commons-collections-3.2.jar,commons-logging-1.1.jar,mysql-connector-java-5.1.7-bin.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar" />
   <property name="test.output" location="testing" />
@@ -112,13 +112,20 @@
     </or>
   </condition>
   <condition property="isHostAicmlMed">
-    <equals arg1="${host.name}" arg2="aicml-med.cs.uablerta.ca"
+    <equals arg1="${host.name}" arg2="aicml-med"
             casesensitive="true" trim="true" />
   </condition>
   <condition property="isHostCbsr">
     <equals arg1="${host.name}" arg2="cbsr.biochem.ualberta.ca"
             casesensitive="true" trim="true" />
   </condition>
+  <condition property="isHostLocal">
+    <and>
+      <isfalse value="${isHostAicmlMed}" />
+      <isfalse value="${isHostCbsr}" />
+    </and>
+  </condition>
+
   <!-- end of copied part -->
   <target name="check-jars-available">
     <available file="${req.jars.dir}" type="dir" property="jars.available" />
@@ -127,7 +134,6 @@
           unless="jars.available"
           description="downloads required jars from the host machine">
     <mkdir dir="${req.jars.dir}" />
-    <echo message="downloading biobank jars..." />
     <exec executable="curl">
       <arg value="--silent" />
       <arg value="-obiobank_jars.tar.bz2" />
@@ -226,14 +232,14 @@
                       files="${cacore.system.jar.files}" />
     </dependset>
     <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir}/lib"
-                      files="${biobank2.jar.files}" />
-    </dependset>
-    <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
                       files="${biobank.common.jar.files}" />
+    </dependset>
+    <dependset>
+      <srcfilelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
+      <targetfilelist dir="${eclipse.proj.dir}/lib"
+                      files="${biobank2.jar.files}" />
     </dependset>
     <dependset>
       <srcfilelist dir="${req.jars.dir}"
@@ -266,33 +272,10 @@
                       files="${sdk.jar.files.basename}" />
     </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-lang-2.4.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir}/lib">
-      <fileset dir="${req.jars.dir}">
-        <include name="org.eclipse.nebula.cwt_0.9.0.HEAD.jar" />
-        <include name="org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar" />
-        <include name="gluegen.jar" />
-        <include name="ini4j-0.5.1.jar" />
-        <include name="jdom.jar" />
-        <include name="scanlib.jar" />
-        <include name="commons-beanutils-1.8.0.jar" />
-        <include name="commons-digester-1.7.jar" />
-        <include name="commons-lang-2.4.jar" />
-        <include name="iText-2.1.0.jar" />
-        <include name="jasperreports-3.7.0.jar" />
-        <include name="DynamicJasper-3.0.14.jar" />
-        <include name="jdt-compiler-3.1.1.jar" />
-        <include name="mail.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.importer}/lib">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-lang-2.4.jar" />
-        <include name="mysql-connector-java-5.1.7-bin.jar" />
-      </fileset>
+      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+      <filelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
+      <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
+      <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/lib"
           file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
@@ -301,18 +284,19 @@
     <copy todir="${eclipse.proj.dir.importer}/lib"
           file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
     <copy todir="${eclipse.proj.dir.common}/conf">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf">
-
-        <include name="application-config-client*.xml" />
-      </fileset>
+      <filelist
+         dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
+         files="application-config-client.xml,application-config-client-info.xml" />
     </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib">
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+    <copy todir="${eclipse.proj.dir}/lib">
+      <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
     <copy todir="${eclipse.proj.dir.common}/lib" 
           file="${eclipse.proj.dir.server}/output/biobank-remote.jar" />
     <copy todir="${eclipse.proj.dir.importer}/lib">
+      <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}" />
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+      <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
     </copy>
   </target>
   <!-- JBoss -->
@@ -322,7 +306,7 @@
               srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
   </target>
   <target name="hostAicmlMed" if="isHostAicmlMed">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
@@ -331,20 +315,23 @@
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+  <target name="hostLocal" if="isHostLocal">
+    <copy file="${secu-log.dir}/jboss/localhost.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="jboss.home.env">
+    <fail unless="env.JBOSS_HOME" message="JBOSS_HOME environment variable not defined" />
+  </target>
   <target name="deploy-jboss"
-          depends="package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr"
+          depends="jboss.home.env,sdk,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
-    <fail unless="env.JBOSS_HOME" message="$JBOSS_HOME not defined" />
-    <echo message="host ${host.name}" />
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
           overwrite="true" />
     <copy file="${secu-log.dir}/jboss/server${debugMode}.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
-          overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/localhost.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
@@ -365,7 +352,8 @@
           overwrite="true" />
   </target>
 
-  <target name="deploy" description="deploys to JBoss and Eclipse project">
+  <target name="deploy"
+          description="deploys to JBoss and Eclipse project">
     <antcall target="jars-download" />
     <antcall target="lib-sources-download" />
     <antcall target="deploy-eclipse" />
@@ -528,6 +516,7 @@
   </target>
 
   <target name="clean"
+          depends="tests-clean,clean-jars"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
     <ant target="clean-jars" />

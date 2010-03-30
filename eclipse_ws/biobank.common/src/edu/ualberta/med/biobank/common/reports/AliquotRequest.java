@@ -8,11 +8,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleRequest extends QueryObject {
+public class AliquotRequest extends QueryObject {
 
     protected static final String NAME = "Aliquot Request by CSV file";
 
-    public SampleRequest(String op, Integer siteId) {
+    public AliquotRequest(String op, Integer siteId) {
         super(
             "Given a CSV file detailing a request (Study, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
             "select s.patientVisit.patient.study.nameShort, s.inventoryId, s.linkDate, s.sampleType.name, s.aliquotPosition.container.label from "
@@ -27,7 +27,7 @@ public class SampleRequest extends QueryObject {
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
+    protected List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;

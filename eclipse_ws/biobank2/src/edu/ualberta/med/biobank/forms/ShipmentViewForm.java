@@ -128,11 +128,6 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected String getEntryFormId() {
-        return ShipmentEntryForm.ID;
-    }
-
-    @Override
     protected void reload() throws Exception {
         retrieveShipment();
         setPartName("Shipment " + shipment.getWaybill());

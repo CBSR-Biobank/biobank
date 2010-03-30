@@ -4,10 +4,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
 public class NewPsByStudyClinic extends QueryObject {
 
     protected static final String NAME = "New Patients per Study per Clinic by Date";
@@ -16,16 +12,14 @@ public class NewPsByStudyClinic extends QueryObject {
 
     public NewPsByStudyClinic(String op, Integer siteId) {
         super(
-            "Displays the total number of patients added per study per clinic by date range.",
+            "Displays the total number of patients added per study per clinic grouped by date range.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
-        addOption("Date Range", DateRange.class, DateRange.Month);
+        addOption("Date Range", DateGroup.class, DateGroup.Month);
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
-
+    public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
@@ -33,10 +27,9 @@ public class NewPsByStudyClinic extends QueryObject {
             if (option.type.equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
-        columnNames[2] = (String) params.get(0);
+        columnNames[2] = (String) params.remove(0);
         queryString = MessageFormat.format(queryString, columnNames[2]);
-        HQLCriteria c = new HQLCriteria(queryString);
-        return appService.query(c);
+        return params;
     }
 
     @Override

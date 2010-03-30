@@ -29,6 +29,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -71,7 +72,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic)
         throws ApplicationException {
-        super(parent, true, null, HEADINGS, BOUNDS, 10);
+        super(parent, null, HEADINGS, BOUNDS, 10);
         this.clinic = clinic;
         setCollection(clinic.getStudyCollection());
     }
@@ -107,7 +108,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

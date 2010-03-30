@@ -14,6 +14,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> {
 
+    private static final int PAGE_SIZE_ROWS = 5;
+
     protected class TableRowData {
         ContactWrapper contact;
         String clinicNameShort;
@@ -30,6 +32,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -79,7 +82,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
-        super(parent, contactCollection, HEADINGS, BOUNDS);
+        super(parent, contactCollection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
     }
 
     @Override
@@ -116,7 +119,8 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

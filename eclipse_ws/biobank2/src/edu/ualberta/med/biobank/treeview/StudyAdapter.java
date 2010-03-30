@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class StudyAdapter extends AdapterBase {
 
@@ -55,16 +54,9 @@ public class StudyAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        if (enableActions) {
-            openForm(new FormInput(this), StudyViewForm.ID);
-        }
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Study", StudyEntryForm.ID);
-        addViewMenu(menu, "Study", StudyViewForm.ID);
+        addEditMenu(menu, "Study");
+        addViewMenu(menu, "Study");
         addDeleteMenu(menu, "Study", DEL_CONFIRM_MSG);
     }
 
@@ -99,4 +91,13 @@ public class StudyAdapter extends AdapterBase {
         return null;
     }
 
+    @Override
+    public String getEntryFormId() {
+        return StudyEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return StudyViewForm.ID;
+    }
 }

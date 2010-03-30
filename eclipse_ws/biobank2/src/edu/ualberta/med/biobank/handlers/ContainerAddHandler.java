@@ -12,9 +12,6 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.forms.ContainerEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -36,8 +33,7 @@ public class ContainerAddHandler extends AbstractHandler {
             }
 
             SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-                .searchNode(SessionManager.getInstance()
-                    .getCurrentSite());
+                .searchNode(SessionManager.getInstance().getCurrentSite());
             Assert.isNotNull(siteAdapter);
 
             ContainerWrapper containerWrapper = new ContainerWrapper(
@@ -46,8 +42,7 @@ public class ContainerAddHandler extends AbstractHandler {
             ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
                 .getContainerTypesGroupNode(), containerWrapper);
 
-            AdapterBase.openForm(new FormInput(containerNode),
-                ContainerEntryForm.ID);
+            containerNode.openEntryForm();
         } catch (Exception e) {
             throw new ExecutionException("Error on action Add Container", e);
         }

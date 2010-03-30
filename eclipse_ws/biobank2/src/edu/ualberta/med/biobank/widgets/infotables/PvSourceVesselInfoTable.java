@@ -14,6 +14,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class PvSourceVesselInfoTable extends
     InfoTableWidget<PvSourceVesselWrapper> {
 
+    private static final int PAGE_SIZE_ROWS = 5;
+
     protected class TableRowData {
         PvSourceVesselWrapper pvSourceVessel;
         String name;
@@ -28,6 +30,7 @@ public class PvSourceVesselInfoTable extends
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -65,14 +68,9 @@ public class PvSourceVesselInfoTable extends
 
     private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
 
-    public PvSourceVesselInfoTable(Composite parent, boolean multiSelectRows,
-        List<PvSourceVesselWrapper> collection) {
-        super(parent, multiSelectRows, collection, HEADINGS, BOUNDS, 10);
-    }
-
     public PvSourceVesselInfoTable(Composite parent,
         List<PvSourceVesselWrapper> collection) {
-        this(parent, true, collection);
+        super(parent, collection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
     }
 
     @Override
@@ -104,7 +102,8 @@ public class PvSourceVesselInfoTable extends
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

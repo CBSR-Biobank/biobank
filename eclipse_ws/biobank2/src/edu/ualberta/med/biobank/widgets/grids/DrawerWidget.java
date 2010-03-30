@@ -104,7 +104,7 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
             gc.setBackground(getStatus(boxIndex).getColor());
             gc.fillRectangle(rectangle);
             if (selection != null && (selection.row + 1) == boxIndex) {
-                gc.setBackground(e.display.getSystemColor(SWT.COLOR_RED));
+                gc.setBackground(e.display.getSystemColor(SWT.COLOR_YELLOW));
                 gc.fillRectangle(rectangle);
             }
             gc.drawRectangle(rectangle);

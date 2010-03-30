@@ -15,8 +15,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.ClinicEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ClinicGroup extends AdapterBase {
@@ -44,7 +42,7 @@ public class ClinicGroup extends AdapterBase {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     addClinic(ClinicGroup.this
-                        .getParentFromClass(SiteAdapter.class));
+                        .getParentFromClass(SiteAdapter.class), false);
                 }
             });
         }
@@ -85,12 +83,23 @@ public class ClinicGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addClinic(SiteAdapter siteAdapter) {
+    public static void addClinic(SiteAdapter siteAdapter,
+        boolean hasPreviousForm) {
         ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
         clinic.setSite(siteAdapter.getWrapper());
         ClinicAdapter adapter = new ClinicAdapter(siteAdapter
             .getClinicGroupNode(), clinic);
-        openForm(new FormInput(adapter), ClinicEntryForm.ID);
+        adapter.openEntryForm(hasPreviousForm);
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return null;
     }
 
 }

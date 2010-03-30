@@ -1,13 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,8 +37,11 @@ public class PalletCell extends Cell {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             for (int j = 0; j < ScanCell.COL_MAX; j++) {
-                palletScanned.put(new RowColPos(i, j), new PalletCell(
-                    scancells[i][j]));
+                ScanCell scanCell = scancells[i][j];
+                if (scanCell != null && scanCell.getValue() != null) {
+                    palletScanned.put(new RowColPos(i, j), new PalletCell(
+                        scanCell));
+                }
             }
         }
         return palletScanned;
@@ -68,13 +72,13 @@ public class PalletCell extends Cell {
 
     public static Map<RowColPos, PalletCell> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
-        Map<RowColPos, PalletCell> palletScanned = initArray();
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsAlreadyAssigned(appService, siteId);
-        if (randomAliquots.size() > 0) {
-            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-                0, 0, randomAliquots.get(0).getInventoryId())));
-        }
+        // if (randomAliquots.size() > 0) {
+        // palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+        // 0, 0, randomAliquots.get(0).getInventoryId())));
+        // }
         if (randomAliquots.size() > 1) {
             palletScanned.put(new RowColPos(2, 4), new PalletCell(new ScanCell(
                 2, 4, randomAliquots.get(1).getInventoryId())));
@@ -85,7 +89,7 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomAliquotsNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned = initArray();
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsNotAssigned(appService, siteId);
         if (randomAliquots.size() > 1) {
@@ -96,17 +100,6 @@ public class PalletCell extends Cell {
                 0, 0, randomAliquots.get(0).getInventoryId())));
             // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
             // .get(1).getInventoryId()));
-        }
-        return palletScanned;
-    }
-
-    private static Map<RowColPos, PalletCell> initArray() {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        for (int indexRow = 0; indexRow < ScanCell.ROW_MAX; indexRow++) {
-            for (int indexCol = 0; indexCol < ScanCell.COL_MAX; indexCol++) {
-                palletScanned.put(new RowColPos(indexRow, indexCol),
-                    new PalletCell(new ScanCell(indexRow, indexCol, null)));
-            }
         }
         return palletScanned;
     }

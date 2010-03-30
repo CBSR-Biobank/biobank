@@ -63,6 +63,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         addEditSupport();
     }
 
+    @Override
+    protected boolean isEditMode() {
+        return true;
+    }
+
     /**
      * 
      * @param message The message to display in the SampleTypeDialog.
@@ -156,6 +161,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
                         setCollection(selectedSampleTypes);
                         deletedSampleTypes.add(sampleType);
+                        notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
                         BioBankPlugin.openRemoteConnectErrorMessage();
                     } catch (Exception e) {

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.utils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -36,6 +37,21 @@ public enum SearchType {
             return ContainerWrapper.getContainersInSite(SessionManager
                 .getAppService(),
                 SessionManager.getInstance().getCurrentSite(), searchString);
+        }
+    },
+
+    CONTAINER_PRODUCT_BARCODE("Container product barcode") {
+        @Override
+        public List<? extends ModelWrapper<?>> search(String searchString)
+            throws Exception {
+            ContainerWrapper container = ContainerWrapper
+                .getContainerWithProductBarcodeInSite(SessionManager
+                    .getAppService(), SessionManager.getInstance()
+                    .getCurrentSite(), searchString);
+            if (container != null) {
+                return Arrays.asList(container);
+            }
+            return null;
         }
     };
 

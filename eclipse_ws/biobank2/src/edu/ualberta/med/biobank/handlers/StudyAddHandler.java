@@ -8,9 +8,6 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.StudyEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
@@ -25,7 +22,7 @@ public class StudyAddHandler extends AbstractHandler {
         study.setSite(site);
         StudyAdapter studyNode = new StudyAdapter(siteAdapter
             .getStudiesGroupNode(), study);
-        AdapterBase.openForm(new FormInput(studyNode), StudyEntryForm.ID);
+        studyNode.openEntryForm();
         return null;
     }
 

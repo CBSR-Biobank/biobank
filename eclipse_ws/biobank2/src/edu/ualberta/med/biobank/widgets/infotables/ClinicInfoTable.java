@@ -79,7 +79,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         130 };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
@@ -116,7 +116,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override
@@ -168,4 +169,13 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         Assert.isNotNull(row);
         return row.clinic;
     }
+
+    /*
+     * @Override public void setSelection(ClinicWrapper item) {
+     * BiobankCollectionModel modelItem = null; for (BiobankCollectionModel m :
+     * model) { if (item.equals(m.o)) { modelItem = m; break; } } if (modelItem
+     * == null) return;
+     * 
+     * tableViewer.setSelection(new StructuredSelection(modelItem)); }
+     */
 }

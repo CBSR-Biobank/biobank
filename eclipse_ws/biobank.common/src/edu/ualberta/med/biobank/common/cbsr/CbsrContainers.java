@@ -107,21 +107,54 @@ public class CbsrContainers {
             .getContainerType("Pallet 96");
 
         ContainerTypeWrapper[] hotelTypes = new ContainerTypeWrapper[] {
-            h19Type, h19Type, h19Type, h19Type, h13Type, h13Type, h13Type,
-            h13Type, h19Type, h19Type, h19Type, h19Type, h19Type, h19Type,
-            h19Type, h19Type, h19Type, h19Type, h19Type, h19Type, h13Type,
-            h13Type, h13Type, h13Type, h19Type, h19Type, h19Type, h19Type,
-            h13Type, h13Type };
+            h19Type, // AA
+            h19Type, // AB
+            h19Type, // AC
+            h19Type, // AD
+            h13Type, // AE
+            h13Type, // AF
+            h13Type, // AG
+            h13Type, // AH
+            h19Type, // AJ
+            h19Type, // AK
+            h19Type, // AL
+            h19Type, // AM
+            h19Type, // AN
+            h19Type, // AP
+            h19Type, // AQ
+            h19Type, // AR
+            h19Type, // AS
+            h19Type, // AT
+            h19Type, // AU
+            h19Type, // AV
+            h13Type, // AW
+            h13Type, // AX
+            h13Type, // AY
+            h13Type, // AZ
+            h19Type, // BA
+            h19Type, // BB
+            h19Type, // BC
+            h19Type, // BD
+            h13Type, // BE
+            h13Type, // BF
+            null, // BG
+            null, // BH
+            h19Type, // BJ
+            h19Type, // BK
+        };
 
         RowColPos pos = new RowColPos();
         int count = 0;
         for (ContainerTypeWrapper hotelType : hotelTypes) {
             pos.row = count % 6;
             pos.col = count / 6;
-            hotel = addContainer(site, hotelType, freezer05, pos.row, pos.col);
+            if (hotelType != null) {
+                hotel = addContainer(site, hotelType, freezer05, pos.row,
+                    pos.col);
 
-            for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
-                addContainer(site, palletType, hotel, j, 0);
+                for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
+                    addContainer(site, palletType, hotel, j, 0);
+                }
             }
             ++count;
         }
@@ -130,8 +163,12 @@ public class CbsrContainers {
     private static void createSentSamplesFreezer(SiteWrapper site)
         throws Exception {
         ContainerWrapper hotel;
-        ContainerWrapper freezer05 = addTopLevelContainer(site, "SS",
+        ContainerWrapper freezerSS = addTopLevelContainer(site, "SS",
             CbsrContainerTypes.getContainerType("Freezer 4x6"));
+        freezerSS
+            .setComment("This freezer holds samples that have been sent out.");
+        freezerSS.persist();
+        freezerSS.reload();
         ContainerTypeWrapper h13Type = CbsrContainerTypes
             .getContainerType("Hotel 13");
         ContainerTypeWrapper h19Type = CbsrContainerTypes
@@ -147,7 +184,7 @@ public class CbsrContainers {
         for (ContainerTypeWrapper hotelType : hotelTypes) {
             pos.row = count % 4;
             pos.col = count / 4;
-            hotel = addContainer(site, hotelType, freezer05, pos.row, pos.col);
+            hotel = addContainer(site, hotelType, freezerSS, pos.row, pos.col);
 
             for (int j = 0, n = hotelType.getRowCapacity(); j < n; ++j) {
                 addContainer(site, palletType, hotel, j, 0);
@@ -381,8 +418,9 @@ public class CbsrContainers {
             hairBinType, // 27,
             null, // 28
             ftaBinLoerschType, // 29
-            null, // 30
+            ftaBinLoerschType, // 30
             ftaBinLoerschType, // 31
+            ftaBinLoerschType, // 32
         };
 
         drawer = addContainer(site, drawerType, cabinet, 3, 0);
@@ -401,7 +439,7 @@ public class CbsrContainers {
         container.setLabel(label);
         container.setSite(site);
         container.setContainerType(type);
-        container.setActivityStatus(CbsrSite.getActivityStatus("Active"));
+        container.setActivityStatus(CbsrSite.getActiveActivityStatus());
         container.persist();
         container.reload();
         return container;
@@ -413,7 +451,7 @@ public class CbsrContainers {
         ContainerWrapper container = new ContainerWrapper(site.getAppService());
         container.setSite(site);
         container.setContainerType(type);
-        container.setActivityStatus(CbsrSite.getActivityStatus("Active"));
+        container.setActivityStatus(CbsrSite.getActiveActivityStatus());
         container.setPosition(row, col);
         container.setParent(parent);
         container.persist();

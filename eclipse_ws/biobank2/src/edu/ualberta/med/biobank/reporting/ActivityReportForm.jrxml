@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ActivityReport" pageWidth="612" pageHeight="791" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
 	<property name="com.jasperassistant.designer.Grid" value="true"/>
 	<property name="com.jasperassistant.designer.SnapToGrid" value="true"/>
@@ -22,7 +21,7 @@
 				<textElement/>
 				<text><![CDATA[USER:]]></text>
 			</staticText>
-			<textField hyperlinkType="None">
+			<textField>
 				<reportElement x="519" y="0" width="51" height="21"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{username}]]></textFieldExpression>
@@ -30,8 +29,8 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="14">
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="None">
+		<band height="13">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="572" height="13" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box padding="0">
 					<pen lineWidth="0.0" lineStyle="Solid"/>
@@ -44,19 +43,24 @@
 	<pageFooter>
 		<band height="20">
 			<staticText>
-				<reportElement x="0" y="6" width="61" height="14"/>
+				<reportElement x="0" y="6" width="50" height="14"/>
 				<textElement verticalAlignment="Bottom"/>
 				<text><![CDATA[Printed on ]]></text>
 			</staticText>
-			<textField pattern="dd/MM/yy h:mm:ss a" hyperlinkType="None">
-				<reportElement x="60" y="6" width="217" height="14"/>
+			<textField pattern="yyyy-MM-dd HH:mm">
+				<reportElement x="49" y="6" width="217" height="14"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
 			</textField>
-			<textField hyperlinkType="None">
-				<reportElement x="504" y="6" width="68" height="14"/>
+			<textField>
+				<reportElement x="452" y="0" width="80" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$V{PAGE_NUMBER}.toString()]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="532" y="0" width="40" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

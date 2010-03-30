@@ -403,6 +403,14 @@ public class ContainerViewForm extends BiobankViewForm {
                     containerToOpen);
                 AdapterBase.openForm(new FormInput(newAdapter),
                     ContainerEntryForm.ID);
+                containerToOpen.setSite(containerAdapter.getParentFromClass(
+                    SiteAdapter.class).getWrapper());
+                containerToOpen.setParent(container);
+                containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
+                    .getCol()));
+                newAdapter = new ContainerAdapter(containerAdapter,
+                    containerToOpen);
+                newAdapter.openEntryForm(true);
             }
         } else {
             ContainerWrapper child = cell.getContainer();
@@ -451,11 +459,6 @@ public class ContainerViewForm extends BiobankViewForm {
                 refreshVis();
             setContainerValues();
         }
-    }
-
-    @Override
-    protected String getEntryFormId() {
-        return ContainerEntryForm.ID;
     }
 
 }

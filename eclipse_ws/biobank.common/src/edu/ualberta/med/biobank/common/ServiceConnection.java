@@ -40,14 +40,7 @@ public class ServiceConnection {
         ServiceConnection.resourceResolver = resourceResolver;
     }
 
-    public static void test() {
-        // AuthorizationManager am = SecurityServiceProvider
-        // .getAuthorizationManager("biobank2");
-        // User user = am.getUser("testuser");
-        // System.out.println(user.getUserId() + " - " + user.getPassword());
-        // System.out.println(am.checkPermission("tech1", Study.class.getName(),
-        // "READ"));
-        // System.out.println(am.checkPermission("tech1", Study.class.getName(),
-        // "UPDATE"));
+    public static ResourceResolver getResourceResolver() {
+        return resourceResolver;
     }
 }

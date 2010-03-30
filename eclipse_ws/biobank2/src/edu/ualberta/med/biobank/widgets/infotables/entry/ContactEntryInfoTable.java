@@ -29,7 +29,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     private ClinicWrapper clinic;
 
     public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, false, clinic.getContactCollection(true));
+        super(parent, clinic.getContactCollection(true));
         this.clinic = clinic;
         selectedContacts = clinic.getContactCollection();
         if (selectedContacts == null) {
@@ -80,19 +80,24 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         });
     }
 
+    @Override
+    protected boolean isEditMode() {
+        return true;
+    }
+
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {
         ContactAddDialog dlg = new ContactAddDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), contactWrapper);
         int res = dlg.open();
         if (res == Dialog.OK) {
+            ContactWrapper contact = dlg.getContactWrapper();
             if (add) {
                 // only add to the collection when adding and not editing
-                ContactWrapper contact = dlg.getContactWrapper();
                 contact.setClinic(clinic);
                 selectedContacts.add(contact);
                 addedOrModifiedContacts.add(contact);
             }
-            reloadCollection(selectedContacts);
+            reloadCollection(selectedContacts, contact);
             notifyListeners();
         } else if (!add && res == Dialog.CANCEL) {
             try {
@@ -100,7 +105,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Cancel error", e);
             }
-            reloadCollection(selectedContacts);
+            reloadCollection(selectedContacts, null);
         }
     }
 
@@ -124,6 +129,6 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         }
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
-        reloadCollection(selectedContacts);
+        reloadCollection(selectedContacts, null);
     }
 }

@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class ShipmentAdapter extends AdapterBase {
 
@@ -48,14 +47,9 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public void executeDoubleClick() {
-        openForm(new FormInput(this), ShipmentViewForm.ID);
-    }
-
-    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Shipment", ShipmentEntryForm.ID);
-        addViewMenu(menu, "Shipment", ShipmentViewForm.ID);
+        addEditMenu(menu, "Shipment");
+        addViewMenu(menu, "Shipment");
     }
 
     @Override
@@ -79,6 +73,16 @@ public class ShipmentAdapter extends AdapterBase {
         throws Exception {
         getWrapper().reload();
         return getWrapper().getPatientVisitCollection();
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return ShipmentEntryForm.ID;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return ShipmentViewForm.ID;
     }
 
 }

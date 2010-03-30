@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.importer;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,13 +11,15 @@ public class Configuration {
     private boolean importPatientVisits;
     private Map<Integer, String> importCabinets;
     private Map<Integer, String> importFreezers;
+    private boolean importDewar;
 
-    Configuration(String configFilename) throws IOException {
+    Configuration(String configFilename) throws Exception {
         importPatients = false;
         importShipments = false;
         importPatientVisits = false;
         importCabinets = new HashMap<Integer, String>();
         importFreezers = new HashMap<Integer, String>();
+        importDewar = false;
 
         Properties configProps = new Properties();
         InputStream in = Thread.currentThread().getContextClassLoader()
@@ -44,7 +45,7 @@ public class Configuration {
 
         for (int i = 1; i <= 2; ++i) {
             property = configProps.getProperty("cbsr.import.cabinet.0" + i);
-            if (property != null) {
+            if ((property != null) && !property.equals("no")) {
                 importCabinets.put(i, property);
             }
         }
@@ -52,9 +53,19 @@ public class Configuration {
         String[] freezerNrs = new String[] { "01", "02", "03", "05", "99" };
         for (String nr : freezerNrs) {
             property = configProps.getProperty("cbsr.import.freezer." + nr);
-            if (property != null) {
+            if ((property != null) && !property.equals("no")) {
                 importFreezers.put(Integer.valueOf(nr), property);
             }
+        }
+
+        property = configProps.getProperty("cbsr.import.dewar");
+        if (property != null) {
+            if ((importCabinets.size() > 0) || (importFreezers.size() > 0)) {
+                throw new Exception("cannot import dewar samples at the same "
+                    + "time as import freezer and cabinet samples");
+            }
+
+            importDewar = property.equals("yes");
         }
     }
 
@@ -131,17 +142,21 @@ public class Configuration {
         }
 
         String configValue;
-        if (hotelLabel.length() == 4) {
+        if (hotelLabel.startsWith("SS")) {
+            configValue = importFreezers.get(99);
+        } else if (hotelLabel.length() == 4) {
             configValue = importFreezers.get(Integer.valueOf(hotelLabel
                 .substring(0, 2)));
-        } else if (hotelLabel.startsWith("Sent Samples")) {
-            configValue = importFreezers.get(99);
         } else {
             throw new Exception("invalid hotel label: " + hotelLabel);
         }
 
         return (configValue.equals("yes") || configValue.contains(hotelLabel
             .subSequence(2, 4)));
+    }
+
+    public boolean importDewar() {
+        return importDewar;
     }
 
 }

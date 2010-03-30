@@ -33,6 +33,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -82,7 +83,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection) {
-        super(parent, true, aliquotCollection, HEADINGS, BOUNDS, 20);
+        super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
     }
 
     @Override
@@ -120,7 +121,8 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

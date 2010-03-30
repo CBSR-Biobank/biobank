@@ -4,15 +4,12 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class FreezerSSamples extends QueryObject {
+public class FreezerSAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study";
 
-    public FreezerSSamples(String op, Integer siteId) {
+    public FreezerSAliquots(String op, Integer siteId) {
         super(
             "Displays the total number of freezer aliquots per study.",
             "select aliquot.patientVisit.patient.study.nameShort, count(*) from "
@@ -29,12 +26,9 @@ public class FreezerSSamples extends QueryObject {
     }
 
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
+    public List<Object> preProcess(List<Object> params) {
         params.add("%Freezer%");
-        HQLCriteria c = new HQLCriteria(queryString);
-        c.setParameters(params);
-        return appService.query(c);
+        return params;
     }
 
     @Override

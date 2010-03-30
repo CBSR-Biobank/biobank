@@ -6,7 +6,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.views.SearchView;
@@ -21,13 +20,7 @@ public class SearchHandler extends AbstractHandler {
         IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
             .getActivePage();
         try {
-            boolean wasOpen = HandlerUtil
-                .toggleCommandState(event.getCommand());
-            if (wasOpen) {
-                page.hideView(page.findView(SearchView.ID));
-            } else {
-                page.showView(SearchView.ID);
-            }
+            page.showView(SearchView.ID);
         } catch (PartInitException e) {
             throw new ExecutionException("View can't be open", e);
         }

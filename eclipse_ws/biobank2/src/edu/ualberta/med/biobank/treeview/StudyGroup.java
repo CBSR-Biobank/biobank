@@ -15,8 +15,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.StudyEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class StudyGroup extends AdapterBase {
@@ -25,6 +23,7 @@ public class StudyGroup extends AdapterBase {
         super(parent, id, "Studies", true, true);
     }
 
+    @Override
     public void openViewForm() {
         Assert.isTrue(false, "should not be called");
     }
@@ -48,7 +47,7 @@ public class StudyGroup extends AdapterBase {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     addStudy(StudyGroup.this
-                        .getParentFromClass(SiteAdapter.class));
+                        .getParentFromClass(SiteAdapter.class), false);
                 }
             });
         }
@@ -90,11 +89,21 @@ public class StudyGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addStudy(SiteAdapter siteAdapter) {
+    public static void addStudy(SiteAdapter siteAdapter, boolean hasPreviousForm) {
         StudyWrapper study = new StudyWrapper(siteAdapter.getAppService());
         study.setSite(siteAdapter.getWrapper());
         StudyAdapter adapter = new StudyAdapter(siteAdapter
             .getStudiesGroupNode(), study);
-        openForm(new FormInput(adapter), StudyEntryForm.ID);
+        adapter.openEntryForm(hasPreviousForm);
+    }
+
+    @Override
+    public String getEntryFormId() {
+        return null;
+    }
+
+    @Override
+    public String getViewFormId() {
+        return null;
     }
 }

@@ -32,6 +32,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Text siteLabel;
 
+    private Text studyLabel;
+
     private AliquotListInfoTable aliquotWidget;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
@@ -39,6 +41,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private Text clinicLabel;
 
     private Text shipmentWaybillLabel;
+
+    private Text shipmentDateReceivedLabel;
 
     private Text patientLabel;
 
@@ -87,9 +91,12 @@ public class PatientVisitViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
+        studyLabel = createReadOnlyField(client, SWT.NONE, "Study");
         clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
+        shipmentDateReceivedLabel = createReadOnlyField(client, SWT.NONE,
+            "Shipment Date Received");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyField(client, SWT.NONE,
             "Date Processed");
@@ -139,12 +146,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void setPatientVisitValues() {
-        setTextValue(siteLabel, patientVisit.getShipment().getClinic()
-            .getSite().getName());
+        setTextValue(siteLabel, patientVisit.getPatient().getStudy().getSite()
+            .getName());
+        setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
         setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
             : patientVisit.getShipment().getClinic().getName());
         setTextValue(shipmentWaybillLabel, patientVisit.getShipment()
             .getWaybill());
+        setTextValue(shipmentDateReceivedLabel, patientVisit.getShipment()
+            .getFormattedDateReceived());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel, patientVisit
             .getFormattedDateProcessed());
@@ -192,8 +202,4 @@ public class PatientVisitViewForm extends BiobankViewForm {
         }
     }
 
-    @Override
-    protected String getEntryFormId() {
-        return PatientVisitEntryForm.ID;
-    }
 }

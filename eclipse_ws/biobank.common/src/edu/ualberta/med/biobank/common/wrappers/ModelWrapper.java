@@ -13,6 +13,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,6 +39,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     private static Logger LOGGER = Logger.getLogger(ModelWrapper.class
         .getName());
+
+    private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
@@ -176,11 +181,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         persistChecks();
         SDKQuery query;
         E origObject = null;
+        WrapperEventType eventType;
         if (isNew()) {
             query = new InsertExampleQuery(wrappedObject);
+            eventType = WrapperEventType.INSERT;
         } else {
             query = new UpdateExampleQuery(wrappedObject);
             origObject = getObjectFromDatabase();
+            eventType = WrapperEventType.UPDATE;
         }
         persistDependencies(origObject);
         SDKQueryResult result = ((BiobankApplicationService) appService)
@@ -188,6 +196,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
         resetInternalField();
+        notifyListeners(new WrapperEvent(eventType, this));
     }
 
     /**
@@ -215,6 +224,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         deleteChecks();
         deleteDependencies();
         appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+        notifyListeners(new WrapperEvent(WrapperEventType.DELETE, this));
     }
 
     @SuppressWarnings("unused")
@@ -414,6 +424,30 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             LOGGER.error("Error testing security authorization on "
                 + getWrappedClass(), e);
             return false;
+        }
+    }
+
+    public void addWrapperListener(WrapperListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeWrapperListener(WrapperListener listener) {
+        listeners.add(listener);
+    }
+
+    private void notifyListeners(WrapperEvent event) {
+        for (WrapperListener listener : listeners) {
+            switch (event.getType()) {
+            case UPDATE:
+                listener.updated(event);
+                break;
+            case INSERT:
+                listener.inserted(event);
+                break;
+            case DELETE:
+                listener.deleted(event);
+                break;
+            }
         }
     }
 }

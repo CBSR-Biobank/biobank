@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -69,6 +71,10 @@ public abstract class BiobankFormBase extends EditorPart {
     private Map<String, Control> widgets;
 
     protected WidgetCreator widgetCreator;
+
+    public static List<BiobankFormBase> currentLinkedForms;
+
+    public List<BiobankFormBase> linkedForms;
 
     protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
         public void doubleClick(DoubleClickEvent event) {
@@ -138,12 +144,19 @@ public abstract class BiobankFormBase extends EditorPart {
         throws PartInitException {
         if (!(input instanceof FormInput))
             throw new PartInitException("Invalid editor input");
+        FormInput formInput = (FormInput) input;
         setSite(editorSite);
         setInput(input);
-        adapter = ((FormInput) input).getNode();
+        adapter = formInput.getNode();
         Assert.isNotNull(adapter, "Bad editor input (null value)");
         appService = adapter.getAppService();
-
+        if (formInput.hasPreviousForm()) {
+            linkedForms = currentLinkedForms;
+        } else {
+            linkedForms = new ArrayList<BiobankFormBase>();
+            currentLinkedForms = linkedForms;
+        }
+        linkedForms.add(this);
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
@@ -304,6 +317,16 @@ public abstract class BiobankFormBase extends EditorPart {
         if (value != null) {
             button.setSelection(value.booleanValue());
         }
+    }
+
+    public void setBroughtToTop() {
+        // linkedForms.remove(this);
+        // linkedForms.add(this);
+        currentLinkedForms = linkedForms;
+    }
+
+    public void setDeactivated() {
+        linkedForms.remove(this);
     }
 
 }

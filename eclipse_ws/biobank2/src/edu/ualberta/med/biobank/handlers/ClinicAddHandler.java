@@ -7,9 +7,6 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.forms.ClinicEntryForm;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
@@ -25,7 +22,7 @@ public class ClinicAddHandler extends AbstractHandler {
         clinic.setSite(siteAdapter.getWrapper());
         ClinicAdapter clinicNode = new ClinicAdapter(siteAdapter
             .getClinicGroupNode(), clinic);
-        AdapterBase.openForm(new FormInput(clinicNode), ClinicEntryForm.ID);
+        clinicNode.openEntryForm();
 
         return null;
     }
