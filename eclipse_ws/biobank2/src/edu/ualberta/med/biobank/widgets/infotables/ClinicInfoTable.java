@@ -116,7 +116,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

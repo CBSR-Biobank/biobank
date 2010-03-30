@@ -92,7 +92,8 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override
