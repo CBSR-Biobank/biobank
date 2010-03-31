@@ -141,7 +141,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         ShippingCompanyWrapper selectedCompany = shipmentWrapper
             .getShippingCompany();
         companyComboViewer = createComboViewerWithNoSelectionValidator(client,
-            "Shipping company", ShippingCompanyWrapper
+            "Transit Method", ShippingCompanyWrapper
                 .getShippingCompanies(appService), selectedCompany, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Box Number",
@@ -175,6 +175,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             });
         shipmentPatientsWidget
             .addDoubleClickListener(collectionDoubleClickListener);
+        shipmentPatientsWidget.addBinding(widgetCreator,
+            "Patients should be added to a shipment");
     }
 
     @Override
@@ -231,7 +233,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
         }
-        shipmentPatientsWidget.reloadList();
+        shipmentPatientsWidget.updateList();
         ShippingCompanyWrapper shipCompany = shipmentWrapper
             .getShippingCompany();
         if (shipCompany != null) {
