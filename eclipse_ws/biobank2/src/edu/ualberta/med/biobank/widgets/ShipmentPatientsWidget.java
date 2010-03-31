@@ -157,9 +157,22 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                 + " has already been added to this shipment");
             return;
         }
-        shipment.addPatients(Arrays.asList(patient));
-        patientTable.setCollection(shipment.getPatientCollection());
-        notifyListeners();
+        boolean canAdd = false;
+        try {
+            canAdd = patient.canBeAddedToShipment(shipment);
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Can't add patient", e);
+            return;
+        }
+        if (canAdd) {
+            shipment.addPatients(Arrays.asList(patient));
+            patientTable.setCollection(shipment.getPatientCollection());
+            notifyListeners();
+        } else {
+            BioBankPlugin.openAsyncError("Error", "Patient "
+                + patient.getPnumber() + " can't be added to this shipment. "
+                + "Patient study is not linked to this shipment clinic.");
+        }
     }
 
     private void addDeleteSupport() {

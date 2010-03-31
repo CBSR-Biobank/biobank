@@ -262,4 +262,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public String toString() {
         return getPnumber();
     }
+
+    public boolean canBeAddedToShipment(ShipmentWrapper shipment)
+        throws ApplicationException, BiobankCheckException {
+        if (shipment.getClinic() == null) {
+            return true;
+        }
+        return getStudy().isLinkedToClinic(shipment.getClinic());
+    }
 }
