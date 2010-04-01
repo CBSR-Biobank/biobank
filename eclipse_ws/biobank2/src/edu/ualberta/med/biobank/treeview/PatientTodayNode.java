@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientTodayNode extends AbstractTodayNode {
 
@@ -50,20 +51,7 @@ public class PatientTodayNode extends AbstractTodayNode {
                         SessionManager.getAppService(), SessionManager
                             .getInstance().getCurrentSite());
                 for (PatientWrapper patient : todayPatients) {
-                    StudyAdapter studyAdapter = (StudyAdapter) accept(new PatientViewNodeSearchVisitor(
-                        patient.getStudy()));
-                    if (studyAdapter == null) {
-                        studyAdapter = new StudyAdapter(this, patient
-                            .getStudy(), false);
-                        addChild(studyAdapter);
-                    }
-                    PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
-                        .accept(new PatientViewNodeSearchVisitor(patient));
-                    if (patientAdapter == null) {
-                        patientAdapter = new PatientAdapter(studyAdapter,
-                            patient);
-                        studyAdapter.addChild(patientAdapter);
-                    }
+                    PatientAdministrationView.addPatientToNode(this, patient);
                 }
             } catch (final RemoteAccessException exp) {
                 BioBankPlugin.openRemoteAccessErrorMessage();

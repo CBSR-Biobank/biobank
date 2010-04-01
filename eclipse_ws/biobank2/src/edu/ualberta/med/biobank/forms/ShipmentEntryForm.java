@@ -208,7 +208,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         shipmentWrapper.persist();
 
         if (newShipment && ShipmentAdministrationView.currentInstance != null) {
-            ShipmentAdministrationView.currentInstance.showInTree(
+            ShipmentAdministrationView.currentInstance.showSearchedObjectInTree(
                 shipmentWrapper, false);
         } else {
             shipmentAdapter.getParent().performExpand();

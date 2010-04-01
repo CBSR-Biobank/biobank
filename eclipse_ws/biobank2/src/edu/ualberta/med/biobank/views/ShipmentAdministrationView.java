@@ -53,12 +53,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    protected String getNoFoundText() {
-        return "- No shipment found -";
-    }
-
-    @Override
-    public void showInTree(Object searchedObject, boolean today) {
+    public void showSearchedObjectInTree(Object searchedObject, boolean today) {
         // rootNode.removeAll();
         ShipmentWrapper shipment = (ShipmentWrapper) searchedObject;
         currentSiteAdapter = new SiteAdapter(searchedNode, SessionManager

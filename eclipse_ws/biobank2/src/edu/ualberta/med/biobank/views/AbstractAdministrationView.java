@@ -1,18 +1,14 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.Collection;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -21,12 +17,9 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
@@ -94,7 +87,8 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             if (searchedObject == null) {
                 notFound(text);
             } else {
-                showInTree(searchedObject, false);
+                showSearchedObjectInTree(searchedObject, false);
+                getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
             BioBankPlugin.openError("Search error", e);
@@ -102,7 +96,8 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         }
     }
 
-    protected abstract void showInTree(Object searchedObject, boolean today);
+    protected abstract void showSearchedObjectInTree(Object searchedObject,
+        boolean today);
 
     protected abstract void notFound(String text);
 
@@ -143,62 +138,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected void setTextEnablement(Integer siteId) {
         treeText.setEnabled(siteId != null && siteId >= 0);
-        // rootNode.removeAll();
     }
-
-    protected AdapterBase getNotFoundAdapter() {
-        AdapterBase noPatientFoundAdapter = new AdapterBase(rootNode, 0,
-            getNoFoundText(), false, false) {
-
-            @Override
-            protected String getLabelInternal() {
-                return null;
-            }
-
-            @Override
-            public String getTooltipText() {
-                return null;
-            }
-
-            @Override
-            public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-            }
-
-            @Override
-            public AdapterBase accept(NodeSearchVisitor visitor) {
-                return null;
-            }
-
-            @Override
-            protected AdapterBase createChildNode() {
-                return null;
-            }
-
-            @Override
-            protected AdapterBase createChildNode(ModelWrapper<?> child) {
-                return null;
-            }
-
-            @Override
-            protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-                throws Exception {
-                return null;
-            }
-
-            @Override
-            public String getEntryFormId() {
-                return null;
-            }
-
-            @Override
-            public String getViewFormId() {
-                return null;
-            }
-        };
-        return noPatientFoundAdapter;
-    }
-
-    protected abstract String getNoFoundText();
 
     @Override
     public void dispose() {

@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import org.eclipse.jface.viewers.StructuredSelection;
-
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -42,23 +40,19 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    protected String getNoFoundText() {
-        return "- No patient found -";
+    public void showSearchedObjectInTree(Object searchedObject, boolean today) {
+        PatientWrapper patient = (PatientWrapper) searchedObject;
+        addPatientToNode(searchedNode, patient);
     }
 
-    @Override
-    public void showInTree(Object searchedObject, boolean today) {
-        PatientWrapper patient = (PatientWrapper) searchedObject;
-        AdapterBase topParent = searchedNode;
-        if (today) {
-            topParent = todayNode;
-        }
-        StudyAdapter studyAdapter = (StudyAdapter) topParent
+    public static void addPatientToNode(AdapterBase parentNode,
+        PatientWrapper patient) {
+        StudyAdapter studyAdapter = (StudyAdapter) parentNode
             .accept(new PatientViewNodeSearchVisitor(patient.getStudy()));
         if (studyAdapter == null) {
-            studyAdapter = new StudyAdapter(topParent, patient.getStudy(),
+            studyAdapter = new StudyAdapter(parentNode, patient.getStudy(),
                 false);
-            topParent.addChild(studyAdapter);
+            parentNode.addChild(studyAdapter);
         }
         PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
             .accept(new PatientViewNodeSearchVisitor(patient));
@@ -66,10 +60,6 @@ public class PatientAdministrationView extends AbstractAdministrationView {
             patientAdapter = new PatientAdapter(studyAdapter, patient);
             studyAdapter.addChild(patientAdapter);
         }
-        currentPatientAdapter = patientAdapter;
-        // patientAdapter.performExpand();
-        getSite().getSelectionProvider().setSelection(
-            new StructuredSelection(currentPatientAdapter));
     }
 
     @Override
