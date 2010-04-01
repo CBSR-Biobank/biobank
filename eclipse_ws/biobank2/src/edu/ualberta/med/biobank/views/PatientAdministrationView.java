@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.StructuredSelection;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -11,13 +8,13 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
+import edu.ualberta.med.biobank.treeview.PatientViewNodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdministrationView extends AbstractAdministrationView {
 
@@ -26,8 +23,6 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     public static PatientAdministrationView currentInstance;
 
     private static PatientAdapter currentPatientAdapter = null;
-
-    private List<PatientWrapper> todayPatients = new ArrayList<PatientWrapper>();
 
     public PatientAdministrationView() {
         currentInstance = this;
@@ -52,20 +47,27 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    public void showInTree(Object searchedObject) {
-        // rootNode.removeAll();
+    public void showInTree(Object searchedObject, boolean today) {
         PatientWrapper patient = (PatientWrapper) searchedObject;
-        SiteAdapter siteAdapter = new SiteAdapter(searchedNode, SessionManager
-            .getInstance().getCurrentSite(), false);
-        searchedNode.addChild(siteAdapter);
-        StudyAdapter studyAdapter = new StudyAdapter(siteAdapter, patient
-            .getStudy(), false);
-        siteAdapter.addChild(studyAdapter);
-        PatientAdapter patientAdapter = new PatientAdapter(studyAdapter,
-            patient);
+        AdapterBase topParent = searchedNode;
+        if (today) {
+            topParent = todayNode;
+        }
+        StudyAdapter studyAdapter = (StudyAdapter) topParent
+            .accept(new PatientViewNodeSearchVisitor(patient.getStudy()));
+        if (studyAdapter == null) {
+            studyAdapter = new StudyAdapter(topParent, patient.getStudy(),
+                false);
+            topParent.addChild(studyAdapter);
+        }
+        PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
+            .accept(new PatientViewNodeSearchVisitor(patient));
+        if (patientAdapter == null) {
+            patientAdapter = new PatientAdapter(studyAdapter, patient);
+            studyAdapter.addChild(patientAdapter);
+        }
         currentPatientAdapter = patientAdapter;
-        studyAdapter.addChild(patientAdapter);
-        patientAdapter.performExpand();
+        // patientAdapter.performExpand();
         getSite().getSelectionProvider().setSelection(
             new StructuredSelection(currentPatientAdapter));
     }
@@ -74,7 +76,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     protected void notFound(String text) {
         currentPatientAdapter = null;
         // rootNode.removeAll();
-        searchedNode.addChild(getNotFoundAdapter());
+        // searchedNode.addChild(getNotFoundAdapter());
         boolean create = BioBankPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
@@ -102,23 +104,6 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     @Override
     protected AbstractSearchedNode getSearchedNode() {
         return new PatientSearchedNode(rootNode, 1);
-    }
-
-    public void reloadTodayPatients() {
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            try {
-                todayPatients = PatientWrapper.getPatientsInTodayShipments(
-                    SessionManager.getAppService(), SessionManager
-                        .getInstance().getCurrentSite());
-                for (PatientWrapper p : todayPatients) {
-                    System.out.println(p);
-                }
-            } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
     }
 
 }

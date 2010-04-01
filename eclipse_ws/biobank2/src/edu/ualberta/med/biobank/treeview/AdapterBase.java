@@ -371,8 +371,11 @@ public abstract class AdapterBase {
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
-            logger.error("Error while loading children of node "
-                + modelObject.toString(), e);
+            String text = getClass().getName();
+            if (modelObject != null) {
+                text = modelObject.toString();
+            }
+            logger.error("Error while loading children of node " + text, e);
         }
     }
 

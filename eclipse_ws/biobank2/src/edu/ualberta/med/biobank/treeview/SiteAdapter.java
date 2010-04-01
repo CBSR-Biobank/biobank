@@ -25,12 +25,10 @@ public class SiteAdapter extends AdapterBase {
         boolean enableActions) {
         super(parent, siteWrapper, enableActions, false);
 
-        if (enableActions) {
-            addChild(new ClinicGroup(this, CLINICS_NODE_ID));
-            addChild(new StudyGroup(this, STUDIES_NODE_ID));
-            addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
-            addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
-        }
+        addChild(new ClinicGroup(this, CLINICS_NODE_ID));
+        addChild(new StudyGroup(this, STUDIES_NODE_ID));
+        addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
+        addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
     }
 
     public SiteWrapper getWrapper() {

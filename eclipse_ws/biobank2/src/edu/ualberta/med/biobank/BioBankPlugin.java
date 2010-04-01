@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
@@ -94,6 +95,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_USER_ADD = "userAdd";
     public static final String IMG_EMAIL = "email";
     public static final String IMG_EMAIL_BANNER = "emailBanner";
+    public static final String IMG_SEARCH = "search";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -114,6 +116,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             put(PatientVisitAdapter.class.getName(),
                 BioBankPlugin.IMG_PATIENT_VISIT);
             put(ShipmentAdapter.class.getName(), BioBankPlugin.IMG_SHIPMENT);
+            put(PatientSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
         }
     };
 
@@ -203,6 +206,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_STUDY, "study.png");
         registerImage(registry, IMG_EMAIL, "email.png");
         registerImage(registry, IMG_EMAIL_BANNER, "email_banner.png");
+        registerImage(registry, IMG_SEARCH, "search.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,

@@ -20,6 +20,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -72,6 +73,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         todayNode = getTodayNode();
         todayNode.setParent(rootNode);
         rootNode.addChild(todayNode);
+        todayNode.performExpand();
 
         searchedNode = getSearchedNode();
         searchedNode.setParent(rootNode);
@@ -92,7 +94,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             if (searchedObject == null) {
                 notFound(text);
             } else {
-                showInTree(searchedObject);
+                showInTree(searchedObject, false);
             }
         } catch (Exception e) {
             BioBankPlugin.openError("Search error", e);
@@ -100,7 +102,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         }
     }
 
-    protected abstract void showInTree(Object searchedObject);
+    protected abstract void showInTree(Object searchedObject, boolean today);
 
     protected abstract void notFound(String text);
 
@@ -119,6 +121,13 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
                 if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
                     setTextEnablement((Integer) sourceValue);
                     getSite().getPage().closeAllEditors(true);
+                    todayNode.removeAll();
+                    searchedNode.removeAll();
+                    if (sourceValue != null
+                        && !SessionManager.getInstance().isAllSitesSelected()) {
+                        todayNode.performExpand();
+                        getTreeViewer().expandToLevel(3);
+                    }
                 }
             }
 

@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class ShipmentAdministrationView extends AbstractAdministrationView {
@@ -56,12 +58,12 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    public void showInTree(Object searchedObject) {
-        rootNode.removeAll();
+    public void showInTree(Object searchedObject, boolean today) {
+        // rootNode.removeAll();
         ShipmentWrapper shipment = (ShipmentWrapper) searchedObject;
-        currentSiteAdapter = new SiteAdapter(rootNode, SessionManager
+        currentSiteAdapter = new SiteAdapter(searchedNode, SessionManager
             .getInstance().getCurrentSite(), false);
-        rootNode.addChild(currentSiteAdapter);
+        searchedNode.addChild(currentSiteAdapter);
         ClinicAdapter clinicAdapter = new ClinicAdapter(currentSiteAdapter,
             shipment.getClinic(), false);
         currentSiteAdapter.addChild(clinicAdapter);
@@ -74,15 +76,16 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     @Override
     protected void notFound(String text) {
-        rootNode.removeAll();
-        rootNode.addChild(getNotFoundAdapter());
+        // rootNode.removeAll();
+        // searchedNode.addChild(getNotFoundAdapter());
         boolean create = BioBankPlugin.openConfirm("Shipment not found",
             "Do you want to create this shipment ?");
         if (create) {
             ShipmentWrapper shipment = new ShipmentWrapper(SessionManager
                 .getAppService());
             shipment.setWaybill(text);
-            ShipmentAdapter adapter = new ShipmentAdapter(rootNode, shipment);
+            ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
+                shipment);
             adapter.openEntryForm();
         }
     }
@@ -100,14 +103,12 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     @Override
     protected AbstractTodayNode getTodayNode() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ShipmentTodayNode(rootNode, 0);
     }
 
     @Override
     protected AbstractSearchedNode getSearchedNode() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ShipmentSearchedNode(rootNode, 1);
     }
 
 }

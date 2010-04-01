@@ -19,6 +19,11 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     }
 
     @Override
+    protected void executeDoubleClick() {
+        performExpand();
+    }
+
+    @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
@@ -46,7 +51,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
 }
