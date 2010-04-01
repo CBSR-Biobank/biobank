@@ -99,7 +99,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         waybillLabel = createReadOnlyField(client, SWT.NONE, "Waybill");
         clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
         dateShippedLabel = createReadOnlyField(client, SWT.NONE, "Date Shipped");
-        companyLabel = createReadOnlyField(client, SWT.NONE, "Shipping company");
+        companyLabel = createReadOnlyField(client, SWT.NONE, "Transit Method");
         boxNumberLabel = createReadOnlyField(client, SWT.NONE, "Box number");
         dateReceivedLabel = createReadOnlyField(client, SWT.NONE,
             "Date received");
