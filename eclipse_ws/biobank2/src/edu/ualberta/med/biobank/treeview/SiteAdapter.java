@@ -16,20 +16,24 @@ public class SiteAdapter extends AdapterBase {
 
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
 
-    public static final int CLINICS_NODE_ID = 0;
-    public static final int STUDIES_NODE_ID = 1;
-    public static final int STORAGE_TYPES_NODE_ID = 2;
-    public static final int STORAGE_CONTAINERS_NODE_ID = 3;
+    public static final int CLINICS_BASE_NODE_ID = 0;
+    public static final int STUDIES_BASE_NODE_ID = 1;
+    public static final int STORAGE_BASE_TYPES_NODE_ID = 2;
+    public static final int STORAGE_BASE_CONTAINERS_NODE_ID = 3;
 
-    public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper,
+    public SiteAdapter(AdapterBase parent, SiteWrapper site,
         boolean enableActions) {
-        super(parent, siteWrapper, enableActions, false);
+        super(parent, site, enableActions, false);
+
+        int nodeIdOffset = 100 * site.getId();
 
         if (enableActions) {
-            addChild(new ClinicGroup(this, CLINICS_NODE_ID));
-            addChild(new StudyGroup(this, STUDIES_NODE_ID));
-            addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
-            addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
+            addChild(new ClinicGroup(this, nodeIdOffset + CLINICS_BASE_NODE_ID));
+            addChild(new StudyGroup(this, nodeIdOffset + STUDIES_BASE_NODE_ID));
+            addChild(new ContainerTypeGroup(this, nodeIdOffset
+                + STORAGE_BASE_TYPES_NODE_ID));
+            addChild(new ContainerGroup(this, nodeIdOffset
+                + STORAGE_BASE_CONTAINERS_NODE_ID));
         }
     }
 
@@ -42,19 +46,19 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public AdapterBase getStudiesGroupNode() {
-        return children.get(STUDIES_NODE_ID);
+        return children.get(STUDIES_BASE_NODE_ID);
     }
 
     public AdapterBase getClinicGroupNode() {
-        return children.get(CLINICS_NODE_ID);
+        return children.get(CLINICS_BASE_NODE_ID);
     }
 
     public AdapterBase getContainerTypesGroupNode() {
-        return children.get(STORAGE_TYPES_NODE_ID);
+        return children.get(STORAGE_BASE_TYPES_NODE_ID);
     }
 
     public AdapterBase getContainersGroupNode() {
-        return children.get(STORAGE_CONTAINERS_NODE_ID);
+        return children.get(STORAGE_BASE_CONTAINERS_NODE_ID);
     }
 
     @Override
