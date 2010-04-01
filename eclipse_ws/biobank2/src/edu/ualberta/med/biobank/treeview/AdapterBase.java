@@ -321,7 +321,7 @@ public abstract class AdapterBase {
         deltaListener.remove(new DeltaEvent(removed));
     }
 
-    public void executeDoubleClick() {
+    protected void executeDoubleClick() {
         if (enableActions) {
             openViewForm();
         }

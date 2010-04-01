@@ -201,6 +201,10 @@
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.todayPatientReload"
+            name="Reload Today Patients">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -509,6 +513,10 @@
 			   </or>
              </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ReloadTodayPatientHandler"
+            commandId="edu.ualberta.med.biobank.commands.todayPatientReload">
       </handler>
    </extension>
    <extension
@@ -1020,6 +1028,13 @@
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.todayPatientReload"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload Today Patients">
             </command>
          </toolbar>
       </menuContribution>

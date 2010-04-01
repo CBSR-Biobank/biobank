@@ -76,23 +76,33 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
         }
-        checkPatients();
+        checkAlLeastOnePatient();
+        checkPatientsStudy();
     }
 
-    private void checkPatients() throws BiobankCheckException,
-        ApplicationException {
+    public void checkAlLeastOnePatient() throws BiobankCheckException {
         List<PatientWrapper> patients = getPatientCollection();
         if (patients == null || patients.size() == 0) {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
+    }
+
+    public void checkPatientsStudy() throws BiobankCheckException,
+        ApplicationException {
+        String patientsInError = "";
         for (PatientWrapper patient : patientsAdded) {
-            if (!patient.getStudy().isLinkedToClinic(getClinic())) {
-                throw new BiobankCheckException("Patient "
-                    + patient.getPnumber()
-                    + " is not part of a study that has contact with clinic "
-                    + getClinic().getName());
+            if (!patient.canBeAddedToShipment(this)) {
+                patientsInError += patient.getPnumber() + ", ";
             }
+        }
+        if (!patientsInError.isEmpty()) {
+            // remove last ", "
+            patientsInError = patientsInError.substring(0, patientsInError
+                .length() - 2);
+            throw new BiobankCheckException("Patient(s) " + patientsInError
+                + " are not part of a study that has contact with clinic "
+                + getClinic().getName());
         }
     }
 
@@ -400,4 +410,5 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public void resetInternalField() {
         patientsAdded.clear();
     }
+
 }

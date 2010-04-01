@@ -512,4 +512,29 @@ public class TestPatient extends TestDatabase {
             }
         }
     }
+
+    @Test
+    public void testGetPatientsInTodayShipments() throws Exception {
+        String name = "testTodayShipments_" + r.nextInt();
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
+        addClinic(patient1);
+        ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
+        ship.addPatients(Arrays.asList(patient1));
+        ship.persist();
+
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
+        addClinic(patient2);
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study);
+        addClinic(patient3);
+        ShipmentWrapper ship2 = ShipmentHelper.newShipment(clinic);
+        ship2.setDateReceived(new Date()); // today
+        ship2.addPatients(Arrays.asList(patient2, patient3));
+        ship2.persist();
+
+        List<PatientWrapper> todayPatients = PatientWrapper
+            .getPatientsInTodayShipments(appService, study.getSite());
+        Assert.assertEquals(2, todayPatients.size());
+        Assert.assertTrue(todayPatients.contains(patient2));
+        Assert.assertTrue(todayPatients.contains(patient3));
+    }
 }
