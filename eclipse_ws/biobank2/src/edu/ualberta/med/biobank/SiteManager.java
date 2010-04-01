@@ -197,7 +197,7 @@ public class SiteManager {
 
     public boolean isAllSitesSelected() {
         if (currentSite == null) {
-            return false;
+            return true;
         }
         return allSitesWrapper == currentSite;
     }

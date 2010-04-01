@@ -11,6 +11,8 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
+import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
@@ -94,6 +96,18 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             patientAdapter.setEditable(false);
             patientAdapter.openViewForm();
         }
+    }
+
+    @Override
+    protected AbstractTodayNode getTodayNode() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected AbstractSearchedNode getSearchedNode() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

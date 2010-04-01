@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -269,5 +270,32 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             return true;
         }
         return getStudy().isLinkedToClinic(shipment.getClinic());
+    }
+
+    public static List<PatientWrapper> getPatientsInTodayShipments(
+        WritableApplicationService appService, SiteWrapper site)
+        throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // yesterday midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "select p from "
+                + Patient.class.getName()
+                + " as p join p.shipmentCollection as ships"
+                + " where p.study.site.id = ? and ships.dateReceived > ? and ships.dateReceived < ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        List<Patient> res = appService.query(criteria);
+        List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+        for (Patient p : res) {
+            patients.add(new PatientWrapper(appService, p));
+        }
+        return patients;
     }
 }

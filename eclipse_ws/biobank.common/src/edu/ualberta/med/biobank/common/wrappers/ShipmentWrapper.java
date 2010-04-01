@@ -410,4 +410,5 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public void resetInternalField() {
         patientsAdded.clear();
     }
+
 }

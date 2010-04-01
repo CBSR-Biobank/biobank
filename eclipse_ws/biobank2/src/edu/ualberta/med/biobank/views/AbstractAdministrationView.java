@@ -22,6 +22,8 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
+import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
+import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -32,6 +34,10 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     protected Text treeText;
 
     private ISourceProviderListener siteStateListener;
+
+    protected AbstractTodayNode todayNode;
+
+    protected AbstractSearchedNode searchedNode;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -63,8 +69,20 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
         adaptersTree.getTreeViewer().expandAll();
 
+        todayNode = getTodayNode();
+        todayNode.setParent(rootNode);
+        rootNode.addChild(todayNode);
+
+        searchedNode = getSearchedNode();
+        searchedNode.setParent(rootNode);
+        rootNode.addChild(searchedNode);
+
         setSiteManagement();
     }
+
+    protected abstract AbstractTodayNode getTodayNode();
+
+    protected abstract AbstractSearchedNode getSearchedNode();
 
     protected void internalSearch() {
         getSite().getPage().closeAllEditors(true);
@@ -116,7 +134,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected void setTextEnablement(Integer siteId) {
         treeText.setEnabled(siteId != null && siteId >= 0);
-        rootNode.removeAll();
+        // rootNode.removeAll();
     }
 
     protected AdapterBase getNotFoundAdapter() {
