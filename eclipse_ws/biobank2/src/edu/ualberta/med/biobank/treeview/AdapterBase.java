@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -72,6 +73,8 @@ public abstract class AdapterBase {
 
     private Thread childUpdateThread;
 
+    private Semaphore loadChildrenSemaphore;
+
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
@@ -83,6 +86,7 @@ public abstract class AdapterBase {
         this.enableActions = enableActions;
         this.haveModelObject = haveModelObject;
         this.loadChildrenInBackground = loadChildrenInBackground;
+        loadChildrenSemaphore = new Semaphore(10, true);
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
             addListener(parent.deltaListener);
@@ -337,6 +341,16 @@ public abstract class AdapterBase {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 loadChildren(true);
+                try {
+                    loadChildrenSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    BioBankPlugin.openAsyncError("Child expand failed", e);
+                }
+                RootNode root = getRootNode();
+                if (root != null) {
+                    root.expandChild(AdapterBase.this);
+                }
+                loadChildrenSemaphore.release();
             }
         });
     }
@@ -347,6 +361,12 @@ public abstract class AdapterBase {
      * @param updateNode If not null, the node in the treeview to update.
      */
     public void loadChildren(boolean updateNode) {
+        try {
+            loadChildrenSemaphore.acquire();
+        } catch (InterruptedException e) {
+            BioBankPlugin.openAsyncError("Could not load children", e);
+        }
+
         if (loadChildrenInBackground) {
             loadChildrenBackground(true);
             return;
@@ -374,6 +394,7 @@ public abstract class AdapterBase {
             logger.error("Error while loading children of node "
                 + modelObject.toString(), e);
         }
+        loadChildrenSemaphore.release();
     }
 
     public void loadChildrenBackground(final boolean updateNode) {
@@ -395,10 +416,6 @@ public abstract class AdapterBase {
                 if (updateNode) {
                     SessionManager.updateTreeNode(node);
                 }
-            }
-            RootNode root = getRootNode();
-            if (root != null) {
-                root.expandChild(this);
             }
 
             childUpdateThread = new Thread() {
@@ -441,6 +458,8 @@ public abstract class AdapterBase {
                         logger.error("Error while loading children of node "
                             + modelObject.toString() + " in background", e);
                     }
+
+                    loadChildrenSemaphore.release();
                 }
             };
             childUpdateThread.start();
