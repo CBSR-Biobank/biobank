@@ -7,7 +7,7 @@ import org.eclipse.core.commands.ExecutionException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientAddHandler extends AbstractHandler {
 
@@ -18,9 +18,9 @@ public class PatientAddHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
             PatientWrapper patientWrapper = new PatientWrapper(SessionManager
-                .getInstance().getSession().getAppService());
-            PatientAdapter adapter = new PatientAdapter(null, patientWrapper);
-            adapter.openEntryForm();
+                .getAppService());
+            PatientAdministrationView.getCurrent().openNewPatientForm(
+                patientWrapper);
         } catch (Exception exp) {
             logger.error("Error while opening the patient entry form", exp);
         }

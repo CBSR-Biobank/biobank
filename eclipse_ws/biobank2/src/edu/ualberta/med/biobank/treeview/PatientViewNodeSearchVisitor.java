@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class PatientViewNodeSearchVisitor extends NodeSearchVisitor {
@@ -23,5 +24,13 @@ public class PatientViewNodeSearchVisitor extends NodeSearchVisitor {
             return searchedNode.getChild(wrapper.getId(), true);
         }
         return visitChildren(searchedNode);
+    }
+
+    @Override
+    public AdapterBase visit(StudyAdapter study) {
+        if (wrapper instanceof PatientWrapper) {
+            return study.getChild(wrapper.getId(), true);
+        }
+        return null;
     }
 }

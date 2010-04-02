@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
@@ -54,11 +53,8 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public AdapterBase visit(StudyAdapter study) {
-        if (wrapper instanceof PatientWrapper) {
-            return study.getChild(wrapper.getId(), true);
-        }
-        return visitChildren(study);
+    public AdapterBase visit(@SuppressWarnings("unused") StudyAdapter study) {
+        return null;
     }
 
     public AdapterBase visit(PatientAdapter patient) {

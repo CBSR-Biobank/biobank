@@ -4,6 +4,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -38,8 +40,9 @@ public class PatientAdministrationView extends AbstractAdministrationView {
             StudyAdapter studyAdapter = (StudyAdapter) parentNode
                 .accept(new PatientViewNodeSearchVisitor(patient.getStudy()));
             if (studyAdapter == null) {
-                studyAdapter = new StudyAdapter(parentNode, patient.getStudy(),
-                    false);
+                studyAdapter = new StudyAdapter(parentNode, patient.getStudy());
+                studyAdapter.setEditable(false);
+                studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
             }
             PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
@@ -67,9 +70,19 @@ public class PatientAdministrationView extends AbstractAdministrationView {
             PatientWrapper patient = new PatientWrapper(SessionManager
                 .getAppService());
             patient.setPnumber(text);
-            PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
-            adapter.openEntryForm();
+            openNewPatientForm(patient);
         }
+    }
+
+    public void openNewPatientForm(final PatientWrapper patient) {
+        patient.addWrapperListener(new WrapperListenerAdapter() {
+            @Override
+            public void inserted(WrapperEvent event) {
+                showSearchedObjectInTree(patient);
+            }
+        });
+        PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
+        adapter.openEntryForm();
     }
 
     @Override

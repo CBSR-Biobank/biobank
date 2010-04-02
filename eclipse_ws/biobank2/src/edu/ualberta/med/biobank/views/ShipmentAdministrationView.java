@@ -61,7 +61,9 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 .accept(new ShipmentViewNodeSearchVisitor(shipment.getClinic()));
             if (clinicAdapter == null) {
                 clinicAdapter = new ClinicAdapter(parentNode, shipment
-                    .getClinic(), false);
+                    .getClinic());
+                clinicAdapter.setEditable(false);
+                clinicAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(clinicAdapter);
             }
             ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
@@ -131,6 +133,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             if (shipAdapter.getWrapper().isReceivedToday()) {
                 shipAdapter.getParent().removeChild(shipAdapter);
                 reloadTodayNode();
+                PatientAdministrationView.getCurrent().reloadTodayNode();
             }
         }
     }

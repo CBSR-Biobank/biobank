@@ -47,8 +47,6 @@ public abstract class AdapterBase {
 
     protected ModelWrapper<?> modelObject;
 
-    protected boolean haveModelObject;
-
     private Integer id;
 
     private String label;
@@ -58,11 +56,6 @@ public abstract class AdapterBase {
     protected boolean hasChildren;
 
     protected List<AdapterBase> children;
-
-    /**
-     * if true, enable normal actions of this adapter
-     */
-    protected boolean enableActions = true;
 
     /**
      * if true, edit button and actions will be visible
@@ -78,13 +71,10 @@ public abstract class AdapterBase {
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    public AdapterBase(AdapterBase parent, boolean haveModelObject,
-        ModelWrapper<?> object, boolean enableActions,
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
         this.modelObject = object;
         this.parent = parent;
-        this.enableActions = enableActions;
-        this.haveModelObject = haveModelObject;
         this.loadChildrenInBackground = loadChildrenInBackground;
         loadChildrenSemaphore = new Semaphore(10, true);
         children = new ArrayList<AdapterBase>();
@@ -95,18 +85,13 @@ public abstract class AdapterBase {
         Assert.isTrue(checkIntegrity(), "integrity checks failed");
     }
 
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
-        boolean enableActions, boolean loadChildrenInBackground) {
-        this(parent, true, object, enableActions, loadChildrenInBackground);
-    }
-
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
-        this(parent, object, true, true);
+        this(parent, object, true);
     }
 
     public AdapterBase(AdapterBase parent, int id, String name,
         boolean hasChildren, boolean loadChildrenInBackground) {
-        this(parent, false, null, true, loadChildrenInBackground);
+        this(parent, null, loadChildrenInBackground);
         setId(id);
         setName(name);
         setHasChildren(hasChildren);
@@ -326,13 +311,11 @@ public abstract class AdapterBase {
     }
 
     protected void executeDoubleClick() {
-        if (enableActions) {
-            openViewForm();
-        }
+        openViewForm();
     }
 
     public void performDoubleClick() {
-        if (!haveModelObject || (modelObject != null)) {
+        if (modelObject != null) {
             executeDoubleClick();
         }
     }
@@ -475,7 +458,7 @@ public abstract class AdapterBase {
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
 
     protected void addEditMenu(Menu menu, String objectName) {
-        if (isEditable() && enableActions) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Edit " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -488,21 +471,19 @@ public abstract class AdapterBase {
     }
 
     protected void addViewMenu(Menu menu, String objectName) {
-        if (enableActions) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("View " + objectName);
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    AdapterBase.this.openViewForm();
-                }
-            });
-        }
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("View " + objectName);
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                AdapterBase.this.openViewForm();
+            }
+        });
     }
 
     protected void addDeleteMenu(Menu menu, String objectName,
         final String question) {
-        if (enableActions) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -659,6 +640,10 @@ public abstract class AdapterBase {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    public void setLoadChildrenInBackground(boolean loadChildrenInBackground) {
+        this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
     public void addChangedListener(AdapterChangedListener listener) {

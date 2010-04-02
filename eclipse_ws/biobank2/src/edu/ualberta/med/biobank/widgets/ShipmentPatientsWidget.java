@@ -142,8 +142,12 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                             .getAppService());
                         patient.setPnumber(patientNumber);
                         addPatientListener(patient);
-                        new PatientAdapter(null, patient, false)
-                            .openEntryForm(true);
+                        PatientAdapter patientAdapter = new PatientAdapter(
+                            null, patient);
+                        // won't be able to edit it once created :
+                        patientAdapter.setEditable(false);
+                        patientAdapter.openEntryForm(true);
+
                     }
                 } else {
                     addPatient(patient);

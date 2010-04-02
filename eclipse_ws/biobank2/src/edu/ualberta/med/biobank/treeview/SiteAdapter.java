@@ -21,9 +21,8 @@ public class SiteAdapter extends AdapterBase {
     public static final int STORAGE_BASE_TYPES_NODE_ID = 2;
     public static final int STORAGE_BASE_CONTAINERS_NODE_ID = 3;
 
-    public SiteAdapter(AdapterBase parent, SiteWrapper site,
-        boolean enableActions) {
-        super(parent, site, enableActions, false);
+    public SiteAdapter(AdapterBase parent, SiteWrapper site) {
+        super(parent, site, false);
 
         int nodeIdOffset = 100 * site.getId();
 
@@ -37,10 +36,6 @@ public class SiteAdapter extends AdapterBase {
 
     public SiteWrapper getWrapper() {
         return (SiteWrapper) modelObject;
-    }
-
-    public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper) {
-        this(parent, siteWrapper, true);
     }
 
     public AdapterBase getStudiesGroupNode() {

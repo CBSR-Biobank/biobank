@@ -21,11 +21,6 @@ public class ClinicAdapter extends AdapterBase {
         super(parent, clinicWrapper);
     }
 
-    public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper,
-        boolean enableActions) {
-        super(parent, clinicWrapper, enableActions, false);
-    }
-
     public ClinicWrapper getWrapper() {
         return (ClinicWrapper) modelObject;
     }
