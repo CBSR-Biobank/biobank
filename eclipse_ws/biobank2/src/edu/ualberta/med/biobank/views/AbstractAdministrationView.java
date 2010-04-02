@@ -17,9 +17,12 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
@@ -66,7 +69,6 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         todayNode = getTodayNode();
         todayNode.setParent(rootNode);
         rootNode.addChild(todayNode);
-        todayNode.performExpand();
 
         searchedNode = getSearchedNode();
         searchedNode.setParent(rootNode);
@@ -80,14 +82,13 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     protected abstract AbstractSearchedNode getSearchedNode();
 
     protected void internalSearch() {
-        getSite().getPage().closeAllEditors(true);
         String text = treeText.getText();
         try {
-            Object searchedObject = search(text);
+            ModelWrapper<?> searchedObject = search(text);
             if (searchedObject == null) {
                 notFound(text);
             } else {
-                showSearchedObjectInTree(searchedObject, false);
+                showSearchedObjectInTree(searchedObject);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
@@ -96,12 +97,30 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         }
     }
 
-    protected abstract void showSearchedObjectInTree(Object searchedObject,
-        boolean today);
+    protected void showSearchedObjectInTree(ModelWrapper<?> searchedObject) {
+        NodeSearchVisitor visitor = getVisitor(searchedObject);
+        AdapterBase node = todayNode.accept(visitor);
+        if (node == null) {
+            node = searchedNode.accept(visitor);
+            if (node == null) {
+                node = addToNode(searchedNode, searchedObject);
+            }
+        }
+        if (node != null) {
+            setSelectedNode(node);
+            node.performDoubleClick();
+        }
+    }
+
+    protected abstract NodeSearchVisitor getVisitor(
+        ModelWrapper<?> searchedObject);
+
+    public abstract AdapterBase addToNode(AdapterBase parentNode,
+        ModelWrapper<?> wrapper);
 
     protected abstract void notFound(String text);
 
-    protected abstract Object search(String text) throws Exception;
+    protected abstract ModelWrapper<?> search(String text) throws Exception;
 
     private void setSiteManagement() {
         ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
@@ -120,8 +139,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
                     searchedNode.removeAll();
                     if (sourceValue != null
                         && !SessionManager.getInstance().isAllSitesSelected()) {
-                        todayNode.performExpand();
-                        getTreeViewer().expandToLevel(3);
+                        reloadTodayNode();
                     }
                 }
             }
@@ -134,6 +152,11 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
         siteSelectionStateSourceProvider
             .addSourceProviderListener(siteStateListener);
+    }
+
+    public void reloadTodayNode() {
+        todayNode.performExpand();
+        getTreeViewer().expandToLevel(3);
     }
 
     protected void setTextEnablement(Integer siteId) {
@@ -160,6 +183,11 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     @Override
     public void setFocus() {
         treeText.setFocus();
+    }
+
+    @Override
+    public void opened() {
+        reloadTodayNode();
     }
 
 }

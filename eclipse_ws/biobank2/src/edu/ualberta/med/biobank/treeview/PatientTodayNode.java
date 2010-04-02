@@ -43,7 +43,6 @@ public class PatientTodayNode extends AbstractTodayNode {
 
     @Override
     public void performExpand() {
-        removeAll();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             try {
                 List<PatientWrapper> todayPatients = PatientWrapper
@@ -51,7 +50,8 @@ public class PatientTodayNode extends AbstractTodayNode {
                         SessionManager.getAppService(), SessionManager
                             .getInstance().getCurrentSite());
                 for (PatientWrapper patient : todayPatients) {
-                    PatientAdministrationView.addPatientToNode(this, patient);
+                    PatientAdministrationView.getCurrent().addToNode(this,
+                        patient);
                 }
             } catch (final RemoteAccessException exp) {
                 BioBankPlugin.openRemoteAccessErrorMessage();

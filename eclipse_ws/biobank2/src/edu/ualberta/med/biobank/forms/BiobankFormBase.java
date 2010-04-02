@@ -117,9 +117,11 @@ public abstract class BiobankFormBase extends EditorPart {
             SessionManager.setSelectedNode(adapter);
             // if selection fails, then the adapter needs to be matched at the
             // id level
-            if (SessionManager.getSelectedNode() == null)
-                SessionManager.setSelectedNode(SessionManager
-                    .searchNode(adapter.getModelObject()));
+            if (SessionManager.getSelectedNode() == null) {
+                AdapterBase node = SessionManager.searchNode(adapter
+                    .getModelObject());
+                SessionManager.setSelectedNode(node);
+            }
         }
     }
 

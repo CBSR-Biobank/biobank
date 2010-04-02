@@ -16,19 +16,31 @@ public class SiteAdapter extends AdapterBase {
 
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
 
-    public static final int CLINICS_NODE_ID = 0;
-    public static final int STUDIES_NODE_ID = 1;
-    public static final int STORAGE_TYPES_NODE_ID = 2;
-    public static final int STORAGE_CONTAINERS_NODE_ID = 3;
+    private static final int CLINICS_NODE_ID = 0;
+    private static final int STUDIES_NODE_ID = 1;
+    private static final int STORAGE_TYPES_NODE_ID = 2;
+    private static final int STORAGE_CONTAINERS_NODE_ID = 3;
+
+    private int currentClinicNodeId;
+    private int currentStudyNodeId;
+    private int currentContainerTypeNodeId;
+    private int currentContainerNodeId;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper siteWrapper,
         boolean enableActions) {
         super(parent, siteWrapper, enableActions, false);
 
-        addChild(new ClinicGroup(this, CLINICS_NODE_ID));
-        addChild(new StudyGroup(this, STUDIES_NODE_ID));
-        addChild(new ContainerTypeGroup(this, STORAGE_TYPES_NODE_ID));
-        addChild(new ContainerGroup(this, STORAGE_CONTAINERS_NODE_ID));
+        currentClinicNodeId = CLINICS_NODE_ID + 100 * siteWrapper.getId();
+        currentStudyNodeId = STUDIES_NODE_ID + 100 * siteWrapper.getId();
+        currentContainerTypeNodeId = STORAGE_TYPES_NODE_ID + 100
+            * siteWrapper.getId();
+        currentContainerNodeId = STORAGE_CONTAINERS_NODE_ID + 100
+            * siteWrapper.getId();
+
+        addChild(new ClinicGroup(this, currentClinicNodeId));
+        addChild(new StudyGroup(this, currentStudyNodeId));
+        addChild(new ContainerTypeGroup(this, currentContainerTypeNodeId));
+        addChild(new ContainerGroup(this, currentContainerNodeId));
     }
 
     public SiteWrapper getWrapper() {

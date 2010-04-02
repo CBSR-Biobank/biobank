@@ -66,7 +66,7 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
+        return visitor.visit(this);
     }
 
     @Override

@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
@@ -142,8 +142,8 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                             .getAppService());
                         patient.setPnumber(patientNumber);
                         addPatientListener(patient);
-                        ShipmentAdministrationView.currentInstance
-                            .displayPatient(patient);
+                        new PatientAdapter(null, patient, false)
+                            .openEntryForm(true);
                     }
                 } else {
                     addPatient(patient);

@@ -124,10 +124,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();
-        if (PatientAdministrationView.currentInstance != null) {
-            PatientAdministrationView.currentInstance.showSearchedObjectInTree(patientAdapter
-                .getWrapper(), false);
-        }
+        PatientAdministrationView.showPatient(patientAdapter.getWrapper());
     }
 
     @Override

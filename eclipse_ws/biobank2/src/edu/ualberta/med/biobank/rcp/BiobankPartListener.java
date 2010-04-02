@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.views.AbstractViewWithTree;
 
 public class BiobankPartListener implements IPartListener {
 
@@ -51,13 +52,15 @@ public class BiobankPartListener implements IPartListener {
 
     @Override
     public void partDeactivated(IWorkbenchPart part) {
-
     }
 
     @Override
     public void partOpened(IWorkbenchPart part) {
         if (part instanceof AbstractAliquotAdminForm) {
             SessionManager.getInstance().lockSite();
+        }
+        if (part instanceof AbstractViewWithTree) {
+            ((AbstractViewWithTree) part).opened();
         }
     }
 

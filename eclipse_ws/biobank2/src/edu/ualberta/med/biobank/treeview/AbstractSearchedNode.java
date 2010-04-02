@@ -3,7 +3,11 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -16,6 +20,14 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Clear");
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                removeAll();
+            }
+        });
     }
 
     @Override

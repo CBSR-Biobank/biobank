@@ -22,7 +22,7 @@ public class NodeSearchVisitor {
     }
 
     protected AdapterBase visitChildren(AdapterBase node) {
-        node.loadChildren(true);
+        // node.loadChildren(true);
         for (AdapterBase child : node.getChildren()) {
             AdapterBase foundChild = child.accept(this);
             if (foundChild != null) {
@@ -180,6 +180,11 @@ public class NodeSearchVisitor {
 
     public AdapterBase visit(
         @SuppressWarnings("unused") AbstractTodayNode abstractTodayNode) {
+        return null;
+    }
+
+    public AdapterBase visit(
+        @SuppressWarnings("unused") ClinicAdapter clinicAdapter) {
         return null;
     }
 }

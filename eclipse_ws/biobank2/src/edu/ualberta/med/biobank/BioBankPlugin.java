@@ -30,9 +30,12 @@ import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
+import edu.ualberta.med.biobank.treeview.PatientTodayNode;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
@@ -96,6 +99,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_EMAIL = "email";
     public static final String IMG_EMAIL_BANNER = "emailBanner";
     public static final String IMG_SEARCH = "search";
+    public static final String IMG_TODAY = "today";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -117,6 +121,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
                 BioBankPlugin.IMG_PATIENT_VISIT);
             put(ShipmentAdapter.class.getName(), BioBankPlugin.IMG_SHIPMENT);
             put(PatientSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
+            put(PatientTodayNode.class.getName(), BioBankPlugin.IMG_TODAY);
+            put(ShipmentSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
+            put(ShipmentTodayNode.class.getName(), BioBankPlugin.IMG_TODAY);
         }
     };
 
@@ -207,6 +214,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_EMAIL, "email.png");
         registerImage(registry, IMG_EMAIL_BANNER, "email_banner.png");
         registerImage(registry, IMG_SEARCH, "search.png");
+        registerImage(registry, IMG_TODAY, "today.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
