@@ -43,6 +43,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -62,6 +63,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm"; //$NON-NLS-1$
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ScanLinkEntryForm.class.getName());
 
     private ScanLinkPalletWidget spw;
 
@@ -457,8 +461,16 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
                 currentPatient.getPnumber());
             // show visits list
-            List<PatientVisitWrapper> collection = currentPatient
-                .getPatientVisitCollection();
+            List<PatientVisitWrapper> collection = null;
+            try {
+                collection = currentPatient.getLast7DaysPatientVisits();
+            } catch (ApplicationException e) {
+                BioBankPlugin.openAsyncError("Visits problem",
+                    "Problem getting last 7 days visits. All visits will "
+                        + "be displayed into the list");
+                logger.error("Last 7 days visits error", e);
+                collection = currentPatient.getPatientVisitCollection();
+            }
             viewerVisits.setInput(collection);
             viewerVisits.getCombo().setFocus();
             viewerVisits.getCombo().setListVisible(true);

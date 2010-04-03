@@ -298,4 +298,30 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
         return patients;
     }
+
+    public List<PatientVisitWrapper> getLast7DaysPatientVisits()
+        throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // today midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date endDate = cal.getTime();
+        // 7 days ago, at midnight
+        cal.add(Calendar.DATE, -7);
+        Date startDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "select visits from "
+                + Patient.class.getName()
+                + " as p join p.patientVisitCollection as visits"
+                + " where p.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
+            Arrays.asList(new Object[] { getId(), startDate, endDate }));
+        List<PatientVisit> res = appService.query(criteria);
+        List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+        for (PatientVisit v : res) {
+            visits.add(new PatientVisitWrapper(appService, v));
+        }
+        return visits;
+    }
 }
