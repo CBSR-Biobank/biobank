@@ -418,7 +418,7 @@ public class CbsrContainers {
             hairBinType, // 27,
             null, // 28
             ftaBinLoerschType, // 29
-            null, // 30
+            ftaBinLoerschType, // 30
             ftaBinLoerschType, // 31
             ftaBinLoerschType, // 32
         };

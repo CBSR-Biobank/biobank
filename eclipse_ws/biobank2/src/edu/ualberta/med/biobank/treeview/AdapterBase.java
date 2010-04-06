@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -46,8 +47,6 @@ public abstract class AdapterBase {
 
     protected ModelWrapper<?> modelObject;
 
-    protected boolean haveModelObject;
-
     private Integer id;
 
     private String label;
@@ -59,11 +58,6 @@ public abstract class AdapterBase {
     protected List<AdapterBase> children;
 
     /**
-     * if true, enable normal actions of this adapter
-     */
-    protected boolean enableActions = true;
-
-    /**
      * if true, edit button and actions will be visible
      */
     private boolean editable = true;
@@ -72,17 +66,17 @@ public abstract class AdapterBase {
 
     private Thread childUpdateThread;
 
+    private Semaphore loadChildrenSemaphore;
+
     // FIXME can we merge this list of listeners with the DeltaListener ?
     private List<AdapterChangedListener> listeners;
 
-    public AdapterBase(AdapterBase parent, boolean haveModelObject,
-        ModelWrapper<?> object, boolean enableActions,
+    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
         boolean loadChildrenInBackground) {
         this.modelObject = object;
         this.parent = parent;
-        this.enableActions = enableActions;
-        this.haveModelObject = haveModelObject;
         this.loadChildrenInBackground = loadChildrenInBackground;
+        loadChildrenSemaphore = new Semaphore(10, true);
         children = new ArrayList<AdapterBase>();
         if (parent != null) {
             addListener(parent.deltaListener);
@@ -91,18 +85,13 @@ public abstract class AdapterBase {
         Assert.isTrue(checkIntegrity(), "integrity checks failed");
     }
 
-    public AdapterBase(AdapterBase parent, ModelWrapper<?> object,
-        boolean enableActions, boolean loadChildrenInBackground) {
-        this(parent, true, object, enableActions, loadChildrenInBackground);
-    }
-
     public AdapterBase(AdapterBase parent, ModelWrapper<?> object) {
-        this(parent, object, true, true);
+        this(parent, object, true);
     }
 
     public AdapterBase(AdapterBase parent, int id, String name,
         boolean hasChildren, boolean loadChildrenInBackground) {
-        this(parent, false, null, true, loadChildrenInBackground);
+        this(parent, null, loadChildrenInBackground);
         setId(id);
         setName(name);
         setHasChildren(hasChildren);
@@ -321,14 +310,12 @@ public abstract class AdapterBase {
         deltaListener.remove(new DeltaEvent(removed));
     }
 
-    public void executeDoubleClick() {
-        if (enableActions) {
-            openViewForm();
-        }
+    protected void executeDoubleClick() {
+        openViewForm();
     }
 
     public void performDoubleClick() {
-        if (!haveModelObject || (modelObject != null)) {
+        if (modelObject != null) {
             executeDoubleClick();
         }
     }
@@ -337,6 +324,16 @@ public abstract class AdapterBase {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 loadChildren(true);
+                try {
+                    loadChildrenSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    BioBankPlugin.openAsyncError("Child expand failed", e);
+                }
+                RootNode root = getRootNode();
+                if (root != null) {
+                    root.expandChild(AdapterBase.this);
+                }
+                loadChildrenSemaphore.release();
             }
         });
     }
@@ -347,6 +344,12 @@ public abstract class AdapterBase {
      * @param updateNode If not null, the node in the treeview to update.
      */
     public void loadChildren(boolean updateNode) {
+        try {
+            loadChildrenSemaphore.acquire();
+        } catch (InterruptedException e) {
+            BioBankPlugin.openAsyncError("Could not load children", e);
+        }
+
         if (loadChildrenInBackground) {
             loadChildrenBackground(true);
             return;
@@ -371,9 +374,13 @@ public abstract class AdapterBase {
         } catch (final RemoteAccessException exp) {
             BioBankPlugin.openRemoteAccessErrorMessage();
         } catch (Exception e) {
-            logger.error("Error while loading children of node "
-                + modelObject.toString(), e);
+            String text = getClass().getName();
+            if (modelObject != null) {
+                text = modelObject.toString();
+            }
+            logger.error("Error while loading children of node " + text, e);
         }
+        loadChildrenSemaphore.release();
     }
 
     public void loadChildrenBackground(final boolean updateNode) {
@@ -395,10 +402,6 @@ public abstract class AdapterBase {
                 if (updateNode) {
                     SessionManager.updateTreeNode(node);
                 }
-            }
-            RootNode root = getRootNode();
-            if (root != null) {
-                root.expandChild(this);
             }
 
             childUpdateThread = new Thread() {
@@ -441,6 +444,8 @@ public abstract class AdapterBase {
                         logger.error("Error while loading children of node "
                             + modelObject.toString() + " in background", e);
                     }
+
+                    loadChildrenSemaphore.release();
                 }
             };
             childUpdateThread.start();
@@ -453,7 +458,7 @@ public abstract class AdapterBase {
     public abstract void popupMenu(TreeViewer tv, Tree tree, Menu menu);
 
     protected void addEditMenu(Menu menu, String objectName) {
-        if (isEditable() && enableActions) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Edit " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -466,21 +471,19 @@ public abstract class AdapterBase {
     }
 
     protected void addViewMenu(Menu menu, String objectName) {
-        if (enableActions) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("View " + objectName);
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    AdapterBase.this.openViewForm();
-                }
-            });
-        }
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("View " + objectName);
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                AdapterBase.this.openViewForm();
+            }
+        });
     }
 
     protected void addDeleteMenu(Menu menu, String objectName,
         final String question) {
-        if (enableActions) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -637,6 +640,10 @@ public abstract class AdapterBase {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
+    }
+
+    public void setLoadChildrenInBackground(boolean loadChildrenInBackground) {
+        this.loadChildrenInBackground = loadChildrenInBackground;
     }
 
     public void addChangedListener(AdapterChangedListener listener) {

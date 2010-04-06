@@ -117,9 +117,11 @@ public abstract class BiobankFormBase extends EditorPart {
             SessionManager.setSelectedNode(adapter);
             // if selection fails, then the adapter needs to be matched at the
             // id level
-            if (SessionManager.getSelectedNode() == null)
-                SessionManager.setSelectedNode(SessionManager
-                    .searchNode(adapter.getModelObject()));
+            if (SessionManager.getSelectedNode() == null) {
+                AdapterBase node = SessionManager.searchNode(adapter
+                    .getModelObject());
+                SessionManager.setSelectedNode(node);
+            }
         }
     }
 
@@ -150,12 +152,10 @@ public abstract class BiobankFormBase extends EditorPart {
         adapter = formInput.getNode();
         Assert.isNotNull(adapter, "Bad editor input (null value)");
         appService = adapter.getAppService();
-        if (formInput.hasPreviousForm()) {
-            linkedForms = currentLinkedForms;
-        } else {
-            linkedForms = new ArrayList<BiobankFormBase>();
-            currentLinkedForms = linkedForms;
+        if (!formInput.hasPreviousForm()) {
+            currentLinkedForms = new ArrayList<BiobankFormBase>();
         }
+        linkedForms = currentLinkedForms;
         linkedForms.add(this);
         try {
             init();
@@ -312,8 +312,6 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     public void setBroughtToTop() {
-        // linkedForms.remove(this);
-        // linkedForms.add(this);
         currentLinkedForms = linkedForms;
     }
 

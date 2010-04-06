@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -76,23 +77,33 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
         }
-        checkPatients();
+        checkAlLeastOnePatient();
+        checkPatientsStudy();
     }
 
-    private void checkPatients() throws BiobankCheckException,
-        ApplicationException {
+    public void checkAlLeastOnePatient() throws BiobankCheckException {
         List<PatientWrapper> patients = getPatientCollection();
         if (patients == null || patients.size() == 0) {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
+    }
+
+    public void checkPatientsStudy() throws BiobankCheckException,
+        ApplicationException {
+        String patientsInError = "";
         for (PatientWrapper patient : patientsAdded) {
-            if (!patient.getStudy().isLinkedToClinic(getClinic())) {
-                throw new BiobankCheckException("Patient "
-                    + patient.getPnumber()
-                    + " is not part of a study that has contact with clinic "
-                    + getClinic().getName());
+            if (!patient.canBeAddedToShipment(this)) {
+                patientsInError += patient.getPnumber() + ", ";
             }
+        }
+        if (!patientsInError.isEmpty()) {
+            // remove last ", "
+            patientsInError = patientsInError.substring(0, patientsInError
+                .length() - 2);
+            throw new BiobankCheckException("Patient(s) " + patientsInError
+                + " are not part of a study that has contact with clinic "
+                + getClinic().getName());
         }
     }
 
@@ -399,5 +410,46 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     public void resetInternalField() {
         patientsAdded.clear();
+    }
+
+    public static List<ShipmentWrapper> getTodayShipments(
+        WritableApplicationService appService, SiteWrapper site)
+        throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // yesterday midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Shipment.class.getName()
+                + " where clinic.site.id = ? and dateReceived > ? and dateReceived < ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        List<Shipment> res = appService.query(criteria);
+        List<ShipmentWrapper> ships = new ArrayList<ShipmentWrapper>();
+        for (Shipment s : res) {
+            ships.add(new ShipmentWrapper(appService, s));
+        }
+        return ships;
+    }
+
+    public boolean isReceivedToday() {
+        Calendar cal = Calendar.getInstance();
+        // yesterday midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        Date dateReveived = getDateReceived();
+        return dateReveived.after(startDate) && dateReveived.before(endDate);
     }
 }

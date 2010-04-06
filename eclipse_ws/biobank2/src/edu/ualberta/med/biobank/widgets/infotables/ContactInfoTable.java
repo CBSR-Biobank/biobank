@@ -14,6 +14,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
+    private static final int PAGE_SIZE_ROWS = 5;
+
     protected class TableRowData {
         ContactWrapper contact;
         String name;
@@ -30,6 +32,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -78,13 +81,8 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final int[] BOUNDS = new int[] { 120, 120, 200, 120, 120,
         100 };
 
-    public ContactInfoTable(Composite parent, boolean multiSelectRows,
-        List<ContactWrapper> contacts) {
-        super(parent, multiSelectRows, contacts, HEADINGS, BOUNDS, 10);
-    }
-
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
-        super(parent, true, contacts, HEADINGS, BOUNDS, 10);
+        super(parent, contacts, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
     }
 
     @Override
@@ -121,7 +119,8 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

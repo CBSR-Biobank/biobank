@@ -19,8 +19,11 @@ join container on container.id=aliquot_position.container_id
 join container_path on container_path.container_id=container.id
 where study.name_short='{study_name_short}'
 and locate('/', path)<>0
-and substr(path, 1, locate('/', path)-1) not in
-(SELECT container.id FROM container where label='SS')
+and substr(path, 1, locate('/', path)-1) in
+(SELECT container.id
+    FROM container
+    join container_type on container_type.id=container.container_type_id
+    where label!='SS' and name like 'Freezer%')
 ";
 
    const ALIQUOT_QUERY = "

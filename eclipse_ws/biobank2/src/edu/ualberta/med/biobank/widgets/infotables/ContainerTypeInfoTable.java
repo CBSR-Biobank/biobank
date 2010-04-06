@@ -97,7 +97,7 @@ public class ContainerTypeInfoTable extends
 
     public ContainerTypeInfoTable(Composite parent,
         List<ContainerTypeWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
@@ -137,7 +137,8 @@ public class ContainerTypeInfoTable extends
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

@@ -8,8 +8,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
@@ -61,7 +61,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     public PatientVisitInfoTable(Composite parent,
         List<PatientVisitWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
@@ -92,7 +92,8 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

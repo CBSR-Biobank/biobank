@@ -3,26 +3,25 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class NodeSearchVisitor {
 
-    private ModelWrapper<?> wrapper;
+    protected ModelWrapper<?> wrapper;
 
     public NodeSearchVisitor(ModelWrapper<?> wrapper) {
         this.wrapper = wrapper;
     }
 
-    private AdapterBase visitChildren(AdapterBase node) {
-        node.loadChildren(true);
+    protected AdapterBase visitChildren(AdapterBase node) {
+        // node.loadChildren(true);
         for (AdapterBase child : node.getChildren()) {
             AdapterBase foundChild = child.accept(this);
             if (foundChild != null) {
@@ -54,11 +53,8 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public AdapterBase visit(StudyAdapter study) {
-        if (wrapper instanceof PatientWrapper) {
-            return study.getChild(wrapper.getId(), true);
-        }
-        return visitChildren(study);
+    public AdapterBase visit(@SuppressWarnings("unused") StudyAdapter study) {
+        return null;
     }
 
     public AdapterBase visit(PatientAdapter patient) {
@@ -170,6 +166,21 @@ public class NodeSearchVisitor {
         if (wrapper instanceof PatientVisitWrapper) {
             return shipment.getChild(wrapper.getId(), true);
         }
+        return null;
+    }
+
+    public AdapterBase visit(
+        @SuppressWarnings("unused") AbstractSearchedNode abstractSearchedNode) {
+        return null;
+    }
+
+    public AdapterBase visit(
+        @SuppressWarnings("unused") AbstractTodayNode abstractTodayNode) {
+        return null;
+    }
+
+    public AdapterBase visit(
+        @SuppressWarnings("unused") ClinicAdapter clinicAdapter) {
         return null;
     }
 }

@@ -512,7 +512,7 @@ public class AdvancedReportsEditor extends EditorPart {
         }
     }
 
-    protected void printTable(boolean b) {
+    protected void printTable(@SuppressWarnings("unused") boolean b) {
         // TODO Auto-generated method stub
 
     }

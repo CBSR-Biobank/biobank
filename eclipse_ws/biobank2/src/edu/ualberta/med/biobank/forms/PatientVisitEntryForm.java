@@ -121,12 +121,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, patient.getStudy().getSite().getName());
+        createReadOnlyField(client, SWT.NONE, "Site", patient.getStudy()
+            .getSite().getName());
 
-        Text patientNumberLabel = createReadOnlyField(client, SWT.NONE,
-            "Patient");
-        setTextValue(patientNumberLabel, patient.getPnumber());
+        createReadOnlyField(client, SWT.NONE, "Study", patient.getStudy()
+            .getName());
+
+        createReadOnlyField(client, SWT.NONE, "Patient", patient.getPnumber());
 
         List<ShipmentWrapper> patientShipments = patient
             .getShipmentCollection();
