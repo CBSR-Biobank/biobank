@@ -39,7 +39,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private CancelConfirmWidget cancelConfirmWidget;
 
-    private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
+    private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
     private IObservableValue scanLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
@@ -58,6 +58,14 @@ public abstract class AbstractPalletAliquotAdminForm extends
             .getPreferenceStore();
         palletNameContains = store
             .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
+    }
+
+    @Override
+    public boolean onClose() {
+        if (!isSaved || BioBankPlugin.getPlatesEnabledCount() != 1) {
+            plateToScanValue.setValue("");
+        }
+        return super.onClose();
     }
 
     protected void setRescanMode() {

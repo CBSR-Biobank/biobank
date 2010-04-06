@@ -378,6 +378,16 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return -1;
     }
 
+    public static int getPlatesEnabledCount() {
+        int count = 0;
+        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
+            if (!isRealScanEnabled()
+                || ScannerConfigPlugin.getDefault().getPlateEnabled(i + 1))
+                count++;
+        }
+        return count;
+    }
+
     public boolean isValidPlateBarcode(String value) {
         return !value.isEmpty() && getPlateNumber(value) != -1;
     }
