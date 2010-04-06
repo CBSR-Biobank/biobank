@@ -74,10 +74,11 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     private void createSiteSampleTypeSection() {
-        Section section = createSection("Site Sample Types");
+        Section section = createSection(siteWrapper.getNameShort()
+            + " only sample types");
         siteSampleWidget = new SampleTypeEntryInfoTable(section,
             siteSampleTypes, globalSampleTypes,
-            "Add a new sample type to the repository site",
+            "Add a new sample type to the repository site   ",
             "Edit the repository site's sample type");
         siteSampleWidget.adaptToToolkit(toolkit, true);
         siteSampleWidget.addSelectionChangedListener(listener);
@@ -94,7 +95,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     }
 
     private void createGlobalSampleTypeSection() {
-        Section section = createSection("Global Sample Types");
+        Section section = createSection("Global sample types");
         globalSampleWidget = new SampleTypeEntryInfoTable(section,
             globalSampleTypes, siteSampleTypes, "Add a new global sample type",
             "Edit the global sample type");

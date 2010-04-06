@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -84,8 +85,6 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(InfoTableWidget.class.getName());
 
-    private static final int DEFAULT_NUM_ROWS = 10;
-
     protected TableViewer tableViewer;
 
     protected List<BiobankCollectionModel> model;
@@ -122,8 +121,8 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
     private boolean reloadData;
 
-    public InfoTableWidget(Composite parent, boolean multilineSelection,
-        List<T> collection, String[] headings, int[] columnWidths) {
+    public InfoTableWidget(Composite parent, List<T> collection,
+        String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
         reloadData = true;
@@ -135,7 +134,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;
-        if (multilineSelection) {
+        if (isEditMode()) {
             style |= SWT.MULTI;
         }
 
@@ -199,20 +198,24 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths) {
-        this(parent, false, collection, headings, columnWidths);
-    }
-
-    public InfoTableWidget(Composite parent, boolean multilineSelection,
-        List<T> collection, String[] headings, int[] columnWidths,
-        int rowsPerPage) {
-        this(parent, multilineSelection, null, headings, columnWidths);
+        String[] headings, int[] columnWidths, int rowsPerPage) {
+        this(parent, null, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
         if (collection != null) {
             initModel(collection);
             setCollection(collection);
-            resizeTable();
         }
+        resizeTable();
+    }
+
+    /**
+     * Derived classes should override this method if info table support editing
+     * of items in the table.
+     * 
+     * @return true if editing is allowed.
+     */
+    protected boolean isEditMode() {
+        return false;
     }
 
     private void initModel(List<T> collection) {
@@ -317,19 +320,28 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
      * 
      * @param collection
      */
+    public void reloadCollection(final List<T> collection, T selection) {
+        reloadData = true;
+        setCollection(collection, selection);
+    }
+
     public void reloadCollection(final List<T> collection) {
         reloadData = true;
-        setCollection(collection);
+        setCollection(collection, null);
     }
 
     public void setCollection(final List<T> collection) {
+        setCollection(collection, null);
+    }
+
+    public void setCollection(final List<T> collection, final T selection) {
         this.collection = collection;
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
         }
 
-        if ((pageInfo.rowsPerPage != 0)
+        if (!isEditMode() && (pageInfo.rowsPerPage != 0)
             && (collection.size() > pageInfo.rowsPerPage)
             && !paginationWidget.getVisible()) {
             pageInfo.page = 0;
@@ -378,7 +390,7 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                 });
 
                 try {
-
+                    BiobankCollectionModel selItem = null;
                     for (int i = start; i < end; ++i) {
                         if (table.isDisposed())
                             return;
@@ -396,14 +408,25 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
                                 }
                             }
                         });
+
+                        if ((selection != null) && selection.equals(item.o)) {
+                            selItem = item;
+                        }
                     }
                     reloadData = false;
 
+                    final BiobankCollectionModel selectedItem = selItem;
                     display.syncExec(new Runnable() {
                         public void run() {
                             if (!table.isDisposed()) {
                                 if (paginationRequired) {
                                     enablePaginationWidget(true);
+                                }
+
+                                if (selectedItem != null) {
+                                    tableViewer
+                                        .setSelection(new StructuredSelection(
+                                            selectedItem));
                                 }
                             }
                         }
@@ -706,19 +729,12 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
     }
 
     private void resizeTable() {
-        int rows;
-        if (pageInfo.rowsPerPage != 0) {
-            rows = pageInfo.rowsPerPage;
-            if (collection != null) {
-                rows = Math.min(pageInfo.rowsPerPage, collection.size());
-            }
-        } else if (collection != null) {
-            rows = Math.min(DEFAULT_NUM_ROWS, collection.size());
-        } else {
-            rows = DEFAULT_NUM_ROWS;
+        int rows = 5;
+        if (!isEditMode() && (pageInfo.rowsPerPage > 0) && (collection != null)) {
+            rows = Math.min(collection.size(), pageInfo.rowsPerPage);
+        } else if (!isEditMode() && (collection != null)) {
+            rows = Math.min(collection.size(), rows);
         }
-
-        rows = Math.max(rows, 1);
 
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();

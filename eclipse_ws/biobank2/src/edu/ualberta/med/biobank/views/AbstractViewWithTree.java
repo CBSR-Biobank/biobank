@@ -46,4 +46,8 @@ public abstract class AbstractViewWithTree extends ViewPart implements
                 new StructuredSelection(node));
         }
     }
+
+    public void opened() {
+
+    }
 }

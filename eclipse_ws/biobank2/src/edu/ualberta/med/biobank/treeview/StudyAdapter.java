@@ -16,21 +16,8 @@ public class StudyAdapter extends AdapterBase {
 
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this study?";
 
-    public static final int PATIENTS_NODE_ID = 0;
-
-    public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper,
-        boolean enabledActions) {
-        super(parent, studyWrapper);
-        this.enableActions = enabledActions;
-
-        if (studyWrapper != null) {
-            setId(studyWrapper.getId());
-            setName(studyWrapper.getName());
-        }
-    }
-
     public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper) {
-        this(parent, studyWrapper, true);
+        super(parent, studyWrapper);
     }
 
     public StudyWrapper getWrapper() {

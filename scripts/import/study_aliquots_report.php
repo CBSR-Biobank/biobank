@@ -44,7 +44,7 @@ and substr(path, 1, locate('/', path)-1) in
 (SELECT container.id
   FROM container
   join container_type on container_type.id=container.container_type_id
-  where name like '{container_type}%')
+  where label!='SS' and name like '{container_type}%')
 ";
 
    const ALIQUOT_QUERY = "
@@ -64,8 +64,12 @@ and label like '{frz_label}%'
    private static $container_types = array('Freezer', 'Cabinet');
 
    private static $headings = array(
-      'patient_nr', 'visit_nr', 'study_name_short', 'sample_name_short', 'date_taken',
-      'fnum', 'rack', 'box', 'cell', 'inventory_id', 'clinic_site');
+      'patient_nr',
+      'visit_nr',
+      'study_name_short', 'sample_name_short', 'date_taken',
+      'fnum', 'rack', 'box', 'cell', 'inventory_id',
+      'clinic_site'
+      );
 
    private $con = null;
 
@@ -155,7 +159,7 @@ and label like '{frz_label}%'
             'viist_nr' => $this->visitNrs[$patient_nr][$date_received],
             'study_name_short' => Utils::getOldStudyName($row->study_name_short),
             'sample_name_short' => $row->sample_name_short,
-            'date_taken' => $date_taken,
+            'date_taken' =>  date('d-M-y', strtotime($row->date_drawn)),
             'fnum' => $pos['top'],
             'rack' => $pos['childL1'],
             'box' => $pos['childL2'],

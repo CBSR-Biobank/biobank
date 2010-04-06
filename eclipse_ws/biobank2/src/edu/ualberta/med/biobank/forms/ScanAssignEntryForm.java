@@ -20,8 +20,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -96,9 +94,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     // missing rowColPos. A moved one is set into its old RowColPos
     private Map<RowColPos, PalletCell> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, PalletCell>();
 
-    private boolean noFieldModification = true;
-
-    private ModifyListener textModifiedListener;
+    private Composite fieldsComposite;
 
     @Override
     protected void init() {
@@ -106,13 +102,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         setPartName(Messages.getString("ScanAssign.tabTitle")); //$NON-NLS-1$
         currentPalletWrapper = new ContainerWrapper(appService);
         initPalletValues();
-        textModifiedListener = new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                noFieldModification = false;
-                setScanNotLauched();
-            }
-        };
     }
 
     @Override
@@ -132,14 +121,27 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createFieldsSection() throws Exception {
-        Composite fieldsComposite = toolkit.createComposite(form.getBody());
+        Composite leftSideComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
-        fieldsComposite.setLayout(layout);
-        toolkit.paintBordersFor(fieldsComposite);
+        layout.horizontalSpacing = 0;
+        layout.marginWidth = 0;
+        layout.verticalSpacing = 0;
+        leftSideComposite.setLayout(layout);
+        toolkit.paintBordersFor(leftSideComposite);
         GridData gd = new GridData();
         gd.widthHint = 400;
         gd.verticalAlignment = SWT.TOP;
+        leftSideComposite.setLayoutData(gd);
+
+        fieldsComposite = toolkit.createComposite(leftSideComposite);
+        layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        fieldsComposite.setLayout(layout);
+        toolkit.paintBordersFor(fieldsComposite);
+        gd = new GridData();
+        gd.widthHint = 400;
+        gd.verticalAlignment = SWT.TOP;
+        gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
         palletproductBarcodeText = (Text) createBoundWidgetWithLabel(
@@ -160,7 +162,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 getExistingPalletFromProductBarcode();
             }
         });
-        palletproductBarcodeText.addModifyListener(textModifiedListener);
 
         palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, Messages
@@ -172,11 +173,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         palletPositionText.setLayoutData(gd);
-        palletPositionText.addModifyListener(textModifiedListener);
 
         createPalletTypesViewer(fieldsComposite);
 
-        createScanComponents(fieldsComposite);
+        createPlateToScanField(fieldsComposite);
+
+        createScanButton(leftSideComposite);
     }
 
     private void createPalletTypesViewer(Composite parent) throws Exception {
@@ -197,7 +199,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                                 .getFirstElement());
                     }
                     setScanNotLauched();
-                    noFieldModification = false;
                 }
             });
         if (palletContainerTypes.size() == 1) {
@@ -318,7 +319,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception {
         boolean canLaunchScan = false;
-        if (isRescanMode() && noFieldModification) {
+        if (isRescanMode()) {
             canLaunchScan = true;
         } else {
             // if another scan has been done on this same form, need to
@@ -332,6 +333,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             processScanResult(monitor);
             palletWidget.setCells(cells);
             setDirty(true);
+            setRescanMode();
         } else {
             palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
             showOnlyPallet(true);
@@ -339,7 +341,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         }
         displayPalletPositions();
         focusOnCancelConfirmText();
-        setRescanMode();
         containersComposite.layout(true, true);
     }
 
@@ -373,11 +374,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 monitor.subTask("Processing position "
                     + LabelingScheme.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                if (!isRescanMode()
-                    || (cell == null
-                        || cell.getStatus() == AliquotCellStatus.EMPTY
-                        || cell.getStatus() == AliquotCellStatus.ERROR || cell
-                        .getStatus() == AliquotCellStatus.MISSING)) {
+                if (!isRescanMode() || cell == null || cell.getStatus() == null
+                    || cell.getStatus() == AliquotCellStatus.EMPTY
+                    || cell.getStatus() == AliquotCellStatus.ERROR
+                    || cell.getStatus() == AliquotCellStatus.MISSING) {
                     AliquotWrapper expectedAliquot = null;
                     if (expectedAliquots != null) {
                         expectedAliquot = expectedAliquots.get(rcp);
@@ -697,6 +697,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     public void reset() throws Exception {
         reset(false);
+        fieldsComposite.setEnabled(true);
     }
 
     public void reset(boolean beforeScan) throws Exception {
@@ -709,7 +710,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             label = currentPalletWrapper.getLabel();
             type = currentPalletWrapper.getContainerType();
             currentPalletWrapper.resetToNewObject();
-            noFieldModification = true;
         } else {
             if (palletTypesViewer != null) {
                 palletTypesViewer.getCombo().deselectAll();
@@ -870,6 +870,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     protected String getActivityTitle() {
         return "Scan assign activity"; //$NON-NLS-1$
+    }
+
+    @Override
+    protected void disableFields() {
+        fieldsComposite.setEnabled(false);
     }
 
 }

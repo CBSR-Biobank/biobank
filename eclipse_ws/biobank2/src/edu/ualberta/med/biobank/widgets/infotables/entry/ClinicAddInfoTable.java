@@ -41,6 +41,11 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         addDeleteSupport();
     }
 
+    @Override
+    protected boolean isEditMode() {
+        return true;
+    }
+
     public void createClinicContact() {
         SelectClinicContactDialog dlg = new SelectClinicContactDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),

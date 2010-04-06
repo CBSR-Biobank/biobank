@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PvSourceVesselInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.PvSourceVesselEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -90,7 +91,7 @@ public class PvSourceVesselEntryWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        pvSourceVesselTable = new PvSourceVesselInfoTable(parent, false, null);
+        pvSourceVesselTable = new PvSourceVesselEntryInfoTable(parent, null);
         updateCollection();
         pvSourceVesselTable.adaptToToolkit(toolkit, true);
         addEditSupport();

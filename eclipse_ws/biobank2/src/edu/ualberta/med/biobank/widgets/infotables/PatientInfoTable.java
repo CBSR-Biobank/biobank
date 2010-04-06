@@ -14,6 +14,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
+    private static final int PAGE_SIZE_ROWS = 5;
+
     class TableRowData {
         PatientWrapper patient;
         String pnumber;
@@ -59,13 +61,8 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     private static final int[] BOUNDS = new int[] { 150, 150, -1, -1, -1, -1 };
 
-    public PatientInfoTable(Composite parent, boolean multiSelectRows,
-        List<PatientWrapper> patients) {
-        super(parent, multiSelectRows, patients, HEADINGS, BOUNDS, 10);
-    }
-
     public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
-        super(parent, true, patients, HEADINGS, BOUNDS, 10);
+        super(parent, patients, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
     }
 
     @Override
@@ -95,7 +92,8 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

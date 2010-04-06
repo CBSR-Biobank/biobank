@@ -32,6 +32,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Text siteLabel;
 
+    private Text studyLabel;
+
     private AliquotListInfoTable aliquotWidget;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
@@ -89,6 +91,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
+        studyLabel = createReadOnlyField(client, SWT.NONE, "Study");
         clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
@@ -143,8 +146,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void setPatientVisitValues() {
-        setTextValue(siteLabel, patientVisit.getShipment().getClinic()
-            .getSite().getName());
+        setTextValue(siteLabel, patientVisit.getPatient().getStudy().getSite()
+            .getName());
+        setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
         setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
             : patientVisit.getShipment().getClinic().getName());
         setTextValue(shipmentWaybillLabel, patientVisit.getShipment()

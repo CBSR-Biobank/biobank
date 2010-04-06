@@ -15,25 +15,25 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 /**
  * Query to generate studies:
- * 
+ *
  * select name, name_short, comment from study
- * 
+ *
  * Query to generate sources vessels:
- * 
+ *
  * select study.name_short, sample_source.name from study join
  * study_sample_source on study.id=study_sample_source.study_id join
  * sample_source on sample_source.id=study_sample_source.sample_source_id order
  * by study.name_short
- * 
+ *
  * Query to generate study pv attributes:
- * 
+ *
  * select study.name_short, study_pv_attr.label, pv_attr_type.name,
  * study_pv_attr.permissible from study join study_pv_attr on
  * study_pv_attr.study_id=study.id join pv_attr_type on
  * pv_attr_type.id=study_pv_attr.pv_attr_type_id order by study.name_short
- * 
+ *
  * Query to generate study contacts:
- * 
+ *
  * select contact.name, study.name_short from contact join clinic on
  * clinic.id=contact.clinic_id left join study_contact on contact.id=contact_id
  * join study on study.id=study_contact.study_id order by study.name_short
@@ -207,6 +207,21 @@ public class CbsrStudies {
         addSampleStorage("CEGIIR", "Serum B", 6, 0.8);
         addSampleStorage("CEGIIR", "WB DMSO", 2, 0.8);
         addSampleStorage("CEGIIR", "WBE", null, null);
+        addSampleStorage("CEGIIR", "Colon, A", null, null);
+        addSampleStorage("CEGIIR", "Colon, D", null, null);
+        addSampleStorage("CEGIIR", "Duodenum", null, null);
+        addSampleStorage("CEGIIR", "Ileum", null, null);
+        addSampleStorage("CEGIIR", "Jejunum", null, null);
+        addSampleStorage("CEGIIR", "R-ColonA", null, null);
+        addSampleStorage("CEGIIR", "R-ColonD", null, null);
+        addSampleStorage("CEGIIR", "R-Duodenum", null, null);
+        addSampleStorage("CEGIIR", "R-Ilieum", null, null);
+        addSampleStorage("CEGIIR", "R-StomachA", null, null);
+        addSampleStorage("CEGIIR", "R-StomachB", null, null);
+        addSampleStorage("CEGIIR", "R-ColonT", null, null);
+        addSampleStorage("CEGIIR", "Stomach, A", null, null);
+        addSampleStorage("CEGIIR", "Stomach, B", null, null);
+        addSampleStorage("CEGIIR", "Colon, T", null, null);
         addSampleStorage("CEGIIR", "Z Urine", 6, 0.9);
         addSampleStorage("CHILD", "CBMC RNA", null, null);
         addSampleStorage("CHILD", "CBMC", null, null);
@@ -288,45 +303,44 @@ public class CbsrStudies {
         addSampleStorage("VAS", "T Nails", null, null);
         addSampleStorage("VAS", "WBE", 4, 0.8);
 
-        addPvAttr(site, "AHFEM", "PBMC Count", "number");
+        addPvAttr(site, "AHFEM", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "AHFEM", "Worksheet", "text");
         addPvAttr(site, "BBPSP", "Consent", "select_multiple",
             "Surveillance;Genetic Predisposition;Previous Samples;Genetic Mutation");
-        addPvAttr(site, "BBPSP", "PBMC Count", "number");
+        addPvAttr(site, "BBPSP", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "BBPSP", "Phlebotomist", "text");
         addPvAttr(site, "BBPSP", "Worksheet", "text");
-        addPvAttr(site, "CCCS", "PBMC Count", "number");
+        addPvAttr(site, "CCCS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "CCCS", "Worksheet", "text");
-        addPvAttr(site, "CEGIIR", "PBMC Count", "number");
+        addPvAttr(site, "CEGIIR", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "CEGIIR", "Worksheet", "text");
-        addPvAttr(site, "CHILD", "PBMC Count", "number");
+        addPvAttr(site, "CHILD", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "CHILD", "Worksheet", "text");
-        addPvAttr(site, "ERCIN", "PBMC Count", "number");
+        addPvAttr(site, "ERCIN", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "ERCIN", "Visit Type", "select_single",
             "Baseline;Precath;6hr Post;24hr Post;48-72hr Post");
         addPvAttr(site, "ERCIN", "Worksheet", "text");
         addPvAttr(site, "KDCS", "Consent", "select_multiple", "Genetic");
-        addPvAttr(site, "KDCS", "PBMC Count", "number");
+        addPvAttr(site, "KDCS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "KDCS", "Worksheet", "text");
-        addPvAttr(site, "KMS", "PBMC Count", "number");
+        addPvAttr(site, "KMS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "KMS", "Worksheet", "text");
-        addPvAttr(site, "LCS", "PBMC Count", "number");
+        addPvAttr(site, "LCS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "LCS", "Worksheet", "text");
-        addPvAttr(site, "MPS", "PBMC Count", "number");
-        addPvAttr(site, "MPS", "PBMC Count", "number");
+        addPvAttr(site, "MPS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "MPS", "Worksheet", "text");
         addPvAttr(site, "NHS", "Biopsy Length", "number");
-        addPvAttr(site, "NHS", "PBMC Count", "number");
+        addPvAttr(site, "NHS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "NHS", "Visit Type", "select_single",
             "D0;D2;D4;Wk2;Wk4;M2;M8;M12;M18;M24");
         addPvAttr(site, "NHS", "Worksheet", "text");
-        addPvAttr(site, "RVS", "PBMC Count", "number");
+        addPvAttr(site, "RVS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "RVS", "Worksheet", "text");
-        addPvAttr(site, "SPARK", "PBMC Count", "number");
+        addPvAttr(site, "SPARK", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "SPARK", "Worksheet", "text");
-        addPvAttr(site, "TCKS", "PBMC Count", "number");
+        addPvAttr(site, "TCKS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "TCKS", "Worksheet", "text");
-        addPvAttr(site, "VAS", "PBMC Count", "number");
+        addPvAttr(site, "VAS", "PBMC Count (x10^6)", "number");
         addPvAttr(site, "VAS", "Worksheet", "text");
 
         addContact("Aleasha Warner", "HL2", "BBPSP");

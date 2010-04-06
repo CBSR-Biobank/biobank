@@ -76,7 +76,7 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     public ContainerInfoTable(Composite parent,
         List<ContainerWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
@@ -114,7 +114,8 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

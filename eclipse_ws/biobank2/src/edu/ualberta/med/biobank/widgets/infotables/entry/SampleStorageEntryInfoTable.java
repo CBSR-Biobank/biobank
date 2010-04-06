@@ -58,7 +58,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
      */
     public SampleStorageEntryInfoTable(Composite parent, SiteWrapper site,
         StudyWrapper study) {
-        super(parent, false, null);
+        super(parent, null);
         getSampleTypes(site);
         this.study = study;
         selectedSampleStorages = study.getSampleStorageCollection();
@@ -73,6 +73,11 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         addEditSupport();
+    }
+
+    @Override
+    protected boolean isEditMode() {
+        return true;
     }
 
     public void addSampleStorage() {

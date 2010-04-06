@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -43,6 +44,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -62,6 +64,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm"; //$NON-NLS-1$
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ScanLinkEntryForm.class.getName());
 
     private ScanLinkPalletWidget spw;
 
@@ -95,10 +100,25 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private boolean patientNumberTextModified = false;
 
+    private Composite fieldsComposite;
+
+    private Button visitsListCheck;
+
+    private static IObservableValue visitsListCheckValue = new WritableValue(
+        Boolean.TRUE, Boolean.class);
+
     @Override
     protected void init() {
         super.init();
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
+    }
+
+    @Override
+    public boolean onClose() {
+        if (!isSaved) {
+            visitsListCheckValue.setValue(true);
+        }
+        return super.onClose();
     }
 
     @Override
@@ -163,7 +183,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         radioComponents.setLayout(compLayout);
         toolkit.paintBordersFor(radioComponents);
         GridData gd = new GridData();
-        gd.horizontalSpan = 2;
+        gd.horizontalSpan = 3;
         radioComponents.setLayoutData(gd);
         radioComponents.setEnabled(false);
 
@@ -336,12 +356,21 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createFieldsComposite() throws Exception {
-        Composite fieldsComposite = toolkit.createComposite(form.getBody());
+        Composite leftSideComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        leftSideComposite.setLayout(layout);
+        GridData gd = new GridData();
+        gd.verticalAlignment = SWT.TOP;
+        leftSideComposite.setLayoutData(gd);
+        toolkit.paintBordersFor(leftSideComposite);
+
+        fieldsComposite = toolkit.createComposite(leftSideComposite);
+        layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
-        GridData gd = new GridData();
+        gd = new GridData();
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
@@ -355,7 +384,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void focusLost(FocusEvent e) {
                 if (patientNumberTextModified) {
-                    setVisitsList();
+                    setVisitsList(visitsListCheck.getSelection());
                 }
                 patientNumberTextModified = false;
             }
@@ -363,18 +392,22 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                reset(false);
                 patientNumberTextModified = true;
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        gd = (GridData) patientNumberText.getLayoutData();
+        gd.horizontalSpan = 2;
         firstControl = patientNumberText;
 
         createVisitCombo(fieldsComposite);
 
-        createScanComponents(fieldsComposite);
+        createPlateToScanField(fieldsComposite);
 
-        createTypesSelectionSection(fieldsComposite);
+        createScanButton(leftSideComposite);
+
+        createTypesSelectionSection(leftSideComposite);
+
     }
 
     @Override
@@ -383,7 +416,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         Composite comp = toolkit.createComposite(fieldsComposite);
         comp.setLayout(new GridLayout());
         gd = new GridData();
-        gd.horizontalSpan = 2;
+        gd.horizontalSpan = 3;
         gd.widthHint = 400;
         comp.setLayoutData(gd);
         fakeScanRandom = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
@@ -431,9 +464,22 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 }
             }
         });
+
+        visitsListCheck = toolkit.createButton(compositeFields, "Last 7 days",
+            SWT.CHECK);
+        visitsListCheck.setSelection(true);
+        visitsListCheck.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setVisitsList(visitsListCheck.getSelection());
+            }
+        });
+        widgetCreator.bindValue(SWTObservables
+            .observeSelection(visitsListCheck), visitsListCheckValue, null,
+            null);
     }
 
-    protected void setVisitsList() {
+    protected void setVisitsList(boolean sevenDaysOnly) {
         currentPatient = null;
         try {
             currentPatient = PatientWrapper.getPatientInSite(appService,
@@ -448,11 +494,27 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
                 currentPatient.getPnumber());
             // show visits list
-            List<PatientVisitWrapper> collection = currentPatient
-                .getPatientVisitCollection();
+            List<PatientVisitWrapper> collection = null;
+            if (sevenDaysOnly) {
+                try {
+                    collection = currentPatient.getLast7DaysPatientVisits();
+                } catch (ApplicationException e) {
+                    BioBankPlugin.openAsyncError("Visits problem",
+                        "Problem getting last 7 days visits. All visits will "
+                            + "be displayed into the list");
+                    logger.error("Last 7 days visits error", e);
+                }
+            }
+            if (collection == null) {
+                collection = currentPatient.getPatientVisitCollection();
+            }
             viewerVisits.setInput(collection);
             viewerVisits.getCombo().setFocus();
-            viewerVisits.getCombo().setListVisible(true);
+            if (collection != null && collection.size() == 1) {
+                viewerVisits.getCombo().select(0);
+            } else {
+                viewerVisits.getCombo().deselectAll();
+            }
         } else {
             viewerVisits.setInput(null);
         }
@@ -650,6 +712,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     public void reset() throws Exception {
         reset(true);
+        fieldsComposite.setEnabled(true);
     }
 
     public void reset(boolean resetAll) {
@@ -678,6 +741,11 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     protected String getActivityTitle() {
         return "Scan link activity"; //$NON-NLS-1$
+    }
+
+    @Override
+    protected void disableFields() {
+        fieldsComposite.setEnabled(false);
     }
 
 }

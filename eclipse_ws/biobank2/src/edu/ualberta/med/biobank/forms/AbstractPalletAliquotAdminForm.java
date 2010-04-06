@@ -39,7 +39,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private CancelConfirmWidget cancelConfirmWidget;
 
-    private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
+    private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
     private IObservableValue scanLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
@@ -60,10 +60,21 @@ public abstract class AbstractPalletAliquotAdminForm extends
             .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
     }
 
-    protected void setRescanMode() {
-        scanButton.setText("Rescan");
-        rescanMode = true;
+    @Override
+    public boolean onClose() {
+        if (!isSaved || BioBankPlugin.getPlatesEnabledCount() != 1) {
+            plateToScanValue.setValue("");
+        }
+        return super.onClose();
     }
+
+    protected void setRescanMode() {
+        scanButton.setText("Retry scan");
+        rescanMode = true;
+        disableFields();
+    }
+
+    protected abstract void disableFields();
 
     protected boolean canLaunchScan() {
         return scanButton.isEnabled();
@@ -75,7 +86,31 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 .getString("linkAssign.scanLaunchValidationMsg")); //$NON-NLS-1$
     }
 
-    protected void createScanComponents(Composite fieldsComposite) {
+    protected void createScanButton(Composite oarent) {
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        plateToScanText.setLayoutData(gd);
+
+        scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
+        if (!BioBankPlugin.isRealScanEnabled()) {
+            createFakeOptions(oarent);
+            scanButtonTitle = "Fake scan"; //$NON-NLS-1$
+        }
+        scanButton = toolkit.createButton(oarent, scanButtonTitle, SWT.PUSH);
+        gd = new GridData();
+        gd.horizontalSpan = 3;
+        gd.widthHint = 100;
+        scanButton.setLayoutData(gd);
+        scanButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                internalScanAndProcessResult();
+            }
+        });
+        addScanBindings();
+    }
+
+    protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
             Text.class, SWT.NONE, Messages
                 .getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
@@ -88,27 +123,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 }
             }
         });
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.FILL;
-        plateToScanText.setLayoutData(gd);
-
-        scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
-        if (!BioBankPlugin.isRealScanEnabled()) {
-            createFakeOptions(fieldsComposite);
-            scanButtonTitle = "Fake scan"; //$NON-NLS-1$
-        }
-        scanButton = toolkit.createButton(fieldsComposite, scanButtonTitle,
-            SWT.PUSH);
-        gd = new GridData();
+        GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalSpan = 2;
-        scanButton.setLayoutData(gd);
-        scanButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                internalScanAndProcessResult();
-            }
-        });
-        addScanBindings();
     }
 
     protected void createFakeOptions(
@@ -177,7 +193,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         } else {
             launchFakeScan();
         }
-        if (isRescanMode()) {
+        if (isRescanMode() && oldCells != null) {
             // rescan: merge previous scan with new in case the scanner wasn't
             // able to scan well
             for (RowColPos rcp : oldCells.keySet()) {

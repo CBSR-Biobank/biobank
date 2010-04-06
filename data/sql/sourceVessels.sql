@@ -1,7 +1,7 @@
 LOCK TABLES `SOURCE_VESSEL` WRITE;
 INSERT INTO `SOURCE_VESSEL` (ID, NAME) VALUES
 ( 1, "N/A"),
-( 2, "Unknown - import"),
+( 2, "Unknown / import"),
 ( 3, "Damaged"),
 ( 4, "Unusable"),
 ( 5, "10mL lavender top EDTA tube"),

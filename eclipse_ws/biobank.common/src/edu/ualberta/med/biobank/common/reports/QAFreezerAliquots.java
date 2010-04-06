@@ -14,7 +14,7 @@ public class QAFreezerAliquots extends QueryObject {
 
     public QAFreezerAliquots(String op, Integer siteId) {
         super(
-            "Retrieves a list of aliquots, at random, within a date range, by aliquot type.",
+            "Retrieves a list of aliquots, at random, within a date range, by sample type.",
             "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
@@ -29,10 +29,10 @@ public class QAFreezerAliquots extends QueryObject {
                 + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site "
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
-                "Aliquot Type" });
+                "Sample Type" });
         addOption("Start Date", Date.class, new Date(0));
         addOption("End Date", Date.class, new Date());
-        addOption("Aliquot Type", String.class, "");
+        addOption("Sample Type", String.class, "");
         addOption("# Aliquots", Integer.class, 0);
     }
 

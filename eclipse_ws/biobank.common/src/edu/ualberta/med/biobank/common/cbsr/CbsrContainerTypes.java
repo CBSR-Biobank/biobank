@@ -34,13 +34,19 @@ public class CbsrContainerTypes {
     private static String[] hairBinSampleTypes = new String[] { "Hair" };
 
     private static String[] pallet96SampleTypes = new String[] { "BC",
-        "C Urine", "CBMC RNA", "CBMC", "CDPA Plasma", "Cells", "Dialysate",
-        "Effluent", "F Nails", "F Urine", "HB", "Lith Hep Plasma", "Meconium",
-        "PF Plasma", "Paxgene", "Plasma SH", "Plasma", "R-ColonA", "R-ColonD",
-        "R-ColonT", "R-Duodenum", "R-Ilieum", "R-Jejunum", "R-StomachA",
-        "R-StomachB", "RNA Biopsy", "RNA Biopsy", "S Water", "Serum B",
-        "Serum Pel", "Serum", "T Nails", "T Water", "Urine", "WB DMSO",
-        "WB Plasma", "WB RNA", "WB Serum", "WBE", "WBlood", "Z Urine" };
+        "C Urine", "CBMC RNA", "CBMC", "CDPA Plasma", "Cells", "Colon, A",
+        "Colon, D", "Colon, T", "Dialysate", "Duodenum", "Effluent", "F Nails",
+        "F Urine", "HB", "Ileum", "Jejunum", "Lith Hep Plasma", "Meconium",
+        "PF Plasma", "Paxgene", "Plasma SH", "Plasma", "R-ColonA", "R-ColonA",
+        "R-ColonD", "R-ColonD", "R-ColonT", "R-ColonT", "R-Duodenum",
+        "R-Duodenum", "R-Ilieum", "R-Ilieum", "R-Jejunum", "R-StomachA",
+        "R-StomachA", "R-StomachB", "R-StomachB", "RNA Biopsy", "RNA Biopsy",
+        "S Water", "Serum B", "Serum Pel", "Serum", "Stomach, A", "Stomach, B",
+        "T Nails", "T Water", "Urine", "WB DMSO", "WB Plasma", "WB RNA",
+        "WB Serum", "WBE", "WBlood", "Z Urine",
+
+        "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
+        "Colon, A", "Colon, T", };
 
     public static ContainerTypeWrapper getContainerType(String name)
         throws Exception {

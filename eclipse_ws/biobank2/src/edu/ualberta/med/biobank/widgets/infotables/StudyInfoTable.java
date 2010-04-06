@@ -30,6 +30,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -74,7 +75,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private static final int[] BOUNDS = new int[] { 260, 130, 130, 130, 130 };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
-        super(parent, true, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, BOUNDS, 10);
     }
 
     @Override
@@ -111,7 +112,8 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

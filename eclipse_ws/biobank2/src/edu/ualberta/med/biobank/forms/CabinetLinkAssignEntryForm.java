@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +45,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -95,6 +97,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private Button radioNew;
 
     private CabinetInventoryIDValidator inventoryIDValidator;
+
+    private List<SampleTypeWrapper> authorizedSampleTypes;
 
     @Override
     protected void init() {
@@ -214,6 +218,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
             public void handleEvent(Event e) {
                 setVisitsList();
+                setTypeCombosLists();
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -221,6 +226,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             @Override
             public void focusLost(FocusEvent e) {
                 setVisitsList();
+                setTypeCombosLists();
             }
         });
         firstControl = patientNumberText;
@@ -295,20 +301,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private void createTypeCombo(Composite fieldsComposite)
         throws ApplicationException {
-        List<SampleTypeWrapper> sampleTypes;
-        sampleTypes = SampleTypeWrapper.getSampleTypeForContainerTypes(
-            appService, SessionManager.getInstance().getCurrentSite(),
-            cabinetNameContains);
-        if (sampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError(Messages
-                .getString("Cabinet.dialog.sampleType.container.error.title"), //$NON-NLS-1$
-                Messages.getFormattedString(
-                    "Cabinet.dialog.sampleType.container.error.msg", //$NON-NLS-1$
-                    cabinetNameContains));
-        }
+        initAuthorizedSampleTypeList();
         viewerSampleTypes = createComboViewerWithNoSelectionValidator(
             fieldsComposite,
-            Messages.getString("Cabinet.sampleType.label"), sampleTypes, null, //$NON-NLS-1$
+            Messages.getString("Cabinet.sampleType.label"), authorizedSampleTypes, null, //$NON-NLS-1$
             Messages.getString("Cabinet.sampleType.validationMsg")); //$NON-NLS-1$
         viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -320,9 +316,22 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         .getFirstElement());
                 }
             });
-        if (sampleTypes.size() == 1) {
+        if (authorizedSampleTypes.size() == 1) {
             viewerSampleTypes.getCombo().select(0);
-            aliquot.setSampleType(sampleTypes.get(0));
+            aliquot.setSampleType(authorizedSampleTypes.get(0));
+        }
+    }
+
+    private void initAuthorizedSampleTypeList() throws ApplicationException {
+        authorizedSampleTypes = SampleTypeWrapper
+            .getSampleTypeForContainerTypes(appService, SessionManager
+                .getInstance().getCurrentSite(), cabinetNameContains);
+        if (authorizedSampleTypes.size() == 0) {
+            BioBankPlugin.openAsyncError(Messages
+                .getString("Cabinet.dialog.sampleType.container.error.title"), //$NON-NLS-1$
+                Messages.getFormattedString(
+                    "Cabinet.dialog.sampleType.container.error.msg", //$NON-NLS-1$
+                    cabinetNameContains));
         }
     }
 
@@ -434,6 +443,34 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
 
         });
+    }
+
+    /**
+     * Get sample types only defined in the patient's study. Then set these
+     * types to the types combo
+     */
+    private void setTypeCombosLists() {
+        List<SampleTypeWrapper> studiesSampleTypes = null;
+        studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
+        if (currentPatient != null) {
+            for (SampleStorageWrapper ss : currentPatient.getStudy()
+                .getSampleStorageCollection()) {
+                if (ss.getActivityStatus().isActive()) {
+                    SampleTypeWrapper type = ss.getSampleType();
+                    if (authorizedSampleTypes.contains(type)) {
+                        studiesSampleTypes.add(type);
+                    }
+                }
+            }
+            viewerSampleTypes.setInput(studiesSampleTypes);
+            if (studiesSampleTypes.size() == 1) {
+                viewerSampleTypes.getCombo().select(0);
+                aliquot.setSampleType(authorizedSampleTypes.get(0));
+            } else {
+                viewerSampleTypes.getCombo().deselectAll();
+                aliquot.setSampleType(null);
+            }
+        }
     }
 
     /**

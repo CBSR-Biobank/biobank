@@ -22,7 +22,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     /**
      * Indicate if this form has been saved
      */
-    private boolean isSaved = false;
+    protected boolean isSaved = false;
 
     private static Logger activityLogger;
     private static ActivityLogAppender appender;

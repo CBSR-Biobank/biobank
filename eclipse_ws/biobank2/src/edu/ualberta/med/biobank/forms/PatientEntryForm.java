@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
@@ -124,10 +123,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             .getSelection()).getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();
-        if (PatientAdministrationView.currentInstance != null) {
-            PatientAdministrationView.currentInstance.showInTree(patientAdapter
-                .getWrapper());
-        }
+        // PatientAdministrationView.showPatient(patientAdapter.getWrapper());
     }
 
     @Override
