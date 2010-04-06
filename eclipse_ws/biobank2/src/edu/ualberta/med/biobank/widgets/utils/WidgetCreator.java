@@ -357,18 +357,21 @@ public class WidgetCreator {
     public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
         Assert.isNotNull(dbc);
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterConvertValidator(new IValidator() {
-            @Override
-            public IStatus validate(Object value) {
-                if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error(errorMsg);
-                } else {
-                    return Status.OK_STATUS;
+        UpdateValueStrategy uvs = null;
+        if (errorMsg != null) {
+            uvs = new UpdateValueStrategy();
+            uvs.setAfterConvertValidator(new IValidator() {
+                @Override
+                public IStatus validate(Object value) {
+                    if (value instanceof Boolean && !(Boolean) value) {
+                        return ValidationStatus.error(errorMsg);
+                    } else {
+                        return Status.OK_STATUS;
+                    }
                 }
-            }
 
-        });
+            });
+        }
         dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 

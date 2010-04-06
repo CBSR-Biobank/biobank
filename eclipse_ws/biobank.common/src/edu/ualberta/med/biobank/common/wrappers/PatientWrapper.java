@@ -303,13 +303,14 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // today midnight
+        cal.add(Calendar.DATE, 1);
         cal.set(Calendar.AM_PM, Calendar.AM);
         cal.set(Calendar.HOUR, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Date endDate = cal.getTime();
         // 7 days ago, at midnight
-        cal.add(Calendar.DATE, -7);
+        cal.add(Calendar.DATE, -8);
         Date startDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
             "select visits from "

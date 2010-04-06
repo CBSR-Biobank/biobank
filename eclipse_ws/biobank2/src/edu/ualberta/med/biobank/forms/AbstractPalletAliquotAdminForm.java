@@ -90,7 +90,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         }
         scanButton = toolkit.createButton(oarent, scanButtonTitle, SWT.PUSH);
         gd = new GridData();
-        gd.horizontalSpan = 2;
+        gd.horizontalSpan = 3;
         gd.widthHint = 100;
         scanButton.setLayoutData(gd);
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -115,6 +115,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 }
             }
         });
+        GridData gd = (GridData) plateToScanText.getLayoutData();
+        gd.horizontalSpan = 2;
     }
 
     protected void createFakeOptions(
