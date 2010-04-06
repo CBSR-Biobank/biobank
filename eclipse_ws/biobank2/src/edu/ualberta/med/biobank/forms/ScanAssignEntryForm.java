@@ -877,4 +877,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         fieldsComposite.setEnabled(false);
     }
 
+    @Override
+    public BiobankLogger getErrorLogger() {
+        return logger;
+    }
+
 }

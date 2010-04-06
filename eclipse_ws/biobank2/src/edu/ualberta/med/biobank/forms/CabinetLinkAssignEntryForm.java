@@ -10,30 +10,23 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -48,10 +41,10 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
@@ -61,15 +54,18 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"; //$NON-NLS-1$
 
-    private PatientWrapper currentPatient;
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(CabinetLinkAssignEntryForm.class.getName());
+
+    private LinkFormPatientManagement linkFormPatientManagement;
 
     private Label cabinetLabel;
     private Label drawerLabel;
     private AbstractContainerDisplayWidget cabinetWidget;
     private AbstractContainerDisplayWidget drawerWidget;
 
-    private Text patientNumberText;
-    private ComboViewer viewerVisits;
+    // private Text patientNumberText;
+    // private ComboViewer viewerVisits;
     private ComboViewer viewerSampleTypes;
     private Text inventoryIdText;
     private Text positionText;
@@ -77,10 +73,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private CancelConfirmWidget cancelConfirmWidget;
 
-    private IObservableValue patientNumberValue = new WritableValue("", //$NON-NLS-1$
-        String.class);
-    private IObservableValue visitSelectionValue = new WritableValue("", //$NON-NLS-1$
-        String.class);
     private IObservableValue positionValue = new WritableValue("", String.class); //$NON-NLS-1$
     private IObservableValue resultShownValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
@@ -109,6 +101,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             .getPreferenceStore();
         cabinetNameContains = store
             .getString(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS);
+        linkFormPatientManagement = new LinkFormPatientManagement(
+            widgetCreator, this);
     }
 
     @Override
@@ -210,28 +204,31 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
-                .getString("Cabinet.patientNumber.label"), new String[0], //$NON-NLS-1$
-            patientNumberValue, new NonEmptyStringValidator(Messages
-                .getString("Cabinet.patientNumber.validationMsg"))); //$NON-NLS-1$
-        patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
-            public void handleEvent(Event e) {
-                setVisitsList();
-                setTypeCombosLists();
-            }
-        });
-        patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
-        patientNumberText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                setVisitsList();
-                setTypeCombosLists();
-            }
-        });
-        firstControl = patientNumberText;
+        linkFormPatientManagement.initPatientNumberText(fieldsComposite);
 
-        createVisitCombo(fieldsComposite);
+        // patientNumberText = (Text)
+        // createBoundWidgetWithLabel(fieldsComposite,
+        // Text.class, SWT.NONE, Messages
+        //                .getString("Cabinet.patientNumber.label"), new String[0], //$NON-NLS-1$
+        // patientNumberValue, new NonEmptyStringValidator(Messages
+        //                .getString("Cabinet.patientNumber.validationMsg"))); //$NON-NLS-1$
+        // patientNumberText.addListener(SWT.DefaultSelection, new Listener() {
+        // public void handleEvent(Event e) {
+        // setVisitsList();
+        // setTypeCombosLists();
+        // }
+        // });
+        // patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        // patientNumberText.addFocusListener(new FocusAdapter() {
+        // @Override
+        // public void focusLost(FocusEvent e) {
+        // setVisitsList();
+        // setTypeCombosLists();
+        // }
+        // });
+        // firstControl = patientNumberText;
+
+        linkFormPatientManagement.createVisitCombo(fieldsComposite);
 
         inventoryIDValidator = new CabinetInventoryIDValidator();
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -287,8 +284,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             reset();
             inventoryIdText.setText(inventoryId);
             positionText.setText(position);
-            patientNumberText.setEnabled(!moveMode);
-            viewerVisits.getCombo().setEnabled(!moveMode);
+            // patientNumberText.setEnabled(!moveMode);
+            // viewerVisits.getCombo().setEnabled(!moveMode);
             viewerSampleTypes.getCombo().setEnabled(!moveMode);
             inventoryIDValidator.setManageOldInventoryIDs(moveMode);
             // Validator has change: we need to re-validate
@@ -335,65 +332,66 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
-    private void createVisitCombo(Composite client) {
-        Combo comboVisits = (Combo) createBoundWidgetWithLabel(client,
-            Combo.class, SWT.NONE,
-            Messages.getString("Cabinet.visit.label"), new String[0], //$NON-NLS-1$
-            visitSelectionValue, new NonEmptyStringValidator(Messages
-                .getString("Cabinet.visit.validationMsg"))); //$NON-NLS-1$
-        GridData gridData = new GridData();
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.horizontalAlignment = SWT.FILL;
-        comboVisits.setLayoutData(gridData);
+    // private void createVisitCombo(Composite client) {
+    // Combo comboVisits = (Combo) createBoundWidgetWithLabel(client,
+    // Combo.class, SWT.NONE,
+    //            Messages.getString("Cabinet.visit.label"), new String[0], //$NON-NLS-1$
+    // visitSelectionValue, new NonEmptyStringValidator(Messages
+    //                .getString("Cabinet.visit.validationMsg"))); //$NON-NLS-1$
+    // GridData gridData = new GridData();
+    // gridData.grabExcessHorizontalSpace = true;
+    // gridData.horizontalAlignment = SWT.FILL;
+    // comboVisits.setLayoutData(gridData);
+    //
+    // viewerVisits = new ComboViewer(comboVisits);
+    // viewerVisits.setContentProvider(new ArrayContentProvider());
+    // viewerVisits.setLabelProvider(new LabelProvider() {
+    // @Override
+    // public String getText(Object element) {
+    // PatientVisitWrapper pv = (PatientVisitWrapper) element;
+    //                return pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
+    // + pv.getShipment().getWaybill();
+    // }
+    // });
+    // comboVisits.addKeyListener(new KeyAdapter() {
+    // @Override
+    // public void keyReleased(KeyEvent e) {
+    // if (e.keyCode == 13) {
+    // inventoryIdText.setFocus();
+    // }
+    // }
+    // });
+    // }
 
-        viewerVisits = new ComboViewer(comboVisits);
-        viewerVisits.setContentProvider(new ArrayContentProvider());
-        viewerVisits.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
-                    + pv.getShipment().getWaybill();
-            }
-        });
-        comboVisits.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13) {
-                    inventoryIdText.setFocus();
-                }
-            }
-        });
-    }
-
-    protected void setVisitsList() {
-        try {
-            String pNumber = patientNumberText.getText();
-            currentPatient = PatientWrapper.getPatientInSite(appService,
-                pNumber, SessionManager.getInstance().getCurrentSite());
-
-            if (currentPatient == null)
-                return;
-            appendLog("--------");
-            appendLogNLS("linkAssign.activitylog.patient", currentPatient
-                .getPnumber());
-            // show visits list
-            List<PatientVisitWrapper> collection = currentPatient
-                .getPatientVisitCollection();
-            viewerVisits.setInput(collection);
-            viewerVisits.getCombo().select(0);
-            viewerVisits.getCombo().setListVisible(true);
-        } catch (ApplicationException e) {
-            BioBankPlugin.openError("Error getting the patient", e); //$NON-NLS-1$
-        }
-    }
+    // protected void setVisitsList() {
+    // try {
+    // String pNumber = patientNumberText.getText();
+    // currentPatient = PatientWrapper.getPatientInSite(appService,
+    // pNumber, SessionManager.getInstance().getCurrentSite());
+    //
+    // if (currentPatient == null)
+    // return;
+    // appendLog("--------");
+    // appendLogNLS("linkAssign.activitylog.patient", currentPatient
+    // .getPnumber());
+    // // show visits list
+    // List<PatientVisitWrapper> collection = currentPatient
+    // .getPatientVisitCollection();
+    // viewerVisits.setInput(collection);
+    // viewerVisits.getCombo().select(0);
+    // viewerVisits.getCombo().setListVisible(true);
+    // } catch (ApplicationException e) {
+    //            BioBankPlugin.openError("Error getting the patient", e); //$NON-NLS-1$
+    // }
+    // }
 
     protected void checkPositionAndAliquot() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             public void run() {
                 try {
                     appendLog("----"); //$NON-NLS-1$
-                    PatientVisitWrapper pv = getSelectedPatientVisit();
+                    PatientVisitWrapper pv = linkFormPatientManagement
+                        .getSelectedPatientVisit();
                     aliquot.setPatientVisit(pv);
                     appendLogNLS("linkAssign.activitylog.visit.selection", //$NON-NLS-1$ 
                         pv.getFormattedDateProcessed(), pv.getShipment()
@@ -452,9 +450,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private void setTypeCombosLists() {
         List<SampleTypeWrapper> studiesSampleTypes = null;
         studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
-        if (currentPatient != null) {
-            for (SampleStorageWrapper ss : currentPatient.getStudy()
-                .getSampleStorageCollection()) {
+        if (linkFormPatientManagement.getCurrentPatient() != null) {
+            for (SampleStorageWrapper ss : linkFormPatientManagement
+                .getCurrentPatient().getStudy().getSampleStorageCollection()) {
                 if (ss.getActivityStatus().isActive()) {
                     SampleTypeWrapper type = ss.getSampleType();
                     if (authorizedSampleTypes.contains(type)) {
@@ -509,13 +507,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 + aliquot.getInventoryId());
         }
         aliquot = aliquots.get(0);
-        currentPatient = aliquot.getPatientVisit().getPatient();
-        patientNumberText.setText(currentPatient.getPnumber());
-        List<PatientVisitWrapper> collection = currentPatient
-            .getPatientVisitCollection();
-        viewerVisits.setInput(collection);
-        viewerVisits.setSelection(new StructuredSelection(aliquot
-            .getPatientVisit()));
+        PatientWrapper patient = aliquot.getPatientVisit().getPatient();
+        linkFormPatientManagement.setCurrentPatientAndVisit(patient, aliquot
+            .getPatientVisit());
         positionText.setText(aliquot.getPositionString(true, false));
         viewerSampleTypes.setSelection(new StructuredSelection(aliquot
             .getSampleType()));
@@ -598,8 +592,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         drawerWidget.setSelection(null);
         resultShownValue.setValue(Boolean.FALSE);
         selectedSampleTypeValue.setValue(""); //$NON-NLS-1$
-        patientNumberText.setText(""); //$NON-NLS-1$
-        viewerVisits.setInput(null);
+        linkFormPatientManagement.reset(true);
         inventoryIdText.setText(""); //$NON-NLS-1$
         positionText.setText(""); //$NON-NLS-1$
         if (viewerSampleTypes.getCombo().getItemCount() > 1) {
@@ -625,22 +618,23 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             msgString = "Cabinet.activitylog.aliquot.saveMove"; //$NON-NLS-1$
         }
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
-            .getSampleType().getName(), currentPatient.getPnumber(), aliquot
-            .getPatientVisit().getFormattedDateProcessed(), aliquot
-            .getPatientVisit().getShipment().getClinic().getName());
+            .getSampleType().getName(), linkFormPatientManagement
+            .getCurrentPatient().getPnumber(), aliquot.getPatientVisit()
+            .getFormattedDateProcessed(), aliquot.getPatientVisit()
+            .getShipment().getClinic().getName());
         setSaved(true);
     }
 
-    private PatientVisitWrapper getSelectedPatientVisit() {
-        if (viewerVisits.getSelection() != null
-            && viewerVisits.getSelection() instanceof IStructuredSelection) {
-            IStructuredSelection selection = (IStructuredSelection) viewerVisits
-                .getSelection();
-            if (selection.size() == 1)
-                return (PatientVisitWrapper) selection.getFirstElement();
-        }
-        return null;
-    }
+    // private PatientVisitWrapper getSelectedPatientVisit() {
+    // if (viewerVisits.getSelection() != null
+    // && viewerVisits.getSelection() instanceof IStructuredSelection) {
+    // IStructuredSelection selection = (IStructuredSelection) viewerVisits
+    // .getSelection();
+    // if (selection.size() == 1)
+    // return (PatientVisitWrapper) selection.getFirstElement();
+    // }
+    // return null;
+    // }
 
     @Override
     protected String getOkMessage() {
@@ -676,5 +670,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     protected String getActivityTitle() {
         return "Cabinet link/assign activity"; //$NON-NLS-1$
+    }
+
+    @Override
+    public BiobankLogger getErrorLogger() {
+        return logger;
+    }
+
+    @Override
+    public boolean onClose() {
+        linkFormPatientManagement.onClose();
+        return super.onClose();
     }
 }
