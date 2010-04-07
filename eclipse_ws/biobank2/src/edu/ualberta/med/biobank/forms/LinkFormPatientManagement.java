@@ -12,8 +12,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -49,6 +47,8 @@ public class LinkFormPatientManagement {
 
     private AbstractAliquotAdminForm aliquotAdminForm;
 
+    private PatientTextCallback patientTextCallback;
+
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
         AbstractAliquotAdminForm aliquotAdminForm) {
         this.widgetCreator = widgetCreator;
@@ -68,17 +68,24 @@ public class LinkFormPatientManagement {
                     setPatientSelected();
                 }
                 patientNumberTextModified = false;
+                if (patientTextCallback != null) {
+                    patientTextCallback.callback();
+                }
             }
         });
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 patientNumberTextModified = true;
+                if (patientTextCallback != null) {
+                    patientTextCallback.callback();
+                }
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
+        aliquotAdminForm.firstControl = patientNumberText;
     }
 
     protected void createVisitCombo(Composite compositeFields) {
@@ -99,15 +106,15 @@ public class LinkFormPatientManagement {
                     + pv.getShipment().getWaybill();
             }
         });
-        viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13) {
-                    // focusOnPlateToScanText();
-                    e.doit = false;
-                }
-            }
-        });
+        // viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
+        // @Override
+        // public void keyReleased(KeyEvent e) {
+        // if (e.keyCode == 13) {
+        // // focusOnPlateToScanText();
+        // e.doit = false;
+        // }
+        // }
+        // });
         viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -212,11 +219,29 @@ public class LinkFormPatientManagement {
 
     public void setCurrentPatientAndVisit(PatientWrapper patient,
         PatientVisitWrapper patientVisit) {
+        visitsListCheckValue.setValue(false);
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
         List<PatientVisitWrapper> collection = patient
             .getPatientVisitCollection();
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(patientVisit));
+    }
+
+    public void enabledPatientText(boolean enabled) {
+        patientNumberText.setEnabled(enabled);
+    }
+
+    public void enabledVisitsList(boolean enabled) {
+        viewerVisits.getCombo().setEnabled(enabled);
+        visitsListCheck.setEnabled(enabled);
+    }
+
+    public void setPatientTextCallback(PatientTextCallback callback) {
+        this.patientTextCallback = callback;
+    }
+
+    protected static interface PatientTextCallback {
+        public void callback();
     }
 }
