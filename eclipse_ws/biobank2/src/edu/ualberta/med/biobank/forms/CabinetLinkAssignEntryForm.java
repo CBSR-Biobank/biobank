@@ -91,6 +91,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private List<SampleTypeWrapper> authorizedSampleTypes;
 
+    private List<ContainerTypeWrapper> cabinetContainerTypes;
+
     @Override
     protected void init() {
         super.init();
@@ -251,6 +253,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getString("Cabinet.position.validationMsg"))); //$NON-NLS-1$
         gd = (GridData) positionText.getLayoutData();
         gd.horizontalSpan = 2;
+        positionText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                initContainersFromPosition();
+            }
+        });
 
         createTypeCombo(fieldsComposite);
 
@@ -266,6 +274,48 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 checkPositionAndAliquot();
             }
         });
+    }
+
+    protected void initContainersFromPosition() {
+        try {
+            String binLabel = positionText.getText().substring(0, 6);
+            List<ContainerWrapper> foundContainers = ContainerWrapper
+                .getContainersInSite(appService, SessionManager.getInstance()
+                    .getCurrentSite(), binLabel);
+            List<ContainerWrapper> cabinetContainers = new ArrayList<ContainerWrapper>();
+            for (ContainerWrapper container : foundContainers) {
+                ContainerWrapper cont = container;
+                while (cont.getParent() != null) {
+                    cont = cont.getParent();
+                }
+                if (cabinetContainerTypes.contains(cont.getContainerType())) {
+                    cabinetContainers.add(container);
+                }
+            }
+            if (cabinetContainers.size() == 1) {
+                bin = cabinetContainers.get(0);
+                drawer = bin.getParent();
+                cabinet = drawer.getParent();
+            } else if (cabinetContainers.size() == 0) {
+                String errorMsg = Messages.getFormattedString(
+                    "Cabinet.activitylog.checkParent.error.found", binLabel); //$NON-NLS-1$
+                BioBankPlugin.openAsyncError(
+                    "Check position and aliquot", errorMsg); //$NON-NLS-1$
+                appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
+                viewerSampleTypes.getCombo().setEnabled(false);
+                return;
+            } else {
+                BioBankPlugin.openAsyncError("Container problem",
+                    "More than one container found for " + binLabel //$NON-NLS-1$
+                        + " --- should do something"); //$NON-NLS-1$
+                viewerSampleTypes.getCombo().setEnabled(false);
+                return;
+            }
+
+            setTypeCombosLists();
+        } catch (Exception ex) {
+            BioBankPlugin.openAsyncError("Init container from position", ex);
+        }
     }
 
     protected void setMoveMode(boolean moveMode) {
@@ -323,6 +373,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     "Cabinet.dialog.sampleType.container.error.msg", //$NON-NLS-1$
                     cabinetNameContains));
         }
+
+        cabinetContainerTypes = ContainerTypeWrapper.getContainerTypesInSite(
+            appService, SessionManager.getInstance().getCurrentSite(),
+            cabinetNameContains, false);
     }
 
     protected void checkPositionAndAliquot() {
@@ -342,7 +396,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         aliquot.checkInventoryIdUnique();
                     }
                     String positionString = positionText.getText();
-                    initParentContainersFromPosition(positionString);
+                    // initParentContainersFromPosition(positionString);
                     if (bin == null) {
                         resultShownValue.setValue(Boolean.FALSE);
                         hidePositions();
@@ -353,9 +407,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     aliquot.setAliquotPositionFromString(positionString, bin);
                     if (aliquot.isPositionFree(bin)) {
                         aliquot.setParent(bin);
-
                         showPositions();
-
                         resultShownValue.setValue(Boolean.TRUE);
                         cancelConfirmWidget.setFocus();
                     } else {
@@ -384,10 +436,11 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     /**
-     * Get sample types only defined in the patient's study. Then set these
-     * types to the types combo
+     * Get sample types only defined in the patient's study and available in
+     * current selected bin. Then set these types to the types combo
      */
     private void setTypeCombosLists() {
+        viewerSampleTypes.getCombo().setEnabled(true);
         List<SampleTypeWrapper> studiesSampleTypes = null;
         studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
         if (linkFormPatientManagement.getCurrentPatient() != null) {
@@ -400,15 +453,26 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     }
                 }
             }
-            viewerSampleTypes.setInput(studiesSampleTypes);
-            if (radioNew.getSelection()) {
-                if (studiesSampleTypes.size() == 1) {
-                    viewerSampleTypes.getCombo().select(0);
-                    aliquot.setSampleType(authorizedSampleTypes.get(0));
-                } else {
-                    viewerSampleTypes.getCombo().deselectAll();
-                    aliquot.setSampleType(null);
-                }
+        }
+        List<SampleTypeWrapper> binAvailableTypes = new ArrayList<SampleTypeWrapper>();
+        if (bin == null) {
+            binAvailableTypes = studiesSampleTypes;
+        } else {
+            List<SampleTypeWrapper> binTypes = bin.getContainerType()
+                .getSampleTypeCollection();
+            for (SampleTypeWrapper type : studiesSampleTypes) {
+                binTypes.contains(type);
+                binAvailableTypes.add(type);
+            }
+        }
+        viewerSampleTypes.setInput(binAvailableTypes);
+        if (radioNew.getSelection()) {
+            if (binAvailableTypes.size() == 1) {
+                viewerSampleTypes.getCombo().select(0);
+                aliquot.setSampleType(binAvailableTypes.get(0));
+            } else {
+                viewerSampleTypes.getCombo().deselectAll();
+                aliquot.setSampleType(null);
             }
         }
     }
@@ -522,6 +586,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             throw new Exception("More than one container found for " + binLabel //$NON-NLS-1$
                 + " --- should do something"); //$NON-NLS-1$
         }
+    }
+
+    public void getSampleTypes() throws ApplicationException {
+
+        ContainerWrapper.getContainersHoldingContainerType(appService, "",
+            SessionManager.getInstance().getCurrentSite(), null);
     }
 
     @Override
