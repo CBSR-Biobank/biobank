@@ -66,20 +66,17 @@ public class LinkFormPatientManagement {
             public void focusLost(FocusEvent e) {
                 if (patientNumberTextModified) {
                     setPatientSelected();
+                    if (patientTextCallback != null) {
+                        patientTextCallback.callback();
+                    }
                 }
                 patientNumberTextModified = false;
-                if (patientTextCallback != null) {
-                    patientTextCallback.callback();
-                }
             }
         });
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 patientNumberTextModified = true;
-                if (patientTextCallback != null) {
-                    patientTextCallback.callback();
-                }
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
