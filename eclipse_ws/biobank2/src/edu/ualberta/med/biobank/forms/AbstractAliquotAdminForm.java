@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
@@ -91,5 +92,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     protected void setSaved(boolean saved) {
         this.isSaved = saved;
     }
+
+    public abstract BiobankLogger getErrorLogger();
 
 }
