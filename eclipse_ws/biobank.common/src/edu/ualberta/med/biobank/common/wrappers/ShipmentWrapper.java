@@ -369,8 +369,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         if (getDateShipped() == null) {
             return getWaybill();
         }
-        return getWaybill() + " (received on " + getFormattedDateReceived()
-            + ")";
+        return getFormattedDateReceived() + " (" + getWaybill() + ")";
     }
 
     /**

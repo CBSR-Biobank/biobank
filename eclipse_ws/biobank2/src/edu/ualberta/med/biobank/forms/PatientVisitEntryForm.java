@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -129,14 +130,24 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createReadOnlyField(client, SWT.NONE, "Patient", patient.getPnumber());
 
-        List<ShipmentWrapper> patientShipments = patient
-            .getShipmentCollection();
+        List<ShipmentWrapper> allShipments = patient.getShipmentCollection();
+        List<ShipmentWrapper> recentShipments = new ArrayList<ShipmentWrapper>();
+        // filter for last 7 days
+        Calendar c = Calendar.getInstance();
+        for (ShipmentWrapper shipment : allShipments) {
+            c.setTime(shipment.getDateReceived());
+            c.add(Calendar.DAY_OF_MONTH, 7);
+            System.out.println(c);
+            System.out.println(new Date());
+            if (c.getTime().after(new Date()))
+                recentShipments.add(shipment);
+        }
         ShipmentWrapper selectedShip = patientVisit.getShipment();
-        if (patientShipments.size() == 1) {
-            selectedShip = patientShipments.get(0);
+        if (recentShipments.size() == 1) {
+            selectedShip = recentShipments.get(0);
         }
         shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Shipment", patientShipments, selectedShip,
+            client, "Shipment", recentShipments, selectedShip,
             "A shipment should be selected");
         firstControl = shipmentsComboViewer.getControl();
 
