@@ -137,8 +137,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         for (ShipmentWrapper shipment : allShipments) {
             c.setTime(shipment.getDateReceived());
             c.add(Calendar.DAY_OF_MONTH, 7);
-            System.out.println(c);
-            System.out.println(new Date());
             if (c.getTime().after(new Date()))
                 recentShipments.add(shipment);
         }
