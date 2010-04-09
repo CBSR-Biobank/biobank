@@ -98,8 +98,8 @@ public class SampleStorageDialog extends BiobankDialog {
         }
 
         sampleTypeComboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents,
-                "Aliquot Type", sampleTypeMap.keySet(), selection,
+            .createComboViewerWithNoSelectionValidator(contents, "Sample Type",
+                sampleTypeMap.keySet(), selection,
                 "A sample type should be selected");
         sampleTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {

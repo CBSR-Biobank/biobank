@@ -448,6 +448,13 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     }
                 }
             }
+            if (studiesSampleTypes.size() == 0) {
+                BioBankPlugin.openAsyncError("No sample types",
+                    "There are no sample types that are defined in study '"
+                        + linkFormPatientManagement.getCurrentPatient()
+                            .getStudy().getNameShort()
+                        + "' and that are types possibles inside a pallet.");
+            }
         }
         for (Integer row : typesRows.keySet()) {
             SampleTypeSelectionWidget widget = sampleTypeWidgets.get(row);
