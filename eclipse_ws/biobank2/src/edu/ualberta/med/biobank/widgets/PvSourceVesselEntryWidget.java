@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -43,7 +42,6 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.PvSourceVesselEntryInfo
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current sample storage collection and allows the user to add
@@ -83,9 +81,9 @@ public class PvSourceVesselEntryWidget extends BiobankWidget {
         PatientVisitWrapper visit, FormToolkit toolkit) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
+        this.patientVisit = visit;
 
         getSourceVessels();
-        this.patientVisit = visit;
         setLists();
 
         setLayout(new GridLayout(1, false));
@@ -103,8 +101,9 @@ public class PvSourceVesselEntryWidget extends BiobankWidget {
                 }
             });
 
-        addPvSourceVesselButton = toolkit.createButton(parent,
-            "Add Source Vessel", SWT.PUSH);
+        addPvSourceVesselButton = toolkit.createButton(parent, null, SWT.PUSH);
+        addPvSourceVesselButton.setImage(BioBankPlugin.getDefault()
+            .getImageRegistry().get(BioBankPlugin.IMG_ADD));
         addPvSourceVesselButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -235,14 +234,8 @@ public class PvSourceVesselEntryWidget extends BiobankWidget {
     }
 
     private void getSourceVessels() {
-        try {
-            allSourceVessels = SourceVesselWrapper
-                .getAllSourceVessels(SessionManager.getAppService());
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Error retrieving source vessels", e);
-        }
+        allSourceVessels = patientVisit.getPatient().getStudy()
+            .getSourceVesselCollection(true);
     }
 
     public Collection<PvSourceVesselWrapper> getPvSourceVessels() {
