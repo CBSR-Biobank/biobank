@@ -39,4 +39,8 @@ public class ServiceConnection {
     public static void setResourceResolver(ResourceResolver resourceResolver) {
         ServiceConnection.resourceResolver = resourceResolver;
     }
+
+    public static ResourceResolver getResourceResolver() {
+        return resourceResolver;
+    }
 }

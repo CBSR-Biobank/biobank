@@ -22,13 +22,7 @@ import edu.ualberta.med.biobank.forms.PatientViewForm;
 public class PatientAdapter extends AdapterBase {
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
-        this(parent, patientWrapper, true);
-    }
-
-    public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper,
-        boolean enableActions) {
-        super(parent, patientWrapper, enableActions, true);
-        setHasChildren(true);
+        super(parent, patientWrapper);
     }
 
     public PatientWrapper getWrapper() {
@@ -67,7 +61,7 @@ public class PatientAdapter extends AdapterBase {
         addEditMenu(menu, "Patient");
         addViewMenu(menu, "Patient");
 
-        if (enableActions) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Patient Visit");
             mi.addSelectionListener(new SelectionAdapter() {

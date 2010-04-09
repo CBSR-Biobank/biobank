@@ -33,6 +33,7 @@ public class SampleStorageInfoTable extends
         }
     }
 
+    @SuppressWarnings("unused")
     private class TableSorter extends BiobankTableSorter {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -126,7 +127,8 @@ public class SampleStorageInfoTable extends
 
     @Override
     protected BiobankTableSorter getTableSorter() {
-        return new TableSorter();
+        // return new TableSorter();
+        return null;
     }
 
     @Override

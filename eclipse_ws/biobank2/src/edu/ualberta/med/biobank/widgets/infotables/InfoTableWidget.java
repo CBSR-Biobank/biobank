@@ -325,6 +325,11 @@ public abstract class InfoTableWidget<T> extends BiobankWidget {
         setCollection(collection, selection);
     }
 
+    public void reloadCollection(final List<T> collection) {
+        reloadData = true;
+        setCollection(collection, null);
+    }
+
     public void setCollection(final List<T> collection) {
         setCollection(collection, null);
     }

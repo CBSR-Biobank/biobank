@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -511,5 +512,61 @@ public class TestPatient extends TestDatabase {
                 }
             }
         }
+    }
+
+    @Test
+    public void testGetPatientsInTodayShipments() throws Exception {
+        String name = "testTodayShipments_" + r.nextInt();
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
+        addClinic(patient1);
+        ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
+        ship.addPatients(Arrays.asList(patient1));
+        ship.persist();
+
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
+        addClinic(patient2);
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study);
+        addClinic(patient3);
+        ShipmentWrapper ship2 = ShipmentHelper.newShipment(clinic);
+        ship2.setDateReceived(new Date()); // today
+        ship2.addPatients(Arrays.asList(patient2, patient3));
+        ship2.persist();
+
+        List<PatientWrapper> todayPatients = PatientWrapper
+            .getPatientsInTodayShipments(appService, study.getSite());
+        Assert.assertEquals(2, todayPatients.size());
+        Assert.assertTrue(todayPatients.contains(patient2));
+        Assert.assertTrue(todayPatients.contains(patient3));
+    }
+
+    @Test
+    public void testGetLastWeekPatientVisits() throws Exception {
+        String name = "testGetLastWeekPatientVisits" + r.nextInt();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -10); // 10 days ago
+        PatientVisitHelper.addPatientVisit(patient, shipment, calendar
+            .getTime());
+        calendar.add(Calendar.DATE, 3); // 7 days ago
+        PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
+            patient, shipment, calendar.getTime());
+        calendar.add(Calendar.DATE, 5); // 2 days ago
+        PatientVisitWrapper visit3 = PatientVisitHelper.addPatientVisit(
+            patient, shipment, calendar.getTime());
+        patient.reload();
+
+        List<PatientVisitWrapper> visits = patient.getLast7DaysPatientVisits();
+        Assert.assertEquals(2, visits.size());
+        Assert.assertTrue(visits.contains(visit2));
+        Assert.assertTrue(visits.contains(visit3));
+
     }
 }

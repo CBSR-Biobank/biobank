@@ -435,14 +435,18 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (BiobankCheckException bce) {
                     setDirty(true);
+                    monitor.setCanceled(true);
                     BioBankPlugin.openAsyncError("Save error", bce);
                 } catch (Exception e) {
                     setDirty(true);
