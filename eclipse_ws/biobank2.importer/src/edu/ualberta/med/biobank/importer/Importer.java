@@ -98,6 +98,7 @@ public class Importer {
         aMap.put("CEGIIR", "CEGIIR");
         aMap.put("CHILD", "CHILD");
         aMap.put("ERCIN", "ERCIN");
+        aMap.put("FIDS", "FIDS");
         aMap.put("HEART", "HEART");
         aMap.put("KDCS", "KDCS");
         aMap.put("KMS", "KMS");
@@ -112,6 +113,7 @@ public class Importer {
         aMap.put("C", "CCCS");
         aMap.put("D", "HEART");
         aMap.put("E", "ERCIN");
+        aMap.put("F", "FIDS");
         aMap.put("G", "CEGIIR");
         aMap.put("H", "AHFEM");
         aMap.put("K", "KMS");
