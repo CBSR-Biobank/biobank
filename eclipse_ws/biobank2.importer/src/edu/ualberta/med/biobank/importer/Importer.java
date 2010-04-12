@@ -131,26 +131,27 @@ public class Importer {
     private static final Map<String, String> patientNrToClinicMap;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
-        aMap.put("AA", "ED1");
-        aMap.put("AB", "CL1-KDCS");
-        aMap.put("AC", "VN1");
-        aMap.put("CC", "ED1");
-        aMap.put("DA", "ED1");
-        aMap.put("ER", "SF1");
-        aMap.put("EA", "ED1");
-        aMap.put("GR", "ED1");
-        aMap.put("HA", "ED1");
-        aMap.put("KN", "KN1");
-        aMap.put("LC", "ED1");
-        aMap.put("MP", "ED1");
-        aMap.put("NH", "ED1");
-        aMap.put("PA", "ED1");
-        aMap.put("RV", "ED1");
-        aMap.put("SA", "ED1");
-        aMap.put("VA", "ED1");
-        aMap.put("ZA", "ED1");
+        aMap.put("AA", "ED1-UofA");
+        aMap.put("AB", "CL1-Sunridge");
+        aMap.put("AC", "VN1-St Paul");
+        aMap.put("CC", "ED1-UofA");
+        aMap.put("DA", "ED1-UofA");
+        aMap.put("ER", "SF1-Health NFLD");
+        aMap.put("EA", "ED1-UofA");
+        aMap.put("FA", "ED1-UofA");
+        aMap.put("GR", "ED1-UofA");
+        aMap.put("HA", "ED1-UofA");
+        aMap.put("KN", "KN1-Cancer Ctr");
+        aMap.put("LC", "ED1-UofA");
+        aMap.put("MP", "ED1-UofA");
+        aMap.put("NH", "ED1-UofA");
+        aMap.put("PA", "ED1-UofA");
+        aMap.put("RV", "ED1-UofA");
+        aMap.put("SA", "ED1-UofA");
+        aMap.put("VA", "ED1-UofA");
+        aMap.put("ZA", "ED1-UofA");
         aMap.put("ZB", "CL1-KDCS");
-        aMap.put("ZC", "VN1");
+        aMap.put("ZC", "VN1-St Paul");
 
         patientNrToClinicMap = Collections.unmodifiableMap(aMap);
     };
@@ -628,7 +629,7 @@ public class Importer {
         String clinicName;
         if (patientNr.length() == 6) {
             if (patientNr.substring(0, 2).equals("CE")) {
-                clinicName = "ED1";
+                clinicName = "ED1-UofA";
             } else {
                 clinicName = getClinicNameFromPatientNr(patientNr);
             }
