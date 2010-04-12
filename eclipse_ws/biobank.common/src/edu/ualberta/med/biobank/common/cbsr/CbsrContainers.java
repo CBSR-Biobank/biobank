@@ -421,6 +421,7 @@ public class CbsrContainers {
             ftaBinLoerschType, // 30
             ftaBinLoerschType, // 31
             ftaBinLoerschType, // 32
+            ftaBinLoerschType, // 33
         };
 
         drawer = addContainer(site, drawerType, cabinet, 3, 0);
