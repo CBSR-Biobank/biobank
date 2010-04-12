@@ -95,4 +95,5 @@ public abstract class AbstractContainerDisplayWidget extends Canvas {
     public MultiSelectionManager getMultiSelectionManager() {
         return multiSelectionManager;
     }
+
 }
