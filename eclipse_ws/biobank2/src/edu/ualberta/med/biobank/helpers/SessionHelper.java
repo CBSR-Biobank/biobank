@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.helpers;
 import java.util.Collection;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
-import org.eclipse.core.runtime.Platform;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -44,10 +43,6 @@ public class SessionHelper implements Runnable {
     }
 
     public void run() {
-        String path = Platform.getInstallLocation().getURL().getPath()
-            + "/all.keystore";
-        System.setProperty("javax.net.ssl.trustStore", path);
-
         try {
             if (userName.length() == 0) {
                 if (BioBankPlugin.getDefault().isDebugging()) {
