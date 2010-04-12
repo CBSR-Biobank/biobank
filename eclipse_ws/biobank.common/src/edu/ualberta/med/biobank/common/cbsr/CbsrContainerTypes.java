@@ -46,7 +46,13 @@ public class CbsrContainerTypes {
         "WB Serum", "WBE", "WBlood", "Z Urine",
 
         "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
-        "Colon, A", "Colon, T", };
+        "Colon, A", "Colon, T",
+
+        "LH PFP 200", "UrineC900", "PlasmaE800", "P100 500", "PlasmaL500",
+        "LH PFP 500", "PlasmaE200", "DNA L 1000", "SerumG500", "PlasmaL200",
+        "DNA E 1000", "PlasmaE500", "UrineSA900"
+
+    };
 
     public static ContainerTypeWrapper getContainerType(String name)
         throws Exception {

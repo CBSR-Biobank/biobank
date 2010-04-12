@@ -29,12 +29,12 @@ function mysqlCsv {
     $MYSQL -h$HOST -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $OUTPUT
 }
 
-QUERIES[0]="select clinic.name_short, activity_status.name, comment, street1, street2, city,
+QUERIES[0]="select clinic.name, clinic.name_short, activity_status.name, comment, street1, street2, city,
 province, postal_code from clinic join address on address.id=clinic.address_id
 join activity_status on activity_status.id=clinic.activity_status_id
 order by clinic.name"
 
-QUERIES[1]="select clinic.name, contact.name, contact.title,
+QUERIES[1]="select clinic.name_short, contact.name, contact.title,
 contact.phone_number, contact.fax_number, contact.email_address from clinic
 join contact on contact.clinic_id=clinic.id order by clinic.name, contact.name"
 
@@ -72,10 +72,13 @@ study_source_vessel on study_source_vessel.study_id=study.id join source_vessel
 on source_vessel.id=study_source_vessel.source_vessel_id order by name_short,
 source_vessel.name"
 
-QUERIES[7]="select study.name_short, sample_type.name_short, quantity, volume
-from study join sample_storage on sample_storage.study_id=study.id join
-sample_type on sample_type.id=sample_storage.sample_type_id order by
-study.name_short, sample_type.name_short"
+QUERIES[7]="select study.name_short, sample_type.name_short, quantity, volume,
+activity_status.name
+from study
+join sample_storage on sample_storage.study_id=study.id
+join sample_type on sample_type.id=sample_storage.sample_type_id
+join activity_status on activity_status.id=container.activity_status_id
+order by study.name_short, sample_type.name_short"
 
 QUERIES[8]="select name, name_short from sample_type order by name"
 
