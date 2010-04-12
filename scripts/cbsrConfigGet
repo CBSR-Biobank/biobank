@@ -29,8 +29,9 @@ function mysqlCsv {
     $MYSQL -h$HOST -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $OUTPUT
 }
 
-QUERIES[0]="select name, activity_status, comment, street1, street2, city,
+QUERIES[0]="select clinic.name_short, activity_status.name, comment, street1, street2, city,
 province, postal_code from clinic join address on address.id=clinic.address_id
+join activity_status on activity_status.id=clinic.activity_status_id
 order by clinic.name"
 
 QUERIES[1]="select clinic.name, contact.name, contact.title,
@@ -38,18 +39,20 @@ contact.phone_number, contact.fax_number, contact.email_address from clinic
 join contact on contact.clinic_id=clinic.id order by clinic.name, contact.name"
 
 QUERIES[2]="select container.label, container.product_barcode,
-container.activity_status, container.comment, container.temperature,
-abstract_position.row, abstract_position.col from container join
-container_position on
-container_position.abstract_position_id=container.position_id join
-abstract_position on abstract_position.id=container.position_id order by label"
+activity_status.name, container.comment, container.temperature,
+abstract_position.row, abstract_position.col from container
+join container_position on container_position.abstract_position_id=container.position_id
+join abstract_position on abstract_position.id=container.position_id
+join activity_status on activity_status.id=container.activity_status_id
+order by label"
 
 QUERIES[3]="select container_type.name_short, container_type.name, top_level,
-default_temperature, comment, activity_status, row_capacity, col_capacity,
-container_labeling_scheme.name from container_type join capacity on
-capacity.id=container_type.capacity_id join container_labeling_scheme on
-container_labeling_scheme.id=container_type.child_labeling_scheme_id order by
-container_type.name_short"
+default_temperature, comment, activity_status.name, row_capacity, col_capacity,
+container_labeling_scheme.name from container_type
+join capacity on capacity.id=container_type.capacity_id
+join container_labeling_scheme on container_labeling_scheme.id=container_type.child_labeling_scheme_id
+join activity_status on activity_status.id=container_type.activity_status_id
+order by container_type.name_short"
 
 QUERIES[4]="select container_type.name_short, parent_ct.name_short from
 container_type join (select name_short, child_container_type_id from
@@ -64,10 +67,10 @@ container_type_sample_type.container_type_id=container_type.id join sample_type
 on sample_type.id=container_type_sample_type.sample_type_id order by
 container_type.name_short"
 
-QUERIES[6]="select name_short, sample_source.name from study join
-study_sample_source on study_sample_source.study_id=study.id join sample_source
-on sample_source.id=study_sample_source.sample_source_id order by name_short,
-sample_source.name"
+QUERIES[6]="select name_short, source_vessel.name from study join
+study_source_vessel on study_source_vessel.study_id=study.id join source_vessel
+on source_vessel.id=study_source_vessel.source_vessel_id order by name_short,
+source_vessel.name"
 
 QUERIES[7]="select study.name_short, sample_type.name_short, quantity, volume
 from study join sample_storage on sample_storage.study_id=study.id join
@@ -76,12 +79,17 @@ study.name_short, sample_type.name_short"
 
 QUERIES[8]="select name, name_short from sample_type order by name"
 
-QUERIES[9]="select name, name_short, activity_status, comment from study order by name"
+QUERIES[9]="select study.name, name_short, activity_status.name, comment
+from study
+join activity_status on activity_status.id=study.activity_status_id
+order by study.name"
 
-QUERIES[10]="select name_short, contact.name, clinic.name from study join
-study_contact on study_contact.study_id=study.id join contact on
-contact.id=study_contact.contact_id join clinic on clinic.id=contact.clinic_id
-order by name_short, contact.name, clinic.name"
+QUERIES[10]="select study.name_short, contact.name, clinic.name_short
+from study
+join study_contact on study_contact.study_id=study.id
+join contact on contact.id=study_contact.contact_id
+join clinic on clinic.id=contact.clinic_id
+order by study.name_short, contact.name, clinic.name_short"
 
 for qry in "${QUERIES[@]}"
 do
