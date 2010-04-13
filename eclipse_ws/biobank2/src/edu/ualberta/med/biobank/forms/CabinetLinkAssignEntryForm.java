@@ -632,7 +632,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             .getCurrentPatient().getPnumber(), aliquot.getPatientVisit()
             .getFormattedDateProcessed(), aliquot.getPatientVisit()
             .getShipment().getClinic().getName());
-        setSaved(true);
+        setFinished(false);
     }
 
     @Override

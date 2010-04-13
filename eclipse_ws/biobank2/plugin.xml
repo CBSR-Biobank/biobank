@@ -221,6 +221,11 @@
             id="edu.ualberta.med.biobank.commands.todayNodeReload"
             name="Reload Today Node in Administration Tree">
       </command>
+      <command
+            defaultHandler="edu.ualberta.med.biobank.handlers.PrintHandler"
+            id="edu.ualberta.med.biobank.commands.print"
+            name="Print">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -946,6 +951,22 @@
                   commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
                   id="edu.ualberta.med.biobank.menu.debug.cbsrConfigWithData"
                   label="Create CBSR Configuration with data"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.print"
+               label="Print">
+            <visibleWhen
+                  checkEnabled="false">
+               <reference
+                     definitionId="biobank2.scanlinking">
+               </reference>
+            </visibleWhen>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.print"
+                  icon="icons/printer.png"
+                  label="Print"
                   style="push">
             </command>
          </menu>
@@ -1924,6 +1945,23 @@
             <count
                   value="1">
             </count>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.scanlinking">
+         <with
+               variable="activeEditorId">
+            <or>
+               <equals
+                     value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
+               </equals>
+               <equals
+                     value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
+               </equals>
+               <equals
+                     value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
+               </equals>
+            </or>
          </with>
       </definition>
    </extension>

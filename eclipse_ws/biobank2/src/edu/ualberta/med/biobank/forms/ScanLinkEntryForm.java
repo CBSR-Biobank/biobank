@@ -518,7 +518,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         appendLog(sb.toString());
         appendLogNLS(
             "ScanLink.activitylog.save.summary", nber, patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$ 
-        setSaved(true);
+        setFinished(false);
     }
 
     /**
