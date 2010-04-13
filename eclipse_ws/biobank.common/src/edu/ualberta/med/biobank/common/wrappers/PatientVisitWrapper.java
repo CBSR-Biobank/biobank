@@ -46,9 +46,9 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "patient", "dateProcessed", "comment",
-            "pvAttrCollection", "aliquotCollection", "username", "shipment",
-            "pvSourceVesselCollection" };
+        return new String[] { "patient", "dateProcessed", "dateDrawn",
+            "comment", "pvAttrCollection", "aliquotCollection", "username",
+            "shipment", "pvSourceVesselCollection" };
     }
 
     public Date getDateProcessed() {
@@ -57,6 +57,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public String getFormattedDateProcessed() {
         return DateFormatter.formatAsDateTime(getDateProcessed());
+    }
+
+    public Date getDateDrawn() {
+        return wrappedObject.getDateDrawn();
+    }
+
+    public String getFormattedDateDrawn() {
+        return DateFormatter.formatAsDateTime(getDateDrawn());
     }
 
     public String getComment() {
@@ -310,6 +318,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         wrappedObject.setDateProcessed(date);
         propertyChangeSupport
             .firePropertyChange("dateProcessed", oldDate, date);
+    }
+
+    public void setDateDrawn(Date date) {
+        Date oldDate = getDateDrawn();
+        wrappedObject.setDateDrawn(date);
+        propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
     }
 
     public void setComment(String comment) {

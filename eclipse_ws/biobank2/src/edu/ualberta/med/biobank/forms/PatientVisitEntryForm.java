@@ -147,6 +147,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             .getDateProcessed(), patientVisit, "dateProcessed",
             "Date processed should be set");
 
+        createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
+            patientVisit, "dateDrawn", "Date Drawn should be set");
+
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
