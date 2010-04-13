@@ -60,6 +60,8 @@ public class PatientAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Patient");
         addViewMenu(menu, "Patient");
+        addDeleteMenu(menu, "Patient",
+            "Are you sure you want to delete this patient?");
 
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);

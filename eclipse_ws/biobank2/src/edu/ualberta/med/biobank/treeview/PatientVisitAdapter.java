@@ -70,6 +70,8 @@ public class PatientVisitAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Visit");
         addViewMenu(menu, "Visit");
+        addDeleteMenu(menu, "Visit",
+            "Are you sure you want to delete this visit?");
     }
 
     public void setSelectedAliquot(AliquotWrapper aliquot) {

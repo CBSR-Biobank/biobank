@@ -437,18 +437,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    /**
-     * Removes the source vessel objects that are not contained in the
-     * collection.
-     */
-    private void deleteSourceVessels() throws Exception {
-        for (SourceVesselWrapper ss : deletedSourceVessels) {
-            if (!ss.isNew()) {
-                ss.delete();
-            }
-        }
-    }
-
     protected Collection<StudyPvAttrWrapper> getStudyPvAttrCollection() {
         Map<String, StudyPvAttrWrapper> map = getStudyPvAttrMap();
         if (map == null) {
@@ -820,7 +808,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
             propertiesMap.put("studyPvAttrCollection", allStudyPvAttrWrappers);
         }
         deleteSampleStorages();
-        deleteSourceVessels();
         deleteStudyPvAttrs();
     }
 

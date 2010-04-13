@@ -133,9 +133,17 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             if (shipAdapter.getWrapper().isReceivedToday()) {
                 shipAdapter.getParent().removeChild(shipAdapter);
                 reloadTodayNode();
-                PatientAdministrationView.getCurrent().reloadTodayNode();
+                ShipmentAdministrationView.getCurrent().reloadTodayNode();
             }
         }
+    }
+
+    public static ShipmentAdapter getCurrentShipment() {
+        AdapterBase selectedNode = currentInstance.getSelectedNode();
+        if (selectedNode != null && selectedNode instanceof ShipmentAdapter) {
+            return (ShipmentAdapter) selectedNode;
+        }
+        return null;
     }
 
 }
