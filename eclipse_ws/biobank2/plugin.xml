@@ -793,6 +793,10 @@
                   style="push">
             </command>
          </menu>
+         <separator
+              name="edu.ualberta.med.biobank.menu.additions"
+              visible="false">
+         </separator>
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
