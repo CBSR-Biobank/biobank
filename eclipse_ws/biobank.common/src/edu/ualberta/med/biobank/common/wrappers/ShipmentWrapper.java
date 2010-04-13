@@ -43,7 +43,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         List<PatientVisitWrapper> patients = getPatientVisitCollection();
         if (patients != null && patients.size() > 0) {
             throw new BiobankCheckException(
-                "Visits are still linked to this shipment. Deletion can't be done.");
+                "Visits are still linked to this shipment. Delete them before attempting to remove the shipment.");
         }
     }
 

@@ -223,10 +223,26 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasSamples()) {
+        checkNoMorePatientVisits();
+        if (hasSamples())
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
-                + " since patient has samples stored in database.");
+                + " because patient has samples stored in database.");
+        if (hasShipments())
+            throw new BiobankCheckException("Unable to delete patient "
+                + getPnumber()
+                + " because patient has shipments recorded in database.");
+    }
+
+    private boolean hasShipments() {
+        return (this.getShipmentCollection().size() > 0);
+    }
+
+    private void checkNoMorePatientVisits() throws BiobankCheckException {
+        List<PatientVisitWrapper> patients = getPatientVisitCollection();
+        if (patients != null && patients.size() > 0) {
+            throw new BiobankCheckException(
+                "Visits are still linked to this patient. Delete them before attempting to remove the patient.");
         }
     }
 
