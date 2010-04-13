@@ -561,6 +561,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         String palletType = currentPalletWrapper.getContainerType().getName();
         String sampleType = foundAliquot.getSampleType().getName();
 
+        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+            .getPnumber());
         scanCell.setStatus(AliquotCellStatus.ERROR);
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
