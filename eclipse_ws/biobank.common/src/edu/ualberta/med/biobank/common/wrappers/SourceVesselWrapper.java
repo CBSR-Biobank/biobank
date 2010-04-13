@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.SourceVessel;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -35,29 +32,6 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "name" };
-    }
-
-    /**
-     * Get study list. Use Study.setSourceVesselCollection to link studies and
-     * source vessels.
-     */
-    @SuppressWarnings("unchecked")
-    public Collection<StudyWrapper> getStudyCollection(boolean sort) {
-        List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
-            .get("studyCollection");
-        if (clinicCollection == null) {
-            Collection<Study> children = wrappedObject.getStudyCollection();
-            if (children != null) {
-                clinicCollection = new ArrayList<StudyWrapper>();
-                for (Study study : children) {
-                    clinicCollection.add(new StudyWrapper(appService, study));
-                }
-                propertiesMap.put("studyCollection", clinicCollection);
-            }
-        }
-        if ((clinicCollection != null) && sort)
-            Collections.sort(clinicCollection);
-        return clinicCollection;
     }
 
     @Override

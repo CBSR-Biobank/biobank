@@ -149,10 +149,14 @@ public class WidgetCreator {
     private Control createButton(Composite composite,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
         Button button = new Button(composite, SWT.CHECK);
-        toolkit.adapt(button, true, true);
+        if (toolkit != null) {
+            toolkit.adapt(button, true, true);
+        }
         dbc.bindValue(SWTObservables.observeSelection(button),
             modelObservableValue, uvs, null);
-        button.addSelectionListener(selectionListener);
+        if (selectionListener != null) {
+            button.addSelectionListener(selectionListener);
+        }
         return button;
     }
 

@@ -234,8 +234,8 @@ public class PvSourceVesselEntryWidget extends BiobankWidget {
     }
 
     private void getSourceVessels() {
-        allSourceVessels = patientVisit.getPatient().getStudy()
-            .getSourceVesselCollection(true);
+        // allSourceVessels = patientVisit.getPatient().getStudy()
+        // .getSourceVesselCollection(true);
     }
 
     public Collection<PvSourceVesselWrapper> getPvSourceVessels() {

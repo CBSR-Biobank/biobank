@@ -1,20 +1,16 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSourceVessel extends TestDatabase {
@@ -28,25 +24,6 @@ public class TestSourceVessel extends TestDatabase {
         super.setUp();
         ssw = SourceVesselHelper.addSourceVessel("SourceVesselName");
         defaultSite = SiteHelper.addSite("Default");
-    }
-
-    @Test
-    public void testGetStudyCollection() throws Exception {
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
-        for (int i = 0; i < 3; i++) {
-            StudyWrapper newStudy = StudyHelper.newStudy(defaultSite,
-                "newStudy" + i);
-            newStudy.addSourceVessels(Arrays.asList(ssw));
-            newStudy.persist();
-            studies.add(newStudy);
-        }
-        ssw.reload();
-        List<StudyWrapper> foundStudies = new ArrayList<StudyWrapper>(ssw
-            .getStudyCollection(true));
-        Assert.assertEquals(studies.size(), foundStudies.size());
-        for (StudyWrapper study : studies) {
-            Assert.assertTrue(foundStudies.contains(study));
-        }
     }
 
     @Test
