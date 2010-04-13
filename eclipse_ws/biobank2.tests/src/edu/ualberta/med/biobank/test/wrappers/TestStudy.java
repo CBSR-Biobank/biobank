@@ -1004,8 +1004,8 @@ public class TestStudy extends TestDatabase {
 
         study.reload();
 
-        Assert.assertTrue(study.hasClinic(clinic1.getName()));
-        Assert.assertFalse(study.hasClinic(clinic2.getName()));
+        Assert.assertTrue(study.hasClinic(clinic1.getNameShort()));
+        Assert.assertFalse(study.hasClinic(clinic2.getNameShort()));
     }
 
     @Test
