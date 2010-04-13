@@ -56,6 +56,7 @@ public class ReportsView extends ViewPart {
     }
 
     public static TreeViewer getTree() {
+        // retrieves the report tree
         return reportsView.querySelect;
     }
 
