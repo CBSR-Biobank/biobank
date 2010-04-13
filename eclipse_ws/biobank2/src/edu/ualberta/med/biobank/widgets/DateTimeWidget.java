@@ -4,18 +4,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.eclipse.nebula.widgets.datechooser.DateChooserCombo;
+import org.eclipse.nebula.widgets.formattedtext.DateFormatter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
+
+//import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
  * Wrapper around Nebula's CDateTime widget.
@@ -30,7 +28,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class DateTimeWidget extends BiobankWidget {
 
-    private DateTime dateEntry;
+    private DateChooserCombo dateEntry;
 
     private DateTime timeEntry;
 
@@ -48,41 +46,14 @@ public class DateTimeWidget extends BiobankWidget {
 
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        dateEntry = new DateTime(this, SWT.DATE);
-        Button open = new Button(this, SWT.PUSH);
-        timeEntry = new DateTime(this, SWT.TIME | SWT.SHORT);
-
-        open.setText("Select Date");
-        open.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                final Shell dialog = new Shell(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM);
-                dialog.setLayout(new GridLayout(3, false));
-
-                final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
-                    | SWT.BORDER);
-
-                new Label(dialog, SWT.NONE);
-                Button ok = new Button(dialog, SWT.PUSH);
-                ok.setText("OK");
-                ok.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                    false));
-                ok.addSelectionListener(new SelectionAdapter() {
-                    public void widgetSelected(SelectionEvent e) {
-                        dialog.close();
-                    }
-                });
-                dialog.setDefaultButton(ok);
-                dialog.pack();
-                dialog.open();
-            }
-        });
+        dateEntry = new DateChooserCombo(this, SWT.BORDER);
+        timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
 
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
 
-        dateEntry.setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal
-            .get(Calendar.DAY_OF_MONTH));
+        dateEntry.setFormatter(new DateFormatter("yyyy-MM-dd"));
+        dateEntry.setValue(date);
         timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
             .get(Calendar.SECOND));
     }
@@ -97,9 +68,14 @@ public class DateTimeWidget extends BiobankWidget {
     }
 
     public Date getDate() {
-        return null;
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(dateEntry.getValue());
+        cal.set(Calendar.HOUR, timeEntry.getHours());
+        cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+        return cal.getTime();
     }
 
     public void setDate(Date date) {
+        dateEntry.setValue(date);
     }
 }
