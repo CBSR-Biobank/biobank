@@ -156,9 +156,11 @@ public class LinkFormPatientManagement {
             currentPatient = PatientWrapper.getPatientInSite(
                 aliquotAdminForm.appService, patientNumberText.getText(),
                 SessionManager.getInstance().getCurrentSite());
-            aliquotAdminForm.appendLog("--------");
-            aliquotAdminForm.appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
-                currentPatient.getPnumber());
+            if (currentPatient != null) {
+                aliquotAdminForm.appendLog("--------");
+                aliquotAdminForm.appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
+                    currentPatient.getPnumber());
+            }
         } catch (ApplicationException e) {
             BioBankPlugin.openError(Messages
                 .getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$

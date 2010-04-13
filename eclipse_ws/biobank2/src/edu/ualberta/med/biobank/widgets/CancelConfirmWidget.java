@@ -13,8 +13,12 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class CancelConfirmWidget extends BiobankWidget {
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(CancelConfirmWidget.class.getName());
 
     private Text confirmCancelText;
 
@@ -58,7 +62,12 @@ public class CancelConfirmWidget extends BiobankWidget {
                         // false
                         e.doit = false;
                     } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
-                        form.cancel();
+                        try {
+                            form.reset();
+                        } catch (Exception ex) {
+                            logger.error(
+                                "Error while reseting pallet values", ex); //$NON-NLS-1$
+                        }
                     }
                 }
             }
@@ -68,7 +77,11 @@ public class CancelConfirmWidget extends BiobankWidget {
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                form.cancel();
+                try {
+                    form.reset();
+                } catch (Exception ex) {
+                    logger.error("Error while reseting pallet values", ex); //$NON-NLS-1$
+                }
             }
         });
 

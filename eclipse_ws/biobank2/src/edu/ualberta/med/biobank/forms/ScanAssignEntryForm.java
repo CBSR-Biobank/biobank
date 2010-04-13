@@ -881,5 +881,4 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     public BiobankLogger getErrorLogger() {
         return logger;
     }
-
 }
