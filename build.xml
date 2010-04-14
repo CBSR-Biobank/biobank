@@ -38,7 +38,7 @@
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
   <property name="biobank2.jar.files"
-            value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar, org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, commons-lang-2.4.jar,iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
+            value="org.eclipse.nebula.widgets.formattedtext_1.0.0.HEAD.jar, org.eclipse.nebula.widgets.datechooser_1.0.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, commons-lang-2.4.jar,iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
   <property name="biobank.common.jar.files" value="commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.importer.jar.files"
             value="mysql-connector-java-5.1.7-bin.jar" />
@@ -129,20 +129,6 @@
   </condition>
   <!-- end of copied part -->
 
-  <target name="check-jars-available">
-    <available file="${req.jars.dir}" type="dir" property="jars.available" />
-  </target>
-  <target name="jars-download" depends="check-jars-available"
-          unless="jars.available"
-          description="downloads required jars from the host machine">
-    <mkdir dir="${req.jars.dir}" />
-    <exec executable="curl">
-      <arg value="--silent" />
-      <arg value="-obiobank_jars.tar.bz2" />
-      <arg value="http://${host}/biobank_jars.tar.bz2" />
-    </exec>
-    <untar src="biobank_jars.tar.bz2" compression="bzip2" dest="." />
-  </target>
   <target name="check-cacore-sdk-available">
     <available file="${cacore.sdk.dir}/build.xml"
                property="cacore.sdk.available" />
@@ -190,7 +176,7 @@
     </pathconvert>
   </target>
   <!-- Eclipse -->
-  <target name="deploy-eclipse" depends="sdk-files,jars-download"
+  <target name="deploy-eclipse" depends="sdk-files"
           description="deploys the caCORE SDK beans to the eclipse project">
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/system/lib"
@@ -313,7 +299,6 @@
 
   <target name="deploy"
           description="deploys to JBoss and Eclipse project">
-    <antcall target="jars-download" />
     <antcall target="deploy-eclipse" />
     <antcall target="deploy-jboss" />
   </target>
@@ -445,7 +430,6 @@
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
     </delete>
-    <delete dir="${req.jars.dir}" />
   </target>
 
 
@@ -458,7 +442,7 @@
   <target name="clean-caCore" if="isCaCoreFolderExists">
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
   </target>
-    
+
 
   <!-- JUnit -->
 
