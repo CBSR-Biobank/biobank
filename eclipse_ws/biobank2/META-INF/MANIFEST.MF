@@ -3,8 +3,6 @@ Bundle-Name: Biobank2 Plug-in
 Bundle-ClassPath: .,
  lib/gluegen.jar,
  lib/scanlib.jar,
- lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar,
- lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar,
  lib/jasperreports-3.7.0.jar,
  lib/commons-beanutils-1.8.0.jar,
  lib/commons-digester-1.7.jar,
@@ -12,7 +10,10 @@ Bundle-ClassPath: .,
  lib/iText-2.1.0.jar,
  lib/DynamicJasper-3.0.14.jar,
  lib/jdt-compiler-3.1.1.jar,
- lib/mail.jar
+ lib/mail.jar,
+ lib/org.eclipse.nebula.widgets.calendarcombo_1.0.0.jar,
+ lib/org.eclipse.nebula.widgets.datechooser_1.0.0.HEAD.jar,
+ lib/org.eclipse.nebula.widgets.formattedtext_1.0.0.HEAD.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
