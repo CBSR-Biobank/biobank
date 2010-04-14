@@ -47,7 +47,9 @@ public class SearchUtils {
         } else if (type == Contact.class) {
             properties.put("Contact", "contact.name");
             properties.put("Title", "contact.title");
-            properties.put("Phone", "contact.phoneNumber");
+            properties.put("Mobile", "contact.mobileNumber");
+            properties.put("Pager", "contact.pagerNumber");
+            properties.put("Office", "contact.officeNumber");
             properties.put("Email", "contact.emailAddress");
         }
         return properties;
@@ -157,8 +159,9 @@ public class SearchUtils {
                 path = path + "contact.";
             add(searchableFields, path, "name", String.class);
             add(searchableFields, path, "title", String.class);
-            add(searchableFields, path, "phoneNumber", String.class);
-            add(searchableFields, path, "faxNumber", String.class);
+            add(searchableFields, path, "mobileNumber", String.class);
+            add(searchableFields, path, "pagerNumber", String.class);
+            add(searchableFields, path, "officeNumber", String.class);
             add(searchableFields, path, "faxNumber", String.class);
             add(searchableFields, path, "emailAddress", String.class);
         } else if (c == Shipment.class) {

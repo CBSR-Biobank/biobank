@@ -148,7 +148,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 + Patient.class.getName()
                 + " as p left join p.patientVisitCollection as visits"
                 + " join visits.pvSourceVesselCollection as ss"
-                + " where p.id = ? and visits.dateProcessed = ? and ss.dateDrawn = ?",
+                + " where p.id = ? and visits.dateProcessed = ? and visits.dateDrawn = ?",
             Arrays.asList(new Object[] { getId(), dateProcessed, dateDrawn }));
         List<PatientVisit> visits = appService.query(criteria);
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
