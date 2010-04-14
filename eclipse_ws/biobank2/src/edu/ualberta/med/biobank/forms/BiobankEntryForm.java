@@ -245,10 +245,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage) {
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            observedObject, propertyName, emptyMessage);
+            modelObservableValue, emptyMessage);
     }
 
     /*

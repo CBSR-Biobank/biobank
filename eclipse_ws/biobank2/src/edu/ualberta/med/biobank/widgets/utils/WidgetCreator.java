@@ -30,8 +30,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -49,6 +47,7 @@ import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.widgets.DateTimeObservableValue;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
@@ -311,17 +310,16 @@ public class WidgetCreator {
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage) {
-        return createDateTimeWidget(client, nameLabel, date, observedObject,
-            propertyName, emptyMessage, true);
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage) {
+        return createDateTimeWidget(client, nameLabel, date,
+            modelObservableValue, emptyMessage, true);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage, boolean showDate) {
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, boolean showDate) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
             date, showDate);
         if (selectionListener != null) {
@@ -330,40 +328,18 @@ public class WidgetCreator {
         if (toolkit != null) {
             widget.adaptToToolkit(toolkit, true);
         }
-
-        if (observedObject != null && propertyName != null) {
-            final IObservableValue dateValue = BeansObservables.observeValue(
-                observedObject, propertyName);
-            widget.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    dateValue.setValue(widget.getDate());
-                }
-            });
-            final IValueChangeListener changeListener = new IValueChangeListener() {
-                @Override
-                public void handleValueChange(ValueChangeEvent event) {
-                    widget.setDate((Date) dateValue.getValue());
-                }
-            };
-            dateValue.addValueChangeListener(changeListener);
-            widget.addDisposeListener(new DisposeListener() {
-                @Override
-                public void widgetDisposed(DisposeEvent e) {
-                    dateValue.removeValueChangeListener(changeListener);
-                }
-            });
-
+        if (modelObservableValue != null) {
+            UpdateValueStrategy uvs = null;
             if (emptyMessage != null && !emptyMessage.isEmpty()) {
                 DateNotNulValidator validator = new DateNotNulValidator(
                     emptyMessage);
                 validator.setControlDecoration(BiobankWidget.createDecorator(
                     label, validator.getErrorMessage()));
-                UpdateValueStrategy uvs = new UpdateValueStrategy();
+                uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
-                bindValue(new WritableValue(null, Date.class), dateValue, uvs,
-                    uvs);
             }
+            dbc.bindValue(new DateTimeObservableValue(widget),
+                modelObservableValue, uvs, null);
         }
         return widget;
     }

@@ -162,11 +162,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setDateProcessed(new Date());
         }
         createDateTimeWidget(client, "Date Processed", patientVisit
-            .getDateProcessed(), patientVisit, "dateProcessed",
-            "Date processed should be set");
+            .getDateProcessed(), BeansObservables.observeValue(patientVisit,
+            "dateProcessed"), "Date processed should be set");
 
         createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
-            patientVisit, "dateDrawn", "Date Drawn should be set");
+            BeansObservables.observeValue(patientVisit, "dateDrawn"),
+            "Date Drawn should be set");
 
         createPvDataSection(client);
 
@@ -226,7 +227,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         } else if (pvCustomInfo.getType().equals("date_time")) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
-                null, null);
+                null);
         } else if (pvCustomInfo.getType().equals("select_single")) {
             control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),

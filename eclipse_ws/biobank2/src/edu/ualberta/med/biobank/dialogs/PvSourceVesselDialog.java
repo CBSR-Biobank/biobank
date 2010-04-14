@@ -123,7 +123,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
         timeDrawnWidget = widgetCreator.createDateTimeWidget(
             optionalFieldsComposite, "Time drawn", pvSourceVessel
-                .getTimeDrawn(), pvSourceVessel, "timeDrawn", null, false);
+                .getTimeDrawn(), BeansObservables.observeValue(pvSourceVessel,
+                "timeDrawn"), null, false);
 
         volumeText = createBoundWidgetWithLabel(optionalFieldsComposite,
             Text.class, SWT.BORDER, "Volume", new String[0], BeansObservables

@@ -61,6 +61,7 @@ public class DateTimeWidget extends BiobankWidget {
             dateEntry.setLayoutData(gd);
         }
         timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
+        timeEntry.setTime(0, 0, 0);
 
         if (date != null) {
             Calendar cal = new GregorianCalendar();
@@ -72,13 +73,6 @@ public class DateTimeWidget extends BiobankWidget {
             timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE),
                 cal.get(Calendar.SECOND));
         }
-    }
-
-    public void addSelectionListener(SelectionListener listener) {
-        if (dateEntry != null) {
-            dateEntry.addSelectionListener(listener);
-        }
-        timeEntry.addSelectionListener(listener);
     }
 
     public String getText() {
@@ -107,8 +101,21 @@ public class DateTimeWidget extends BiobankWidget {
         if (dateEntry != null) {
             dateEntry.setValue(cal.getTime());
         }
-
         timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
             .get(Calendar.SECOND));
+    }
+
+    public void addSelectionListener(SelectionListener listener) {
+        if (dateEntry != null) {
+            dateEntry.addSelectionListener(listener);
+        }
+        timeEntry.addSelectionListener(listener);
+    }
+
+    public void removeSelectionListener(SelectionListener listener) {
+        if (dateEntry != null) {
+            dateEntry.removeSelectionListener(listener);
+        }
+        timeEntry.removeSelectionListener(listener);
     }
 }
