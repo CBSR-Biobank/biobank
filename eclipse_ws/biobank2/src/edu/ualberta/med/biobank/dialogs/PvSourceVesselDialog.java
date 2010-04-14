@@ -46,7 +46,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         super.configureShell(shell);
         String title = new String();
 
-        if (pvSourceVessel.isNew()) {
+        if (pvSourceVessel.getSourceVessel() == null) {
             title = "Add ";
         } else {
             title = "Edit ";
@@ -60,7 +60,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         Control contents = super.createContents(parent);
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_COMPUTER_KEY));
-        if (pvSourceVessel.isNew()) {
+        if (pvSourceVessel.getSourceVessel() == null) {
             setTitle("Add Source Vessel");
             setMessage("Add a source vessel to a patient visit");
         } else {

@@ -61,7 +61,7 @@ public class SampleStorageDialog extends BiobankDialog {
         super.configureShell(shell);
         String title = new String();
 
-        if (origSampleStorage.isNew()) {
+        if (origSampleStorage.getSampleType() == null) {
             title = "Add ";
         } else {
             title = "Edit ";
@@ -75,7 +75,7 @@ public class SampleStorageDialog extends BiobankDialog {
         Control contents = super.createContents(parent);
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_COMPUTER_KEY));
-        if (origSampleStorage.isNew()) {
+        if (origSampleStorage.getSampleType() == null) {
             setTitle("New Sample Storage");
         } else {
             setTitle("Edit Sample Storage");
