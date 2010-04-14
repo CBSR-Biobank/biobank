@@ -379,25 +379,21 @@ public class TestPatient extends TestDatabase {
 
         PvSourceVesselWrapper pvSourceVessel = PvSourceVesselHelper
             .newPvSourceVessel(Utils.getRandomString(5, 10), visit1);
-        pvSourceVessel.setDateDrawn(dateDrawn1);
         visit1.addPvSourceVessels(Arrays.asList(pvSourceVessel));
         visit1.persist();
 
         pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
             .getRandomString(5, 10), visit1_1);
-        pvSourceVessel.setDateDrawn(dateDrawn1_1);
         visit1_1.addPvSourceVessels(Arrays.asList(pvSourceVessel));
         visit1_1.persist();
 
         pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
             .getRandomString(5, 10), visit2);
-        pvSourceVessel.setDateDrawn(dateDrawn2);
         visit2.addPvSourceVessels(Arrays.asList(pvSourceVessel));
         visit2.persist();
 
         pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
             .getRandomString(5, 10), visit3);
-        pvSourceVessel.setDateDrawn(dateDrawn3);
         visit3.addPvSourceVessels(Arrays.asList(pvSourceVessel));
         visit3.persist();
 

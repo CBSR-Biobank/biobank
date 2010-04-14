@@ -286,7 +286,7 @@ public class CbsrClinics {
     }
 
     private static ContactWrapper addContact(String clinicName, String name,
-        String title, String phoneNumber, String faxNumber, String emailAddress)
+        String title, String officeNumber, String faxNumber, String emailAddress)
         throws Exception {
         ClinicWrapper clinic = clinicsMap.get(clinicName);
 
@@ -298,7 +298,7 @@ public class CbsrClinics {
         contact.setClinic(clinic);
         contact.setName(name);
         contact.setTitle(title);
-        contact.setPhoneNumber(phoneNumber);
+        contact.setOfficeNumber(officeNumber);
         contact.setFaxNumber(faxNumber);
         contact.setEmailAddress(emailAddress);
         contact.persist();

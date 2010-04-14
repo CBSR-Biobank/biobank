@@ -48,8 +48,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private Text commentLabel;
 
-    private Text usernameLabel;
-
     private Text dateDrawnLabel;
 
     private class FormPvCustomInfo extends PvAttrCustom {
@@ -102,7 +100,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
         createPvDataSection(client);
 
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
-        usernameLabel = createReadOnlyField(client, SWT.None, "Creator");
 
         setPatientVisitValues();
     }
@@ -155,7 +152,6 @@ public class PatientVisitViewForm extends BiobankViewForm {
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, patientVisit.getFormattedDateDrawn());
         setTextValue(commentLabel, patientVisit.getComment());
-        setTextValue(usernameLabel, patientVisit.getUsername());
 
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {

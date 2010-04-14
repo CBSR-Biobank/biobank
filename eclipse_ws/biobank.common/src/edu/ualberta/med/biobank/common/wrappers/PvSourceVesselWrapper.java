@@ -24,7 +24,7 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "quantity", "patientVisit", "sourceVessel",
-            "patientCollection", "dateDrawn" };
+            "patientCollection", "timeDrawn", "volume" };
     }
 
     @Override
@@ -68,18 +68,28 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
     }
 
-    public Date getDateDrawn() {
-        return wrappedObject.getDateDrawn();
+    public Date getTimeDrawn() {
+        return wrappedObject.getTimeDrawn();
     }
 
-    public String getFormattedDateDrawn() {
-        return DateFormatter.formatAsDateTime(getDateDrawn());
+    public String getFormattedTimeDrawn() {
+        return DateFormatter.formatAsTime(getTimeDrawn());
     }
 
-    public void setDateDrawn(Date date) {
-        Date oldDate = getDateDrawn();
-        wrappedObject.setDateDrawn(date);
-        propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
+    public void setTimeDrawn(Date date) {
+        Date oldDate = getTimeDrawn();
+        wrappedObject.setTimeDrawn(date);
+        propertyChangeSupport.firePropertyChange("timeDrawn", oldDate, date);
+    }
+
+    public String getVolume() {
+        return wrappedObject.getVolume();
+    }
+
+    public void setVolume(String volume) {
+        String oldVol = getVolume();
+        wrappedObject.setVolume(volume);
+        propertyChangeSupport.firePropertyChange("volume", oldVol, volume);
     }
 
     public SourceVesselWrapper getSourceVessel() {

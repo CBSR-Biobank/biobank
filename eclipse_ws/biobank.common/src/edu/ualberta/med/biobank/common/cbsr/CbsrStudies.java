@@ -432,6 +432,7 @@ public class CbsrStudies {
         }
         StudySourceVesselWrapper studySourceVessel = new StudySourceVesselWrapper(
             ss.getAppService());
+        studySourceVessel.setStudy(study);
         studySourceVessel.setSourceVessel(ss);
         study.addStudySourceVessels(Arrays.asList(studySourceVessel));
         study.persist();

@@ -313,10 +313,20 @@ public class WidgetCreator {
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, Object observedObject,
         String propertyName, final String emptyMessage) {
+        return createDateTimeWidget(client, nameLabel, date, observedObject,
+            propertyName, emptyMessage, true);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object observedObject,
+        String propertyName, final String emptyMessage, boolean showDate) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
-        widget.addSelectionListener(selectionListener);
+        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
+            date, showDate);
+        if (selectionListener != null) {
+            widget.addSelectionListener(selectionListener);
+        }
         if (toolkit != null) {
             widget.adaptToToolkit(toolkit, true);
         }

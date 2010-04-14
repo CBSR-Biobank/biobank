@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -18,8 +20,9 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class PvSourceVesselDialog extends BiobankDialog {
 
@@ -29,16 +32,26 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private ComboViewer sourceVesselsComboViewer;
 
-    private Collection<SourceVesselWrapper> sourceVessels;
+    private Map<String, StudySourceVesselWrapper> mapStudySourceVessel;
+
+    private DateTimeWidget timeDrawnWidget;
+
+    private Control volumeText;
+
+    private Composite optionalFieldsComposite;
 
     public PvSourceVesselDialog(Shell parent,
         PvSourceVesselWrapper pvSourceVessel,
-        Collection<SourceVesselWrapper> sourceVessels) {
+        List<StudySourceVesselWrapper> studySourceVessels) {
         super(parent);
         Assert.isNotNull(pvSourceVessel);
-        Assert.isNotNull(sourceVessels);
+        Assert.isNotNull(studySourceVessels);
         this.pvSourceVessel = pvSourceVessel;
-        this.sourceVessels = sourceVessels;
+        mapStudySourceVessel = new HashMap<String, StudySourceVesselWrapper>();
+        for (StudySourceVesselWrapper ssv : studySourceVessels) {
+            mapStudySourceVessel.put(ssv.getSourceVessel().getName(), ssv);
+        }
+
     }
 
     @Override
@@ -76,10 +89,14 @@ public class PvSourceVesselDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        StudySourceVesselWrapper ssv = null;
+        if (pvSourceVessel.getSourceVessel() != null) {
+            ssv = mapStudySourceVessel.get(pvSourceVessel.getSourceVessel()
+                .getName());
+        }
         sourceVesselsComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
-                "Source Vessel", sourceVessels,
-                pvSourceVessel.getSourceVessel(),
+                "Source Vessel", mapStudySourceVessel.values(), ssv,
                 "A source vessel should be selected");
         sourceVesselsComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -88,8 +105,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
                     IStructuredSelection stSelection = (IStructuredSelection) sourceVesselsComboViewer
                         .getSelection();
                     pvSourceVessel
-                        .setSourceVessel((SourceVesselWrapper) stSelection
-                            .getFirstElement());
+                        .setSourceVessel(((StudySourceVesselWrapper) stSelection
+                            .getFirstElement()).getSourceVessel());
+                    updateWidgetVisibility();
                 }
             });
 
@@ -98,8 +116,37 @@ public class PvSourceVesselDialog extends BiobankDialog {
                 pvSourceVessel, "quantity"), new IntegerNumberValidator(
                 "quantity should be a whole number", false));
 
-        createDateTimeWidget(contents, "Date drawn", null, pvSourceVessel,
-            "dateDrawn", "Date drawn should be selected");
+        optionalFieldsComposite = new Composite(parent, SWT.NONE);
+        optionalFieldsComposite.setLayout(new GridLayout(2, false));
+        optionalFieldsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+            true, true));
+
+        timeDrawnWidget = widgetCreator.createDateTimeWidget(
+            optionalFieldsComposite, "Time drawn", pvSourceVessel
+                .getTimeDrawn(), pvSourceVessel, "timeDrawn", null, false);
+
+        volumeText = createBoundWidgetWithLabel(optionalFieldsComposite,
+            Text.class, SWT.BORDER, "Volume", new String[0], BeansObservables
+                .observeValue(pvSourceVessel, "volume"), null);
+
+        updateWidgetVisibility();
+    }
+
+    public void updateWidgetVisibility() {
+        StudySourceVesselWrapper ssv = null;
+        if (pvSourceVessel.getSourceVessel() != null) {
+            ssv = mapStudySourceVessel.get(pvSourceVessel.getSourceVessel()
+                .getName());
+        }
+        if (ssv == null) {
+            optionalFieldsComposite.setVisible(false);
+        } else {
+            boolean needTimeDrawn = Boolean.TRUE.equals(ssv.getNeedTimeDrawn());
+            boolean needVolume = Boolean.TRUE.equals(ssv.getNeedRealVolume());
+            optionalFieldsComposite.setVisible(needTimeDrawn || needVolume);
+            timeDrawnWidget.setEnabled(ssv != null && needTimeDrawn);
+            volumeText.setEnabled(ssv != null && needVolume);
+        }
     }
 
     public PvSourceVesselWrapper getPvSourceVessel() {
