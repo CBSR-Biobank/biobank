@@ -241,4 +241,8 @@ public class SessionManager {
             view.getTreeViewer().expandToLevel(3);
         }
     }
+
+    public boolean isConnected() {
+        return sessionAdapter != null;
+    }
 }

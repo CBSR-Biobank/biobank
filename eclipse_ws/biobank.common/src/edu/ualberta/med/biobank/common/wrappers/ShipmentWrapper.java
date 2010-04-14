@@ -24,6 +24,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
+    private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
 
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -79,6 +80,42 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         checkAlLeastOnePatient();
         checkPatientsStudy();
+        checkRemovedPatients();
+    }
+
+    private void checkRemovedPatients() throws BiobankCheckException,
+        ApplicationException {
+        if (!isNew()) {
+            for (PatientWrapper patient : patientsRemoved) {
+                checkCanRemovePatient(patient);
+            }
+        }
+    }
+
+    public void checkCanRemovePatient(PatientWrapper patient)
+        throws ApplicationException, BiobankCheckException {
+        if (hasVisitForPatient(patient)) {
+            throw new BiobankCheckException("Cannot remove patient "
+                + patient.getPnumber()
+                + ": a visit related to this shipment has "
+                + "already been created. Remove visit first "
+                + "and then you will be able to remove this "
+                + "patient from this shipment.");
+        }
+    }
+
+    public boolean hasVisitForPatient(PatientWrapper patient)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria("select count(*) from "
+            + PatientVisit.class.getName()
+            + " where patient.id=? and shipment.id= ?", Arrays
+            .asList(new Object[] { patient.getId(), getId() }));
+
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0) > 0;
     }
 
     public void checkAlLeastOnePatient() throws BiobankCheckException {
@@ -338,6 +375,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             // new patients
             for (PatientWrapper patient : newPatients) {
                 patientsAdded.add(patient);
+                patientsRemoved.remove(patient);
                 allPatientsObjects.add(patient.getWrappedObject());
                 allPatientsWrappers.add(patient);
             }
@@ -348,6 +386,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public void removePatients(List<PatientWrapper> patientsToRemove) {
         if (patientsToRemove != null && patientsToRemove.size() > 0) {
             patientsAdded.removeAll(patientsToRemove);
+            patientsRemoved.addAll(patientsToRemove);
             Collection<Patient> allPatientsObjects = new HashSet<Patient>();
             List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
             // already in list
@@ -409,6 +448,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     public void resetInternalField() {
         patientsAdded.clear();
+        patientsRemoved.clear();
     }
 
     public static List<ShipmentWrapper> getTodayShipments(
