@@ -49,19 +49,21 @@ public class DateTimeWidget extends BiobankWidget {
 
         dateEntry = new DateChooserCombo(this, SWT.BORDER);
         timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-
         dateEntry.setFormatter(new DateFormatter("yyyy-MM-dd"));
-        dateEntry.setValue(date);
-        timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
-            .get(Calendar.SECOND));
 
         Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
         GridData gd = new GridData();
         gd.widthHint = size.x + 10;
         dateEntry.setLayoutData(gd);
+
+        if (date != null) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTime(date);
+
+            dateEntry.setValue(date);
+            timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE),
+                cal.get(Calendar.SECOND));
+        }
     }
 
     public void addSelectionListener(SelectionListener listener) {
@@ -82,6 +84,9 @@ public class DateTimeWidget extends BiobankWidget {
     }
 
     public void setDate(Date date) {
+        if (date == null)
+            return;
+
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.set(Calendar.HOUR, 0);

@@ -38,7 +38,7 @@
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
   <property name="biobank2.jar.files"
-            value="org.eclipse.nebula.widgets.formattedtext_1.0.0.HEAD.jar, org.eclipse.nebula.widgets.datechooser_1.0.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, commons-lang-2.4.jar,iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
+            value="org.eclipse.nebula.widgets.formattedtext_1.0.0.HEAD.jar, org.eclipse.nebula.widgets.datechooser_1.0.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
   <property name="biobank.common.jar.files" value="commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.importer.jar.files"
             value="mysql-connector-java-5.1.7-bin.jar" />
@@ -221,8 +221,6 @@
                    files="${sdk.jar.files.basename}" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
                       files="${sdk.jar.files.basename}" />
-      <targetfilelist dir="${eclipse.proj.dir.importer}/lib"
-                      files="${sdk.jar.files.basename}" />
     </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib">
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
@@ -239,9 +237,8 @@
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
     <copy todir="${eclipse.proj.dir.importer}/lib">
-      <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}" />
-      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
-      <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
+      <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}"/>
+      <fileset file="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/log4j-1.2.14.jar"/>
     </copy>
   </target>
   <!-- JBoss -->
