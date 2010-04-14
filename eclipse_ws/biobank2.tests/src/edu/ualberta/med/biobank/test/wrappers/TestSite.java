@@ -848,8 +848,11 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(nber + nber2 + nber3 + nber4, site
             .getPatientVisitCount().longValue());
 
-        // delete patient 1 and all it's visits
-        patient1.delete();
+        // delete patient 1 visits
+        patient1.reload();
+        for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
+            visit.delete();
+        }
         site.reload();
         Assert.assertEquals(nber2 + nber4, site.getPatientVisitCount()
             .longValue());
@@ -931,8 +934,11 @@ public class TestSite extends TestDatabase {
             for (AliquotWrapper aliquot : visit.getAliquotCollection()) {
                 aliquot.delete();
             }
+            visit.delete();
         }
+        shipment1.delete();
         patient1.delete();
+
         site.reload();
         Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
     }

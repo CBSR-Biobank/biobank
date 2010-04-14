@@ -21,10 +21,11 @@ public class PatientVisitHelper extends DbHelper {
      * @return A new patient visit wrapper.
      */
     public static PatientVisitWrapper newPatientVisit(PatientWrapper patient,
-        ShipmentWrapper shipment, Date dateProcessed) {
+        ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn) {
         PatientVisitWrapper pv = new PatientVisitWrapper(appService);
         pv.setPatient(patient);
         pv.setDateProcessed(dateProcessed);
+        pv.setDateDrawn(dateDrawn);
         pv.setShipment(shipment);
         return pv;
     }
@@ -39,9 +40,10 @@ public class PatientVisitHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-        ShipmentWrapper shipment, Date dateProcessed) throws Exception {
+        ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn)
+        throws Exception {
         PatientVisitWrapper pv = newPatientVisit(patient, shipment,
-            dateProcessed);
+            dateProcessed, dateDrawn);
         pv.persist();
         return pv;
     }
@@ -63,7 +65,7 @@ public class PatientVisitHelper extends DbHelper {
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (int i = 0; i < count; i++) {
             visits.add(addPatientVisit(patient, shipment, TestCommon
-                .getUniqueDate(r)));
+                .getUniqueDate(r), TestCommon.getUniqueDate(r)));
         }
         return visits;
     }

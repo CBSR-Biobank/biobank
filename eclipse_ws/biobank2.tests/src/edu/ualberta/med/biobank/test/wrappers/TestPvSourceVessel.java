@@ -42,7 +42,7 @@ public class TestPvSourceVessel extends TestDatabase {
             clinic, Utils.getRandomString(10));
         PatientWrapper patient = shipment.getPatientCollection().get(0);
         PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         pvSourceVessel = PvSourceVesselHelper.addPvSourceVessel(Utils
             .getRandomString(10), pvw);
@@ -78,7 +78,8 @@ public class TestPvSourceVessel extends TestDatabase {
 
         PatientVisitWrapper oldPv = pvSourceVessel.getPatientVisit();
         PatientVisitWrapper newPv = PatientVisitHelper.addPatientVisit(oldPv
-            .getPatient(), oldPv.getShipment(), Utils.getRandomDate());
+            .getPatient(), oldPv.getShipment(), Utils.getRandomDate(), Utils
+            .getRandomDate());
         pvSourceVessel.setPatientVisit(newPv);
         pvSourceVessel.persist();
 

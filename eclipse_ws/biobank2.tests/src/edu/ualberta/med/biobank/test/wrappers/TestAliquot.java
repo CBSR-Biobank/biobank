@@ -86,7 +86,7 @@ public class TestAliquot extends TestDatabase {
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, null);
+            shipment, null, Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
             3);
         container.reload();
@@ -206,7 +206,7 @@ public class TestAliquot extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
             newPatient);
         PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
-            newPatient, shipment, null);
+            newPatient, shipment, null, Utils.getRandomDate());
 
         aliquot.setPatientVisit(newVisit);
         try {
@@ -420,7 +420,7 @@ public class TestAliquot extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
             .getClinicCollection().get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
@@ -429,8 +429,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType, container,
-            pv, 2, 3);
+        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
+            container, pv, 2, 3);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
@@ -455,7 +455,7 @@ public class TestAliquot extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
             .getClinicCollection().get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
@@ -464,8 +464,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType, container,
-            pv, 2, 3);
+        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
+            container, pv, 2, 3);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
@@ -520,7 +520,7 @@ public class TestAliquot extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
             .getClinicCollection().get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, 4, 5, true);
@@ -529,8 +529,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(name, name,
             null, site, type);
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType, container,
-            pv, 2, 3);
+        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
+            container, pv, 2, 3);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, null, pv, null, null);

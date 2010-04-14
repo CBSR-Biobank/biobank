@@ -504,9 +504,9 @@ public class TestClinic extends TestDatabase {
         ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic,
             patient1, patient2);
         PatientVisitHelper.addPatientVisit(patient1, shipment1, Utils
-            .getRandomDate());
+            .getRandomDate(), Utils.getRandomDate());
         PatientVisitHelper.addPatientVisit(patient2, shipment1, Utils
-            .getRandomDate());
+            .getRandomDate(), Utils.getRandomDate());
 
         StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
             + "_2");
@@ -516,7 +516,7 @@ public class TestClinic extends TestDatabase {
         ShipmentWrapper shipment2 = ShipmentHelper
             .addShipment(clinic, patient3);
         PatientVisitHelper.addPatientVisit(patient3, shipment2, Utils
-            .getRandomDate());
+            .getRandomDate(), Utils.getRandomDate());
 
         clinic.reload();
         Assert.assertEquals(3, clinic.getPatientVisitCollection().size());
@@ -641,8 +641,9 @@ public class TestClinic extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name);
         ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name + "2");
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "_2");
+        ContactWrapper contact2 = ContactHelper
+            .addContact(clinic2, name + "_2");
 
         StudyWrapper study = StudyHelper.addStudy(clinic1.getSite(), name);
         study.addContacts(Arrays.asList(contact1, contact2));
@@ -659,7 +660,6 @@ public class TestClinic extends TestDatabase {
         // add patients
         for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
             patient = PatientHelper.addPatient(name + "_p" + i, study);
-
             ClinicWrapper clinic = clinics.get(i & 1);
             patientMap.get(clinic).add(patient);
             ShipmentHelper.addShipment(clinic, patient);
@@ -671,6 +671,13 @@ public class TestClinic extends TestDatabase {
         for (ClinicWrapper clinic : clinics) {
             while (patientMap.get(clinic).size() > 0) {
                 patient = patientMap.get(clinic).get(0);
+                patient.reload();
+                if (patient.getShipmentCollection() != null) {
+                    for (ShipmentWrapper s : patient.getShipmentCollection()) {
+                        s.delete();
+                    }
+                    patient.reload();
+                }
                 patient.delete();
                 patientMap.get(clinic).remove(0);
                 Assert.assertEquals(patientMap.get(clinic).size(), clinic

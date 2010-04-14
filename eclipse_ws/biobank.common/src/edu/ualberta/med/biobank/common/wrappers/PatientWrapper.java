@@ -143,12 +143,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      */
     public List<PatientVisitWrapper> getVisits(Date dateProcessed,
         Date dateDrawn) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select visits from "
-                + Patient.class.getName()
-                + " as p left join p.patientVisitCollection as visits"
-                + " join visits.pvSourceVesselCollection as ss"
-                + " where p.id = ? and visits.dateProcessed = ? and visits.dateDrawn = ?",
+        HQLCriteria criteria = new HQLCriteria("from "
+            + PatientVisit.class.getName()
+            + " where patient.id = ? and dateProcessed = ? and dateDrawn = ?",
             Arrays.asList(new Object[] { getId(), dateProcessed, dateDrawn }));
         List<PatientVisit> visits = appService.query(criteria);
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();

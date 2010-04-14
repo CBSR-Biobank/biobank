@@ -143,7 +143,7 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         testGettersAndSetters(visit, GETTER_SKIP_METHODS);
 
         visit = new PatientVisitWrapper(appService);
@@ -153,17 +153,17 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testCompareTo() throws Exception {
         // visit2's date processed is 1 day after visit1's
-        Date dateProcessed = Utils.getRandomDate();
+        Date date = Utils.getRandomDate();
         PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
-            patient, shipment, dateProcessed);
+            patient, shipment, date, date);
 
         Calendar cal = Calendar.getInstance();
-        cal.setTime(dateProcessed);
+        cal.setTime(date);
         cal.add(Calendar.DATE, 1);
         ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic, patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
-            patient, shipment2, cal.getTime());
+            patient, shipment2, cal.getTime(), date);
 
         Assert.assertEquals(-1, visit1.compareTo(visit2));
 
@@ -181,26 +181,26 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testReset() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         visit.reset();
     }
 
     @Test
     public void testReload() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         visit.reload();
     }
 
     @Test
     public void testDelete() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         visit.delete();
 
         // make sure visit cannot be deleted if it has samples
         visit = PatientVisitHelper.addPatientVisit(patient, shipment, Utils
-            .getRandomDate());
+            .getRandomDate(), Utils.getRandomDate());
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
@@ -225,14 +225,14 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testGetWrappedClass() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         Assert.assertEquals(PatientVisit.class, visit.getWrappedClass());
     }
 
     @Test
     public void testGetSampleCollection() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
@@ -289,7 +289,7 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(5, labels.size());
 
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         visit.reload();
 
         Assert.assertEquals(0, visit.getPvAttrLabels().length);
@@ -318,7 +318,7 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testEmptyGetPvAttr() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         visit.reload();
         List<String> pvAttr = Arrays.asList(visit.getPvAttrLabels());
         Assert.assertEquals(0, pvAttr.size());
@@ -329,7 +329,7 @@ public class TestPatientVisit extends TestDatabase {
         addPvAttrs();
 
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         visit.reload();
 
         // no values have been set yet, they should return null
@@ -405,7 +405,7 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(5, labels.size());
 
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         visit.reload();
 
         // get types before they are assigned on patient visit
@@ -451,7 +451,7 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(5, labels.size());
 
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         visit.reload();
 
         visit.setPvAttrValue("PMBC Count", "-0.543");
@@ -494,7 +494,7 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals(5, labels.size());
 
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         visit.reload();
 
         // lock an attribute
@@ -522,7 +522,7 @@ public class TestPatientVisit extends TestDatabase {
     public void testGetFormattedDateProcessed() throws Exception {
         Date date = Utils.getRandomDate();
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, date);
+            shipment, date, date);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Assert.assertTrue(sdf.format(date).equals(
@@ -532,14 +532,14 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testGetPatient() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         Assert.assertEquals(patient, visit.getPatient());
     }
 
     @Test
     public void testGetShipment() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
         Assert.assertEquals(shipment, visit.getShipment());
 
         // check for no shipment
@@ -553,7 +553,7 @@ public class TestPatientVisit extends TestDatabase {
     public void testCheckHasShipment() {
         // check valid case
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
 
         // check invalid case
         visit = new PatientVisitWrapper(appService);
@@ -573,13 +573,13 @@ public class TestPatientVisit extends TestDatabase {
     public void testCheckPatientInShipment() throws Exception {
         // check valid case
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
-            shipment, TestCommon.getUniqueDate(r));
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
 
         // check invalid case
         PatientWrapper patient2 = PatientHelper.addPatient(Utils
             .getRandomNumericString(20), study);
         visit = PatientVisitHelper.newPatientVisit(patient2, shipment,
-            TestCommon.getUniqueDate(r));
+            TestCommon.getUniqueDate(r), Utils.getRandomDate());
 
         try {
             visit.persist();
@@ -593,14 +593,15 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testPersist() throws Exception {
         PatientVisitWrapper pv = PatientVisitHelper.newPatientVisit(patient,
-            shipment, DateFormatter.dateFormatter.parse("2009-12-25 00:00"));
+            shipment, DateFormatter.dateFormatter.parse("2009-12-25 00:00"),
+            Utils.getRandomDate());
         pv.persist();
     }
 
     @Test
     public void testAddPvSourceVessels() throws Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         PvSourceVesselWrapper ss1, ss2, ss3;
 
@@ -635,7 +636,7 @@ public class TestPatientVisit extends TestDatabase {
     @Test
     public void testAddNewSample() throws BiobankCheckException, Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
