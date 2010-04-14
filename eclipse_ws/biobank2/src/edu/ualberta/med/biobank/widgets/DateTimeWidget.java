@@ -1,16 +1,20 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
-import org.eclipse.nebula.widgets.cdatetime.CDT;
-import org.eclipse.nebula.widgets.cdatetime.CDateTime;
+import org.eclipse.nebula.widgets.datechooser.DateChooserCombo;
+import org.eclipse.nebula.widgets.formattedtext.DateFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DateTime;
 
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+//import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
  * Wrapper around Nebula's CDateTime widget.
@@ -25,7 +29,9 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
  */
 public class DateTimeWidget extends BiobankWidget {
 
-    CDateTime cdt;
+    private DateChooserCombo dateEntry;
+
+    private DateTime timeEntry;
 
     /**
      * Allow date to be null.
@@ -33,7 +39,7 @@ public class DateTimeWidget extends BiobankWidget {
     public DateTimeWidget(Composite parent, int style, Date date) {
         super(parent, style);
 
-        GridLayout layout = new GridLayout(1, false);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
@@ -41,33 +47,50 @@ public class DateTimeWidget extends BiobankWidget {
 
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        cdt = new CDateTime(this, CDT.BORDER | CDT.COMPACT | CDT.DROP_DOWN
-            | CDT.DATE_LONG | CDT.TIME_MEDIUM);
-        cdt.setPattern(DateFormatter.DATE_TIME_FORMAT);
-        cdt.setSelection(date);
-        cdt.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        dateEntry = new DateChooserCombo(this, SWT.BORDER);
+        timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
+
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        dateEntry.setFormatter(new DateFormatter("yyyy-MM-dd"));
+        dateEntry.setValue(date);
+        timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
+            .get(Calendar.SECOND));
+
+        Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        GridData gd = new GridData();
+        gd.widthHint = size.x + 10;
+        dateEntry.setLayoutData(gd);
     }
 
     public void addSelectionListener(SelectionListener listener) {
-        cdt.addSelectionListener(listener);
+        dateEntry.addSelectionListener(listener);
+        timeEntry.addSelectionListener(listener);
     }
 
     public String getText() {
-        String text = cdt.getText();
-        if (text.equals("<choose date>"))
-            return null;
-        return text;
+        return null;
     }
 
     public Date getDate() {
-        String text = cdt.getText();
-        if (text.equals("<choose date>"))
-            return null;
-
-        return DateFormatter.parseToDateTime(cdt.getText());
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(dateEntry.getValue());
+        cal.set(Calendar.HOUR, timeEntry.getHours());
+        cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+        return cal.getTime();
     }
 
     public void setDate(Date date) {
-        cdt.setSelection(date);
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.AM_PM, 0);
+        dateEntry.setValue(cal.getTime());
+
+        cal.setTime(date);
+        timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
+            .get(Calendar.SECOND));
     }
 }
