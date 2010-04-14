@@ -24,6 +24,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static final String ACTIVE_STATUS_STRING = "Active";
 
+    public static final String CLOSED_STATUS_STRING = "Closed";
+
     public ActivityStatusWrapper(WritableApplicationService appService,
         ActivityStatus wrappedObject) {
         super(appService, wrappedObject);
