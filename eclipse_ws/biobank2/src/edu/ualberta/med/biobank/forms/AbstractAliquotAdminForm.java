@@ -105,7 +105,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     public abstract BiobankLogger getErrorLogger();
 
     public void setPrinted(boolean b) {
-        this.printed = true;
+        this.printed = b;
     }
 
 }
