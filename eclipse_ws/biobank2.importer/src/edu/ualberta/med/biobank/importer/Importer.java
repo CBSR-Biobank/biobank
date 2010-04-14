@@ -304,7 +304,7 @@ public class Importer {
         checkSourceVessels();
         checkShippingCompanies();
         checkSampleTypes();
-        // checkContainerConfiguration();
+        checkContainerConfiguration();
 
         defaultDateShipped = getDateFromStr("1900-01-01");
 
@@ -1150,7 +1150,7 @@ public class Importer {
                 freezersMap.put(2, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
                 freezersMap.put(3, container);
-            } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
+            } else if (label.equals("05") && typeNameShort.equals("F4x17")) {
                 freezersMap.put(5, container);
             } else if (label.equals("SS") && typeNameShort.equals("F4x6")) {
                 freezersMap.put(99, container);

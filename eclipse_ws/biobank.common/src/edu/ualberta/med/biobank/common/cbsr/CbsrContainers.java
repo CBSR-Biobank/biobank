@@ -98,7 +98,7 @@ public class CbsrContainers {
     private static void createFreezer05(SiteWrapper site) throws Exception {
         ContainerWrapper hotel;
         ContainerWrapper freezer05 = addTopLevelContainer(site, "05",
-            CbsrContainerTypes.getContainerType("Freezer 6x12"));
+            CbsrContainerTypes.getContainerType("Freezer 4x17"));
         ContainerTypeWrapper h13Type = CbsrContainerTypes
             .getContainerType("Hotel 13");
         ContainerTypeWrapper h19Type = CbsrContainerTypes
@@ -145,9 +145,10 @@ public class CbsrContainers {
 
         RowColPos pos = new RowColPos();
         int count = 0;
+        int maxRows = freezer05.getRowCapacity();
         for (ContainerTypeWrapper hotelType : hotelTypes) {
-            pos.row = count % 6;
-            pos.col = count / 6;
+            pos.row = count % maxRows;
+            pos.col = count / maxRows;
             if (hotelType != null) {
                 hotel = addContainer(site, hotelType, freezer05, pos.row,
                     pos.col);
