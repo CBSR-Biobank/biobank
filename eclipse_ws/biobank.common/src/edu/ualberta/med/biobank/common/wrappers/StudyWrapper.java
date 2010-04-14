@@ -637,13 +637,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return clinicWrappers;
     }
 
-    public boolean hasClinic(String clinicName) throws Exception {
+    public boolean hasClinic(String clinicNameShort) throws Exception {
         HQLCriteria criteria = new HQLCriteria(
             "select count(*) from "
                 + Study.class.getName()
                 + " as study join study.contactCollection as contacts"
-                + " join contacts.clinic as clinics where study = ? and clinics.name = ?",
-            Arrays.asList(new Object[] { getWrappedObject(), clinicName }));
+                + " join contacts.clinic as clinics where study = ? and clinics.nameShort = ?",
+            Arrays.asList(new Object[] { getWrappedObject(), clinicNameShort }));
         List<Long> result = appService.query(criteria);
         return (result.get(0) > 0);
     }

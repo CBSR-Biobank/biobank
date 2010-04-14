@@ -98,6 +98,7 @@ public class Importer {
         aMap.put("CEGIIR", "CEGIIR");
         aMap.put("CHILD", "CHILD");
         aMap.put("ERCIN", "ERCIN");
+        aMap.put("FIDS", "FIDS");
         aMap.put("HEART", "HEART");
         aMap.put("KDCS", "KDCS");
         aMap.put("KMS", "KMS");
@@ -112,6 +113,7 @@ public class Importer {
         aMap.put("C", "CCCS");
         aMap.put("D", "HEART");
         aMap.put("E", "ERCIN");
+        aMap.put("F", "FIDS");
         aMap.put("G", "CEGIIR");
         aMap.put("H", "AHFEM");
         aMap.put("K", "KMS");
@@ -126,29 +128,67 @@ public class Importer {
         newStudyShortNameMap = Collections.unmodifiableMap(aMap);
     };
 
+    private static final Map<String, String> newClinicShortNameMap;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("CL1", "CL1-Foothills");
+        aMap.put("CL2", "CL2-Children Hosp");
+        aMap.put("ED1", "ED1-UofA");
+        aMap.put("FM1", "FM1-King");
+        aMap.put("GP1", "GP1-QE Hosp");
+        aMap.put("HL1", "HL1-QE II");
+        aMap.put("HL2", "HL2-IWK");
+        aMap.put("HM1", "HM1-McMaster");
+        aMap.put("KN1", "KN1-Cancer Ctr");
+        aMap.put("LM1", "LM1-Lloyd Hosp");
+        aMap.put("LN1", "LN1-St Joseph");
+        aMap.put("MC1", "MC1-Moncton Hosp");
+        aMap.put("MN1", "MN1-Ste-Justine");
+        aMap.put("MN2", "MN2-Children Hosp");
+        aMap.put("OL1", "OL1-Hingst");
+        aMap.put("OT1", "OT1-Ottawa Hosp");
+        aMap.put("OT2", "OT2-Children Hosp");
+        aMap.put("QB1", "QB1-Enfant-Jesus");
+        aMap.put("RD1", "RD1-Red Deer Hosp");
+        aMap.put("SB1", "SB1-St John NB Hosp");
+        aMap.put("SD1", "SD1-Sudbury Hosp");
+        aMap.put("SF1", "SF1-Health NFLD");
+        aMap.put("SP1", "SP1-St Therese Hosp");
+        aMap.put("SS1", "SS1-Royal Hosp");
+        aMap.put("TH1", "TH1-Regional Hosp");
+        aMap.put("TR1", "TR1-St Mikes");
+        aMap.put("VN1", "VN1-St Paul");
+        aMap.put("VN2", "VN2-Childrens Hosp");
+        aMap.put("WL1", "WL1-Westlock Hosp");
+        aMap.put("WN1", "WN1-Cancer Care");
+
+        newClinicShortNameMap = Collections.unmodifiableMap(aMap);
+    };
+
     private static final Map<String, String> patientNrToClinicMap;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
-        aMap.put("AA", "ED1");
-        aMap.put("AB", "CL1-KDCS");
-        aMap.put("AC", "VN1");
-        aMap.put("CC", "ED1");
-        aMap.put("DA", "ED1");
-        aMap.put("ER", "SF1");
-        aMap.put("EA", "ED1");
-        aMap.put("GR", "ED1");
-        aMap.put("HA", "ED1");
-        aMap.put("KN", "KN1");
-        aMap.put("LC", "ED1");
-        aMap.put("MP", "ED1");
-        aMap.put("NH", "ED1");
-        aMap.put("PA", "ED1");
-        aMap.put("RV", "ED1");
-        aMap.put("SA", "ED1");
-        aMap.put("VA", "ED1");
-        aMap.put("ZA", "ED1");
-        aMap.put("ZB", "CL1-KDCS");
-        aMap.put("ZC", "VN1");
+        aMap.put("AA", "ED1-UofA");
+        aMap.put("AB", "CL1-Sunridge");
+        aMap.put("AC", "VN1-St Paul");
+        aMap.put("CC", "ED1-UofA");
+        aMap.put("DA", "ED1-UofA");
+        aMap.put("ER", "SF1-Health NFLD");
+        aMap.put("EA", "ED1-UofA");
+        aMap.put("FA", "ED1-UofA");
+        aMap.put("GR", "ED1-UofA");
+        aMap.put("HA", "ED1-UofA");
+        aMap.put("KN", "KN1-Cancer Ctr");
+        aMap.put("LC", "ED1-UofA");
+        aMap.put("MP", "ED1-UofA");
+        aMap.put("NH", "ED1-UofA");
+        aMap.put("PA", "ED1-UofA");
+        aMap.put("RV", "ED1-UofA");
+        aMap.put("SA", "ED1-UofA");
+        aMap.put("VA", "ED1-UofA");
+        aMap.put("ZA", "ED1-UofA");
+        aMap.put("ZB", "CL1-Sunridge");
+        aMap.put("ZC", "VN1-St Paul");
 
         patientNrToClinicMap = Collections.unmodifiableMap(aMap);
     };
@@ -323,7 +363,7 @@ public class Importer {
     private static void initClinicsMap() {
         clinicsMap = new HashMap<String, ClinicWrapper>();
         for (ClinicWrapper clinic : cbsrSite.getClinicCollection()) {
-            clinicsMap.put(clinic.getName(), clinic);
+            clinicsMap.put(clinic.getNameShort(), clinic);
         }
     }
 
@@ -625,19 +665,31 @@ public class Importer {
         return studyNameShort;
     }
 
-    private static String getClinicName(String patientNr,
+    private static ClinicWrapper getClinic(String patientNr,
         String defaultClinicName) throws Exception {
         String clinicName;
         if (patientNr.length() == 6) {
             if (patientNr.substring(0, 2).equals("CE")) {
-                clinicName = "ED1";
+                clinicName = "ED1-UofA";
             } else {
                 clinicName = getClinicNameFromPatientNr(patientNr);
             }
+
+            if (clinicName == null) {
+                logger.error("no clinic for patient " + patientNr);
+                return null;
+            }
         } else {
-            clinicName = defaultClinicName;
+            clinicName = newClinicShortNameMap.get(defaultClinicName
+                .toUpperCase());
         }
-        return clinicName;
+
+        ClinicWrapper clinic = clinicsMap.get(clinicName);
+        if (clinic == null) {
+            logger.error("no clinic \"" + clinicName + "\" ("
+                + defaultClinicName + ") for patient " + patientNr);
+        }
+        return clinic;
     }
 
     private static void importPatients() throws Exception {
@@ -717,7 +769,6 @@ public class Importer {
     private static void importShipments() throws Exception {
         String studyNameShort;
         StudyWrapper study;
-        String clinicName;
         ClinicWrapper clinic;
         PatientWrapper patient;
         String dateReceivedStr;
@@ -756,8 +807,7 @@ public class Importer {
         while (rs.next()) {
             String patientNr = cipher.decode(rs.getBytes(1));
             studyNameShort = getStudyNameShort(patientNr, rs.getString(2));
-            clinicName = getClinicName(patientNr, rs.getString(3))
-                .toUpperCase();
+            clinic = getClinic(patientNr, rs.getString(3));
 
             if (studyNameShort == null) {
                 logger.error("no study for patient " + patientNr);
@@ -765,24 +815,14 @@ public class Importer {
                 continue;
             }
 
-            if (clinicName == null) {
-                logger.error("no clinic for patient " + patientNr);
-                ++count;
-                continue;
-            }
-
             study = getStudyFromOldShortName(studyNameShort);
-            clinicName = clinicName.toUpperCase();
-            clinic = clinicsMap.get(clinicName);
             if (clinic == null) {
-                logger.error("no clinic \"" + clinicName + "\" for patient "
-                    + patientNr);
                 ++count;
                 continue;
             }
 
             // make sure the clinic and study are linked via a contact
-            if (!study.hasClinic(clinicName)) {
+            if (!study.hasClinic(clinic.getNameShort())) {
                 logger.error("study " + study.getNameShort() + " for patient "
                     + patientNr + " is not linked to clinic "
                     + clinic.getName() + " via a contact");
@@ -813,8 +853,8 @@ public class Importer {
 
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
-                shipment.setWaybill(String.format("W-CBSR-%s-%s", clinicName,
-                    getWaybillDate(dateReceived)));
+                shipment.setWaybill(String.format("W-CBSR-%s-%s", clinic
+                    .getNameShort(), getWaybillDate(dateReceived)));
                 shipment.setDateReceived(dateReceived);
                 shipment.setDateShipped(defaultDateShipped);
                 shipment.addPatients(Arrays.asList(patient));
@@ -856,7 +896,6 @@ public class Importer {
 
         String studyNameShort;
         StudyWrapper study;
-        String clinicName;
         ClinicWrapper clinic;
         String dateProcessedStr;
         Date dateProcessed;
@@ -889,8 +928,7 @@ public class Importer {
         while (rs.next()) {
             String patientNr = rs.getString(22);
             studyNameShort = getStudyNameShort(patientNr, rs.getString(21));
-            clinicName = getClinicName(patientNr, rs.getString(3))
-                .toUpperCase();
+            clinic = getClinic(patientNr, rs.getString(3));
 
             if (studyNameShort == null) {
                 logger.error("no study for patient " + patientNr);
@@ -898,18 +936,9 @@ public class Importer {
                 continue;
             }
 
-            if (clinicName == null) {
-                logger.error("no for patient " + patientNr);
-                ++count;
-                continue;
-            }
-
             study = getStudyFromOldShortName(studyNameShort);
-            clinic = clinicsMap.get(clinicName);
 
             if (clinic == null) {
-                logger.error("no clinic \"" + clinicName + "\" for patient "
-                    + patientNr);
                 ++count;
                 continue;
             }
@@ -932,7 +961,7 @@ public class Importer {
             if (shipment == null) {
                 logger.error("found 0 shipments for patientNo/" + patientNr
                     + " studyName/" + study.getNameShort() + " clinicName/"
-                    + clinicName + " dateReceived/"
+                    + clinic.getNameShort() + " dateReceived/"
                     + DateFormatter.formatAsDateTime(dateProcessed));
                 ++count;
                 continue;
@@ -1125,7 +1154,7 @@ public class Importer {
                 freezersMap.put(2, container);
             } else if (label.equals("03") && typeNameShort.equals("F5x9")) {
                 freezersMap.put(3, container);
-            } else if (label.equals("05") && typeNameShort.equals("F6x12")) {
+            } else if (label.equals("05") && typeNameShort.equals("F4x17")) {
                 freezersMap.put(5, container);
             } else if (label.equals("SS") && typeNameShort.equals("F4x6")) {
                 freezersMap.put(99, container);
