@@ -45,7 +45,6 @@ public class ContactAddDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-
         if (contactWrapper.getName() == null) {
             setTitle("Add Contact");
             setMessage("Add a contact person to this clinic");
