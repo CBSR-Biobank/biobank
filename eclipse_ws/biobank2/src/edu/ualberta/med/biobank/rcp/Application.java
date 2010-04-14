@@ -34,6 +34,7 @@ public class Application implements IApplication {
                 return FileLocator.resolve(url);
             }
         });
+        ServiceConnection.setTrustStore();
 
         boolean trace = "true".equalsIgnoreCase(Platform
             .getDebugOption(PlatformUI.PLUGIN_ID + "/trace/graphics"));

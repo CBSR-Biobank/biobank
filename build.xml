@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="biobank2" basedir="." default="deploy">
+
   <!--
      Overall build file
      use command "ant -projecthelp" to display the targets.
@@ -51,6 +52,24 @@
   <condition property="debugMode" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
+  <condition property="isHostAicmlMed">
+    <equals arg1="${host.name}" arg2="aicml-med"
+            casesensitive="true" trim="true" />
+  </condition>
+  <condition property="isHostCbsr">
+    <equals arg1="${host.name}" arg2="cbsr.biochem.ualberta.ca"
+            casesensitive="true" trim="true" />
+  </condition>
+  <condition property="isHostLocal">
+    <and>
+      <isfalse value="${isHostAicmlMed}" />
+      <isfalse value="${isHostCbsr}" />
+    </and>
+  </condition>
+  <condition property="isCaCoreFolderExists">
+    <available file="${cacore.sdk.dir}" type="dir"/>
+  </condition>
+
   <!--
      files included in the sdk build.xml - necessary to be sure that we have
      all the keys for the target we redefined
@@ -108,22 +127,8 @@
               trim="true" />
     </or>
   </condition>
-  <condition property="isHostAicmlMed">
-    <equals arg1="${host.name}" arg2="aicml-med"
-            casesensitive="true" trim="true" />
-  </condition>
-  <condition property="isHostCbsr">
-    <equals arg1="${host.name}" arg2="cbsr.biochem.ualberta.ca"
-            casesensitive="true" trim="true" />
-  </condition>
-  <condition property="isHostLocal">
-    <and>
-      <isfalse value="${isHostAicmlMed}" />
-      <isfalse value="${isHostCbsr}" />
-    </and>
-  </condition>
-
   <!-- end of copied part -->
+
   <target name="check-jars-available">
     <available file="${req.jars.dir}" type="dir" property="jars.available" />
   </target>
@@ -443,12 +448,17 @@
     <delete dir="${req.jars.dir}" />
   </target>
 
+
   <target name="clean"
-          depends="tests-clean,clean-jars"
+          depends="tests-clean,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
-    <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
     <ant target="clean-jars" />
   </target>
+
+  <target name="clean-caCore" if="isCaCoreFolderExists">
+    <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
+  </target>
+    
 
   <!-- JUnit -->
 

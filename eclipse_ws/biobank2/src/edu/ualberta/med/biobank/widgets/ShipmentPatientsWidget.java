@@ -209,7 +209,12 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                         + patient.getPnumber() + "\" for this shipment ?")) {
                     return;
                 }
-
+                try {
+                    shipment.checkCanRemovePatient(patient);
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Cannot remove patient", e);
+                    return;
+                }
                 shipment.removePatients(Arrays.asList(patient));
                 updateList();
                 notifyListeners();
