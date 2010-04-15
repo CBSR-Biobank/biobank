@@ -467,7 +467,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Shipment.class.getName()
-                + " where clinic.site.id = ? and dateReceived > ? and dateReceived < ?",
+                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<Shipment> res = appService.query(criteria);
         List<ShipmentWrapper> ships = new ArrayList<ShipmentWrapper>();

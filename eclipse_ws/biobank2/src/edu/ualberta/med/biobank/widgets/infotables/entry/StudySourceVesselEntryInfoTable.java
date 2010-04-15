@@ -30,7 +30,7 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SampleStorageEntryInfoTable.class.getName());
 
-    private List<SourceVesselWrapper> allSourceVessels;
+    private List<SourceVesselWrapper> availableSourceVessels;
 
     private List<StudySourceVesselWrapper> selectedStudySourceVessels;
 
@@ -58,8 +58,8 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
      */
     public StudySourceVesselEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
-        initAllSourceVessels();
         this.study = study;
+        initSourceVessels();
         selectedStudySourceVessels = study.getStudySourceVesselCollection();
         if (selectedStudySourceVessels == null) {
             selectedStudySourceVessels = new ArrayList<StudySourceVesselWrapper>();
@@ -83,20 +83,24 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
         StudySourceVesselWrapper newStudySourcevessel = new StudySourceVesselWrapper(
             SessionManager.getAppService());
         newStudySourcevessel.setStudy(study);
-        addOrEditStudySourceVessel(true, newStudySourcevessel, allSourceVessels);
+        addOrEditStudySourceVessel(true, newStudySourcevessel);
     }
 
     private void addOrEditStudySourceVessel(boolean add,
-        StudySourceVesselWrapper studySourceVessel,
-        List<SourceVesselWrapper> availSourceVessels) {
+        StudySourceVesselWrapper studySourceVessel) {
+        List<SourceVesselWrapper> dialogSourceVessels = availableSourceVessels;
+        if (!add) {
+            dialogSourceVessels.add(studySourceVessel.getSourceVessel());
+        }
         StudySourceVesselDialog dlg = new StudySourceVesselDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            studySourceVessel, availSourceVessels);
+            studySourceVessel, dialogSourceVessels);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
                 selectedStudySourceVessels.add(studySourceVessel);
             }
+            availableSourceVessels.remove(studySourceVessel.getSourceVessel());
             reloadCollection(selectedStudySourceVessels);
             addedOrModifiedSourceVessels.add(studySourceVessel);
             notifyListeners();
@@ -114,8 +118,7 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
             @Override
             public void editItem(InfoTableEvent event) {
                 StudySourceVesselWrapper studySourceVessel = getSelection();
-                addOrEditStudySourceVessel(false, studySourceVessel,
-                    allSourceVessels);
+                addOrEditStudySourceVessel(false, studySourceVessel);
             }
         });
 
@@ -134,15 +137,23 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
                 selectedStudySourceVessels.remove(studySourceVessel);
                 setCollection(selectedStudySourceVessels);
                 deletedSourceVessels.add(studySourceVessel);
+                availableSourceVessels.add(studySourceVessel.getSourceVessel());
                 notifyListeners();
             }
         });
     }
 
-    private void initAllSourceVessels() {
+    private void initSourceVessels() {
         try {
-            allSourceVessels = SourceVesselWrapper
+            availableSourceVessels = SourceVesselWrapper
                 .getAllSourceVessels(SessionManager.getAppService());
+            List<StudySourceVesselWrapper> studySourceVessels = study
+                .getStudySourceVesselCollection();
+            if (studySourceVessels != null) {
+                for (StudySourceVesselWrapper ssv : studySourceVessels) {
+                    availableSourceVessels.remove(ssv.getSourceVessel());
+                }
+            }
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {

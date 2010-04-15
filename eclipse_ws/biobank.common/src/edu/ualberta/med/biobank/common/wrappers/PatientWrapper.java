@@ -302,7 +302,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             "select p from "
                 + Patient.class.getName()
                 + " as p join p.shipmentCollection as ships"
-                + " where p.study.site.id = ? and ships.dateReceived > ? and ships.dateReceived < ?",
+                + " where p.study.site.id = ? and ships.dateReceived >= ? and ships.dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<Patient> res = appService.query(criteria);
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();

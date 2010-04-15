@@ -8,6 +8,7 @@ import org.eclipse.nebula.widgets.datechooser.DateChooserCombo;
 import org.eclipse.nebula.widgets.formattedtext.DateFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -32,6 +33,10 @@ public class DateTimeWidget extends BiobankWidget {
     private DateChooserCombo dateEntry;
 
     private DateTime timeEntry;
+
+    private Color oldDateEntryBackgroundColor;
+
+    private Color oldTimeEntryBackgroundColor;
 
     public DateTimeWidget(Composite parent, int style, Date date) {
         this(parent, style, date, true);
@@ -82,7 +87,10 @@ public class DateTimeWidget extends BiobankWidget {
     public Date getDate() {
         Calendar cal = new GregorianCalendar();
         if (dateEntry != null) {
-            cal.setTime(dateEntry.getValue());
+            Date value = dateEntry.getValue();
+            if (value != null) {
+                cal.setTime(dateEntry.getValue());
+            }
         }
         cal.set(Calendar.HOUR, timeEntry.getHours());
         cal.set(Calendar.MINUTE, timeEntry.getMinutes());
@@ -95,14 +103,16 @@ public class DateTimeWidget extends BiobankWidget {
 
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
+
+        timeEntry.setTime(cal.get(Calendar.HOUR_OF_DAY), cal
+            .get(Calendar.MINUTE), cal.get(Calendar.SECOND));
+
         cal.set(Calendar.HOUR, 0);
         cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.AM_PM, 0);
+        cal.set(Calendar.AM_PM, Calendar.AM);
         if (dateEntry != null) {
             dateEntry.setValue(cal.getTime());
         }
-        timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
-            .get(Calendar.SECOND));
     }
 
     public void addSelectionListener(SelectionListener listener) {
@@ -118,4 +128,5 @@ public class DateTimeWidget extends BiobankWidget {
         }
         timeEntry.removeSelectionListener(listener);
     }
+
 }

@@ -67,7 +67,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankEntryForm.class.getName());
 
-    private static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
+    public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
         .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     protected String sessionName;

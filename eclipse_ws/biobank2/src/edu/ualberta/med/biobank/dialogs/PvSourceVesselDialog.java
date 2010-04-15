@@ -38,8 +38,6 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private Control volumeText;
 
-    private Composite optionalFieldsComposite;
-
     public PvSourceVesselDialog(Shell parent,
         PvSourceVesselWrapper pvSourceVessel,
         List<StudySourceVesselWrapper> studySourceVessels) {
@@ -116,19 +114,13 @@ public class PvSourceVesselDialog extends BiobankDialog {
                 pvSourceVessel, "quantity"), new IntegerNumberValidator(
                 "quantity should be a whole number", false));
 
-        optionalFieldsComposite = new Composite(parent, SWT.NONE);
-        optionalFieldsComposite.setLayout(new GridLayout(2, false));
-        optionalFieldsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-            true, true));
+        timeDrawnWidget = widgetCreator.createDateTimeWidget(contents,
+            "Time drawn", pvSourceVessel.getTimeDrawn(), BeansObservables
+                .observeValue(pvSourceVessel, "timeDrawn"), null, false);
 
-        timeDrawnWidget = widgetCreator.createDateTimeWidget(
-            optionalFieldsComposite, "Time drawn", pvSourceVessel
-                .getTimeDrawn(), BeansObservables.observeValue(pvSourceVessel,
-                "timeDrawn"), null, false);
-
-        volumeText = createBoundWidgetWithLabel(optionalFieldsComposite,
-            Text.class, SWT.BORDER, "Volume", new String[0], BeansObservables
-                .observeValue(pvSourceVessel, "volume"), null);
+        volumeText = createBoundWidgetWithLabel(contents, Text.class,
+            SWT.BORDER, "Volume", new String[0], BeansObservables.observeValue(
+                pvSourceVessel, "volume"), null);
 
         updateWidgetVisibility();
     }
@@ -139,15 +131,10 @@ public class PvSourceVesselDialog extends BiobankDialog {
             ssv = mapStudySourceVessel.get(pvSourceVessel.getSourceVessel()
                 .getName());
         }
-        if (ssv == null) {
-            optionalFieldsComposite.setVisible(false);
-        } else {
-            boolean needTimeDrawn = Boolean.TRUE.equals(ssv.getNeedTimeDrawn());
-            boolean needVolume = Boolean.TRUE.equals(ssv.getNeedRealVolume());
-            optionalFieldsComposite.setVisible(needTimeDrawn || needVolume);
-            timeDrawnWidget.setEnabled(ssv != null && needTimeDrawn);
-            volumeText.setEnabled(ssv != null && needVolume);
-        }
+        timeDrawnWidget.setEnabled(ssv != null
+            && Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));
+        volumeText.setEnabled(ssv != null
+            && Boolean.TRUE.equals(ssv.getNeedRealVolume()));
     }
 
     public PvSourceVesselWrapper getPvSourceVessel() {
