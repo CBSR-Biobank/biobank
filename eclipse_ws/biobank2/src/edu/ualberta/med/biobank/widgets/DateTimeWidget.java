@@ -8,7 +8,6 @@ import org.eclipse.nebula.widgets.datechooser.DateChooserCombo;
 import org.eclipse.nebula.widgets.formattedtext.DateFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,10 +32,6 @@ public class DateTimeWidget extends BiobankWidget {
     private DateChooserCombo dateEntry;
 
     private DateTime timeEntry;
-
-    private Color oldDateEntryBackgroundColor;
-
-    private Color oldTimeEntryBackgroundColor;
 
     public DateTimeWidget(Composite parent, int style, Date date) {
         this(parent, style, date, true);
