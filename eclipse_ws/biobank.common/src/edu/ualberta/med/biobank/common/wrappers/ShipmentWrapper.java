@@ -484,11 +484,13 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         cal.set(Calendar.HOUR, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         Date startDate = cal.getTime();
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
         Date dateReveived = getDateReceived();
-        return dateReveived.after(startDate) && dateReveived.before(endDate);
+        return dateReveived.compareTo(startDate) >= 0
+            && dateReveived.compareTo(endDate) <= 0;
     }
 }

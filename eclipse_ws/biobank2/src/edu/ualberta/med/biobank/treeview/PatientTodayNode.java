@@ -4,20 +4,14 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientTodayNode extends AbstractTodayNode {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(PatientTodayNode.class.getName());
 
     public PatientTodayNode(AdapterBase parent, int id) {
         super(parent, id);
@@ -42,22 +36,10 @@ public class PatientTodayNode extends AbstractTodayNode {
     }
 
     @Override
-    public void performExpand() {
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            try {
-                List<PatientWrapper> todayPatients = PatientWrapper
-                    .getPatientsInTodayShipments(
-                        SessionManager.getAppService(), SessionManager
-                            .getInstance().getCurrentSite());
-                for (PatientWrapper patient : todayPatients) {
-                    PatientAdministrationView.getCurrent().addToNode(this,
-                        patient);
-                }
-            } catch (final RemoteAccessException exp) {
-                BioBankPlugin.openRemoteAccessErrorMessage();
-            } catch (Exception e) {
-                logger.error("Error while getting today's patients", e);
-            }
-        }
+    protected List<? extends ModelWrapper<?>> getTodayElements()
+        throws ApplicationException {
+        return PatientWrapper.getPatientsInTodayShipments(SessionManager
+            .getAppService(), SessionManager.getInstance().getCurrentSite());
     }
+
 }
