@@ -103,15 +103,6 @@ public class LinkFormPatientManagement {
                     + pv.getShipment().getWaybill();
             }
         });
-        // viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
-        // @Override
-        // public void keyReleased(KeyEvent e) {
-        // if (e.keyCode == 13) {
-        // // focusOnPlateToScanText();
-        // e.doit = false;
-        // }
-        // }
-        // });
         viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -199,7 +190,7 @@ public class LinkFormPatientManagement {
     }
 
     public void onClose() {
-        if (!aliquotAdminForm.finished) {
+        if (aliquotAdminForm.finished) {
             visitsListCheckValue.setValue(true);
         }
     }

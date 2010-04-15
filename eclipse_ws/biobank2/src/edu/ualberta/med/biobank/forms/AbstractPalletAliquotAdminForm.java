@@ -62,7 +62,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     @Override
     public boolean onClose() {
-        if (!finished || BioBankPlugin.getPlatesEnabledCount() != 1) {
+        if (finished || BioBankPlugin.getPlatesEnabledCount() != 1) {
             plateToScanValue.setValue("");
         }
         return super.onClose();
