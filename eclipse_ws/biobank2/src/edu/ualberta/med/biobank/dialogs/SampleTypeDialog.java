@@ -41,14 +41,14 @@ public class SampleTypeDialog extends BiobankDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText(((origSampleType.getId() == null) ? "Add " : "Edit ")
+        shell.setText(((origSampleType.getName() == null) ? "Add " : "Edit ")
             + TITLE);
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        if (origSampleType.isNew()) {
+        if (origSampleType.getName() == null) {
             setTitle("Add Sample Type");
         } else {
             setTitle("Edit Sample Type");

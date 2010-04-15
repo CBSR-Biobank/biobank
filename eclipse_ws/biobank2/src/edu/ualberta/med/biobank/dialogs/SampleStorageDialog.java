@@ -61,8 +61,8 @@ public class SampleStorageDialog extends BiobankDialog {
         super.configureShell(shell);
         String title = new String();
 
-        if (origSampleStorage.isNew()) {
-            title = "Add";
+        if (origSampleStorage.getSampleType() == null) {
+            title = "Add ";
         } else {
             title = "Edit ";
         }
@@ -75,12 +75,10 @@ public class SampleStorageDialog extends BiobankDialog {
         Control contents = super.createContents(parent);
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_COMPUTER_KEY));
-        if (origSampleStorage.isNew()) {
-            setTitle("Add Aliquot Storage");
-            setMessage("Add sample storage to this study");
+        if (origSampleStorage.getSampleType() == null) {
+            setTitle("New Sample Storage");
         } else {
-            setTitle("Edit Aliquot Storage");
-            setMessage("Edit sample storage for this study");
+            setTitle("Edit Sample Storage");
         }
         return contents;
     }

@@ -538,7 +538,7 @@ public abstract class AdapterBase {
         closeEditor(input);
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().openEditor(input, id, true);
+                .getActivePage().openEditor(input, id, false);
         } catch (PartInitException e) {
             logger.error("Can't open form with id " + id, e);
             return null;

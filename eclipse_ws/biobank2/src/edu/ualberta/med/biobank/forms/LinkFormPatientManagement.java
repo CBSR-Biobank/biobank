@@ -199,7 +199,7 @@ public class LinkFormPatientManagement {
     }
 
     public void onClose() {
-        if (!aliquotAdminForm.isSaved) {
+        if (!aliquotAdminForm.finished) {
             visitsListCheckValue.setValue(true);
         }
     }

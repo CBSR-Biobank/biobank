@@ -33,7 +33,7 @@ public class ContactAddDialog extends BiobankDialog {
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
         String title = new String();
-        if (contactWrapper.isNew()) {
+        if (contactWrapper.getName() == null) {
             title = "Add";
         } else {
             title = "Edit ";
@@ -45,8 +45,7 @@ public class ContactAddDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-
-        if (contactWrapper.isNew()) {
+        if (contactWrapper.getName() == null) {
             setTitle("Add Contact");
             setMessage("Add a contact person to this clinic");
         } else {

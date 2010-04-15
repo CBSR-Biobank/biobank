@@ -678,7 +678,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             appendLog(sb.toString());
             appendLogNLS("ScanAssign.activitylog.save.summary", totalNb, //$NON-NLS-1$
                 currentPalletWrapper.getLabel());
-            setSaved(true);
+            setFinished(false);
         }
     }
 
