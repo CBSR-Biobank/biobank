@@ -23,6 +23,9 @@ public class PatientAdapter extends AdapterBase {
 
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
         super(parent, patientWrapper);
+        if (patientWrapper != null) {
+            setHasChildren(patientWrapper.getPatientVisitCollection().size() > 0);
+        }
     }
 
     public PatientWrapper getWrapper() {

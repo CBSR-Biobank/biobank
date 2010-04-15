@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.ShipmentAdministrationView.ShipmentListener;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -55,6 +56,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ShipmentPatientsWidget shipmentPatientsWidget;
 
+    private ShipmentListener shipListener;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -76,7 +79,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             tabName = "Shipment " + shipmentWrapper.getWaybill();
         }
         setPartName(tabName);
+        shipListener = new ShipmentListener(shipmentAdapter);
+        shipmentWrapper.addWrapperListener(shipListener);
     }
+
+    // @Override
+    // public void dispose() {
+    // shipmentWrapper.removeWrapperListener(shipListener);
+    // super.dispose();
+    // }
 
     @Override
     protected void createFormContent() throws Exception {
