@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,6 +164,15 @@ public class CbsrSite {
         for (PatientVisitWrapper visit : visits) {
             patientVisitDeleteSubObjects(visit);
         }
+        for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+            ship.removePatients(Arrays.asList(patient));
+            if (ship.getPatientCollection().size() == 0) {
+                ship.delete();
+            } else {
+                ship.persist();
+            }
+        }
+        patient.reload();
         patient.reload();
         patient.delete();
     }
