@@ -111,4 +111,11 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         this.printed = b;
     }
 
+    @Override
+    protected void addToolbarButtons() {
+        addResetAction();
+        addConfirmAction();
+        form.updateToolBar();
+    }
+
 }

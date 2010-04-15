@@ -323,7 +323,44 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         separator.setLayoutData(gd);
     }
 
-    private void addToolbarButtons() {
+    protected void addToolbarButtons() {
+        addResetAction();
+        addCancelAction();
+        addConfirmAction();
+        form.updateToolBar();
+    }
+
+    protected void addConfirmAction() {
+        confirmAction = new Action("Confirm") {
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
+                        confirm();
+                    }
+                });
+            }
+        };
+        confirmAction.setImageDescriptor(confirmActionImage);
+        form.getToolBarManager().add(confirmAction);
+    }
+
+    protected void addCancelAction() {
+        Action cancel = new Action("Cancel") {
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
+                        cancel();
+                    }
+                });
+            }
+        };
+        cancel.setImageDescriptor(cancelActionImage);
+        form.getToolBarManager().add(cancel);
+    }
+
+    protected void addResetAction() {
         Action reset = new Action("Reset") {
             @Override
             public void run() {
@@ -340,34 +377,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         };
         reset.setImageDescriptor(resetActionImage);
         form.getToolBarManager().add(reset);
-
-        Action cancel = new Action("Cancel") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        cancel();
-                    }
-                });
-            }
-        };
-        cancel.setImageDescriptor(cancelActionImage);
-        form.getToolBarManager().add(cancel);
-
-        confirmAction = new Action("Confirm") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        confirm();
-                    }
-                });
-            }
-        };
-        confirmAction.setImageDescriptor(confirmActionImage);
-        form.getToolBarManager().add(confirmAction);
-
-        form.updateToolBar();
     }
 
     public void confirm() {
