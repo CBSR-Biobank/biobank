@@ -55,7 +55,7 @@ public class StudySourceVesselDialog extends BiobankDialog {
         super.configureShell(shell);
         String title = new String();
 
-        if (origStudySourceVessel.isNew()) {
+        if (origStudySourceVessel.getSourceVessel() == null) {
             title = "Add";
         } else {
             title = "Edit ";
@@ -69,7 +69,7 @@ public class StudySourceVesselDialog extends BiobankDialog {
         Control contents = super.createContents(parent);
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_COMPUTER_KEY));
-        if (origStudySourceVessel.isNew()) {
+        if (origStudySourceVessel.getSourceVessel() == null) {
             setTitle("Add Study Source Vessel");
             setMessage("Add source vessel to this study");
         } else {
