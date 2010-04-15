@@ -2095,6 +2095,26 @@
             <equals value="true" />
          </with>
       </definition>
+      <definition id="biobank2.plate2Enabled">
+         <with variable="edu.ualberta.med.biobank.sourceprovider.plate2Enabled">
+            <equals value="true" />
+         </with>
+      </definition>
+      <definition id="biobank2.plate3Enabled">
+         <with variable="edu.ualberta.med.biobank.sourceprovider.plate3Enabled">
+            <equals value="true" />
+         </with>
+      </definition>
+      <definition id="biobank2.plate4Enabled">
+         <with variable="edu.ualberta.med.biobank.sourceprovider.plate4Enabled">
+            <equals value="true" />
+         </with>
+      </definition>
+      <definition id="biobank2.plate5Enabled">
+         <with variable="edu.ualberta.med.biobank.sourceprovider.plate5Enabled">
+            <equals value="true" />
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
