@@ -972,12 +972,12 @@ public class Importer {
             pv.setDateProcessed(dateProcessed);
             pv.setPatient(patient);
             pv.setShipment(shipment);
+            pv.setDateDrawn(getDateFromStr(rs.getString(5)));
 
             PvSourceVesselWrapper sourceVessel = new PvSourceVesselWrapper(
                 appService);
             sourceVessel.setSourceVessel(importSourceVessel);
             sourceVessel.setQuantity(0);
-            sourceVessel.setDateDrawn(getDateFromStr(rs.getString(5)));
             sourceVessel.setPatientVisit(pv);
 
             pv.addPvSourceVessels(Arrays.asList(sourceVessel));

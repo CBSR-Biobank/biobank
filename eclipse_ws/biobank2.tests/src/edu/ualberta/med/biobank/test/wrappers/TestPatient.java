@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -183,7 +181,7 @@ public class TestPatient extends TestDatabase {
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (int i = 0; i < count; i++) {
             visits.add(PatientVisitHelper.newPatientVisit(patient, shipment,
-                Utils.getRandomDate()));
+                Utils.getRandomDate(), Utils.getRandomDate()));
         }
         patient.addPatientVisits(visits);
         patient.persist();
@@ -206,6 +204,26 @@ public class TestPatient extends TestDatabase {
 
         // delete aliquot and patient
         aliquot.delete();
+
+        try {
+            patient.delete();
+            Assert.fail("should not be allowed to delete patient with visits");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+        for (PatientVisitWrapper visit : patient.getPatientVisitCollection()) {
+            visit.delete();
+        }
+
+        try {
+            patient.delete();
+            Assert
+                .fail("should not be allowed to delete patient linked to shipments");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+        shipment.delete();
+
         patient.delete();
     }
 
@@ -295,14 +313,14 @@ public class TestPatient extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
 
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         patient.addPatientVisits(Arrays.asList(visit));
         patient.persist();
         patient.reload();
         Assert.assertEquals(1, patient.getPatientVisitCollection().size());
 
         visit = PatientVisitHelper.newPatientVisit(patient, shipment, Utils
-            .getRandomDate());
+            .getRandomDate(), Utils.getRandomDate());
         patient.addPatientVisits(Arrays.asList(visit));
         patient.persist();
         patient.reload();
@@ -369,37 +387,13 @@ public class TestPatient extends TestDatabase {
         Date dateDrawn3 = Utils.getRandomDate();
 
         PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
-            patient1, shipment, dateProcessed1);
+            patient1, shipment, dateProcessed1, dateDrawn1);
         PatientVisitWrapper visit1_1 = PatientVisitHelper.addPatientVisit(
-            patient1, shipment, dateProcessed1);
+            patient1, shipment, dateProcessed1, dateDrawn1_1);
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
-            patient1, shipment, dateProcessed2);
+            patient1, shipment, dateProcessed2, dateDrawn2);
         PatientVisitWrapper visit3 = PatientVisitHelper.addPatientVisit(
-            patient2, shipment, dateProcessed3);
-
-        PvSourceVesselWrapper pvSourceVessel = PvSourceVesselHelper
-            .newPvSourceVessel(Utils.getRandomString(5, 10), visit1);
-        pvSourceVessel.setDateDrawn(dateDrawn1);
-        visit1.addPvSourceVessels(Arrays.asList(pvSourceVessel));
-        visit1.persist();
-
-        pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
-            .getRandomString(5, 10), visit1_1);
-        pvSourceVessel.setDateDrawn(dateDrawn1_1);
-        visit1_1.addPvSourceVessels(Arrays.asList(pvSourceVessel));
-        visit1_1.persist();
-
-        pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
-            .getRandomString(5, 10), visit2);
-        pvSourceVessel.setDateDrawn(dateDrawn2);
-        visit2.addPvSourceVessels(Arrays.asList(pvSourceVessel));
-        visit2.persist();
-
-        pvSourceVessel = PvSourceVesselHelper.newPvSourceVessel(Utils
-            .getRandomString(5, 10), visit3);
-        pvSourceVessel.setDateDrawn(dateDrawn3);
-        visit3.addPvSourceVessels(Arrays.asList(pvSourceVessel));
-        visit3.persist();
+            patient2, shipment, dateProcessed3, dateDrawn3);
 
         patient1.reload();
         patient2.reload();
@@ -456,7 +450,7 @@ public class TestPatient extends TestDatabase {
             List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
             for (int i = 0; i < count; i++) {
                 visits.add(PatientVisitHelper.newPatientVisit(patient,
-                    shipment, Utils.getRandomDate()));
+                    shipment, Utils.getRandomDate(), Utils.getRandomDate()));
             }
             patient.addPatientVisits(visits);
             patient.persist();
@@ -554,13 +548,13 @@ public class TestPatient extends TestDatabase {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -10); // 10 days ago
         PatientVisitHelper.addPatientVisit(patient, shipment, calendar
-            .getTime());
+            .getTime(), Utils.getRandomDate());
         calendar.add(Calendar.DATE, 3); // 7 days ago
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
-            patient, shipment, calendar.getTime());
+            patient, shipment, calendar.getTime(), Utils.getRandomDate());
         calendar.add(Calendar.DATE, 5); // 2 days ago
         PatientVisitWrapper visit3 = PatientVisitHelper.addPatientVisit(
-            patient, shipment, calendar.getTime());
+            patient, shipment, calendar.getTime(), Utils.getRandomDate());
         patient.reload();
 
         List<PatientVisitWrapper> visits = patient.getLast7DaysPatientVisits();

@@ -77,9 +77,17 @@ public class ContactAddDialog extends BiobankDialog {
             new String[0], BeansObservables.observeValue(contactWrapper,
                 "emailAddress"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Phone #",
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Mobile #", new String[0], BeansObservables.observeValue(
+                contactWrapper, "mobileNumber"), null);
+
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Pager #",
             new String[0], BeansObservables.observeValue(contactWrapper,
-                "phoneNumber"), null);
+                "pagerNumber"), null);
+
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Office #", new String[0], BeansObservables.observeValue(
+                contactWrapper, "officeNumber"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
             new String[0], BeansObservables.observeValue(contactWrapper,

@@ -21,9 +21,9 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyPvAttr;
+import edu.ualberta.med.biobank.model.StudySourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -34,7 +34,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
 
-    private Set<SourceVesselWrapper> deletedSourceVessels = new HashSet<SourceVesselWrapper>();
+    private Set<StudySourceVesselWrapper> deletedStudySourceVessels = new HashSet<StudySourceVesselWrapper>();
 
     private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
@@ -360,18 +360,31 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
+    /**
+     * Removes the study source vessel objects that are not contained in the
+     * collection.
+     */
+    private void deleteStudySourceVessels() throws Exception {
+        for (StudySourceVesselWrapper st : deletedStudySourceVessels) {
+            if (!st.isNew()) {
+                st.delete();
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    public List<SourceVesselWrapper> getSourceVesselCollection(boolean sort) {
-        List<SourceVesselWrapper> ssCollection = (List<SourceVesselWrapper>) propertiesMap
-            .get("sourceVesselCollection");
+    public List<StudySourceVesselWrapper> getStudySourceVesselCollection(
+        boolean sort) {
+        List<StudySourceVesselWrapper> ssCollection = (List<StudySourceVesselWrapper>) propertiesMap
+            .get("studySourceVesselCollection");
         if (ssCollection == null) {
-            Collection<SourceVessel> children = wrappedObject
-                .getSourceVesselCollection();
+            Collection<StudySourceVessel> children = wrappedObject
+                .getStudySourceVesselCollection();
             if (children != null) {
-                ssCollection = new ArrayList<SourceVesselWrapper>();
-                for (SourceVessel study : children) {
-                    ssCollection
-                        .add(new SourceVesselWrapper(appService, study));
+                ssCollection = new ArrayList<StudySourceVesselWrapper>();
+                for (StudySourceVessel study : children) {
+                    ssCollection.add(new StudySourceVesselWrapper(appService,
+                        study));
                 }
                 propertiesMap.put("sourceVesselCollection", ssCollection);
             }
@@ -381,71 +394,62 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return ssCollection;
     }
 
-    public List<SourceVesselWrapper> getSourceVesselCollection() {
-        return getSourceVesselCollection(false);
+    public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
+        return getStudySourceVesselCollection(false);
     }
 
-    private void setSourceVessels(Collection<SourceVessel> allSsObject,
-        List<SourceVesselWrapper> allSsWrappers) {
-        Collection<SourceVessel> oldSourceVessels = wrappedObject
-            .getSourceVesselCollection();
-        wrappedObject.setSourceVesselCollection(allSsObject);
-        propertyChangeSupport.firePropertyChange("sourceVesselCollection",
+    private void setStudySourceVessels(
+        Collection<StudySourceVessel> allSsObject,
+        List<StudySourceVesselWrapper> allSsWrappers) {
+        Collection<StudySourceVessel> oldSourceVessels = wrappedObject
+            .getStudySourceVesselCollection();
+        wrappedObject.setStudySourceVesselCollection(allSsObject);
+        propertyChangeSupport.firePropertyChange("studySourceVesselCollection",
             oldSourceVessels, allSsObject);
-        propertiesMap.put("sourceVesselCollection", allSsWrappers);
+        propertiesMap.put("studySourceVesselCollection", allSsWrappers);
     }
 
-    public void addSourceVessels(List<SourceVesselWrapper> newSourceVessels) {
-        if (newSourceVessels != null && newSourceVessels.size() > 0) {
-            Collection<SourceVessel> allSsObjects = new HashSet<SourceVessel>();
-            List<SourceVesselWrapper> allSsWrappers = new ArrayList<SourceVesselWrapper>();
+    public void addStudySourceVessels(
+        List<StudySourceVesselWrapper> newStudySourceVessels) {
+        if (newStudySourceVessels != null && newStudySourceVessels.size() > 0) {
+            Collection<StudySourceVessel> allSsObjects = new HashSet<StudySourceVessel>();
+            List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
             // already in list
-            List<SourceVesselWrapper> currentList = getSourceVesselCollection();
+            List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
             if (currentList != null) {
-                for (SourceVesselWrapper ss : currentList) {
+                for (StudySourceVesselWrapper ss : currentList) {
                     allSsObjects.add(ss.getWrappedObject());
                     allSsWrappers.add(ss);
                 }
             }
             // new
-            for (SourceVesselWrapper ss : newSourceVessels) {
+            for (StudySourceVesselWrapper ss : newStudySourceVessels) {
                 allSsObjects.add(ss.getWrappedObject());
                 allSsWrappers.add(ss);
-                deletedSourceVessels.remove(ss);
+                deletedStudySourceVessels.remove(ss);
             }
-            setSourceVessels(allSsObjects, allSsWrappers);
+            setStudySourceVessels(allSsObjects, allSsWrappers);
         }
     }
 
-    public void removeSourceVessels(
-        List<SourceVesselWrapper> sourceVesselsToDelete) {
-        if (sourceVesselsToDelete != null && sourceVesselsToDelete.size() > 0) {
-            deletedSourceVessels.addAll(sourceVesselsToDelete);
-            Collection<SourceVessel> allSsObjects = new HashSet<SourceVessel>();
-            List<SourceVesselWrapper> allSsWrappers = new ArrayList<SourceVesselWrapper>();
+    public void removeStudySourceVessels(
+        List<StudySourceVesselWrapper> studySourceVesselsToDelete) {
+        if (studySourceVesselsToDelete != null
+            && studySourceVesselsToDelete.size() > 0) {
+            deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
+            Collection<StudySourceVessel> allSsObjects = new HashSet<StudySourceVessel>();
+            List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
             // already in list
-            List<SourceVesselWrapper> currentList = getSourceVesselCollection();
+            List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
             if (currentList != null) {
-                for (SourceVesselWrapper ss : currentList) {
-                    if (!deletedSourceVessels.contains(ss)) {
+                for (StudySourceVesselWrapper ss : currentList) {
+                    if (!deletedStudySourceVessels.contains(ss)) {
                         allSsObjects.add(ss.getWrappedObject());
                         allSsWrappers.add(ss);
                     }
                 }
             }
-            setSourceVessels(allSsObjects, allSsWrappers);
-        }
-    }
-
-    /**
-     * Removes the source vessel objects that are not contained in the
-     * collection.
-     */
-    private void deleteSourceVessels() throws Exception {
-        for (SourceVesselWrapper ss : deletedSourceVessels) {
-            if (!ss.isNew()) {
-                ss.delete();
-            }
+            setStudySourceVessels(allSsObjects, allSsWrappers);
         }
     }
 
@@ -820,7 +824,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             propertiesMap.put("studyPvAttrCollection", allStudyPvAttrWrappers);
         }
         deleteSampleStorages();
-        deleteSourceVessels();
+        deleteStudySourceVessels();
         deleteStudyPvAttrs();
     }
 
@@ -846,7 +850,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void resetInternalField() {
         studyPvAttrMap = null;
         deletedSampleStorages.clear();
-        deletedSourceVessels.clear();
+        deletedStudySourceVessels.clear();
         deletedStudyPvAttr.clear();
     }
 

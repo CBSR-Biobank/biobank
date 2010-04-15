@@ -311,7 +311,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
                         updateRowType(typeWidget, indexRow);
-                        setDirty(true);
+                        if (spw.isEverythingTyped()) {
+                            setDirty(true);
+                        }
                     }
 
                 });
@@ -557,6 +559,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     public void reset() throws Exception {
+        setDirty(false);
         reset(true);
         fieldsComposite.setEnabled(true);
     }

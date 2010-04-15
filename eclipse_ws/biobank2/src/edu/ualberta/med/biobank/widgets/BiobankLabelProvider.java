@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -70,8 +71,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return aliquot.getLinkDate() == null ? "" : DateFormatter
                     .formatAsDateTime(aliquot.getLinkDate());
             case 4:
-                return aliquot.getQuantity() == null ? "" : aliquot.getQuantity()
-                    .toString();
+                return aliquot.getQuantity() == null ? "" : aliquot
+                    .getQuantity().toString();
             case 6:
                 return aliquot.getComment() == null ? "" : aliquot.getComment();
             }
@@ -130,6 +131,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {
             return ((ActivityStatusWrapper) element).getName();
+        } else if (element instanceof StudySourceVesselWrapper) {
+            return ((StudySourceVesselWrapper) element).getSourceVessel()
+                .getName();
         } else if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }
@@ -157,10 +161,18 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getEmailAddress();
             break;
         case 4:
-            if ((contact != null) && (contact.getPhoneNumber() != null))
-                return contact.getPhoneNumber();
+            if ((contact != null) && (contact.getMobileNumber() != null))
+                return contact.getMobileNumber();
             break;
         case 5:
+            if ((contact != null) && (contact.getPagerNumber() != null))
+                return contact.getPagerNumber();
+            break;
+        case 6:
+            if ((contact != null) && (contact.getOfficeNumber() != null))
+                return contact.getOfficeNumber();
+            break;
+        case 7:
             if ((contact != null) && (contact.getFaxNumber() != null))
                 return contact.getFaxNumber();
             break;

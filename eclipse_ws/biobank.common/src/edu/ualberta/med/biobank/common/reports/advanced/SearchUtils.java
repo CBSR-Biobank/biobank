@@ -23,32 +23,34 @@ public class SearchUtils {
     public static HashMap<String, String> getColumnInfo(Class<?> type) {
         HashMap<String, String> properties = new HashMap<String, String>();
         if (type == Aliquot.class) {
-            properties.put("Inventory Id", "inventoryId");
-            properties.put("Link Date", "linkDate");
-            properties.put("Sample Type", "sampleType.name");
+            properties.put("Inventory Id", "aliquot.inventoryId");
+            properties.put("Link Date", "aliquot.linkDate");
+            properties.put("Sample Type", "aliquot.sampleType.name");
         } else if (type == Container.class) {
-            properties.put("Label", "label");
-            properties.put("Container Type", "containerType.name");
+            properties.put("Label", "container.label");
+            properties.put("Container Type", "container.containerType.name");
         } else if (type == Site.class) {
-            properties.put("Name", "name");
-            properties.put("Status", "activityStatus.name");
+            properties.put("Site", "site.name");
+            properties.put("Status", "site.activityStatus.name");
         } else if (type == Clinic.class) {
-            properties.put("Name", "name");
-            properties.put("Status", "activityStatus.name");
+            properties.put("Clinic", "clinic.name");
+            properties.put("Clinic Status", "clinic.activityStatus.name");
         } else if (type == Study.class) {
-            properties.put("Name", "name");
-            properties.put("Short Name", "nameShort");
+            properties.put("Study", "study.name");
+            properties.put("Short Name", "study.nameShort");
         } else if (type == Patient.class) {
-            properties.put("Patient Number", "pnumber");
-            properties.put("Study", "study.nameShort");
+            properties.put("Patient Number", "patient.pnumber");
+            properties.put("Study", "patient.study.nameShort");
         } else if (type == PatientVisit.class) {
-            properties.put("Patient", "patient.pnumber");
-            properties.put("Date Processed", "dateProcessed");
+            properties.put("Patient", "patientVisit.patient.pnumber");
+            properties.put("Date Processed", "patientVisit.dateProcessed");
         } else if (type == Contact.class) {
-            properties.put("Name", "name");
-            properties.put("Title", "title");
-            properties.put("Phone", "phoneNumber");
-            properties.put("Email", "emailAddress");
+            properties.put("Contact", "contact.name");
+            properties.put("Title", "contact.title");
+            properties.put("Mobile", "contact.mobileNumber");
+            properties.put("Pager", "contact.pagerNumber");
+            properties.put("Office", "contact.officeNumber");
+            properties.put("Email", "contact.emailAddress");
         }
         return properties;
     }
@@ -157,8 +159,9 @@ public class SearchUtils {
                 path = path + "contact.";
             add(searchableFields, path, "name", String.class);
             add(searchableFields, path, "title", String.class);
-            add(searchableFields, path, "phoneNumber", String.class);
-            add(searchableFields, path, "faxNumber", String.class);
+            add(searchableFields, path, "mobileNumber", String.class);
+            add(searchableFields, path, "pagerNumber", String.class);
+            add(searchableFields, path, "officeNumber", String.class);
             add(searchableFields, path, "faxNumber", String.class);
             add(searchableFields, path, "emailAddress", String.class);
         } else if (c == Shipment.class) {
@@ -218,8 +221,6 @@ public class SearchUtils {
             add(searchableFields, path, "site", Site.class);
             add(searchableFields, path, "contactCollection", Contact.class);
             add(searchableFields, path, "shipmentCollection", Shipment.class);
-            add(searchableFields, path, "patientVisitCollection",
-                PatientVisit.class);
         } else if (c == Aliquot.class) {
             if (collection)
                 path = path.replace('.', '_') + "aliquotCollection.";
@@ -252,7 +253,7 @@ public class SearchUtils {
                 path = path + "patientVisit.";
             add(searchableFields, path, "patient", Patient.class);
             add(searchableFields, path, "aliquotCollection", Aliquot.class);
-        } else if (c == PatientVisit.class) {
+        } else if (c == Contact.class) {
             if (collection)
                 path = path.replace('.', '_') + "contactCollection.";
             else

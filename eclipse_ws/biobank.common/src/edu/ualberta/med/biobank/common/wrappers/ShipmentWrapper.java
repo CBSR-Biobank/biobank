@@ -44,7 +44,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         List<PatientVisitWrapper> patients = getPatientVisitCollection();
         if (patients != null && patients.size() > 0) {
             throw new BiobankCheckException(
-                "Visits are still linked to this shipment. Deletion can't be done.");
+                "Visits are still linked to this shipment. Delete them before attempting to remove the shipment.");
         }
     }
 
@@ -408,8 +408,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         if (getDateShipped() == null) {
             return getWaybill();
         }
-        return getWaybill() + " (received on " + getFormattedDateReceived()
-            + ")";
+        return getFormattedDateReceived() + " (" + getWaybill() + ")";
     }
 
     /**
@@ -468,7 +467,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Shipment.class.getName()
-                + " where clinic.site.id = ? and dateReceived > ? and dateReceived < ?",
+                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<Shipment> res = appService.query(criteria);
         List<ShipmentWrapper> ships = new ArrayList<ShipmentWrapper>();

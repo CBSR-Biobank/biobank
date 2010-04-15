@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,7 +13,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -153,14 +151,8 @@ public class AliquotViewForm extends BiobankViewForm {
             .getPnumber());
         setTextValue(visitLabel, aliquot.getPatientVisit()
             .getFormattedDateProcessed());
-        List<PvSourceVesselWrapper> sourceVessels = aliquot.getPatientVisit()
-            .getPvSourceVesselCollection();
-        if (sourceVessels.isEmpty()) {
-            setTextValue(dateDrawnLabel, "");
-        } else if (sourceVessels.size() == 1) {
-            setTextValue(dateDrawnLabel, sourceVessels.get(0)
-                .getFormattedDateDrawn());
-        }
+        setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
+            .getFormattedDateDrawn());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }

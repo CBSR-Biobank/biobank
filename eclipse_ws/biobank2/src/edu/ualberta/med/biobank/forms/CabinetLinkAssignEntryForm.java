@@ -408,7 +408,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                                 bin.getLabel()));
                         appendLogNLS(
                             "Cabinet.activitylog.checkPosition.error", positionString, bin.getLabel()); //$NON-NLS-1$
+                        return;
                     }
+                    setDirty(true);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (BiobankCheckException bce) {
@@ -420,7 +422,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     BioBankPlugin.openAsyncError(
                         "Error while checking position", e); //$NON-NLS-1$
                 }
-                setDirty(true);
             }
 
         });
@@ -608,6 +609,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (viewerSampleTypes.getCombo().getItemCount() > 1) {
             viewerSampleTypes.getCombo().deselectAll();
         }
+        setDirty(false);
     }
 
     @Override

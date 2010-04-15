@@ -24,7 +24,10 @@ public class SiteAdapter extends AdapterBase {
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
 
-        int nodeIdOffset = 100 * site.getId();
+        int nodeIdOffset = 100;
+        if (site != null && site.getId() != null) {
+            nodeIdOffset *= site.getId();
+        }
 
         addChild(new ClinicGroup(this, nodeIdOffset + CLINICS_BASE_NODE_ID));
         addChild(new StudyGroup(this, nodeIdOffset + STUDIES_BASE_NODE_ID));

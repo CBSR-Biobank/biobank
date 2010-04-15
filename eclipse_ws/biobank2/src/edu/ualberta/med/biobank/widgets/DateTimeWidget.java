@@ -8,6 +8,7 @@ import org.eclipse.nebula.widgets.datechooser.DateChooserCombo;
 import org.eclipse.nebula.widgets.formattedtext.DateFormatter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,10 +34,19 @@ public class DateTimeWidget extends BiobankWidget {
 
     private DateTime timeEntry;
 
+    private Color oldDateEntryBackgroundColor;
+
+    private Color oldTimeEntryBackgroundColor;
+
+    public DateTimeWidget(Composite parent, int style, Date date) {
+        this(parent, style, date, true);
+    }
+
     /**
      * Allow date to be null.
      */
-    public DateTimeWidget(Composite parent, int style, Date date) {
+    public DateTimeWidget(Composite parent, int style, Date date,
+        boolean showDate) {
         super(parent, style);
 
         GridLayout layout = new GridLayout(3, false);
@@ -47,28 +57,27 @@ public class DateTimeWidget extends BiobankWidget {
 
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        dateEntry = new DateChooserCombo(this, SWT.BORDER);
+        if (showDate) {
+            dateEntry = new DateChooserCombo(this, SWT.BORDER);
+            dateEntry.setFormatter(new DateFormatter("yyyy-MM-dd"));
+            Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+            GridData gd = new GridData();
+            gd.widthHint = size.x + 10;
+            dateEntry.setLayoutData(gd);
+        }
         timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
-        dateEntry.setFormatter(new DateFormatter("yyyy-MM-dd"));
-
-        Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        GridData gd = new GridData();
-        gd.widthHint = size.x + 10;
-        dateEntry.setLayoutData(gd);
+        timeEntry.setTime(0, 0, 0);
 
         if (date != null) {
             Calendar cal = new GregorianCalendar();
             cal.setTime(date);
 
-            dateEntry.setValue(date);
+            if (showDate) {
+                dateEntry.setValue(date);
+            }
             timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE),
                 cal.get(Calendar.SECOND));
         }
-    }
-
-    public void addSelectionListener(SelectionListener listener) {
-        dateEntry.addSelectionListener(listener);
-        timeEntry.addSelectionListener(listener);
     }
 
     public String getText() {
@@ -77,7 +86,12 @@ public class DateTimeWidget extends BiobankWidget {
 
     public Date getDate() {
         Calendar cal = new GregorianCalendar();
-        cal.setTime(dateEntry.getValue());
+        if (dateEntry != null) {
+            Date value = dateEntry.getValue();
+            if (value != null) {
+                cal.setTime(dateEntry.getValue());
+            }
+        }
         cal.set(Calendar.HOUR, timeEntry.getHours());
         cal.set(Calendar.MINUTE, timeEntry.getMinutes());
         return cal.getTime();
@@ -89,13 +103,30 @@ public class DateTimeWidget extends BiobankWidget {
 
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
+
+        timeEntry.setTime(cal.get(Calendar.HOUR_OF_DAY), cal
+            .get(Calendar.MINUTE), cal.get(Calendar.SECOND));
+
         cal.set(Calendar.HOUR, 0);
         cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.AM_PM, 0);
-        dateEntry.setValue(cal.getTime());
-
-        cal.setTime(date);
-        timeEntry.setTime(cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE), cal
-            .get(Calendar.SECOND));
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        if (dateEntry != null) {
+            dateEntry.setValue(cal.getTime());
+        }
     }
+
+    public void addSelectionListener(SelectionListener listener) {
+        if (dateEntry != null) {
+            dateEntry.addSelectionListener(listener);
+        }
+        timeEntry.addSelectionListener(listener);
+    }
+
+    public void removeSelectionListener(SelectionListener listener) {
+        if (dateEntry != null) {
+            dateEntry.removeSelectionListener(listener);
+        }
+        timeEntry.removeSelectionListener(listener);
+    }
+
 }

@@ -2,8 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -24,7 +22,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -34,9 +31,9 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SampleStorageEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.StudySourceVesselEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class StudyEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm";
@@ -51,10 +48,6 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ClinicAddInfoTable contactEntryTable;
 
-    private Collection<SourceVesselWrapper> allSourceVessels;
-
-    private MultiSelectWidget sourceVesselMultiSelect;
-
     private List<StudyPvAttrCustom> pvCustomInfoList;
 
     private SampleStorageEntryInfoTable sampleStorageEntryTable;
@@ -67,6 +60,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     };
 
     private ComboViewer activityStatusComboViewer;
+
+    private StudySourceVesselEntryInfoTable studySourceVesselEntryTable;
 
     private class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
@@ -176,33 +171,20 @@ public class StudyEntryForm extends BiobankEntryForm {
         section.setClient(sampleStorageEntryTable);
     }
 
-    private void createSourceVesselsSection() throws Exception {
-        Composite client = createSectionWithClient("Source Vessels");
-        allSourceVessels = SourceVesselWrapper.getAllSourceVessels(appService);
-        sourceVesselMultiSelect = new MultiSelectWidget(client, SWT.NONE,
-            "Selected Source Vessels", "Available Source Vessels", 100);
-        sourceVesselMultiSelect.adaptToToolkit(toolkit, true);
-        sourceVesselMultiSelect.addSelectionChangedListener(listener);
-        setSourceVesselWidgetSelections();
-    }
+    private void createSourceVesselsSection() {
+        Section section = createSection("Source Vessels");
+        studySourceVesselEntryTable = new StudySourceVesselEntryInfoTable(
+            section, study);
+        studySourceVesselEntryTable.adaptToToolkit(toolkit, true);
+        studySourceVesselEntryTable.addSelectionChangedListener(listener);
 
-    public void setSourceVesselWidgetSelections() {
-        Collection<SourceVesselWrapper> studySourceVessels = study
-            .getSourceVesselCollection();
-        LinkedHashMap<Integer, String> availSourceVessel = new LinkedHashMap<Integer, String>();
-        List<Integer> selSourceVessel = new ArrayList<Integer>();
-
-        if (studySourceVessels != null) {
-            for (SourceVesselWrapper ss : studySourceVessels) {
-                selSourceVessel.add(ss.getId());
+        addSectionToolbar(section, "Add Source Vessel", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                studySourceVesselEntryTable.addStudySourceVessel();
             }
-        }
-
-        for (SourceVesselWrapper ss : allSourceVessels) {
-            availSourceVessel.put(ss.getId(), ss.getName());
-        }
-        sourceVesselMultiSelect.setSelections(availSourceVessel,
-            selSourceVessel);
+        });
+        section.setClient(studySourceVesselEntryTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -277,7 +259,10 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getSelection()).getFirstElement();
         study.setActivityStatus(activity);
 
-        setSourceVessels();
+        study.addStudySourceVessels(studySourceVesselEntryTable
+            .getAddedOrModifiedStudySourceVessels());
+        study.removeStudySourceVessels(studySourceVesselEntryTable
+            .getDeletedStudySourceVessels());
 
         setStudyPvAttr();
 
@@ -337,31 +322,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void setSourceVessels() {
-        List<Integer> addedSourceVesselIds = sourceVesselMultiSelect
-            .getAddedToSelection();
-        List<Integer> removedSourceVesselIds = sourceVesselMultiSelect
-            .getRemovedToSelection();
-        List<SourceVesselWrapper> addedSourceVessels = new ArrayList<SourceVesselWrapper>();
-        List<SourceVesselWrapper> removedSourceVessels = new ArrayList<SourceVesselWrapper>();
-        if (allSourceVessels != null) {
-            for (SourceVesselWrapper ss : allSourceVessels) {
-                int id = ss.getId();
-                if (addedSourceVesselIds.indexOf(id) >= 0) {
-                    addedSourceVessels.add(ss);
-                } else if (removedSourceVesselIds.indexOf(id) >= 0) {
-                    removedSourceVessels.add(ss);
-                }
-            }
-        }
-        Assert.isTrue(addedSourceVessels.size() == addedSourceVesselIds.size(),
-            "problem with added source vessel selections");
-        study.addSourceVessels(addedSourceVessels);
-        Assert.isTrue(removedSourceVessels.size() == removedSourceVesselIds
-            .size(), "problem with removed source vessel selections");
-        study.removeSourceVessels(removedSourceVessels);
-    }
-
     @Override
     public String getNextOpenedFormID() {
         return StudyViewForm.ID;
@@ -380,8 +340,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         contactEntryTable.reload();
         sampleStorageEntryTable.reload();
-
-        setSourceVesselWidgetSelections();
+        studySourceVesselEntryTable.reload();
 
         resetPvCustomInfo();
 

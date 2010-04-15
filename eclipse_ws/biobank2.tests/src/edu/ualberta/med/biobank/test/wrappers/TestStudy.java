@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -33,6 +34,7 @@ import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
 
 public class TestStudy extends TestDatabase {
 
@@ -279,70 +281,77 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testGetSourceVesselCollection() throws Exception {
-        String name = "testGetSourceVesselCollection" + r.nextInt();
+    public void testGetStudySourceVesselCollection() throws Exception {
+        String name = "testGetStudySourceVesselCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = SourceVesselHelper.addSourceVessels(study, name);
+        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
 
-        List<SourceVesselWrapper> storages = study.getSourceVesselCollection();
+        List<StudySourceVesselWrapper> storages = study
+            .getStudySourceVesselCollection();
         int sizeFound = storages.size();
 
         Assert.assertEquals(nber, sizeFound);
     }
 
     @Test
-    public void testGetSourceVesselCollectionBoolean() throws Exception {
-        String name = "testGetSourceVesselCollectionBoolean" + r.nextInt();
+    public void testGetStudySourceVesselCollectionBoolean() throws Exception {
+        String name = "testGetStudySourceVesselCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        SourceVesselHelper.addSourceVessels(study, name);
+        StudySourceVesselHelper.addStudySourceVessels(study, name);
 
-        List<SourceVesselWrapper> sources = study
-            .getSourceVesselCollection(true);
+        List<StudySourceVesselWrapper> sources = study
+            .getStudySourceVesselCollection(true);
         if (sources.size() > 1) {
             for (int i = 0; i < sources.size() - 1; i++) {
-                SourceVesselWrapper source1 = sources.get(i);
-                SourceVesselWrapper source2 = sources.get(i + 1);
+                StudySourceVesselWrapper source1 = sources.get(i);
+                StudySourceVesselWrapper source2 = sources.get(i + 1);
                 Assert.assertTrue(source1.compareTo(source2) <= 0);
             }
         }
     }
 
     @Test
-    public void testAddSourceVessels() throws Exception {
-        String name = "testAddSourceVessels" + r.nextInt();
+    public void testAddStudySourceVessels() throws Exception {
+        String name = "testAddStudySourceVessels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = SourceVesselHelper.addSourceVessels(study, name);
+        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
 
-        SourceVesselWrapper source = SourceVesselHelper.addSourceVessel(name);
-        study.addSourceVessels(Arrays.asList(source));
+        SourceVesselWrapper sourceVessel = SourceVesselHelper
+            .addSourceVessel(name);
+        study.addStudySourceVessels(Arrays.asList(StudySourceVesselHelper
+            .addStudySourceVessel(study, sourceVessel)));
         study.persist();
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber + 1, study.getSourceVesselCollection().size());
+        Assert.assertEquals(nber + 1, study.getStudySourceVesselCollection()
+            .size());
     }
 
     @Test
-    public void testRemoveSourceVessels() throws Exception {
-        String name = "testRemoveSourceVessels" + r.nextInt();
+    public void testRemoveStudySourceVessels() throws Exception {
+        String name = "testRemoveStudySourceVessels" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        int nber = SourceVesselHelper.addSourceVessels(study, name);
+        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
 
-        List<SourceVesselWrapper> sources = study.getSourceVesselCollection();
-        SourceVesselWrapper source = DbHelper.chooseRandomlyInList(sources);
+        List<StudySourceVesselWrapper> sources = study
+            .getStudySourceVesselCollection();
+        StudySourceVesselWrapper source = DbHelper
+            .chooseRandomlyInList(sources);
         // don't have to delete the storage thanks to
         // deleteSourceVesselDifference method
         SourceVesselHelper.createdSourceVessels.remove(source);
-        study.removeSourceVessels(Arrays.asList(source));
+        study.removeStudySourceVessels(Arrays.asList(source));
         study.persist();
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber - 1, study.getSourceVesselCollection().size());
+        Assert.assertEquals(nber - 1, study.getStudySourceVesselCollection()
+            .size());
     }
 
     @Test
