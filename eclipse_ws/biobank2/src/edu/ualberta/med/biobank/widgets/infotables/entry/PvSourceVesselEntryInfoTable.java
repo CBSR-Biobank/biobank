@@ -17,9 +17,11 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSourceVesselDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -28,6 +30,7 @@ import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.PvSourceVesselInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
 
@@ -43,6 +46,8 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
         Boolean.FALSE, Boolean.class);
 
     private PatientVisitWrapper patientVisit;
+
+    private List<SourceVesselWrapper> allSourceVessels;
 
     public PvSourceVesselEntryInfoTable(Composite parent,
         List<PvSourceVesselWrapper> collection) {
@@ -68,6 +73,13 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
         studySourceVessels = patientVisit.getPatient().getStudy()
             .getStudySourceVesselCollection(true);
 
+        try {
+            allSourceVessels = SourceVesselWrapper
+                .getAllSourceVessels(SessionManager.getAppService());
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("Error retrievind source vessels", e);
+        }
+
         selectedPvSourceVessels = patientVisit.getPvSourceVesselCollection();
         if (selectedPvSourceVessels == null) {
             selectedPvSourceVessels = new ArrayList<PvSourceVesselWrapper>();
@@ -91,7 +103,7 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
         PvSourceVesselWrapper sourceVessel = new PvSourceVesselWrapper(
             SessionManager.getAppService());
         sourceVessel.setPatientVisit(patientVisit);
-        addOrEditPvSourceVessel(true, sourceVessel, studySourceVessels);
+        addOrEditPvSourceVessel(true, sourceVessel);
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -116,11 +128,10 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
     }
 
     private void addOrEditPvSourceVessel(boolean add,
-        PvSourceVesselWrapper pvSourceVessel,
-        List<StudySourceVesselWrapper> studySourceVessels) {
+        PvSourceVesselWrapper pvSourceVessel) {
         PvSourceVesselDialog dlg = new PvSourceVesselDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            pvSourceVessel, studySourceVessels);
+            pvSourceVessel, studySourceVessels, allSourceVessels);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
@@ -145,12 +156,7 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
             @Override
             public void editItem(InfoTableEvent event) {
                 PvSourceVesselWrapper svss = getSelection();
-                // Set<SourceVesselWrapper> allowedSourceVessels =
-                // getNonDuplicateSourceVessels();
-                // allowedSourceVessels.add(svss.getSourceVessel());
-                // addOrEditPvSourceVessel(false, svss,
-                // allowedSourceVessels);
-                addOrEditPvSourceVessel(false, svss, studySourceVessels);
+                addOrEditPvSourceVessel(false, svss);
             }
         });
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
