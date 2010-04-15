@@ -64,7 +64,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private List<SampleTypeWrapper> allSampleTypes;
 
-    private List<ContainerTypeWrapper> allContainerTypes;
+    private List<ContainerTypeWrapper> availSubContainerTypes;
 
     private SiteWrapper site;
 
@@ -99,11 +99,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         retrieveSiteAndType();
-        allContainerTypes = site.getContainerTypeCollection();
-        for (ContainerTypeWrapper type : new ArrayList<ContainerTypeWrapper>(
-            allContainerTypes)) {
-            if (Boolean.TRUE.equals(type.getTopLevel())) {
-                allContainerTypes.remove(type);
+        availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        for (ContainerTypeWrapper type : site.getContainerTypeCollection()) {
+            if (type.getTopLevel().equals(Boolean.FALSE)) {
+                availSubContainerTypes.add(type);
             }
         }
         String tabName;
@@ -300,8 +299,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         }
         LinkedHashMap<Integer, String> availContainerTypes = new LinkedHashMap<Integer, String>();
-        if (allContainerTypes != null) {
-            for (ContainerTypeWrapper type : allContainerTypes) {
+        if (availSubContainerTypes != null) {
+            for (ContainerTypeWrapper type : availSubContainerTypes) {
                 if (containerType.isNew() || !containerType.equals(type)) {
                     availContainerTypes.put(type.getId(), type.getName());
                 }
@@ -386,8 +385,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 .getRemovedToSelection();
             List<ContainerTypeWrapper> addedContainerTypes = new ArrayList<ContainerTypeWrapper>();
             List<ContainerTypeWrapper> removedContainerTypes = new ArrayList<ContainerTypeWrapper>();
-            if (allContainerTypes != null) {
-                for (ContainerTypeWrapper containerType : allContainerTypes) {
+            if (availSubContainerTypes != null) {
+                for (ContainerTypeWrapper containerType : availSubContainerTypes) {
                     if (addedTypesIds.indexOf(containerType.getId()) >= 0) {
                         addedContainerTypes.add(containerType);
                     }

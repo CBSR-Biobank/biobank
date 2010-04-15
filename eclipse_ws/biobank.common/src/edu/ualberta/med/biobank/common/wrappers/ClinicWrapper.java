@@ -38,10 +38,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "address", "site", "contactCollection", "shipmentCollection",
-            "street1", "street2", "city", "province", "postalCode",
-            "patientVisitCollection" };
+        return new String[] { "name", "nameShort", "activityStatus",
+            "hasShipments", "comment", "address", "site", "contactCollection",
+            "shipmentCollection", "street1", "street2", "city", "province",
+            "postalCode", "patientVisitCollection" };
     }
 
     private AddressWrapper getAddress() {
@@ -78,6 +78,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         wrappedObject.setNameShort(nameShort);
         propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
             nameShort);
+    }
+
+    public void setHasShipments(Boolean hasShipments) {
+        Boolean oldHasShipments = wrappedObject.getHasShipments();
+        wrappedObject.setHasShipments(hasShipments);
+        propertyChangeSupport.firePropertyChange("hasShipments",
+            oldHasShipments, hasShipments);
+    }
+
+    public Boolean getHasShipments() {
+        return wrappedObject.getHasShipments();
     }
 
     public ActivityStatusWrapper getActivityStatus() {

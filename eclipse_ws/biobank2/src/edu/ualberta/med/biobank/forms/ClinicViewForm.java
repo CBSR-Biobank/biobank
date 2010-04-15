@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
@@ -31,6 +32,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private Text nameLabel;
 
     private Text nameShortLabel;
+
+    private Button hasShipmentsButton;
 
     private Text activityStatusLabel;
 
@@ -82,6 +85,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
             "Repository Site");
         nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
         nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
+        hasShipmentsButton = (Button) createWidget(client, Button.class,
+            SWT.NONE, "Has Shipments");
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
@@ -97,6 +102,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setTextValue(nameLabel, clinic.getName());
         setTextValue(nameShortLabel, clinic.getNameShort());
         setTextValue(siteLabel, clinic.getSite().getName());
+        setCheckBoxValue(hasShipmentsButton, clinic.getHasShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
         setTextValue(shipmentTotal, clinic.getShipmentCollection().size());
