@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
@@ -54,6 +54,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private SiteWrapper site;
 
     private ShipmentPatientsWidget shipmentPatientsWidget;
+
+    private Text waybillText;
 
     @Override
     protected void init() throws Exception {
@@ -100,10 +102,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, site.getName());
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Waybill",
-            null, BeansObservables.observeValue(shipmentWrapper, "waybill"),
-            new NonEmptyStringValidator("A waybill should be set"));
-
         if (shipmentWrapper.isNew()) {
             // choose clinic for new shipment
             List<ClinicWrapper> siteClinics = site.getClinicCollection(true);
@@ -121,6 +119,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                         setClinicFromSelection();
                         try {
                             shipmentWrapper.checkPatientsStudy();
+                            waybillText.setEnabled(shipmentWrapper.getClinic()
+                                .getHasShipments());
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Patients check", e);
                         }
@@ -133,16 +133,23 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         }
 
+        waybillText = (Text) createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Waybill", null, BeansObservables.observeValue(
+                shipmentWrapper, "waybill"), new NonEmptyStringValidator(
+                "A waybill should be set"));
+
+        waybillText.setEnabled(false);
+
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
             "Date Shipped", shipmentWrapper.getDateShipped(), BeansObservables
                 .observeValue(shipmentWrapper, "dateShipped"),
             "Date shipped should be set");
         firstControl = dateShippedWidget;
 
-        ShippingCompanyWrapper selectedCompany = shipmentWrapper
+        ShippingMethodWrapper selectedCompany = shipmentWrapper
             .getShippingCompany();
         companyComboViewer = createComboViewerWithNoSelectionValidator(client,
-            "Transit Method", ShippingCompanyWrapper
+            "Transit Method", ShippingMethodWrapper
                 .getShippingCompanies(appService), selectedCompany, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Box Number",
@@ -200,10 +207,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             .getSelection();
         if ((companySelection != null) && (companySelection.size() > 0)) {
             shipmentWrapper
-                .setShippingCompany((ShippingCompanyWrapper) companySelection
+                .setShippingCompany((ShippingMethodWrapper) companySelection
                     .getFirstElement());
         } else {
-            shipmentWrapper.setShippingCompany((ShippingCompanyWrapper) null);
+            shipmentWrapper.setShippingCompany((ShippingMethodWrapper) null);
         }
         boolean newShipment = shipmentWrapper.isNew();
         shipmentWrapper.persist();
@@ -234,7 +241,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             clinicsComboViewer.getCombo().deselectAll();
         }
         shipmentPatientsWidget.updateList();
-        ShippingCompanyWrapper shipCompany = shipmentWrapper
+        ShippingMethodWrapper shipCompany = shipmentWrapper
             .getShippingCompany();
         if (shipCompany != null) {
             companyComboViewer

@@ -86,7 +86,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
         nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
         hasShipmentsButton = (Button) createWidget(client, Button.class,
-            SWT.NONE, "Has Shipments");
+            SWT.NONE, "Sends Shipments");
         activityStatusLabel = createReadOnlyField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
@@ -102,7 +102,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setTextValue(nameLabel, clinic.getName());
         setTextValue(nameShortLabel, clinic.getNameShort());
         setTextValue(siteLabel, clinic.getSite().getName());
-        setCheckBoxValue(hasShipmentsButton, clinic.getHasShipments());
+        setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
         setTextValue(shipmentTotal, clinic.getShipmentCollection().size());

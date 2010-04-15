@@ -44,7 +44,7 @@ import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -203,7 +203,7 @@ public class Importer {
 
     private static Map<String, ContainerWrapper> topContainersMap = null;
 
-    private static Map<String, ShippingCompanyWrapper> shippingCompanyMap = null;
+    private static Map<String, ShippingMethodWrapper> shippingCompanyMap = null;
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
@@ -397,8 +397,8 @@ public class Importer {
     }
 
     private static void initShipmentCompanyMap() throws Exception {
-        shippingCompanyMap = new HashMap<String, ShippingCompanyWrapper>();
-        for (ShippingCompanyWrapper company : ShippingCompanyWrapper
+        shippingCompanyMap = new HashMap<String, ShippingMethodWrapper>();
+        for (ShippingMethodWrapper company : ShippingMethodWrapper
             .getShippingCompanies(appService)) {
             shippingCompanyMap.put(company.getName(), company);
         }
@@ -776,7 +776,7 @@ public class Importer {
         ShipmentWrapper shipment;
         BlowfishCipher cipher = new BlowfishCipher();
 
-        ShippingCompanyWrapper unknownShippingCompany = shippingCompanyMap
+        ShippingMethodWrapper unknownShippingCompany = shippingCompanyMap
             .get("unknown");
 
         removeAllShipments();

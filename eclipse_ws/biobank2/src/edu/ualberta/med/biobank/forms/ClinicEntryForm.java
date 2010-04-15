@@ -120,11 +120,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             null, BeansObservables.observeValue(clinic, "nameShort"),
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        if (clinic.getHasShipments() == null) {
-            clinic.setHasShipments(false);
+        if (clinic.getSendsShipments() == null) {
+            clinic.setSendsShipments(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Has Shipments", null, BeansObservables.observeValue(clinic,
+            "Sends Shipments", null, BeansObservables.observeValue(clinic,
                 "hasShipments"), null);
         toolkit.paintBordersFor(client);
 

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -47,7 +47,7 @@ public class CbsrConfigJob {
 
     protected List<SampleTypeWrapper> sampleTypesList;
 
-    protected List<ShippingCompanyWrapper> shippingCompaniesList;
+    protected List<ShippingMethodWrapper> shippingCompaniesList;
 
     // methods that add objects to database, plus a message to display in job
     // dialog
@@ -78,7 +78,7 @@ public class CbsrConfigJob {
         try {
             sampleTypesList = SampleTypeWrapper.getGlobalSampleTypes(
                 appService, false);
-            shippingCompaniesList = ShippingCompanyWrapper
+            shippingCompaniesList = ShippingMethodWrapper
                 .getShippingCompanies(appService);
         } catch (Exception e) {
             BioBankPlugin.openError("Init Examples",

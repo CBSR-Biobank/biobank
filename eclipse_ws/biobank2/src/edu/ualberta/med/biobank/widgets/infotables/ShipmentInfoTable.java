@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
@@ -118,7 +118,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         info.shipment = shipment;
         info.dateReceived = shipment.getFormattedDateReceived();
         info.waybill = shipment.getWaybill();
-        ShippingCompanyWrapper company = shipment.getShippingCompany();
+        ShippingMethodWrapper company = shipment.getShippingCompany();
         if (company != null) {
             info.shippingCompany = company.getName();
         } else {

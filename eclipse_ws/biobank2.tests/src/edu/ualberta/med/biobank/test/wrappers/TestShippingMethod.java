@@ -12,26 +12,26 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.ShippingCompany;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
-import edu.ualberta.med.biobank.test.internal.ShippingCompanyHelper;
+import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
-public class TestShippingCompany extends TestDatabase {
+public class TestShippingMethod extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
 
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .addShippingCompany(name);
+        ShippingMethodWrapper company = ShippingMethodHelper
+            .addShippingMethod(name);
         testGettersAndSetters(company);
     }
 
@@ -46,10 +46,10 @@ public class TestShippingCompany extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ShippingCompanyWrapper company1 = ShippingCompanyHelper
-            .addShippingCompany(name);
-        ShippingCompanyWrapper company2 = ShippingCompanyHelper
-            .addShippingCompany(name + "_2");
+        ShippingMethodWrapper company1 = ShippingMethodHelper
+            .addShippingMethod(name);
+        ShippingMethodWrapper company2 = ShippingMethodHelper
+            .addShippingMethod(name + "_2");
 
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
@@ -81,8 +81,8 @@ public class TestShippingCompany extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .addShippingCompany(name);
+        ShippingMethodWrapper company = ShippingMethodHelper
+            .addShippingMethod(name);
 
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
@@ -114,13 +114,13 @@ public class TestShippingCompany extends TestDatabase {
     @Test
     public void testGetShippingCompanies() throws Exception {
         String name = "testGetShippingCompanies" + r.nextInt();
-        int sizeBefore = ShippingCompanyWrapper
-            .getShippingCompanies(appService).size();
+        int sizeBefore = ShippingMethodWrapper.getShippingCompanies(appService)
+            .size();
 
-        ShippingCompanyHelper.addShippingCompany(name);
-        ShippingCompanyHelper.addShippingCompany(name + "_2");
+        ShippingMethodHelper.addShippingMethod(name);
+        ShippingMethodHelper.addShippingMethod(name + "_2");
 
-        int sizeAfter = ShippingCompanyWrapper.getShippingCompanies(appService)
+        int sizeAfter = ShippingMethodWrapper.getShippingCompanies(appService)
             .size();
 
         Assert.assertEquals(sizeBefore + 2, sizeAfter);
@@ -129,39 +129,39 @@ public class TestShippingCompany extends TestDatabase {
     @Test
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
-        ShippingCompanyWrapper company = ShippingCompanyHelper
+        ShippingMethodWrapper company = ShippingMethodHelper
             .newShippingCompany(name);
         company.persist();
-        ShippingCompanyHelper.createdCompanies.add(company);
+        ShippingMethodHelper.createdCompanies.add(company);
 
-        ShippingCompany shipComp = new ShippingCompany();
+        ShippingMethod shipComp = new ShippingMethod();
         shipComp.setId(company.getId());
-        Assert.assertEquals(1, appService.search(ShippingCompany.class,
-            shipComp).size());
+        Assert.assertEquals(1, appService
+            .search(ShippingMethod.class, shipComp).size());
     }
 
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .addShippingCompany(name, false);
+        ShippingMethodWrapper company = ShippingMethodHelper.addShippingMethod(
+            name, false);
 
-        ShippingCompany shipComp = new ShippingCompany();
+        ShippingMethod shipComp = new ShippingMethod();
         shipComp.setId(company.getId());
-        Assert.assertEquals(1, appService.search(ShippingCompany.class,
-            shipComp).size());
+        Assert.assertEquals(1, appService
+            .search(ShippingMethod.class, shipComp).size());
 
         company.delete();
 
-        Assert.assertEquals(0, appService.search(ShippingCompany.class,
-            shipComp).size());
+        Assert.assertEquals(0, appService
+            .search(ShippingMethod.class, shipComp).size());
     }
 
     @Test
     public void testDeleteFailNoShipments() throws Exception {
         String name = "testDeleteFailNoShipments" + r.nextInt();
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .addShippingCompany(name, false);
+        ShippingMethodWrapper company = ShippingMethodHelper.addShippingMethod(
+            name, false);
 
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
@@ -172,7 +172,7 @@ public class TestShippingCompany extends TestDatabase {
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment1.setShippingCompany(company);
+        shipment1.setShippingMethod(company);
         shipment1.persist();
         company.reload();
 
@@ -183,7 +183,7 @@ public class TestShippingCompany extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        shipment1.setShippingCompany(null);
+        shipment1.setShippingMethod(null);
         shipment1.persist();
         company.reload();
         company.delete();
@@ -192,8 +192,8 @@ public class TestShippingCompany extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .addShippingCompany(name);
+        ShippingMethodWrapper company = ShippingMethodHelper
+            .addShippingMethod(name);
         company.setName("QQQQ");
         company.reset();
         Assert.assertEquals(name, company.getName());
@@ -202,8 +202,8 @@ public class TestShippingCompany extends TestDatabase {
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetNew" + r.nextInt();
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .newShippingCompany(name);
+        ShippingMethodWrapper company = ShippingMethodHelper
+            .newShippingMethod(name);
         company.setName("QQQQ");
         company.reset();
         Assert.assertEquals(null, company.getName());
@@ -212,10 +212,10 @@ public class TestShippingCompany extends TestDatabase {
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        ShippingCompanyWrapper company1 = ShippingCompanyHelper
-            .addShippingCompany("QWERTY" + name);
-        ShippingCompanyWrapper company2 = ShippingCompanyHelper
-            .addShippingCompany("ASDFG" + name);
+        ShippingMethodWrapper company1 = ShippingMethodHelper
+            .addShippingMethod("QWERTY" + name);
+        ShippingMethodWrapper company2 = ShippingMethodHelper
+            .addShippingMethod("ASDFG" + name);
         Assert.assertTrue(company1.compareTo(company2) > 0);
         Assert.assertTrue(company2.compareTo(company1) < 0);
     }

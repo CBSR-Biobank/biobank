@@ -7,18 +7,18 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShippingCompany;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
+public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
 
-    public ShippingCompanyWrapper(WritableApplicationService appService) {
+    public ShippingMethodWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
-    public ShippingCompanyWrapper(WritableApplicationService appService,
-        ShippingCompany sc) {
+    public ShippingMethodWrapper(WritableApplicationService appService,
+        ShippingMethod sc) {
         super(appService, sc);
     }
 
@@ -39,8 +39,8 @@ public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
     }
 
     @Override
-    public Class<ShippingCompany> getWrappedClass() {
-        return ShippingCompany.class;
+    public Class<ShippingMethod> getWrappedClass() {
+        return ShippingMethod.class;
     }
 
     @Override
@@ -59,8 +59,8 @@ public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<ShippingCompany> o) {
-        if (o instanceof ShippingCompanyWrapper) {
+    public int compareTo(ModelWrapper<ShippingMethod> o) {
+        if (o instanceof ShippingMethodWrapper) {
             return getName().compareTo(o.getWrappedObject().getName());
         }
         return 0;
@@ -91,13 +91,13 @@ public class ShippingCompanyWrapper extends ModelWrapper<ShippingCompany> {
         return getShipmentCollection(false);
     }
 
-    public static List<ShippingCompanyWrapper> getShippingCompanies(
+    public static List<ShippingMethodWrapper> getShippingCompanies(
         WritableApplicationService appService) throws ApplicationException {
-        List<ShippingCompany> objects = appService.search(
-            ShippingCompany.class, new ShippingCompany());
-        List<ShippingCompanyWrapper> wrappers = new ArrayList<ShippingCompanyWrapper>();
-        for (ShippingCompany sc : objects) {
-            wrappers.add(new ShippingCompanyWrapper(appService, sc));
+        List<ShippingMethod> objects = appService.search(ShippingMethod.class,
+            new ShippingMethod());
+        List<ShippingMethodWrapper> wrappers = new ArrayList<ShippingMethodWrapper>();
+        for (ShippingMethod sc : objects) {
+            wrappers.add(new ShippingMethodWrapper(appService, sc));
         }
         return wrappers;
     }
