@@ -131,13 +131,15 @@ public class TestShipment extends TestDatabase {
             clinic, name);
         int nber = r.nextInt(3) + 1;
         for (int i = 0; i < nber; i++) {
-            PatientVisitHelper.addPatientVisit(shipment.getPatientCollection()
-                .get(0), shipment, Utils.getRandomDate());
+            PatientVisitHelper
+                .addPatientVisit(shipment.getPatientCollection().get(0),
+                    shipment, Utils.getRandomDate(), Utils.getRandomDate());
         }
         shipment.reload();
 
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(shipment
-            .getPatientCollection().get(0), shipment, Utils.getRandomDate());
+            .getPatientCollection().get(0), shipment, Utils.getRandomDate(),
+            Utils.getRandomDate());
         shipment.addPatientVisits(Arrays.asList(visit));
         shipment.persist();
 
@@ -498,7 +500,8 @@ public class TestShipment extends TestDatabase {
         ShipmentHelper.addShipment(clinic, patient1);
 
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(
-            patient1, shipmentTest, Utils.getRandomDate());
+            patient1, shipmentTest, Utils.getRandomDate(), Utils
+                .getRandomDate());
         shipmentTest.reload();
 
         try {

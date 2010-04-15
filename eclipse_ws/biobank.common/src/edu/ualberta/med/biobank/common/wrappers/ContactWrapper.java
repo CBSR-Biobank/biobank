@@ -43,15 +43,37 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         propertyChangeSupport.firePropertyChange("title", oldTitle, title);
     }
 
-    public String getPhoneNumber() {
-        return wrappedObject.getPhoneNumber();
+    public String getMobileNumber() {
+        return wrappedObject.getMobileNumber();
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        String oldPhoneNumber = getPhoneNumber();
-        wrappedObject.setPhoneNumber(phoneNumber);
-        propertyChangeSupport.firePropertyChange("phoneNumber", oldPhoneNumber,
-            phoneNumber);
+    public void setMobileNumber(String mobileNumber) {
+        String oldMobileNumber = getMobileNumber();
+        wrappedObject.setMobileNumber(mobileNumber);
+        propertyChangeSupport.firePropertyChange("mobileNumber",
+            oldMobileNumber, mobileNumber);
+    }
+
+    public String getPagerNumber() {
+        return wrappedObject.getPagerNumber();
+    }
+
+    public void setPagerNumber(String pagerNumber) {
+        String oldPagerNumber = getPagerNumber();
+        wrappedObject.setPagerNumber(pagerNumber);
+        propertyChangeSupport.firePropertyChange("pagerNumber", oldPagerNumber,
+            pagerNumber);
+    }
+
+    public String getOfficeNumber() {
+        return wrappedObject.getOfficeNumber();
+    }
+
+    public void setOfficeNumber(String officeNumber) {
+        String oldOfficeNumber = getOfficeNumber();
+        wrappedObject.setOfficeNumber(officeNumber);
+        propertyChangeSupport.firePropertyChange("officeNumber",
+            oldOfficeNumber, officeNumber);
     }
 
     public String getFaxNumber() {
@@ -70,7 +92,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     public void setEmailAddress(String emailAddress) {
-        String oldEmailAddress = getPhoneNumber();
+        String oldEmailAddress = getEmailAddress();
         wrappedObject.setEmailAddress(emailAddress);
         propertyChangeSupport.firePropertyChange("emailAddress",
             oldEmailAddress, emailAddress);
@@ -131,8 +153,9 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "title", "phoneNumber", "faxNumber",
-            "emailAddress", "clinic", "studyCollection" };
+        return new String[] { "name", "title", "mobileNumber", "pagerNumber",
+            "officeNumber", "faxNumber", "emailAddress", "clinic",
+            "studyCollection" };
     }
 
     @Override
@@ -159,6 +182,6 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     @Override
     public String toString() {
-        return getName() + " (" + getPhoneNumber() + ")";
+        return getName() + " (" + getMobileNumber() + ")";
     }
 }

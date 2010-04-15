@@ -22,13 +22,15 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
         String name;
         String title;
         String emailAddress;
-        String phoneNumber;
-        String faxNumber;
+        String mobileNumber;
+        String pagerNumber;
+        String officeNumber;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort, name,
-                title, emailAddress, phoneNumber, faxNumber }, "\t");
+                title, emailAddress, mobileNumber, pagerNumber, officeNumber },
+                "\t");
         }
     }
 
@@ -58,10 +60,13 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 rc = compare(i1.emailAddress, i2.emailAddress);
                 break;
             case 4:
-                rc = compare(i1.phoneNumber, i2.phoneNumber);
+                rc = compare(i1.mobileNumber, i2.mobileNumber);
                 break;
             case 5:
-                rc = compare(i1.faxNumber, i2.faxNumber);
+                rc = compare(i1.pagerNumber, i2.pagerNumber);
+                break;
+            case 6:
+                rc = compare(i1.officeNumber, i2.officeNumber);
                 break;
             default:
                 rc = 0;
@@ -75,10 +80,10 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     private static final String[] HEADINGS = new String[] { "Clinic",
-        "Contact Name", "Title", "Email", "Phone #", "Fax #" };
+        "Contact Name", "Title", "Email", "Mobile #", "Pager #", "Office #" };
 
     private static final int[] BOUNDS = new int[] { 100, 150, 150, 200, 100,
-        100 };
+        100, -1 };
 
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
@@ -107,9 +112,11 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
                 case 3:
                     return item.emailAddress;
                 case 4:
-                    return item.phoneNumber;
+                    return item.mobileNumber;
                 case 5:
-                    return item.faxNumber;
+                    return item.pagerNumber;
+                case 6:
+                    return item.officeNumber;
                 default:
                     return "";
                 }
@@ -139,8 +146,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
             info.title = new String();
         }
         info.emailAddress = contact.getEmailAddress();
-        info.phoneNumber = contact.getPhoneNumber();
-        info.faxNumber = contact.getFaxNumber();
+        info.mobileNumber = contact.getMobileNumber();
+        info.pagerNumber = contact.getPagerNumber();
+        info.officeNumber = contact.getOfficeNumber();
         return info;
     }
 

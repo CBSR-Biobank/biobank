@@ -164,7 +164,7 @@ public class SampleTypeSelectionWidget {
                     if (value instanceof Boolean && !(Boolean) value) {
                         controlDecoration.show();
                         return ValidationStatus
-                            .error("Types should be selected");
+                            .error("Type should be selected");
                     } else {
                         controlDecoration.hide();
                         return Status.OK_STATUS;

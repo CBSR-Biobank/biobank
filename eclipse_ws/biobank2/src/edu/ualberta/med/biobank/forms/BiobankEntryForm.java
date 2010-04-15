@@ -67,7 +67,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankEntryForm.class.getName());
 
-    private static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
+    public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
         .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     protected String sessionName;
@@ -245,10 +245,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage) {
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            observedObject, propertyName, emptyMessage);
+            modelObservableValue, emptyMessage);
     }
 
     /*

@@ -20,13 +20,14 @@ public class PvSourceVesselInfoTable extends
         PvSourceVesselWrapper pvSourceVessel;
         String name;
         Integer quantity;
-        String dateDrawn;
+        String timeDrawn;
+        String volume;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name,
-                (quantity != null) ? quantity.toString() : "", dateDrawn },
-                "\t");
+                (quantity != null) ? quantity.toString() : "", timeDrawn,
+                volume }, "\t");
         }
     }
 
@@ -50,7 +51,10 @@ public class PvSourceVesselInfoTable extends
                 rc = compare(i1.quantity, i2.quantity);
                 break;
             case 2:
-                rc = compare(i1.dateDrawn, i2.dateDrawn);
+                rc = compare(i1.timeDrawn, i2.timeDrawn);
+                break;
+            case 3:
+                rc = compare(i1.volume, i2.volume);
                 break;
             default:
                 rc = 0;
@@ -64,9 +68,9 @@ public class PvSourceVesselInfoTable extends
     }
 
     private final static String[] HEADINGS = new String[] { "Name", "Quantity",
-        "Date Drawn" };
+        "Time Drawn", "Volume (ml)" };
 
-    private final static int[] BOUNDS = new int[] { 250, 100, -1, -1, -1 };
+    private final static int[] BOUNDS = new int[] { 250, 100, 100, -1, -1 };
 
     public PvSourceVesselInfoTable(Composite parent,
         List<PvSourceVesselWrapper> collection) {
@@ -92,7 +96,9 @@ public class PvSourceVesselInfoTable extends
                     return (info.quantity != null) ? info.quantity.toString()
                         : "";
                 case 2:
-                    return info.dateDrawn;
+                    return info.timeDrawn;
+                case 3:
+                    return info.volume;
                 default:
                     return "";
                 }
@@ -115,7 +121,8 @@ public class PvSourceVesselInfoTable extends
             "patient visit source vessel has null for source vessel");
         info.name = pvSourceVessel.getSourceVessel().getName();
         info.quantity = pvSourceVessel.getQuantity();
-        info.dateDrawn = pvSourceVessel.getFormattedDateDrawn();
+        info.timeDrawn = pvSourceVessel.getFormattedTimeDrawn();
+        info.volume = pvSourceVessel.getVolume();
         return info;
     }
 

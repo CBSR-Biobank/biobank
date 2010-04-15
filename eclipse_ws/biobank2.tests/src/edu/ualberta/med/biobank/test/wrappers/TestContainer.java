@@ -823,7 +823,7 @@ public class TestContainer extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
         return pv;
     }
 
@@ -889,7 +889,7 @@ public class TestContainer extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);

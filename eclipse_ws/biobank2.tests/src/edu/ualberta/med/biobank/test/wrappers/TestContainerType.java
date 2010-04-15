@@ -563,7 +563,7 @@ public class TestContainerType extends TestDatabase {
         study.persist();
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, null);
+            shipment, null, Utils.getRandomDate());
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
         AliquotWrapper aliquot = AliquotHelper.addAliquot(selectedSampleTypes
             .get(1), cont3, pv, 0, 1);

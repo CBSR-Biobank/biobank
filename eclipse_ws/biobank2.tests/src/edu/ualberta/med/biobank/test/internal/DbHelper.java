@@ -5,9 +5,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -70,6 +72,14 @@ public class DbHelper {
 
         for (PatientWrapper patient : patients) {
             deletePatientVisits(patient.getPatientVisitCollection());
+            for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+                ship.removePatients(Arrays.asList(patient));
+                if (ship.getPatientCollection().size() == 0) {
+                    ship.delete();
+                } else {
+                    ship.persist();
+                }
+            }
             patient.reload();
             patient.delete();
         }

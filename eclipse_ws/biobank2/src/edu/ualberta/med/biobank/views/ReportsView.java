@@ -56,6 +56,7 @@ public class ReportsView extends ViewPart {
     }
 
     public static TreeViewer getTree() {
+        // retrieves the report tree
         return reportsView.querySelect;
     }
 
@@ -71,26 +72,23 @@ public class ReportsView extends ViewPart {
             public void doubleClick(DoubleClickEvent event) {
                 ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
                     .getSelection()).getFirstElement();
-                if (node.getParent().isRoot())
-                    ;
-                else if (node.getParent().getLabel().compareTo("Standard") != 0)
-                    try {
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().openEditor(new ReportInput(node),
-                                AdvancedReportsEditor.ID);
-                    } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Error opening editor.",
-                            ex);
+                try {
+                    if (node.getQuery() != null) {
+                        if (node.getQuery() instanceof QueryTreeNode)
+                            PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getActivePage()
+                                .openEditor(new ReportInput(node),
+                                    AdvancedReportsEditor.ID);
+                        else
+                            PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getActivePage()
+                                .openEditor(new ReportInput(node),
+                                    ReportsEditor.ID);
                     }
-                else
-                    try {
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().openEditor(new ReportInput(node),
-                                ReportsEditor.ID);
-                    } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Error",
-                            "There was an error while building page.");
-                    }
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Error",
+                        "There was an error while building page.");
+                }
             }
         });
         querySelect.setContentProvider(new ITreeContentProvider() {
@@ -166,7 +164,8 @@ public class ReportsView extends ViewPart {
                 Object element = ((StructuredSelection) querySelect
                     .getSelection()).getFirstElement();
                 final ReportTreeNode node = (ReportTreeNode) element;
-                if (node != null && node.getParent().getQuery() != null) {
+                if (node != null
+                    && node.getParent().getLabel().compareTo("Custom") == 0) {
                     MenuItem mi = new MenuItem(menu, SWT.NONE);
                     mi.setText("Delete");
                     mi.addSelectionListener(new SelectionAdapter() {
@@ -174,10 +173,7 @@ public class ReportsView extends ViewPart {
                         public void widgetSelected(SelectionEvent event) {
                             File file = new File(Platform.getInstanceLocation()
                                 .getURL().getPath()
-                                + "/saved_reports/"
-                                + node.getParent().getLabel()
-                                + "_"
-                                + node.getLabel() + ".xml");
+                                + "/saved_reports/" + node.getLabel() + ".xml");
                             file.delete();
                             node.getParent().removeChild(node);
                             querySelect.refresh();
@@ -191,52 +187,87 @@ public class ReportsView extends ViewPart {
         ReportTreeNode root = new ReportTreeNode("", null);
         ReportTreeNode standard = new ReportTreeNode("Standard", null);
         ReportTreeNode advanced = new ReportTreeNode("Advanced", null);
+
+        // create standard's subnodes
+        ReportTreeNode aliquots = new ReportTreeNode("Aliquots", null);
+        ReportTreeNode clinics = new ReportTreeNode("Clinics", null);
+        ReportTreeNode patientVisits = new ReportTreeNode("PatientVisits", null);
+        ReportTreeNode patients = new ReportTreeNode("Patients", null);
+        ReportTreeNode misc = new ReportTreeNode("Miscellaneous", null);
+
+        standard.addChild(aliquots);
+        standard.addChild(clinics);
+        standard.addChild(patientVisits);
+        standard.addChild(patients);
+        standard.addChild(misc);
+        aliquots.setParent(standard);
+        clinics.setParent(standard);
+        patientVisits.setParent(standard);
+        patients.setParent(standard);
+        misc.setParent(standard);
+
         String[] names = QueryObject.getQueryObjectNames();
         for (int i = 0; i < names.length; i++)
             try {
                 ReportTreeNode child = new ReportTreeNode(names[i], QueryObject
                     .getQueryObjectByName(names[i]));
-                standard.addChild(child);
-                child.setParent(standard);
+                if (names[i].contains("Aliquot")) {
+                    aliquots.addChild(child);
+                    child.setParent(aliquots);
+                } else if (names[i].contains("Patient Visit")) {
+                    patientVisits.addChild(child);
+                    child.setParent(patientVisits);
+                } else if (names[i].contains("Patient")) {
+                    patients.addChild(child);
+                    child.setParent(patients);
+                } else if (names[i].contains("Clinic")) {
+                    clinics.addChild(child);
+                    child.setParent(clinics);
+                } else {
+                    misc.addChild(child);
+                    child.setParent(misc);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-        File dir = new File(Platform.getInstanceLocation().getURL().getPath()
-            + "/saved_reports");
-        File[] files = dir.listFiles();
 
         List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs();
         for (Class<?> obj : advancedObjs) {
             ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
                 .replace("Wrapper", ""), QueryTree.constructTree(new HQLField(
                 "", obj.getSimpleName(), obj)));
-            if (files != null)
-                try {
-                    for (int i = 0; i < files.length; i++) {
-                        if (files[i].getName().contains(".xml")
-                            && files[i].getName().startsWith(child.getLabel())) {
-                            ReportTreeNode custom = new ReportTreeNode(files[i]
-                                .getName().replace(".xml", "").substring(
-                                    child.getLabel().length() + 1),
-                                QueryTreeNode.getTreeFromFile(files[i]));
-                            custom.setParent(child);
-                            child.addChild(custom);
-                        }
-                    }
-                } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Error loading saved reports",
-                        e);
-                }
             advanced.addChild(child);
             child.setParent(advanced);
         }
+
+        ReportTreeNode custom = new ReportTreeNode("Custom", null);
+        custom.setParent(advanced);
+        advanced.addChild(custom);
+
+        File dir = new File(Platform.getInstanceLocation().getURL().getPath()
+            + "/saved_reports");
+        File[] files = dir.listFiles();
+        if (files != null)
+            try {
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].getName().contains(".xml")) {
+                        String name = files[i].getName().replace(".xml", "");
+                        ReportTreeNode customNode = new ReportTreeNode(name,
+                            QueryTreeNode.getTreeFromFile(files[i]));
+                        customNode.setParent(custom);
+                        custom.addChild(customNode);
+                    }
+                }
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Error loading saved reports", e);
+            }
 
         root.addChild(standard);
         standard.setParent(root);
         root.addChild(advanced);
         advanced.setParent(root);
         querySelect.setInput(root);
+        querySelect.expandAll();
 
         GridData qgd = new GridData();
         qgd.verticalAlignment = SWT.FILL;

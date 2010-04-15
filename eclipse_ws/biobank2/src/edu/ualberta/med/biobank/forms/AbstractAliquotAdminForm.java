@@ -39,6 +39,9 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             appender = new ActivityLogAppender(getActivityTitle());
             activityLogger.addAppender(appender);
         }
+        widgetCreator.setKeyListener(null);
+        widgetCreator.setModifyListener(null);
+        widgetCreator.setSelectionListener(null);
     }
 
     public boolean onClose() {

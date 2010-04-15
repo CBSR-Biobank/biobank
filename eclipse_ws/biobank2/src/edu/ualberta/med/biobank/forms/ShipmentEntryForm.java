@@ -134,8 +134,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         }
 
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
-            "Date Shipped", shipmentWrapper.getDateShipped(), shipmentWrapper,
-            "dateShipped", "Date shipped should be set");
+            "Date Shipped", shipmentWrapper.getDateShipped(), BeansObservables
+                .observeValue(shipmentWrapper, "dateShipped"),
+            "Date shipped should be set");
         firstControl = dateShippedWidget;
 
         ShippingCompanyWrapper selectedCompany = shipmentWrapper
@@ -149,8 +150,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             null);
 
         createDateTimeWidget(client, "Date Received", shipmentWrapper
-            .getDateReceived(), shipmentWrapper, "dateReceived",
-            "Date received should be set");
+            .getDateReceived(), BeansObservables.observeValue(shipmentWrapper,
+            "dateReceived"), "Date received should be set");
 
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
             null, BeansObservables.observeValue(shipmentWrapper, "comment"),

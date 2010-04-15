@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -8,13 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.SourceVessel;
@@ -23,9 +23,9 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 
 public class TestPvSourceVessel extends TestDatabase {
 
@@ -42,7 +42,7 @@ public class TestPvSourceVessel extends TestDatabase {
             clinic, Utils.getRandomString(10));
         PatientWrapper patient = shipment.getPatientCollection().get(0);
         PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate());
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         pvSourceVessel = PvSourceVesselHelper.addPvSourceVessel(Utils
             .getRandomString(10), pvw);
@@ -78,7 +78,8 @@ public class TestPvSourceVessel extends TestDatabase {
 
         PatientVisitWrapper oldPv = pvSourceVessel.getPatientVisit();
         PatientVisitWrapper newPv = PatientVisitHelper.addPatientVisit(oldPv
-            .getPatient(), oldPv.getShipment(), Utils.getRandomDate());
+            .getPatient(), oldPv.getShipment(), Utils.getRandomDate(), Utils
+            .getRandomDate());
         pvSourceVessel.setPatientVisit(newPv);
         pvSourceVessel.persist();
 
@@ -90,13 +91,12 @@ public class TestPvSourceVessel extends TestDatabase {
     }
 
     @Test
-    public void testGetDateDrawn() throws Exception {
+    public void testGetTimeDrawn() throws Exception {
         Date date = Utils.getRandomDate();
-        pvSourceVessel.setDateDrawn(date);
+        pvSourceVessel.setTimeDrawn(date);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Assert.assertTrue(sdf.format(date).equals(
-            pvSourceVessel.getFormattedDateDrawn()));
+        Assert.assertTrue(DateFormatter.formatAsTime(date).equals(
+            pvSourceVessel.getFormattedTimeDrawn()));
     }
 
     @Test

@@ -10,11 +10,16 @@ public class DateFormatter {
 
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 
+    public static final String TIME_FORMAT = "HH:mm";
+
     public static final SimpleDateFormat dateFormatter = new SimpleDateFormat(
         DATE_FORMAT);
 
     public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
         DATE_TIME_FORMAT);
+
+    public static final SimpleDateFormat timeFormatter = new SimpleDateFormat(
+        TIME_FORMAT);
 
     public static String formatAsDate(Date date) {
         return format(dateFormatter, date);
@@ -22,6 +27,10 @@ public class DateFormatter {
 
     public static String formatAsDateTime(Date date) {
         return format(dateTimeFormatter, date);
+    }
+
+    public static String formatAsTime(Date date) {
+        return format(timeFormatter, date);
     }
 
     public static String format(SimpleDateFormat sdf, Date date) {
@@ -37,6 +46,10 @@ public class DateFormatter {
 
     public static Date parseToDateTime(String string) {
         return parse(dateTimeFormatter, string);
+    }
+
+    public static Date parseToTime(String string) {
+        return parse(timeFormatter, string);
     }
 
     public static Date parse(SimpleDateFormat sdf, String string) {

@@ -46,8 +46,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "patient", "dateProcessed", "comment",
-            "pvAttrCollection", "aliquotCollection", "username", "shipment",
+        return new String[] { "patient", "dateProcessed", "dateDrawn",
+            "comment", "pvAttrCollection", "aliquotCollection", "shipment",
             "pvSourceVesselCollection" };
     }
 
@@ -57,6 +57,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public String getFormattedDateProcessed() {
         return DateFormatter.formatAsDateTime(getDateProcessed());
+    }
+
+    public Date getDateDrawn() {
+        return wrappedObject.getDateDrawn();
+    }
+
+    public String getFormattedDateDrawn() {
+        return DateFormatter.formatAsDateTime(getDateDrawn());
     }
 
     public String getComment() {
@@ -312,6 +320,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             .firePropertyChange("dateProcessed", oldDate, date);
     }
 
+    public void setDateDrawn(Date date) {
+        Date oldDate = getDateDrawn();
+        wrappedObject.setDateDrawn(date);
+        propertyChangeSupport.firePropertyChange("dateDrawn", oldDate, date);
+    }
+
     public void setComment(String comment) {
         String oldComment = getComment();
         wrappedObject.setComment(comment);
@@ -360,17 +374,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 ss.delete();
             }
         }
-    }
-
-    public String getUsername() {
-        return wrappedObject.getUsername();
-    }
-
-    public void setUsername(String username) {
-        String oldUsername = wrappedObject.getUsername();
-        wrappedObject.setUsername(username);
-        propertyChangeSupport.firePropertyChange("username", oldUsername,
-            username);
     }
 
     public ShipmentWrapper getShipment() {
