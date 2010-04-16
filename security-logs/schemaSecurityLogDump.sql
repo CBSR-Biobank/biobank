@@ -15,6 +15,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+
 --
 -- Table structure for table `csm_application`
 --
@@ -290,7 +291,7 @@ CREATE TABLE `csm_protection_element` (
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -332,7 +333,7 @@ INSERT INTO `csm_protection_element` VALUES (33,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','','','',2,'2010-01-11');
 INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','','','',2,'2010-04-13');
 INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
-INSERT INTO `csm_protection_element` VALUES (43,'edu.ualberta.med.biobank.model.Site/ID=2/Name=Canadian BioSample Repository','Canadian BioSample Repository','edu.ualberta.med.biobank.model.Site','id','1','',2,'2010-03-30');
+INSERT INTO `csm_protection_element` VALUES (43,'edu.ualberta.med.biobank.model.Site/ID=1/Name=Canadian BioSample Repository','Canadian BioSample Repository','edu.ualberta.med.biobank.model.Site','id','1','',2,'2010-04-16');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -382,7 +383,7 @@ INSERT INTO `csm_protection_group` VALUES (16,'pg-patients-parent','Children= pg
 INSERT INTO `csm_protection_group` VALUES (17,'pg-visits-parent','Children=pg-pvAttr, pg-visits, pg-samples-all, pg-sample-source',2,0,'2010-01-29',NULL);
 INSERT INTO `csm_protection_group` VALUES (18,'pg-pvAttr','',2,0,'2010-01-29',17);
 INSERT INTO `csm_protection_group` VALUES (19,'pg-visits','',2,0,'2010-01-29',17);
-INSERT INTO `csm_protection_group` VALUES (20,'pg-sourcevessels','',2,0,'2010-03-15',17);
+INSERT INTO `csm_protection_group` VALUES (20,'pg-pv-sourcevessels','',2,0,'2010-04-16',17);
 INSERT INTO `csm_protection_group` VALUES (21,'pg-aliquots-parent','Children= pg-sample-type, pg-sample, pg-sample-position',2,0,'2010-03-15',NULL);
 INSERT INTO `csm_protection_group` VALUES (22,'pg-aliquot-position','',2,0,'2010-03-15',21);
 INSERT INTO `csm_protection_group` VALUES (23,'pg-sample-type','',2,0,'2010-01-29',21);
@@ -391,13 +392,13 @@ INSERT INTO `csm_protection_group` VALUES (25,'pg-studies-parent','Children= pg-
 INSERT INTO `csm_protection_group` VALUES (26,'pg-sampleStorage','',2,0,'2010-01-29',25);
 INSERT INTO `csm_protection_group` VALUES (27,'pg-clinics-parent','Children=pg-shipments, pg-shippingCompany, pg-clinics',2,0,'2010-01-29',NULL);
 INSERT INTO `csm_protection_group` VALUES (29,'pg-shipment','',2,0,'2010-01-29',27);
-INSERT INTO `csm_protection_group` VALUES (30,'pg-shipping-company','',2,0,'2010-01-29',27);
+INSERT INTO `csm_protection_group` VALUES (30,'pg-shipping-method','',2,0,'2010-04-16',27);
 INSERT INTO `csm_protection_group` VALUES (31,'pg-StudyPvAttr','',2,0,'2010-01-29',25);
 INSERT INTO `csm_protection_group` VALUES (32,'pg-sitePvAttr','',2,0,'2010-01-29',33);
 INSERT INTO `csm_protection_group` VALUES (33,'pg-site-parent','Children=pg-site, pg-sitePvAttr',2,0,'2010-01-29',NULL);
 INSERT INTO `csm_protection_group` VALUES (34,'pg-visits-aliquots-all','',2,0,'2010-03-15',16);
 INSERT INTO `csm_protection_group` VALUES (35,'pg-aliquot-all','',2,0,'2010-03-15',17);
-INSERT INTO `csm_protection_group` VALUES (36,'pg-study-samplesource','',2,0,'2010-01-29',25);
+INSERT INTO `csm_protection_group` VALUES (36,'pg-study-sourcevessel','',2,0,'2010-04-16',25);
 /*!40000 ALTER TABLE `csm_protection_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -719,6 +720,7 @@ CREATE TABLE `objectattributes` (
 UNLOCK TABLES;
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -727,4 +729,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-03-15 16:21:47
+-- Dump completed on 2010-04-16 15:13:30
