@@ -345,8 +345,7 @@ public class ContainerViewForm extends BiobankViewForm {
             context.run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("D    eleting...",
-                        IProgressMonitor.UNKNOWN);
+                    monitor.beginTask("Deleting...", IProgressMonitor.UNKNOWN);
                     boolean deleteDones = false;
                     try {
 

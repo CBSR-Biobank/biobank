@@ -14,15 +14,14 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
-    /**
-     * Indicate if this form has been saved
-     */
-    private boolean isSaved = false;
+    protected boolean finished = true;
+    protected boolean printed = false;
 
     private static Logger activityLogger;
     private static ActivityLogAppender appender;
@@ -38,27 +37,38 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             appender = new ActivityLogAppender(getActivityTitle());
             activityLogger.addAppender(appender);
         }
+        widgetCreator.setKeyListener(null);
+        widgetCreator.setModifyListener(null);
+        widgetCreator.setSelectionListener(null);
     }
 
     public boolean onClose() {
-        if (!isSaved) {
-            if (BioBankPlugin.isAskPrint()) {
-                boolean doPrint = MessageDialog.openQuestion(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    "Print", "Do you want to print information ?");
-                if (doPrint) {
-                    print();
+        if (finished) {
+            if (!printed) {
+                if (BioBankPlugin.isAskPrint()) {
+                    boolean doPrint = MessageDialog.openQuestion(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        "Print", "Do you want to print information ?");
+                    if (doPrint) {
+                        if (print())
+                            printed = true;
+                        else {
+                            printed = false;
+                            return false;
+                        }
+                    }
                 }
             }
             activityLogger.removeAppender(appender);
             appender.close();
             appender = null;
+
             return true;
         }
         return false;
     }
 
-    protected void print() {
+    public boolean print() {
         if (appender == null) {
             BioBankPlugin.openError("Print error", "Can't print: log error.");
         }
@@ -71,8 +81,10 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             JasperPrint jp = ReportingUtils.createStandardReport(
                 "ActivityReportForm", map, logsList);
             ReportingUtils.printReport(jp);
+            return true;
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);
+            return false;
         }
     }
 
@@ -82,14 +94,28 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         if (activityLogger != null) {
             activityLogger.trace(message);
         }
+        printed = false;
     }
 
     public void appendLogNLS(String key, Object... params) {
         appendLog(Messages.getFormattedString(key, params));
     }
 
-    protected void setSaved(boolean saved) {
-        this.isSaved = saved;
+    protected void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public abstract BiobankLogger getErrorLogger();
+
+    public void setPrinted(boolean b) {
+        this.printed = b;
+    }
+
+    @Override
+    protected void addToolbarButtons() {
+        addResetAction();
+        addConfirmAction();
+        form.updateToolBar();
     }
 
 }

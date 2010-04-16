@@ -20,6 +20,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -40,9 +42,11 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
+import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
+import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scanlib.ScanCell;
@@ -280,8 +284,30 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletLabel = toolkit.createLabel(palletComposite, "Pallet"); //$NON-NLS-1$
         palletWidget = new ScanPalletWidget(palletComposite);
         toolkit.adapt(palletWidget);
+        palletWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
+                    .getObjectAtCoordinates(e.x, e.y);
+                manageCellProblem((PalletCell) cell);
+            }
+        });
 
         showOnlyPallet(true);
+    }
+
+    protected void manageCellProblem(PalletCell cell) {
+        if (cell != null) {
+            switch (cell.getStatus()) {
+            case ERROR:
+                // do something ?
+                break;
+            case MISSING:
+                SessionManager.openViewForm(cell.getExpectedAliquot());
+                break;
+            }
+        }
+
     }
 
     private GridLayout getNeutralGridLayout() {
@@ -535,6 +561,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         String palletType = currentPalletWrapper.getContainerType().getName();
         String sampleType = foundAliquot.getSampleType().getName();
 
+        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+            .getPnumber());
         scanCell.setStatus(AliquotCellStatus.ERROR);
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
@@ -650,7 +678,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             appendLog(sb.toString());
             appendLogNLS("ScanAssign.activitylog.save.summary", totalNb, //$NON-NLS-1$
                 currentPalletWrapper.getLabel());
-            setSaved(true);
+            setFinished(false);
         }
     }
 
@@ -877,4 +905,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         fieldsComposite.setEnabled(false);
     }
 
+    @Override
+    public BiobankLogger getErrorLogger() {
+        return logger;
+    }
 }

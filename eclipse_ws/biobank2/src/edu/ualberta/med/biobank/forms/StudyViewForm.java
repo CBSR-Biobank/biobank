@@ -22,8 +22,8 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudySourceVesselInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -42,7 +42,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
-    private SourceVesselInfoTable sourceVesselTable;
+    private StudySourceVesselInfoTable studySourceVesselsTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
         public Text wiget;
@@ -154,11 +154,12 @@ public class StudyViewForm extends BiobankViewForm {
 
     private void createSourceVesselSection() {
         Section section = createSection("Source Vessels");
-        sourceVesselTable = new SourceVesselInfoTable(section, study
-            .getSourceVesselCollection());
-        section.setClient(sourceVesselTable);
-        sampleStorageTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sourceVesselTable);
+
+        studySourceVesselsTable = new StudySourceVesselInfoTable(section, study
+            .getStudySourceVesselCollection());
+        section.setClient(studySourceVesselsTable);
+        studySourceVesselsTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(studySourceVesselsTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {

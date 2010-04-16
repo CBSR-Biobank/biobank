@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,7 +13,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -35,7 +33,7 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text linkDateLabel;
 
-    private Text quantityLabel;
+    private Text volumeLabel;
 
     private Text shipmentWaybillLabel;
 
@@ -90,7 +88,7 @@ public class AliquotViewForm extends BiobankViewForm {
 
         sampleTypeLabel = createReadOnlyField(client, SWT.NONE, "Type");
         linkDateLabel = createReadOnlyField(client, SWT.NONE, "Link Date");
-        quantityLabel = createReadOnlyField(client, SWT.NONE, "Quantity");
+        volumeLabel = createReadOnlyField(client, SWT.NONE, "Volume (ml)");
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
@@ -101,48 +99,51 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void createContainersSection() {
-        Section section = createSection("Containers Visualization");
-        Composite containersComposite = toolkit.createComposite(section);
-        section.setClient(containersComposite);
-        section.setExpanded(false);
-        containersComposite.setLayout(new GridLayout(1, false));
-        toolkit.paintBordersFor(containersComposite);
+        if (aliquot.getParent() != null) {
+            Section section = createSection("Containers Visualization");
+            Composite containersComposite = toolkit.createComposite(section);
+            section.setClient(containersComposite);
+            section.setExpanded(false);
+            containersComposite.setLayout(new GridLayout(1, false));
+            toolkit.paintBordersFor(containersComposite);
 
-        Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
-        ContainerWrapper container = aliquot.getParent();
-        while (container != null) {
-            parents.push(container);
-            container = container.getParent();
-        }
-        while (!parents.isEmpty()) {
-            container = parents.pop();
-            RowColPos position;
-            if (parents.isEmpty()) {
-                position = aliquot.getPosition();
-            } else {
-                position = parents.peek().getPosition();
+            Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
+            ContainerWrapper container = aliquot.getParent();
+            while (container != null) {
+                parents.push(container);
+                container = container.getParent();
             }
-            Composite containerComposite = toolkit
-                .createComposite(containersComposite);
-            GridLayout layout = new GridLayout(1, false);
-            layout.horizontalSpacing = 0;
-            layout.marginWidth = 0;
-            layout.verticalSpacing = 0;
-            containerComposite.setLayout(layout);
-            toolkit.createLabel(containerComposite, container.getLabel() + " ("
-                + container.getContainerType().getNameShort() + ") ");
-            AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
-                .createWidget(containerComposite, container);
-            containerWidget.setSelection(position);
-            toolkit.adapt(containerWidget);
+            while (!parents.isEmpty()) {
+                container = parents.pop();
+                RowColPos position;
+                if (parents.isEmpty()) {
+                    position = aliquot.getPosition();
+                } else {
+                    position = parents.peek().getPosition();
+                }
+                Composite containerComposite = toolkit
+                    .createComposite(containersComposite);
+                GridLayout layout = new GridLayout(1, false);
+                layout.horizontalSpacing = 0;
+                layout.marginWidth = 0;
+                layout.verticalSpacing = 0;
+                containerComposite.setLayout(layout);
+                toolkit
+                    .createLabel(containerComposite, container.getLabel()
+                        + " (" + container.getContainerType().getNameShort()
+                        + ") ");
+                AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
+                    .createWidget(containerComposite, container);
+                containerWidget.setSelection(position);
+                toolkit.adapt(containerWidget);
+            }
         }
-
     }
 
     private void setValues() {
         setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
-        setTextValue(quantityLabel, aliquot.getQuantity() == null ? null
+        setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
             : aliquot.getQuantity().toString());
         setTextValue(shipmentWaybillLabel, aliquot.getPatientVisit()
             .getShipment().getWaybill());
@@ -150,14 +151,8 @@ public class AliquotViewForm extends BiobankViewForm {
             .getPnumber());
         setTextValue(visitLabel, aliquot.getPatientVisit()
             .getFormattedDateProcessed());
-        List<PvSourceVesselWrapper> sourceVessels = aliquot.getPatientVisit()
-            .getPvSourceVesselCollection();
-        if (sourceVessels.isEmpty()) {
-            setTextValue(dateDrawnLabel, "");
-        } else if (sourceVessels.size() == 1) {
-            setTextValue(dateDrawnLabel, sourceVessels.get(0)
-                .getFormattedDateDrawn());
-        }
+        setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
+            .getFormattedDateDrawn());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }

@@ -6,7 +6,9 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -18,12 +20,13 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.ShipmentAdministrationView.ShipmentListener;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -47,11 +50,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ComboViewer clinicsComboViewer;
 
-    private ComboViewer companyComboViewer;
+    private ComboViewer shippingMethodComboViewer;
 
     private SiteWrapper site;
 
     private ShipmentPatientsWidget shipmentPatientsWidget;
+
+    private ShipmentListener shipListener;
+
+    private Text waybillText;
 
     @Override
     protected void init() throws Exception {
@@ -74,7 +81,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             tabName = "Shipment " + shipmentWrapper.getWaybill();
         }
         setPartName(tabName);
+        shipListener = new ShipmentListener(shipmentAdapter);
+        shipmentWrapper.addWrapperListener(shipListener);
     }
+
+    // @Override
+    // public void dispose() {
+    // shipmentWrapper.removeWrapperListener(shipListener);
+    // super.dispose();
+    // }
 
     @Override
     protected void createFormContent() throws Exception {
@@ -98,10 +113,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, site.getName());
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Waybill",
-            null, BeansObservables.observeValue(shipmentWrapper, "waybill"),
-            new NonEmptyStringValidator("A waybill should be set"));
-
         if (shipmentWrapper.isNew()) {
             // choose clinic for new shipment
             List<ClinicWrapper> siteClinics = site.getClinicCollection(true);
@@ -112,6 +123,20 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             clinicsComboViewer = createComboViewerWithNoSelectionValidator(
                 client, "Clinic", siteClinics, selectedClinic,
                 "A clinic should be selected");
+            clinicsComboViewer
+                .addSelectionChangedListener(new ISelectionChangedListener() {
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        setClinicFromSelection();
+                        try {
+                            shipmentWrapper.checkPatientsStudy();
+                            waybillText.setEnabled(shipmentWrapper.getClinic()
+                                .getSendsShipments());
+                        } catch (Exception e) {
+                            BioBankPlugin.openAsyncError("Patients check", e);
+                        }
+                    }
+                });
         } else {
             Text clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
             if (shipmentWrapper.getClinic() != null) {
@@ -119,24 +144,32 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         }
 
+        waybillText = (Text) createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Waybill", null, BeansObservables.observeValue(
+                shipmentWrapper, "waybill"), new NonEmptyStringValidator(
+                "A waybill should be set"));
+
+        waybillText.setEnabled(false);
+
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
-            "Date Shipped", shipmentWrapper.getDateShipped(), shipmentWrapper,
-            "dateShipped", "Date shipped should be set");
+            "Date Shipped", shipmentWrapper.getDateShipped(), BeansObservables
+                .observeValue(shipmentWrapper, "dateShipped"),
+            "Date shipped should be set");
         firstControl = dateShippedWidget;
 
-        ShippingCompanyWrapper selectedCompany = shipmentWrapper
-            .getShippingCompany();
-        companyComboViewer = createComboViewerWithNoSelectionValidator(client,
-            "Shipping company", ShippingCompanyWrapper
-                .getShippingCompanies(appService), selectedCompany, null);
+        ShippingMethodWrapper selectedShippingMethod = shipmentWrapper
+            .getShippingMethod();
+        shippingMethodComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Shipping Method", ShippingMethodWrapper
+                .getShippingMethods(appService), selectedShippingMethod, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Box Number",
             null, BeansObservables.observeValue(shipmentWrapper, "boxNumber"),
             null);
 
         createDateTimeWidget(client, "Date Received", shipmentWrapper
-            .getDateReceived(), shipmentWrapper, "dateReceived",
-            "Date received should be set");
+            .getDateReceived(), BeansObservables.observeValue(shipmentWrapper,
+            "dateReceived"), "Date received should be set");
 
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
             null, BeansObservables.observeValue(shipmentWrapper, "comment"),
@@ -161,6 +194,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             });
         shipmentPatientsWidget
             .addDoubleClickListener(collectionDoubleClickListener);
+        shipmentPatientsWidget.addBinding(widgetCreator,
+            "Patients should be added to a shipment");
     }
 
     @Override
@@ -177,32 +212,36 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         if (clinicsComboViewer != null) {
-            IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
-                .getSelection();
-            if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
-                shipmentWrapper.setClinic((ClinicWrapper) clinicSelection
-                    .getFirstElement());
-            } else {
-                shipmentWrapper.setClinic((ClinicWrapper) null);
-            }
+            setClinicFromSelection();
         }
-        IStructuredSelection companySelection = (IStructuredSelection) companyComboViewer
+        IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
             .getSelection();
-        if ((companySelection != null) && (companySelection.size() > 0)) {
+        if ((shippingMethodSelection != null)
+            && (shippingMethodSelection.size() > 0)) {
             shipmentWrapper
-                .setShippingCompany((ShippingCompanyWrapper) companySelection
+                .setShippingMethod((ShippingMethodWrapper) shippingMethodSelection
                     .getFirstElement());
         } else {
-            shipmentWrapper.setShippingCompany((ShippingCompanyWrapper) null);
+            shipmentWrapper.setShippingMethod((ShippingMethodWrapper) null);
         }
         boolean newShipment = shipmentWrapper.isNew();
         shipmentWrapper.persist();
 
-        if (newShipment && ShipmentAdministrationView.currentInstance != null) {
-            ShipmentAdministrationView.currentInstance
-                .showInTree(shipmentWrapper);
+        if (newShipment) {
+            ShipmentAdministrationView.showShipment(shipmentWrapper);
         } else {
             shipmentAdapter.getParent().performExpand();
+        }
+    }
+
+    private void setClinicFromSelection() {
+        IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
+            .getSelection();
+        if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
+            shipmentWrapper.setClinic((ClinicWrapper) clinicSelection
+                .getFirstElement());
+        } else {
+            shipmentWrapper.setClinic((ClinicWrapper) null);
         }
     }
 
@@ -213,14 +252,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
         }
-        shipmentPatientsWidget.reloadList();
-        ShippingCompanyWrapper shipCompany = shipmentWrapper
-            .getShippingCompany();
-        if (shipCompany != null) {
-            companyComboViewer
-                .setSelection(new StructuredSelection(shipCompany));
-        } else if (companyComboViewer.getCombo().getItemCount() > 1) {
-            companyComboViewer.getCombo().deselectAll();
+        shipmentPatientsWidget.updateList();
+        ShippingMethodWrapper shipMethod = shipmentWrapper.getShippingMethod();
+        if (shipMethod != null) {
+            shippingMethodComboViewer.setSelection(new StructuredSelection(
+                shipMethod));
+        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
+            shippingMethodComboViewer.getCombo().deselectAll();
         }
     }
 

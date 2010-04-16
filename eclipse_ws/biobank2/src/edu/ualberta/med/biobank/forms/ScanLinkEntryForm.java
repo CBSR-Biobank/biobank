@@ -9,19 +9,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -30,7 +21,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -38,16 +28,14 @@ import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
@@ -63,10 +51,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm"; //$NON-NLS-1$
 
-    private ScanLinkPalletWidget spw;
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(ScanLinkEntryForm.class.getName());
 
-    private Text patientNumberText;
-    private ComboViewer viewerVisits;
+    private LinkFormPatientManagement linkFormPatientManagement;
+
+    private ScanLinkPalletWidget spw;
 
     // choose selection mode - deactivated by default
     private Composite radioComponents;
@@ -83,9 +73,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private IObservableValue typesFilledValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
-    // currentPatient
-    private PatientWrapper currentPatient;
-
     // button to choose a fake scan - debug only
     private Button fakeScanRandom;
     private Button fakeScanExists;
@@ -93,14 +80,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     // sampleTypes for containers of type that contains 'palletNameContains'
     private List<SampleTypeWrapper> authorizedSampleTypes;
 
-    private boolean patientNumberTextModified = false;
-
     private Composite fieldsComposite;
 
     @Override
     protected void init() {
         super.init();
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
+        linkFormPatientManagement = new LinkFormPatientManagement(
+            widgetCreator, this);
     }
 
     @Override
@@ -165,7 +152,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         radioComponents.setLayout(compLayout);
         toolkit.paintBordersFor(radioComponents);
         GridData gd = new GridData();
-        gd.horizontalSpan = 2;
+        gd.horizontalSpan = 3;
         radioComponents.setLayoutData(gd);
         radioComponents.setEnabled(false);
 
@@ -324,7 +311,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
                         updateRowType(typeWidget, indexRow);
-                        setDirty(true);
+                        if (spw.isEverythingTyped()) {
+                            setDirty(true);
+                        }
                     }
 
                 });
@@ -339,44 +328,27 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(form.getBody());
-        leftSideComposite.setLayout(new GridLayout(2, false));
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 10;
+        leftSideComposite.setLayout(layout);
+        GridData gd = new GridData();
+        gd.verticalAlignment = SWT.TOP;
+        leftSideComposite.setLayoutData(gd);
         toolkit.paintBordersFor(leftSideComposite);
 
         fieldsComposite = toolkit.createComposite(leftSideComposite);
-        GridLayout layout = new GridLayout(2, false);
+        layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
-        GridData gd = new GridData();
+        gd = new GridData();
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
-        gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
-        patientNumberText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
-                .getString("ScanLink.patientNumber.label"), new String[0], //$NON-NLS-1$
-            new WritableValue("", String.class), new NonEmptyStringValidator( //$NON-NLS-1$
-                Messages.getString("ScanLink.patientNumber.validationMsg"))); //$NON-NLS-1$
-        patientNumberText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (patientNumberTextModified) {
-                    setVisitsList();
-                }
-                patientNumberTextModified = false;
-            }
-        });
-        patientNumberText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                patientNumberTextModified = true;
-            }
-        });
-        patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
-        firstControl = patientNumberText;
+        linkFormPatientManagement.initPatientNumberText(fieldsComposite);
 
-        createVisitCombo(fieldsComposite);
+        linkFormPatientManagement.createVisitCombo(fieldsComposite);
 
         createPlateToScanField(fieldsComposite);
 
@@ -392,7 +364,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         Composite comp = toolkit.createComposite(fieldsComposite);
         comp.setLayout(new GridLayout());
         gd = new GridData();
-        gd.horizontalSpan = 2;
+        gd.horizontalSpan = 3;
         gd.widthHint = 400;
         comp.setLayoutData(gd);
         fakeScanRandom = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
@@ -400,71 +372,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         fakeScanRandom.setSelection(true);
         fakeScanExists = toolkit.createButton(comp,
             "Get random and already linked aliquots", SWT.RADIO); //$NON-NLS-1$
-    }
-
-    private void createVisitCombo(Composite compositeFields) {
-        viewerVisits = createComboViewerWithNoSelectionValidator(
-            compositeFields,
-            Messages.getString("ScanLink.visit.label"), null, null, //$NON-NLS-1$
-            Messages.getString("ScanLink.visit.validationMsg")); //$NON-NLS-1$
-        GridData gridData = new GridData();
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.horizontalAlignment = SWT.FILL;
-        viewerVisits.getCombo().setLayoutData(gridData);
-
-        viewerVisits.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
-                    + pv.getShipment().getWaybill();
-            }
-        });
-        viewerVisits.getCombo().addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13) {
-                    focusOnPlateToScanText();
-                    e.doit = false;
-                }
-            }
-        });
-        viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                PatientVisitWrapper pv = getSelectedPatientVisit();
-                if (pv != null) {
-                    appendLogNLS("linkAssign.activitylog.visit.selection", pv //$NON-NLS-1$
-                        .getFormattedDateProcessed(), pv.getShipment()
-                        .getClinic().getName());
-                }
-            }
-        });
-    }
-
-    protected void setVisitsList() {
-        currentPatient = null;
-        try {
-            currentPatient = PatientWrapper.getPatientInSite(appService,
-                patientNumberText.getText(), SessionManager.getInstance()
-                    .getCurrentSite());
-        } catch (ApplicationException e) {
-            BioBankPlugin.openError(Messages
-                .getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$
-        }
-        if (currentPatient != null) {
-            appendLog("--------");
-            appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
-                currentPatient.getPnumber());
-            // show visits list
-            List<PatientVisitWrapper> collection = currentPatient
-                .getPatientVisitCollection();
-            viewerVisits.setInput(collection);
-            viewerVisits.getCombo().setFocus();
-            viewerVisits.getCombo().setListVisible(true);
-        } else {
-            viewerVisits.setInput(null);
-        }
     }
 
     @Override
@@ -534,14 +441,21 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         List<SampleTypeWrapper> studiesSampleTypes = null;
         if (!isRescanMode()) { // already done at first scan
             studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
-            for (SampleStorageWrapper ss : currentPatient.getStudy()
-                .getSampleStorageCollection()) {
+            for (SampleStorageWrapper ss : linkFormPatientManagement
+                .getCurrentPatient().getStudy().getSampleStorageCollection()) {
                 if (ss.getActivityStatus().isActive()) {
                     SampleTypeWrapper type = ss.getSampleType();
                     if (authorizedSampleTypes.contains(type)) {
                         studiesSampleTypes.add(type);
                     }
                 }
+            }
+            if (studiesSampleTypes.size() == 0) {
+                BioBankPlugin.openAsyncError("No sample types",
+                    "There are no sample types that are defined in study '"
+                        + linkFormPatientManagement.getCurrentPatient()
+                            .getStudy().getNameShort()
+                        + "' and that are types possibles inside a pallet.");
             }
         }
         for (Integer row : typesRows.keySet()) {
@@ -589,7 +503,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void saveForm() throws Exception {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
             .getCells();
-        PatientVisitWrapper patientVisit = getSelectedPatientVisit();
+        PatientVisitWrapper patientVisit = linkFormPatientManagement
+            .getSelectedPatientVisit();
         StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:\n"); //$NON-NLS-1$
         int nber = 0;
         StudyWrapper study = patientVisit.getPatient().getStudy();
@@ -612,21 +527,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         appendLog(sb.toString());
         appendLogNLS(
             "ScanLink.activitylog.save.summary", nber, patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$ 
-        setSaved(true);
-    }
-
-    /**
-     * get selected patient visit
-     */
-    private PatientVisitWrapper getSelectedPatientVisit() {
-        if (viewerVisits.getSelection() != null
-            && viewerVisits.getSelection() instanceof IStructuredSelection) {
-            IStructuredSelection selection = (IStructuredSelection) viewerVisits
-                .getSelection();
-            if (selection.size() == 1)
-                return (PatientVisitWrapper) selection.getFirstElement();
-        }
-        return null;
+        setFinished(false);
     }
 
     /**
@@ -658,19 +559,18 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     public void reset() throws Exception {
+        setDirty(false);
         reset(true);
         fieldsComposite.setEnabled(true);
     }
 
     public void reset(boolean resetAll) {
-        viewerVisits.setInput(null);
-        currentPatient = null;
+        linkFormPatientManagement.reset(resetAll);
         getCancelConfirmWidget().reset();
         removeRescanMode();
         enableScan(false);
         setScanNotLauched();
         if (resetAll) {
-            patientNumberText.setText(""); //$NON-NLS-1$
             resetPlateToScan();
             spw.setCells(null);
             for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
@@ -695,4 +595,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         fieldsComposite.setEnabled(false);
     }
 
+    @Override
+    public BiobankLogger getErrorLogger() {
+        return logger;
+    }
+
+    @Override
+    public boolean onClose() {
+        linkFormPatientManagement.onClose();
+        return super.onClose();
+    }
 }

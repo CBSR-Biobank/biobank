@@ -38,10 +38,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "address", "site", "contactCollection", "shipmentCollection",
-            "street1", "street2", "city", "province", "postalCode",
-            "patientVisitCollection" };
+        return new String[] { "name", "nameShort", "activityStatus",
+            "sendsShipments", "comment", "address", "site",
+            "contactCollection", "shipmentCollection", "street1", "street2",
+            "city", "province", "postalCode", "patientVisitCollection" };
     }
 
     private AddressWrapper getAddress() {
@@ -78,6 +78,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         wrappedObject.setNameShort(nameShort);
         propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
             nameShort);
+    }
+
+    public void setSendsShipments(Boolean sendsShipments) {
+        Boolean oldSendsShipments = wrappedObject.getSendsShipments();
+        wrappedObject.setSendsShipments(sendsShipments);
+        propertyChangeSupport.firePropertyChange("sendsShipments",
+            oldSendsShipments, sendsShipments);
+    }
+
+    public Boolean getSendsShipments() {
+        return wrappedObject.getSendsShipments();
     }
 
     public ActivityStatusWrapper getActivityStatus() {
@@ -369,7 +380,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasShipments()) {
+        if (sendsShipments()) {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName() + ". All defined shipments must be removed first.");
         }
@@ -380,7 +391,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         }
     }
 
-    public boolean hasShipments() throws ApplicationException,
+    public boolean sendsShipments() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria(
             "select count(shipment) from "

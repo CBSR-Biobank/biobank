@@ -10,8 +10,12 @@ import java.util.jar.Manifest;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.dialogs.LoginDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class BiobankStartup implements IStartup {
@@ -50,6 +54,18 @@ public class BiobankStartup implements IStartup {
                     manifestVersion);
                 properties.store(new FileOutputStream(fileAbout), null);
             }
+
+            final IWorkbench workbench = PlatformUI.getWorkbench();
+            workbench.getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    IWorkbenchWindow window = workbench
+                        .getActiveWorkbenchWindow();
+                    if (window != null) {
+                        LoginDialog dlg = new LoginDialog(window.getShell());
+                        dlg.open();
+                    }
+                }
+            });
 
         } catch (Exception e) {
             logger.debug("Error while checking and/or modifying the "

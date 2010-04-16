@@ -34,7 +34,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private Text commentLabel;
 
-    private Text companyLabel;
+    private Text shippingMethodLabel;
 
     private Text boxNumberLabel;
 
@@ -99,7 +99,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         waybillLabel = createReadOnlyField(client, SWT.NONE, "Waybill");
         clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
         dateShippedLabel = createReadOnlyField(client, SWT.NONE, "Date Shipped");
-        companyLabel = createReadOnlyField(client, SWT.NONE, "Shipping company");
+        shippingMethodLabel = createReadOnlyField(client, SWT.NONE,
+            "Shipping Method");
         boxNumberLabel = createReadOnlyField(client, SWT.NONE, "Box number");
         dateReceivedLabel = createReadOnlyField(client, SWT.NONE,
             "Date received");
@@ -117,8 +118,9 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment
             .getClinic().getName());
         setTextValue(dateShippedLabel, shipment.getFormattedDateShipped());
-        setTextValue(companyLabel, shipment.getShippingCompany() == null ? ""
-            : shipment.getShippingCompany().getName());
+        setTextValue(shippingMethodLabel,
+            shipment.getShippingMethod() == null ? "" : shipment
+                .getShippingMethod().getName());
         setTextValue(boxNumberLabel, shipment.getBoxNumber());
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
         setTextValue(commentLabel, shipment.getComment());

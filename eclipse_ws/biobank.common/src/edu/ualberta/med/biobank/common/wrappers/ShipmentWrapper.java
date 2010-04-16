@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -15,7 +16,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShippingCompany;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -23,6 +24,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
+    private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
 
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -42,7 +44,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         List<PatientVisitWrapper> patients = getPatientVisitCollection();
         if (patients != null && patients.size() > 0) {
             throw new BiobankCheckException(
-                "Visits are still linked to this shipment. Deletion can't be done.");
+                "Visits are still linked to this shipment. Delete them before attempting to remove the shipment.");
         }
     }
 
@@ -50,7 +52,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateShipped", "dateReceived", "clinic",
             "comment", "patientVisitCollection", "waybill", "boxNumber",
-            "shippingCompany", "patientCollection" };
+            "shippingMethod", "patientCollection" };
     }
 
     @Override
@@ -76,23 +78,69 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                 + getWaybill() + " already exist in clinic "
                 + getClinic().getName() + ".");
         }
-        checkPatients();
+        checkAlLeastOnePatient();
+        checkPatientsStudy();
+        checkRemovedPatients();
     }
 
-    private void checkPatients() throws BiobankCheckException,
+    private void checkRemovedPatients() throws BiobankCheckException,
         ApplicationException {
+        if (!isNew()) {
+            for (PatientWrapper patient : patientsRemoved) {
+                checkCanRemovePatient(patient);
+            }
+        }
+    }
+
+    public void checkCanRemovePatient(PatientWrapper patient)
+        throws ApplicationException, BiobankCheckException {
+        if (hasVisitForPatient(patient)) {
+            throw new BiobankCheckException("Cannot remove patient "
+                + patient.getPnumber()
+                + ": a visit related to this shipment has "
+                + "already been created. Remove visit first "
+                + "and then you will be able to remove this "
+                + "patient from this shipment.");
+        }
+    }
+
+    public boolean hasVisitForPatient(PatientWrapper patient)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria("select count(*) from "
+            + PatientVisit.class.getName()
+            + " where patient.id=? and shipment.id= ?", Arrays
+            .asList(new Object[] { patient.getId(), getId() }));
+
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0) > 0;
+    }
+
+    public void checkAlLeastOnePatient() throws BiobankCheckException {
         List<PatientWrapper> patients = getPatientCollection();
         if (patients == null || patients.size() == 0) {
             throw new BiobankCheckException(
                 "At least one patient should be added to this shipment");
         }
+    }
+
+    public void checkPatientsStudy() throws BiobankCheckException,
+        ApplicationException {
+        String patientsInError = "";
         for (PatientWrapper patient : patientsAdded) {
-            if (!patient.getStudy().isLinkedToClinic(getClinic())) {
-                throw new BiobankCheckException("Patient "
-                    + patient.getPnumber()
-                    + " is not part of a study that has contact with clinic "
-                    + getClinic().getName());
+            if (!patient.canBeAddedToShipment(this)) {
+                patientsInError += patient.getPnumber() + ", ";
             }
+        }
+        if (!patientsInError.isEmpty()) {
+            // remove last ", "
+            patientsInError = patientsInError.substring(0, patientsInError
+                .length() - 2);
+            throw new BiobankCheckException("Patient(s) " + patientsInError
+                + " are not part of a study that has contact with clinic "
+                + getClinic().getName());
         }
     }
 
@@ -257,25 +305,25 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         propertyChangeSupport.firePropertyChange("boxNumber", old, boxNumber);
     }
 
-    public ShippingCompanyWrapper getShippingCompany() {
-        ShippingCompany sc = wrappedObject.getShippingCompany();
+    public ShippingMethodWrapper getShippingMethod() {
+        ShippingMethod sc = wrappedObject.getShippingMethod();
         if (sc == null) {
             return null;
         }
-        return new ShippingCompanyWrapper(appService, sc);
+        return new ShippingMethodWrapper(appService, sc);
     }
 
-    protected void setShippingCompany(ShippingCompany sc) {
-        ShippingCompany old = wrappedObject.getShippingCompany();
-        wrappedObject.setShippingCompany(sc);
-        propertyChangeSupport.firePropertyChange("shippingCompany", old, sc);
+    protected void setShippingMethod(ShippingMethod sc) {
+        ShippingMethod old = wrappedObject.getShippingMethod();
+        wrappedObject.setShippingMethod(sc);
+        propertyChangeSupport.firePropertyChange("shippingMethod", old, sc);
     }
 
-    public void setShippingCompany(ShippingCompanyWrapper sc) {
+    public void setShippingMethod(ShippingMethodWrapper sc) {
         if (sc == null) {
-            setShippingCompany((ShippingCompany) null);
+            setShippingMethod((ShippingMethod) null);
         } else {
-            setShippingCompany(sc.wrappedObject);
+            setShippingMethod(sc.wrappedObject);
         }
     }
 
@@ -327,6 +375,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             // new patients
             for (PatientWrapper patient : newPatients) {
                 patientsAdded.add(patient);
+                patientsRemoved.remove(patient);
                 allPatientsObjects.add(patient.getWrappedObject());
                 allPatientsWrappers.add(patient);
             }
@@ -337,6 +386,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public void removePatients(List<PatientWrapper> patientsToRemove) {
         if (patientsToRemove != null && patientsToRemove.size() > 0) {
             patientsAdded.removeAll(patientsToRemove);
+            patientsRemoved.addAll(patientsToRemove);
             Collection<Patient> allPatientsObjects = new HashSet<Patient>();
             List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
             // already in list
@@ -358,8 +408,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         if (getDateShipped() == null) {
             return getWaybill();
         }
-        return getWaybill() + " (received on " + getFormattedDateReceived()
-            + ")";
+        return getFormattedDateReceived() + " (" + getWaybill() + ")";
     }
 
     /**
@@ -399,5 +448,49 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     public void resetInternalField() {
         patientsAdded.clear();
+        patientsRemoved.clear();
+    }
+
+    public static List<ShipmentWrapper> getTodayShipments(
+        WritableApplicationService appService, SiteWrapper site)
+        throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // yesterday midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Shipment.class.getName()
+                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        List<Shipment> res = appService.query(criteria);
+        List<ShipmentWrapper> ships = new ArrayList<ShipmentWrapper>();
+        for (Shipment s : res) {
+            ships.add(new ShipmentWrapper(appService, s));
+        }
+        return ships;
+    }
+
+    public boolean isReceivedToday() {
+        Calendar cal = Calendar.getInstance();
+        // yesterday midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date startDate = cal.getTime();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        Date dateReveived = getDateReceived();
+        return dateReveived.compareTo(startDate) >= 0
+            && dateReveived.compareTo(endDate) <= 0;
     }
 }

@@ -20,12 +20,12 @@ public class PatientVisitAddHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
             PatientAdapter patientAdapter = PatientAdministrationView
-                .getCurrentPatientAdapter();
+                .getCurrentPatient();
             PatientVisitWrapper pvWrapper = new PatientVisitWrapper(
                 SessionManager.getAppService());
+            pvWrapper.setPatient(patientAdapter.getWrapper());
             PatientVisitAdapter adapter = new PatientVisitAdapter(
                 patientAdapter, pvWrapper);
-            adapter.getWrapper().setPatient(patientAdapter.getWrapper());
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error("Error while opening the patient visit entry form",

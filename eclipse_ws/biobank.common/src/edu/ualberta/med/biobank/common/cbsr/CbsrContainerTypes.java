@@ -46,7 +46,13 @@ public class CbsrContainerTypes {
         "WB Serum", "WBE", "WBlood", "Z Urine",
 
         "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
-        "Colon, A", "Colon, T", };
+        "Colon, A", "Colon, T",
+
+        "LH PFP 200", "UrineC900", "PlasmaE800", "P100 500", "PlasmaL500",
+        "LH PFP 500", "PlasmaE200", "DNA L 1000", "SerumG500", "PlasmaL200",
+        "DNA E 1000", "PlasmaE500", "UrineSA900"
+
+    };
 
     public static ContainerTypeWrapper getContainerType(String name)
         throws Exception {
@@ -110,8 +116,8 @@ public class CbsrContainerTypes {
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 5, 9, Arrays
                 .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
 
-        addContainerType(site, "Freezer 6x12", "F6x12", -80.0,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 6, 12, Arrays
+        addContainerType(site, "Freezer 4x17", "F4x17", -80.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 4, 17, Arrays
                 .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
 
         addContainerType(site, "Freezer 4x6", "F4x6", -80.0,

@@ -12,16 +12,15 @@ public class ServiceConnection {
      */
     private static ResourceResolver resourceResolver;
 
+    private static String TRUST_STORE_PROPERTY_NAME = "javax.net.ssl.trustStore";
+
+    private static String KEYSTORE_FILE_PATH = "cert/all.keystore";
+
     public static WritableApplicationService getAppService(String serverUrl,
         String userName, String password) throws Exception {
-        if (serverUrl.startsWith("https")) {
-            URL url = ServiceConnection.class.getResource("cert/all.keystore");
-            if (url != null) {
-                if (resourceResolver != null) {
-                    url = resourceResolver.resolveURL(url);
-                }
-                System.setProperty("javax.net.ssl.trustStore", url.getFile());
-            }
+        if (serverUrl.startsWith("https")
+            && System.getProperty(TRUST_STORE_PROPERTY_NAME) == null) {
+            setTrustStore();
         }
         if (userName == null) {
             return (WritableApplicationService) ApplicationServiceProvider
@@ -29,6 +28,16 @@ public class ServiceConnection {
         }
         return (WritableApplicationService) ApplicationServiceProvider
             .getApplicationServiceFromUrl(serverUrl, userName, password);
+    }
+
+    public static void setTrustStore() throws Exception {
+        URL url = ServiceConnection.class.getResource(KEYSTORE_FILE_PATH);
+        if (url != null) {
+            if (resourceResolver != null) {
+                url = resourceResolver.resolveURL(url);
+            }
+            System.setProperty(TRUST_STORE_PROPERTY_NAME, url.getFile());
+        }
     }
 
     public static WritableApplicationService getAppService(String serverUrl)

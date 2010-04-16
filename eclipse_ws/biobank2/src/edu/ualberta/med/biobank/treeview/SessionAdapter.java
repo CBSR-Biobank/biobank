@@ -32,7 +32,7 @@ public class SessionAdapter extends AdapterBase {
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId, String name,
         String userName) {
-        super(parent, null, true, false);
+        super(parent, null, false);
         this.appService = appService;
         setId(sessionId);
         setName(name);

@@ -31,7 +31,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_EMAIL,
             "biobank2@gmail.com");
-        store
-            .setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT, 25);
+        store.setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER,
+            "smtp.gmail.com");
+        store.setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT,
+            465);
+        store.setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_USER,
+            "biobank2@gmail.com");
+        store.setDefault(
+            PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PASSWORD, "catissue");
     }
 }

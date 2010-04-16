@@ -39,7 +39,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private CancelConfirmWidget cancelConfirmWidget;
 
-    private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
+    private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
     private IObservableValue scanLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
@@ -58,6 +58,14 @@ public abstract class AbstractPalletAliquotAdminForm extends
             .getPreferenceStore();
         palletNameContains = store
             .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
+    }
+
+    @Override
+    public boolean onClose() {
+        if (finished || BioBankPlugin.getPlatesEnabledCount() != 1) {
+            plateToScanValue.setValue("");
+        }
+        return super.onClose();
     }
 
     protected void setRescanMode() {
@@ -90,7 +98,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         }
         scanButton = toolkit.createButton(oarent, scanButtonTitle, SWT.PUSH);
         gd = new GridData();
-        gd.horizontalSpan = 2;
+        gd.horizontalSpan = 3;
         gd.widthHint = 100;
         scanButton.setLayoutData(gd);
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -115,6 +123,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 }
             }
         });
+        GridData gd = (GridData) plateToScanText.getLayoutData();
+        gd.horizontalSpan = 2;
     }
 
     protected void createFakeOptions(
@@ -195,8 +205,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                         newScannedCell.getValue())) {
                     cells = oldCells;
                     throw new Exception(
-                        "Scan canceled: found different aliquot in previously scanned position. "
-                            + "Are you sure this is a rescan. If any doubt, reset page and restart process.");
+                        "Scan Aborted: previously scanned aliquot has been replaced. "
+                            + "If this is not a re-scan, reset and start again.");
                 }
                 if (PalletCell.hasValue(oldScannedCell)) {
                     cells.put(rcp, oldScannedCell);
@@ -257,10 +267,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void resetPlateToScan() {
         plateToScanText.setText(""); //$NON-NLS-1$
         plateToScanValue.setValue(""); //$NON-NLS-1$
-    }
-
-    protected void focusOnPlateToScanText() {
-        plateToScanText.setFocus();
     }
 
     protected void focusOnCancelConfirmText() {

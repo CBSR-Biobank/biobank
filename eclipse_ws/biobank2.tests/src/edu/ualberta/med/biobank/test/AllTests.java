@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.test.wrappers.TestPvSourceVessel;
 import edu.ualberta.med.biobank.test.wrappers.TestSampleStorage;
 import edu.ualberta.med.biobank.test.wrappers.TestSampleType;
 import edu.ualberta.med.biobank.test.wrappers.TestShipment;
-import edu.ualberta.med.biobank.test.wrappers.TestShippingCompany;
+import edu.ualberta.med.biobank.test.wrappers.TestShippingMethod;
 import edu.ualberta.med.biobank.test.wrappers.TestSite;
 import edu.ualberta.med.biobank.test.wrappers.TestSourceVessel;
 import edu.ualberta.med.biobank.test.wrappers.TestStudy;
@@ -33,7 +33,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     TestPvSourceVessel.class, TestActivityStatus.class, TestAliquot.class,
     TestClinic.class, TestSampleStorage.class, TestSourceVessel.class,
     TestSampleType.class, TestContainer.class, TestContainerType.class,
-    TestShipment.class, TestContact.class, TestShippingCompany.class })
+    TestShipment.class, TestContact.class, TestShippingMethod.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

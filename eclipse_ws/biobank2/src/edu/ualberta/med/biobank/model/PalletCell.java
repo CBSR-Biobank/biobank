@@ -75,10 +75,10 @@ public class PalletCell extends Cell {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsAlreadyAssigned(appService, siteId);
-        // if (randomAliquots.size() > 0) {
-        // palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-        // 0, 0, randomAliquots.get(0).getInventoryId())));
-        // }
+        if (randomAliquots.size() > 0) {
+            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+                0, 0, randomAliquots.get(0).getInventoryId())));
+        }
         if (randomAliquots.size() > 1) {
             palletScanned.put(new RowColPos(2, 4), new PalletCell(new ScanCell(
                 2, 4, randomAliquots.get(1).getInventoryId())));

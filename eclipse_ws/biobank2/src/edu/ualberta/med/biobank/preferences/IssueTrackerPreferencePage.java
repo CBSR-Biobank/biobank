@@ -29,6 +29,11 @@ public class IssueTrackerPreferencePage extends FieldEditorPreferencePage
         addField(new StringFieldEditor(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_USER,
             "SMTP server username:", getFieldEditorParent()));
+        StringFieldEditor field = new StringFieldEditor(
+            PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PASSWORD,
+            "SMTP server password:", getFieldEditorParent());
+        field.getTextControl(getFieldEditorParent()).setEchoChar('*');
+        addField(field);
     }
 
     @Override

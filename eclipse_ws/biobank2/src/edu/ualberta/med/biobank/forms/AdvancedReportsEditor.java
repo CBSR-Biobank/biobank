@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,9 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.advanced.CustomQueryObject;
 import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
@@ -62,7 +63,6 @@ import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AdvancedReportsEditor extends EditorPart {
 
@@ -80,6 +80,7 @@ public class AdvancedReportsEditor extends EditorPart {
     private List<HQLField> fields;
     private ArrayList<Widget> widgetFields;
     private ArrayList<Combo> operatorFields;
+    protected ArrayList<Button> includedFields;
     private ArrayList<Label> textLabels;
 
     private SearchResultsInfoTable reportTable;
@@ -88,8 +89,6 @@ public class AdvancedReportsEditor extends EditorPart {
 
     private QueryTree tree;
     private QueryTreeNode selectedNode;
-
-    private static Map<Class<?>, int[]> columnWidths;
 
     @Override
     public void init(IEditorSite site, IEditorInput input)
@@ -102,8 +101,6 @@ public class AdvancedReportsEditor extends EditorPart {
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
 
-        columnWidths = SearchUtils.getColumnWidths();
-        columnWidths = Collections.unmodifiableMap(columnWidths);
     }
 
     @Override
@@ -117,7 +114,8 @@ public class AdvancedReportsEditor extends EditorPart {
         top.setLayout(layout);
         top.setLayoutData(gdfill);
 
-        tree = new QueryTree(top, SWT.BORDER, (QueryTreeNode) node.getQuery());
+        tree = new QueryTree(top, SWT.BORDER, ((QueryTreeNode) node.getQuery())
+            .clone());
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -165,32 +163,32 @@ public class AdvancedReportsEditor extends EditorPart {
                 SaveReportDialog dlg = new SaveReportDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell());
                 if (dlg.open() == Dialog.OK) {
-                    List<ReportTreeNode> children = node.getChildren();
-                    if (children.size() == 0)
-                        children = node.getParent().getChildren();
-                    for (ReportTreeNode sibling : children) {
-                        if (sibling.getLabel().compareTo(dlg.getName()) == 0) {
-                            BioBankPlugin
-                                .openAsyncError(
-                                    "Duplicate Name",
-                                    "A report already exists with that name. Please choose a different name or remove the duplicate first.");
-                            return;
+                    List<ReportTreeNode> siblings = node.getParent()
+                        .getChildren();
+                    for (ReportTreeNode sibling : siblings) {
+                        if (sibling.getLabel().compareTo("Custom") == 0) {
+                            List<ReportTreeNode> customNodes = sibling
+                                .getChildren();
+                            for (ReportTreeNode customNode : customNodes)
+                                if (customNode.getLabel().compareTo(
+                                    dlg.getName()) == 0) {
+                                    BioBankPlugin
+                                        .openAsyncError(
+                                            "Duplicate Name",
+                                            "A report already exists with that name. Please choose a different name or remove the duplicate first.");
+                                    return;
+                                }
+                            tree.saveTree(Platform.getInstanceLocation()
+                                .getURL().getPath()
+                                + "/saved_reports/", dlg.getName());
+                            ReportTreeNode custom = new ReportTreeNode(dlg
+                                .getName(), tree.getInput());
+                            custom.setParent(sibling);
+                            sibling.addChild(custom);
                         }
                     }
-                    tree.saveTree(Platform.getInstanceLocation().getURL()
-                        .getPath()
-                        + "/saved_reports/", dlg.getName());
-                    ReportTreeNode child = new ReportTreeNode(dlg.getName(),
-                        tree.getInput());
-                    if (node.getParent().getLabel().startsWith("Advanced")) {
-                        child.setParent(node);
-                        node.addChild(child);
-                    } else {
-                        child.setParent(node.getParent());
-                        node.getParent().addChild(child);
-                    }
                     ReportsView.getTree().refresh();
-                    ReportsView.getTree().reveal(child);
+                    ReportsView.getTree().expandAll();
                 }
             }
         });
@@ -238,7 +236,7 @@ public class AdvancedReportsEditor extends EditorPart {
         parameterSection = new Composite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
-        gl.numColumns = 4;
+        gl.numColumns = 5;
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.TOP;
@@ -247,12 +245,13 @@ public class AdvancedReportsEditor extends EditorPart {
 
         Label headerLabel = new Label(parameterSection, SWT.NONE);
         GridData gdl = new GridData();
-        gdl.horizontalSpan = 4;
+        gdl.horizontalSpan = 5;
         headerLabel.setLayoutData(gdl);
         headerLabel.setText(node.getTreePath());
 
         widgetFields = new ArrayList<Widget>();
         operatorFields = new ArrayList<Combo>();
+        includedFields = new ArrayList<Button>();
         textLabels = new ArrayList<Label>();
         fields = node.getFieldData();
         for (HQLField field : fields) {
@@ -319,14 +318,16 @@ public class AdvancedReportsEditor extends EditorPart {
                 displayFields(selectedNode);
             }
         });
+
+        final Button box = new Button(parameterSection, SWT.CHECK);
+        box.setText("Include in results");
+        includedFields.add(box);
+
     }
 
     private void generate() {
 
         saveFields();
-        final HashMap<String, String> colInfo = SearchUtils
-            .getColumnInfo(((QueryTreeNode) node.getQuery()).getNodeInfo()
-                .getType());
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -338,10 +339,10 @@ public class AdvancedReportsEditor extends EditorPart {
                         @Override
                         public void run() {
                             try {
-                                reportData = SessionManager.getAppService()
-                                    .query(
-                                        new HQLCriteria(tree
-                                            .compileQuery(colInfo.values())));
+                                QueryObject tempQuery = new CustomQueryObject(
+                                    null, tree.compileQuery(), new String[] {});
+                                reportData = tempQuery.generate(SessionManager
+                                    .getAppService(), null);
                                 if (reportData.size() >= 1000)
                                     BioBankPlugin
                                         .openAsyncError(
@@ -380,12 +381,14 @@ public class AdvancedReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
+                            String[] names = tree.getSelectClauses().keySet()
+                                .toArray(new String[] {});
                             reportTable.dispose();
+                            int[] headingSizes = new int[names.length];
+                            for (int i = 0; i < names.length; i++)
+                                headingSizes[i] = 100;
                             reportTable = new SearchResultsInfoTable(top,
-                                reportData, colInfo.keySet().toArray(
-                                    new String[] {}), columnWidths
-                                    .get(((QueryTreeNode) node.getQuery())
-                                        .getNodeInfo().getType()));
+                                reportData, names, headingSizes);
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;
@@ -496,10 +499,14 @@ public class AdvancedReportsEditor extends EditorPart {
                     }
                     fields.get(i).setValue(val);
                     fields.get(i).setOperator(operatorFields.get(i).getText());
+                    fields.get(i).setDisplay(
+                        includedFields.get(i).getSelection());
                 } else {
                     fields.get(i).setValue(
                         ((Text) widgetFields.get(i)).getText());
                     fields.get(i).setOperator(operatorFields.get(i).getText());
+                    fields.get(i).setDisplay(
+                        includedFields.get(i).getSelection());
                 }
             }
         }

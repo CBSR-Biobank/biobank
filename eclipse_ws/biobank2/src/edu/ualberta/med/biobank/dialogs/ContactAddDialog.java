@@ -33,7 +33,7 @@ public class ContactAddDialog extends BiobankDialog {
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
         String title = new String();
-        if (contactWrapper.isNew()) {
+        if (contactWrapper.getName() == null) {
             title = "Add";
         } else {
             title = "Edit ";
@@ -45,8 +45,7 @@ public class ContactAddDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-
-        if (contactWrapper.isNew()) {
+        if (contactWrapper.getName() == null) {
             setTitle("Add Contact");
             setMessage("Add a contact person to this clinic");
         } else {
@@ -77,9 +76,17 @@ public class ContactAddDialog extends BiobankDialog {
             new String[0], BeansObservables.observeValue(contactWrapper,
                 "emailAddress"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Phone #",
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Mobile #", new String[0], BeansObservables.observeValue(
+                contactWrapper, "mobileNumber"), null);
+
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Pager #",
             new String[0], BeansObservables.observeValue(contactWrapper,
-                "phoneNumber"), null);
+                "pagerNumber"), null);
+
+        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+            "Office #", new String[0], BeansObservables.observeValue(
+                contactWrapper, "officeNumber"), null);
 
         createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
             new String[0], BeansObservables.observeValue(contactWrapper,

@@ -142,7 +142,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=316 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=400 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -170,7 +170,7 @@ INSERT INTO `csm_pg_pe` VALUES (144,32,13,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (145,32,12,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (221,36,24,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (249,1,32,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (250,1,42,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (250,1,36,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (251,1,18,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (252,1,10,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (253,1,7,'0000-00-00');
@@ -197,16 +197,16 @@ INSERT INTO `csm_pg_pe` VALUES (273,1,4,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (274,1,13,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (275,1,3,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (276,1,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (277,14,42,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (277,14,36,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (278,14,7,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (279,35,42,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (279,35,36,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (280,35,16,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (281,35,14,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (282,35,15,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (283,22,42,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (283,22,36,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (284,22,15,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (285,34,24,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (286,34,42,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (286,34,36,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (287,34,10,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (288,34,33,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (289,34,9,'0000-00-00');
@@ -327,10 +327,11 @@ INSERT INTO `csm_protection_element` VALUES (28,'CLM','','CLM','','','',1,'2009-
 INSERT INTO `csm_protection_element` VALUES (29,'APPLICATION_NAME:biobank2','','APPLICATION_NAME:biobank2','','','',3,'2009-07-27');
 INSERT INTO `csm_protection_element` VALUES (30,'edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','','','',2,'2009-08-24');
 INSERT INTO `csm_protection_element` VALUES (31,'edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment','','','',2,'2009-11-24');
-INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.ShippingCompany','edu.ualberta.med.biobank.model.ShippingCompany','edu.ualberta.med.biobank.model.ShippingCompany','','','',2,'2009-11-30');
+INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (33,'edu.ualberta.med.biobank.model.PvSourceVessel','edu.ualberta.med.biobank.model.PvSourceVessel','edu.ualberta.med.biobank.model.PvSourceVessel','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','','','',2,'2010-01-11');
-INSERT INTO `csm_protection_element` VALUES (42,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
+INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','','','',2,'2010-04-13');
+INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
 INSERT INTO `csm_protection_element` VALUES (43,'edu.ualberta.med.biobank.model.Site/ID=2/Name=Canadian BioSample Repository','Canadian BioSample Repository','edu.ualberta.med.biobank.model.Site','id','1','',2,'2010-03-30');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -650,6 +651,7 @@ INSERT INTO `csm_user_pe` VALUES (2,2,2);
 INSERT INTO `csm_user_pe` VALUES (3,28,6);
 /*!40000 ALTER TABLE `csm_user_pe` ENABLE KEYS */;
 UNLOCK TABLES;
+
 --
 -- Table structure for table `log_message`
 --

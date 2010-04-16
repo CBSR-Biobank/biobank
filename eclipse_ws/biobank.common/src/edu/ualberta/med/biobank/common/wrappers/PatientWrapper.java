@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -146,12 +147,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      */
     public List<PatientVisitWrapper> getVisits(Date dateProcessed,
         Date dateDrawn) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select visits from "
-                + Patient.class.getName()
-                + " as p left join p.patientVisitCollection as visits"
-                + " join visits.pvSourceVesselCollection as ss"
-                + " where p.id = ? and visits.dateProcessed = ? and ss.dateDrawn = ?",
+        HQLCriteria criteria = new HQLCriteria("from "
+            + PatientVisit.class.getName()
+            + " where patient.id = ? and dateProcessed = ? and dateDrawn = ?",
             Arrays.asList(new Object[] { getId(), dateProcessed, dateDrawn }));
         List<PatientVisit> visits = appService.query(criteria);
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
@@ -226,10 +224,26 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasSamples()) {
+        checkNoMorePatientVisits();
+        if (hasSamples())
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
-                + " since patient has samples stored in database.");
+                + " because patient has samples stored in database.");
+        if (hasShipments())
+            throw new BiobankCheckException("Unable to delete patient "
+                + getPnumber()
+                + " because patient has shipments recorded in database.");
+    }
+
+    private boolean hasShipments() {
+        return (this.getShipmentCollection().size() > 0);
+    }
+
+    private void checkNoMorePatientVisits() throws BiobankCheckException {
+        List<PatientVisitWrapper> patients = getPatientVisitCollection();
+        if (patients != null && patients.size() > 0) {
+            throw new BiobankCheckException(
+                "Visits are still linked to this patient. Delete them before attempting to remove the patient.");
         }
     }
 
@@ -265,5 +279,67 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     public String toString() {
         return getPnumber();
+    }
+
+    public boolean canBeAddedToShipment(ShipmentWrapper shipment)
+        throws ApplicationException, BiobankCheckException {
+        if (shipment.getClinic() == null) {
+            return true;
+        }
+        return getStudy().isLinkedToClinic(shipment.getClinic());
+    }
+
+    public static List<PatientWrapper> getPatientsInTodayShipments(
+        WritableApplicationService appService, SiteWrapper site)
+        throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // yesterday midnight
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "select p from "
+                + Patient.class.getName()
+                + " as p join p.shipmentCollection as ships"
+                + " where p.study.site.id = ? and ships.dateReceived >= ? and ships.dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        List<Patient> res = appService.query(criteria);
+        List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+        for (Patient p : res) {
+            patients.add(new PatientWrapper(appService, p));
+        }
+        return patients;
+    }
+
+    public List<PatientVisitWrapper> getLast7DaysPatientVisits()
+        throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date endDate = cal.getTime();
+        // 7 days ago, at midnight
+        cal.add(Calendar.DATE, -8);
+        Date startDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "select visits from "
+                + Patient.class.getName()
+                + " as p join p.patientVisitCollection as visits"
+                + " where p.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
+            Arrays.asList(new Object[] { getId(), startDate, endDate }));
+        List<PatientVisit> res = appService.query(criteria);
+        List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+        for (PatientVisit v : res) {
+            visits.add(new PatientVisitWrapper(appService, v));
+        }
+        return visits;
     }
 }

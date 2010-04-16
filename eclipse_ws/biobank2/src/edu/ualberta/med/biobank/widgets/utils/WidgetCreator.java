@@ -11,6 +11,7 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -30,8 +31,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -49,6 +48,7 @@ import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
+import edu.ualberta.med.biobank.widgets.DateTimeObservableValue;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
@@ -149,10 +149,14 @@ public class WidgetCreator {
     private Control createButton(Composite composite,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
         Button button = new Button(composite, SWT.CHECK);
-        toolkit.adapt(button, true, true);
+        if (toolkit != null) {
+            toolkit.adapt(button, true, true);
+        }
         dbc.bindValue(SWTObservables.observeSelection(button),
             modelObservableValue, uvs, null);
-        button.addSelectionListener(selectionListener);
+        if (selectionListener != null) {
+            button.addSelectionListener(selectionListener);
+        }
         return button;
     }
 
@@ -307,49 +311,36 @@ public class WidgetCreator {
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage) {
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage) {
+        return createDateTimeWidget(client, nameLabel, date,
+            modelObservableValue, emptyMessage, true);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, boolean showDate) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE, date);
-        widget.addSelectionListener(selectionListener);
+        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
+            date, showDate);
+        if (selectionListener != null) {
+            widget.addSelectionListener(selectionListener);
+        }
         if (toolkit != null) {
             widget.adaptToToolkit(toolkit, true);
         }
-
-        if (observedObject != null && propertyName != null) {
-            final IObservableValue dateValue = BeansObservables.observeValue(
-                observedObject, propertyName);
-            widget.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    dateValue.setValue(widget.getDate());
-                }
-            });
-            final IValueChangeListener changeListener = new IValueChangeListener() {
-                @Override
-                public void handleValueChange(ValueChangeEvent event) {
-                    widget.setDate((Date) dateValue.getValue());
-                }
-            };
-            dateValue.addValueChangeListener(changeListener);
-            widget.addDisposeListener(new DisposeListener() {
-                @Override
-                public void widgetDisposed(DisposeEvent e) {
-                    dateValue.removeValueChangeListener(changeListener);
-                }
-            });
-
+        if (modelObservableValue != null) {
+            UpdateValueStrategy uvs = null;
             if (emptyMessage != null && !emptyMessage.isEmpty()) {
                 DateNotNulValidator validator = new DateNotNulValidator(
                     emptyMessage);
                 validator.setControlDecoration(BiobankWidget.createDecorator(
                     label, validator.getErrorMessage()));
-                UpdateValueStrategy uvs = new UpdateValueStrategy();
+                uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
-                bindValue(new WritableValue(null, Date.class), dateValue, uvs,
-                    uvs);
             }
+            dbc.bindValue(new DateTimeObservableValue(widget),
+                modelObservableValue, uvs, null);
         }
         return widget;
     }
@@ -357,18 +348,21 @@ public class WidgetCreator {
     public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
         Assert.isNotNull(dbc);
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterConvertValidator(new IValidator() {
-            @Override
-            public IStatus validate(Object value) {
-                if (value instanceof Boolean && !(Boolean) value) {
-                    return ValidationStatus.error(errorMsg);
-                } else {
-                    return Status.OK_STATUS;
+        UpdateValueStrategy uvs = null;
+        if (errorMsg != null) {
+            uvs = new UpdateValueStrategy();
+            uvs.setAfterConvertValidator(new IValidator() {
+                @Override
+                public IStatus validate(Object value) {
+                    if (value instanceof Boolean && !(Boolean) value) {
+                        return ValidationStatus.error(errorMsg);
+                    } else {
+                        return Status.OK_STATUS;
+                    }
                 }
-            }
 
-        });
+            });
+        }
         dbc.bindValue(writableValue, observableValue, uvs, uvs);
     }
 
@@ -397,6 +391,10 @@ public class WidgetCreator {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void disableValidator() {
+        IObservableList bindings = dbc.getBindings();
     }
 
     public void setKeyListener(KeyListener keyListener) {

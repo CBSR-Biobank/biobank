@@ -30,8 +30,12 @@ public class ShipmentAdapter extends AdapterBase {
     protected String getLabelInternal() {
         ShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "shipment is null");
-        return shipment.getWaybill() + " - "
-            + shipment.getFormattedDateShipped();
+        String label = shipment.getFormattedDateReceived();
+        if (shipment.getWaybill() != null) {
+            label += " (" + shipment.getWaybill() + ")";
+        }
+        return label;
+
     }
 
     @Override
@@ -50,6 +54,8 @@ public class ShipmentAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Shipment");
         addViewMenu(menu, "Shipment");
+        addDeleteMenu(menu, "Shipment",
+            "Are you sure you want to delete this shipment?");
     }
 
     @Override

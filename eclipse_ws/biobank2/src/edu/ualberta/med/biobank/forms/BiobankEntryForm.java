@@ -67,7 +67,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankEntryForm.class.getName());
 
-    private static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
+    public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
         .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     protected String sessionName;
@@ -254,10 +254,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object observedObject,
-        String propertyName, final String emptyMessage) {
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            observedObject, propertyName, emptyMessage);
+            modelObservableValue, emptyMessage);
     }
 
     /*
@@ -332,7 +332,44 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         separator.setLayoutData(gd);
     }
 
-    private void addToolbarButtons() {
+    protected void addToolbarButtons() {
+        addResetAction();
+        addCancelAction();
+        addConfirmAction();
+        form.updateToolBar();
+    }
+
+    protected void addConfirmAction() {
+        confirmAction = new Action("Confirm") {
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
+                        confirm();
+                    }
+                });
+            }
+        };
+        confirmAction.setImageDescriptor(confirmActionImage);
+        form.getToolBarManager().add(confirmAction);
+    }
+
+    protected void addCancelAction() {
+        Action cancel = new Action("Cancel") {
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
+                        cancel();
+                    }
+                });
+            }
+        };
+        cancel.setImageDescriptor(cancelActionImage);
+        form.getToolBarManager().add(cancel);
+    }
+
+    protected void addResetAction() {
         Action reset = new Action("Reset") {
             @Override
             public void run() {
@@ -349,34 +386,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         };
         reset.setImageDescriptor(resetActionImage);
         form.getToolBarManager().add(reset);
-
-        Action cancel = new Action("Cancel") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        cancel();
-                    }
-                });
-            }
-        };
-        cancel.setImageDescriptor(cancelActionImage);
-        form.getToolBarManager().add(cancel);
-
-        confirmAction = new Action("Confirm") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    public void run() {
-                        confirm();
-                    }
-                });
-            }
-        };
-        confirmAction.setImageDescriptor(confirmActionImage);
-        form.getToolBarManager().add(confirmAction);
-
-        form.updateToolBar();
     }
 
     public void confirm() {
@@ -444,14 +453,18 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
                     setDirty(true);
+                    monitor.setCanceled(true);
                 } catch (BiobankCheckException bce) {
                     setDirty(true);
+                    monitor.setCanceled(true);
                     BioBankPlugin.openAsyncError("Save error", bce);
                 } catch (Exception e) {
                     setDirty(true);

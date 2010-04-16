@@ -262,4 +262,8 @@ public class SessionManager {
     public static boolean canUpdate(Class<?> clazz) {
         return SecurityHelper.canUpdate(getAppService(), clazz);
     }
+
+    public boolean isConnected() {
+        return sessionAdapter != null;
+    }
 }

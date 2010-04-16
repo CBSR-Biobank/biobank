@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -7,22 +9,27 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
+import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
+import edu.ualberta.med.biobank.treeview.ShipmentViewNodeSearchVisitor;
 
 public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.ShipmentAdminView";
 
-    public static ShipmentAdministrationView currentInstance;
-
-    private SiteAdapter currentSiteAdapter;
+    private static ShipmentAdministrationView currentInstance;
 
     public ShipmentAdministrationView() {
         currentInstance = this;
@@ -30,7 +37,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    protected Object search(String text) throws Exception {
+    protected ModelWrapper<?> search(String text) throws Exception {
         List<ShipmentWrapper> shipments = ShipmentWrapper.getShipmentsInSite(
             SessionManager.getAppService(), text, SessionManager.getInstance()
                 .getCurrentSite());
@@ -49,51 +56,118 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    protected String getNoFoundText() {
-        return "- No shipment found -";
+    public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
+        if (wrapper instanceof ShipmentWrapper) {
+            ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
+            ClinicAdapter clinicAdapter = (ClinicAdapter) parentNode
+                .accept(new ShipmentViewNodeSearchVisitor(shipment.getClinic()));
+            if (clinicAdapter == null) {
+                clinicAdapter = new ClinicAdapter(parentNode, shipment
+                    .getClinic());
+                clinicAdapter.setEditable(false);
+                clinicAdapter.setLoadChildrenInBackground(false);
+                parentNode.addChild(clinicAdapter);
+            }
+            ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
+                .accept(new ShipmentViewNodeSearchVisitor(shipment));
+            if (shipmentAdapter == null) {
+                shipmentAdapter = new ShipmentAdapter(clinicAdapter, shipment);
+                clinicAdapter.addChild(shipmentAdapter);
+            }
+            return shipmentAdapter;
+        }
+        return null;
     }
 
     @Override
-    public void showInTree(Object searchedObject) {
-        rootNode.removeAll();
-        ShipmentWrapper shipment = (ShipmentWrapper) searchedObject;
-        currentSiteAdapter = new SiteAdapter(rootNode, SessionManager
-            .getInstance().getCurrentSite(), false);
-        rootNode.addChild(currentSiteAdapter);
-        ClinicAdapter clinicAdapter = new ClinicAdapter(currentSiteAdapter,
-            shipment.getClinic(), false);
-        currentSiteAdapter.addChild(clinicAdapter);
-        ShipmentAdapter shipmentAdapter = new ShipmentAdapter(clinicAdapter,
-            shipment);
-        clinicAdapter.addChild(shipmentAdapter);
-        shipmentAdapter.performExpand();
-        shipmentAdapter.performDoubleClick();
+    protected NodeSearchVisitor getVisitor(ModelWrapper<?> searchedObject) {
+        return new ShipmentViewNodeSearchVisitor(searchedObject);
     }
 
     @Override
     protected void notFound(String text) {
-        rootNode.removeAll();
-        rootNode.addChild(getNotFoundAdapter());
         boolean create = BioBankPlugin.openConfirm("Shipment not found",
             "Do you want to create this shipment ?");
         if (create) {
             ShipmentWrapper shipment = new ShipmentWrapper(SessionManager
                 .getAppService());
             shipment.setWaybill(text);
-            ShipmentAdapter adapter = new ShipmentAdapter(rootNode, shipment);
+            ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
+                shipment);
             adapter.openEntryForm();
         }
     }
 
-    public void displayPatient(PatientWrapper patient) {
-        PatientAdapter patientAdapter = new PatientAdapter(
-            currentInstance.rootNode, patient, false);
-        if (patient.isNew()) {
-            patientAdapter.openEntryForm(true);
-        } else {
-            patientAdapter.setEditable(false);
-            patientAdapter.openViewForm();
+    @Override
+    protected AbstractTodayNode getTodayNode() {
+        return new ShipmentTodayNode(rootNode, 0);
+    }
+
+    @Override
+    protected AbstractSearchedNode getSearchedNode() {
+        return new ShipmentSearchedNode(rootNode, 1);
+    }
+
+    public static void showShipment(ShipmentWrapper shipment) {
+        if (currentInstance != null) {
+            currentInstance.showSearchedObjectInTree(shipment);
         }
+    }
+
+    public static ShipmentAdministrationView getCurrent() {
+        return currentInstance;
+    }
+
+    public static class ShipmentListener extends WrapperListenerAdapter {
+        private ShipmentAdapter shipAdapter;
+
+        private boolean dateReceivedChanged = false;
+
+        public ShipmentListener(ShipmentAdapter ship) {
+            this.shipAdapter = ship;
+            shipAdapter.getWrapper().addPropertyChangeListener("dateReceived",
+                new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        dateReceivedChanged = true;
+                    }
+                });
+        }
+
+        @Override
+        public void inserted(WrapperEvent event) {
+            if (shipAdapter.getWrapper().isReceivedToday()) {
+                shipAdapter.getParent().removeChild(shipAdapter);
+                displayTodayObjects();
+            }
+        }
+
+        @Override
+        public void updated(WrapperEvent event) {
+            if (dateReceivedChanged) {
+                shipAdapter.getParent().removeChild(shipAdapter);
+                displayTodayObjects();
+                if (!shipAdapter.getWrapper().isReceivedToday()) {
+                    ShipmentAdministrationView.showShipment(shipAdapter
+                        .getWrapper());
+                }
+            }
+        }
+
+        private void displayTodayObjects() {
+            ShipmentAdministrationView.getCurrent().reloadTodayNode();
+            if (PatientAdministrationView.getCurrent() != null) {
+                PatientAdministrationView.getCurrent().reloadTodayNode();
+            }
+        }
+    }
+
+    public static ShipmentAdapter getCurrentShipment() {
+        AdapterBase selectedNode = currentInstance.getSelectedNode();
+        if (selectedNode != null && selectedNode instanceof ShipmentAdapter) {
+            return (ShipmentAdapter) selectedNode;
+        }
+        return null;
     }
 
 }
