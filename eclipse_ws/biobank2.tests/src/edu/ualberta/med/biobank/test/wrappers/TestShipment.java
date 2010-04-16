@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingCompanyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Shipment;
@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
-import edu.ualberta.med.biobank.test.internal.ShippingCompanyHelper;
+import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -150,21 +150,21 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testGetSetShippingCompany() throws Exception {
-        String name = "testGetSetShippingCompany" + r.nextInt();
+    public void testGetSetShippingMethod() throws Exception {
+        String name = "testGetSetShippingMethod" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        ShippingCompanyWrapper company = ShippingCompanyHelper
-            .addShippingCompany(name);
+        ShippingMethodWrapper company = ShippingMethodHelper
+            .addShippingMethod(name);
         ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomPatient(
             clinic, name);
 
-        shipment.setShippingCompany(company);
+        shipment.setShippingMethod(company);
         shipment.persist();
 
         shipment.reload();
 
-        Assert.assertEquals(company, shipment.getShippingCompany());
+        Assert.assertEquals(company, shipment.getShippingMethod());
     }
 
     @Test

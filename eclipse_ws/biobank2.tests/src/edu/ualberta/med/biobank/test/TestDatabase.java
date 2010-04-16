@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
-import edu.ualberta.med.biobank.test.internal.ShippingCompanyHelper;
+import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -55,7 +55,7 @@ public class TestDatabase {
             SampleTypeHelper.deleteCreatedSampleTypes();
             SiteHelper.deleteCreatedSites();
             SourceVesselHelper.deleteCreatedSourceVessels();
-            ShippingCompanyHelper.deleteCreateShippingCompanies();
+            ShippingMethodHelper.deleteCreateShippingMethods();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();
