@@ -293,15 +293,21 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         String propertyName, String value, Integer siteId, String errorMessage)
         throws ApplicationException, BiobankCheckException {
         List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { siteId, value }));
+            .asList(new Object[] { value }));
+        String siteIdTest = "site.id=?";
+        if (siteId == null) {
+            siteIdTest = "site.id is null";
+        } else {
+            parameters.add(siteId);
+        }
         String notSameObject = "";
         if (!isNew()) {
             notSameObject = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria = new HQLCriteria("from " + objectClass.getName()
-            + " where site.id=? and " + propertyName + "=?" + notSameObject,
-            parameters);
+        HQLCriteria criteria = new HQLCriteria(
+            "from " + objectClass.getName() + " where " + propertyName
+                + "=? and " + siteIdTest + notSameObject, parameters);
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
             throw new BiobankCheckException(errorMessage);
