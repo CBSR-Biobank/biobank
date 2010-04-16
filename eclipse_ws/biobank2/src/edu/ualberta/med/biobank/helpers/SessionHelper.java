@@ -6,6 +6,7 @@ import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -40,6 +41,7 @@ public class SessionHelper implements Runnable {
 
         appService = null;
         siteWrappers = null;
+
     }
 
     public void run() {
@@ -57,12 +59,21 @@ public class SessionHelper implements Runnable {
                     userName, password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
+            SessionManager.failedLoginAttempts = 0;
         } catch (ApplicationException exp) {
             logger.error("Error while logging to application", exp);
             if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BioBankPlugin.openAsyncError("Login Failed",
-                    "Error authenticating user " + userName);
+                SessionManager.failedLoginAttempts++;
+                if (SessionManager.failedLoginAttempts > 2)
+                    BioBankPlugin
+                        .openAsyncError("Login Failed",
+                            "Too many failed connection attempts. Login disabled for 30 min.");
+                else
+                    BioBankPlugin.openAsyncError("Login Failed",
+                        "Error authenticating user " + userName + ". "
+                            + (3 - SessionManager.failedLoginAttempts)
+                            + " attempt(s) remaining.");
                 return;
             }
             BioBankPlugin.openRemoteConnectErrorMessage();

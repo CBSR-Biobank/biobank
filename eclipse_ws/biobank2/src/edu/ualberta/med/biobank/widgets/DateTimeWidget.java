@@ -54,6 +54,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         if (showDate) {
             dateEntry = new DateChooserCombo(this, SWT.BORDER);
+            // dateEntry.setFormatter(new MyFormatter("yyyy-MM-dd"));
             dateEntry.setFormatter(new DateFormatter("yyyy-MM-dd"));
             Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
             GridData gd = new GridData();
