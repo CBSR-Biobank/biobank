@@ -117,11 +117,60 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         ApplicationException {
         checkNotEmpty(getName(), "Name");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(SampleType.class, "name", getName(),
-            "A sample type with name \"" + getName() + "\" already exists.");
-        checkNoDuplicates(SampleType.class, "nameShort", getNameShort(),
-            "A sample type with short name \"" + getNameShort()
-                + "\" already exists.");
+        checkNameAndShortNameUniquesForSiteAndGlobal();
+    }
+
+    public void checkNameAndShortNameUniquesForSiteAndGlobal()
+        throws ApplicationException, BiobankCheckException {
+        Integer siteId = null;
+        String siteMsg = ".";
+        String globalMsg = "";
+        if (getSite() == null) {
+            globalMsg = "global";
+            siteMsg = " or is used by a site.";
+        } else {
+            siteId = getSite().getId();
+            siteMsg = " for site " + getSite().getNameShort()
+                + " or in global types.";
+        }
+        checkNoDuplicatesInSiteAndGlobal("name", getName(), siteId, "A "
+            + globalMsg + " sample type with name \"" + getName()
+            + "\" already exists" + siteMsg);
+
+        checkNoDuplicatesInSiteAndGlobal("nameShort", getNameShort(), siteId,
+            "A " + globalMsg + " sample type with short name \""
+                + getNameShort() + "\" already exists" + siteMsg);
+    }
+
+    private void checkNoDuplicatesInSiteAndGlobal(String propertyName,
+        String value, Integer siteId, String errorMessage)
+        throws ApplicationException, BiobankCheckException {
+        List<Object> parameters = new ArrayList<Object>(Arrays
+            .asList(new Object[] { value }));
+        String siteTest = "";
+        if (siteId != null) {
+            // if Sample Type is for a specific site: check the property does
+            // not exists for this site, nor for global types
+            siteTest = " and (site.id=? or site.id is null)";
+            parameters.add(siteId);
+        }
+        // if global type, check the name is use nowhere
+
+        String notSameObject = "";
+        if (!isNew()) {
+            notSameObject = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("select count(*) from "
+            + SampleType.class.getName() + " where " + propertyName + "=? "
+            + siteTest + notSameObject, parameters);
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        if (result.get(0) > 0) {
+            throw new BiobankCheckException(errorMessage);
+        }
     }
 
     /**

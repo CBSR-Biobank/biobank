@@ -1,11 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -15,7 +11,9 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -23,6 +21,7 @@ import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current sample storage collection and allows the user to add
@@ -35,8 +34,6 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
     private List<SampleTypeWrapper> selectedSampleTypes;
 
-    private List<SampleTypeWrapper> conflictTypes;
-
     private List<SampleTypeWrapper> addedOrModifiedSampleTypes;
 
     private List<SampleTypeWrapper> deletedSampleTypes;
@@ -44,6 +41,8 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     private String addMessage;
 
     private String editMessage;
+
+    private SiteWrapper currentSite;
 
     /**
      * 
@@ -53,13 +52,13 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      *            displayed in the table viewer (can be null).
      */
     public SampleTypeEntryInfoTable(Composite parent,
-        List<SampleTypeWrapper> sampleTypeCollection,
-        List<SampleTypeWrapper> conflictTypes, String addMessage,
-        String editMessage) {
+        List<SampleTypeWrapper> sampleTypeCollection, String addMessage,
+        String editMessage, SiteWrapper currentSite) {
         super(parent, null);
-        setLists(sampleTypeCollection, conflictTypes);
+        setLists(sampleTypeCollection);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
+        this.currentSite = currentSite;
         addEditSupport();
     }
 
@@ -73,17 +72,18 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addSampleType() {
-        addOrEditSampleType(true, new SampleTypeWrapper(SessionManager
-            .getAppService()), getRestrictedTypes(), addMessage);
+        SampleTypeWrapper newST = new SampleTypeWrapper(SessionManager
+            .getAppService());
+        newST.setSite(currentSite);
+        addOrEditSampleType(true, newST, addMessage);
     }
 
     private boolean addOrEditSampleType(boolean add,
-        SampleTypeWrapper sampleType, Set<SampleTypeWrapper> restrictedTypes,
-        String message) {
+        SampleTypeWrapper sampleType, String message) {
         SampleTypeDialog dlg = new SampleTypeDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), sampleType, message);
         if (dlg.open() == Dialog.OK) {
-            if (addEditOk(sampleType, restrictedTypes)) {
+            if (addEditOk(sampleType)) {
                 if (add) {
                     // only add to the collection when adding and not editing
                     selectedSampleTypes.add(sampleType);
@@ -93,19 +93,8 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 notifyListeners();
                 return true;
             }
-            BioBankPlugin.openAsyncError("Name Problem",
-                "A type with the same name or short name already exists.");
         }
         return false;
-    }
-
-    // need sample types that have not yet been selected in sampleStorageTable
-    private Set<SampleTypeWrapper> getRestrictedTypes() {
-        Set<SampleTypeWrapper> restrictedTypes = new HashSet<SampleTypeWrapper>(
-            conflictTypes);
-        Collection<SampleTypeWrapper> currentSampleTypes = getCollection();
-        restrictedTypes.addAll(currentSampleTypes);
-        return restrictedTypes;
     }
 
     private void addEditSupport() {
@@ -120,9 +109,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             @Override
             public void editItem(InfoTableEvent event) {
                 SampleTypeWrapper type = getSelection();
-                Set<SampleTypeWrapper> restrictedTypes = getRestrictedTypes();
-                restrictedTypes.remove(type);
-                addOrEditSampleType(false, type, restrictedTypes, editMessage);
+                addOrEditSampleType(false, type, editMessage);
             }
         });
 
@@ -132,7 +119,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 SampleTypeWrapper sampleType = getSelection();
 
                 try {
-                    if (sampleType.isUsedBySamples()) {
+                    if (!sampleType.isNew() && sampleType.isUsedBySamples()) {
                         BioBankPlugin.openError("Sample Type Delete Error",
                             "Cannot delete sample type \""
                                 + sampleType.getName()
@@ -165,13 +152,15 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         });
     }
 
-    private boolean addEditOk(SampleTypeWrapper type,
-        Set<SampleTypeWrapper> restrictedTypes) {
-        for (SampleTypeWrapper st : restrictedTypes) {
-            if (st.getName().equals(type.getName())
-                || st.getNameShort().equals(type.getNameShort())) {
-                return false;
-            }
+    private boolean addEditOk(SampleTypeWrapper type) {
+        try {
+            type.checkNameAndShortNameUniquesForSiteAndGlobal();
+        } catch (BiobankCheckException bce) {
+            BioBankPlugin.openAsyncError("Check error", bce);
+            return false;
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("Check error", e);
+            return false;
         }
         return true;
     }
@@ -184,22 +173,25 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         return deletedSampleTypes;
     }
 
-    public void setLists(List<SampleTypeWrapper> sampleTypeCollection,
-        List<SampleTypeWrapper> conflictTypes) {
-        this.conflictTypes = conflictTypes;
-        if (conflictTypes == null) {
-            conflictTypes = new ArrayList<SampleTypeWrapper>();
-        }
-
+    public void setLists(List<SampleTypeWrapper> sampleTypeCollection) {
         if (sampleTypeCollection == null) {
             selectedSampleTypes = new ArrayList<SampleTypeWrapper>();
         } else {
             selectedSampleTypes = new ArrayList<SampleTypeWrapper>(
                 sampleTypeCollection);
         }
-        Collections.sort(selectedSampleTypes);
         reloadCollection(sampleTypeCollection);
         addedOrModifiedSampleTypes = new ArrayList<SampleTypeWrapper>();
         deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
+    }
+
+    public SiteWrapper getCurrentSite() {
+        return currentSite;
+    }
+
+    public void reload() {
+        if (currentSite != null) {
+            setLists(currentSite.getSampleTypeCollection(true));
+        }
     }
 }
