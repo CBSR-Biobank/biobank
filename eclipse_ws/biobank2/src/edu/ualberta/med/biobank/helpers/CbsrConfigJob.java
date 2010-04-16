@@ -79,7 +79,7 @@ public class CbsrConfigJob {
             sampleTypesList = SampleTypeWrapper.getGlobalSampleTypes(
                 appService, false);
             shippingCompaniesList = ShippingMethodWrapper
-                .getShippingCompanies(appService);
+                .getShippingMethods(appService);
         } catch (Exception e) {
             BioBankPlugin.openError("Init Examples",
                 "Error encounted when adding init examples");

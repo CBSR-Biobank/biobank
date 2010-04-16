@@ -53,15 +53,15 @@ public class TestShippingMethod extends TestDatabase {
 
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment1.setShippingCompany(company1);
+        shipment1.setShippingMethod(company1);
         shipment1.persist();
         ShipmentWrapper shipment2 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment2.setShippingCompany(company2);
+        shipment2.setShippingMethod(company2);
         shipment2.persist();
         ShipmentWrapper shipment3 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment3.setShippingCompany(company2);
+        shipment3.setShippingMethod(company2);
         shipment3.persist();
 
         company1.reload();
@@ -86,17 +86,17 @@ public class TestShippingMethod extends TestDatabase {
 
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment1.setShippingCompany(company);
+        shipment1.setShippingMethod(company);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
         ShipmentWrapper shipment2 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment2.setShippingCompany(company);
+        shipment2.setShippingMethod(company);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
         ShipmentWrapper shipment3 = ShipmentHelper
             .addShipment(clinic, patient1);
-        shipment3.setShippingCompany(company);
+        shipment3.setShippingMethod(company);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
@@ -114,13 +114,13 @@ public class TestShippingMethod extends TestDatabase {
     @Test
     public void testGetShippingCompanies() throws Exception {
         String name = "testGetShippingCompanies" + r.nextInt();
-        int sizeBefore = ShippingMethodWrapper.getShippingCompanies(appService)
+        int sizeBefore = ShippingMethodWrapper.getShippingMethods(appService)
             .size();
 
         ShippingMethodHelper.addShippingMethod(name);
         ShippingMethodHelper.addShippingMethod(name + "_2");
 
-        int sizeAfter = ShippingMethodWrapper.getShippingCompanies(appService)
+        int sizeAfter = ShippingMethodWrapper.getShippingMethods(appService)
             .size();
 
         Assert.assertEquals(sizeBefore + 2, sizeAfter);
@@ -130,7 +130,7 @@ public class TestShippingMethod extends TestDatabase {
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
         ShippingMethodWrapper company = ShippingMethodHelper
-            .newShippingCompany(name);
+            .newShippingMethod(name);
         company.persist();
         ShippingMethodHelper.createdCompanies.add(company);
 

@@ -9,7 +9,7 @@ public class ShippingMethodHelper extends DbHelper {
 
     public static List<ShippingMethodWrapper> createdCompanies = new ArrayList<ShippingMethodWrapper>();
 
-    public static ShippingMethodWrapper newShippingCompany(String name) {
+    public static ShippingMethodWrapper newShippingMethod(String name) {
         ShippingMethodWrapper company = new ShippingMethodWrapper(appService);
         company.setName(name);
         return company;
@@ -17,7 +17,7 @@ public class ShippingMethodHelper extends DbHelper {
 
     public static ShippingMethodWrapper addShippingMethod(String name,
         boolean addToCreatedList) throws Exception {
-        ShippingMethodWrapper company = newShippingCompany(name);
+        ShippingMethodWrapper company = newShippingMethod(name);
         company.persist();
         if (addToCreatedList) {
             createdCompanies.add(company);

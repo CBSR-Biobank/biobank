@@ -49,7 +49,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ComboViewer clinicsComboViewer;
 
-    private ComboViewer companyComboViewer;
+    private ComboViewer shippingMethodComboViewer;
 
     private SiteWrapper site;
 
@@ -120,7 +120,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                         try {
                             shipmentWrapper.checkPatientsStudy();
                             waybillText.setEnabled(shipmentWrapper.getClinic()
-                                .getHasShipments());
+                                .getSendsShipments());
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Patients check", e);
                         }
@@ -146,11 +146,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Date shipped should be set");
         firstControl = dateShippedWidget;
 
-        ShippingMethodWrapper selectedCompany = shipmentWrapper
-            .getShippingCompany();
-        companyComboViewer = createComboViewerWithNoSelectionValidator(client,
-            "Transit Method", ShippingMethodWrapper
-                .getShippingCompanies(appService), selectedCompany, null);
+        ShippingMethodWrapper selectedShippingMethod = shipmentWrapper
+            .getShippingMethod();
+        shippingMethodComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Shipping Method", ShippingMethodWrapper
+                .getShippingMethods(appService), selectedShippingMethod, null);
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Box Number",
             null, BeansObservables.observeValue(shipmentWrapper, "boxNumber"),
@@ -203,14 +203,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (clinicsComboViewer != null) {
             setClinicFromSelection();
         }
-        IStructuredSelection companySelection = (IStructuredSelection) companyComboViewer
+        IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
             .getSelection();
-        if ((companySelection != null) && (companySelection.size() > 0)) {
+        if ((shippingMethodSelection != null)
+            && (shippingMethodSelection.size() > 0)) {
             shipmentWrapper
-                .setShippingCompany((ShippingMethodWrapper) companySelection
+                .setShippingMethod((ShippingMethodWrapper) shippingMethodSelection
                     .getFirstElement());
         } else {
-            shipmentWrapper.setShippingCompany((ShippingMethodWrapper) null);
+            shipmentWrapper.setShippingMethod((ShippingMethodWrapper) null);
         }
         boolean newShipment = shipmentWrapper.isNew();
         shipmentWrapper.persist();
@@ -241,13 +242,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             clinicsComboViewer.getCombo().deselectAll();
         }
         shipmentPatientsWidget.updateList();
-        ShippingMethodWrapper shipCompany = shipmentWrapper
-            .getShippingCompany();
-        if (shipCompany != null) {
-            companyComboViewer
-                .setSelection(new StructuredSelection(shipCompany));
-        } else if (companyComboViewer.getCombo().getItemCount() > 1) {
-            companyComboViewer.getCombo().deselectAll();
+        ShippingMethodWrapper shipMethod = shipmentWrapper.getShippingMethod();
+        if (shipMethod != null) {
+            shippingMethodComboViewer.setSelection(new StructuredSelection(
+                shipMethod));
+        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
+            shippingMethodComboViewer.getCombo().deselectAll();
         }
     }
 

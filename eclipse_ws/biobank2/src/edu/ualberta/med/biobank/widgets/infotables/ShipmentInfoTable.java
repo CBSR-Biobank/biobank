@@ -118,7 +118,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         info.shipment = shipment;
         info.dateReceived = shipment.getFormattedDateReceived();
         info.waybill = shipment.getWaybill();
-        ShippingMethodWrapper company = shipment.getShippingCompany();
+        ShippingMethodWrapper company = shipment.getShippingMethod();
         if (company != null) {
             info.shippingCompany = company.getName();
         } else {

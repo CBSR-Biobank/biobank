@@ -150,8 +150,8 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
-    public void testGetSetShippingCompany() throws Exception {
-        String name = "testGetSetShippingCompany" + r.nextInt();
+    public void testGetSetShippingMethod() throws Exception {
+        String name = "testGetSetShippingMethod" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ShippingMethodWrapper company = ShippingMethodHelper
@@ -159,12 +159,12 @@ public class TestShipment extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomPatient(
             clinic, name);
 
-        shipment.setShippingCompany(company);
+        shipment.setShippingMethod(company);
         shipment.persist();
 
         shipment.reload();
 
-        Assert.assertEquals(company, shipment.getShippingCompany());
+        Assert.assertEquals(company, shipment.getShippingMethod());
     }
 
     @Test

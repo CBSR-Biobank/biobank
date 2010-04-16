@@ -91,13 +91,13 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return getShipmentCollection(false);
     }
 
-    public static List<ShippingMethodWrapper> getShippingCompanies(
+    public static List<ShippingMethodWrapper> getShippingMethods(
         WritableApplicationService appService) throws ApplicationException {
         List<ShippingMethod> objects = appService.search(ShippingMethod.class,
             new ShippingMethod());
         List<ShippingMethodWrapper> wrappers = new ArrayList<ShippingMethodWrapper>();
-        for (ShippingMethod sc : objects) {
-            wrappers.add(new ShippingMethodWrapper(appService, sc));
+        for (ShippingMethod sm : objects) {
+            wrappers.add(new ShippingMethodWrapper(appService, sm));
         }
         return wrappers;
     }

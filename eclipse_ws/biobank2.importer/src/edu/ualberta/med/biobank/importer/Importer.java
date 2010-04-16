@@ -399,7 +399,7 @@ public class Importer {
     private static void initShipmentCompanyMap() throws Exception {
         shippingCompanyMap = new HashMap<String, ShippingMethodWrapper>();
         for (ShippingMethodWrapper company : ShippingMethodWrapper
-            .getShippingCompanies(appService)) {
+            .getShippingMethods(appService)) {
             shippingCompanyMap.put(company.getName(), company);
         }
     }
@@ -858,7 +858,7 @@ public class Importer {
                 shipment.setDateReceived(dateReceived);
                 shipment.setDateShipped(defaultDateShipped);
                 shipment.addPatients(Arrays.asList(patient));
-                shipment.setShippingCompany(unknownShippingCompany);
+                shipment.setShippingMethod(unknownShippingCompany);
                 shipment.persist();
             } else if (!shipment.hasPatient(patientNr)) {
                 logger.debug("adding to shipment: patient/"
