@@ -472,21 +472,21 @@ public class TestClinic extends TestDatabase {
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
 
-        Assert.assertFalse(clinic.hasShipments());
+        Assert.assertFalse(clinic.sendsShipments());
 
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
         ShipmentWrapper shipment2 = ShipmentHelper
             .addShipment(clinic, patient2);
 
-        Assert.assertTrue(clinic.hasShipments());
+        Assert.assertTrue(clinic.sendsShipments());
 
         clinic.reload();
         shipment1.delete();
         shipment2.delete();
         clinic.reload();
 
-        Assert.assertFalse(clinic.hasShipments());
+        Assert.assertFalse(clinic.sendsShipments());
     }
 
     @Test

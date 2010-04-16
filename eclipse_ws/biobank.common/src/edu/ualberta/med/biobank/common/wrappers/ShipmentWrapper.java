@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShippingCompany;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -52,7 +52,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateShipped", "dateReceived", "clinic",
             "comment", "patientVisitCollection", "waybill", "boxNumber",
-            "shippingCompany", "patientCollection" };
+            "shippingMethod", "patientCollection" };
     }
 
     @Override
@@ -305,25 +305,25 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         propertyChangeSupport.firePropertyChange("boxNumber", old, boxNumber);
     }
 
-    public ShippingCompanyWrapper getShippingCompany() {
-        ShippingCompany sc = wrappedObject.getShippingCompany();
+    public ShippingMethodWrapper getShippingMethod() {
+        ShippingMethod sc = wrappedObject.getShippingMethod();
         if (sc == null) {
             return null;
         }
-        return new ShippingCompanyWrapper(appService, sc);
+        return new ShippingMethodWrapper(appService, sc);
     }
 
-    protected void setShippingCompany(ShippingCompany sc) {
-        ShippingCompany old = wrappedObject.getShippingCompany();
-        wrappedObject.setShippingCompany(sc);
-        propertyChangeSupport.firePropertyChange("shippingCompany", old, sc);
+    protected void setShippingMethod(ShippingMethod sc) {
+        ShippingMethod old = wrappedObject.getShippingMethod();
+        wrappedObject.setShippingMethod(sc);
+        propertyChangeSupport.firePropertyChange("shippingMethod", old, sc);
     }
 
-    public void setShippingCompany(ShippingCompanyWrapper sc) {
+    public void setShippingMethod(ShippingMethodWrapper sc) {
         if (sc == null) {
-            setShippingCompany((ShippingCompany) null);
+            setShippingMethod((ShippingMethod) null);
         } else {
-            setShippingCompany(sc.wrappedObject);
+            setShippingMethod(sc.wrappedObject);
         }
     }
 
@@ -484,11 +484,13 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         cal.set(Calendar.HOUR, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         Date startDate = cal.getTime();
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
         Date dateReveived = getDateReceived();
-        return dateReveived.after(startDate) && dateReveived.before(endDate);
+        return dateReveived.compareTo(startDate) >= 0
+            && dateReveived.compareTo(endDate) <= 0;
     }
 }

@@ -30,8 +30,12 @@ public class ShipmentAdapter extends AdapterBase {
     protected String getLabelInternal() {
         ShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "shipment is null");
-        return shipment.getWaybill() + " - "
-            + shipment.getFormattedDateShipped();
+        String label = shipment.getFormattedDateReceived();
+        if (shipment.getWaybill() != null) {
+            label += " (" + shipment.getWaybill() + ")";
+        }
+        return label;
+
     }
 
     @Override

@@ -132,7 +132,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             shipment.setWaybill(r.nextInt(2000) + getRandomString(10));
             shipment.setClinic(clinic);
             shipment.addPatients(Arrays.asList(patient));
-            shipment.setShippingCompany(shippingCompaniesList.get(r
+            shipment.setShippingMethod(shippingCompaniesList.get(r
                 .nextInt(numShippingCompanies)));
             shipment.persist();
             clinic.reload();
