@@ -269,10 +269,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
         plateToScanValue.setValue(""); //$NON-NLS-1$
     }
 
-    protected void focusOnPlateToScanText() {
-        plateToScanText.setFocus();
-    }
-
     protected void focusOnCancelConfirmText() {
         cancelConfirmWidget.setFocus();
     }
