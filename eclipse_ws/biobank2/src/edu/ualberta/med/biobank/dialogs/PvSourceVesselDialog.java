@@ -10,6 +10,7 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -94,15 +95,25 @@ public class PvSourceVesselDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        boolean useStudyOnlySourceVessels = true;
         StudySourceVesselWrapper ssv = null;
         if (pvSourceVessel.getSourceVessel() != null) {
             ssv = mapStudySourceVessel.get(pvSourceVessel.getSourceVessel()
                 .getName());
         }
+        if (ssv == null && pvSourceVessel.getSourceVessel() != null
+            && allSourceVessels.contains(pvSourceVessel.getSourceVessel())) {
+            useStudyOnlySourceVessels = false;
+        }
         sourceVesselsComboViewer = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
                 "Source Vessel", mapStudySourceVessel.values(), ssv,
                 "A source vessel should be selected");
+        if (!useStudyOnlySourceVessels) {
+            sourceVesselsComboViewer.setInput(allSourceVessels);
+            sourceVesselsComboViewer.setSelection(new StructuredSelection(
+                pvSourceVessel.getSourceVessel()));
+        }
         sourceVesselsComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -134,7 +145,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
                 }
             }
         });
-        allSourceVesselCheckBox.setSelection(true);
+        allSourceVesselCheckBox.setSelection(useStudyOnlySourceVessels);
 
         Text quantityText = (Text) createBoundWidgetWithLabel(contents,
             Text.class, SWT.BORDER, "Quantity", new String[0], BeansObservables
@@ -146,7 +157,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
         timeDrawnWidget = widgetCreator.createDateTimeWidget(contents,
             "Time drawn", pvSourceVessel.getTimeDrawn(), BeansObservables
-                .observeValue(pvSourceVessel, "timeDrawn"), null, false);
+                .observeValue(pvSourceVessel, "timeDrawn"), null, SWT.TIME);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 

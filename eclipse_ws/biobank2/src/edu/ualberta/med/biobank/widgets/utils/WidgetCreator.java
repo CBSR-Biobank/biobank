@@ -314,15 +314,15 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, true);
+            modelObservableValue, emptyMessage, -1);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, boolean showDate) {
+        final String emptyMessage, int typeShown) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
-            date, showDate);
+            date, typeShown);
         if (selectionListener != null) {
             widget.addSelectionListener(selectionListener);
         }

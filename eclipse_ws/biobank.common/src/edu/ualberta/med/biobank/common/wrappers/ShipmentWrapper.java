@@ -437,6 +437,37 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     /**
+     * Search for shipments in the site with the given date received. Don't use
+     * hour and minute.
+     */
+    public static List<ShipmentWrapper> getShipmentsInSite(
+        WritableApplicationService appService, Date dateReceived,
+        SiteWrapper site) throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // date at 0:0am
+        cal.setTime(dateReceived);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // date at 0:0pm
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Shipment.class.getName()
+                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        List<Shipment> shipments = appService.query(criteria);
+        List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
+        for (Shipment s : shipments) {
+            wrappers.add(new ShipmentWrapper(appService, s));
+        }
+        return wrappers;
+    }
+
+    /**
      */
     public boolean hasPatient(String patientNumber) throws Exception {
         HQLCriteria criteria = new HQLCriteria(

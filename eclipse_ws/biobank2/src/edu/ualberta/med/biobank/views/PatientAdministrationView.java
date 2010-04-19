@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Arrays;
+import java.util.List;
+
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -28,9 +31,15 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    protected ModelWrapper<?> search(String text) throws Exception {
-        return PatientWrapper.getPatientInSite(SessionManager.getAppService(),
-            text, SessionManager.getInstance().getCurrentSite());
+    protected List<? extends ModelWrapper<?>> search(String text)
+        throws Exception {
+        PatientWrapper patient = PatientWrapper.getPatientInSite(SessionManager
+            .getAppService(), text, SessionManager.getInstance()
+            .getCurrentSite());
+        if (patient != null) {
+            return Arrays.asList(patient);
+        }
+        return null;
     }
 
     @Override
@@ -78,7 +87,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         patient.addWrapperListener(new WrapperListenerAdapter() {
             @Override
             public void inserted(WrapperEvent event) {
-                showSearchedObjectInTree(patient);
+                showSearchedObjectsInTree(Arrays.asList(patient));
             }
         });
         PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
@@ -105,7 +114,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
 
     public static void showPatient(PatientWrapper patient) {
         if (currentInstance != null) {
-            currentInstance.showSearchedObjectInTree(patient);
+            currentInstance.showSearchedObjectsInTree(Arrays.asList(patient));
         }
     }
 
