@@ -102,6 +102,4 @@ SELECT study_id, study_id FROM tmp_study_source_vessel;
 
 DROP TABLE tmp_study_source_vessel;
 
-INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','','','',2,'2010-04-13');
-
 SET FOREIGN_KEY_CHECKS = 1;
