@@ -46,7 +46,7 @@ public class TreeViewerDragListener implements DragSourceListener {
     }
 
     public void dragFinished(DragSourceEvent event) {
-        if (!event.doit)
+        if (!event.doit || dragData == null)
             return;
 
         MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();

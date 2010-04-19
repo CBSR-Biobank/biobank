@@ -50,8 +50,10 @@ public class TreeViewerDropListener extends ViewerDropAdapter {
     @Override
     public boolean validateDrop(Object target, int operation,
         TransferData transferType) {
-        return MultiSelectNodeTransfer.getInstance().isSupportedType(
-            transferType);
+        if (target != null && target == this.getSelectedObject())
+            return false;
+        else
+            return MultiSelectNodeTransfer.getInstance().isSupportedType(
+                transferType);
     }
-
 }
