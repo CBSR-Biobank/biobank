@@ -43,6 +43,8 @@ public class SessionManager {
 
     private SiteManager siteManager;
 
+    public static int failedLoginAttempts = 0;
+
     /**
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
      * perspective is set

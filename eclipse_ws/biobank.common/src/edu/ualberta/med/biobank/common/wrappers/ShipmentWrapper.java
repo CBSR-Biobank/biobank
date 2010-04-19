@@ -81,6 +81,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         checkAlLeastOnePatient();
         checkPatientsStudy();
         checkRemovedPatients();
+        checkDateReceivedNotNull();
     }
 
     private void checkRemovedPatients() throws BiobankCheckException,
@@ -90,6 +91,12 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                 checkCanRemovePatient(patient);
             }
         }
+    }
+
+    private void checkDateReceivedNotNull() throws BiobankCheckException {
+        if (getDateReceived() == null)
+            throw new BiobankCheckException(
+                "'Date Received' is a required field. You must set this value before saving a shipment.");
     }
 
     public void checkCanRemovePatient(PatientWrapper patient)
