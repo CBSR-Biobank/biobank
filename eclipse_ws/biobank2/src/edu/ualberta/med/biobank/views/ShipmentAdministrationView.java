@@ -235,7 +235,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         @Override
         public void inserted(WrapperEvent event) {
             if (shipAdapter.getWrapper().isReceivedToday()) {
-                shipAdapter.getParent().removeChild(shipAdapter);
+                shipAdapter.getParent().removeChild(shipAdapter, false);
                 displayTodayObjects();
             }
         }
@@ -243,7 +243,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         @Override
         public void updated(WrapperEvent event) {
             if (dateReceivedChanged) {
-                shipAdapter.getParent().removeChild(shipAdapter);
+                shipAdapter.getParent().removeChild(shipAdapter, false);
                 displayTodayObjects();
                 if (!shipAdapter.getWrapper().isReceivedToday()) {
                     ShipmentAdministrationView.showShipment(shipAdapter

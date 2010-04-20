@@ -11,7 +11,6 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -199,7 +198,7 @@ public class WidgetCreator {
         return combo;
     }
 
-    private Text createText(Composite composite, int widgetOptions,
+    public Text createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
         if (widgetOptions == SWT.NONE) {
             widgetOptions = SWT.SINGLE;
@@ -391,10 +390,6 @@ public class WidgetCreator {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void disableValidator() {
-        IObservableList bindings = dbc.getBindings();
     }
 
     public void setKeyListener(KeyListener keyListener) {

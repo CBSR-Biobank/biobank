@@ -69,14 +69,22 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (getWaybill() == null) {
-            throw new BiobankCheckException(
-                "A waybill should be set on this shipment");
-        }
-        if (getClinic() != null && !checkWaybillUniqueForClinic()) {
-            throw new BiobankCheckException("A shipment with waybill "
-                + getWaybill() + " already exist in clinic "
-                + getClinic().getName() + ".");
+        if (getClinic() != null
+            && Boolean.TRUE.equals(getClinic().getSendsShipments())) {
+            if (getWaybill() == null) {
+                throw new BiobankCheckException(
+                    "A waybill should be set on this shipment");
+            }
+            if (!checkWaybillUniqueForClinic()) {
+                throw new BiobankCheckException("A shipment with waybill "
+                    + getWaybill() + " already exist in clinic "
+                    + getClinic().getName() + ".");
+            }
+        } else {
+            if (getWaybill() != null) {
+                throw new BiobankCheckException(
+                    "This shipment clinic doesn't send shipment: waybill should not be set");
+            }
         }
         checkAlLeastOnePatient();
         checkPatientsStudy();

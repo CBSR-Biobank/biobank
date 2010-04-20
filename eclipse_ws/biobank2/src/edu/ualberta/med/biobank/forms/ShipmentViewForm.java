@@ -52,7 +52,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         shipment = shipmentAdapter.getWrapper();
         retrieveShipment();
 
-        setPartName("Shipment " + shipment.getWaybill());
+        setPartName("Shipment " + shipment.getFormattedDateReceived());
     }
 
     private void retrieveShipment() {
@@ -66,7 +66,9 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment waybill: " + shipment.getWaybill());
+        form.setText("Shipment received on "
+            + shipment.getFormattedDateReceived() + " from "
+            + shipment.getClinic().getNameShort());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
