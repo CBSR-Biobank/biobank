@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,26 +107,37 @@ public class BioBankPlugin extends AbstractUIPlugin {
     //
     private static Map<String, String> classToImageKey;
     static {
-        Map<String, String> aMap = new HashMap<String, String>();
-        aMap.put(SessionAdapter.class.getName(), BioBankPlugin.IMG_SESSIONS);
-        aMap.put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
-        aMap.put(ClinicGroup.class.getName(), BioBankPlugin.IMG_CLINICS);
-        aMap.put(StudyGroup.class.getName(), BioBankPlugin.IMG_STUDIES);
-        aMap.put(ContainerTypeGroup.class.getName(),
+        classToImageKey = new HashMap<String, String>();
+        classToImageKey.put(SessionAdapter.class.getName(),
+            BioBankPlugin.IMG_SESSIONS);
+        classToImageKey
+            .put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
+        classToImageKey.put(ClinicGroup.class.getName(),
+            BioBankPlugin.IMG_CLINICS);
+        classToImageKey.put(StudyGroup.class.getName(),
+            BioBankPlugin.IMG_STUDIES);
+        classToImageKey.put(ContainerTypeGroup.class.getName(),
             BioBankPlugin.IMG_CONTAINER_TYPES);
-        aMap.put(ContainerGroup.class.getName(), BioBankPlugin.IMG_CONTAINERS);
-        aMap.put(ClinicAdapter.class.getName(), BioBankPlugin.IMG_CLINIC);
-        aMap.put(StudyAdapter.class.getName(), BioBankPlugin.IMG_STUDY);
-        aMap.put(PatientAdapter.class.getName(), BioBankPlugin.IMG_PATIENT);
-        aMap.put(PatientVisitAdapter.class.getName(),
+        classToImageKey.put(ContainerGroup.class.getName(),
+            BioBankPlugin.IMG_CONTAINERS);
+        classToImageKey.put(ClinicAdapter.class.getName(),
+            BioBankPlugin.IMG_CLINIC);
+        classToImageKey.put(StudyAdapter.class.getName(),
+            BioBankPlugin.IMG_STUDY);
+        classToImageKey.put(PatientAdapter.class.getName(),
+            BioBankPlugin.IMG_PATIENT);
+        classToImageKey.put(PatientVisitAdapter.class.getName(),
             BioBankPlugin.IMG_PATIENT_VISIT);
-        aMap.put(ShipmentAdapter.class.getName(), BioBankPlugin.IMG_SHIPMENT);
-        aMap.put(PatientSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
-        aMap.put(PatientTodayNode.class.getName(), BioBankPlugin.IMG_TODAY);
-        aMap
-            .put(ShipmentSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
-        aMap.put(ShipmentTodayNode.class.getName(), BioBankPlugin.IMG_TODAY);
-        classToImageKey = Collections.unmodifiableMap(aMap);
+        classToImageKey.put(ShipmentAdapter.class.getName(),
+            BioBankPlugin.IMG_SHIPMENT);
+        classToImageKey.put(PatientSearchedNode.class.getName(),
+            BioBankPlugin.IMG_SEARCH);
+        classToImageKey.put(PatientTodayNode.class.getName(),
+            BioBankPlugin.IMG_TODAY);
+        classToImageKey.put(ShipmentSearchedNode.class.getName(),
+            BioBankPlugin.IMG_SEARCH);
+        classToImageKey.put(ShipmentTodayNode.class.getName(),
+            BioBankPlugin.IMG_TODAY);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
