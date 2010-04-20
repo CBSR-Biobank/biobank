@@ -283,13 +283,11 @@ public class AdvancedReportsEditor extends EditorPart {
         operatorFields.add(operatorCombo);
         Widget widget;
         GridData wgd = new GridData();
-        wgd.widthHint = 200;
+        wgd.horizontalAlignment = SWT.FILL;
         if (field.getType() == Date.class) {
             widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
-            wgd.widthHint = 211;
             ((DateTimeWidget) widget).setLayoutData(wgd);
-            if (field.getValue() != null)
-                ((DateTimeWidget) widget).setDate((Date) field.getValue());
+            ((DateTimeWidget) widget).setDate((Date) field.getValue());
         } else if (field.getType() == String.class) {
             widget = new Text(parameterSection, SWT.BORDER);
             ((Text) widget).setLayoutData(wgd);
@@ -499,15 +497,12 @@ public class AdvancedReportsEditor extends EditorPart {
                     }
                     fields.get(i).setValue(val);
                     fields.get(i).setOperator(operatorFields.get(i).getText());
-                    fields.get(i).setDisplay(
-                        includedFields.get(i).getSelection());
                 } else {
                     fields.get(i).setValue(
                         ((Text) widgetFields.get(i)).getText());
                     fields.get(i).setOperator(operatorFields.get(i).getText());
-                    fields.get(i).setDisplay(
-                        includedFields.get(i).getSelection());
                 }
+                fields.get(i).setDisplay(includedFields.get(i).getSelection());
             }
         }
     }

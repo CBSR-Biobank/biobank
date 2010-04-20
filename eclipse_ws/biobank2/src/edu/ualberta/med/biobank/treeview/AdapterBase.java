@@ -229,6 +229,10 @@ public abstract class AdapterBase {
     }
 
     public void removeChild(AdapterBase item) {
+        removeChild(item, true);
+    }
+
+    public void removeChild(AdapterBase item, boolean closeForm) {
         if (children.size() == 0)
             return;
         AdapterBase itemToRemove = null;
@@ -238,7 +242,9 @@ public abstract class AdapterBase {
                 itemToRemove = child;
         }
         if (itemToRemove != null) {
-            closeEditor(new FormInput(itemToRemove));
+            if (closeForm) {
+                closeEditor(new FormInput(itemToRemove));
+            }
             children.remove(itemToRemove);
             fireRemove(itemToRemove);
         }

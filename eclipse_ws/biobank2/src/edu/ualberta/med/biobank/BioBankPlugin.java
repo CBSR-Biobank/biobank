@@ -101,6 +101,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_EMAIL_BANNER = "emailBanner";
     public static final String IMG_SEARCH = "search";
     public static final String IMG_TODAY = "today";
+    public static final String IMG_CALENDAR = "calendar";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -179,6 +180,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_CABINET, "cabinet.png");
         registerImage(registry, IMG_CABINET_LINK_ASSIGN,
             "cabinetLinkAssign.png");
+        registerImage(registry, IMG_CALENDAR, "calendar.png");
         registerImage(registry, IMG_CANCEL_FORM, "cancel.png");
         registerImage(registry, IMG_CLINIC, "clinic.png");
         registerImage(registry, IMG_CLINICS, "clinics.png");

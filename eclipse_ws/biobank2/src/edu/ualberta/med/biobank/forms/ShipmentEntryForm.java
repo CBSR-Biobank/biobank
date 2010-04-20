@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
+import org.eclipse.core.databinding.Binding;
+import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -14,6 +17,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -27,6 +31,7 @@ import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView.ShipmentListener;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -60,6 +65,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Text waybillText;
 
+    private Label waybillLabel;
+
+    private Binding waybillBinding;
+
+    private NonEmptyStringValidator waybillValidator;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -70,6 +81,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         shipmentWrapper = shipmentAdapter.getWrapper();
         site = SessionManager.getInstance().getCurrentSite();
         try {
+            site.reload();
             shipmentWrapper.reload();
         } catch (Exception e) {
             logger.error("Error while retrieving shipment", e);
@@ -78,18 +90,18 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (shipmentWrapper.isNew()) {
             tabName = "New Shipment";
         } else {
-            tabName = "Shipment " + shipmentWrapper.getWaybill();
+            tabName = "Shipment " + shipmentWrapper.getFormattedDateReceived();
         }
         setPartName(tabName);
         shipListener = new ShipmentListener(shipmentAdapter);
         shipmentWrapper.addWrapperListener(shipListener);
     }
 
-    // @Override
-    // public void dispose() {
-    // shipmentWrapper.removeWrapperListener(shipListener);
-    // super.dispose();
-    // }
+    @Override
+    public void dispose() {
+        shipmentWrapper.removeWrapperListener(shipListener);
+        super.dispose();
+    }
 
     @Override
     protected void createFormContent() throws Exception {
@@ -130,8 +142,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                         setClinicFromSelection();
                         try {
                             shipmentWrapper.checkPatientsStudy();
-                            waybillText.setEnabled(shipmentWrapper.getClinic()
-                                .getSendsShipments());
+                            activateWaybillField(Boolean.TRUE
+                                .equals(shipmentWrapper.getClinic()
+                                    .getSendsShipments()));
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Patients check", e);
                         }
@@ -144,12 +157,21 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         }
 
-        waybillText = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.NONE, "Waybill", null, BeansObservables.observeValue(
-                shipmentWrapper, "waybill"), new NonEmptyStringValidator(
-                "A waybill should be set"));
+        waybillLabel = widgetCreator.createLabel(client, "Waybill");
+        waybillLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        waybillValidator = new NonEmptyStringValidator(
+            "A waybill should be set");
+        waybillValidator.setControlDecoration(BiobankWidget.createDecorator(
+            waybillLabel, waybillValidator.getErrorMessage()));
+        waybillText = widgetCreator.createText(client, SWT.NONE, null, null);
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(waybillValidator);
+        waybillBinding = widgetCreator.bindValue(SWTObservables.observeText(
+            waybillText, SWT.Modify), BeansObservables.observeValue(
+            shipmentWrapper, "waybill"), uvs, null);
 
-        waybillText.setEnabled(false);
+        activateWaybillField(false);
 
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
             "Date Shipped", shipmentWrapper.getDateShipped(), BeansObservables
@@ -174,6 +196,21 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
             null, BeansObservables.observeValue(shipmentWrapper, "comment"),
             null);
+    }
+
+    private void activateWaybillField(boolean activate) {
+        waybillText.setVisible(activate);
+        ((GridData) waybillText.getLayoutData()).exclude = !activate;
+        waybillLabel.setVisible(activate);
+        ((GridData) waybillLabel.getLayoutData()).exclude = !activate;
+        if (activate) {
+            widgetCreator.addBinding(waybillBinding);
+            waybillValidator.validate(waybillText.getText());
+        } else {
+            widgetCreator.removeBinding(waybillBinding);
+            waybillValidator.validate("test");
+        }
+        form.layout(true, true);
     }
 
     private void createPatientsSection() {
@@ -214,6 +251,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (clinicsComboViewer != null) {
             setClinicFromSelection();
         }
+        if (!Boolean.TRUE.equals(shipmentWrapper.getClinic()
+            .getSendsShipments())) {
+            shipmentWrapper.setWaybill(null);
+        }
+
         IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
             .getSelection();
         if ((shippingMethodSelection != null)

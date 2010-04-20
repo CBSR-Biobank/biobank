@@ -11,7 +11,6 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -199,7 +198,7 @@ public class WidgetCreator {
         return combo;
     }
 
-    private Text createText(Composite composite, int widgetOptions,
+    public Text createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
         if (widgetOptions == SWT.NONE) {
             widgetOptions = SWT.SINGLE;
@@ -314,15 +313,15 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, true);
+            modelObservableValue, emptyMessage, -1);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, boolean showDate) {
+        final String emptyMessage, int typeShown) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
-            date, showDate);
+            date, typeShown);
         if (selectionListener != null) {
             widget.addSelectionListener(selectionListener);
         }
@@ -391,10 +390,6 @@ public class WidgetCreator {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void disableValidator() {
-        IObservableList bindings = dbc.getBindings();
     }
 
     public void setKeyListener(KeyListener keyListener) {
