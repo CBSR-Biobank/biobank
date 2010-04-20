@@ -13,7 +13,9 @@ Bundle-ClassPath: .,
  lib/mail.jar,
  lib/org.eclipse.nebula.widgets.calendarcombo_1.0.0.jar,
  lib/org.eclipse.nebula.widgets.datechooser_1.0.0.HEAD.jar,
- lib/org.eclipse.nebula.widgets.formattedtext_1.0.0.HEAD.jar
+ lib/org.eclipse.nebula.widgets.formattedtext_1.0.0.HEAD.jar,
+ lib/org.eclipse.nebula.cwt_0.9.0.HEAD.jar,
+ lib/org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
