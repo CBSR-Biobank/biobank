@@ -242,8 +242,8 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd) {
-        if (wrapperTypeToAdd != null
-            && SessionManager.canCreate(wrapperTypeToAdd)) {
+        if (wrapperTypeToAdd == null
+            || SessionManager.canCreate(wrapperTypeToAdd)) {
             ToolBar tbar = (ToolBar) section.getTextClient();
             if (tbar == null) {
                 tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);

@@ -122,6 +122,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
+        boolean newSite = site.isNew();
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
@@ -130,6 +131,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 .getSelection()).getFirstElement());
         site.persist();
         SessionManager.getInstance().updateSites();
+
+        if (newSite && !SessionManager.getInstance().isAllSitesSelected()) {
+            SessionManager.getInstance().getSiteCombo().setSelection(site);
+        }
     }
 
     @Override

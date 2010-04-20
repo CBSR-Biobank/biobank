@@ -55,6 +55,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Sample Type Information");
         form.getBody().setLayout(new GridLayout(1, false));
+
         createGlobalSampleTypeSection();
 
         firstControl = globalSampleWidget;
