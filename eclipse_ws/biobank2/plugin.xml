@@ -713,7 +713,7 @@
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate1">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate1Enabled">
+                  definitionId="scannerConfigPlugin.plate1Enabled">
             </reference>
          </activeWhen>
       </handler>
@@ -722,7 +722,7 @@
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate2">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate2Enabled">
+                  definitionId="scannerConfigPlugin.plate2Enabled">
             </reference>
          </activeWhen>
       </handler>
@@ -731,7 +731,7 @@
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate3">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate3Enabled">
+                  definitionId="scannerConfigPlugin.plate3Enabled">
             </reference>
          </activeWhen>
       </handler>
@@ -740,7 +740,7 @@
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate4">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate4Enabled">
+                  definitionId="scannerConfigPlugin.plate4Enabled">
             </reference>
          </activeWhen>
       </handler>
@@ -749,7 +749,7 @@
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate5">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate5Enabled">
+                  definitionId="scannerConfigPlugin.plate5Enabled">
             </reference>
          </activeWhen>
       </handler>
@@ -1906,29 +1906,6 @@
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
-      <sourceProvider
-            provider="edu.ualberta.med.biobank.sourceproviders.PlateEnabledState">
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate1Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate2Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate3Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate4Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate5Enabled"
-               priorityLevel="workbench">
-         </variable>
-      </sourceProvider>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -2089,31 +2066,6 @@
                </equals>
             </or>
                      </with>
-      </definition>
-      <definition id="biobank2.plate1Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate1Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate2Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate2Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate3Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate3Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate4Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate4Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate5Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate5Enabled">
-            <equals value="true" />
-         </with>
       </definition>
    </extension>
    <extension

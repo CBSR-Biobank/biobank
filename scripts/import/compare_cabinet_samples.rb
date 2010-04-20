@@ -5,6 +5,10 @@ $LOAD_PATH.unshift( File.join( File.dirname(__FILE__), 'lib' ) )
 require "script_base"
 require 'date'
 
+# used to determine differences between BBPDB and BioBank2 databases. This scripts extracts all
+# cabinet samples since 2010-04-15 from both databases into CSV files. The two files can then
+# be diff'ed to see if any differences exist between the two.
+
 class Script < ScriptBase
 
   BBPDB_QUERY1 = <<BBPDB_QUERY_END
