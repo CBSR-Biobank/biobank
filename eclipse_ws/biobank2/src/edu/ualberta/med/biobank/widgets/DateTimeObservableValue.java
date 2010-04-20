@@ -8,7 +8,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 
-
 public class DateTimeObservableValue extends AbstractObservableValue {
 
     private DateTimeWidget dateTime;
@@ -20,7 +19,8 @@ public class DateTimeObservableValue extends AbstractObservableValue {
         public void widgetSelected(SelectionEvent e) {
             Date newValue = dateTimeToDate();
 
-            if (!newValue.equals(DateTimeObservableValue.this.oldValue)) {
+            if (oldValue == null
+                || !newValue.equals(DateTimeObservableValue.this.oldValue)) {
                 fireValueChange(Diffs.createValueDiff(
                     DateTimeObservableValue.this.oldValue, newValue));
                 DateTimeObservableValue.this.oldValue = newValue;

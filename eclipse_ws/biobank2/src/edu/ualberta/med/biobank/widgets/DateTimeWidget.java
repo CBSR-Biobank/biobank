@@ -23,8 +23,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
-//import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-
 /**
  * Wrapper around Nebula's CDateTime widget.
  * 
@@ -133,8 +131,10 @@ public class DateTimeWidget extends BiobankWidget {
         Calendar cal = new GregorianCalendar();
         if (dateEntry != null && dateEntry.getSelection() != null) {
             cal.setTime(dateEntry.getSelection());
-            cal.set(Calendar.HOUR, timeEntry.getHours());
-            cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+            if (timeEntry != null) {
+                cal.set(Calendar.HOUR, timeEntry.getHours());
+                cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+            }
             return cal.getTime();
         }
         return null;
