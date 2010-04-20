@@ -283,7 +283,7 @@ public class AdvancedReportsEditor extends EditorPart {
         operatorFields.add(operatorCombo);
         Widget widget;
         GridData wgd = new GridData();
-        wgd.widthHint = 175;
+        wgd.horizontalAlignment = SWT.FILL;
         if (field.getType() == Date.class) {
             widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
             ((DateTimeWidget) widget).setLayoutData(wgd);

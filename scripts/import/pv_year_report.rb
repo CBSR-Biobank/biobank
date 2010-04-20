@@ -1,8 +1,11 @@
 #!/usr/bin/ruby -w
 
-require "mysql"
+$LOAD_PATH.unshift( File.join( File.dirname(__FILE__), 'lib' ) )
 
-class Script
+require "script_base"
+
+
+class Script < ScriptBase
 
   YEAR_QUERY = <<YEAR_QUERY_END
 select year(date_processed)
@@ -73,8 +76,6 @@ from
 group by name_short
 order by name_short
 PATIENT_QUERY_TOT_BY_STUDY_END
-
-  @dbh = nil
 
   def initialize
     getDbConnection
@@ -165,15 +166,6 @@ PATIENT_QUERY_TOT_BY_STUDY_END
     end
     if (data["Totals"] != nil)
       print "Totals,", data["Totals"].join(","), "\n"
-    end
-  end
-
-  def getDbConnection
-    begin
-      @dbh = Mysql.real_connect("localhost", "dummy", "ozzy498", "biobank2")
-    rescue Mysql::Error => e
-      puts "Error message: #{e.error}"
-      exit
     end
   end
 
