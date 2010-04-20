@@ -150,13 +150,22 @@ public class DateTimeWidget extends BiobankWidget {
 
     public Date getDate() {
         Calendar cal = new GregorianCalendar();
-        if (dateEntry != null && dateEntry.getSelection() != null) {
-            cal.setTime(dateEntry.getSelection());
+        if (dateEntry == null) {
+            // can modify only time
             if (timeEntry != null) {
-                cal.set(Calendar.HOUR, timeEntry.getHours());
+                cal.set(Calendar.HOUR_OF_DAY, timeEntry.getHours());
                 cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+                return cal.getTime();
             }
-            return cal.getTime();
+        } else {
+            if (dateEntry.getSelection() != null) {
+                cal.setTime(dateEntry.getSelection());
+                if (timeEntry != null) {
+                    cal.set(Calendar.HOUR_OF_DAY, timeEntry.getHours());
+                    cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+                }
+                return cal.getTime();
+            }
         }
         return null;
     }
