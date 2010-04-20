@@ -59,21 +59,27 @@ public class SessionHelper implements Runnable {
                     userName, password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
-            SessionManager.failedLoginAttempts = 0;
+            SessionManager.failedLoginAttempts.put(userName, new Integer(0));
         } catch (ApplicationException exp) {
             logger.error("Error while logging to application", exp);
             if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                SessionManager.failedLoginAttempts++;
-                if (SessionManager.failedLoginAttempts > 2)
-                    BioBankPlugin
-                        .openAsyncError("Login Failed",
-                            "Too many failed connection attempts. Login disabled for 30 min.");
+                Integer tries = SessionManager.failedLoginAttempts
+                    .get(userName);
+                if (tries == null)
+                    tries = 0;
+                SessionManager.failedLoginAttempts.put(userName, tries + 1);
+                if (tries > 1)
+                    BioBankPlugin.openAsyncError("Login Failed",
+                        "Too many failed connection attempts. Login for \""
+                            + userName + "\" disabled for 30 min.");
                 else
                     BioBankPlugin.openAsyncError("Login Failed",
-                        "Error authenticating user " + userName + ". "
-                            + (3 - SessionManager.failedLoginAttempts)
-                            + " attempt(s) remaining.");
+                        "Error authenticating user "
+                            + userName
+                            + ". "
+                            + (3 - SessionManager.failedLoginAttempts
+                                .get(userName)) + " attempt(s) remaining.");
                 return;
             }
             BioBankPlugin.openRemoteConnectErrorMessage();
