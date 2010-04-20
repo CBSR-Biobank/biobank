@@ -1,23 +1,28 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -41,6 +46,8 @@ public class DateTimeWidget extends BiobankWidget {
     private Button dateButton;
 
     private DateTime timeEntry;
+
+    private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
 
     /**
      * Show date and time widget
@@ -104,6 +111,7 @@ public class DateTimeWidget extends BiobankWidget {
                             c.set(Calendar.MONTH, calendar.getMonth());
                             c.set(Calendar.YEAR, calendar.getYear());
                             dateEntry.setSelection(c.getTime());
+                            fireModifyListeners();
                             dialog.close();
                         }
                     });
@@ -113,10 +121,23 @@ public class DateTimeWidget extends BiobankWidget {
                 }
 
             });
+
+            dateEntry.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    fireModifyListeners();
+                }
+            });
         }
         if (typeShown != SWT.DATE) {
             timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
             timeEntry.setTime(0, 0, 0);
+            timeEntry.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    fireModifyListeners();
+                }
+            });
         }
         if (date != null) {
             setDate(date);
@@ -160,41 +181,22 @@ public class DateTimeWidget extends BiobankWidget {
         }
     }
 
-    public void addSelectionListener(SelectionListener listener) {
-        if (dateEntry != null) {
-            dateEntry.addSelectionListener(listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.addSelectionListener(listener);
+    public void addModifyListener(ModifyListener modifyListener) {
+        modifyListeners.add(modifyListener);
+    }
+
+    protected void fireModifyListeners() {
+        Event event = new Event();
+        event.type = SWT.Modify;
+        event.widget = this;
+        ModifyEvent modifyEvent = new ModifyEvent(event);
+        for (ModifyListener listener : modifyListeners) {
+            listener.modifyText(modifyEvent);
         }
     }
 
-    public void removeSelectionListener(SelectionListener listener) {
-        if (dateEntry != null) {
-            dateEntry.removeSelectionListener(listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.removeSelectionListener(listener);
-        }
+    public void removeModifyListener(ModifyListener listener) {
+        modifyListeners.remove(listener);
     }
 
-    @Override
-    public void addListener(int eventType, Listener listener) {
-        if (dateEntry != null) {
-            dateEntry.addListener(eventType, listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.addListener(eventType, listener);
-        }
-    }
-
-    @Override
-    public void removeListener(int eventType, Listener listener) {
-        if (dateEntry != null) {
-            dateEntry.removeListener(eventType, listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.removeListener(eventType, listener);
-        }
-    }
 }

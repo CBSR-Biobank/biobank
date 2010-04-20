@@ -4,9 +4,8 @@ import java.util.Date;
 
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 
 public class DateTimeObservableValue extends AbstractObservableValue {
 
@@ -14,9 +13,9 @@ public class DateTimeObservableValue extends AbstractObservableValue {
 
     protected Date oldValue;
 
-    private SelectionListener listener = new SelectionAdapter() {
+    private ModifyListener listener = new ModifyListener() {
         @Override
-        public void widgetSelected(SelectionEvent e) {
+        public void modifyText(ModifyEvent e) {
             Date newValue = dateTimeToDate();
 
             if (oldValue == null
@@ -30,7 +29,7 @@ public class DateTimeObservableValue extends AbstractObservableValue {
 
     public DateTimeObservableValue(DateTimeWidget dateTime) {
         this.dateTime = dateTime;
-        this.dateTime.addSelectionListener(listener);
+        this.dateTime.addModifyListener(listener);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class DateTimeObservableValue extends AbstractObservableValue {
 
     @Override
     public synchronized void dispose() {
-        dateTime.removeSelectionListener(listener);
+        dateTime.removeModifyListener(listener);
         super.dispose();
     }
 

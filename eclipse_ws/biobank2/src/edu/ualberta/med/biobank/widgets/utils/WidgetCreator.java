@@ -323,7 +323,7 @@ public class WidgetCreator {
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
             date, typeShown);
         if (selectionListener != null) {
-            widget.addSelectionListener(selectionListener);
+            widget.addModifyListener(modifyListener);
         }
         if (toolkit != null) {
             widget.adaptToToolkit(toolkit, true);

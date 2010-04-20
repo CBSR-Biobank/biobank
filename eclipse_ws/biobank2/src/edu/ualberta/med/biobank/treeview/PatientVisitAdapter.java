@@ -38,9 +38,6 @@ public class PatientVisitAdapter extends AdapterBase {
         PatientVisitWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper, "patientVisit is null");
         String name = wrapper.getFormattedDateProcessed();
-        if (wrapper.getShipment() != null) {
-            name += " - " + wrapper.getShipment().getWaybill();
-        }
         Collection<AliquotWrapper> samples = wrapper.getAliquotCollection();
         int total = 0;
         if (samples != null) {
