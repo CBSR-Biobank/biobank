@@ -117,7 +117,7 @@ CREATE TABLE `csm_group` (
 LOCK TABLES `csm_group` WRITE;
 /*!40000 ALTER TABLE `csm_group` DISABLE KEYS */;
 INSERT INTO `csm_group` VALUES (2,'Viewers','','2009-07-22',2);
-INSERT INTO `csm_group` VALUES (3,'Technicians','','2009-07-22',2);
+INSERT INTO `csm_group` VALUES (3,'Technicians','','2010-04-19',2);
 INSERT INTO `csm_group` VALUES (4,'Administrators','Can access and modify everything','2009-07-23',2);
 INSERT INTO `csm_group` VALUES (5,'Website Administrator','','2010-01-28',2);
 INSERT INTO `csm_group` VALUES (6,'CBSR Technician Level 1','','2010-01-28',2);

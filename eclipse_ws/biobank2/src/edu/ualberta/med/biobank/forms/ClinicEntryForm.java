@@ -126,7 +126,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
             "Sends Shipments", null, BeansObservables.observeValue(clinic,
-                "hasShipments"), null);
+                "sendsShipments"), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(

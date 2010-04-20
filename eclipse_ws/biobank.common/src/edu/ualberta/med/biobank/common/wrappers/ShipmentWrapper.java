@@ -69,18 +69,27 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (getWaybill() == null || getWaybill().isEmpty()) {
-            throw new BiobankCheckException(
-                "A waybill should be set on this shipment");
-        }
-        if (getClinic() != null && !checkWaybillUniqueForClinic()) {
-            throw new BiobankCheckException("A shipment with waybill "
-                + getWaybill() + " already exist in clinic "
-                + getClinic().getName() + ".");
+        if (getClinic() != null
+            && Boolean.TRUE.equals(getClinic().getSendsShipments())) {
+            if (getWaybill() == null || getWaybill().isEmpty()) {
+                throw new BiobankCheckException(
+                    "A waybill should be set on this shipment");
+            }
+            if (!checkWaybillUniqueForClinic()) {
+                throw new BiobankCheckException("A shipment with waybill "
+                    + getWaybill() + " already exist in clinic "
+                    + getClinic().getName() + ".");
+            }
+        } else {
+            if (getWaybill() != null) {
+                throw new BiobankCheckException(
+                    "This shipment clinic doesn't send shipment: waybill should not be set");
+            }
         }
         checkAlLeastOnePatient();
         checkPatientsStudy();
         checkRemovedPatients();
+        checkDateReceivedNotNull();
     }
 
     private void checkRemovedPatients() throws BiobankCheckException,
@@ -90,6 +99,12 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
                 checkCanRemovePatient(patient);
             }
         }
+    }
+
+    private void checkDateReceivedNotNull() throws BiobankCheckException {
+        if (getDateReceived() == null)
+            throw new BiobankCheckException(
+                "'Date Received' is a required field. You must set this value before saving a shipment.");
     }
 
     public void checkCanRemovePatient(PatientWrapper patient)
@@ -421,6 +436,37 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             + Shipment.class.getName()
             + " where clinic.site.id = ? and waybill = ?", Arrays
             .asList(new Object[] { site.getId(), waybill }));
+        List<Shipment> shipments = appService.query(criteria);
+        List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
+        for (Shipment s : shipments) {
+            wrappers.add(new ShipmentWrapper(appService, s));
+        }
+        return wrappers;
+    }
+
+    /**
+     * Search for shipments in the site with the given date received. Don't use
+     * hour and minute.
+     */
+    public static List<ShipmentWrapper> getShipmentsInSite(
+        WritableApplicationService appService, Date dateReceived,
+        SiteWrapper site) throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // date at 0:0am
+        cal.setTime(dateReceived);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // date at 0:0pm
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Shipment.class.getName()
+                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<Shipment> shipments = appService.query(criteria);
         List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
         for (Shipment s : shipments) {

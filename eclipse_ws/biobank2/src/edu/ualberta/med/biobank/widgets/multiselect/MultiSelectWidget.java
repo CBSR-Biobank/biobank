@@ -8,6 +8,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -16,6 +18,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
@@ -39,6 +42,8 @@ public class MultiSelectWidget extends BiobankWidget {
         "availRoot");
 
     private int minHeight;
+
+    protected boolean ctrl;
 
     public MultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight) {
@@ -118,11 +123,30 @@ public class MultiSelectWidget extends BiobankWidget {
         gd.horizontalAlignment = SWT.CENTER;
         l.setLayoutData(gd);
 
-        TreeViewer tv = new TreeViewer(selComposite);
+        TreeViewer tv = new TreeViewer(selComposite, SWT.MULTI | SWT.BORDER);
         gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.heightHint = minHeight;
         gd.widthHint = 180;
         tv.getTree().setLayoutData(gd);
+
+        tv.getTree().addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((e.stateMask & SWT.CTRL) != 0)
+                    ctrl = true;
+                // check characters
+                if (ctrl == true && e.keyCode == 'a') {
+                    ((Tree) e.getSource()).selectAll();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if ((e.stateMask & SWT.CTRL) != 0)
+                    ctrl = false;
+            }
+        });
 
         tv.setLabelProvider(new MultiSelectNodeLabelProvider());
         tv.setContentProvider(new MultiSelectNodeContentProvider());

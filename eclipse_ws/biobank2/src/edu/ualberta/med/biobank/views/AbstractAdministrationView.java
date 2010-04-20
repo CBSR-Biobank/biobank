@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -36,16 +37,20 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected AbstractSearchedNode searchedNode;
 
+    protected Listener searchListener;
+
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
-
-        treeText = new Text(parent, SWT.SINGLE | SWT.BORDER);
-        Listener searchListener = new Listener() {
+        searchListener = new Listener() {
             public void handleEvent(Event e) {
                 internalSearch();
             }
         };
+
+        createTreeTextOptions(parent);
+
+        treeText = new Text(parent, SWT.SINGLE | SWT.BORDER);
         treeText.addListener(SWT.DefaultSelection, searchListener);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -77,6 +82,11 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         setSiteManagement();
     }
 
+    protected void createTreeTextOptions(
+        @SuppressWarnings("unused") Composite parent) {
+        // default do nothing
+    }
+
     protected abstract AbstractTodayNode getTodayNode();
 
     protected abstract AbstractSearchedNode getSearchedNode();
@@ -84,11 +94,11 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     protected void internalSearch() {
         String text = treeText.getText();
         try {
-            ModelWrapper<?> searchedObject = search(text);
-            if (searchedObject == null) {
+            List<? extends ModelWrapper<?>> searchedObject = search(text);
+            if (searchedObject == null || searchedObject.size() == 0) {
                 notFound(text);
             } else {
-                showSearchedObjectInTree(searchedObject);
+                showSearchedObjectsInTree(searchedObject);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
@@ -97,18 +107,21 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
         }
     }
 
-    protected void showSearchedObjectInTree(ModelWrapper<?> searchedObject) {
-        NodeSearchVisitor visitor = getVisitor(searchedObject);
-        AdapterBase node = todayNode.accept(visitor);
-        if (node == null) {
-            node = searchedNode.accept(visitor);
+    protected void showSearchedObjectsInTree(
+        List<? extends ModelWrapper<?>> searchedObjects) {
+        for (ModelWrapper<?> searchedObject : searchedObjects) {
+            NodeSearchVisitor visitor = getVisitor(searchedObject);
+            AdapterBase node = todayNode.accept(visitor);
             if (node == null) {
-                node = addToNode(searchedNode, searchedObject);
+                node = searchedNode.accept(visitor);
+                if (node == null) {
+                    node = addToNode(searchedNode, searchedObject);
+                }
             }
-        }
-        if (node != null) {
-            setSelectedNode(node);
-            node.performDoubleClick();
+            if (node != null) {
+                setSelectedNode(node);
+                node.performDoubleClick();
+            }
         }
     }
 
@@ -120,7 +133,8 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     protected abstract void notFound(String text);
 
-    protected abstract ModelWrapper<?> search(String text) throws Exception;
+    protected abstract List<? extends ModelWrapper<?>> search(String text)
+        throws Exception;
 
     private void setSiteManagement() {
         ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
@@ -166,8 +180,10 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     @Override
     public void dispose() {
         super.dispose();
-        getSiteSelectionStateSourceProvider().removeSourceProviderListener(
-            siteStateListener);
+        if (siteStateListener != null) {
+            getSiteSelectionStateSourceProvider().removeSourceProviderListener(
+                siteStateListener);
+        }
     }
 
     private ISourceProvider getSiteSelectionStateSourceProvider() {
