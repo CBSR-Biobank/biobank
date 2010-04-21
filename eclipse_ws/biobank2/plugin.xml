@@ -250,6 +250,26 @@
             id="edu.ualberta.med.biobank.commands.scanner.decodePlate5"
             name="Decode Plate 5">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate1"
+            name="Scan Plate 1">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate2"
+            name="Scan Plate 2">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate3"
+            name="Scan Plate 3">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate4"
+            name="Scan Plate 4">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate5"
+            name="Scan Plate 5">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -765,6 +785,50 @@
                   definitionId="scannerConfigPlugin.plate5Enabled">
             </reference>
          </activeWhen>
+      </handler> <handler
+            class="edu.ualberta.med.biobank.handlers.ScanPlate1Handler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate1">
+         <activeWhen>
+            <reference
+                  definitionId="scannerConfigPlugin.plate1Enabled">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ScanPlate2Handler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate2">
+         <activeWhen>
+            <reference
+                  definitionId="scannerConfigPlugin.plate2Enabled">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ScanPlate3Handler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate3">
+         <activeWhen>
+            <reference
+                  definitionId="scannerConfigPlugin.plate3Enabled">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ScanPlate4Handler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate4">
+         <activeWhen>
+            <reference
+                  definitionId="scannerConfigPlugin.plate4Enabled">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ScanPlate5Handler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate5">
+         <activeWhen>
+            <reference
+                  definitionId="scannerConfigPlugin.plate5Enabled">
+            </reference>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -1019,6 +1083,36 @@
          <menu
                id="edu.ualberta.med.biobank.menu.scanner"
                label="Scanner">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate1"
+                  id="edu.ualberta.med.biobank.menu.scanner.scanPlate1"
+                  label="Scan Plate 1"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate2"
+                  id="edu.ualberta.med.biobank.menu.scanner.scanPlate2"
+                  label="Scan Plate 2"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate3"
+                  id="edu.ualberta.med.biobank.menu.scanner.scanPlate3"
+                  label="Scan Plate 3"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate4"
+                  id="edu.ualberta.med.biobank.menu.scanner.scanPlate4"
+                  label="Scan Plate 4"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate5"
+                  id="edu.ualberta.med.biobank.menu.scanner.scanPlate5"
+                  label="Scan Plate 5"
+                  style="push">
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate1"
                   id="edu.ualberta.med.biobank.menu.scanner.decodePlate1"
@@ -1781,6 +1875,13 @@
             icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.DecodePlateForm"
             name="Decode Plate">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ScanPlateForm"
+            default="false"
+            icon="icons/scanLink.png"
+            id="edu.ualberta.med.biobank.forms.ScanPlateForm"
+            name="Scan Plate">
       </editor>
    </extension>
    <extension
