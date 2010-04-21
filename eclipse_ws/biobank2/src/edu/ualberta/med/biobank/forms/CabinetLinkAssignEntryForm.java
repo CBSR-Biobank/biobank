@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -265,8 +266,15 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 if (positionTextModified
                     && cabinetPositionvalidator
                         .validate(positionText.getText()) == Status.OK_STATUS) {
-                    initContainersFromPosition();
-                    setTypeCombosLists();
+                    BusyIndicator.showWhile(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell().getDisplay(),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                initContainersFromPosition();
+                                setTypeCombosLists();
+                            }
+                        });
                 }
                 positionTextModified = false;
             }
@@ -439,8 +447,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
      */
     private void setTypeCombosLists() {
         viewerSampleTypes.getCombo().setEnabled(true);
-        List<SampleTypeWrapper> studiesSampleTypes = null;
-        studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
+        List<SampleTypeWrapper> studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
         if (linkFormPatientManagement.getCurrentPatient() != null
             && bin != null) {
             List<SampleTypeWrapper> binTypes = bin.getContainerType()

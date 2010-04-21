@@ -115,7 +115,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
      * avoid using "Active" string everywhere
      */
     public boolean isActive() {
-        return getName() != null && getName().equals(ACTIVE_STATUS_STRING);
+        String name = getName();
+        return name != null && name.equals(ACTIVE_STATUS_STRING);
     }
 
     @Override
