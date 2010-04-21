@@ -136,6 +136,10 @@
       		name="Edit Sample Types">
       		</command>
       <command
+            id="edu.ualberta.med.biobank.commands.editSourceVessels"
+            name="Edit Source Vessels">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.reports"
             name="Reports">
       </command>
@@ -352,6 +356,15 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditSourceVesselsHandler"
+            commandId="edu.ualberta.med.biobank.commands.editSourceVessels">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -829,6 +842,12 @@
                      label="Edit Sample Types"
                      style="push">
                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.editSourceVessels"
+                      id="edu.ualberta.med.biobank.menu.editSourceVessels"
+                      label="Edit Source Vessels"
+                      style="push">
+                </command>
                <visibleWhen
                      checkEnabled="false">
                   <reference
@@ -1749,6 +1768,12 @@
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.AdvancedReportsEditor"
             name="Advanced Reports Editor">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
+            name="Source Vessel Entry">
       </editor>
    </extension>
    <extension
