@@ -86,6 +86,8 @@ public class FormInput implements IEditorInput {
     public Object getAdapter(Class adapter) {
         if ((adapter == AdapterBase.class) && (obj instanceof AdapterBase)) {
             return obj;
+        } else if (adapter == obj.getClass()) {
+            return obj;
         }
         return null;
     }

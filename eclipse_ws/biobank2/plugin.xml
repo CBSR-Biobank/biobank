@@ -1753,7 +1753,7 @@
       <editor
             class="edu.ualberta.med.biobank.forms.DecodePlateForm"
             default="false"
-            icon="icons/clinic.png"
+            icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.DecodePlateForm"
             name="Decode Plate">
       </editor>
