@@ -50,23 +50,28 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         super.init(editorSite, input);
-        adapterChangedListener = new AdapterChangedListener() {
-            @Override
-            public void changed(AdapterChangedEvent event) {
-                try {
-                    reload();
-                } catch (Exception e) {
-                    logger.error("Error sending event", e);
+
+        if (adapter != null) {
+            adapterChangedListener = new AdapterChangedListener() {
+                @Override
+                public void changed(AdapterChangedEvent event) {
+                    try {
+                        reload();
+                    } catch (Exception e) {
+                        logger.error("Error sending event", e);
+                    }
                 }
-            }
-        };
-        adapter.addChangedListener(adapterChangedListener);
+            };
+            adapter.addChangedListener(adapterChangedListener);
+        }
     }
 
     @Override
     public void dispose() {
-        Assert.isNotNull(adapterChangedListener);
-        adapter.removeChangedListener(adapterChangedListener);
+        if (adapter != null) {
+            Assert.isNotNull(adapterChangedListener);
+            adapter.removeChangedListener(adapterChangedListener);
+        }
     }
 
     @Override
@@ -102,6 +107,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     }
 
     protected void addToolbarButtons() {
+        if (adapter == null)
+            return;
+
         Action reloadAction = new Action("Reload") {
             @Override
             public void run() {

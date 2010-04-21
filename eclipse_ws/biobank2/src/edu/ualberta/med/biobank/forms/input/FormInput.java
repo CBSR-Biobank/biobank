@@ -10,9 +10,15 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class FormInput implements IEditorInput {
     private Object obj;
     private boolean hasPreviousForm;
+    private String name;
 
     public FormInput(Object o) {
         this(o, false);
+    }
+
+    public FormInput(Object o, String name) {
+        obj = o;
+        this.name = name;
     }
 
     public FormInput(Object o, boolean hasPreviousForm) {
@@ -35,6 +41,7 @@ public class FormInput implements IEditorInput {
     }
 
     public AdapterBase getNode() {
+        Assert.isNotNull(obj, "form input object is null");
         if (obj instanceof AdapterBase) {
             return (AdapterBase) obj;
         } else {
@@ -60,10 +67,8 @@ public class FormInput implements IEditorInput {
 
         if (obj instanceof AdapterBase) {
             return ((AdapterBase) obj).getTooltipText();
-        } else {
-            Assert.isTrue(false, "invalid type for form input object");
         }
-        return null;
+        return name;
     }
 
     @Override
@@ -79,6 +84,9 @@ public class FormInput implements IEditorInput {
     @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(Class adapter) {
+        if ((adapter == AdapterBase.class) && (obj instanceof AdapterBase)) {
+            return obj;
+        }
         return null;
     }
 

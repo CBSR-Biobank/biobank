@@ -1750,6 +1750,13 @@
             id="edu.ualberta.med.biobank.editors.AdvancedReportsEditor"
             name="Advanced Reports Editor">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.DecodePlateForm"
+            default="false"
+            icon="icons/clinic.png"
+            id="edu.ualberta.med.biobank.forms.DecodePlateForm"
+            name="Decode Plate">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
