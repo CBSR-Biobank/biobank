@@ -7,18 +7,18 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.forms.DecodePlateForm;
+import edu.ualberta.med.biobank.forms.ScanPlateForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
-public class DecodePlateHandler extends AbstractHandler implements IHandler {
+public class ScanPlateHandler extends AbstractHandler implements IHandler {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(DecodePlateHandler.class.getName());
+        .getLogger(ScanPlateHandler.class.getName());
 
     protected int plateId;
 
-    public DecodePlateHandler(int plateId) {
+    public ScanPlateHandler(int plateId) {
         this.plateId = plateId;
     }
 
@@ -27,9 +27,9 @@ public class DecodePlateHandler extends AbstractHandler implements IHandler {
             + plateId);
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().openEditor(input, DecodePlateForm.ID, false);
+                .getActivePage().openEditor(input, ScanPlateForm.ID, false);
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + DecodePlateForm.ID, e);
+            logger.error("Can't open form with id " + ScanPlateForm.ID, e);
             return null;
         }
     }
