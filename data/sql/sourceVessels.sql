@@ -31,6 +31,7 @@ INSERT INTO `SOURCE_VESSEL` (ID, NAME) VALUES
 (29, "Stool"),
 (30, "ERCIN Serum processing pallet"),
 (31, "ERCIN Urine processing pallet"),
-(32, "AHFEM processing pallet ");
+(32, "AHFEM processing pallet "),
+(33, "8.5ml P100");
 UNLOCK TABLES;
 
