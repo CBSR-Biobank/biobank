@@ -12,31 +12,31 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.dialogs.SourceVesselDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current sample storage collection and allows the user to add
  * additional sample storage to the collection.
  */
-public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
+public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(SampleTypeEntryInfoTable.class.getName());
+        .getLogger(SourceVesselEntryInfoTable.class.getName());
 
-    private List<SampleTypeWrapper> selectedSampleTypes;
+    private List<SourceVesselWrapper> selectedSourceVessels;
 
-    private List<SampleTypeWrapper> addedOrModifiedSampleTypes;
+    private List<SourceVesselWrapper> addedOrModifiedSourceVessels;
 
-    private List<SampleTypeWrapper> deletedSampleTypes;
+    private List<SourceVesselWrapper> deletedSourceVessels;
 
     private String addMessage;
 
@@ -51,11 +51,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      * @param SampleTypeCollection the sample storage already selected and to be
      *            displayed in the table viewer (can be null).
      */
-    public SampleTypeEntryInfoTable(Composite parent,
-        List<SampleTypeWrapper> sampleTypeCollection, String addMessage,
+    public SourceVesselEntryInfoTable(Composite parent,
+        List<SourceVesselWrapper> globalSourceVessels, String addMessage,
         String editMessage, SiteWrapper currentSite) {
         super(parent, null);
-        setLists(sampleTypeCollection);
+        setLists(globalSourceVessels);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
         this.currentSite = currentSite;
@@ -71,32 +71,31 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      * 
      * @param message The message to display in the SampleTypeDialog.
      */
-    public void addSampleType() {
-        SampleTypeWrapper newST = new SampleTypeWrapper(SessionManager
+    public void addSourceVessel() {
+        SourceVesselWrapper newST = new SourceVesselWrapper(SessionManager
             .getAppService());
-        newST.setSite(currentSite);
-        addOrEditSampleType(true, newST, addMessage);
+        addOrEditSourceVessel(true, newST, addMessage);
     }
 
-    private boolean addOrEditSampleType(boolean add,
-        SampleTypeWrapper sampleType, String message) {
-        SampleTypeDialog dlg = new SampleTypeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), sampleType, message);
+    private boolean addOrEditSourceVessel(boolean add,
+        SourceVesselWrapper sourceVessel, String message) {
+        SourceVesselDialog dlg = new SourceVesselDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            sourceVessel, message);
         if (dlg.open() == Dialog.OK) {
-            if (addEditOk(sampleType)) {
+            if (addEditOk(sourceVessel)) {
                 if (add) {
                     // only add to the collection when adding and not editing
-                    selectedSampleTypes.add(sampleType);
+                    selectedSourceVessels.add(sourceVessel);
                 }
-                reloadCollection(selectedSampleTypes);
-                addedOrModifiedSampleTypes.add(sampleType);
+                reloadCollection(selectedSourceVessels);
+                addedOrModifiedSourceVessels.add(sourceVessel);
                 notifyListeners();
                 return true;
             } else {
-                SampleTypeWrapper orig = dlg.getOrigSampleType();
-                sampleType.setName(orig.getName());
-                sampleType.setNameShort(orig.getNameShort());
-                reloadCollection(selectedSampleTypes);
+                SourceVesselWrapper orig = dlg.getOrigSourceVessel();
+                sourceVessel.setName(orig.getName());
+                reloadCollection(selectedSourceVessels);
             }
         }
         return false;
@@ -106,28 +105,28 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         addAddItemListener(new IInfoTableAddItemListener() {
             @Override
             public void addItem(InfoTableEvent event) {
-                addSampleType();
+                addSourceVessel();
             }
         });
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
-                SampleTypeWrapper type = getSelection();
-                addOrEditSampleType(false, type, editMessage);
+                SourceVesselWrapper type = getSelection();
+                addOrEditSourceVessel(false, type, editMessage);
             }
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                SampleTypeWrapper sampleType = getSelection();
+                SourceVesselWrapper sourceVessel = getSelection();
 
                 try {
-                    if (!sampleType.isNew() && sampleType.isUsedBySamples()) {
-                        BioBankPlugin.openError("Sample Type Delete Error",
-                            "Cannot delete sample type \""
-                                + sampleType.getName()
+                    if (!sourceVessel.isNew() && sourceVessel.isUsed()) {
+                        BioBankPlugin.openError("Source Vessel Delete Error",
+                            "Cannot delete source vessel \""
+                                + sourceVessel.getName()
                                 + "\" since there are samples of this "
                                 + "type already in the database.");
                         return;
@@ -135,18 +134,18 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
                     if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(),
-                        "Delete Sample Type",
-                        "Are you sure you want to delete sample type \""
-                            + sampleType.getName() + "\"?")) {
+                        "Delete Source Vessel",
+                        "Are you sure you want to delete source vessel \""
+                            + sourceVessel.getName() + "\"?")) {
                         return;
                     }
 
                     // equals method now compare toString() results if both
                     // ids are null.
-                    selectedSampleTypes.remove(sampleType);
+                    selectedSourceVessels.remove(sourceVessel);
 
-                    setCollection(selectedSampleTypes);
-                    deletedSampleTypes.add(sampleType);
+                    setCollection(selectedSourceVessels);
+                    deletedSourceVessels.add(sourceVessel);
                     notifyListeners();
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
@@ -157,9 +156,9 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         });
     }
 
-    private boolean addEditOk(SampleTypeWrapper type) {
+    private boolean addEditOk(SourceVesselWrapper type) {
         try {
-            type.checkNameAndShortNameUniquesForSiteAndGlobal();
+            type.checkUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;
@@ -170,24 +169,24 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         return true;
     }
 
-    public List<SampleTypeWrapper> getAddedOrModifiedSampleTypes() {
-        return addedOrModifiedSampleTypes;
+    public List<SourceVesselWrapper> getAddedOrModifiedSampleTypes() {
+        return addedOrModifiedSourceVessels;
     }
 
-    public List<SampleTypeWrapper> getDeletedSampleTypes() {
-        return deletedSampleTypes;
+    public List<SourceVesselWrapper> getDeletedSampleTypes() {
+        return deletedSourceVessels;
     }
 
-    public void setLists(List<SampleTypeWrapper> sampleTypeCollection) {
-        if (sampleTypeCollection == null) {
-            selectedSampleTypes = new ArrayList<SampleTypeWrapper>();
+    public void setLists(List<SourceVesselWrapper> sourceVesselCollection) {
+        if (sourceVesselCollection == null) {
+            selectedSourceVessels = new ArrayList<SourceVesselWrapper>();
         } else {
-            selectedSampleTypes = new ArrayList<SampleTypeWrapper>(
-                sampleTypeCollection);
+            selectedSourceVessels = new ArrayList<SourceVesselWrapper>(
+                sourceVesselCollection);
         }
-        reloadCollection(sampleTypeCollection);
-        addedOrModifiedSampleTypes = new ArrayList<SampleTypeWrapper>();
-        deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
+        reloadCollection(sourceVesselCollection);
+        addedOrModifiedSourceVessels = new ArrayList<SourceVesselWrapper>();
+        deletedSourceVessels = new ArrayList<SourceVesselWrapper>();
     }
 
     public SiteWrapper getCurrentSite() {
@@ -195,8 +194,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     }
 
     public void reload() {
-        if (currentSite != null) {
-            setLists(currentSite.getSampleTypeCollection(true));
+        try {
+            setLists(SourceVesselWrapper.getAllSourceVessels(SessionManager
+                .getAppService()));
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("AppService unavailable", e);
         }
     }
 }
