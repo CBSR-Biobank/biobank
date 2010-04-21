@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
@@ -20,6 +21,7 @@ public class SampleTypeDialog extends BiobankDialog {
     private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
     private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
 
+    private SampleTypeWrapper oldSampleType;
     private SampleTypeWrapper origSampleType;
 
     // this is the object that is modified via the bound widgets
@@ -36,6 +38,7 @@ public class SampleTypeDialog extends BiobankDialog {
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
         this.message = message;
+        oldSampleType = new SampleTypeWrapper(SessionManager.getAppService());
     }
 
     @Override
@@ -74,13 +77,15 @@ public class SampleTypeDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
+        oldSampleType.setName(origSampleType.getName());
+        oldSampleType.setNameShort(origSampleType.getNameShort());
         origSampleType.setName(sampleType.getName());
         origSampleType.setNameShort(sampleType.getNameShort());
         super.okPressed();
     }
 
-    public SampleTypeWrapper getSampleType() {
-        return origSampleType;
+    public SampleTypeWrapper getOrigSampleType() {
+        return oldSampleType;
     }
 
 }
