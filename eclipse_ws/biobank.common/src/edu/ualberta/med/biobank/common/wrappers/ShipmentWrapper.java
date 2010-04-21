@@ -420,10 +420,11 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     @Override
     public String toString() {
-        if (getDateShipped() == null) {
-            return getWaybill();
+        String s = getFormattedDateReceived();
+        if (getWaybill() != null) {
+            s += getWaybill();
         }
-        return getFormattedDateReceived() + " (" + getWaybill() + ")";
+        return s;
     }
 
     /**

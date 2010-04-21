@@ -149,8 +149,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             if (c.getTime().after(new Date()))
                 recentShipments.add(shipment);
         }
-        ShipmentWrapper selectedShip = patientVisit.getShipment();
-        if (recentShipments.size() == 1) {
+        ShipmentWrapper selectedShip = null;
+        if (!patientVisit.isNew()) {
+            selectedShip = patientVisit.getShipment();
+            // need to add into the list, to be able to see it.
+            recentShipments.add(selectedShip);
+        } else if (recentShipments.size() == 1) {
             selectedShip = recentShipments.get(0);
         }
         shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
