@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms.input;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -7,29 +8,39 @@ import org.eclipse.ui.IPersistableElement;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class FormInput implements IEditorInput {
-    private AdapterBase node;
+    private Object obj;
     private boolean hasPreviousForm;
 
-    public FormInput(AdapterBase o) {
+    public FormInput(Object o) {
         this(o, false);
     }
 
-    public FormInput(AdapterBase o, boolean hasPreviousForm) {
-        node = o;
+    public FormInput(Object o, boolean hasPreviousForm) {
+        obj = o;
         this.hasPreviousForm = hasPreviousForm;
     }
 
     public int getIndex() {
-        if (node != null) {
-            Integer id = node.getId();
-            if (id != null)
-                return id.intValue();
+        if (obj instanceof AdapterBase) {
+            AdapterBase adapter = (AdapterBase) obj;
+            if (adapter != null) {
+                Integer id = adapter.getId();
+                if (id != null)
+                    return id.intValue();
+            }
+        } else {
+            Assert.isTrue(false, "invalid type for form input object");
         }
         return -1;
     }
 
     public AdapterBase getNode() {
-        return node;
+        if (obj instanceof AdapterBase) {
+            return (AdapterBase) obj;
+        } else {
+            Assert.isTrue(false, "invalid type for form input object");
+        }
+        return null;
     }
 
     @Override
@@ -44,9 +55,15 @@ public class FormInput implements IEditorInput {
 
     @Override
     public String getName() {
-        if (node == null)
+        if (obj == null)
             return null;
-        return node.getTooltipText();
+
+        if (obj instanceof AdapterBase) {
+            return ((AdapterBase) obj).getTooltipText();
+        } else {
+            Assert.isTrue(false, "invalid type for form input object");
+        }
+        return null;
     }
 
     @Override
@@ -67,17 +84,19 @@ public class FormInput implements IEditorInput {
 
     @Override
     public boolean equals(Object o) {
-        if ((node == null) || (o == null))
+        if ((obj == null) || (o == null))
             return false;
 
         if (o instanceof FormInput) {
-            if (node.getClass() != ((FormInput) o).node.getClass())
+            if (obj.getClass() != ((FormInput) o).obj.getClass())
                 return false;
 
-            int myIndex = getIndex();
-            int oIndex = ((FormInput) o).getIndex();
+            if (obj instanceof AdapterBase) {
+                int myIndex = getIndex();
+                int oIndex = ((FormInput) o).getIndex();
 
-            return ((myIndex != -1) && (oIndex != -1) && (myIndex == oIndex));
+                return ((myIndex != -1) && (oIndex != -1) && (myIndex == oIndex));
+            }
         }
         return false;
     }
