@@ -28,6 +28,8 @@ public class DecodePlateForm extends BiobankViewForm {
 
     private Integer plateId;
 
+    private Button scanButton;
+
     private ScanPalletWidget spw;
 
     protected Map<RowColPos, PalletCell> cells;
@@ -49,11 +51,11 @@ public class DecodePlateForm extends BiobankViewForm {
         form.getBody().setLayoutData(
             new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        spw = new ScanPalletWidget(form.getBody());
+        spw = new ScanPalletWidget(form.getBody(), false);
         spw.setVisible(true);
         toolkit.adapt(spw);
 
-        Button scanButton = toolkit.createButton(form.getBody(), "Scan Plate",
+        scanButton = toolkit.createButton(form.getBody(), "Scan Plate",
             SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
@@ -64,6 +66,11 @@ public class DecodePlateForm extends BiobankViewForm {
             }
         });
 
+    }
+
+    @Override
+    public void setFocus() {
+        scanButton.setFocus();
     }
 
     @Override
