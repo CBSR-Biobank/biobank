@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.io.File;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -23,9 +22,7 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.RowColPos;
-import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class ScanPlateForm extends BiobankViewForm {
@@ -33,15 +30,15 @@ public class ScanPlateForm extends BiobankViewForm {
 
     public static final String PALLET_IMAGE_FILE = "plate.bmp";
 
-    private Integer plateId;
-
     private Button scanButton;
 
     private Canvas imageCanvas;
 
     private Image img;
 
-    protected Map<RowColPos, PalletCell> cells;
+    private PlateSelectionWidget plateSelectionWidget;
+
+    Integer plateToScan;
 
     @Override
     protected void init() throws Exception {
@@ -51,19 +48,24 @@ public class ScanPlateForm extends BiobankViewForm {
             plateFile.delete();
         }
 
-        FormInput input = (FormInput) getEditorInput();
-        plateId = (Integer) input.getAdapter(Integer.class);
-        setPartName(Messages.getFormattedString("ScanPlate.tabTitle", plateId)); //$NON-NLS-1$
+        setPartName(Messages.getString("ScanPlate.tabTitle")); //$NON-NLS-1$
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form
-            .setText(Messages.getFormattedString("ScanPlate.tabTitle", plateId));
+        form.setText(Messages.getString("ScanPlate.tabTitle"));
         GridLayout layout = new GridLayout(2, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(
             new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+
+        plateSelectionWidget = new PlateSelectionWidget(form.getBody(),
+            SWT.NONE);
+        plateSelectionWidget.adaptToToolkit(toolkit, true);
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        plateSelectionWidget.setLayoutData(gd);
 
         scanButton = toolkit.createButton(form.getBody(), "Scan Plate",
             SWT.PUSH);
@@ -120,9 +122,18 @@ public class ScanPlateForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
+        plateSelectionWidget.reload();
     }
 
     protected void scanPlate() {
+        plateToScan = plateSelectionWidget.getSelectedPlate();
+
+        if (plateToScan == null) {
+            BioBankPlugin.openAsyncError("Decode Plate Error",
+                "No plate selected");
+            return;
+        }
+
         IRunnableWithProgress op = new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) {
                 monitor.beginTask("Scanning...", IProgressMonitor.UNKNOWN);
@@ -148,7 +159,7 @@ public class ScanPlateForm extends BiobankViewForm {
 
     protected void launchScan(IProgressMonitor monitor) throws Exception {
         monitor.subTask("Launching scan");
-        ScannerConfigPlugin.scanPlate(plateId, PALLET_IMAGE_FILE);
+        ScannerConfigPlugin.scanPlate(plateToScan, PALLET_IMAGE_FILE);
         File plateFile = new File(PALLET_IMAGE_FILE);
         if (plateFile.exists()) {
             PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {

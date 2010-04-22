@@ -16,15 +16,8 @@ public class ScanPlateHandler extends AbstractHandler implements IHandler {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ScanPlateHandler.class.getName());
 
-    protected int plateId;
-
-    public ScanPlateHandler(int plateId) {
-        this.plateId = plateId;
-    }
-
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        FormInput input = new FormInput(new Integer(plateId), "Decode Plate "
-            + plateId);
+        FormInput input = new FormInput(null, "Scan Plate");
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, ScanPlateForm.ID, false);

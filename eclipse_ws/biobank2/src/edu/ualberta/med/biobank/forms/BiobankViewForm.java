@@ -107,9 +107,6 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     }
 
     protected void addToolbarButtons() {
-        if (adapter == null)
-            return;
-
         Action reloadAction = new Action("Reload") {
             @Override
             public void run() {
@@ -130,7 +127,8 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         reloadAction.setImageDescriptor(reloadActionImage);
         form.getToolBarManager().add(reloadAction);
 
-        if (adapter.isEditable() && adapter.getEntryFormId() != null) {
+        if ((adapter != null) && adapter.isEditable()
+            && adapter.getEntryFormId() != null) {
             Action edit = new Action("Edit") {
                 @Override
                 public void run() {

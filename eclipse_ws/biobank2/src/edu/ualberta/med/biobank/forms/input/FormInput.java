@@ -62,8 +62,13 @@ public class FormInput implements IEditorInput {
 
     @Override
     public String getName() {
-        if (obj == null)
+        if ((obj == null) && (name != null)) {
+            return name;
+        }
+
+        if (obj == null) {
             return null;
+        }
 
         if (obj instanceof AdapterBase) {
             return ((AdapterBase) obj).getTooltipText();
@@ -84,6 +89,9 @@ public class FormInput implements IEditorInput {
     @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(Class adapter) {
+        if (obj == null)
+            return null;
+
         if ((adapter == AdapterBase.class) && (obj instanceof AdapterBase)) {
             return obj;
         } else if (adapter == obj.getClass()) {
