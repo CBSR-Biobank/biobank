@@ -18,6 +18,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -59,10 +60,17 @@ public class ScanPlateForm extends BiobankViewForm {
         form.getBody().setLayoutData(
             new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
+        Label label = toolkit.createLabel(form.getBody(),
+            "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        label.setLayoutData(gd);
+
         plateSelectionWidget = new PlateSelectionWidget(form.getBody(),
             SWT.NONE);
         plateSelectionWidget.adaptToToolkit(toolkit, true);
-        GridData gd = new GridData();
+        gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
