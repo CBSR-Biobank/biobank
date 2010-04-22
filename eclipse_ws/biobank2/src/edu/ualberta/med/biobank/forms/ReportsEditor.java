@@ -125,7 +125,7 @@ public class ReportsEditor extends EditorPart {
         aMap.put(FreezerCAliquots.class, new int[] { 100, 100, 100 });
         aMap.put(FreezerDAliquots.class, new int[] { 100, 100, 100, 100 });
         aMap.put(FreezerSAliquots.class, new int[] { 100, 100 });
-        aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
         aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
         aMap.put(PsByStudy.class, new int[] { 100, 100, 100 });
