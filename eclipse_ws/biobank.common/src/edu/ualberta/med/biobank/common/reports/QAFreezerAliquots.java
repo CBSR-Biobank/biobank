@@ -14,7 +14,7 @@ public class QAFreezerAliquots extends QueryObject {
 
     public QAFreezerAliquots(String op, Integer siteId) {
         super(
-            "Retrieves a list of aliquots, at random, within a date range, by sample type.",
+            "Retrieves a list of aliquots, at random, within a date range, by sample type. Note: the top container's name must contain \"Freezer\".",
             "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "

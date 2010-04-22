@@ -22,7 +22,7 @@ public class FreezerDAliquots extends QueryObject {
 
     public FreezerDAliquots(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer aliquots per study per clinic grouped by calendar week/month/quarter/year.",
+            "Displays the total number of freezer aliquots per study per clinic grouped by calendar week/month/quarter/year. Note: the top container's name must contain \"Freezer\".",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Week);
