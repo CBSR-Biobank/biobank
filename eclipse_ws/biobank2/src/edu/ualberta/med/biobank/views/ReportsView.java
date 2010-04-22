@@ -292,7 +292,7 @@ public class ReportsView extends ViewPart {
         ReportTreeNode clinics = new ReportTreeNode("Clinics", null);
         ReportTreeNode patientVisits = new ReportTreeNode("PatientVisits", null);
         ReportTreeNode patients = new ReportTreeNode("Patients", null);
-        ReportTreeNode misc = new ReportTreeNode("Miscellaneous", null);
+        ReportTreeNode misc = new ReportTreeNode("Sample Types", null);
 
         standard.addChild(aliquots);
         standard.addChild(clinics);
@@ -313,6 +313,9 @@ public class ReportsView extends ViewPart {
                 if (names[i].contains("Aliquot")) {
                     aliquots.addChild(child);
                     child.setParent(aliquots);
+                } else if (names[i].contains("Sample Type")) {
+                    misc.addChild(child);
+                    child.setParent(misc);
                 } else if (names[i].contains("Patient Visit")) {
                     patientVisits.addChild(child);
                     child.setParent(patientVisits);
@@ -322,10 +325,8 @@ public class ReportsView extends ViewPart {
                 } else if (names[i].contains("Clinic")) {
                     clinics.addChild(child);
                     child.setParent(clinics);
-                } else {
-                    misc.addChild(child);
-                    child.setParent(misc);
-                }
+                } else
+                    throw new Exception("Unable to place report node.");
             } catch (Exception e) {
                 e.printStackTrace();
             }

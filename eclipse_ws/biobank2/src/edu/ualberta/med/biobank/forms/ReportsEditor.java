@@ -77,11 +77,13 @@ import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
 import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.SampleTypePvCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.views.ReportsView;
@@ -145,6 +147,8 @@ public class ReportsEditor extends EditorPart {
             new int[] { 100, 100, 150, 100 });
         aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(AliquotSCount.class, new int[] { 100, 150, 100 });
+        aMap
+            .put(SampleTypePvCount.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(SampleTypeSUsage.class, new int[] { 150, 100 });
         columnWidths = Collections.unmodifiableMap(aMap);
     }
@@ -604,9 +608,20 @@ public class ReportsEditor extends EditorPart {
                         ((Combo) widget).select(0);
                         ((Combo) widget).setLayoutData(widgetData);
                     } catch (ApplicationException e1) {
-                        widget = new FileBrowser(parameterSection, SWT.NONE);
+                        widget = null;
                     }
-                else
+                else if (option.getName().compareTo("Study") == 0) {
+                    Collection<StudyWrapper> studyWrappers = site
+                        .getStudyCollection(true);
+                    ArrayList<String> studyNames = new ArrayList<String>();
+                    for (StudyWrapper s : studyWrappers)
+                        studyNames.add(s.getNameShort());
+                    widget = new Combo(parameterSection, SWT.NONE);
+                    ((Combo) widget).setItems(studyNames
+                        .toArray(new String[] {}));
+                    ((Combo) widget).select(0);
+                    ((Combo) widget).setLayoutData(widgetData);
+                } else
                     widget = new FileBrowser(parameterSection, SWT.NONE);
             } else if (option.getType() == Integer.class
                 || option.getType() == Double.class) {
