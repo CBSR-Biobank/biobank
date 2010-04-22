@@ -106,6 +106,9 @@ public class FormInput implements IEditorInput {
             return false;
 
         if (o instanceof FormInput) {
+            if ((obj == null) || (((FormInput) o).obj == null))
+                return false;
+
             if (obj.getClass() != ((FormInput) o).obj.getClass())
                 return false;
 
