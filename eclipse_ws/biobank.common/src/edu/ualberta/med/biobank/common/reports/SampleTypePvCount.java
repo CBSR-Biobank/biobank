@@ -15,8 +15,8 @@ public class SampleTypePvCount extends QueryObject {
                 + " and Alias.aliquotPosition.container.label not like 'SS%' and Alias.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateDrawn",
-            new String[] { "Patient Number", "Date Drawn", "Date Processed",
+                + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateProcessed",
+            new String[] { "Patient Number", "Date Processed", "Date Drawn",
                 "Sample Type", "Total" });
         addOption("Study", String.class, "");
     }
