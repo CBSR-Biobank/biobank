@@ -19,7 +19,7 @@ public class QAFreezerAliquots extends QueryObject {
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.patientVisit.dateProcessed "
+                + " as aliquot where aliquot.aliquotPosition.container.label not like 'SS%' and aliquot.patientVisit.dateProcessed "
                 + "between ? and ? and aliquot.sampleType.nameShort = ?"
                 + " and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "

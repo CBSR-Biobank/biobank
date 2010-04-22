@@ -13,7 +13,7 @@ public class FreezerDAliquots extends QueryObject {
 
     protected static final String query = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate), {2}(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
-        + " as aliquot where aliquot.aliquotPosition.container.id in (select path1.container.id from "
+        + " as aliquot where aliquot.aliquotPosition.container.label not like 'SS%' and aliquot.aliquotPosition.container.id in (select path1.container.id from "
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()

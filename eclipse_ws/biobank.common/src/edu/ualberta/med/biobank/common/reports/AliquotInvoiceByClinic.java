@@ -13,7 +13,7 @@ public class AliquotInvoiceByClinic extends QueryObject {
         + "Alias.patientVisit.patient.pnumber, "
         + "Alias.linkDate, Alias.sampleType.name  from "
         + Aliquot.class.getName()
-        + " as Alias where Alias.linkDate > ? and Alias.linkDate < ? and "
+        + " as Alias where Alias.aliquotPosition.container.label not like 'SS%' and Alias.linkDate > ? and Alias.linkDate < ? and "
         + "Alias.patientVisit.patient.study.site.id {1} {0,number,#} ORDER BY "
         + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
 
