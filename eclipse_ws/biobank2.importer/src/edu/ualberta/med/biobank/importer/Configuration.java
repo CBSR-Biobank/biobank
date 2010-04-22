@@ -11,7 +11,7 @@ public class Configuration {
     private boolean importPatientVisits;
     private Map<Integer, String> importCabinets;
     private Map<Integer, String> importFreezers;
-    private boolean importDewar;
+    private boolean importScanAssigned;
 
     Configuration(String configFilename) throws Exception {
         importPatients = false;
@@ -19,7 +19,7 @@ public class Configuration {
         importPatientVisits = false;
         importCabinets = new HashMap<Integer, String>();
         importFreezers = new HashMap<Integer, String>();
-        importDewar = false;
+        importScanAssigned = false;
 
         Properties configProps = new Properties();
         InputStream in = Thread.currentThread().getContextClassLoader()
@@ -58,14 +58,9 @@ public class Configuration {
             }
         }
 
-        property = configProps.getProperty("cbsr.import.dewar");
+        property = configProps.getProperty("cbsr.import.scan_assigned");
         if (property != null) {
-            if ((importCabinets.size() > 0) || (importFreezers.size() > 0)) {
-                throw new Exception("cannot import dewar samples at the same "
-                    + "time as import freezer and cabinet samples");
-            }
-
-            importDewar = property.equals("yes");
+            importScanAssigned = property.equals("yes");
         }
     }
 
@@ -155,8 +150,8 @@ public class Configuration {
             .subSequence(2, 4)));
     }
 
-    public boolean importDewar() {
-        return importDewar;
+    public boolean importScanLinked() {
+        return importScanAssigned;
     }
 
 }
