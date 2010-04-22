@@ -21,9 +21,9 @@ public class NewPVsByStudyClinic extends QueryObject {
     public NewPVsByStudyClinic(String op, Integer siteId) {
         super(
             "Displays the total number of patient visits added per study per "
-                + "clinic grouped by date range.", MessageFormat.format(query,
-                op, siteId, "{0}"), new String[] { "Study", "Clinic", "",
-                "Total" });
+                + "clinic grouped by calendar week/month/quarter/year.",
+            MessageFormat.format(query, op, siteId, "{0}"), new String[] {
+                "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
     }
 

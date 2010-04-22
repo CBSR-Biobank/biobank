@@ -13,7 +13,7 @@ public class PsByStudy extends QueryObject {
 
     public PsByStudy(String op, Integer siteId) {
         super(
-            "Displays the total number of patients per study with a patient visit in a given date range.",
+            "Displays the total number of patients per study with at least one patient visit grouped by calendar week/month/quarter/year.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);

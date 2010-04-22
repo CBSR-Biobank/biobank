@@ -194,7 +194,7 @@ public class SearchUtils {
                 path = path + "sampleStorage.";
             add(searchableFields, path, "sampleType.name", String.class);
             add(searchableFields, path, "quantity", Integer.class);
-            add(searchableFields, path, "volume", Integer.class);
+            add(searchableFields, path, "volume", String.class);
             add(searchableFields, path, "activityStatus", String.class);
         }
 
