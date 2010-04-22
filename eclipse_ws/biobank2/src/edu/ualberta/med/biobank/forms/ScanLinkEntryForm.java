@@ -344,6 +344,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd = new GridData();
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
+        gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
         linkFormPatientManagement.initPatientNumberText(fieldsComposite);

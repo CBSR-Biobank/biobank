@@ -66,16 +66,20 @@ public class LinkFormPatientManagement {
                 if (patientNumberTextModified) {
                     setPatientSelected();
                     if (patientTextCallback != null) {
-                        patientTextCallback.callback();
+                        patientTextCallback.focusLost();
                     }
                 }
                 patientNumberTextModified = false;
+                viewerVisits.getCombo().setFocus();
             }
         });
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 patientNumberTextModified = true;
+                if (patientTextCallback != null) {
+                    patientTextCallback.textModified();
+                }
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -106,7 +110,6 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-
         visitsListCheck = aliquotAdminForm.toolkit.createButton(
             compositeFields, "Last 7 days", SWT.CHECK);
         visitsListCheck.setSelection(true);
@@ -223,6 +226,8 @@ public class LinkFormPatientManagement {
     }
 
     protected static interface PatientTextCallback {
-        public void callback();
+        public void focusLost();
+
+        public void textModified();
     }
 }
