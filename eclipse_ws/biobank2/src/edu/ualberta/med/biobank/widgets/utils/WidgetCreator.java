@@ -332,6 +332,13 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage, int typeShown) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
+        return createDateTimeWidget(client, label, date, modelObservableValue,
+            emptyMessage, typeShown);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, int typeShown) {
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
             date, typeShown);
         if (selectionListener != null) {
