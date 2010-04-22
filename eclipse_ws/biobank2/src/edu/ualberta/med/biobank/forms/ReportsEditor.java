@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -84,7 +85,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.views.ReportsView;
-import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
@@ -304,8 +304,11 @@ public class ReportsEditor extends EditorPart {
                         }
                     }
                 }
-            } else if (widgetFields.get(i) instanceof AutoTextWidget) {
-                params.add(((AutoTextWidget) widgetFields.get(i)).getText());
+            } else if (widgetFields.get(i) instanceof Combo) {
+                params
+                    .add(((Combo) widgetFields.get(i))
+                        .getItem(((Combo) widgetFields.get(i))
+                            .getSelectionIndex()));
             }
         }
         List<Option> queryOptions = query.getOptions();
@@ -590,10 +593,16 @@ public class ReportsEditor extends EditorPart {
             else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
                     try {
-                        widget = new AutoTextWidget(parameterSection, SWT.NONE,
-                            site.getAllSampleTypeCollection(true),
-                            SampleTypeWrapper.class);
-                        ((AutoTextWidget) widget).setLayoutData(widgetData);
+                        Collection<SampleTypeWrapper> sampleTypeWrappers = site
+                            .getAllSampleTypeCollection(true);
+                        ArrayList<String> sampleTypes = new ArrayList<String>();
+                        for (SampleTypeWrapper w : sampleTypeWrappers)
+                            sampleTypes.add(w.getNameShort());
+                        widget = new Combo(parameterSection, SWT.NONE);
+                        ((Combo) widget).setItems(sampleTypes
+                            .toArray(new String[] {}));
+                        ((Combo) widget).select(0);
+                        ((Combo) widget).setLayoutData(widgetData);
                     } catch (ApplicationException e1) {
                         widget = new FileBrowser(parameterSection, SWT.NONE);
                     }
