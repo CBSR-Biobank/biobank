@@ -91,14 +91,21 @@ public class ScanPlateForm extends BiobankViewForm {
                 }
 
                 if (img != null) {
-                    Point size = imageCanvas.getSize();
-                    Rectangle bounds = img.getBounds();
+                    Point canvasSize = imageCanvas.getSize();
+                    Rectangle imgBounds = img.getBounds();
+
+                    double w = canvasSize.x;
+                    double h = (double) canvasSize.x
+                        * (double) imgBounds.height / imgBounds.width;
+                    if (h > canvasSize.y) {
+                        h = canvasSize.y;
+                        w = (double) canvasSize.y * (double) imgBounds.width
+                            / imgBounds.height;
+                    }
 
                     GC gc = new GC(imageCanvas);
-                    // gc.drawImage(img, 0, 0, bounds.width, bounds.height, 0,
-                    // 0,
-                    // size.x, size.y);
-                    gc.drawImage(img, 0, 0);
+                    gc.drawImage(img, 0, 0, imgBounds.width, imgBounds.height,
+                        0, 0, (int) w, (int) h);
                     gc.dispose();
                 }
             }
