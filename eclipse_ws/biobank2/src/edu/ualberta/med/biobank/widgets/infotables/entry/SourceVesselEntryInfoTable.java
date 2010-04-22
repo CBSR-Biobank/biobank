@@ -124,11 +124,12 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
 
                 try {
                     if (!sourceVessel.isNew() && sourceVessel.isUsed()) {
-                        BioBankPlugin.openError("Source Vessel Delete Error",
-                            "Cannot delete source vessel \""
-                                + sourceVessel.getName()
-                                + "\" since there are samples of this "
-                                + "type already in the database.");
+                        BioBankPlugin
+                            .openError(
+                                "Source Vessel Delete Error",
+                                "Cannot delete source vessel \""
+                                    + sourceVessel.getName()
+                                    + "\" since studies and/or patient visits are using it.");
                         return;
                     }
 

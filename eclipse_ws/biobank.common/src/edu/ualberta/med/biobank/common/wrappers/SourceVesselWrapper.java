@@ -110,6 +110,9 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
+        if (results.get(0) > 0) {
+            return true;
+        }
         String queryString2 = "select count(s) from "
             + PvSourceVessel.class.getName() + " as s where s.sourceVessel=?)";
         HQLCriteria c2 = new HQLCriteria(queryString2, Arrays
@@ -118,7 +121,7 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         if (results2.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
-        return (results.get(0) > 0 || results2.get(0) > 0);
+        return results2.get(0) > 0;
     }
 
     public void checkUnique() throws ApplicationException,

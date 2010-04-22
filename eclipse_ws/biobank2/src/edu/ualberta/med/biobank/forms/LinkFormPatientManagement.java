@@ -7,7 +7,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -95,14 +94,6 @@ public class LinkFormPatientManagement {
         gridData.horizontalAlignment = SWT.FILL;
         viewerVisits.getCombo().setLayoutData(gridData);
 
-        viewerVisits.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
-                    + pv.getShipment().getWaybill();
-            }
-        });
         viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {

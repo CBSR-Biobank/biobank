@@ -11,7 +11,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SampleTypeEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceVesselEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -26,8 +25,6 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
     public static final String OK_MESSAGE = "View and edit source vessels.";
 
     private SourceVesselEntryInfoTable globalSourceWidget;
-
-    List<SampleTypeEntryInfoTable> siteWidgets = new ArrayList<SampleTypeEntryInfoTable>();
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -104,10 +101,6 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
         }
         if (globalSourceVessels != null) {
             globalSourceWidget.setLists(globalSourceVessels);
-        }
-
-        for (SampleTypeEntryInfoTable siteWidget : siteWidgets) {
-            siteWidget.reload();
         }
     }
 }
