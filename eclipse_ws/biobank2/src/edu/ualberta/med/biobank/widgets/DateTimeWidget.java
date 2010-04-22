@@ -208,4 +208,14 @@ public class DateTimeWidget extends BiobankWidget {
         modifyListeners.remove(listener);
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (dateEntry != null) {
+            dateEntry.setEnabled(enabled);
+        }
+        if (timeEntry != null) {
+            timeEntry.setEnabled(enabled);
+        }
+    }
 }
