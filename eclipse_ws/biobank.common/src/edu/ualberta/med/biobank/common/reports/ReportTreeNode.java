@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,22 @@ public class ReportTreeNode extends Object {
 
     public String getLabel() {
         return name;
+    }
+
+    public String getToolTipText() {
+        try {
+            if (QueryObject.class.isAssignableFrom((Class<?>) query)) {
+
+                Constructor<?> c = ((Class<?>) query).getConstructor(
+                    String.class, Integer.class);
+                QueryObject obj;
+                obj = (QueryObject) c.newInstance("", 0);
+                return obj.getDescription();
+
+            }
+        } catch (Exception e) {
+        }
+        return "";
     }
 
     public Object getQuery() {
