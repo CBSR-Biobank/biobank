@@ -30,10 +30,7 @@ public class AutoTextWidget extends BiobankWidget {
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
         this.setLayout(gl);
-        GridData gridData = new GridData();
-        gridData.widthHint = 100;
         text = new Text(this, SWT.BORDER);
-        text.setLayoutData(gridData);
         this.elements = elements;
         this.type = type;
         this.selectionIndex = 0;
@@ -87,5 +84,9 @@ public class AutoTextWidget extends BiobankWidget {
 
     public Object getText() {
         return text.getText();
+    }
+
+    public void setLayoutData(GridData data) {
+        text.setLayoutData(data);
     }
 }

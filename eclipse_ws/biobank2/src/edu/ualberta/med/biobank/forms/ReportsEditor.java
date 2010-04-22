@@ -266,8 +266,15 @@ public class ReportsEditor extends EditorPart {
                 if (((Text) widgetFields.get(i)).getText().compareTo("") == 0)
                     params.add(query.getOptions().get(i).getDefaultValue());
                 else
-                    params.add(Integer.parseInt(((Text) widgetFields.get(i))
-                        .getText()));
+                    try {
+                        params.add(Integer
+                            .parseInt(((Text) widgetFields.get(i)).getText()));
+                    } catch (NumberFormatException e) {
+                        BioBankPlugin
+                            .openAsyncError("Invalid Number Format",
+                                "Please enter a valid number. Searching with default value...");
+                        params.add(query.getOptions().get(i).getDefaultValue());
+                    }
             } else if (widgetFields.get(i) instanceof Combo) {
                 Combo tempCombo = (Combo) widgetFields.get(i);
                 // would rather return a daterange but basic combo (necessary
@@ -501,14 +508,20 @@ public class ReportsEditor extends EditorPart {
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
+        Label description = new Label(top, SWT.NONE);
+        description.setText("Description: " + query.getDescription());
+        GridData gd2 = new GridData();
+        gd2.horizontalSpan = 2;
+        description.setLayoutData(gd2);
+
         if (parameterSection != null)
             parameterSection.dispose();
 
         parameterSection = new Composite(top, SWT.NONE);
         GridData pgd = new GridData();
+        GridLayout pgl = new GridLayout(2, false);
         pgd.grabExcessHorizontalSpace = true;
-        pgd.horizontalAlignment = SWT.FILL;
-        parameterSection.setLayout(new GridLayout(2, false));
+        parameterSection.setLayout(pgl);
         parameterSection.setLayoutData(pgd);
 
         buttonSection = new Composite(top, SWT.NONE);
@@ -557,18 +570,14 @@ public class ReportsEditor extends EditorPart {
             }
         });
 
-        Label description = new Label(parameterSection, SWT.NONE);
-        description.setText("Description: " + query.getDescription());
-        GridData gd2 = new GridData();
-        gd2.horizontalSpan = 2;
-        description.setLayoutData(gd2);
-
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             Label fieldLabel = new Label(parameterSection, SWT.NONE);
             fieldLabel.setText(option.getName() + ":");
             textLabels.add(fieldLabel);
             Widget widget;
+            GridData widgetData = new GridData();
+            widgetData.horizontalAlignment = SWT.FILL;
 
             if (option.getType() == DateGroup.class) {
                 widget = new Combo(parameterSection, SWT.READ_ONLY);
@@ -581,16 +590,20 @@ public class ReportsEditor extends EditorPart {
             else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
                     try {
-                        widget = new AutoTextWidget(parameterSection, SWT.None,
+                        widget = new AutoTextWidget(parameterSection, SWT.NONE,
                             site.getAllSampleTypeCollection(true),
                             SampleTypeWrapper.class);
+                        ((AutoTextWidget) widget).setLayoutData(widgetData);
                     } catch (ApplicationException e1) {
                         widget = new FileBrowser(parameterSection, SWT.NONE);
                     }
                 else
                     widget = new FileBrowser(parameterSection, SWT.NONE);
-            } else if (option.getType() == Integer.class) {
+            } else if (option.getType() == Integer.class
+                || option.getType() == Double.class) {
                 widget = new Text(parameterSection, SWT.BORDER);
+                ((Text) widget).setText("0");
+                ((Text) widget).setLayoutData(widgetData);
             } else
                 widget = null;
             widgetFields.add(widget);
