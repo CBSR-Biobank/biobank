@@ -8,6 +8,7 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -94,6 +95,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private List<ContainerTypeWrapper> cabinetContainerTypes;
 
     protected boolean positionTextModified;
+
+    private CabinetLabelValidator cabinetPositionvalidator;
 
     @Override
     protected void init() {
@@ -246,19 +249,22 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
+        cabinetPositionvalidator = new CabinetLabelValidator(Messages
+            .getString("Cabinet.position.validationMsg"));
         positionText = (Text) createBoundWidgetWithLabel(
             fieldsComposite,
             Text.class,
             SWT.NONE,
             Messages.getString("Cabinet.position.label"), new String[0], positionValue, //$NON-NLS-1$
-            new CabinetLabelValidator(Messages
-                .getString("Cabinet.position.validationMsg"))); //$NON-NLS-1$
+            cabinetPositionvalidator); //$NON-NLS-1$
         gd = (GridData) positionText.getLayoutData();
         gd.horizontalSpan = 2;
         positionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (positionTextModified) {
+                if (positionTextModified
+                    && cabinetPositionvalidator
+                        .validate(positionText.getText()) == Status.OK_STATUS) {
                     initContainersFromPosition();
                     setTypeCombosLists();
                 }
