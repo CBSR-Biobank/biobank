@@ -54,7 +54,7 @@ public class NewPVsByStudyClinic extends QueryObject {
             for (Object ob : results) {
                 Object[] castOb = (Object[]) ob;
                 compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3] + "(" + castOb[2] + ")", castOb[4] });
+                    castOb[3] + "-" + castOb[2], castOb[4] });
             }
         }
         return compressedDates;

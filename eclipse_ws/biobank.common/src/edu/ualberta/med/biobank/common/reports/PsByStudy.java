@@ -46,7 +46,7 @@ public class PsByStudy extends QueryObject {
             for (Object ob : results) {
                 Object[] castOb = (Object[]) ob;
                 compressedDates.add(new Object[] { castOb[0],
-                    castOb[2] + "(" + castOb[1] + ")", castOb[3] });
+                    castOb[2] + "-" + castOb[1], castOb[3] });
             }
         }
         return compressedDates;
