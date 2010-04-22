@@ -17,8 +17,8 @@ public class AliquotInvoiceByPatient extends QueryObject {
                 + op + siteId + " ORDER BY Alias.patientVisit.patient.pnumber",
             new String[] { "Patient Number", "Clinic", "Link Date",
                 "Sample Type" });
-        addOption("Start Date", Date.class, new Date(0));
-        addOption("End Date", Date.class, new Date());
+        addOption("Start Date (Linked)", Date.class, new Date(0));
+        addOption("End Date (Linked)", Date.class, new Date());
     }
 
     @Override

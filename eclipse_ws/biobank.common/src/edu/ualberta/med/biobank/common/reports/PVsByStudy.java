@@ -19,10 +19,11 @@ public class PVsByStudy extends QueryObject {
         + "Year(Alias.dateProcessed), {2}(Alias.dateProcessed)";
 
     public PVsByStudy(String op, Integer siteId) {
-        super("Displays the total number of patient visits per study"
-            + " grouped by calendar week/month/quarter/year.", MessageFormat
-            .format(query, op, siteId, "{0}"), new String[] { "Study", "",
-            "Total" });
+        super(
+            "Displays the total number of patient visits per study"
+                + " grouped by date processed in a calendar week/month/quarter/year.",
+            MessageFormat.format(query, op, siteId, "{0}"), new String[] {
+                "Study", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
     }
 

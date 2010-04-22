@@ -30,8 +30,8 @@ public class QAFreezerAliquots extends QueryObject {
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
                 "Sample Type" });
-        addOption("Start Date", Date.class, new Date(0));
-        addOption("End Date", Date.class, new Date());
+        addOption("Start Date (Processed)", Date.class, new Date(0));
+        addOption("End Date (Processed)", Date.class, new Date());
         addOption("Sample Type", String.class, "");
         addOption("# Aliquots", Integer.class, 0);
     }
