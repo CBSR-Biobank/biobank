@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Configuration {
+    private boolean checkContainerConfig;
     private boolean importPatients;
     private boolean importShipments;
     private boolean importPatientVisits;
@@ -27,6 +28,11 @@ public class Configuration {
         configProps.load(in);
 
         String property;
+
+        property = configProps.getProperty("cbsr.check.container_config");
+        if (property != null) {
+            checkContainerConfig = property.equals("yes");
+        }
 
         property = configProps.getProperty("cbsr.import.patients");
         if (property != null) {
@@ -62,6 +68,10 @@ public class Configuration {
         if (property != null) {
             importScanAssigned = property.equals("yes");
         }
+    }
+
+    public boolean checkContainerConfig() {
+        return checkContainerConfig;
     }
 
     public boolean importPatients() {
