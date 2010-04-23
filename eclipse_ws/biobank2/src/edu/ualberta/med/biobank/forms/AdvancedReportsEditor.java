@@ -299,6 +299,11 @@ public class AdvancedReportsEditor extends EditorPart {
             if (field.getValue() != null)
                 ((Text) widget)
                     .setText(((Integer) field.getValue()).toString());
+        } else if (field.getType() == Double.class) {
+            widget = new Text(parameterSection, SWT.BORDER);
+            ((Text) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((Text) widget).setText(((Double) field.getValue()).toString());
         } else
             widget = null;
 
@@ -491,6 +496,16 @@ public class AdvancedReportsEditor extends EditorPart {
                     Integer val;
                     try {
                         val = Integer.parseInt(((Text) widgetFields.get(i))
+                            .getText());
+                    } catch (NumberFormatException e) {
+                        val = null;
+                    }
+                    fields.get(i).setValue(val);
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                } else if (fields.get(i).getType() == Double.class) {
+                    Double val;
+                    try {
+                        val = Double.parseDouble(((Text) widgetFields.get(i))
                             .getText());
                     } catch (NumberFormatException e) {
                         val = null;
