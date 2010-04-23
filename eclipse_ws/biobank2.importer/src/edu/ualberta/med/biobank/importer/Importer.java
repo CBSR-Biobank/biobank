@@ -86,6 +86,7 @@ public class Importer {
         aMap.put("PFP", "PF Plasma");
         aMap.put("Plasma LH", "Lith Hep Plasma");
         aMap.put("RNA Later", "RNA Biopsy");
+        aMap.put("CDPA Plas", "CDPA Plasma");
         newSampleTypeName = Collections.unmodifiableMap(aMap);
     }
 
@@ -304,7 +305,7 @@ public class Importer {
         checkSourceVessels();
         checkShippingCompanies();
         checkSampleTypes();
-        checkContainerConfiguration();
+        // checkContainerConfiguration();
 
         defaultDateShipped = getDateFromStr("1900-01-01");
 
@@ -854,7 +855,7 @@ public class Importer {
                 shipment = new ShipmentWrapper(appService);
                 shipment.setClinic(clinic);
 
-                if (clinic.sendsShipments()) {
+                if (clinic.getSendsShipments()) {
                     shipment.setWaybill(String.format("W-CBSR-%s-%s", clinic
                         .getNameShort(), getWaybillDate(dateReceived)));
                 }
@@ -1049,13 +1050,13 @@ public class Importer {
     private static void importScanLinkedSamples() throws Exception {
         logger.info("importing scan assigned only aliquots ...");
 
-        String qryPart = "from freezer_link"
-            + "join sample_list on sample_list.sample_nr=freezer_link.sample_nr"
-            + "join patient_visit on patient_visit.visit_nr=freezer_link.visit_nr"
-            + "join patient on patient.patient_nr=patient_visit.patient_nr"
-            + "join study_list on study_list.study_nr=patient_visit.study_nr"
-            + "left join freezer on freezer.inventory_id=freezer_link.inventory_id"
-            + "where fnum is null" + "order by link_date desc";
+        String qryPart = "from freezer_link "
+            + "join sample_list on sample_list.sample_nr=freezer_link.sample_nr "
+            + "join patient_visit on patient_visit.visit_nr=freezer_link.visit_nr "
+            + "join patient on patient.patient_nr=patient_visit.patient_nr "
+            + "join study_list on study_list.study_nr=patient_visit.study_nr "
+            + "left join freezer on freezer.inventory_id=freezer_link.inventory_id "
+            + "where fnum is null order by link_date desc";
 
         Statement s = con.createStatement();
         s.execute("select count(*) " + qryPart);
@@ -1067,7 +1068,7 @@ public class Importer {
             + "patient_visit.bb2_pv_id,"
             + "patient_visit.date_received,patient_visit.date_taken,"
             + "sample_name_short,freezer_link.link_date,"
-            + "freezer_link.inventory_id" + qryPart);
+            + "freezer_link.inventory_id " + qryPart);
 
         rs = s.getResultSet();
         if (rs == null) {
@@ -1097,6 +1098,11 @@ public class Importer {
             AliquotWrapper aliquot = createAliquot(cbsrSite, studyNameShort,
                 patientNr, visitId, dateProcessedStr, dateTakenStr,
                 inventoryId, sampleTypeNameShort, linkDateStr);
+
+            if (aliquot == null) {
+                return;
+            }
+
             aliquot.persist();
 
             ++count;
@@ -1369,11 +1375,11 @@ public class Importer {
             return null;
         }
 
-        SampleTypeWrapper sampleType = Importer
-            .getSampleType(sampleTypeNameShort);
+        SampleTypeWrapper sampleType = getSampleType(sampleTypeNameShort);
 
         if (sampleType == null) {
-            logger.error("sample type not in database: " + sampleTypeNameShort);
+            logger.error("inventory_id/" + inventoryId
+                + " sample type not in database: " + sampleTypeNameShort);
             return null;
         }
 
@@ -1396,17 +1402,22 @@ public class Importer {
 
     public static boolean inventoryIdUnique(String inventoryId)
         throws Exception {
-        List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
             appService, inventoryId, cbsrSite);
-        if (samples.size() == 0)
+        if (aliquots.size() == 0)
             return true;
 
         String labels = "";
-        for (AliquotWrapper samp : samples) {
-            labels += samp.getPositionString(true, true) + ", ";
+        for (AliquotWrapper aliquot : aliquots) {
+            labels += aliquot.getPositionString(true, true) + ", ";
+        }
+        if (labels.length() != 0) {
+            logger.error("an aliquot with inventory id " + inventoryId
+                + " already exists at " + labels);
         }
         logger.error("an aliquot with inventory id " + inventoryId
-            + " already exists at " + labels);
+            + " already fro patient "
+            + aliquots.get(0).getPatientVisit().getPatient().getPnumber());
         return false;
     }
 
