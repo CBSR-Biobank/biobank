@@ -82,7 +82,6 @@ public class DecodePlateForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        plateSelectionWidget.reload();
     }
 
     protected void internalScanAndProcessResult() {

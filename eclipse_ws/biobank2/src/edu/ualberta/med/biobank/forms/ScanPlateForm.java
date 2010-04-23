@@ -130,7 +130,6 @@ public class ScanPlateForm extends BiobankViewForm {
 
     @Override
     protected void reload() throws Exception {
-        plateSelectionWidget.reload();
     }
 
     protected void scanPlate() {
