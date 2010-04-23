@@ -602,7 +602,7 @@ public class ReportsEditor extends EditorPart {
                         ArrayList<String> sampleTypes = new ArrayList<String>();
                         for (SampleTypeWrapper w : sampleTypeWrappers)
                             sampleTypes.add(w.getNameShort());
-                        widget = new Combo(parameterSection, SWT.NONE);
+                        widget = new Combo(parameterSection, SWT.READ_ONLY);
                         ((Combo) widget).setItems(sampleTypes
                             .toArray(new String[] {}));
                         ((Combo) widget).select(0);
@@ -616,7 +616,7 @@ public class ReportsEditor extends EditorPart {
                     ArrayList<String> studyNames = new ArrayList<String>();
                     for (StudyWrapper s : studyWrappers)
                         studyNames.add(s.getNameShort());
-                    widget = new Combo(parameterSection, SWT.NONE);
+                    widget = new Combo(parameterSection, SWT.READ_ONLY);
                     ((Combo) widget).setItems(studyNames
                         .toArray(new String[] {}));
                     ((Combo) widget).select(0);

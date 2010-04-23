@@ -89,6 +89,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
     private QueryTree tree;
     private QueryTreeNode selectedNode;
+    private HashMap<String, String> checked;
 
     @Override
     public void init(IEditorSite site, IEditorInput input)
@@ -97,6 +98,8 @@ public class AdvancedReportsEditor extends EditorPart {
         setInput(input);
 
         node = ((ReportInput) input).node;
+        checked = SearchUtils.getColumnInfo(((QueryTreeNode) node.getQuery())
+            .getNodeInfo().getType());
 
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
@@ -325,7 +328,8 @@ public class AdvancedReportsEditor extends EditorPart {
         final Button box = new Button(parameterSection, SWT.CHECK);
         box.setText("Include in results");
         includedFields.add(box);
-
+        if (checked.containsValue(field.getPath() + field.getFname()))
+            box.setSelection(true);
     }
 
     private void generate() {
