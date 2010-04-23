@@ -62,6 +62,7 @@ public class PlateSelectionWidget extends BiobankWidget {
         label.setText("Select plate:");
         plateButtons = new HashMap<Integer, Button>();
 
+        int numPlatesEnabled = 0;
         for (int i = 1, n = ScannerConfigPlugin.getPlatesMax(); i <= n; ++i) {
             Button b = new Button(this, SWT.RADIO);
             b.setText("Plate" + i);
@@ -72,6 +73,15 @@ public class PlateSelectionWidget extends BiobankWidget {
             gd.exclude = !visible;
             b.setLayoutData(gd);
             plateButtons.put(i, b);
+
+            if (visible) {
+                ++numPlatesEnabled;
+            }
+        }
+
+        if (numPlatesEnabled == 1) {
+            int plateId = plateButtons.keySet().iterator().next();
+            plateButtons.get(plateId).setSelection(true);
         }
 
         ScannerConfigPlugin.getDefault().getPreferenceStore()
