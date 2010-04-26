@@ -17,6 +17,8 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -25,7 +27,6 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -40,9 +41,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
@@ -86,13 +85,15 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ReportsEditor extends EditorPart {
+public class ReportsEditor extends BiobankFormBase {
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
@@ -109,8 +110,6 @@ public class ReportsEditor extends EditorPart {
 
     private Button printButton;
     private Button exportButton;
-
-    private ScrolledComposite sc;
 
     private QueryObject query;
 
@@ -228,7 +227,6 @@ public class ReportsEditor extends EditorPart {
                             gd.verticalAlignment = SWT.FILL;
                             reportTable.setLayoutData(gd);
                             top.layout();
-                            updateScrollBars();
                         }
                     });
 
@@ -466,29 +464,6 @@ public class ReportsEditor extends EditorPart {
     }
 
     @Override
-    public void init(IEditorSite site, IEditorInput input)
-        throws PartInitException {
-        setSite(site);
-        setInput(input);
-
-        reportData = new ArrayList<Object>();
-        node = ((ReportInput) input).node;
-        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
-        String op = "=";
-        if (siteWrap.getName().compareTo("All Sites") == 0)
-            op = "!=";
-        try {
-            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
-                String.class, Integer.class).newInstance(
-                new Object[] { op, siteWrap.getId() });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        this.setPartName(query.getName());
-    }
-
-    @Override
     public boolean isDirty() {
         // TODO Auto-generated method stub
         return false;
@@ -500,15 +475,24 @@ public class ReportsEditor extends EditorPart {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
-        sc = new ScrolledComposite(parent, SWT.V_SCROLL);
-        sc.setLayout(new GridLayout(1, false));
-        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        sc.setExpandHorizontal(true);
-        sc.setExpandVertical(true);
+    public void setFocus() {
+        ReportsView.getTree().setSelection(new StructuredSelection(node));
+    }
 
-        top = new Composite(sc, SWT.NONE);
+    @Override
+    protected void createFormContent() throws Exception {
+        GridLayout formLayout = new GridLayout();
+        formLayout.marginWidth = 0;
+        form.getBody().setLayout(formLayout);
+        top = new Composite(form.getBody(), SWT.BORDER);
         top.setLayout(new GridLayout());
+        GridData topData = new GridData();
+        topData.grabExcessHorizontalSpace = true;
+        topData.grabExcessVerticalSpace = true;
+        topData.horizontalAlignment = SWT.FILL;
+        topData.verticalAlignment = SWT.FILL;
+
+        top.setLayoutData(topData);
 
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         List<Option> queryOptions = query.getOptions();
@@ -623,11 +607,23 @@ public class ReportsEditor extends EditorPart {
                     ((Combo) widget).setLayoutData(widgetData);
                 } else
                     widget = new FileBrowser(parameterSection, SWT.NONE);
-            } else if (option.getType() == Integer.class
-                || option.getType() == Double.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
-                ((Text) widget).setText("0");
+            } else if (option.getType() == Integer.class) {
+                IObservableValue numAliquots = new WritableValue("",
+                    String.class);
+                widget = widgetCreator.createBoundWidgetWithLabel(
+                    parameterSection, Text.class, SWT.BORDER, "# Aliquots",
+                    new String[0], numAliquots, new IntegerNumberValidator(
+                        "Enter a valid integer."));
                 ((Text) widget).setLayoutData(widgetData);
+            } else if (option.getType() == Double.class) {
+                IObservableValue numAliquots = new WritableValue("",
+                    String.class);
+                widget = widgetCreator.createBoundWidgetWithLabel(
+                    parameterSection, Text.class, SWT.BORDER, "# Aliquots",
+                    new String[0], numAliquots, new DoubleNumberValidator(
+                        "Enter a valid integer."));
+                ((Text) widget).setText("0");
+
             } else
                 widget = null;
             widgetFields.add(widget);
@@ -639,18 +635,36 @@ public class ReportsEditor extends EditorPart {
         top.layout(true, true);
 
         top.layout();
-        sc.setContent(top);
-        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-    }
-
-    public void updateScrollBars() {
-        sc.layout(true, true);
-        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     @Override
-    public void setFocus() {
-        ReportsView.getTree().setSelection(new StructuredSelection(node));
+    public void init(IEditorSite editorSite, IEditorInput input) {
+        setSite(editorSite);
+        setInput(input);
+        try {
+            init();
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Unable to open report.", e);
+        }
+    }
+
+    @Override
+    protected void init() throws Exception {
+
+        reportData = new ArrayList<Object>();
+        node = ((ReportInput) getEditorInput()).node;
+        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
+        String op = "=";
+        if (siteWrap.getName().compareTo("All Sites") == 0)
+            op = "!=";
+        try {
+            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
+                String.class, Integer.class).newInstance(
+                new Object[] { op, siteWrap.getId() });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.setPartName(query.getName());
     }
 }
