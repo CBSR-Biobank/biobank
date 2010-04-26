@@ -16,6 +16,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0;
 
 
+
 --
 -- Table structure for table `csm_application`
 --
@@ -622,7 +623,7 @@ CREATE TABLE `csm_user_group_role_pg` (
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_USER` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -661,7 +662,8 @@ INSERT INTO `csm_user_group_role_pg` VALUES (74,NULL,9,2,39,'2010-04-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (75,NULL,9,1,1,'2010-04-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (76,NULL,5,2,40,'2010-04-26');
 INSERT INTO `csm_user_group_role_pg` VALUES (77,NULL,6,2,40,'2010-04-26');
-INSERT INTO `csm_user_group_role_pg` VALUES (78,NULL,7,2,41,'2010-04-26');
+INSERT INTO `csm_user_group_role_pg` VALUES (79,NULL,7,4,41,'2010-04-26');
+INSERT INTO `csm_user_group_role_pg` VALUES (80,NULL,7,6,41,'2010-04-26');
 /*!40000 ALTER TABLE `csm_user_group_role_pg` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -696,6 +698,9 @@ INSERT INTO `csm_user_pe` VALUES (2,2,2);
 INSERT INTO `csm_user_pe` VALUES (3,28,6);
 /*!40000 ALTER TABLE `csm_user_pe` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+
 --
 -- Table structure for table `log_message`
 --
