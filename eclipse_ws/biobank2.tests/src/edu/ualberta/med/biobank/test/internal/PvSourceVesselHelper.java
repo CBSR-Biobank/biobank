@@ -6,14 +6,20 @@ import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 
 public class PvSourceVesselHelper extends DbHelper {
 
-    public static PvSourceVesselWrapper newPvSourceVessel(String name,
-        PatientVisitWrapper visit) throws Exception {
+    public static PvSourceVesselWrapper newPvSourceVessel(
+        SourceVesselWrapper sourceVessel, PatientVisitWrapper visit)
+        throws Exception {
         PvSourceVesselWrapper pss = new PvSourceVesselWrapper(appService);
-        SourceVesselWrapper ssw = SourceVesselHelper.addSourceVessel(name);
-        pss.setSourceVessel(ssw);
+        pss.setSourceVessel(sourceVessel);
         pss.setQuantity(r.nextInt(10));
         pss.setPatientVisit(visit);
         return pss;
+    }
+
+    public static PvSourceVesselWrapper newPvSourceVessel(String name,
+        PatientVisitWrapper visit) throws Exception {
+        SourceVesselWrapper ssw = SourceVesselHelper.addSourceVessel(name);
+        return newPvSourceVessel(ssw, visit);
     }
 
     public static PvSourceVesselWrapper addPvSourceVessel(String name,
