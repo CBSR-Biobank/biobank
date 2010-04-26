@@ -12,7 +12,7 @@ public class NewPsByStudyClinic extends QueryObject {
 
     public NewPsByStudyClinic(String op, Integer siteId) {
         super(
-            "Displays the total number of patients added per study per clinic grouped by date range.",
+            "Displays the total number of patients added per study per clinic grouped by date processed in a calendar week/month/quarter/year.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
@@ -45,7 +45,7 @@ public class NewPsByStudyClinic extends QueryObject {
             for (Object ob : results) {
                 Object[] castOb = (Object[]) ob;
                 compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3] + "(" + castOb[2] + ")", castOb[4] });
+                    castOb[3] + "-" + castOb[2], castOb[4] });
             }
         }
         return compressedDates;

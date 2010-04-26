@@ -66,7 +66,7 @@ public class SearchUtils {
             opList.add("doesn't start with");
             opList.add("ends with");
             opList.add("doesn't end with");
-        } else if (type == Integer.class) {
+        } else if (type == Integer.class || type == Double.class) {
             opList.add("=");
             opList.add("<=");
             opList.add(">=");
@@ -184,7 +184,7 @@ public class SearchUtils {
             add(searchableFields, path, "position", String.class);
             add(searchableFields, path, "activityStatus", String.class);
             add(searchableFields, path, "label", String.class);
-            add(searchableFields, path, "temperature", Integer.class);
+            add(searchableFields, path, "temperature", Double.class);
             add(searchableFields, path, "comment", String.class);
             add(searchableFields, path, "containerType.name", String.class);
         } else if (c == SampleStorage.class) {
@@ -194,7 +194,7 @@ public class SearchUtils {
                 path = path + "sampleStorage.";
             add(searchableFields, path, "sampleType.name", String.class);
             add(searchableFields, path, "quantity", Integer.class);
-            add(searchableFields, path, "volume", Integer.class);
+            add(searchableFields, path, "volume", String.class);
             add(searchableFields, path, "activityStatus", String.class);
         }
 

@@ -46,8 +46,8 @@ public class PatientVisitSummary extends QueryObject {
             MessageFormat.format(QUERY_STRING, siteId, op), new String[] {
                 "Study", "Clinic", "1 Visit", "2 Visit", "3 Visit", "4 Visit",
                 "5+ Visits", "Total Visits", "Total Patients" });
-        addOption("Start Date", Date.class, new Date(0));
-        addOption("End Date", Date.class, new Date());
+        addOption("Start Date (Processed)", Date.class, new Date(0));
+        addOption("End Date (Processed)", Date.class, new Date());
     }
 
     @Override

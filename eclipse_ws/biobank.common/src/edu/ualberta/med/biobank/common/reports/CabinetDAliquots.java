@@ -22,7 +22,7 @@ public class CabinetDAliquots extends QueryObject {
 
     public CabinetDAliquots(String op, Integer siteId) {
         super(
-            "Displays the total number of cabinet aliquots per study per clinic grouped by date range.",
+            "Displays the total number of cabinet aliquots per study per clinic grouped by link date in a calendar week/month/quarter/year. Note: the top container's name must contain \"Cabinet\".",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Week);
@@ -56,7 +56,7 @@ public class CabinetDAliquots extends QueryObject {
             for (Object ob : results) {
                 Object[] castOb = (Object[]) ob;
                 compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3] + "(" + castOb[2] + ")", castOb[4] });
+                    castOb[3] + "-" + castOb[2], castOb[4] });
             }
         }
         return compressedDates;

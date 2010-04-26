@@ -265,12 +265,6 @@ public class QueryTree extends TreeViewer {
         addClausesForNode(root, whereClauses);
         generateSubClauses(root, whereClauses, fromClauses);
 
-        HashMap<String, String> basicSelects = SearchUtils.getColumnInfo(root
-            .getNodeInfo().getType());
-        basicSelects.putAll(extraSelectClauses);
-        extraSelectClauses = basicSelects;
-        // Random comment
-
         String selectClause = "select ";
         for (String key : extraSelectClauses.keySet()) {
             selectClause += extraSelectClauses.get(key) + ", ";

@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,15 +17,19 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -39,9 +44,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
@@ -76,21 +79,24 @@ import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
 import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.SampleTypePvCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.views.ReportsView;
-import edu.ualberta.med.biobank.widgets.AutoTextWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ReportsEditor extends EditorPart {
+public class ReportsEditor extends BiobankFormBase {
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
@@ -108,11 +114,11 @@ public class ReportsEditor extends EditorPart {
     private Button printButton;
     private Button exportButton;
 
-    private ScrolledComposite sc;
-
     private QueryObject query;
 
     private ReportTreeNode node;
+
+    private IObservableValue statusObservable;
 
     private static Map<Class<?>, int[]> columnWidths;
 
@@ -125,14 +131,15 @@ public class ReportsEditor extends EditorPart {
         aMap.put(FreezerCAliquots.class, new int[] { 100, 100, 100 });
         aMap.put(FreezerDAliquots.class, new int[] { 100, 100, 100, 100 });
         aMap.put(FreezerSAliquots.class, new int[] { 100, 100 });
-        aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100 });
+        aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
         aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
         aMap.put(PsByStudy.class, new int[] { 100, 100, 100 });
         aMap.put(PVsByStudy.class, new int[] { 100, 100, 100 });
         aMap.put(PatientVisitSummary.class, new int[] { 100, 100, 100, 100,
             100, 100, 100, 100, 100 });
-        aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100, 100,
+            100 });
         aMap.put(QACabinetAliquots.class, new int[] { 100, 100, 100, 100, 100,
             100 });
         aMap.put(QAFreezerAliquots.class, new int[] { 100, 100, 100, 100, 100,
@@ -144,6 +151,8 @@ public class ReportsEditor extends EditorPart {
             new int[] { 100, 100, 150, 100 });
         aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(AliquotSCount.class, new int[] { 100, 150, 100 });
+        aMap
+            .put(SampleTypePvCount.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(SampleTypeSUsage.class, new int[] { 150, 100 });
         columnWidths = Collections.unmodifiableMap(aMap);
     }
@@ -223,7 +232,6 @@ public class ReportsEditor extends EditorPart {
                             gd.verticalAlignment = SWT.FILL;
                             reportTable.setLayoutData(gd);
                             top.layout();
-                            updateScrollBars();
                         }
                     });
 
@@ -265,8 +273,15 @@ public class ReportsEditor extends EditorPart {
                 if (((Text) widgetFields.get(i)).getText().compareTo("") == 0)
                     params.add(query.getOptions().get(i).getDefaultValue());
                 else
-                    params.add(Integer.parseInt(((Text) widgetFields.get(i))
-                        .getText()));
+                    try {
+                        params.add(Integer
+                            .parseInt(((Text) widgetFields.get(i)).getText()));
+                    } catch (NumberFormatException e) {
+                        BioBankPlugin
+                            .openAsyncError("Invalid Number Format",
+                                "Please enter a valid number. Searching with default value...");
+                        params.add(query.getOptions().get(i).getDefaultValue());
+                    }
             } else if (widgetFields.get(i) instanceof Combo) {
                 Combo tempCombo = (Combo) widgetFields.get(i);
                 // would rather return a daterange but basic combo (necessary
@@ -296,8 +311,11 @@ public class ReportsEditor extends EditorPart {
                         }
                     }
                 }
-            } else if (widgetFields.get(i) instanceof AutoTextWidget) {
-                params.add(((AutoTextWidget) widgetFields.get(i)).getText());
+            } else if (widgetFields.get(i) instanceof Combo) {
+                params
+                    .add(((Combo) widgetFields.get(i))
+                        .getItem(((Combo) widgetFields.get(i))
+                            .getSelectionIndex()));
             }
         }
         List<Option> queryOptions = query.getOptions();
@@ -451,29 +469,6 @@ public class ReportsEditor extends EditorPart {
     }
 
     @Override
-    public void init(IEditorSite site, IEditorInput input)
-        throws PartInitException {
-        setSite(site);
-        setInput(input);
-
-        reportData = new ArrayList<Object>();
-        node = ((ReportInput) input).node;
-        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
-        String op = "=";
-        if (siteWrap.getName().compareTo("All Sites") == 0)
-            op = "!=";
-        try {
-            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
-                String.class, Integer.class).newInstance(
-                new Object[] { op, siteWrap.getId() });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        this.setPartName(query.getName());
-    }
-
-    @Override
     public boolean isDirty() {
         // TODO Auto-generated method stub
         return false;
@@ -485,29 +480,44 @@ public class ReportsEditor extends EditorPart {
     }
 
     @Override
-    public void createPartControl(Composite parent) {
-        sc = new ScrolledComposite(parent, SWT.V_SCROLL);
-        sc.setLayout(new GridLayout(1, false));
-        sc.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        sc.setExpandHorizontal(true);
-        sc.setExpandVertical(true);
+    public void setFocus() {
+        ReportsView.getTree().setSelection(new StructuredSelection(node));
+    }
 
-        top = new Composite(sc, SWT.NONE);
+    @Override
+    protected void createFormContent() throws Exception {
+        GridLayout formLayout = new GridLayout();
+        formLayout.marginWidth = 0;
+        form.getBody().setLayout(formLayout);
+        top = new Composite(form.getBody(), SWT.BORDER);
         top.setLayout(new GridLayout());
+        GridData topData = new GridData();
+        topData.grabExcessHorizontalSpace = true;
+        topData.grabExcessVerticalSpace = true;
+        topData.horizontalAlignment = SWT.FILL;
+        topData.verticalAlignment = SWT.FILL;
+
+        top.setLayoutData(topData);
 
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         List<Option> queryOptions = query.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
+        Label description = new Label(top, SWT.NONE);
+        description.setText("Description: " + query.getDescription());
+        GridData gd2 = new GridData();
+        gd2.horizontalSpan = 2;
+        description.setLayoutData(gd2);
+
         if (parameterSection != null)
             parameterSection.dispose();
 
         parameterSection = new Composite(top, SWT.NONE);
         GridData pgd = new GridData();
+        GridLayout pgl = new GridLayout(2, false);
         pgd.grabExcessHorizontalSpace = true;
-        pgd.horizontalAlignment = SWT.FILL;
-        parameterSection.setLayout(new GridLayout(2, false));
+        parameterSection.setLayout(pgl);
         parameterSection.setLayoutData(pgd);
 
         buttonSection = new Composite(top, SWT.NONE);
@@ -556,18 +566,14 @@ public class ReportsEditor extends EditorPart {
             }
         });
 
-        Label description = new Label(parameterSection, SWT.NONE);
-        description.setText("Description: " + query.getDescription());
-        GridData gd2 = new GridData();
-        gd2.horizontalSpan = 2;
-        description.setLayoutData(gd2);
-
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
             Label fieldLabel = new Label(parameterSection, SWT.NONE);
             fieldLabel.setText(option.getName() + ":");
             textLabels.add(fieldLabel);
             Widget widget;
+            GridData widgetData = new GridData();
+            widgetData.horizontalAlignment = SWT.FILL;
 
             if (option.getType() == DateGroup.class) {
                 widget = new Combo(parameterSection, SWT.READ_ONLY);
@@ -580,20 +586,70 @@ public class ReportsEditor extends EditorPart {
             else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
                     try {
-                        widget = new AutoTextWidget(parameterSection, SWT.None,
-                            site.getAllSampleTypeCollection(true),
-                            SampleTypeWrapper.class);
+                        Collection<SampleTypeWrapper> sampleTypeWrappers = site
+                            .getAllSampleTypeCollection(true);
+                        ArrayList<String> sampleTypes = new ArrayList<String>();
+                        for (SampleTypeWrapper w : sampleTypeWrappers)
+                            sampleTypes.add(w.getNameShort());
+                        widget = new Combo(parameterSection, SWT.READ_ONLY);
+                        ((Combo) widget).setItems(sampleTypes
+                            .toArray(new String[] {}));
+                        ((Combo) widget).select(0);
+                        ((Combo) widget).setLayoutData(widgetData);
                     } catch (ApplicationException e1) {
-                        widget = new FileBrowser(parameterSection, SWT.NONE);
+                        widget = null;
                     }
-                else
+                else if (option.getName().compareTo("Study") == 0) {
+                    Collection<StudyWrapper> studyWrappers = site
+                        .getStudyCollection(true);
+                    ArrayList<String> studyNames = new ArrayList<String>();
+                    for (StudyWrapper s : studyWrappers)
+                        studyNames.add(s.getNameShort());
+                    widget = new Combo(parameterSection, SWT.READ_ONLY);
+                    ((Combo) widget).setItems(studyNames
+                        .toArray(new String[] {}));
+                    ((Combo) widget).select(0);
+                    ((Combo) widget).setLayoutData(widgetData);
+                } else
                     widget = new FileBrowser(parameterSection, SWT.NONE);
             } else if (option.getType() == Integer.class) {
-                widget = new Text(parameterSection, SWT.BORDER);
+                IObservableValue numAliquots = new WritableValue("",
+                    String.class);
+                widget = widgetCreator.createBoundWidget(parameterSection,
+                    Text.class, SWT.BORDER, fieldLabel, new String[0],
+                    numAliquots, new IntegerNumberValidator(
+                        "Enter a valid integer.", false));
+                ((Text) widget).setLayoutData(widgetData);
+            } else if (option.getType() == Double.class) {
+                IObservableValue numAliquots = new WritableValue("",
+                    String.class);
+                widget = widgetCreator.createBoundWidget(parameterSection,
+                    Text.class, SWT.BORDER, fieldLabel, new String[0],
+                    numAliquots, new DoubleNumberValidator(
+                        "Enter a valid integer.", false));
+                ((Text) widget).setText("0");
             } else
                 widget = null;
             widgetFields.add(widget);
         }
+
+        statusObservable = new WritableValue();
+        statusObservable.addChangeListener(new IChangeListener() {
+            public void handleChange(ChangeEvent event) {
+                IObservableValue validationStatus = (IObservableValue) event
+                    .getSource();
+                handleStatusChanged((IStatus) validationStatus.getValue());
+            }
+
+            private void handleStatusChanged(IStatus status) {
+                if (status.getSeverity() == IStatus.OK)
+                    generateButton.setEnabled(true);
+                else
+                    generateButton.setEnabled(false);
+            }
+        });
+
+        widgetCreator.addGlobalBindValue(statusObservable);
 
         // update parents
         createEmptyReportTable();
@@ -601,18 +657,37 @@ public class ReportsEditor extends EditorPart {
         top.layout(true, true);
 
         top.layout();
-        sc.setContent(top);
-        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-    }
-
-    public void updateScrollBars() {
-        sc.layout(true, true);
-        sc.setMinSize(top.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     @Override
-    public void setFocus() {
-        ReportsView.getTree().setSelection(new StructuredSelection(node));
+    public void init(IEditorSite editorSite, IEditorInput input) {
+        setSite(editorSite);
+        setInput(input);
+        try {
+            init();
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Unable to open report.", e);
+        }
+    }
+
+    @Override
+    protected void init() throws Exception {
+        widgetCreator.initDataBinding();
+
+        reportData = new ArrayList<Object>();
+        node = ((ReportInput) getEditorInput()).node;
+        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
+        String op = "=";
+        if (siteWrap.getName().compareTo("All Sites") == 0)
+            op = "!=";
+        try {
+            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
+                String.class, Integer.class).newInstance(
+                new Object[] { op, siteWrap.getId() });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.setPartName(query.getName());
     }
 }
