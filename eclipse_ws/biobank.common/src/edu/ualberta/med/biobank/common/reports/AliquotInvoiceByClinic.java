@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 
@@ -13,7 +14,7 @@ public class AliquotInvoiceByClinic extends QueryObject {
         + "Alias.patientVisit.patient.pnumber, "
         + "Alias.linkDate, Alias.sampleType.name  from "
         + Aliquot.class.getName()
-        + " as Alias where Alias.aliquotPosition.container.label not like 'SS%' and Alias.linkDate > ? and Alias.linkDate < ? and "
+        + " as Alias where Alias.aliquotPosition.container.label not like ? and Alias.linkDate > ? and Alias.linkDate < ? and "
         + "Alias.patientVisit.patient.study.site.id {1} {0,number,#} ORDER BY "
         + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
 
@@ -24,6 +25,12 @@ public class AliquotInvoiceByClinic extends QueryObject {
                 "Clinic", "Patient Number", "Link Date", "Sample Type" });
         addOption("Start Date (Linked)", Date.class, new Date(0));
         addOption("End Date (Linked)", Date.class, new Date());
+    }
+
+    @Override
+    public List<Object> preProcess(List<Object> params) {
+        params.add(0, "SS%");
+        return params;
     }
 
     @Override
