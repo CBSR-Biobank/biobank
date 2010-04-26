@@ -41,46 +41,56 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String SITE_ADMIN_PG_ID = "11";
 
+    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
+
+    private static final String CREATE_PRIVILEGE = "CREATE";
+
+    private static final String DELETE_PRIVILEGE = "DELETE";
+
+    private static final String UPDATE_PRIVILEGE = "UPDATE";
+
+    private static final String READ_PRIVILEGE = "READ";
+
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
     }
 
     @Override
     public boolean canReadObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, "READ");
+        return hasPrivilege(clazz, null, READ_PRIVILEGE);
     }
 
     @Override
     public boolean canReadObject(Class<?> clazz, Integer id)
         throws ApplicationException {
-        return hasPrivilege(clazz, id, "READ");
+        return hasPrivilege(clazz, id, READ_PRIVILEGE);
     }
 
     @Override
     public boolean canCreateObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, "CREATE");
+        return hasPrivilege(clazz, null, CREATE_PRIVILEGE);
     }
 
     @Override
     public boolean canDeleteObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, "DELETE");
+        return hasPrivilege(clazz, null, DELETE_PRIVILEGE);
     }
 
     @Override
     public boolean canDeleteObject(Class<?> clazz, Integer id)
         throws ApplicationException {
-        return hasPrivilege(clazz, id, "CREATE");
+        return hasPrivilege(clazz, id, DELETE_PRIVILEGE);
     }
 
     @Override
     public boolean canUpdateObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, "UPDATE");
+        return hasPrivilege(clazz, null, UPDATE_PRIVILEGE);
     }
 
     @Override
     public boolean canUpdateObject(Class<?> clazz, Integer id)
         throws ApplicationException {
-        return hasPrivilege(clazz, id, "UPDATE");
+        return hasPrivilege(clazz, id, UPDATE_PRIVILEGE);
     }
 
     @Override
@@ -97,6 +107,19 @@ public class BiobankApplicationServiceImpl extends
             }
             return am.checkPermission(userLogin, clazz.getName(), "id", id
                 .toString(), privilegeName);
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    public boolean isContainerAdministrator() throws ApplicationException {
+        try {
+            String userLogin = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+            AuthorizationManager am = SecurityServiceProvider
+                .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
+            return am.checkPermission(userLogin,
+                CONTAINER_ADMINISTRATION_STRING, "CREATE");
         } catch (Exception e) {
             throw new ApplicationException(e);
         }

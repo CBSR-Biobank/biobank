@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SecurityHelper {
@@ -86,6 +87,17 @@ public class SecurityHelper {
         } catch (Exception e) {
             LOGGER.error("Error testing security authorization on "
                 + modelWrapperType.getName(), e);
+            return false;
+        }
+    }
+
+    public static boolean isContainerAdministrator(
+        WritableApplicationService appService) {
+        try {
+            return ((BiobankApplicationService) appService)
+                .isContainerAdministrator();
+        } catch (ApplicationException e) {
+            LOGGER.error("Error testing security isContainerAdministrator");
             return false;
         }
     }
