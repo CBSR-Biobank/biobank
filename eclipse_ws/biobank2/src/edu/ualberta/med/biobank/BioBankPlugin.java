@@ -100,31 +100,44 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_EMAIL_BANNER = "emailBanner";
     public static final String IMG_SEARCH = "search";
     public static final String IMG_TODAY = "today";
+    public static final String IMG_CALENDAR = "calendar";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
     //
-    private Map<String, String> classToImageKey = new HashMap<String, String>() {
-        private static final long serialVersionUID = 1L;
-        {
-            put(SessionAdapter.class.getName(), BioBankPlugin.IMG_SESSIONS);
-            put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
-            put(ClinicGroup.class.getName(), BioBankPlugin.IMG_CLINICS);
-            put(StudyGroup.class.getName(), BioBankPlugin.IMG_STUDIES);
-            put(ContainerTypeGroup.class.getName(),
-                BioBankPlugin.IMG_CONTAINER_TYPES);
-            put(ContainerGroup.class.getName(), BioBankPlugin.IMG_CONTAINERS);
-            put(ClinicAdapter.class.getName(), BioBankPlugin.IMG_CLINIC);
-            put(StudyAdapter.class.getName(), BioBankPlugin.IMG_STUDY);
-            put(PatientAdapter.class.getName(), BioBankPlugin.IMG_PATIENT);
-            put(PatientVisitAdapter.class.getName(),
-                BioBankPlugin.IMG_PATIENT_VISIT);
-            put(ShipmentAdapter.class.getName(), BioBankPlugin.IMG_SHIPMENT);
-            put(PatientSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
-            put(PatientTodayNode.class.getName(), BioBankPlugin.IMG_TODAY);
-            put(ShipmentSearchedNode.class.getName(), BioBankPlugin.IMG_SEARCH);
-            put(ShipmentTodayNode.class.getName(), BioBankPlugin.IMG_TODAY);
-        }
+    private static Map<String, String> classToImageKey;
+    static {
+        classToImageKey = new HashMap<String, String>();
+        classToImageKey.put(SessionAdapter.class.getName(),
+            BioBankPlugin.IMG_SESSIONS);
+        classToImageKey
+            .put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
+        classToImageKey.put(ClinicGroup.class.getName(),
+            BioBankPlugin.IMG_CLINICS);
+        classToImageKey.put(StudyGroup.class.getName(),
+            BioBankPlugin.IMG_STUDIES);
+        classToImageKey.put(ContainerTypeGroup.class.getName(),
+            BioBankPlugin.IMG_CONTAINER_TYPES);
+        classToImageKey.put(ContainerGroup.class.getName(),
+            BioBankPlugin.IMG_CONTAINERS);
+        classToImageKey.put(ClinicAdapter.class.getName(),
+            BioBankPlugin.IMG_CLINIC);
+        classToImageKey.put(StudyAdapter.class.getName(),
+            BioBankPlugin.IMG_STUDY);
+        classToImageKey.put(PatientAdapter.class.getName(),
+            BioBankPlugin.IMG_PATIENT);
+        classToImageKey.put(PatientVisitAdapter.class.getName(),
+            BioBankPlugin.IMG_PATIENT_VISIT);
+        classToImageKey.put(ShipmentAdapter.class.getName(),
+            BioBankPlugin.IMG_SHIPMENT);
+        classToImageKey.put(PatientSearchedNode.class.getName(),
+            BioBankPlugin.IMG_SEARCH);
+        classToImageKey.put(PatientTodayNode.class.getName(),
+            BioBankPlugin.IMG_TODAY);
+        classToImageKey.put(ShipmentSearchedNode.class.getName(),
+            BioBankPlugin.IMG_SEARCH);
+        classToImageKey.put(ShipmentTodayNode.class.getName(),
+            BioBankPlugin.IMG_TODAY);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
@@ -177,6 +190,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_CABINET, "cabinet.png");
         registerImage(registry, IMG_CABINET_LINK_ASSIGN,
             "cabinetLinkAssign.png");
+        registerImage(registry, IMG_CALENDAR, "calendar.png");
         registerImage(registry, IMG_CANCEL_FORM, "cancel.png");
         registerImage(registry, IMG_CLINIC, "clinic.png");
         registerImage(registry, IMG_CLINICS, "clinics.png");

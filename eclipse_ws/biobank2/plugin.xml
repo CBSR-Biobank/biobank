@@ -136,6 +136,10 @@
       		name="Edit Sample Types">
       		</command>
       <command
+            id="edu.ualberta.med.biobank.commands.editSourceVessels"
+            name="Edit Source Vessels">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.reports"
             name="Reports">
       </command>
@@ -227,24 +231,12 @@
             name="Print">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.scanner.decodePlate1"
-            name="Decode Plate 1">
+            id="edu.ualberta.med.biobank.commands.scanner.decodePlate"
+            name="Decode Plate">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.scanner.decodePlate2"
-            name="Decode Plate 2">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.scanner.decodePlate3"
-            name="Decode Plate 3">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.scanner.decodePlate4"
-            name="Decode Plate 4">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.scanner.decodePlate5"
-            name="Decode Plate 5">
+            id="edu.ualberta.med.biobank.commands.scanner.scanPlate"
+            name="Scan Plate">
       </command>
    </extension>
    <extension
@@ -352,6 +344,15 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditSourceVesselsHandler"
+            commandId="edu.ualberta.med.biobank.commands.editSourceVessels">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -709,47 +710,20 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DecodePlate1Handler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate1">
+            class="edu.ualberta.med.biobank.handlers.DecodePlateHandler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate1Enabled">
+                  definitionId="scannerConfigPlugin.platesEnabled">
             </reference>
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DecodePlate2Handler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate2">
+            class="edu.ualberta.med.biobank.handlers.ScanPlateHandler"
+            commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate">
          <activeWhen>
             <reference
-                  definitionId="biobank2.plate2Enabled">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.DecodePlate3Handler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate3">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.plate3Enabled">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.DecodePlate4Handler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate4">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.plate4Enabled">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.DecodePlate5Handler"
-            commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate5">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.plate5Enabled">
+                  definitionId="scannerConfigPlugin.platesEnabled">
             </reference>
          </activeWhen>
       </handler>
@@ -829,6 +803,12 @@
                      label="Edit Sample Types"
                      style="push">
                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.editSourceVessels"
+                      id="edu.ualberta.med.biobank.menu.editSourceVessels"
+                      label="Edit Source Vessels"
+                      style="push">
+                </command>
                <visibleWhen
                      checkEnabled="false">
                   <reference
@@ -1001,33 +981,15 @@
                id="edu.ualberta.med.biobank.menu.scanner"
                label="Scanner">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate1"
-                  id="edu.ualberta.med.biobank.menu.scanner.decodePlate1"
-                  label="Decode Plate 1"
+                  commandId="edu.ualberta.med.biobank.commands.scanner.scanPlate"
+                  id="edu.ualberta.med.biobank.menu.scanner.scanPlate"
+                  label="Scan Plate"
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate2"
-                  id="edu.ualberta.med.biobank.menu.scanner.decodePlate2"
-                  label="Decode Plate 2"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate3"
-                  id="edu.ualberta.med.biobank.menu.scanner.decodePlate3"
-                  label="Decode Plate 3"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate4"
-                  id="edu.ualberta.med.biobank.menu.scanner.decodePlate4"
-                  label="Decode Plate 4"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate5"
-                  id="edu.ualberta.med.biobank.menu.scanner.decodePlate5"
-                  label="Decode Plate 5"
+                  commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate"
+                  id="edu.ualberta.med.biobank.menu.scanner.decodePlate"
+                  label="Decode Plate"
                   style="push">
             </command>
          </menu>
@@ -1750,6 +1712,26 @@
             id="edu.ualberta.med.biobank.editors.AdvancedReportsEditor"
             name="Advanced Reports Editor">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.DecodePlateForm"
+            default="false"
+            icon="icons/scanLink.png"
+            id="edu.ualberta.med.biobank.forms.DecodePlateForm"
+            name="Decode Plate">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ScanPlateForm"
+            default="false"
+            icon="icons/scanLink.png"
+            id="edu.ualberta.med.biobank.forms.ScanPlateForm"
+            name="Scan Plate">
+            </editor>
+       <editor
+            class="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
+            name="Source Vessel Entry">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -1903,29 +1885,6 @@
             provider="edu.ualberta.med.biobank.sourceproviders.SiteSelectionState">
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.siteSelectionId"
-               priorityLevel="workbench">
-         </variable>
-      </sourceProvider>
-      <sourceProvider
-            provider="edu.ualberta.med.biobank.sourceproviders.PlateEnabledState">
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate1Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate2Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate3Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate4Enabled"
-               priorityLevel="workbench">
-         </variable>
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.plate5Enabled"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
@@ -2089,31 +2048,6 @@
                </equals>
             </or>
                      </with>
-      </definition>
-      <definition id="biobank2.plate1Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate1Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate2Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate2Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate3Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate3Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate4Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate4Enabled">
-            <equals value="true" />
-         </with>
-      </definition>
-      <definition id="biobank2.plate5Enabled">
-         <with variable="edu.ualberta.med.biobank.sourceprovider.plate5Enabled">
-            <equals value="true" />
-         </with>
       </definition>
    </extension>
    <extension

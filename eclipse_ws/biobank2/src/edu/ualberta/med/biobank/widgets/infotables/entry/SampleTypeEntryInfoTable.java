@@ -92,6 +92,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 addedOrModifiedSampleTypes.add(sampleType);
                 notifyListeners();
                 return true;
+            } else {
+                SampleTypeWrapper orig = dlg.getOrigSampleType();
+                sampleType.setName(orig.getName());
+                sampleType.setNameShort(orig.getNameShort());
+                reloadCollection(selectedSampleTypes);
             }
         }
         return false;

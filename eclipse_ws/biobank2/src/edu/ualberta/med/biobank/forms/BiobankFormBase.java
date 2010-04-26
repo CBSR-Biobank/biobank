@@ -113,7 +113,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
     @Override
     public void setFocus() {
-        if (adapter.getId() != null) {
+        if ((adapter != null) && (adapter.getId() != null)) {
             SessionManager.setSelectedNode(adapter);
             // if selection fails, then the adapter needs to be matched at the
             // id level
@@ -149,14 +149,19 @@ public abstract class BiobankFormBase extends EditorPart {
         FormInput formInput = (FormInput) input;
         setSite(editorSite);
         setInput(input);
-        adapter = formInput.getNode();
-        Assert.isNotNull(adapter, "Bad editor input (null value)");
-        appService = adapter.getAppService();
-        if (!formInput.hasPreviousForm()) {
-            currentLinkedForms = new ArrayList<BiobankFormBase>();
+
+        adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
+        if (adapter != null) {
+            adapter = formInput.getNode();
+            Assert.isNotNull(adapter, "Bad editor input (null value)");
+            appService = adapter.getAppService();
+            if (!formInput.hasPreviousForm()) {
+                currentLinkedForms = new ArrayList<BiobankFormBase>();
+            }
+            linkedForms = currentLinkedForms;
+            linkedForms.add(this);
         }
-        linkedForms = currentLinkedForms;
-        linkedForms.add(this);
+
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
@@ -324,7 +329,9 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     public void setDeactivated() {
-        linkedForms.remove(this);
+        if (linkedForms != null) {
+            linkedForms.remove(this);
+        }
     }
 
 }

@@ -1,25 +1,32 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
+import org.eclipse.nebula.widgets.cdatetime.CDT;
+import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-//import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.BioBankPlugin;
 
 /**
  * Wrapper around Nebula's CDateTime widget.
@@ -34,11 +41,13 @@ import org.eclipse.ui.PlatformUI;
  */
 public class DateTimeWidget extends BiobankWidget {
 
-    private DateTime dateEntry;
+    private CDateTime dateEntry;
 
     private Button dateButton;
 
     private DateTime timeEntry;
+
+    private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
 
     /**
      * Show date and time widget
@@ -63,80 +72,102 @@ public class DateTimeWidget extends BiobankWidget {
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         if (typeShown != SWT.TIME) {
-            dateEntry = new DateTime(this, SWT.BORDER);
+            dateEntry = new CDateTime(this, CDT.BORDER);
+            dateEntry.setPattern("yyyy-MM-dd");
             Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
             GridData gd = new GridData();
             gd.widthHint = size.x + 10;
+            gd.heightHint = size.y;
             dateEntry.setLayoutData(gd);
 
             dateButton = new Button(this, SWT.NONE);
-            dateButton.setText("calendar");
-            dateButton.addSelectionListener(new SelectionAdapter() {
+            dateButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+                .get(BioBankPlugin.IMG_CALENDAR));
+            dateButton.addMouseListener(new MouseAdapter() {
+
                 @Override
-                public void widgetSelected(SelectionEvent e) {
+                public void mouseUp(MouseEvent e) {
                     final Shell dialog = new Shell(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM);
                     dialog.setLayout(new GridLayout(3, false));
 
                     final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
                         | SWT.BORDER);
-
-                    new Label(dialog, SWT.NONE);
-                    Button ok = new Button(dialog, SWT.PUSH);
-                    ok.setText("OK");
-                    ok.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                        false));
-                    ok.addSelectionListener(new SelectionAdapter() {
+                    if (dateEntry.getSelection() != null) {
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(dateEntry.getSelection());
+                        calendar.setDate(c.get(Calendar.YEAR), c
+                            .get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+                    }
+                    new Label(dialog, SWT.BORDER);
+                    calendar.addMouseListener(new MouseAdapter() {
                         @Override
-                        public void widgetSelected(SelectionEvent e) {
+                        public void mouseDoubleClick(MouseEvent e) {
+                            // not perfect... a double click can close widget
+                            // even
+                            // if its on a month or year (or on nothing at all)
+                            Calendar c = Calendar.getInstance();
+                            c.set(Calendar.DAY_OF_MONTH, calendar.getDay());
+                            c.set(Calendar.MONTH, calendar.getMonth());
+                            c.set(Calendar.YEAR, calendar.getYear());
+                            dateEntry.setSelection(c.getTime());
+                            fireModifyListeners();
                             dialog.close();
                         }
                     });
-                    dialog.setDefaultButton(ok);
                     dialog.pack();
                     dialog.open();
 
+                }
+
+            });
+
+            dateEntry.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    fireModifyListeners();
                 }
             });
         }
         if (typeShown != SWT.DATE) {
             timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
             timeEntry.setTime(0, 0, 0);
+            timeEntry.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    fireModifyListeners();
+                }
+            });
         }
         if (date != null) {
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(date);
-
-            if (typeShown != SWT.TIME) {
-                dateEntry.setDate(cal.get(Calendar.YEAR), cal
-                    .get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-            }
-            if (typeShown != SWT.DATE) {
-                timeEntry.setTime(cal.get(Calendar.HOUR), cal
-                    .get(Calendar.MINUTE), cal.get(Calendar.SECOND));
-            }
+            setDate(date);
         }
     }
 
     public String getText() {
-        return null;
+        return getDate().toString();
     }
 
     public Date getDate() {
         Calendar cal = new GregorianCalendar();
-        if (dateEntry != null) {
-            cal.set(Calendar.YEAR, dateEntry.getYear());
-            cal.set(Calendar.MONTH, dateEntry.getMonth());
-            cal.set(Calendar.DAY_OF_MONTH, dateEntry.getDay());
-        }
-        if (timeEntry == null) {
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
+        if (dateEntry == null) {
+            // can modify only time
+            if (timeEntry != null) {
+                cal.set(Calendar.HOUR_OF_DAY, timeEntry.getHours());
+                cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+                return cal.getTime();
+            }
         } else {
-            cal.set(Calendar.HOUR, timeEntry.getHours());
-            cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+            if (dateEntry.getSelection() != null) {
+                cal.setTime(dateEntry.getSelection());
+                if (timeEntry != null) {
+                    cal.set(Calendar.HOUR_OF_DAY, timeEntry.getHours());
+                    cal.set(Calendar.MINUTE, timeEntry.getMinutes());
+                }
+                return cal.getTime();
+            }
         }
-        return cal.getTime();
+        return null;
     }
 
     public void setDate(Date date) {
@@ -155,46 +186,36 @@ public class DateTimeWidget extends BiobankWidget {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.AM_PM, Calendar.AM);
         if (dateEntry != null) {
-            dateEntry.setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH));
+            dateEntry.setSelection(date);
         }
     }
 
-    public void addSelectionListener(SelectionListener listener) {
-        if (dateEntry != null) {
-            dateEntry.addSelectionListener(listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.addSelectionListener(listener);
+    public void addModifyListener(ModifyListener modifyListener) {
+        modifyListeners.add(modifyListener);
+    }
+
+    protected void fireModifyListeners() {
+        Event event = new Event();
+        event.type = SWT.Modify;
+        event.widget = this;
+        ModifyEvent modifyEvent = new ModifyEvent(event);
+        for (ModifyListener listener : modifyListeners) {
+            listener.modifyText(modifyEvent);
         }
     }
 
-    public void removeSelectionListener(SelectionListener listener) {
-        if (dateEntry != null) {
-            dateEntry.removeSelectionListener(listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.removeSelectionListener(listener);
-        }
-    }
-
-    @Override
-    public void addListener(int eventType, Listener listener) {
-        if (dateEntry != null) {
-            dateEntry.addListener(eventType, listener);
-        }
-        if (timeEntry != null) {
-            timeEntry.addListener(eventType, listener);
-        }
+    public void removeModifyListener(ModifyListener listener) {
+        modifyListeners.remove(listener);
     }
 
     @Override
-    public void removeListener(int eventType, Listener listener) {
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
         if (dateEntry != null) {
-            dateEntry.removeListener(eventType, listener);
+            dateEntry.setEnabled(enabled);
         }
         if (timeEntry != null) {
-            timeEntry.removeListener(eventType, listener);
+            timeEntry.setEnabled(enabled);
         }
     }
 }

@@ -6,12 +6,13 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Configuration {
+    private boolean checkContainerConfig;
     private boolean importPatients;
     private boolean importShipments;
     private boolean importPatientVisits;
     private Map<Integer, String> importCabinets;
     private Map<Integer, String> importFreezers;
-    private boolean importDewar;
+    private boolean importScanAssigned;
 
     Configuration(String configFilename) throws Exception {
         importPatients = false;
@@ -19,7 +20,7 @@ public class Configuration {
         importPatientVisits = false;
         importCabinets = new HashMap<Integer, String>();
         importFreezers = new HashMap<Integer, String>();
-        importDewar = false;
+        importScanAssigned = false;
 
         Properties configProps = new Properties();
         InputStream in = Thread.currentThread().getContextClassLoader()
@@ -27,6 +28,11 @@ public class Configuration {
         configProps.load(in);
 
         String property;
+
+        property = configProps.getProperty("cbsr.check.container_config");
+        if (property != null) {
+            checkContainerConfig = property.equals("yes");
+        }
 
         property = configProps.getProperty("cbsr.import.patients");
         if (property != null) {
@@ -58,15 +64,14 @@ public class Configuration {
             }
         }
 
-        property = configProps.getProperty("cbsr.import.dewar");
+        property = configProps.getProperty("cbsr.import.scan_assigned");
         if (property != null) {
-            if ((importCabinets.size() > 0) || (importFreezers.size() > 0)) {
-                throw new Exception("cannot import dewar samples at the same "
-                    + "time as import freezer and cabinet samples");
-            }
-
-            importDewar = property.equals("yes");
+            importScanAssigned = property.equals("yes");
         }
+    }
+
+    public boolean checkContainerConfig() {
+        return checkContainerConfig;
     }
 
     public boolean importPatients() {
@@ -155,8 +160,8 @@ public class Configuration {
             .subSequence(2, 4)));
     }
 
-    public boolean importDewar() {
-        return importDewar;
+    public boolean importScanLinked() {
+        return importScanAssigned;
     }
 
 }

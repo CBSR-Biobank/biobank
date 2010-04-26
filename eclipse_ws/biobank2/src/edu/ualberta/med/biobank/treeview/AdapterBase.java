@@ -321,9 +321,7 @@ public abstract class AdapterBase {
     }
 
     public void performDoubleClick() {
-        if (modelObject != null) {
-            executeDoubleClick();
-        }
+        executeDoubleClick();
     }
 
     public void performExpand() {

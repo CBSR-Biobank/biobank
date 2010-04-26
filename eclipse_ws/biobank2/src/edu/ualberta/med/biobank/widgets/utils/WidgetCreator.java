@@ -28,6 +28,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -212,6 +214,16 @@ public class WidgetCreator {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         if ((widgetOptions & SWT.MULTI) != 0) {
             gd.heightHint = 40;
+            text.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.keyCode == 9) { // TAB
+                        ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
+                        // cancel default tab behaviour of the text
+                        e.doit = false;
+                    }
+                }
+            });
         }
         text.setLayoutData(gd);
         if (keyListener != null) {
@@ -320,10 +332,17 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage, int typeShown) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
+        return createDateTimeWidget(client, label, date, modelObservableValue,
+            emptyMessage, typeShown);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, int typeShown) {
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
             date, typeShown);
         if (selectionListener != null) {
-            widget.addSelectionListener(selectionListener);
+            widget.addModifyListener(modifyListener);
         }
         if (toolkit != null) {
             widget.adaptToToolkit(toolkit, true);

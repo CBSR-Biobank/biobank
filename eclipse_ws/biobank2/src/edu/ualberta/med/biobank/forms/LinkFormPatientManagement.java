@@ -7,7 +7,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -67,16 +66,20 @@ public class LinkFormPatientManagement {
                 if (patientNumberTextModified) {
                     setPatientSelected();
                     if (patientTextCallback != null) {
-                        patientTextCallback.callback();
+                        patientTextCallback.focusLost();
                     }
                 }
                 patientNumberTextModified = false;
+                viewerVisits.getCombo().setFocus();
             }
         });
         patientNumberText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 patientNumberTextModified = true;
+                if (patientTextCallback != null) {
+                    patientTextCallback.textModified();
+                }
             }
         });
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -95,14 +98,6 @@ public class LinkFormPatientManagement {
         gridData.horizontalAlignment = SWT.FILL;
         viewerVisits.getCombo().setLayoutData(gridData);
 
-        viewerVisits.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                PatientVisitWrapper pv = (PatientVisitWrapper) element;
-                return pv.getFormattedDateProcessed() + " - " //$NON-NLS-1$
-                    + pv.getShipment().getWaybill();
-            }
-        });
         viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -115,7 +110,6 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-
         visitsListCheck = aliquotAdminForm.toolkit.createButton(
             compositeFields, "Last 7 days", SWT.CHECK);
         visitsListCheck.setSelection(true);
@@ -232,6 +226,8 @@ public class LinkFormPatientManagement {
     }
 
     protected static interface PatientTextCallback {
-        public void callback();
+        public void focusLost();
+
+        public void textModified();
     }
 }

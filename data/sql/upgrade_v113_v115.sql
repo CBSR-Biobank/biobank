@@ -98,7 +98,7 @@ CREATE TABLE study_source_vessel (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO study_source_vessel (study_id, source_vessel_id)
-SELECT study_id, study_id FROM tmp_study_source_vessel;
+SELECT study_id, source_vessel_id FROM tmp_study_source_vessel;
 
 DROP TABLE tmp_study_source_vessel;
 
