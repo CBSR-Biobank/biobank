@@ -1713,6 +1713,12 @@
             name="Advanced Reports Editor">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
+            name="Source Vessel Entry">
+            </editor>
+		<editor
             class="edu.ualberta.med.biobank.forms.DecodePlateForm"
             default="false"
             icon="icons/scanLink.png"
@@ -1725,12 +1731,6 @@
             icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.ScanPlateForm"
             name="Scan Plate">
-            </editor>
-       <editor
-            class="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
-            default="false"
-            id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
-            name="Source Vessel Entry">
       </editor>
    </extension>
    <extension

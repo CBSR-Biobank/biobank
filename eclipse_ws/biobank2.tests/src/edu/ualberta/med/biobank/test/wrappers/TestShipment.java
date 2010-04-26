@@ -393,6 +393,33 @@ public class TestShipment extends TestDatabase {
     }
 
     @Test
+    public void testPersistFailNoNeedWaybill() throws Exception {
+        String name = "testPersistFailNoNeedWaybill" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.newClinic(site, name);
+        clinic.setSendsShipments(false);
+        clinic.persist();
+        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic,
+            TestCommon.getNewWaybill(r), Utils.getRandomDate(), patient);
+
+        try {
+            shipment.persist();
+            Assert.fail("shipment should not have a waybill");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        // should not have any waybill
+        shipment.setWaybill(null);
+        shipment.persist();
+    }
+
+    @Test
     public void testPersistFailWaybillExists() throws Exception {
         String name = "testPersistFailWaybillExists" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);

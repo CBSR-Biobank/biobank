@@ -89,6 +89,7 @@ public class AdvancedReportsEditor extends EditorPart {
 
     private QueryTree tree;
     private QueryTreeNode selectedNode;
+    private HashMap<String, String> checked;
 
     @Override
     public void init(IEditorSite site, IEditorInput input)
@@ -97,6 +98,8 @@ public class AdvancedReportsEditor extends EditorPart {
         setInput(input);
 
         node = ((ReportInput) input).node;
+        checked = SearchUtils.getColumnInfo(((QueryTreeNode) node.getQuery())
+            .getNodeInfo().getType());
 
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
@@ -299,6 +302,11 @@ public class AdvancedReportsEditor extends EditorPart {
             if (field.getValue() != null)
                 ((Text) widget)
                     .setText(((Integer) field.getValue()).toString());
+        } else if (field.getType() == Double.class) {
+            widget = new Text(parameterSection, SWT.BORDER);
+            ((Text) widget).setLayoutData(wgd);
+            if (field.getValue() != null)
+                ((Text) widget).setText(((Double) field.getValue()).toString());
         } else
             widget = null;
 
@@ -320,7 +328,8 @@ public class AdvancedReportsEditor extends EditorPart {
         final Button box = new Button(parameterSection, SWT.CHECK);
         box.setText("Include in results");
         includedFields.add(box);
-
+        if (checked.containsValue(field.getPath() + field.getFname()))
+            box.setSelection(true);
     }
 
     private void generate() {
@@ -491,6 +500,16 @@ public class AdvancedReportsEditor extends EditorPart {
                     Integer val;
                     try {
                         val = Integer.parseInt(((Text) widgetFields.get(i))
+                            .getText());
+                    } catch (NumberFormatException e) {
+                        val = null;
+                    }
+                    fields.get(i).setValue(val);
+                    fields.get(i).setOperator(operatorFields.get(i).getText());
+                } else if (fields.get(i).getType() == Double.class) {
+                    Double val;
+                    try {
+                        val = Double.parseDouble(((Text) widgetFields.get(i))
                             .getText());
                     } catch (NumberFormatException e) {
                         val = null;

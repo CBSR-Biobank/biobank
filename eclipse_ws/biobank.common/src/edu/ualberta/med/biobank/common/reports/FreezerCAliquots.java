@@ -11,11 +11,11 @@ public class FreezerCAliquots extends QueryObject {
 
     public FreezerCAliquots(String op, Integer siteId) {
         super(
-            "Displays the total number of freezer aliquots per study per clinic.",
+            "Displays the total number of freezer aliquots per study per clinic. Note: the top container's name must contain \"Freezer\".",
             "select aliquot.patientVisit.patient.study.nameShort, "
                 + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.aliquotPosition.container.id "
+                + " as aliquot where aliquot.aliquotPosition.container.label not like 'SS%' and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
                 + ContainerPath.class.getName()
                 + " as path1, "

@@ -14,13 +14,13 @@ public class QACabinetAliquots extends QueryObject {
 
     public QACabinetAliquots(String op, Integer siteId) {
         super(
-            "Retrieves a list of aliquots, at random, within a date range, by sample type.",
+            "Retrieves a list of aliquots, at random, within a date range, by sample type.  Note: the number of aliquots must be specified, and the top container's name must contain \"Cabinet\".",
             "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
                 + Aliquot.class.getName()
                 + " as aliquot where aliquot.patientVisit.dateProcessed "
-                + "between ? and ? and aliquot.sampleType.name like ?"
+                + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"
                 + " and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
                 + ContainerPath.class.getName()
@@ -30,8 +30,8 @@ public class QACabinetAliquots extends QueryObject {
                 + op + siteId + " ORDER BY RAND()", new String[] { "Label",
                 "Inventory ID", "Patient", "Visit", "Date Processed",
                 "Sample Type" });
-        addOption("Start Date", Date.class, new Date(0));
-        addOption("End Date", Date.class, new Date());
+        addOption("Start Date (Processed)", Date.class, new Date(0));
+        addOption("End Date (Processed)", Date.class, new Date());
         addOption("Sample Type", String.class, "");
         addOption("# Aliquots", Integer.class, 0);
     }
