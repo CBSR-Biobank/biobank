@@ -17,10 +17,13 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -114,6 +117,8 @@ public class ReportsEditor extends BiobankFormBase {
     private QueryObject query;
 
     private ReportTreeNode node;
+
+    private IObservableValue statusObservable;
 
     private static Map<Class<?>, int[]> columnWidths;
 
@@ -610,24 +615,41 @@ public class ReportsEditor extends BiobankFormBase {
             } else if (option.getType() == Integer.class) {
                 IObservableValue numAliquots = new WritableValue("",
                     String.class);
-                widget = widgetCreator.createBoundWidgetWithLabel(
-                    parameterSection, Text.class, SWT.BORDER, "# Aliquots",
-                    new String[0], numAliquots, new IntegerNumberValidator(
-                        "Enter a valid integer."));
+                widget = widgetCreator.createBoundWidget(parameterSection,
+                    Text.class, SWT.BORDER, fieldLabel, new String[0],
+                    numAliquots, new IntegerNumberValidator(
+                        "Enter a valid integer.", false));
                 ((Text) widget).setLayoutData(widgetData);
             } else if (option.getType() == Double.class) {
                 IObservableValue numAliquots = new WritableValue("",
                     String.class);
-                widget = widgetCreator.createBoundWidgetWithLabel(
-                    parameterSection, Text.class, SWT.BORDER, "# Aliquots",
-                    new String[0], numAliquots, new DoubleNumberValidator(
-                        "Enter a valid integer."));
+                widget = widgetCreator.createBoundWidget(parameterSection,
+                    Text.class, SWT.BORDER, fieldLabel, new String[0],
+                    numAliquots, new DoubleNumberValidator(
+                        "Enter a valid integer.", false));
                 ((Text) widget).setText("0");
-
             } else
                 widget = null;
             widgetFields.add(widget);
         }
+
+        statusObservable = new WritableValue();
+        statusObservable.addChangeListener(new IChangeListener() {
+            public void handleChange(ChangeEvent event) {
+                IObservableValue validationStatus = (IObservableValue) event
+                    .getSource();
+                handleStatusChanged((IStatus) validationStatus.getValue());
+            }
+
+            private void handleStatusChanged(IStatus status) {
+                if (status.getSeverity() == IStatus.OK)
+                    generateButton.setEnabled(true);
+                else
+                    generateButton.setEnabled(false);
+            }
+        });
+
+        widgetCreator.addGlobalBindValue(statusObservable);
 
         // update parents
         createEmptyReportTable();
@@ -650,6 +672,7 @@ public class ReportsEditor extends BiobankFormBase {
 
     @Override
     protected void init() throws Exception {
+        widgetCreator.initDataBinding();
 
         reportData = new ArrayList<Object>();
         node = ((ReportInput) getEditorInput()).node;

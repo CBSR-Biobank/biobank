@@ -11,7 +11,7 @@ public class SampleTypePvCount extends QueryObject {
             "Lists the total number of each sample type per patient visit for a specified study.",
             "Select pv.patient.pnumber, pv.dateProcessed, pv.dateDrawn,  Alias.sampleType.name, count(*) from "
                 + PatientVisit.class.getName()
-                + " as pv join pv.aliquotCollection as Alias where pv.patient.study.nameShort = ? "
+                + " as pv join pv.aliquotCollection as Alias where pv.patient.study.nameShort LIKE ? "
                 + " and Alias.aliquotPosition.container.label not like 'SS%' and Alias.patientVisit.patient.study.site "
                 + op
                 + siteId
