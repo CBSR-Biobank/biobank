@@ -26,6 +26,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -78,7 +79,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     // for debugging only (fake scan) :
     private Button fakeScanLinkedOnlyButton;
-    private Button fakeScanLinkedAssignButton;
 
     private Composite containersComposite;
 
@@ -99,6 +99,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private Map<RowColPos, PalletCell> movedAndMissingAliquotsFromPallet = new HashMap<RowColPos, PalletCell>();
 
     private Composite fieldsComposite;
+
+    private boolean isFakeScanLinkedOnly;
 
     @Override
     protected void init() {
@@ -237,10 +239,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         comp.setLayoutData(gd);
-        fakeScanLinkedAssignButton = toolkit.createButton(comp,
-            "Select linked only aliquots", SWT.RADIO); //$NON-NLS-1$
-        fakeScanLinkedAssignButton.setSelection(true);
         fakeScanLinkedOnlyButton = toolkit.createButton(comp,
+            "Select linked only aliquots", SWT.RADIO); //$NON-NLS-1$
+        fakeScanLinkedOnlyButton.setSelection(true);
+        toolkit.createButton(comp,
             "Select linked and assigned aliquots", SWT.RADIO); //$NON-NLS-1$
     }
 
@@ -357,30 +359,59 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             showOnlyPallet(false);
             launchScan(monitor);
             processScanResult(monitor);
-            palletWidget.setCells(cells);
-            setDirty(true);
-            setRescanMode();
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    palletWidget.setCells(cells);
+                    setDirty(true);
+                    setRescanMode();
+                    endScan();
+                }
+            });
         } else {
-            palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
-            showOnlyPallet(true);
-            scanValidValue.setValue(false);
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
+                    showOnlyPallet(true);
+                    scanValidValue.setValue(false);
+                    endScan();
+                }
+            });
         }
+    }
+
+    protected void endScan() {
         displayPalletPositions();
         focusOnCancelConfirmText();
         containersComposite.layout(true, true);
+
     }
 
     @Override
-    protected void setScanOk(boolean scanOk) {
-        scanValidValue.setValue(scanOk);
+    protected void setScanOk(final boolean scanOk) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                scanValidValue.setValue(scanOk);
+            }
+        });
+    }
+
+    @Override
+    protected void saveUINeededInformation() {
+        super.saveUINeededInformation();
+        if (fakeScanLinkedOnlyButton != null) {
+            isFakeScanLinkedOnly = fakeScanLinkedOnlyButton.getSelection();
+        }
     }
 
     @Override
     protected void launchFakeScan() throws Exception {
-        if (fakeScanLinkedAssignButton.getSelection()) {
+        if (isFakeScanLinkedOnly) {
             cells = PalletCell.getRandomAliquotsNotAssigned(appService,
                 SessionManager.getInstance().getCurrentSite().getId());
-        } else if (fakeScanLinkedOnlyButton.getSelection()) {
+        } else {
             cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
                 SessionManager.getInstance().getCurrentSite().getId());
         }
@@ -427,14 +458,20 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        scanValidValue.setValue(currentScanState != AliquotCellStatus.ERROR);
+        setScanOk(currentScanState != AliquotCellStatus.ERROR);
     }
 
-    private void showOnlyPallet(boolean show) {
-        freezerLabel.getParent().setVisible(!show);
-        ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
-        hotelLabel.getParent().setVisible(!show);
-        ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
+    private void showOnlyPallet(final boolean show) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                freezerLabel.getParent().setVisible(!show);
+                ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
+                hotelLabel.getParent().setVisible(!show);
+                ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
+            }
+        });
+
     }
 
     protected void displayPalletPositions() {
@@ -748,7 +785,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             palletWidget.setCells(null);
         }
         movedAndMissingAliquotsFromPallet.clear();
-        setScanNotLauched();
+        setScanNotLauched(true);
         initPalletValues();
 
         if (beforeScan) { // re-apply fields values

@@ -60,11 +60,7 @@ public class FreezerImporter {
         sampleImportCount = 0;
         currentPalletNr = 0;
 
-        if (configuration.importDewar()) {
-            doImportDewar();
-        } else {
-            doImport();
-        }
+        doImport();
     }
 
     protected void doImport() throws Exception {

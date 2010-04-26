@@ -20,6 +20,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -75,12 +76,13 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     // button to choose a fake scan - debug only
     private Button fakeScanRandom;
-    private Button fakeScanExists;
 
     // sampleTypes for containers of type that contains 'palletNameContains'
     private List<SampleTypeWrapper> authorizedSampleTypes;
 
     private Composite fieldsComposite;
+
+    private boolean isFakeScanRandom;
 
     @Override
     protected void init() {
@@ -344,6 +346,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd = new GridData();
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
+        gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
         linkFormPatientManagement.initPatientNumberText(fieldsComposite);
@@ -370,32 +373,46 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         fakeScanRandom = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
             SWT.RADIO);
         fakeScanRandom.setSelection(true);
-        fakeScanExists = toolkit.createButton(comp,
+        toolkit.createButton(comp,
             "Get random and already linked aliquots", SWT.RADIO); //$NON-NLS-1$
+    }
+
+    @Override
+    protected void saveUINeededInformation() {
+        super.saveUINeededInformation();
+        if (fakeScanRandom != null) {
+            isFakeScanRandom = fakeScanRandom.getSelection();
+        }
     }
 
     @Override
     protected void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception {
         launchScan(monitor);
-        radioComponents.setEnabled(true);
-        boolean everythingOk = processScanResult(monitor);
-        radioComponents.setEnabled(everythingOk);
-        typesSelectionPerRowComposite.setEnabled(everythingOk);
-
-        // Show result in grid
-        spw.setCells(cells);
-        setRescanMode();
+        final boolean everythingOk = processScanResult(monitor);
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                typesSelectionPerRowComposite.setEnabled(everythingOk);
+                // Show result in grid
+                spw.setCells(cells);
+                setRescanMode();
+            }
+        });
     }
 
     @Override
-    protected void launchFakeScan() throws Exception {
-        if (fakeScanRandom.getSelection()) {
+    protected void launchFakeScan() {
+        if (isFakeScanRandom) {
             cells = PalletCell.getRandomScanLink();
-        } else if (fakeScanExists.getSelection()) {
-            cells = PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, SessionManager.getInstance().getCurrentSite()
-                    .getId());
+        } else {
+            try {
+                cells = PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
+                    appService, SessionManager.getInstance().getCurrentSite()
+                        .getId());
+            } catch (Exception ex) {
+                BioBankPlugin.openError("Fake Scan problem", ex); //$NON-NLS-1$
+            }
         }
     }
 
@@ -406,14 +423,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean processScanResult(IProgressMonitor monitor)
         throws ApplicationException {
         boolean everythingOk = true;
-        Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+        final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
         for (RowColPos rcp : cells.keySet()) {
             monitor.subTask("Processing position "
                 + LabelingScheme.rowColToSbs(rcp));
             Integer typesRowsCount = typesRows.get(rcp.row);
             if (typesRowsCount == null) {
                 typesRowsCount = 0;
-                sampleTypeWidgets.get(rcp.row).resetValues(true);
+                sampleTypeWidgets.get(rcp.row).resetValues(true, true);
             }
             PalletCell cell = null;
             cell = cells.get(rcp);
@@ -429,7 +446,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 typesRows.put(rcp.row, typesRowsCount);
             }
         }
-        setTypeCombosLists(typesRows);
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                setTypeCombosLists(typesRows);
+            }
+        });
         return everythingOk;
     }
 

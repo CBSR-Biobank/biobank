@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -44,6 +45,10 @@ public class PvSourceVesselDialog extends BiobankDialog {
     private Control volumeText;
 
     private List<SourceVesselWrapper> allSourceVessels;
+
+    private Label timeDrawnLabel;
+
+    private Label volumeLabel;
 
     public PvSourceVesselDialog(Shell parent,
         PvSourceVesselWrapper pvSourceVessel,
@@ -128,7 +133,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
                         pvSourceVessel
                             .setSourceVessel((SourceVesselWrapper) selection);
                     }
-                    updateWidgetVisibility();
+                    updateWidgetVisibilityAndValues();
                 }
             });
 
@@ -155,31 +160,46 @@ public class PvSourceVesselDialog extends BiobankDialog {
         GridData gd = (GridData) quantityText.getLayoutData();
         gd.horizontalSpan = 2;
 
+        timeDrawnLabel = widgetCreator.createLabel(contents, "Time drawn");
         timeDrawnWidget = widgetCreator.createDateTimeWidget(contents,
-            "Time drawn", pvSourceVessel.getTimeDrawn(), BeansObservables
+            timeDrawnLabel, pvSourceVessel.getTimeDrawn(), BeansObservables
                 .observeValue(pvSourceVessel, "timeDrawn"), null, SWT.TIME);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
-        volumeText = createBoundWidgetWithLabel(contents, Text.class,
-            SWT.BORDER, "Volume (ml)", new String[0], BeansObservables
+        volumeLabel = widgetCreator.createLabel(contents, "Volume (ml)");
+        volumeLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        volumeText = widgetCreator.createBoundWidget(contents, Text.class,
+            SWT.BORDER, volumeLabel, new String[0], BeansObservables
                 .observeValue(pvSourceVessel, "volume"), null);
         gd = (GridData) volumeText.getLayoutData();
         gd.horizontalSpan = 2;
 
-        updateWidgetVisibility();
+        updateWidgetVisibilityAndValues();
     }
 
-    public void updateWidgetVisibility() {
+    public void updateWidgetVisibilityAndValues() {
         StudySourceVesselWrapper ssv = null;
-        if (pvSourceVessel.getSourceVessel() != null) {
-            ssv = mapStudySourceVessel.get(pvSourceVessel.getSourceVessel()
-                .getName());
+        SourceVesselWrapper currentSourceVessel = pvSourceVessel
+            .getSourceVessel();
+        if (currentSourceVessel != null) {
+            ssv = mapStudySourceVessel.get(currentSourceVessel.getName());
         }
-        timeDrawnWidget.setEnabled(ssv == null
-            || Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));
-        volumeText.setEnabled(ssv == null
-            || Boolean.TRUE.equals(ssv.getNeedRealVolume()));
+        boolean enableTimeDrawn = (currentSourceVessel != null)
+            && (ssv == null || Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));
+        boolean enableVolume = (currentSourceVessel != null)
+            && (ssv == null || Boolean.TRUE.equals(ssv.getNeedRealVolume()));
+        timeDrawnLabel.setVisible(enableTimeDrawn);
+        timeDrawnWidget.setVisible(enableTimeDrawn);
+        volumeLabel.setVisible(enableVolume);
+        volumeText.setVisible(enableVolume);
+        if (!enableTimeDrawn) {
+            pvSourceVessel.setTimeDrawn(null);
+        }
+        if (!enableVolume) {
+            pvSourceVessel.setVolume(null);
+        }
     }
 
     public PvSourceVesselWrapper getPvSourceVessel() {
