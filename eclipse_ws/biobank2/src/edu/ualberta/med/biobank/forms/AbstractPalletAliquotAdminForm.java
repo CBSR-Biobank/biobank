@@ -17,6 +17,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -46,6 +47,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private IObservableValue scanLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
+    private String currentPlateToScan;
+
     private boolean rescanMode = false;
 
     protected Map<RowColPos, PalletCell> cells;
@@ -54,6 +57,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected String palletNameContains = ""; //$NON-NLS-1$
 
     private Button scanChoiceSimple;
+    private boolean isScanChoiceSimple;
 
     @Override
     protected void init() {
@@ -147,6 +151,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void internalScanAndProcessResult() {
+        saveUINeededInformation();
         IRunnableWithProgress op = new IRunnableWithProgress() {
             public void run(IProgressMonitor monitor) {
                 monitor.beginTask("Scan and process...",
@@ -177,9 +182,16 @@ public abstract class AbstractPalletAliquotAdminForm extends
         };
         try {
             new ProgressMonitorDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell()).run(false, false, op);
+                .getActiveWorkbenchWindow().getShell()).run(true, false, op);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    protected void saveUINeededInformation() {
+        currentPlateToScan = plateToScanValue.getValue().toString();
+        if (scanChoiceSimple != null) {
+            isScanChoiceSimple = scanChoiceSimple.getSelection();
         }
     }
 
@@ -191,15 +203,15 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void launchScan(IProgressMonitor monitor) throws Exception {
         monitor.subTask("Launching scan");
-        setScanNotLauched();
+        setScanNotLauched(true);
         Map<RowColPos, PalletCell> oldCells = cells;
         appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
-            plateToScanValue.getValue().toString());
+            currentPlateToScan);
         if (BioBankPlugin.isRealScanEnabled()) {
             int plateNum = BioBankPlugin.getDefault().getPlateNumber(
-                plateToScanValue.getValue().toString());
+                currentPlateToScan);
             ScanCell[][] scanCells = null;
-            if (scanChoiceSimple.getSelection()) {
+            if (isScanChoiceSimple) {
                 scanCells = ScannerConfigPlugin.scan(plateNum);
             } else {
                 scanCells = ScannerConfigPlugin.scanMultiple(plateNum);
@@ -228,7 +240,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 }
             }
         }
-        setScanHasBeenLauched();
+        setScanHasBeenLauched(true);
         appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
             cells.keySet().size());
     }
@@ -257,8 +269,30 @@ public abstract class AbstractPalletAliquotAdminForm extends
         scanLaunchedValue.setValue(false);
     }
 
+    protected void setScanNotLauched(boolean async) {
+        if (async)
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    setScanNotLauched();
+                }
+            });
+        else
+            setScanNotLauched();
+    }
+
     protected void setScanHasBeenLauched() {
         scanLaunchedValue.setValue(true);
+    }
+
+    protected void setScanHasBeenLauched(boolean async) {
+        if (async)
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    setScanHasBeenLauched();
+                }
+            });
+        else
+            setScanHasBeenLauched();
     }
 
     protected boolean isRescanMode() {
