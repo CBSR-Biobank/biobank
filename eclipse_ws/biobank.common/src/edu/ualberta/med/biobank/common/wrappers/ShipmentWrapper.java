@@ -422,7 +422,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public String toString() {
         String s = getFormattedDateReceived();
         if (getWaybill() != null) {
-            s += getWaybill();
+            s += " (" + getWaybill() + ")";
         }
         return s;
     }
