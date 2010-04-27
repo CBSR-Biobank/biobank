@@ -38,7 +38,7 @@
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
   <property name="biobank2.jar.files"
-            value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar, org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,scanlib.jar, commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
+            value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar, org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
   <property name="biobank.common.jar.files" value="commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.importer.jar.files"
             value="mysql-connector-java-5.1.7-bin.jar" />

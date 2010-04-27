@@ -49,7 +49,7 @@ import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
