@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
@@ -945,6 +946,12 @@ public class ContainerWrapper extends
         super.resetInternalField();
         addedChildren.clear();
         addedAliquots.clear();
+    }
+
+    @Override
+    public boolean canEdit() {
+        return super.canEdit()
+            && SecurityHelper.isContainerAdministrator(appService);
     }
 
 }

@@ -13,10 +13,10 @@ public class StudyHelper extends DbHelper {
         study.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         if (name != null) {
-            if (name.length() <= 50) {
+            if (name.length() < 50) {
                 study.setNameShort(name);
             } else {
-                study.setNameShort(name.substring(50));
+                study.setNameShort(name.substring(0, 49));
             }
         }
         study.setSite(site);

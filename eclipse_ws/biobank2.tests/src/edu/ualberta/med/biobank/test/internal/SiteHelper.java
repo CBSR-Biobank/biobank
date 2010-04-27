@@ -18,7 +18,7 @@ public class SiteHelper extends DbHelper {
             if (name.length() <= 50) {
                 site.setNameShort(name);
             } else {
-                site.setNameShort(name.substring(50));
+                site.setNameShort(name.substring(0, 49));
             }
         }
         site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(

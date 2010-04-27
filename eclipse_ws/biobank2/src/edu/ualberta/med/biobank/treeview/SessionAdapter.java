@@ -60,24 +60,27 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add Repository Site");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                IHandlerService handlerService = (IHandlerService) PlatformUI
-                    .getWorkbench().getService(IHandlerService.class);
+        if (SessionManager.canCreate(SiteWrapper.class)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add Repository Site");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    IHandlerService handlerService = (IHandlerService) PlatformUI
+                        .getWorkbench().getService(IHandlerService.class);
 
-                try {
-                    handlerService.executeCommand(ADDSITE_COMMAND_ID, null);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ADDSITE_COMMAND_ID
-                        + " not found");
+                    try {
+                        handlerService.executeCommand(ADDSITE_COMMAND_ID, null);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ADDSITE_COMMAND_ID
+                            + " not found");
+
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        mi = new MenuItem(menu, SWT.PUSH);
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Logout");
         mi.addSelectionListener(new SelectionAdapter() {
             @Override

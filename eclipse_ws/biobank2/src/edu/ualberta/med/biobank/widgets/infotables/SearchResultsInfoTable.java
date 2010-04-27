@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SearchResultsInfoTable extends InfoTableWidget<Object> {
@@ -29,8 +31,13 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
                         return "";
-                    else
-                        return castedVals[columnIndex].toString();
+                    else {
+                        if (castedVals[columnIndex] instanceof Date)
+                            return DateFormatter
+                                .formatAsDate((Date) castedVals[columnIndex]);
+                        else
+                            return castedVals[columnIndex].toString();
+                    }
                 }
                 return "no label provider";
             }

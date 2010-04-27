@@ -639,7 +639,7 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable;
+        return editable && modelObject.canEdit();
     }
 
     public void setEditable(boolean editable) {

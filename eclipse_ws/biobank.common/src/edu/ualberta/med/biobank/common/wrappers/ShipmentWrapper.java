@@ -71,7 +71,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         ApplicationException, WrapperException {
         if (getClinic() != null
             && Boolean.TRUE.equals(getClinic().getSendsShipments())) {
-            if (getWaybill() == null) {
+            if (getWaybill() == null || getWaybill().isEmpty()) {
                 throw new BiobankCheckException(
                     "A waybill should be set on this shipment");
             }
@@ -422,7 +422,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public String toString() {
         String s = getFormattedDateReceived();
         if (getWaybill() != null) {
-            s += getWaybill();
+            s += " (" + getWaybill() + ")";
         }
         return s;
     }

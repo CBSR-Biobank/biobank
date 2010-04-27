@@ -21,6 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
@@ -167,7 +168,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 public void widgetSelected(SelectionEvent e) {
                     sampleStorageEntryTable.addSampleStorage();
                 }
-            });
+            }, SampleStorageWrapper.class);
         section.setClient(sampleStorageEntryTable);
     }
 

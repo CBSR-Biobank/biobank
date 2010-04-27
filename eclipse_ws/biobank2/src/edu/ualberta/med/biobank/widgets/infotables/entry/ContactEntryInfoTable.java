@@ -38,46 +38,50 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
 
-        addAddItemListener(new IInfoTableAddItemListener() {
-            @Override
-            public void addItem(InfoTableEvent event) {
-                addContact();
-            }
-        });
-
-        addEditItemListener(new IInfoTableEditItemListener() {
-            @Override
-            public void editItem(InfoTableEvent event) {
-                addOrEditContact(false, getSelection());
-            }
-        });
-
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
-            @Override
-            public void deleteItem(InfoTableEvent event) {
-                ContactWrapper contact = getSelection();
-                if (!contact.deleteAllowed()) {
-                    BioBankPlugin
-                        .openError(
-                            "Contact Delete Error",
-                            "Cannot delete contact \""
-                                + contact.getName()
-                                + "\" since it is associated with one or more studies");
-                    return;
+        if (SessionManager.canCreate(ContactWrapper.class)) {
+            addAddItemListener(new IInfoTableAddItemListener() {
+                @Override
+                public void addItem(InfoTableEvent event) {
+                    addContact();
                 }
-
-                if (!BioBankPlugin.openConfirm("Delete Contact",
-                    "Are you sure you want to delete contact \""
-                        + contact.getName() + "\"")) {
-                    return;
+            });
+        }
+        if (SessionManager.canUpdate(ContactWrapper.class)) {
+            addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(InfoTableEvent event) {
+                    addOrEditContact(false, getSelection());
                 }
+            });
+        }
+        if (SessionManager.canDelete(ContactWrapper.class)) {
+            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    ContactWrapper contact = getSelection();
+                    if (!contact.deleteAllowed()) {
+                        BioBankPlugin
+                            .openError(
+                                "Contact Delete Error",
+                                "Cannot delete contact \""
+                                    + contact.getName()
+                                    + "\" since it is associated with one or more studies");
+                        return;
+                    }
 
-                deletedContacts.add(contact);
-                selectedContacts.remove(contact);
-                setCollection(selectedContacts);
-                notifyListeners();
-            }
-        });
+                    if (!BioBankPlugin.openConfirm("Delete Contact",
+                        "Are you sure you want to delete contact \""
+                            + contact.getName() + "\"")) {
+                        return;
+                    }
+
+                    deletedContacts.add(contact);
+                    selectedContacts.remove(contact);
+                    setCollection(selectedContacts);
+                    notifyListeners();
+                }
+            });
+        }
     }
 
     @Override

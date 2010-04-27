@@ -44,13 +44,10 @@ public class QueryTree extends TreeViewer {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-
             }
 
             @Override
             public void dispose() {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
@@ -77,7 +74,6 @@ public class QueryTree extends TreeViewer {
 
             @Override
             public Image getImage(Object element) {
-                // TODO Auto-generated method stub
                 return null;
             }
 
@@ -264,12 +260,6 @@ public class QueryTree extends TreeViewer {
 
         addClausesForNode(root, whereClauses);
         generateSubClauses(root, whereClauses, fromClauses);
-
-        HashMap<String, String> basicSelects = SearchUtils.getColumnInfo(root
-            .getNodeInfo().getType());
-        basicSelects.putAll(extraSelectClauses);
-        extraSelectClauses = basicSelects;
-        // Random comment
 
         String selectClause = "select ";
         for (String key : extraSelectClauses.keySet()) {

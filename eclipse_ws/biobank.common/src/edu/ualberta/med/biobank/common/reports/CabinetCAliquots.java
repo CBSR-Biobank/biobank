@@ -11,7 +11,7 @@ public class CabinetCAliquots extends QueryObject {
 
     public CabinetCAliquots(String op, Integer siteId) {
         super(
-            "Displays the total number of cabinet aliquots per study per clinic.",
+            "Displays the total number of cabinet aliquots per study per clinic. Note: the top container's name must contain \"Cabinet\".",
 
             "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name, count(*) from "
                 + Aliquot.class.getName()

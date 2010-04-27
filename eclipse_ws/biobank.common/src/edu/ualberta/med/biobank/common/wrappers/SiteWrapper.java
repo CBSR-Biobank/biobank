@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -833,4 +834,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
         deletedSitePvAttr.clear();
     }
 
+    /**
+     * return true if the user can edit this object
+     */
+    @Override
+    public boolean canEdit() {
+        try {
+            return ((BiobankApplicationService) appService).canUpdateObject(
+                getWrappedClass(), getId());
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

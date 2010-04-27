@@ -11,7 +11,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
@@ -140,7 +144,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 StudyGroup.addStudy(siteAdapter, true);
             }
-        });
+        }, StudyWrapper.class);
 
         studiesTable = new StudyInfoTable(section, site.getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
@@ -155,7 +159,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 ClinicGroup.addClinic(siteAdapter, true);
             }
-        });
+        }, ClinicWrapper.class);
 
         clinicsTable = new ClinicInfoTable(section, site
             .getClinicCollection(true));
@@ -172,7 +176,7 @@ public class SiteViewForm extends AddressViewFormCommon {
                 public void widgetSelected(SelectionEvent e) {
                     ContainerTypeGroup.addContainerType(siteAdapter, true);
                 }
-            });
+            }, ContainerTypeWrapper.class);
 
         containerTypesTable = new ContainerTypeInfoTable(section, site
             .getContainerTypeCollection());
@@ -190,7 +194,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 ContainerGroup.addContainer(siteAdapter, true);
             }
-        });
+        }, ContainerWrapper.class);
 
         topContainersTable = new ContainerInfoTable(section, siteAdapter
             .getWrapper().getTopContainerCollection());

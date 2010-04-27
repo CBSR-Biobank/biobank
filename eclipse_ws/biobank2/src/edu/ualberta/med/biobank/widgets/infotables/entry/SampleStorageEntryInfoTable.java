@@ -103,39 +103,44 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
-            @Override
-            public void addItem(InfoTableEvent event) {
-                addSampleStorage();
-            }
-        });
-        addEditItemListener(new IInfoTableEditItemListener() {
-            @Override
-            public void editItem(InfoTableEvent event) {
-                SampleStorageWrapper sampleStorage = getSelection();
-                addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
-            }
-        });
-
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
-            @Override
-            public void deleteItem(InfoTableEvent event) {
-                SampleStorageWrapper sampleStorage = getSelection();
-
-                if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(),
-                    "Delete Aliquot Storage",
-                    "Are you sure you want to delete sample storage \""
-                        + sampleStorage.getSampleType().getName() + "\"?")) {
-                    return;
+        if (SessionManager.canCreate(SampleStorageWrapper.class)) {
+            addAddItemListener(new IInfoTableAddItemListener() {
+                @Override
+                public void addItem(InfoTableEvent event) {
+                    addSampleStorage();
                 }
+            });
+        }
+        if (SessionManager.canUpdate(SampleStorageWrapper.class)) {
+            addEditItemListener(new IInfoTableEditItemListener() {
+                @Override
+                public void editItem(InfoTableEvent event) {
+                    SampleStorageWrapper sampleStorage = getSelection();
+                    addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
+                }
+            });
+        }
+        if (SessionManager.canDelete(SampleStorageWrapper.class)) {
+            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    SampleStorageWrapper sampleStorage = getSelection();
 
-                selectedSampleStorages.remove(sampleStorage);
-                setCollection(selectedSampleStorages);
-                deletedSampleStorages.add(sampleStorage);
-                notifyListeners();
-            }
-        });
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        "Delete Aliquot Storage",
+                        "Are you sure you want to delete sample storage \""
+                            + sampleStorage.getSampleType().getName() + "\"?")) {
+                        return;
+                    }
+
+                    selectedSampleStorages.remove(sampleStorage);
+                    setCollection(selectedSampleStorages);
+                    deletedSampleStorages.add(sampleStorage);
+                    notifyListeners();
+                }
+            });
+        }
     }
 
     private void getSampleTypes(SiteWrapper site) {

@@ -26,6 +26,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -190,6 +191,19 @@ public class SampleTypeSelectionWidget {
             setNumber(null);
         } else {
             setNumber(number); // to re-do the validation tests
+        }
+    }
+
+    public void resetValues(final boolean resetNumber, boolean async) {
+        if (async) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    resetValues(resetNumber);
+                }
+            });
+        } else {
+            resetValues(resetNumber);
         }
     }
 

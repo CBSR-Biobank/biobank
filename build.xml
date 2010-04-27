@@ -17,6 +17,8 @@
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
+  <property name="eclipse.proj.dir.server" 
+            location="eclipse_ws/biobank.server" />
   <property name="eclipse.proj.dir.importer"
             location="eclipse_ws/biobank2.importer" />
   <property name="eclipse.proj.dir.junit"
@@ -37,6 +39,7 @@
   <property name="database.username" value="dummy" />
   <property name="database.password" value="ozzy498" />
   <property name="req.jars.dir" value="jars" />
+  <property name="lib-sources.dir" value="lib-sources" />
   <property name="biobank2.jar.files"
             value="org.eclipse.nebula.cwt_0.9.0.HEAD.jar, org.eclipse.nebula.widgets.cdatetime_0.14.0.HEAD.jar, gluegen.jar,ini4j-0.5.1.jar,jdom.jar,commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar, jdt-compiler-3.1.1.jar, mail.jar" />
   <property name="biobank.common.jar.files" value="commons-lang-2.4.jar,xstream-1.3.1.jar" />
@@ -152,16 +155,26 @@
     <uptodate property="cacore.sdk.uptodate"
               targetfile="${cacore.sdk.dir}/output/biobank2">
       <srcfiles file="sdk_conf/deploy.properties" />
+      <srcfiles file="sdk_conf/build.properties" />
+      <srcfiles file="sdk_conf/validator-extension-Config.xml" />
+      <srcfiles file="sdk_conf/config.xml" />
+      <srcfiles file="sdk_conf/application-config-client.xml" />
       <srcfiles file="model/biobank2.uml" />
     </uptodate>
   </target>
-  <target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate"
+  <target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate, build-server-project"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
           tofile="${cacore.sdk.dir}/conf/deploy.properties" />
+    <copy file="sdk_conf/build.properties" tofile="${cacore.sdk.dir}/build.properties" />
+    <copy file="sdk_conf/validator-extension-Config.xml" tofile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
+    <copy file="sdk_conf/application-config.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
+    <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
+    <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
     <copy file="security-logs/clm-log4j/log4j.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" />
+    <copy todir="${cacore.sdk.dir}/system/lib/"  file="${eclipse.proj.dir.server}/output/biobank-validators.jar" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
   <target name="sdk-files" depends="sdk">
@@ -173,6 +186,14 @@
                  refid="sdk.jar.files">
       <map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/"
            to="" />
+    </pathconvert>
+    
+    <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" id="sdk.local.jar.files">
+      <include name="*.jar" />
+    </fileset>
+
+    <pathconvert pathsep="," property="sdk.local.jar.files.basename" refid="sdk.local.jar.files">
+      <map from="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/" to="" />
     </pathconvert>
   </target>
   <!-- Eclipse -->
@@ -228,6 +249,12 @@
       <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
       <filelist dir="${cacore.sdk.dir}/system/security/dist" files="sdk-security.jar" />
     </copy>
+    <copy todir="${eclipse.proj.dir.common}/lib"
+          file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
+    <copy todir="${eclipse.proj.dir.common}/lib" 
+          file="${cacore.sdk.dir}/system/lib/hibernate-validator.jar" />
+    <copy todir="${eclipse.proj.dir.importer}/lib"
+          file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
     <copy todir="${eclipse.proj.dir.common}/conf">
       <filelist
          dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
@@ -236,6 +263,8 @@
     <copy todir="${eclipse.proj.dir}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
+    <copy todir="${eclipse.proj.dir.common}/lib" 
+          file="${eclipse.proj.dir.server}/output/biobank-remote.jar" />
     <copy todir="${eclipse.proj.dir.importer}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}"/>
       <fileset file="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/log4j-1.2.14.jar"/>
@@ -371,6 +400,29 @@
     </jar>
   </target>
 
+
+  <target name="build-server-project">
+    <copy todir="${eclipse.proj.dir.server}/lib">
+      <fileset dir="${cacore.sdk.dir}/system/lib">
+        <include name="csmapi*.*" />
+        <include name="spring*.*" />
+        <include name="hibernate3*.*" />
+        <include name="caGrid-CQL-cql*.*" />
+        <include name="hibernate-validator*.*" />
+        <include name="acegi-security*.*" />
+        <include name="log4j*.*" />
+      </fileset>
+      <fileset dir="${cacore.sdk.dir}/writable-api/dist" includes="*.jar" />
+      <fileset dir="${cacore.sdk.dir}/system/security/dist" includes="*.jar" />
+      <fileset dir="${cacore.sdk.dir}/system/dist">
+        <include name="sdk-core*.*" />
+        <include name="sdk-client*.*" />
+      </fileset>
+    </copy>
+    <ant dir="${eclipse.proj.dir.server}" target="build-remote-lib" inheritRefs="false" />
+    <ant dir="${eclipse.proj.dir.server}" target="build-validator-lib" inheritRefs="false" />
+  </target>
+
   <!-- copied from sdk build.xml -->
   <target name="package-webapp-orm" depends="package-codegen-orm">
     <war destfile="${cacore.sdk.dir}\${package.system.dir}\${PROJECT_NAME}.war"
@@ -415,6 +467,7 @@
         <include name="${csm.ehcache.file}" />
         <include name="${clm.object.state.logger.config}" />
       </classes>
+      <classes dir="${eclipse.proj.dir.server}/bin" />
       <webinf dir="${cacore.sdk.dir}\${output.src.dir}">
         <include name="server-config.wsdd" />
       </webinf>
@@ -424,6 +477,7 @@
   <target name="clean-jars" description="deletes jars from eclipse projects">
     <delete>
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.server}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
     </delete>

@@ -17,13 +17,21 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
@@ -91,6 +99,7 @@ public class ReportsView extends ViewPart {
                 }
             }
         });
+
         querySelect.setContentProvider(new ITreeContentProvider() {
 
             @Override
@@ -136,6 +145,7 @@ public class ReportsView extends ViewPart {
 
             @Override
             public void addListener(ILabelProviderListener listener) {
+
             }
 
             @Override
@@ -151,6 +161,95 @@ public class ReportsView extends ViewPart {
             public void removeListener(ILabelProviderListener listener) {
             }
         });
+
+        // lengthy tooltip faking code here
+        final Tree tree = querySelect.getTree();
+        final Display display = tree.getDisplay();
+        final Shell shell = new Shell(display);
+        shell.setLayout(new FillLayout());
+        // Disable native tooltip
+        tree.setToolTipText("");
+
+        // Implement a "fake" tooltip
+        final Listener labelListener = new Listener() {
+            public void handleEvent(Event event) {
+                Label label = (Label) event.widget;
+                Shell shell = label.getShell();
+                switch (event.type) {
+                case SWT.MouseDown:
+                    Event e = new Event();
+                    e.item = (TreeItem) label.getData("_TREEITEM");
+                    // Assuming table is single select, set the selection as if
+                    // the mouse down event went through to the table
+                    tree.setSelection(new TreeItem[] { (TreeItem) e.item });
+                    tree.notifyListeners(SWT.Selection, e);
+                    shell.dispose();
+                    tree.setFocus();
+                    break;
+                case SWT.MouseExit:
+                    shell.dispose();
+                    break;
+                }
+            }
+        };
+
+        Listener tableListener = new Listener() {
+            Shell tip = null;
+            Label label = null;
+
+            public void handleEvent(Event event) {
+                switch (event.type) {
+                case SWT.Dispose:
+                case SWT.KeyDown:
+                case SWT.MouseMove: {
+                    if (tip == null)
+                        break;
+                    tip.dispose();
+                    tip = null;
+                    label = null;
+                    break;
+                }
+                case SWT.MouseHover: {
+                    TreeItem item = tree.getItem(new Point(event.x, event.y));
+                    if (item != null) {
+                        if (tip != null && !tip.isDisposed())
+                            tip.dispose();
+                        tip = new Shell(shell, SWT.ON_TOP | SWT.NO_FOCUS
+                            | SWT.TOOL);
+                        tip.setBackground(display
+                            .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                        FillLayout layout = new FillLayout();
+                        layout.marginWidth = 2;
+                        tip.setLayout(layout);
+                        label = new Label(tip, SWT.NONE);
+                        label.setForeground(display
+                            .getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+                        label.setBackground(display
+                            .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+                        label.setData("_TREEITEM", item);
+                        String text = ((ReportTreeNode) item.getData())
+                            .getToolTipText();
+                        if (text.equalsIgnoreCase(""))
+                            return;
+                        else
+                            label.setText(text);
+                        label.addListener(SWT.MouseExit, labelListener);
+                        label.addListener(SWT.MouseDown, labelListener);
+                        Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+                        Rectangle rect = item.getBounds(0);
+                        Point pt = tree.toDisplay(rect.x, rect.y);
+                        tip.setBounds(pt.x, pt.y, size.x, size.y);
+                        tip.setVisible(true);
+                    }
+                }
+                }
+            }
+        };
+        tree.addListener(SWT.Dispose, tableListener);
+        tree.addListener(SWT.KeyDown, tableListener);
+        tree.addListener(SWT.MouseMove, tableListener);
+        tree.addListener(SWT.MouseHover, tableListener);
+
         Menu menu = new Menu(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), SWT.NONE);
         menu.addListener(SWT.Show, new Listener() {
@@ -193,7 +292,7 @@ public class ReportsView extends ViewPart {
         ReportTreeNode clinics = new ReportTreeNode("Clinics", null);
         ReportTreeNode patientVisits = new ReportTreeNode("PatientVisits", null);
         ReportTreeNode patients = new ReportTreeNode("Patients", null);
-        ReportTreeNode misc = new ReportTreeNode("Miscellaneous", null);
+        ReportTreeNode misc = new ReportTreeNode("Sample Types", null);
 
         standard.addChild(aliquots);
         standard.addChild(clinics);
@@ -214,6 +313,9 @@ public class ReportsView extends ViewPart {
                 if (names[i].contains("Aliquot")) {
                     aliquots.addChild(child);
                     child.setParent(aliquots);
+                } else if (names[i].contains("Sample Type")) {
+                    misc.addChild(child);
+                    child.setParent(misc);
                 } else if (names[i].contains("Patient Visit")) {
                     patientVisits.addChild(child);
                     child.setParent(patientVisits);
@@ -223,10 +325,8 @@ public class ReportsView extends ViewPart {
                 } else if (names[i].contains("Clinic")) {
                     clinics.addChild(child);
                     child.setParent(clinics);
-                } else {
-                    misc.addChild(child);
-                    child.setParent(misc);
-                }
+                } else
+                    throw new Exception("Unable to place report node.");
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -85,6 +85,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getPnumber() == null || getPnumber().isEmpty()) {
+            throw new BiobankCheckException(
+                "Pnumber of patient should not be empty");
+        }
         if (!checkPatientNumberUnique()) {
             throw new BiobankCheckException("A patient with number \""
                 + getPnumber() + "\" already exists.");

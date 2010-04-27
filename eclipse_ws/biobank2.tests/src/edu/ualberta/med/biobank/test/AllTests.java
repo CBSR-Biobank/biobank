@@ -46,7 +46,7 @@ public class AllTests {
     }
 
     @AfterClass
-    public static void tearDown() {
+    public static void tearDown() throws Exception {
     }
 
 }

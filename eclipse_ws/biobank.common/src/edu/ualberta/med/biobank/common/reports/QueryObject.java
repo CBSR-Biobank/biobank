@@ -35,6 +35,7 @@ public abstract class QueryObject {
         aMap.put(AliquotInvoiceByPatient.NAME, AliquotInvoiceByPatient.class);
         aMap.put(AliquotRequest.NAME, AliquotRequest.class);
         aMap.put(AliquotSCount.NAME, AliquotSCount.class);
+        aMap.put(SampleTypePvCount.NAME, SampleTypePvCount.class);
         aMap.put(SampleTypeSUsage.NAME, SampleTypeSUsage.class);
         aMap.put(QACabinetAliquots.NAME, QACabinetAliquots.class);
         aMap.put(QAFreezerAliquots.NAME, QAFreezerAliquots.class);
