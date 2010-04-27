@@ -97,10 +97,14 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void createScanButton(Composite parent) {
         scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
         if (BioBankPlugin.isRealScanEnabled()) {
-            scanChoiceSimple = toolkit
-                .createButton(parent, "Simple", SWT.RADIO);
+            toolkit.createLabel(parent, "Decode Type:");
+
+            Composite composite = toolkit.createComposite(parent);
+            composite.setLayout(new GridLayout(2, false));
+            scanChoiceSimple = toolkit.createButton(composite, "Single Scan",
+                SWT.RADIO);
             scanChoiceSimple.setSelection(true);
-            toolkit.createButton(parent, "Multiple", SWT.RADIO);
+            toolkit.createButton(composite, "Multiple Scan", SWT.RADIO);
         } else {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
