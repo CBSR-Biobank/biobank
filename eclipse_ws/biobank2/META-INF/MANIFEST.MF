@@ -2,11 +2,9 @@ Manifest-Version: 1.0
 Bundle-Name: Biobank2 Plug-in
 Bundle-ClassPath: .,
  lib/gluegen.jar,
- lib/scanlib.jar,
  lib/jasperreports-3.7.0.jar,
  lib/commons-beanutils-1.8.0.jar,
  lib/commons-digester-1.7.jar,
- lib/commons-lang-2.4.jar,
  lib/iText-2.1.0.jar,
  lib/DynamicJasper-3.0.14.jar,
  lib/jdt-compiler-3.1.1.jar,
