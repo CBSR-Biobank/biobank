@@ -918,7 +918,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (barcode == null) {
             barcode = "[none]"; //$NON-NLS-1$
         }
-        BioBankPlugin.openError(Messages
+        BioBankPlugin.openAsyncError(Messages
             .getString("ScanAssign.dialog.positionUsed.title"), //$NON-NLS-1$
             Messages.getFormattedString(
                 "ScanAssign.dialog.positionUsed.msg", barcode)); //$NON-NLS-1$

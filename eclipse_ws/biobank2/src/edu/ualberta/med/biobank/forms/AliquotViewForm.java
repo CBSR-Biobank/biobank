@@ -39,7 +39,7 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text patientLabel;
 
-    private Text visitLabel;
+    private Text dateProcessedLabel;
 
     private Text dateDrawnLabel;
 
@@ -92,7 +92,7 @@ public class AliquotViewForm extends BiobankViewForm {
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
-        visitLabel = createReadOnlyField(client, SWT.NONE, "Patient Visit");
+        dateProcessedLabel = createReadOnlyField(client, SWT.NONE, "Date Processed");
         dateDrawnLabel = createReadOnlyField(client, SWT.NONE, "Date Drawn");
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
         positionLabel = createReadOnlyField(client, SWT.WRAP, "Position");
@@ -149,7 +149,7 @@ public class AliquotViewForm extends BiobankViewForm {
             .getShipment().getWaybill());
         setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
             .getPnumber());
-        setTextValue(visitLabel, aliquot.getPatientVisit()
+        setTextValue(dateProcessedLabel, aliquot.getPatientVisit()
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
             .getFormattedDateDrawn());
