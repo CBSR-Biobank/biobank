@@ -14,7 +14,7 @@ public class ClinicHelper extends DbHelper {
             if (name.length() <= 50) {
                 clinic.setNameShort(name);
             } else {
-                clinic.setNameShort(name.substring(50));
+                clinic.setNameShort(name.substring(0, 49));
             }
         }
         clinic.setCity("");

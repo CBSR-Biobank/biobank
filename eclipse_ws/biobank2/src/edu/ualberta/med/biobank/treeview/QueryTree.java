@@ -44,13 +44,10 @@ public class QueryTree extends TreeViewer {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-
             }
 
             @Override
             public void dispose() {
-                // TODO Auto-generated method stub
-
             }
 
             @Override
@@ -77,7 +74,6 @@ public class QueryTree extends TreeViewer {
 
             @Override
             public Image getImage(Object element) {
-                // TODO Auto-generated method stub
                 return null;
             }
 

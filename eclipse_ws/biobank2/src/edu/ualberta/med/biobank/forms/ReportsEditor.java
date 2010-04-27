@@ -458,19 +458,14 @@ public class ReportsEditor extends BiobankFormBase {
 
     @Override
     public void doSave(IProgressMonitor monitor) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void doSaveAs() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isDirty() {
-        // TODO Auto-generated method stub
         return false;
     }
 

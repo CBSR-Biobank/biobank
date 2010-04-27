@@ -399,6 +399,7 @@ public class TestShipment extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.newClinic(site, name);
         clinic.setSendsShipments(false);
         clinic.persist();
+
         StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -479,7 +480,7 @@ public class TestShipment extends TestDatabase {
         try {
             shipment.persist();
             Assert
-                .fail("patient should be part of the sutdy that has contact with the clinic");
+                .fail("patient should be part of the study that has contact with the clinic");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }

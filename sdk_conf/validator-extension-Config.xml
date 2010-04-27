@@ -105,37 +105,6 @@
             </constructor-arg>
           </bean>
         </entry>
-        <entry key="edu.ualberta.med.biobank.model.Shipment">
-          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
-            <constructor-arg value="edu.ualberta.med.biobank.model.Shipment" />
-            <constructor-arg index="1">
-              <map>
-                <entry key="waybill">
-                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
-                    <constructor-arg value="waybill" />
-                    <constructor-arg index="1">
-                      <list>
-                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
-                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
-                          <constructor-arg index="1">
-                            <map>
-                              <entry key="message">
-                                <value>"Waybill of shipment should not be null or empty"</value>
-                              </entry>
-                            </map>
-                          </constructor-arg>
-                        </bean>
-                      </list>
-                    </constructor-arg>
-                  </bean>
-                </entry>
-              </map>
-            </constructor-arg>
-            <constructor-arg index="2">
-              <list />
-            </constructor-arg>
-          </bean>
-        </entry>
         <entry key="edu.ualberta.med.biobank.model.SampleType">
           <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
             <constructor-arg value="edu.ualberta.med.biobank.model.SampleType" />

@@ -158,10 +158,10 @@ public class BiobankApplicationServiceImpl extends
     private void deleteSiteSecurity(Object siteObject)
         throws ApplicationException {
         Object id = null;
-        String name = null;
+        String nameShort = null;
         try {
             id = getSiteObjectId(siteObject);
-            name = getSiteObjectName(siteObject);
+            nameShort = getSiteObjectNameShort(siteObject);
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             Set<ProtectionElement> siteAdminPEs = upm
@@ -175,25 +175,25 @@ public class BiobankApplicationServiceImpl extends
             }
         } catch (Exception e) {
             throw new ApplicationException("Error deleting site " + id + ":"
-                + name + "security: " + e.getMessage());
+                + nameShort + "security: " + e.getMessage());
         }
 
     }
 
     private void newSiteSecurity(Object siteObject) throws ApplicationException {
         Object id = null;
-        String name = null;
+        String nameShort = null;
         try {
             id = getSiteObjectId(siteObject);
-            name = getSiteObjectName(siteObject);
+            nameShort = getSiteObjectNameShort(siteObject);
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             // Create protection element for the site
             ProtectionElement pe = new ProtectionElement();
             pe.setApplication(upm.getApplication(APPLICATION_CONTEXT_NAME));
-            pe.setProtectionElementName(SITE_CLASS_NAME + "/ID=" + id
-                + "/Name=" + name);
-            pe.setProtectionElementDescription(name);
+            pe.setProtectionElementName(SITE_CLASS_NAME + "/ID=" + id + "/"
+                + nameShort);
+            pe.setProtectionElementDescription(nameShort);
             pe.setObjectId(SITE_CLASS_NAME);
             pe.setAttribute("id");
             pe.setValue(id.toString());
@@ -205,15 +205,15 @@ public class BiobankApplicationServiceImpl extends
         } catch (Exception e) {
             log.error("error adding new site security", e);
             throw new ApplicationException("Error adding new site " + id + ":"
-                + name + "security:" + e.getMessage());
+                + nameShort + "security:" + e.getMessage());
         }
     }
 
-    private String getSiteObjectName(Object siteObject)
+    private String getSiteObjectNameShort(Object siteObject)
         throws SecurityException, NoSuchMethodException,
         IllegalArgumentException, IllegalAccessException,
         InvocationTargetException {
-        Method getNameMethod = siteObject.getClass().getMethod("getName");
+        Method getNameMethod = siteObject.getClass().getMethod("getNameShort");
         return (String) getNameMethod.invoke(siteObject);
     }
 
