@@ -15,10 +15,10 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
-import edu.ualberta.med.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 
 /**
  * Specific widget to draw a 8*12 pallet for scan features

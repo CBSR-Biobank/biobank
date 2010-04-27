@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.biobank.widgets.grids.ScanLinkPalletWidget;
-import edu.ualberta.med.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**

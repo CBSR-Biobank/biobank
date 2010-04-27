@@ -30,8 +30,8 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {
@@ -214,7 +214,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             if (isScanChoiceSimple) {
                 scanCells = ScannerConfigPlugin.scan(plateNum);
             } else {
-                scanCells = ScannerConfigPlugin.scanMultiple(plateNum);
+                scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
             }
             cells = PalletCell.convertArray(scanCells);
         } else {
