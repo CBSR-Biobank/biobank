@@ -224,29 +224,34 @@ public abstract class AbstractPalletAliquotAdminForm extends
         } else {
             launchFakeScan();
         }
-        if (isRescanMode() && oldCells != null) {
-            // rescan: merge previous scan with new in case the scanner wasn't
-            // able to scan well
-            for (RowColPos rcp : oldCells.keySet()) {
-                PalletCell oldScannedCell = oldCells.get(rcp);
-                PalletCell newScannedCell = cells.get(rcp);
-                if (PalletCell.hasValue(oldScannedCell)
-                    && PalletCell.hasValue(newScannedCell)
-                    && !oldScannedCell.getValue().equals(
-                        newScannedCell.getValue())) {
-                    cells = oldCells;
-                    throw new Exception(
-                        "Scan Aborted: previously scanned aliquot has been replaced. "
-                            + "If this is not a re-scan, reset and start again.");
-                }
-                if (PalletCell.hasValue(oldScannedCell)) {
-                    cells.put(rcp, oldScannedCell);
+        if (cells != null) {
+            if (isRescanMode() && oldCells != null) {
+                // rescan: merge previous scan with new in case the scanner
+                // wasn't
+                // able to scan well
+                for (RowColPos rcp : oldCells.keySet()) {
+                    PalletCell oldScannedCell = oldCells.get(rcp);
+                    PalletCell newScannedCell = cells.get(rcp);
+                    if (PalletCell.hasValue(oldScannedCell)
+                        && PalletCell.hasValue(newScannedCell)
+                        && !oldScannedCell.getValue().equals(
+                            newScannedCell.getValue())) {
+                        cells = oldCells;
+                        throw new Exception(
+                            "Scan Aborted: previously scanned aliquot has been replaced. "
+                                + "If this is not a re-scan, reset and start again.");
+                    }
+                    if (PalletCell.hasValue(oldScannedCell)) {
+                        cells.put(rcp, oldScannedCell);
+                    }
                 }
             }
+            setScanHasBeenLauched(true);
+            appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
+                cells.keySet().size());
+        } else {
+            setScanNotLauched(true);
         }
-        setScanHasBeenLauched(true);
-        appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
-            cells.keySet().size());
     }
 
     @SuppressWarnings("unused")

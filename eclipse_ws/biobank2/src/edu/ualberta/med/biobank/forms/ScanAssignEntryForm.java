@@ -339,7 +339,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     palletFoundWithProductBarcode.getContainerType()));
             }
         } catch (Exception ex) {
-            BioBankPlugin.openError("Product barcode", ex); //$NON-NLS-1$
+            BioBankPlugin.openAsyncError("Product barcode", ex); //$NON-NLS-1$
         }
     }
 

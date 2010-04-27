@@ -411,7 +411,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     appService, SessionManager.getInstance().getCurrentSite()
                         .getId());
             } catch (Exception ex) {
-                BioBankPlugin.openError("Fake Scan problem", ex); //$NON-NLS-1$
+                BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
             }
         }
     }
