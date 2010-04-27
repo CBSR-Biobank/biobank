@@ -97,7 +97,7 @@ public class AdvancedReportsEditor extends EditorPart {
         setSite(site);
         setInput(input);
 
-        node = ((ReportInput) input).node;
+        node = ((ReportInput) input).getNode();
         checked = SearchUtils.getColumnInfo(((QueryTreeNode) node.getQuery())
             .getNodeInfo().getType());
 

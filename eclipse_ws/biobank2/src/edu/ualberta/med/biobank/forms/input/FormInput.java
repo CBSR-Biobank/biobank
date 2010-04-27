@@ -40,16 +40,6 @@ public class FormInput implements IEditorInput {
         return -1;
     }
 
-    public AdapterBase getNode() {
-        Assert.isNotNull(obj, "form input object is null");
-        if (obj instanceof AdapterBase) {
-            return (AdapterBase) obj;
-        } else {
-            Assert.isTrue(false, "invalid type for form input object");
-        }
-        return null;
-    }
-
     @Override
     public boolean exists() {
         return true;

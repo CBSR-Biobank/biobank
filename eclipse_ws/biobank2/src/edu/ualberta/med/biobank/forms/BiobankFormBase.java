@@ -152,7 +152,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
         adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
         if (adapter != null) {
-            adapter = formInput.getNode();
+            // adapter = formInput.getNode();
             Assert.isNotNull(adapter, "Bad editor input (null value)");
             appService = adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
