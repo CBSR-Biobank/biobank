@@ -191,8 +191,7 @@ public class BiobankApplicationServiceImpl extends
             // Create protection element for the site
             ProtectionElement pe = new ProtectionElement();
             pe.setApplication(upm.getApplication(APPLICATION_CONTEXT_NAME));
-            pe.setProtectionElementName(SITE_CLASS_NAME + "/ID=" + id + "/"
-                + nameShort);
+            pe.setProtectionElementName(SITE_CLASS_NAME + "/" + nameShort);
             pe.setProtectionElementDescription(nameShort);
             pe.setObjectId(SITE_CLASS_NAME);
             pe.setAttribute("id");
