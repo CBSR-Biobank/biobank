@@ -16,9 +16,12 @@ public class HQLField {
     }
 
     public HQLField(HQLField nodeInfo) {
-        this.fname = new String(nodeInfo.getFname());
+        this.fname = nodeInfo.getFname();
         this.type = nodeInfo.getType();
-        this.path = new String(nodeInfo.getPath());
+        this.path = nodeInfo.getPath();
+        this.value = nodeInfo.getValue();
+        this.operator = nodeInfo.getOperator();
+        this.display = nodeInfo.getDisplay();
     }
 
     public String getFname() {

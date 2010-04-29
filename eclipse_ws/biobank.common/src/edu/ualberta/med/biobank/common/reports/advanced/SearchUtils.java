@@ -101,9 +101,7 @@ public class SearchUtils {
             else
                 path = path + "site.";
             add(searchableFields, path, "name", String.class);
-            add(searchableFields, path, "activityStatus", String.class);
-            add(searchableFields, path, "sampleTypeCollection.name",
-                String.class);
+            add(searchableFields, path, "activityStatus.name", String.class);
         } else if (c == Clinic.class) {
             if (collection)
                 path = path.replace('.', '_') + "clinicCollection.";
@@ -142,7 +140,7 @@ public class SearchUtils {
             add(searchableFields, path, "name", String.class);
             add(searchableFields, path, "nameShort", String.class);
             add(searchableFields, path, "comment", String.class);
-            add(searchableFields, path, "activityStatus", String.class);
+            add(searchableFields, path, "activityStatus.name", String.class);
         } else if (c == PatientVisit.class) {
             if (collection)
                 path = path.replace('.', '_') + "patientVisitCollection.";
@@ -150,8 +148,6 @@ public class SearchUtils {
                 path = path + "patientVisit.";
             add(searchableFields, path, "dateProcessed", Date.class);
             add(searchableFields, path, "comment", String.class);
-            add(searchableFields, path, "username", String.class);
-            add(searchableFields, path, "shipment", String.class);
         } else if (c == Contact.class) {
             if (collection)
                 path = path.replace('.', '_') + "contactCollection.";
@@ -182,7 +178,7 @@ public class SearchUtils {
                 path = path + "container.";
             add(searchableFields, path, "productBarcode", String.class);
             add(searchableFields, path, "position", String.class);
-            add(searchableFields, path, "activityStatus", String.class);
+            add(searchableFields, path, "activityStatus.name", String.class);
             add(searchableFields, path, "label", String.class);
             add(searchableFields, path, "temperature", Double.class);
             add(searchableFields, path, "comment", String.class);
@@ -195,7 +191,7 @@ public class SearchUtils {
             add(searchableFields, path, "sampleType.name", String.class);
             add(searchableFields, path, "quantity", Integer.class);
             add(searchableFields, path, "volume", String.class);
-            add(searchableFields, path, "activityStatus", String.class);
+            add(searchableFields, path, "activityStatus.name", String.class);
         }
 
         return searchableFields;
@@ -253,6 +249,7 @@ public class SearchUtils {
                 path = path + "patientVisit.";
             add(searchableFields, path, "patient", Patient.class);
             add(searchableFields, path, "aliquotCollection", Aliquot.class);
+            add(searchableFields, path, "shipmentCollection", Shipment.class);
         } else if (c == Contact.class) {
             if (collection)
                 path = path.replace('.', '_') + "contactCollection.";

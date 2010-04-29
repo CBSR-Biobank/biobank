@@ -89,7 +89,6 @@ public class AdvancedReportsEditor extends EditorPart {
 
     private QueryTree tree;
     private QueryTreeNode selectedNode;
-    private HashMap<String, String> checked;
 
     @Override
     public void init(IEditorSite site, IEditorInput input)
@@ -98,8 +97,6 @@ public class AdvancedReportsEditor extends EditorPart {
         setInput(input);
 
         node = ((ReportInput) input).node;
-        checked = SearchUtils.getColumnInfo(((QueryTreeNode) node.getQuery())
-            .getNodeInfo().getType());
 
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
@@ -166,30 +163,33 @@ public class AdvancedReportsEditor extends EditorPart {
                 SaveReportDialog dlg = new SaveReportDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell());
                 if (dlg.open() == Dialog.OK) {
-                    List<ReportTreeNode> siblings = node.getParent()
-                        .getChildren();
-                    for (ReportTreeNode sibling : siblings) {
-                        if (sibling.getLabel().compareTo("Custom") == 0) {
-                            List<ReportTreeNode> customNodes = sibling
-                                .getChildren();
-                            for (ReportTreeNode customNode : customNodes)
-                                if (customNode.getLabel().compareTo(
-                                    dlg.getName()) == 0) {
-                                    BioBankPlugin
-                                        .openAsyncError(
-                                            "Duplicate Name",
-                                            "A report already exists with that name. Please choose a different name or remove the duplicate first.");
-                                    return;
-                                }
-                            tree.saveTree(Platform.getInstanceLocation()
-                                .getURL().getPath()
-                                + "/saved_reports/", dlg.getName());
-                            ReportTreeNode custom = new ReportTreeNode(dlg
-                                .getName(), tree.getInput());
-                            custom.setParent(sibling);
-                            sibling.addChild(custom);
+                    ReportTreeNode custom = null;
+                    if (node.getParent().getLabel().compareTo("Advanced") == 0) {
+                        List<ReportTreeNode> siblings = node.getParent()
+                            .getChildren();
+                        for (ReportTreeNode sibling : siblings) {
+                            if (sibling.getLabel().compareTo("Custom") == 0) {
+                                custom = sibling;
+                            }
                         }
-                    }
+                    } else
+                        custom = node.getParent();
+                    List<ReportTreeNode> customNodes = custom.getChildren();
+                    for (ReportTreeNode customNode : customNodes)
+                        if (customNode.getLabel().compareTo(dlg.getName()) == 0) {
+                            BioBankPlugin
+                                .openAsyncError(
+                                    "Duplicate Name",
+                                    "A report already exists with that name. Please choose a different name or remove the duplicate first.");
+                            return;
+                        }
+                    tree.saveTree(Platform.getInstanceLocation().getURL()
+                        .getPath()
+                        + "/saved_reports/", dlg.getName());
+                    ReportTreeNode newReport = new ReportTreeNode(
+                        dlg.getName(), tree.getInput());
+                    newReport.setParent(custom);
+                    custom.addChild(newReport);
                     ReportsView.getTree().refresh();
                     ReportsView.getTree().expandAll();
                 }
@@ -328,8 +328,10 @@ public class AdvancedReportsEditor extends EditorPart {
         final Button box = new Button(parameterSection, SWT.CHECK);
         box.setText("Include in results");
         includedFields.add(box);
-        if (checked.containsValue(field.getPath() + field.getFname()))
-            box.setSelection(true);
+        if (field.getDisplay() != null) {
+            box.setSelection(field.getDisplay());
+        }
+
     }
 
     private void generate() {
