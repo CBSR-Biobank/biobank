@@ -109,6 +109,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private PalletBarCodeValidator palletLabelValidator;
 
+    private ModifyListener palletPositionModifyListener;
+
+    private String palletFoundWithProductBarcodeLabel;
+
+    private ContainerWrapper containerToRemove;
+
     @Override
     protected void init() {
         super.init();
@@ -178,10 +184,16 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                         currentPalletWrapper.getProductBarcode()).equals(
                         Status.OK_STATUS)) {
                     reset(true);
-                    getExistingPalletFromProductBarcode();
-                    if (palletLabelValidator.validate(
-                        currentPalletWrapper.getLabel()).equals(
-                        Status.OK_STATUS)) {
+                    // remove it so the text is not flagged as modifyed
+                    palletPositionText
+                        .removeModifyListener(palletPositionModifyListener);
+                    boolean exists = getExistingPalletFromProductBarcode();
+                    palletPositionText
+                        .addModifyListener(palletPositionModifyListener);
+                    if (!exists
+                        && palletLabelValidator.validate(
+                            currentPalletWrapper.getLabel()).equals(
+                            Status.OK_STATUS)) {
                         checkPallet();
                     }
                 }
@@ -217,12 +229,13 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 palletPositionTextModified = false;
             }
         });
-        palletPositionText.addModifyListener(new ModifyListener() {
+        palletPositionModifyListener = new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 palletPositionTextModified = true;
             }
-        });
+        };
+        palletPositionText.addModifyListener(palletPositionModifyListener);
 
         createPalletTypesViewer(fieldsComposite);
 
@@ -363,7 +376,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         return layout;
     }
 
-    private void getExistingPalletFromProductBarcode() {
+    /**
+     * @return true if a pallet already exists with this barcode
+     */
+    private boolean getExistingPalletFromProductBarcode() {
         try {
             palletFoundWithProductBarcode = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(appService,
@@ -371,7 +387,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     currentPalletWrapper.getProductBarcode());
             if (palletFoundWithProductBarcode == null) {
                 // no pallet found with this barcode
+                palletTypesViewer.setInput(palletContainerTypes);
                 palletTypesViewer.getCombo().setEnabled(true);
+                return false;
             } else {
                 // a pallet has been found
                 palletPositionText.setText(palletFoundWithProductBarcode
@@ -380,11 +398,20 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 palletTypesViewer.getCombo().setEnabled(false);
                 palletTypesViewer.setSelection(new StructuredSelection(
                     palletFoundWithProductBarcode.getContainerType()));
+                palletFoundWithProductBarcodeLabel = palletFoundWithProductBarcode
+                    .getLabel();
+                appendLogNLS(
+                    "ScanAssign.activitylog.pallet.productBarcode.exists",
+                    currentPalletWrapper.getProductBarcode(),
+                    palletFoundWithProductBarcode.getLabel(),
+                    palletFoundWithProductBarcode.getContainerType().getName());
+                return true;
             }
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Product barcode", ex); //$NON-NLS-1$
             setCanLaunchScan(false);
         }
+        return false;
     }
 
     @Override
@@ -707,6 +734,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     protected void saveForm() throws Exception {
         if (saveEvenIfAliquotsMissing()) {
+            if (containerToRemove != null) {
+                containerToRemove.delete();
+            }
             currentPalletWrapper.persist();
             displayPalletPositionInfo();
             int totalNb = 0;
@@ -850,17 +880,18 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             oldPalletLabel = null;
             newPallet = true;
             boolean needToCheckPosition = true;
-            ContainerTypeWrapper type = null;
-            appendLogNLS(
-                "ScanAssign.activitylog.pallet.checkingProductBarcode", //$NON-NLS-1$
-                currentPalletWrapper.getProductBarcode());
+            ContainerTypeWrapper type = currentPalletWrapper.getContainerType();
             if (palletFoundWithProductBarcode != null) {
                 // a pallet with this product barcode already exists in the
                 // database.
-                appendLogNLS("ScanAssign.activitylog.pallet.checkLabel", //$NON-NLS-1$
-                    currentPalletWrapper.getLabel());
-                if (palletFoundWithProductBarcode.getLabel().equals(
-                    currentPalletWrapper.getLabel())) {
+                appendLogNLS(
+                    "ScanAssign.activitylog.pallet.checkLabelForProductBarcode", //$NON-NLS-1$
+                    currentPalletWrapper.getLabel(),
+                    palletFoundWithProductBarcode.getProductBarcode());
+                // need to compare with this value, in case the container has
+                // been copied to the current pallet
+                if (palletFoundWithProductBarcodeLabel
+                    .equals(currentPalletWrapper.getLabel())) {
                     // The position already contains this pallet. Don't need to
                     // check it. Need to use exact same retrieved wrappedObject.
                     currentPalletWrapper
@@ -889,8 +920,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                         return false;
                     }
                 }
-                appendLogNLS("ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
-                    currentPalletWrapper.getContainerType().getName());
+                if (type != null) {
+                    appendLogNLS("ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
+                        type.getName());
+                }
             }
             if (needToCheckPosition) {
                 canContinue = checkAndSetPosition(type);
@@ -919,34 +952,55 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean checkAndSetPosition(ContainerTypeWrapper typeFixed)
         throws Exception {
         appendLogNLS(
-            "ScanAssign.activitylog.pallet.checkingPosition", currentPalletWrapper.getLabel()); //$NON-NLS-1$
-
+            "ScanAssign.activitylog.pallet.checkingPositionAvailable", currentPalletWrapper.getLabel()); //$NON-NLS-1$
+        containerToRemove = null;
         List<ContainerTypeWrapper> palletTypes = palletContainerTypes;
         if (typeFixed != null) {
             palletTypes = Arrays.asList(typeFixed);
         }
+        // search for containers at this position, with type in one of the type
+        // listed
         List<ContainerWrapper> containersAtPosition = currentPalletWrapper
             .getContainersWithSameLabelWithType(palletTypes);
+        String palletLabel = currentPalletWrapper.getLabel();
         if (containersAtPosition.size() == 0) {
-            currentPalletWrapper.setPositionAndParentFromLabel(
-                currentPalletWrapper.getLabel(), palletTypes);
+            appendLogNLS("ScanAssign.activitylog.pallet.positionAvailable",
+                palletLabel);
+            currentPalletWrapper.setPositionAndParentFromLabel(palletLabel,
+                palletTypes);
         } else if (containersAtPosition.size() == 1) {
+            // One container found
             ContainerWrapper containerAtPosition = containersAtPosition.get(0);
             String barcode = containerAtPosition.getProductBarcode();
             if ((barcode != null && !barcode.isEmpty())
                 || containerAtPosition.hasAliquots()) {
+                // Position already physically used
                 openDialogPositionUsed(barcode == null ? "[none]" : barcode);
                 return false;
             }
+            appendLogNLS("ScanAssign.activitylog.pallet.positionInitialized",
+                palletLabel);
+            // Position initialised but not physically used
             palletTypes = Arrays.asList(containerAtPosition.getContainerType());
             typeFixed = containerAtPosition.getContainerType();
-            String productbarcode = currentPalletWrapper.getProductBarcode();
-            currentPalletWrapper = containerAtPosition;
-            currentPalletWrapper.setProductBarcode(productbarcode);
+            if (palletFoundWithProductBarcode != null) {
+                containerToRemove = containerAtPosition;
+                // pallet already exists. Need to remove the initialisation to
+                // replace it.
+                currentPalletWrapper.setParent(containerAtPosition.getParent());
+                currentPalletWrapper.setPosition(containerAtPosition
+                    .getPosition());
+            } else {
+                // new pallet. Can use the initialised one
+                String productBarcode = currentPalletWrapper
+                    .getProductBarcode();
+                currentPalletWrapper.initObjectWith(containerAtPosition);
+                currentPalletWrapper.reset();
+                currentPalletWrapper.setProductBarcode(productBarcode);
+            }
         } else {
             BioBankPlugin.openAsyncError("Check position",
-                "Found more than one pallet with position "
-                    + currentPalletWrapper.getLabel());
+                "Found more than one pallet with position " + palletLabel);
             return false;
         }
         palletTypesViewer.setInput(palletTypes);
