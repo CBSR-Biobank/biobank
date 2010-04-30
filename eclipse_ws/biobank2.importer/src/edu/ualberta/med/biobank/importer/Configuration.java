@@ -30,13 +30,14 @@ public class Configuration {
 
         String property;
 
-        property = configProps.getProperty("cbsr.check.container_config");
-        if (property != null) {
-            checkContainerConfig = property.equals("yes");
-
         property = configProps.getProperty("cbsr.decode.patient_numbers");
         if (property != null) {
             decodePatientNumbers = property.equals("yes");
+        }
+
+        property = configProps.getProperty("cbsr.check.container_config");
+        if (property != null) {
+            checkContainerConfig = property.equals("yes");
         }
 
         property = configProps.getProperty("cbsr.import.patients");
