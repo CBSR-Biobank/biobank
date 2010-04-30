@@ -141,6 +141,7 @@ public class CbsrContainers {
             null, // BH
             h19Type, // BJ
             h19Type, // BK
+            h19Type, // BL
         };
 
         RowColPos pos = new RowColPos();
@@ -417,12 +418,15 @@ public class CbsrContainers {
             ftaBinLoerschType, // 25
             ftaBinLoerschType, // 26
             hairBinType, // 27,
-            null, // 28
+            hairBinType, // 28
             ftaBinLoerschType, // 29
             ftaBinLoerschType, // 30
             ftaBinLoerschType, // 31
             ftaBinLoerschType, // 32
             ftaBinLoerschType, // 33
+            ftaBinLoerschType, // 34
+            ftaBinLoerschType, // 35
+            ftaBinLoerschType, // 36
         };
 
         drawer = addContainer(site, drawerType, cabinet, 3, 0);
