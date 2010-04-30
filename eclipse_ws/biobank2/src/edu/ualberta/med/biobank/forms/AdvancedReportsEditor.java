@@ -236,6 +236,8 @@ public class AdvancedReportsEditor extends EditorPart {
     public void displayFields(QueryTreeNode node) {
         if (parameterSection != null)
             parameterSection.dispose();
+        Boolean allOrNone = node.getParent().getLabel().compareTo("All") == 0
+            || node.getParent().getLabel().compareTo("None") == 0;
         parameterSection = new Composite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
@@ -258,13 +260,13 @@ public class AdvancedReportsEditor extends EditorPart {
         textLabels = new ArrayList<Label>();
         fields = node.getFieldData();
         for (HQLField field : fields) {
-            drawField(field);
+            drawField(field, !allOrNone);
         }
         parameterSection.moveBelow(tree.getTree());
         top.layout(true, true);
     }
 
-    private void drawField(final HQLField field) {
+    private void drawField(final HQLField field, Boolean displayable) {
         Label fieldLabel = new Label(parameterSection, SWT.NONE);
         fieldLabel.setText(field.getFname().replaceAll(".name", "") + ":");
         textLabels.add(fieldLabel);
@@ -324,14 +326,14 @@ public class AdvancedReportsEditor extends EditorPart {
                 displayFields(selectedNode);
             }
         });
-
         final Button box = new Button(parameterSection, SWT.CHECK);
         box.setText("Include in results");
         includedFields.add(box);
         if (field.getDisplay() != null) {
             box.setSelection(field.getDisplay());
         }
-
+        if (!displayable)
+            box.setVisible(false);
     }
 
     private void generate() {

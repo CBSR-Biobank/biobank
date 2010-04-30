@@ -133,4 +133,12 @@ public class QueryTreeNode extends Object {
         return (QueryTreeNode) xStream.fromXML(xml.toString());
 
     }
+
+    public void setDisplayable(Boolean displayable) {
+        for (HQLField field : fieldData)
+            field.setDisplay(displayable);
+        for (QueryTreeNode child : children)
+            child.setDisplayable(displayable);
+    }
+
 }

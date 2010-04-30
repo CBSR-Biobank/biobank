@@ -286,7 +286,8 @@ public class QueryTree extends TreeViewer {
         }
         selectClause = selectClause.substring(0, selectClause.length() - 2)
             + " from " + type.getName() + " "
-            + type.getSimpleName().toLowerCase();
+            + String.valueOf(type.getSimpleName().charAt(0)).toLowerCase()
+            + type.getSimpleName().substring(1);
 
         String hqlString = selectClause + compileFromClause(fromClauses);
 
@@ -325,6 +326,21 @@ public class QueryTree extends TreeViewer {
             if ((child.getLabel().compareTo("All") == 0)
                 || (child.getLabel().compareTo("None") == 0)) {
                 QueryTreeNode childCollection = child.getChildren().get(0);
+                childCollection.setDisplayable(false);
+                String pathString = childCollection.getNodeInfo().getPath();
+                if (pathString.indexOf('.') != pathString.length() - 1) {
+                    pathString = pathString.replace(".", "_");
+                    fromClauses
+                        .add(childCollection.getNodeInfo().getPath()
+                            .substring(
+                                0,
+                                childCollection.getNodeInfo().getPath()
+                                    .length() - 1)
+                            + " as "
+                            + pathString.substring(0, pathString.length() - 1));
+                }
+                pathString = pathString.substring(0, childCollection
+                    .getNodeInfo().getPath().length() - 1);
                 String collectionName = childCollection.getNodeInfo().getPath()
                     + childCollection.getNodeInfo().getFname();
                 String name = childCollection.getNodeInfo().getPath().replace(
@@ -333,12 +349,11 @@ public class QueryTree extends TreeViewer {
                 String newSelect;
                 if (child.getLabel().compareTo("All") == 0)
                     newSelect = collectionName
-                        + ".size = (select count(*) from " + collectionName
-                        + " " + name;
+                        + ".size = (select count(*) from " + pathString + "."
+                        + childCollection.getNodeInfo().getFname() + " " + name;
                 else
-                    newSelect = "0 = (select count(*) from "
-                        + childCollection.getNodeInfo().getType().getName()
-                        + " " + name;
+                    newSelect = "0 = (select count(*) from " + pathString + "."
+                        + childCollection.getNodeInfo().getFname() + " " + name;
                 List<String> collectionWhereClauses = new ArrayList<String>();
                 HashSet<String> collectionFromClauses = new HashSet<String>();
                 Boolean addedSubFields = addClausesForNode(childCollection,
@@ -348,7 +363,8 @@ public class QueryTree extends TreeViewer {
                 String hqlString = newSelect
                     + compileFromClause(collectionFromClauses);
                 String where = compileWhereClause(collectionWhereClauses);
-                hqlString = hqlString + " where " + where;
+                if (where != null)
+                    hqlString = hqlString + " where " + where;
                 whereClauses.add(hqlString + ")");
                 addedFields = addedFields || addedSubFields;
                 addedChildren = addedChildren || addedSubChildren;
@@ -438,4 +454,5 @@ public class QueryTree extends TreeViewer {
     public HashMap<String, String> getSelectClauses() {
         return extraSelectClauses;
     }
+
 }
