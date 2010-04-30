@@ -7,6 +7,7 @@ import java.util.Properties;
 
 public class Configuration {
     private boolean checkContainerConfig;
+    private boolean decodePatientNumbers;
     private boolean importPatients;
     private boolean importShipments;
     private boolean importPatientVisits;
@@ -32,6 +33,10 @@ public class Configuration {
         property = configProps.getProperty("cbsr.check.container_config");
         if (property != null) {
             checkContainerConfig = property.equals("yes");
+
+        property = configProps.getProperty("cbsr.decode.patient_numbers");
+        if (property != null) {
+            decodePatientNumbers = property.equals("yes");
         }
 
         property = configProps.getProperty("cbsr.import.patients");
@@ -72,6 +77,10 @@ public class Configuration {
 
     public boolean checkContainerConfig() {
         return checkContainerConfig;
+    }
+
+    public boolean decodePatientNumbers() {
+        return decodePatientNumbers;
     }
 
     public boolean importPatients() {
