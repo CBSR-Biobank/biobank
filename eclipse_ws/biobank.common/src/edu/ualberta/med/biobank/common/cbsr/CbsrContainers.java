@@ -141,6 +141,7 @@ public class CbsrContainers {
             null, // BH
             h19Type, // BJ
             h19Type, // BK
+            h19Type, // BL
         };
 
         RowColPos pos = new RowColPos();
@@ -424,7 +425,7 @@ public class CbsrContainers {
             ftaBinLoerschType, // 32
             ftaBinLoerschType, // 33
             ftaBinLoerschType, // 34
-            null, // 35
+            ftaBinLoerschType, // 35
             ftaBinLoerschType, // 36
         };
 

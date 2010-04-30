@@ -247,6 +247,10 @@ public class Importer {
                         throw new Exception("Table " + table + " not found");
                 }
 
+                if (configuration.decodePatientNumbers()) {
+                    decodePatientNumbers();
+                }
+
                 appService = ServiceConnection.getAppService("http://"
                     + System.getProperty("server", "localhost:8080")
                     + "/biobank2", "testuser", "test");
@@ -254,10 +258,10 @@ public class Importer {
                 cbsrSite = getCbsrSite();
 
                 if (cbsrSite == null) {
-                    importAll();
-                } else {
-                    doImport();
+                    createCbsrConfiguration();
                 }
+
+                doImport();
 
                 logger.info("import complete");
             } catch (Exception e) {
@@ -276,7 +280,7 @@ public class Importer {
         }
     }
 
-    private static void importAll() throws Exception {
+    private static void createCbsrConfiguration() throws Exception {
         CbsrSite.deleteConfiguration(appService);
         logger.info("creating CBSR site...");
         cbsrSite = CbsrSite.addSite(appService);
@@ -292,7 +296,6 @@ public class Importer {
 
         logger.info("creating containers...");
         CbsrContainers.createContainers(cbsrSite);
-        doImport();
     }
 
     private static void doImport() throws Exception {
@@ -694,6 +697,30 @@ public class Importer {
                 + defaultClinicName + ") for patient " + patientNr);
         }
         return clinic;
+    }
+
+    private static void decodePatientNumbers() throws Exception {
+        logger.info("decoding patient numbers ...");
+
+        BlowfishCipher cipher = new BlowfishCipher();
+        Statement s = con.createStatement();
+        s.execute("select * from patient");
+        ResultSet rs = s.getResultSet();
+        if (rs == null) {
+            throw new Exception("Database query returned null");
+        }
+
+        while (rs.next()) {
+            String patientNr = cipher.decode(rs.getBytes(2));
+            String decChrNr = rs.getString(5);
+            if (decChrNr == null) {
+                PreparedStatement ps = con
+                    .prepareStatement("update patient set dec_chr_nr = ? where patient_nr = ?");
+                ps.setString(1, patientNr);
+                ps.setInt(2, rs.getInt(1));
+                ps.executeUpdate();
+            }
+        }
     }
 
     private static void importPatients() throws Exception {

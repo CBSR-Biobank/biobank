@@ -13,19 +13,19 @@ class Script < ScriptBase
 
   BBPDB_QUERY = <<BBPDB_QUERY_END
 SELECT inventory_id,date(process_date),study_name_short,dec_chr_nr,date_received,sample_name_short,
-cnum,drawer, bin, binpos
-FROM cabinet
-join patient_visit on patient_visit.visit_nr=cabinet.visit_nr
-join patient on patient.patient_nr=cabinet.patient_nr
-join study_list on study_list.study_nr=cabinet.study_nr
-join sample_list on sample_list.sample_nr=cabinet.sample_nr
+fnum,rack, box,cell
+FROM freezer
+join patient_visit on patient_visit.visit_nr=freezer.visit_nr
+join patient on patient.patient_nr=freezer.patient_nr
+join study_list on study_list.study_nr=freezer.study_nr
+join sample_list on sample_list.sample_nr=freezer.sample_nr
 where process_date>='2010-04-15'
 order by inventory_id
 BBPDB_QUERY_END
 
   BB2_QUERY = <<BB2_QUERY
 select inventory_id,date(link_date),study.name_short,patient.pnumber,
-patient_visit.date_processed,sample_type.name_short,container.label,row
+patient_visit.date_processed,sample_type.name_short,container.label,row,col
 from aliquot
 join patient_visit on patient_visit.id=aliquot.patient_visit_id
 join patient on patient.id=patient_visit.patient_id
@@ -41,19 +41,19 @@ and substr(path, 1, locate('/', path)-1) in
 (SELECT container.id
     FROM container
     join container_type on container_type.id=container.container_type_id
-    where name like 'Cabinet%')
+    where name like 'Freezer%')
 order by inventory_id
 BB2_QUERY
 
   def initialize
-    getBbpdbCabinetSamples
-    getBiobank2CabinetSamples
+    getBbpdbFreezerSamples
+    getBiobank2FreezerSamples
   end
 
-  def getBbpdbCabinetSamples
+  def getBbpdbFreezerSamples
     getDbConnection("bbpdb")
     res = @dbh.query(BBPDB_QUERY)
-    f = File.new("bbpdb_cabinet.csv", "w")
+    f = File.new("bbpdb_freezer.csv", "w")
     while row = res.fetch_row do
       buf = ','
       label = sprintf("%02d%s%02d%s", row[6], row[7], row[8], row[9])
@@ -62,13 +62,13 @@ BB2_QUERY
     f.close
   end
 
-  def getBiobank2CabinetSamples
+  def getBiobank2FreezerSamples
     getDbConnection("biobank2")
     res = @dbh.query(BB2_QUERY)
-    f = File.new("biobank2_cabinet.csv", "w")
+    f = File.new("biobank2_freezer.csv", "w")
     while row = res.fetch_row do
       buf = ','
-      label = sprintf("%s%c%c", row[6], CBSR_ALPHA[row[7].to_i / CBSR_ALPHA.length], CBSR_ALPHA[row[7].to_i % CBSR_ALPHA.length])
+      label = sprintf("%s%c%d", row[6], CBSR_ALPHA[row[7].to_i], row[8].to_i + 1)
       f.write CSV.generate_line([row[0], row[1], getStudyOldName(row[2]), row[3], row[5], label], ',') << "\n"
     end
     f.close
