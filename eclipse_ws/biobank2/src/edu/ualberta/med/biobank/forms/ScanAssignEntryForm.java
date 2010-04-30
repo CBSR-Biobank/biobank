@@ -821,6 +821,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         fieldsComposite.setEnabled(true);
         showOnlyPallet(true);
         form.layout(true);
+        palletproductBarcodeText.setFocus();
     }
 
     public void reset(boolean beforeScan) {
