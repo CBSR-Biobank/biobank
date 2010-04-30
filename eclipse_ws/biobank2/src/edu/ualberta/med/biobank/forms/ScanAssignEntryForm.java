@@ -183,10 +183,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     && productBarcodeValidator.validate(
                         currentPalletWrapper.getProductBarcode()).equals(
                         Status.OK_STATUS)) {
-                    reset(true);
-                    // remove it so the text is not flagged as modifyed
                     palletPositionText
                         .removeModifyListener(palletPositionModifyListener);
+                    reset(true);
+                    // remove it so the text is not flagged as modifyed
                     boolean exists = getExistingPalletFromProductBarcode();
                     palletPositionText
                         .addModifyListener(palletPositionModifyListener);
@@ -392,9 +392,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 return false;
             } else {
                 // a pallet has been found
-                palletPositionText.setText(palletFoundWithProductBarcode
-                    .getLabel());
+                currentPalletWrapper
+                    .initObjectWith(palletFoundWithProductBarcode);
+                currentPalletWrapper.reset();
                 palletPositionText.selectAll();
+                palletLabelValidator.validate(palletPositionText.getText());
                 palletTypesViewer.getCombo().setEnabled(false);
                 palletTypesViewer.setSelection(new StructuredSelection(
                     palletFoundWithProductBarcode.getContainerType()));
@@ -423,10 +425,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                displayPalletPositions();
                 palletWidget.setCells(cells);
                 setDirty(true);
                 setRescanMode();
-                displayPalletPositions();
                 focusOnCancelConfirmText();
                 containersComposite.layout(true, true);
             }
@@ -968,6 +970,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 palletLabel);
             currentPalletWrapper.setPositionAndParentFromLabel(palletLabel,
                 palletTypes);
+            palletTypes = palletContainerTypes;
+            typeFixed = null;
         } else if (containersAtPosition.size() == 1) {
             // One container found
             ContainerWrapper containerAtPosition = containersAtPosition.get(0);
@@ -1003,9 +1007,18 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 "Found more than one pallet with position " + palletLabel);
             return false;
         }
+        ContainerTypeWrapper oldSelection = currentPalletWrapper
+            .getContainerType();
         palletTypesViewer.setInput(palletTypes);
+        if (oldSelection != null) {
+            palletTypesViewer
+                .setSelection(new StructuredSelection(oldSelection));
+        }
         if (typeFixed != null) {
             palletTypesViewer.setSelection(new StructuredSelection(typeFixed));
+        }
+        if (palletTypes.size() == 1) {
+            palletTypesViewer.getCombo().select(0);
         }
         palletTypesViewer.getCombo().setEnabled(typeFixed == null);
         return true;
