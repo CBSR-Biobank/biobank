@@ -590,7 +590,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         linkFormPatientManagement.reset(resetAll);
         getCancelConfirmWidget().reset();
         removeRescanMode();
-        enableScan(false);
+        setScanHasBeenLauched(false);
         setScanNotLauched();
         if (resetAll) {
             resetPlateToScan();

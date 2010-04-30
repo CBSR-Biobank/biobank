@@ -1,16 +1,15 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -20,6 +19,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
@@ -71,10 +72,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private Label hotelLabel;
     private GridContainerWidget hotelWidget;
 
-    // true if no errors in aliquots scan and process
-    private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
-        Boolean.class);
-
     protected ContainerWrapper currentPalletWrapper;
 
     // for debugging only (fake scan) :
@@ -102,6 +99,16 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private boolean isFakeScanLinkedOnly;
 
+    protected boolean palletproductBarcodeTextModified;
+
+    protected boolean palletPositionTextModified;
+
+    private List<ContainerTypeWrapper> palletContainerTypes;
+
+    private NonEmptyStringValidator productBarcodeValidator;
+
+    private PalletBarCodeValidator palletLabelValidator;
+
     @Override
     protected void init() {
         super.init();
@@ -121,9 +128,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         createContainersVisualisationSection();
 
         createCancelConfirmWidget();
-
-        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-            scanValidValue, Messages.getString("ScanAssign.scanErrorMsg")); //$NON-NLS-1$
     }
 
     private void createFieldsSection() throws Exception {
@@ -150,12 +154,16 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
+        productBarcodeValidator = new NonEmptyStringValidator( //$NON-NLS-1$
+            Messages.getString("ScanAssign.productBarcode.validationMsg"));
+        palletLabelValidator = new PalletBarCodeValidator(Messages
+            .getString("ScanAssign.palletLabel.validationMsg"));
+
         palletproductBarcodeText = (Text) createBoundWidgetWithLabel(
             fieldsComposite, Text.class, SWT.NONE, Messages
                 .getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
             null, BeansObservables.observeValue(currentPalletWrapper,
-                "productBarcode"), new NonEmptyStringValidator( //$NON-NLS-1$
-                Messages.getString("ScanAssign.productBarcode.validationMsg"))); //$NON-NLS-1$
+                "productBarcode"), productBarcodeValidator); //$NON-NLS-1$
         palletproductBarcodeText
             .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
@@ -165,7 +173,25 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletproductBarcodeText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                getExistingPalletFromProductBarcode();
+                if (palletproductBarcodeTextModified
+                    && productBarcodeValidator.validate(
+                        currentPalletWrapper.getProductBarcode()).equals(
+                        Status.OK_STATUS)) {
+                    reset(true);
+                    getExistingPalletFromProductBarcode();
+                    if (palletLabelValidator.validate(
+                        currentPalletWrapper.getLabel()).equals(
+                        Status.OK_STATUS)) {
+                        checkPallet();
+                    }
+                }
+                palletproductBarcodeTextModified = false;
+            }
+        });
+        palletproductBarcodeText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                palletproductBarcodeTextModified = true;
             }
         });
 
@@ -173,12 +199,30 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             Text.class, SWT.NONE, Messages
                 .getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
             BeansObservables.observeValue(currentPalletWrapper, "label"), //$NON-NLS-1$
-            new PalletBarCodeValidator(Messages
-                .getString("ScanAssign.palletLabel.validationMsg"))); //$NON-NLS-1$
+            palletLabelValidator); //$NON-NLS-1$
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         palletPositionText.setLayoutData(gd);
+        palletPositionText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (palletPositionTextModified
+                    && palletLabelValidator.validate(
+                        currentPalletWrapper.getLabel()).equals(
+                        Status.OK_STATUS)) {
+                    reset(true);
+                    setCanLaunchScan(checkPallet());
+                }
+                palletPositionTextModified = false;
+            }
+        });
+        palletPositionText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                palletPositionTextModified = true;
+            }
+        });
 
         createPalletTypesViewer(fieldsComposite);
 
@@ -188,7 +232,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createPalletTypesViewer(Composite parent) throws Exception {
-        List<ContainerTypeWrapper> palletContainerTypes = getPalletContainerTypes();
+        palletContainerTypes = getPalletContainerTypes();
         palletTypesViewer = createComboViewerWithNoSelectionValidator(parent,
             Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
             palletContainerTypes, null, Messages
@@ -309,7 +353,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 break;
             }
         }
-
     }
 
     private GridLayout getNeutralGridLayout() {
@@ -340,62 +383,36 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             }
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Product barcode", ex); //$NON-NLS-1$
+            setCanLaunchScan(false);
         }
     }
 
     @Override
     protected void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception {
-        boolean canLaunchScan = false;
-        if (isRescanMode()) {
-            canLaunchScan = true;
-        } else {
-            // if another scan has been done on this same form, need to
-            // reset values set before
-            reset(true);
-            canLaunchScan = checkPallet();
-        }
-        if (canLaunchScan) {
-            showOnlyPallet(false);
-            launchScan(monitor);
-            processScanResult(monitor);
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    palletWidget.setCells(cells);
-                    setDirty(true);
-                    setRescanMode();
-                    endScan();
-                }
-            });
-        } else {
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
-                    showOnlyPallet(true);
-                    scanValidValue.setValue(false);
-                    endScan();
-                }
-            });
-        }
-    }
-
-    protected void endScan() {
-        displayPalletPositions();
-        focusOnCancelConfirmText();
-        containersComposite.layout(true, true);
-
-    }
-
-    @Override
-    protected void setScanOk(final boolean scanOk) {
+        showOnlyPallet(false, true);
+        launchScan(monitor);
+        processScanResult(monitor);
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                scanValidValue.setValue(scanOk);
+                palletWidget.setCells(cells);
+                setDirty(true);
+                setRescanMode();
+                displayPalletPositions();
+                focusOnCancelConfirmText();
+                containersComposite.layout(true, true);
             }
         });
+    }
+
+    protected void disableScan() {
+        showOnlyPallet(true);
+        palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
+        setScanValid(false);
+        displayPalletPositions();
+        focusOnCancelConfirmText();
+        containersComposite.layout(true, true);
     }
 
     @Override
@@ -458,20 +475,27 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        setScanOk(currentScanState != AliquotCellStatus.ERROR);
+        setScanValid(currentScanState != AliquotCellStatus.ERROR);
     }
 
-    private void showOnlyPallet(final boolean show) {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                freezerLabel.getParent().setVisible(!show);
-                ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
-                hotelLabel.getParent().setVisible(!show);
-                ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
-            }
-        });
+    private void showOnlyPallet(boolean show) {
+        freezerLabel.getParent().setVisible(!show);
+        ((GridData) freezerLabel.getParent().getLayoutData()).exclude = show;
+        hotelLabel.getParent().setVisible(!show);
+        ((GridData) hotelLabel.getParent().getLayoutData()).exclude = show;
+    }
 
+    private void showOnlyPallet(final boolean show, boolean async) {
+        if (async) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    showOnlyPallet(show);
+                }
+            });
+        } else {
+            showOnlyPallet(show);
+        }
     }
 
     protected void displayPalletPositions() {
@@ -763,64 +787,52 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     public void reset() throws Exception {
         reset(false);
         fieldsComposite.setEnabled(true);
+        showOnlyPallet(true);
+        form.layout(true);
     }
 
-    public void reset(boolean beforeScan) throws Exception {
+    public void reset(boolean beforeScan) {
         String productBarcode = ""; //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
         ContainerTypeWrapper type = null;
 
         if (beforeScan) { // keep fields values
-            productBarcode = currentPalletWrapper.getProductBarcode();
-            label = currentPalletWrapper.getLabel();
+            productBarcode = palletproductBarcodeText.getText();
+            label = palletPositionText.getText();
             type = currentPalletWrapper.getContainerType();
-            currentPalletWrapper.resetToNewObject();
         } else {
             if (palletTypesViewer != null) {
                 palletTypesViewer.getCombo().deselectAll();
             }
+            setScanHasBeenLauched(false);
             removeRescanMode();
             freezerWidget.setSelection(null);
             hotelWidget.setSelection(null);
             palletWidget.setCells(null);
         }
         movedAndMissingAliquotsFromPallet.clear();
-        setScanNotLauched(true);
+        setScanNotLauched();
         initPalletValues();
 
-        if (beforeScan) { // re-apply fields values
-            currentPalletWrapper.setProductBarcode(productBarcode);
-            currentPalletWrapper.setLabel(label);
-            currentPalletWrapper.setContainerType(type);
-        } else {
+        currentPalletWrapper.setProductBarcode(productBarcode);
+        productBarcodeValidator.validate(productBarcode);
+        currentPalletWrapper.setLabel(label);
+        palletLabelValidator.validate(label);
+        currentPalletWrapper.setContainerType(type);
+        if (!beforeScan) {
             setDirty(false);
         }
     }
 
     private void initPalletValues() {
         try {
-            currentPalletWrapper.reset();
+            currentPalletWrapper.resetToNewObject();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
             currentPalletWrapper.setSite(SessionManager.getInstance()
                 .getCurrentSite());
         } catch (Exception e) {
             logger.error("Error while reseting pallet values", e); //$NON-NLS-1$
-        }
-    }
-
-    @Override
-    protected void handleStatusChanged(IStatus status) {
-        super.handleStatusChanged(status);
-        if (status.getSeverity() != IStatus.OK) {
-            if (isPlateValid()) {
-                enableScan(!palletproductBarcodeText.getText().isEmpty()
-                    && !palletPositionText.getText().isEmpty());
-            }
-            if (palletTypesViewer != null
-                && palletTypesViewer.getCombo().getSelectionIndex() == -1) {
-                enableScan(false);
-            }
         }
     }
 
@@ -832,51 +844,59 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     /**
      * From the pallet product barcode, get existing information from database
      */
-    private boolean checkPallet() throws Exception {
+    private boolean checkPallet() {
         boolean canContinue = true;
-        oldPalletLabel = null;
-        newPallet = true;
-        boolean needToCheckPosition = true;
-        appendLogNLS("ScanAssign.activitylog.pallet.checkingProductBarcode", //$NON-NLS-1$
-            currentPalletWrapper.getProductBarcode());
-        if (palletFoundWithProductBarcode != null) {
-            // a pallet with this product barcode already exists in the
-            // database.
-            appendLogNLS("ScanAssign.activitylog.pallet.checkLabel", //$NON-NLS-1$
-                currentPalletWrapper.getLabel());
-            if (palletFoundWithProductBarcode.getLabel().equals(
-                currentPalletWrapper.getLabel())) {
-                // The position already contains this pallet. Don't need to
-                // check it. Need to use exact same retrieved wrappedObject.
-                currentPalletWrapper
-                    .initObjectWith(palletFoundWithProductBarcode);
-                currentPalletWrapper.reset();
-                needToCheckPosition = false;
-                newPallet = false;
-            } else {
-                canContinue = openDialogPalletMoved();
-                if (canContinue) {
-                    // Move the pallet.
-                    // Need to use exact same retrieved wrappedObject.
-                    oldPalletLabel = palletFoundWithProductBarcode.getLabel();
-                    palletFoundWithProductBarcode.setLabel(currentPalletWrapper
-                        .getLabel());
+        try {
+            oldPalletLabel = null;
+            newPallet = true;
+            boolean needToCheckPosition = true;
+            ContainerTypeWrapper type = null;
+            appendLogNLS(
+                "ScanAssign.activitylog.pallet.checkingProductBarcode", //$NON-NLS-1$
+                currentPalletWrapper.getProductBarcode());
+            if (palletFoundWithProductBarcode != null) {
+                // a pallet with this product barcode already exists in the
+                // database.
+                appendLogNLS("ScanAssign.activitylog.pallet.checkLabel", //$NON-NLS-1$
+                    currentPalletWrapper.getLabel());
+                if (palletFoundWithProductBarcode.getLabel().equals(
+                    currentPalletWrapper.getLabel())) {
+                    // The position already contains this pallet. Don't need to
+                    // check it. Need to use exact same retrieved wrappedObject.
                     currentPalletWrapper
                         .initObjectWith(palletFoundWithProductBarcode);
-                    appendLogNLS(
-                        "ScanAssign.activitylog.pallet.moveInfo", //$NON-NLS-1$
-                        currentPalletWrapper.getProductBarcode(),
-                        palletFoundWithProductBarcode.getLabel(),
-                        currentPalletWrapper.getLabel());
+                    currentPalletWrapper.reset();
+                    needToCheckPosition = false;
+                    newPallet = false;
                 } else {
-                    return false;
+                    canContinue = openDialogPalletMoved();
+                    if (canContinue) {
+                        // Move the pallet.
+                        // Need to use exact same retrieved wrappedObject.
+                        oldPalletLabel = palletFoundWithProductBarcode
+                            .getLabel();
+                        palletFoundWithProductBarcode
+                            .setLabel(currentPalletWrapper.getLabel());
+                        currentPalletWrapper
+                            .initObjectWith(palletFoundWithProductBarcode);
+                        type = currentPalletWrapper.getContainerType();
+                        appendLogNLS(
+                            "ScanAssign.activitylog.pallet.moveInfo", //$NON-NLS-1$
+                            currentPalletWrapper.getProductBarcode(),
+                            palletFoundWithProductBarcode.getLabel(),
+                            currentPalletWrapper.getLabel());
+                    } else {
+                        return false;
+                    }
                 }
+                appendLogNLS("ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
+                    currentPalletWrapper.getContainerType().getName());
             }
-            appendLogNLS("ScanAssign.activitylog.pallet.typeUsed", //$NON-NLS-1$
-                currentPalletWrapper.getContainerType().getName());
-        }
-        if (needToCheckPosition) {
-            canContinue = checkAndSetPosition();
+            if (needToCheckPosition) {
+                canContinue = checkAndSetPosition(type);
+            }
+        } catch (Exception ex) {
+            BioBankPlugin.openAsyncError("Check Pallet", ex); //$NON-NLS-1$
         }
         return canContinue;
     }
@@ -896,33 +916,52 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      * 
      * @return true if was able to create the ContainerPosition
      */
-    private boolean checkAndSetPosition() throws Exception {
+    private boolean checkAndSetPosition(ContainerTypeWrapper typeFixed)
+        throws Exception {
         appendLogNLS(
             "ScanAssign.activitylog.pallet.checkingPosition", currentPalletWrapper.getLabel()); //$NON-NLS-1$
 
-        ContainerWrapper containerAtPosition = currentPalletWrapper
-            .getContainer(currentPalletWrapper.getLabel(), currentPalletWrapper
-                .getContainerType());
-        if (containerAtPosition == null) {
-            currentPalletWrapper
-                .setPositionAndParentFromLabel(currentPalletWrapper.getLabel());
-            return true;
+        List<ContainerTypeWrapper> palletTypes = palletContainerTypes;
+        if (typeFixed != null) {
+            palletTypes = Arrays.asList(typeFixed);
+        }
+        List<ContainerWrapper> containersAtPosition = currentPalletWrapper
+            .getContainersWithSameLabelWithType(palletTypes);
+        if (containersAtPosition.size() == 0) {
+            currentPalletWrapper.setPositionAndParentFromLabel(
+                currentPalletWrapper.getLabel(), palletTypes);
+        } else if (containersAtPosition.size() == 1) {
+            ContainerWrapper containerAtPosition = containersAtPosition.get(0);
+            String barcode = containerAtPosition.getProductBarcode();
+            if ((barcode != null && !barcode.isEmpty())
+                || containerAtPosition.hasAliquots()) {
+                openDialogPositionUsed(barcode == null ? "[none]" : barcode);
+                return false;
+            }
+            palletTypes = Arrays.asList(containerAtPosition.getContainerType());
+            typeFixed = containerAtPosition.getContainerType();
+            String productbarcode = currentPalletWrapper.getProductBarcode();
+            currentPalletWrapper = containerAtPosition;
+            currentPalletWrapper.setProductBarcode(productbarcode);
         } else {
-            openDialogPositionUsed(containerAtPosition);
+            BioBankPlugin.openAsyncError("Check position",
+                "Found more than one pallet with position "
+                    + currentPalletWrapper.getLabel());
             return false;
         }
+        palletTypesViewer.setInput(palletTypes);
+        if (typeFixed != null) {
+            palletTypesViewer.setSelection(new StructuredSelection(typeFixed));
+        }
+        palletTypesViewer.getCombo().setEnabled(typeFixed == null);
+        return true;
     }
 
-    private void openDialogPositionUsed(ContainerWrapper containerAtPosition) {
-        String barcode = containerAtPosition.getProductBarcode();
-        if (barcode == null) {
-            barcode = "[none]"; //$NON-NLS-1$
-        }
+    private void openDialogPositionUsed(String barcode) {
         BioBankPlugin.openAsyncError(Messages
             .getString("ScanAssign.dialog.positionUsed.title"), //$NON-NLS-1$
             Messages.getFormattedString(
                 "ScanAssign.dialog.positionUsed.msg", barcode)); //$NON-NLS-1$
-
         appendLogNLS("ScanAssign.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
             currentPalletWrapper.getLabel()); //$NON-NLS-1$
     }

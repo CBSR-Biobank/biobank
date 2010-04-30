@@ -44,8 +44,12 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
-    private IObservableValue scanLaunchedValue = new WritableValue(
+    private IObservableValue canLaunchScanValue = new WritableValue(
+        Boolean.TRUE, Boolean.class);
+    private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
+    private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     private String currentPlateToScan;
 
@@ -90,8 +94,14 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void addScanBindings() {
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            scanLaunchedValue, Messages
-                .getString("linkAssign.scanLaunchValidationMsg")); //$NON-NLS-1$
+            canLaunchScanValue, Messages
+                .getString("linkAssign.canLaunchScanValidationMsg")); //$NON-NLS-1$
+        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+            scanHasBeenLaunchedValue, Messages
+                .getString("linkAssign.scanHasBeenLaunchedValidationMsg")); //$NON-NLS-1$
+        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
+            scanValidValue, Messages
+                .getString("linkAssign.scanValidValidationMsg")); //$NON-NLS-1$
     }
 
     protected void createScanButton(Composite parent) {
@@ -169,12 +179,12 @@ public abstract class AbstractPalletAliquotAdminForm extends
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
-                    setScanOk(false);
+                    setScanValid(false);
                 } catch (Exception e) {
                     BioBankPlugin.openAsyncError(Messages
                         .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
                         e);
-                    setScanOk(false);
+                    setScanValid(false);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
                         msg = e.getCause().getMessage();
@@ -197,9 +207,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
         if (scanChoiceSimple != null) {
             isScanChoiceSimple = scanChoiceSimple.getSelection();
         }
-    }
-
-    protected void setScanOk(@SuppressWarnings("unused") boolean scanOk) {
     }
 
     protected abstract void scanAndProcessResult(IProgressMonitor monitor)
@@ -275,7 +282,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void setScanNotLauched() {
-        scanLaunchedValue.setValue(false);
+        scanHasBeenLaunchedValue.setValue(false);
     }
 
     protected void setScanNotLauched(boolean async) {
@@ -289,8 +296,16 @@ public abstract class AbstractPalletAliquotAdminForm extends
             setScanNotLauched();
     }
 
+    protected void setScanValid(final boolean valid) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                scanValidValue.setValue(valid);
+            }
+        });
+    }
+
     protected void setScanHasBeenLauched() {
-        scanLaunchedValue.setValue(true);
+        scanHasBeenLaunchedValue.setValue(true);
     }
 
     protected void setScanHasBeenLauched(boolean async) {
@@ -313,7 +328,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         rescanMode = false;
     }
 
-    protected void enableScan(boolean enabled) {
+    private void enableScan(boolean enabled) {
         scanButton.setEnabled(enabled);
     }
 
@@ -333,5 +348,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected CancelConfirmWidget getCancelConfirmWidget() {
         return cancelConfirmWidget;
+    }
+
+    protected void setCanLaunchScan(boolean canLauch) {
+        canLaunchScanValue.setValue(canLauch);
     }
 }
