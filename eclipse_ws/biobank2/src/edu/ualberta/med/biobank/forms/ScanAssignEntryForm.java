@@ -979,7 +979,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 return false;
             }
             appendLogNLS("ScanAssign.activitylog.pallet.positionInitialized",
-                palletLabel);
+                palletLabel, containerAtPosition.getContainerType().getName());
             // Position initialised but not physically used
             palletTypes = Arrays.asList(containerAtPosition.getContainerType());
             typeFixed = containerAtPosition.getContainerType();
