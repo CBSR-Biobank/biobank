@@ -454,8 +454,12 @@ public abstract class AdapterBase {
             };
             childUpdateThread.start();
         } catch (Exception e) {
-            logger.error("Error while expanding children of node "
-                + modelObject.toString(), e);
+            String nodeString = "null";
+            if (modelObject != null) {
+                nodeString = modelObject.toString();
+            }
+            logger.error(
+                "Error while expanding children of node " + nodeString, e);
         }
     }
 

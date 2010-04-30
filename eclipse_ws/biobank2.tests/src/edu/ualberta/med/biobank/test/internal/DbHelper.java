@@ -45,7 +45,7 @@ public class DbHelper {
             if (container.hasChildren()) {
                 deleteContainers(container.getChildren().values());
             }
-            if (container.hasSamples()) {
+            if (container.hasAliquots()) {
                 deleteFromList(container.getAliquots().values());
             }
             container.reload();

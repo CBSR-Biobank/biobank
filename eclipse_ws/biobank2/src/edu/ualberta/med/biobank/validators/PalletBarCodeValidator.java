@@ -18,16 +18,18 @@ public class PalletBarCodeValidator extends AbstractValidator {
 
     @Override
     public IStatus validate(Object value) {
-        if (!(value instanceof String)) {
+        if (value != null && !(value instanceof String)) {
             throw new RuntimeException(
                 "Not supposed to be called for non-strings.");
         }
 
-        String v = (String) value;
-        Matcher m = PATTERN.matcher(v);
-        if (m.matches()) {
-            hideDecoration();
-            return Status.OK_STATUS;
+        if (value != null) {
+            String v = (String) value;
+            Matcher m = PATTERN.matcher(v);
+            if (m.matches()) {
+                hideDecoration();
+                return Status.OK_STATUS;
+            }
         }
         showDecoration();
         return ValidationStatus.error(errorMessage);

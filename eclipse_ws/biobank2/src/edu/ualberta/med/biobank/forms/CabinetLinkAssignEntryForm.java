@@ -622,12 +622,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
-    public void getSampleTypes() throws ApplicationException {
-
-        ContainerWrapper.getContainersHoldingContainerType(appService, "",
-            SessionManager.getInstance().getCurrentSite(), null);
-    }
-
     @Override
     public void reset() throws Exception {
         aliquot.resetToNewObject();
