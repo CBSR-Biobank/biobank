@@ -100,6 +100,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private CabinetLabelValidator cabinetPositionvalidator;
 
+    protected boolean inventoryIdModified;
+
     @Override
     protected void init() {
         super.init();
@@ -201,7 +203,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             }
         });
-        final Button radioMove = toolkit.createButton(fieldsComposite, Messages
+        Button radioMove = toolkit.createButton(fieldsComposite, Messages
             .getString("Cabinet.button.move.text"), SWT.RADIO); //$NON-NLS-1$
         gd = new GridData();
         gd.horizontalSpan = 2;
@@ -209,7 +211,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         radioMove.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (radioMove.getSelection()) {
+                if (!radioNew.getSelection()) {
                     setMoveMode(true);
                 }
             }
@@ -244,7 +246,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (!radioNew.getSelection()) {
+                if (inventoryIdModified && !radioNew.getSelection()) {
                     // Move Mode only
                     try {
                         retrieveAliquotDataForMoving();
@@ -253,6 +255,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                             .openAsyncError("Move - aliquot error", ex); //$NON-NLS-1$
                     }
                 }
+                inventoryIdModified = false;
+            }
+        });
+        inventoryIdText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                inventoryIdModified = true;
             }
         });
 
@@ -292,7 +301,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 positionTextModified = true;
-                viewerSampleTypes.setInput(null);
+                if (radioNew.getSelection()) {
+                    viewerSampleTypes.setInput(null);
+                }
             }
         });
 
@@ -494,9 +505,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         + ") and that are defined as possible for bin "
                         + bin.getLabel());
             }
+            if (!radioNew.getSelection()) {
+                // Move
+                SampleTypeWrapper type = aliquot.getSampleType();
+                if (!studiesSampleTypes.contains(type)
+                    && binTypes.contains(type)) {
+                    // in move mode, the sample source could be deactivate
+                    studiesSampleTypes.add(type);
+                }
+            }
         }
         viewerSampleTypes.setInput(studiesSampleTypes);
         if (radioNew.getSelection()) {
+            viewerSampleTypes.getCombo().setEnabled(true);
             if (studiesSampleTypes.size() == 1) {
                 viewerSampleTypes.getCombo().select(0);
                 aliquot.setSampleType(studiesSampleTypes.get(0));
@@ -507,6 +528,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         } else {
             viewerSampleTypes.setSelection(new StructuredSelection(aliquot
                 .getSampleType()));
+            viewerSampleTypes.getCombo().setEnabled(false);
         }
         return studiesSampleTypes.size();
     }
@@ -546,7 +568,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             throw new Exception("No aliquot found with inventoryId " //$NON-NLS-1$
                 + aliquot.getInventoryId());
         }
-        aliquot = aliquots.get(0);
+        aliquot.initObjectWith(aliquots.get(0));
         PatientWrapper patient = aliquot.getPatientVisit().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient, aliquot
             .getPatientVisit());

@@ -129,4 +129,9 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return getSampleType().getName() + "/" + getQuantity() + "/"
+            + getActivityStatus();
+    }
 }
