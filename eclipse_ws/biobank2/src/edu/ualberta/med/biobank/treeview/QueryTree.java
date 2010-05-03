@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 public class QueryTree extends TreeViewer {
 
     private LinkedHashMap<String, String> extraSelectClauses;
+    private static HashMap<String, String> displayed;
 
     public QueryTree(Composite parent, int style, QueryTreeNode node) {
         super(parent, style);
@@ -222,12 +223,17 @@ public class QueryTree extends TreeViewer {
     }
 
     public static QueryTreeNode constructTree(HQLField root) {
+        // root node might have auto-activated fields
         QueryTreeNode dummy = new QueryTreeNode(new HQLField("", "", root
             .getType()));
         QueryTreeNode rootNode = new QueryTreeNode(root);
+
+        displayed = (SearchUtils
+            .getColumnInfo(rootNode.getNodeInfo().getType()));
         expand(rootNode);
         rootNode.setParent(dummy);
         dummy.addChild(rootNode);
+
         return dummy;
     }
 
@@ -238,13 +244,6 @@ public class QueryTree extends TreeViewer {
 
         List<HQLField> fields = SearchUtils.getSimpleFields(node.getNodeInfo()
             .getType(), node.getNodeInfo().getPath(), collection);
-
-        // root node might have auto-activated fields
-        HashMap<String, String> displayed = new HashMap<String, String>();
-        if (node.getNodeInfo().getPath().compareTo("") == 0) {
-            displayed.putAll(SearchUtils.getColumnInfo(node.getNodeInfo()
-                .getType()));
-        }
 
         for (HQLField field : fields) {
             node.addField(field);
