@@ -83,8 +83,8 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         "Type", "Position", "Link Date", "Quantity (ml)", "Activity Status",
         "Comment" };
 
-    private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, 150,
-        150, 150, -1 };
+    private static final int[] BOUNDS = new int[] { 80, 80, 120, 120, 80, 80,
+        80, -1 };
 
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection) {

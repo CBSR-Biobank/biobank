@@ -3,10 +3,11 @@ package edu.ualberta.med.biobank.views;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
@@ -29,8 +30,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.utils.SearchType;
 
 public class SearchView extends ViewPart {
@@ -57,6 +56,19 @@ public class SearchView extends ViewPart {
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         searchTypeCombo.getCombo().setLayoutData(gd);
+        searchTypeCombo
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection selection = (IStructuredSelection) event
+                        .getSelection();
+                    SearchType searchType = (SearchType) selection
+                        .getFirstElement();
+                    searchText
+                        .setEnabled(searchType != SearchType.ALIQUOT_NON_ACTIVE);
+                    searchText.setText("");
+                }
+            });
 
         searchText = new Text(parent, SWT.BORDER);
         gd = new GridData();
@@ -141,24 +153,7 @@ public class SearchView extends ViewPart {
                     List<? extends ModelWrapper<?>> res = type
                         .search(searchString);
                     if (res != null && res.size() > 0) {
-                        int size = res.size();
-                        if (size == 1) {
-                            openResult(res.get(0));
-                        } else {
-                            boolean open = MessageDialog
-                                .openQuestion(
-                                    PlatformUI.getWorkbench()
-                                        .getActiveWorkbenchWindow().getShell(),
-                                    "Search Result",
-                                    "Found "
-                                        + size
-                                        + " results. Do you want to open all of them ?");
-                            if (open) {
-                                for (ModelWrapper<?> wrapper : res) {
-                                    openResult(wrapper);
-                                }
-                            }
-                        }
+                        type.processResults(res);
                     } else {
                         BioBankPlugin.openInformation("Search Result",
                             "no result");
@@ -168,13 +163,6 @@ public class SearchView extends ViewPart {
                 }
             }
         });
-    }
-
-    public void openResult(ModelWrapper<?> wrapper) {
-        AdapterBase adapter = AdapterFactory.getAdapter(wrapper);
-        if (adapter != null) {
-            adapter.performDoubleClick();
-        }
     }
 
 }

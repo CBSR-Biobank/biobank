@@ -1,5 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+INSERT INTO activity_status (ID,NAME)
+VALUES (4,"Flagged");
+
 ALTER TABLE aliquot
     ADD ACTIVITY_STATUS_ID int(11) NOT NULL;
 
