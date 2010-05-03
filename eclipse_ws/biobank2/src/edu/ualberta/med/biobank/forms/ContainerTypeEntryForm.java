@@ -150,7 +150,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyField(client, SWT.NONE,
+        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
         firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,

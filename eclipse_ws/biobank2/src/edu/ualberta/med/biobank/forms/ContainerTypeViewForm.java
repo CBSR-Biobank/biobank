@@ -99,21 +99,21 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
-        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
-        isTopLevelButton = (Button) createWidget(client, Button.class,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Repository Site");
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        isTopLevelButton = (Button) createLabelledWidget(client, Button.class,
             SWT.NONE, "Top Level Container");
-        rowCapacityLabel = createReadOnlyField(client, SWT.NONE, "Maximum Rows");
-        colCapacityLabel = createReadOnlyField(client, SWT.NONE,
+        rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE, "Maximum Rows");
+        colCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Maximum Columns");
-        defaultTempLabel = createReadOnlyField(client, SWT.NONE,
+        defaultTempLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Default Temperature\n(Celcius)");
-        numSchemeLabel = createReadOnlyField(client, SWT.NONE,
+        numSchemeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Child Labeling Scheme");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
 
         setContainerTypeValues();
     }

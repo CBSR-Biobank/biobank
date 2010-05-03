@@ -82,14 +82,14 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
-        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Repository Site");
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
-        patientTotal = createReadOnlyField(client, SWT.NONE, "Total Patients");
-        visitTotal = createReadOnlyField(client, SWT.NONE,
+        commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comments");
+        patientTotal = createReadOnlyLabelledField(client, SWT.NONE, "Total Patients");
+        visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patient Visits");
 
         createClinicSection();
@@ -196,7 +196,7 @@ public class StudyViewForm extends BiobankViewForm {
             if (pvCustomInfo.getAllowedValues() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
-                pvCustomInfo.wiget = createReadOnlyField(subcomp, SWT.NONE,
+                pvCustomInfo.wiget = createReadOnlyLabelledField(subcomp, SWT.NONE,
                     pvCustomInfo.getLabel());
             } else {
                 subcomp.setLayout(new GridLayout(1, false));

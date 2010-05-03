@@ -264,9 +264,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * Applies a background color to the read only field.
      */
     @Override
-    protected Text createReadOnlyField(Composite parent, int widgetOptions,
+    protected Text createReadOnlyLabelledField(Composite parent, int widgetOptions,
         String fieldLabel, String value) {
-        Text widget = super.createReadOnlyField(parent, widgetOptions,
+        Text widget = super.createReadOnlyLabelledField(parent, widgetOptions,
             fieldLabel, value);
         widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;

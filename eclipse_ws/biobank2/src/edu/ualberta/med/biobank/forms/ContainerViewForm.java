@@ -133,16 +133,16 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
-        containerLabelLabel = createReadOnlyField(client, SWT.NONE, "Label");
-        productBarcodeLabel = createReadOnlyField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Repository Site");
+        containerLabelLabel = createReadOnlyLabelledField(client, SWT.NONE, "Label");
+        productBarcodeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Product Bar Code");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentsLabel = createReadOnlyField(client, SWT.NONE, "Comments");
-        containerTypeLabel = createReadOnlyField(client, SWT.NONE,
+        commentsLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
+        containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Container Type");
-        temperatureLabel = createReadOnlyField(client, SWT.NONE, "Temperature");
+        temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE, "Temperature");
 
         setContainerValues();
 
