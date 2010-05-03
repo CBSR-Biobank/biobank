@@ -45,6 +45,8 @@ public class TestAliquot extends TestDatabase {
 
     private AliquotWrapper aliquot;
 
+    private SiteWrapper site;
+
     private Integer siteId;
 
     private ContainerWrapper topContainer;
@@ -96,6 +98,23 @@ public class TestAliquot extends TestDatabase {
     public void testGettersAndSetters() throws Exception {
         aliquot.persist();
         testGettersAndSetters(aliquot);
+    }
+
+    @Test
+    public void testPersistFailActivityStatusNull() throws Exception {
+        AliquotWrapper pAliquot = AliquotHelper.newAliquot(aliquot
+            .getSampleType());
+        pAliquot.setPatientVisit(aliquot.getPatientVisit());
+
+        try {
+            pAliquot.persist();
+            Assert.fail("Should not insert the aliquot : no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+        pAliquot.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        pAliquot.persist();
     }
 
     @Test

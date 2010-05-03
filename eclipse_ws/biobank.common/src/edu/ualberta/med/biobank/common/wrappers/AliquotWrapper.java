@@ -49,7 +49,7 @@ public class AliquotWrapper extends
         ApplicationException {
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
-                "the clinic does not have an activity status");
+                "the aliquot does not have an activity status");
         }
         checkPatientVisitNotNull();
         checkInventoryIdUnique();
