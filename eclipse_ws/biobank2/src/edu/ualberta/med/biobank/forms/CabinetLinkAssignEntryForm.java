@@ -647,6 +647,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     public void reset() throws Exception {
         aliquot.resetToNewObject();
+        aliquot.reset(); // reset internal values
         cabinet = null;
         drawer = null;
         bin = null;
