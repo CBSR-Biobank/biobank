@@ -99,6 +99,23 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
+    public void testPersistFailActivityStatusNull() throws Exception {
+        AliquotWrapper pAliquot = AliquotHelper.newAliquot(aliquot
+            .getSampleType(), null);
+        pAliquot.setPatientVisit(aliquot.getPatientVisit());
+
+        try {
+            pAliquot.persist();
+            Assert.fail("Should not insert the aliquot : no activity status");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+        pAliquot.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
+        pAliquot.persist();
+    }
+
+    @Test
     public void testPersistCheckInventoryIdUnique()
         throws BiobankCheckException, Exception {
         aliquot.persist();

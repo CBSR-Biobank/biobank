@@ -650,7 +650,8 @@ public class TestPatientVisit extends TestDatabase {
         ss3.setVolume(3.0);
         ss3.persist();
         AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
-            Arrays.asList(ss1, ss2, ss3));
+            Arrays.asList(ss1, ss2, ss3), ActivityStatusWrapper
+                .getActivityStatus(appService, "Active"));
         Aliquot dbSample = ModelUtils.getObjectWithId(appService,
             Aliquot.class, newSample.getId());
         Assert.assertEquals(dbSample.getSampleType().getId(), newSample

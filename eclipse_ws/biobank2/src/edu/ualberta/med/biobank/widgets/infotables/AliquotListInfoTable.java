@@ -23,13 +23,14 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         String position;
         String linkDate;
         Double quantity;
+        String activityStatus;
         String comment;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, position,
                 linkDate, (quantity != null) ? quantity.toString() : "",
-                comment }, "\t");
+                activityStatus, comment }, "\t");
         }
     }
 
@@ -62,6 +63,9 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
                 rc = compare(i1.quantity, i2.quantity);
                 break;
             case 5:
+                rc = compare(i1.activityStatus, i2.activityStatus);
+                break;
+            case 6:
                 rc = compare(i1.comment, i2.comment);
                 break;
             default:
@@ -76,10 +80,11 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Inventory ID",
-        "Type", "Position", "Link Date", "Quantity (ml)", "Comment" };
+        "Type", "Position", "Link Date", "Quantity (ml)", "Activity Status",
+        "Comment" };
 
     private static final int[] BOUNDS = new int[] { 130, 130, 150, 150, 150,
-        150, -1 };
+        150, 150, -1 };
 
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection) {
@@ -111,6 +116,8 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
                     return (info.quantity != null) ? info.quantity.toString()
                         : "";
                 case 5:
+                    return info.activityStatus;
+                case 6:
                     return info.comment;
                 default:
                     return "";
@@ -126,18 +133,19 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(AliquotWrapper sample)
+    public Object getCollectionModelObject(AliquotWrapper aliquot)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.aliquot = sample;
-        info.inventoryId = sample.getInventoryId();
-        SampleTypeWrapper type = sample.getSampleType();
+        info.aliquot = aliquot;
+        info.inventoryId = aliquot.getInventoryId();
+        SampleTypeWrapper type = aliquot.getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
-        info.position = sample.getPositionString();
-        info.linkDate = DateFormatter.formatAsDateTime(sample.getLinkDate());
-        info.quantity = sample.getQuantity();
-        info.comment = sample.getComment();
+        info.position = aliquot.getPositionString();
+        info.linkDate = DateFormatter.formatAsDateTime(aliquot.getLinkDate());
+        info.quantity = aliquot.getQuantity();
+        info.activityStatus = aliquot.getActivityStatus().getName();
+        info.comment = aliquot.getComment();
         return info;
     }
 

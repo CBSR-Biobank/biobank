@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -35,7 +36,7 @@ public class AliquotWrapper extends
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "inventoryId", "patientVisit", "position",
-            "linkDate", "sampleType", "quantity", "oldComment" };
+            "linkDate", "sampleType", "quantity", "activityStatus", "comment" };
     }
 
     @Override
@@ -46,6 +47,10 @@ public class AliquotWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the aliquot does not have an activity status");
+        }
         checkPatientVisitNotNull();
         checkInventoryIdUnique();
         checkParentAcceptSampleType();
@@ -220,6 +225,24 @@ public class AliquotWrapper extends
 
     public Double getQuantity() {
         return wrappedObject.getQuantity();
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
+        if (activityStatus == null)
+            return null;
+        return new ActivityStatusWrapper(appService, activityStatus);
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
     }
 
     public void setComment(String comment) {
