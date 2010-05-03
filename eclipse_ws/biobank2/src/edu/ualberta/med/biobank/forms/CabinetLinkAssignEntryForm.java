@@ -572,9 +572,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         PatientWrapper patient = aliquot.getPatientVisit().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient, aliquot
             .getPatientVisit());
-        positionText.setText(aliquot.getPositionString(true, false));
-        initParentContainersFromPosition(positionText.getText());
-        setTypeCombosLists();
+        String positionString = aliquot.getPositionString(true, false);
+        if (positionString != null) {
+            positionText.setText(positionString);
+            initParentContainersFromPosition(positionString);
+            setTypeCombosLists();
+        }
         String posStr = aliquot.getPositionString(true, false);
         if (posStr == null) {
             posStr = "none"; //$NON-NLS-1$
