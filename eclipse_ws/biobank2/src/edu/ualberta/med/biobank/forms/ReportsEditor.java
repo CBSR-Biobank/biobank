@@ -42,8 +42,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PlatformUI;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
@@ -100,7 +98,7 @@ public class ReportsEditor extends BiobankFormBase {
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
-    private Composite top;
+    // private Composite top;
     private Composite buttonSection;
     private Composite parameterSection;
 
@@ -221,17 +219,18 @@ public class ReportsEditor extends BiobankFormBase {
                                 exportButton.setEnabled(false);
                             }
                             reportTable.dispose();
-                            reportTable = new SearchResultsInfoTable(top,
-                                reportData, query.getColumnNames(),
+                            reportTable = new SearchResultsInfoTable(form
+                                .getBody(), reportData, query.getColumnNames(),
                                 columnWidths.get(query.getClass()));
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
-                            gd.grabExcessVerticalSpace = false;
+                            gd.grabExcessVerticalSpace = true;
                             gd.horizontalSpan = 2;
                             gd.horizontalAlignment = SWT.FILL;
                             gd.verticalAlignment = SWT.FILL;
                             reportTable.setLayoutData(gd);
-                            top.layout();
+                            reportTable.adaptToToolkit(toolkit, true);
+                            form.layout(true, true);
                         }
                     });
 
@@ -246,7 +245,7 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new SearchResultsInfoTable(top, null,
+        reportTable = new SearchResultsInfoTable(form.getBody(), null,
             new String[] { " " }, new int[] { 500 });
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
@@ -255,6 +254,7 @@ public class ReportsEditor extends BiobankFormBase {
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;
         reportTable.setLayoutData(gd);
+        reportTable.adaptToToolkit(toolkit, true);
     }
 
     public void resetSearch() {
@@ -458,19 +458,14 @@ public class ReportsEditor extends BiobankFormBase {
 
     @Override
     public void doSave(IProgressMonitor monitor) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void doSaveAs() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isDirty() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -489,44 +484,32 @@ public class ReportsEditor extends BiobankFormBase {
         GridLayout formLayout = new GridLayout();
         formLayout.marginWidth = 0;
         form.getBody().setLayout(formLayout);
-        top = new Composite(form.getBody(), SWT.BORDER);
-        top.setLayout(new GridLayout());
-        GridData topData = new GridData();
-        topData.grabExcessHorizontalSpace = true;
-        topData.grabExcessVerticalSpace = true;
-        topData.horizontalAlignment = SWT.FILL;
-        topData.verticalAlignment = SWT.FILL;
 
-        top.setLayoutData(topData);
+        form.setText(query.getDescription());
 
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         List<Option> queryOptions = query.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
-        Label description = new Label(top, SWT.NONE);
-        description.setText("Description: " + query.getDescription());
-        GridData gd2 = new GridData();
-        gd2.horizontalSpan = 2;
-        description.setLayoutData(gd2);
-
         if (parameterSection != null)
             parameterSection.dispose();
 
-        parameterSection = new Composite(top, SWT.NONE);
+        parameterSection = toolkit.createComposite(form.getBody(), SWT.NONE);
         GridData pgd = new GridData();
         GridLayout pgl = new GridLayout(2, false);
         pgd.grabExcessHorizontalSpace = true;
         parameterSection.setLayout(pgl);
         parameterSection.setLayoutData(pgd);
 
-        buttonSection = new Composite(top, SWT.NONE);
+        buttonSection = toolkit.createComposite(form.getBody(), SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.numColumns = 3;
         buttonSection.setLayout(gl);
+        toolkit.adapt(buttonSection);
 
-        generateButton = new Button(buttonSection, SWT.NONE);
-        generateButton.setText("Generate");
+        generateButton = toolkit.createButton(buttonSection, "Generate",
+            SWT.NONE);
         generateButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -534,10 +517,9 @@ public class ReportsEditor extends BiobankFormBase {
             }
         });
 
-        printButton = new Button(buttonSection, SWT.NONE);
+        printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
         printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PRINTER));
-        printButton.setText("Print");
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -551,8 +533,7 @@ public class ReportsEditor extends BiobankFormBase {
             }
         });
 
-        exportButton = new Button(buttonSection, SWT.NONE);
-        exportButton.setText("Export");
+        exportButton = toolkit.createButton(buttonSection, "Export", SWT.NONE);
         exportButton.setEnabled(false);
         exportButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -568,8 +549,9 @@ public class ReportsEditor extends BiobankFormBase {
 
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
-            Label fieldLabel = new Label(parameterSection, SWT.NONE);
-            fieldLabel.setText(option.getName() + ":");
+            Label fieldLabel = toolkit.createLabel(parameterSection, option
+                .getName()
+                + ":", SWT.NONE);
             textLabels.add(fieldLabel);
             Widget widget;
             GridData widgetData = new GridData();
@@ -581,9 +563,11 @@ public class ReportsEditor extends BiobankFormBase {
                 for (int j = 0; j < values.length; j++)
                     ((Combo) widget).add(values[j].toString());
                 ((Combo) widget).select(0);
-            } else if (option.getType() == Date.class)
+                toolkit.adapt((Combo) widget, true, true);
+            } else if (option.getType() == Date.class) {
                 widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
-            else if (option.getType() == String.class) {
+                ((DateTimeWidget) widget).adaptToToolkit(toolkit, true);
+            } else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
                     try {
                         Collection<SampleTypeWrapper> sampleTypeWrappers = site
@@ -596,6 +580,7 @@ public class ReportsEditor extends BiobankFormBase {
                             .toArray(new String[] {}));
                         ((Combo) widget).select(0);
                         ((Combo) widget).setLayoutData(widgetData);
+                        toolkit.adapt((Combo) widget, true, true);
                     } catch (ApplicationException e1) {
                         widget = null;
                     }
@@ -610,8 +595,11 @@ public class ReportsEditor extends BiobankFormBase {
                         .toArray(new String[] {}));
                     ((Combo) widget).select(0);
                     ((Combo) widget).setLayoutData(widgetData);
-                } else
+                    toolkit.adapt((Combo) widget, true, true);
+                } else {
                     widget = new FileBrowser(parameterSection, SWT.NONE);
+                    toolkit.adapt((FileBrowser) widget, true, true);
+                }
             } else if (option.getType() == Integer.class) {
                 IObservableValue numAliquots = new WritableValue("",
                     String.class);
@@ -654,20 +642,6 @@ public class ReportsEditor extends BiobankFormBase {
         // update parents
         createEmptyReportTable();
         parameterSection.moveAbove(buttonSection);
-        top.layout(true, true);
-
-        top.layout();
-    }
-
-    @Override
-    public void init(IEditorSite editorSite, IEditorInput input) {
-        setSite(editorSite);
-        setInput(input);
-        try {
-            init();
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Unable to open report.", e);
-        }
     }
 
     @Override
@@ -675,7 +649,7 @@ public class ReportsEditor extends BiobankFormBase {
         widgetCreator.initDataBinding();
 
         reportData = new ArrayList<Object>();
-        node = ((ReportInput) getEditorInput()).node;
+        node = ((ReportInput) getEditorInput()).getNode();
         SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
         String op = "=";
         if (siteWrap.getName().compareTo("All Sites") == 0)

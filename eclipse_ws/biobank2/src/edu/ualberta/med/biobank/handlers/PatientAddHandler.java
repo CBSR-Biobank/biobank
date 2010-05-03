@@ -27,4 +27,9 @@ public class PatientAddHandler extends AbstractHandler {
         return null;
     }
 
+    @Override
+    public boolean isEnabled() {
+        return SessionManager.canCreate(PatientWrapper.class);
+    }
+
 }

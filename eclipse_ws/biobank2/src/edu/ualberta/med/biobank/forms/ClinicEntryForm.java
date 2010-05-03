@@ -18,6 +18,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -154,7 +155,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             public void widgetSelected(SelectionEvent e) {
                 contactEntryWidget.addContact();
             }
-        });
+        }, ContactWrapper.class);
         section.setClient(contactEntryWidget);
     }
 

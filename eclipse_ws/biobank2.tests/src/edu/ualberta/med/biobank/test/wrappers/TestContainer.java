@@ -535,33 +535,44 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testGetContainer() throws Exception {
-        ContainerWrapper top, result;
-
-        top = containerMap.get("Top");
+    public void testGetContainersWithSameLabelWithType() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
 
+        ContainerWrapper testContainer = new ContainerWrapper(appService);
+        testContainer.setSite(top.getSite());
+
         // success cases
-        result = top.getContainer("01AA", containerTypeMap.get("ChildCtL1"));
-        Assert.assertEquals(containerMap.get("ChildL1"), result);
+        testContainer.setLabel(containerMap.get("ChildL1").getLabel());
+        List<ContainerWrapper> result = testContainer
+            .getContainersWithSameLabelWithType(Arrays.asList(containerTypeMap
+                .get("ChildCtL1")));
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals(containerMap.get("ChildL1"), result.get(0));
 
-        result = top.getContainer("01AA01", containerTypeMap.get("ChildCtL2"));
-        Assert.assertEquals(containerMap.get("ChildL2"), result);
+        testContainer.setLabel(containerMap.get("ChildL2").getLabel());
+        result = testContainer.getContainersWithSameLabelWithType(Arrays
+            .asList(containerTypeMap.get("ChildCtL2")));
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals(containerMap.get("ChildL2"), result.get(0));
 
-        result = top
-            .getContainer("01AA01A1", containerTypeMap.get("ChildCtL3"));
-        Assert.assertEquals(containerMap.get("ChildL3"), result);
+        testContainer.setLabel(containerMap.get("ChildL3").getLabel());
+        result = testContainer.getContainersWithSameLabelWithType(Arrays
+            .asList(containerTypeMap.get("ChildCtL3")));
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals(containerMap.get("ChildL3"), result.get(0));
 
         // fail cases
-        result = top.getContainer("01AB", containerTypeMap.get("ChildCtL1"));
-        Assert.assertNull(result);
+        testContainer.setLabel(containerMap.get("ChildL2").getLabel());
+        result = testContainer.getContainersWithSameLabelWithType(Arrays
+            .asList(containerTypeMap.get("ChildCtL1")));
+        Assert.assertEquals(0, result.size());
 
-        result = top.getContainer("01AA02", containerTypeMap.get("ChildCtL1"));
-        Assert.assertNull(result);
+        testContainer.setLabel(containerMap.get("ChildL3").getLabel());
+        result = testContainer.getContainersWithSameLabelWithType(Arrays
+            .asList(containerTypeMap.get("ChildCtL1")));
+        Assert.assertEquals(0, result.size());
 
-        result = top
-            .getContainer("01AA01A2", containerTypeMap.get("ChildCtL3"));
-        Assert.assertNull(result);
     }
 
     @Test
@@ -576,15 +587,22 @@ public class TestContainer extends TestDatabase {
         drawer = containerMap.get("D02AA");
 
         List<ContainerWrapper> list = ContainerWrapper
-            .getContainersHoldingContainerType(appService, "02", site, hotel
-                .getContainerType());
+            .getContainersHoldingContainerTypes(appService, "02", site, Arrays
+                .asList(hotel.getContainerType()));
         Assert.assertEquals(1, list.size());
         Assert.assertTrue(list.contains(freezer));
 
-        list = ContainerWrapper.getContainersHoldingContainerType(appService,
-            "02", site, drawer.getContainerType());
+        list = ContainerWrapper.getContainersHoldingContainerTypes(appService,
+            "02", site, Arrays.asList(drawer.getContainerType()));
         Assert.assertEquals(1, list.size());
         Assert.assertTrue(list.contains(cabinet));
+
+        list = ContainerWrapper.getContainersHoldingContainerTypes(appService,
+            "02", site, Arrays.asList(drawer.getContainerType(), hotel
+                .getContainerType()));
+        Assert.assertEquals(2, list.size());
+        Assert.assertTrue(list.contains(cabinet));
+        Assert.assertTrue(list.contains(freezer));
     }
 
     @Test
@@ -1392,7 +1410,7 @@ public class TestContainer extends TestDatabase {
             "testaddNew", null, site, type);
         // expect position 1:5
         String label = "01AA01B6";
-        newContainer.setPositionAndParentFromLabel(label);
+        newContainer.setPositionAndParentFromLabel(label, Arrays.asList(type));
 
         Assert.assertEquals(childL2, newContainer.getParent());
         Assert.assertEquals(new RowColPos(1, 5), newContainer.getPosition());
@@ -1408,7 +1426,8 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper newContainer = ContainerHelper.newContainer(null,
             "testaddNew_2", null, site, type2);
         try {
-            newContainer.setPositionAndParentFromLabel("01AA01B6");
+            newContainer.setPositionAndParentFromLabel("01AA01B6", Arrays
+                .asList(type2));
             Assert.fail("No container with label 01AA01 can hold this type");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -1438,7 +1457,8 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper newContainer = ContainerHelper.newContainer(null,
             "testsetPosition", null, site, existingType);
         try {
-            newContainer.setPositionAndParentFromLabel("01AA01");
+            newContainer.setPositionAndParentFromLabel("01AA01", Arrays
+                .asList(existingType));
             Assert.fail("Two container with label 01AA can hold this type");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);

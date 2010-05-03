@@ -385,4 +385,18 @@ public class AliquotWrapper extends
         return getInventoryId();
     }
 
+    /**
+     * init this wrapper with the given aliquotWrapper.
+     * 
+     * @throws WrapperException
+     */
+    public void initObjectWith(AliquotWrapper aliquotWrapper)
+        throws WrapperException {
+        if (aliquotWrapper == null) {
+            throw new WrapperException(
+                "Cannot init internal object with a null aliquot");
+        }
+        setWrappedObject(aliquotWrapper.wrappedObject);
+    }
+
 }

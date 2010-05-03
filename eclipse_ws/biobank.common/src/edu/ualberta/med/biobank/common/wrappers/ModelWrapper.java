@@ -10,10 +10,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -33,6 +36,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         this);
 
     protected HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
+
+    private static Logger LOGGER = Logger.getLogger(ModelWrapper.class
+        .getName());
 
     private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
 
@@ -185,7 +191,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             eventType = WrapperEventType.UPDATE;
         }
         persistDependencies(origObject);
-        SDKQueryResult result = appService.executeQuery(query);
+        SDKQueryResult result = ((BiobankApplicationService) appService)
+            .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
         resetInternalField();
@@ -396,6 +403,34 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return sb.toString();
         }
         return super.toString();
+    }
+
+    /**
+     * return true if the user can view this object
+     */
+    public boolean canView() {
+        try {
+            return ((BiobankApplicationService) appService)
+                .canReadObjects(getWrappedClass());
+        } catch (ApplicationException e) {
+            LOGGER.error("Error testing security authorization on "
+                + getWrappedClass(), e);
+            return false;
+        }
+    }
+
+    /**
+     * return true if the user can edit this object
+     */
+    public boolean canEdit() {
+        try {
+            return ((BiobankApplicationService) appService)
+                .canUpdateObjects(getWrappedClass());
+        } catch (ApplicationException e) {
+            LOGGER.error("Error testing security authorization on "
+                + getWrappedClass(), e);
+            return false;
+        }
     }
 
     public void addWrapperListener(WrapperListener listener) {

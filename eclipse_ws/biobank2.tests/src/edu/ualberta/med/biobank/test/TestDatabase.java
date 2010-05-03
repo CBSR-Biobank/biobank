@@ -2,10 +2,10 @@ package edu.ualberta.med.biobank.test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
@@ -19,7 +19,6 @@ import java.util.Random;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-
 
 public class TestDatabase {
     protected static WritableApplicationService appService;

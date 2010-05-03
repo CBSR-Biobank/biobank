@@ -11,6 +11,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -242,6 +243,26 @@ public class SessionManager {
         if (view != null) {
             view.getTreeViewer().expandToLevel(3);
         }
+    }
+
+    public static String getUser() {
+        return getInstance().getSession().getUserName();
+    }
+
+    public static boolean canCreate(Class<?> clazz) {
+        return SecurityHelper.canCreate(getAppService(), clazz);
+    }
+
+    public static boolean canDelete(Class<?> clazz) {
+        return SecurityHelper.canCreate(getAppService(), clazz);
+    }
+
+    public static boolean canView(Class<?> clazz) {
+        return SecurityHelper.canView(getAppService(), clazz);
+    }
+
+    public static boolean canUpdate(Class<?> clazz) {
+        return SecurityHelper.canUpdate(getAppService(), clazz);
     }
 
     public boolean isConnected() {

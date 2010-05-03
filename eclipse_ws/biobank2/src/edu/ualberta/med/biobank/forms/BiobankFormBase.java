@@ -152,7 +152,7 @@ public abstract class BiobankFormBase extends EditorPart {
 
         adapter = (AdapterBase) formInput.getAdapter(AdapterBase.class);
         if (adapter != null) {
-            adapter = formInput.getNode();
+            // adapter = formInput.getNode();
             Assert.isNotNull(adapter, "Bad editor input (null value)");
             appService = adapter.getAppService();
             if (!formInput.hasPreviousForm()) {
@@ -242,17 +242,25 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener) {
-        ToolBar tbar = (ToolBar) section.getTextClient();
-        if (tbar == null) {
-            tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
-            section.setTextClient(tbar);
-        }
+        addSectionToolbar(section, tooltip, listener, null);
+    }
 
-        ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_ADD));
-        titem.setToolTipText(tooltip);
-        titem.addSelectionListener(listener);
+    protected void addSectionToolbar(Section section, String tooltip,
+        SelectionListener listener, Class<?> wrapperTypeToAdd) {
+        if (wrapperTypeToAdd == null
+            || SessionManager.canCreate(wrapperTypeToAdd)) {
+            ToolBar tbar = (ToolBar) section.getTextClient();
+            if (tbar == null) {
+                tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
+                section.setTextClient(tbar);
+            }
+
+            ToolItem titem = new ToolItem(tbar, SWT.NULL);
+            titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+                BioBankPlugin.IMG_ADD));
+            titem.setToolTipText(tooltip);
+            titem.addSelectionListener(listener);
+        }
     }
 
     public FormToolkit getToolkit() {

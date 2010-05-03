@@ -23,9 +23,12 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 
 public class DecodePlateForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
+
+    private Button multipleScanButton;
 
     private Button scanButton;
 
@@ -36,6 +39,8 @@ public class DecodePlateForm extends BiobankViewForm {
     private PlateSelectionWidget plateSelectionWidget;
 
     Integer plateToScan;
+
+    boolean multipleScan;
 
     @Override
     protected void init() throws Exception {
@@ -58,6 +63,13 @@ public class DecodePlateForm extends BiobankViewForm {
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
+        multipleScanButton = new Button(form.getBody(), SWT.CHECK);
+        multipleScanButton.setText("Multiple Scan");
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        multipleScanButton.setLayoutData(gd);
+
         scanButton = toolkit.createButton(form.getBody(),
             "Scan && Decode Plate", SWT.PUSH);
         scanButton
@@ -65,7 +77,7 @@ public class DecodePlateForm extends BiobankViewForm {
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                internalScanAndProcessResult();
+                scanAndProcessResult();
             }
         });
 
@@ -84,8 +96,9 @@ public class DecodePlateForm extends BiobankViewForm {
     protected void reload() throws Exception {
     }
 
-    protected void internalScanAndProcessResult() {
+    protected void scanAndProcessResult() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
+        multipleScan = multipleScanButton.getSelection();
 
         if (plateToScan == null) {
             BioBankPlugin.openAsyncError("Decode Plate Error",
@@ -153,7 +166,14 @@ public class DecodePlateForm extends BiobankViewForm {
 
     protected void launchScan(IProgressMonitor monitor) throws Exception {
         monitor.subTask("Launching scan");
-        cells = PalletCell.convertArray(ScannerConfigPlugin.scan(plateToScan));
+
+        ScanCell[][] decodedCells = null;
+        if (multipleScan) {
+            decodedCells = ScannerConfigPlugin.scanMultipleDpi(plateToScan);
+        } else {
+            decodedCells = ScannerConfigPlugin.scan(plateToScan);
+        }
+        cells = PalletCell.convertArray(decodedCells);
     }
 
     /**

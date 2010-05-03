@@ -606,9 +606,9 @@ public class TestPatientVisit extends TestDatabase {
         PvSourceVesselWrapper ss1, ss2, ss3;
 
         ss1 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
-            .getAllSourceVessels(appService).get(0).getName(), visit);
+            .getAllSourceVessels(appService).get(0), visit);
         ss2 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
-            .getAllSourceVessels(appService).get(1).getName(), visit);
+            .getAllSourceVessels(appService).get(1), visit);
 
         visit.addPvSourceVessels(Arrays.asList(ss1, ss2));
         visit.persist();
@@ -621,7 +621,7 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertTrue(list.get(0).compareTo(list.get(1)) < 0);
 
         ss3 = PvSourceVesselHelper.newPvSourceVessel(SourceVesselWrapper
-            .getAllSourceVessels(appService).get(1).getName(), visit);
+            .getAllSourceVessels(appService).get(1), visit);
 
         PvSourceVesselWrapper pvss = list.get(0);
         visit.removePvSourceVessels(Arrays.asList(pvss));

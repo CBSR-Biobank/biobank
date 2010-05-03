@@ -30,8 +30,8 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.scanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {
@@ -44,8 +44,12 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
-    private IObservableValue scanLaunchedValue = new WritableValue(
+    private IObservableValue canLaunchScanValue = new WritableValue(
+        Boolean.TRUE, Boolean.class);
+    private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
+    private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     private String currentPlateToScan;
 
@@ -90,17 +94,27 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void addScanBindings() {
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            scanLaunchedValue, Messages
-                .getString("linkAssign.scanLaunchValidationMsg")); //$NON-NLS-1$
+            canLaunchScanValue, Messages
+                .getString("linkAssign.canLaunchScanValidationMsg")); //$NON-NLS-1$
+        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+            scanHasBeenLaunchedValue, Messages
+                .getString("linkAssign.scanHasBeenLaunchedValidationMsg")); //$NON-NLS-1$
+        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
+            scanValidValue, Messages
+                .getString("linkAssign.scanValidValidationMsg")); //$NON-NLS-1$
     }
 
     protected void createScanButton(Composite parent) {
         scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
         if (BioBankPlugin.isRealScanEnabled()) {
-            scanChoiceSimple = toolkit
-                .createButton(parent, "Simple", SWT.RADIO);
+            toolkit.createLabel(parent, "Decode Type:");
+
+            Composite composite = toolkit.createComposite(parent);
+            composite.setLayout(new GridLayout(2, false));
+            scanChoiceSimple = toolkit.createButton(composite, "Single Scan",
+                SWT.RADIO);
             scanChoiceSimple.setSelection(true);
-            toolkit.createButton(parent, "Multiple", SWT.RADIO);
+            toolkit.createButton(composite, "Multiple Scan", SWT.RADIO);
         } else {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
@@ -165,12 +179,12 @@ public abstract class AbstractPalletAliquotAdminForm extends
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
-                    setScanOk(false);
+                    setScanValid(false);
                 } catch (Exception e) {
                     BioBankPlugin.openAsyncError(Messages
                         .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
                         e);
-                    setScanOk(false);
+                    setScanValid(false);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
                         msg = e.getCause().getMessage();
@@ -195,9 +209,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
         }
     }
 
-    protected void setScanOk(@SuppressWarnings("unused") boolean scanOk) {
-    }
-
     protected abstract void scanAndProcessResult(IProgressMonitor monitor)
         throws Exception;
 
@@ -214,35 +225,40 @@ public abstract class AbstractPalletAliquotAdminForm extends
             if (isScanChoiceSimple) {
                 scanCells = ScannerConfigPlugin.scan(plateNum);
             } else {
-                scanCells = ScannerConfigPlugin.scanMultiple(plateNum);
+                scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
             }
             cells = PalletCell.convertArray(scanCells);
         } else {
             launchFakeScan();
         }
-        if (isRescanMode() && oldCells != null) {
-            // rescan: merge previous scan with new in case the scanner wasn't
-            // able to scan well
-            for (RowColPos rcp : oldCells.keySet()) {
-                PalletCell oldScannedCell = oldCells.get(rcp);
-                PalletCell newScannedCell = cells.get(rcp);
-                if (PalletCell.hasValue(oldScannedCell)
-                    && PalletCell.hasValue(newScannedCell)
-                    && !oldScannedCell.getValue().equals(
-                        newScannedCell.getValue())) {
-                    cells = oldCells;
-                    throw new Exception(
-                        "Scan Aborted: previously scanned aliquot has been replaced. "
-                            + "If this is not a re-scan, reset and start again.");
-                }
-                if (PalletCell.hasValue(oldScannedCell)) {
-                    cells.put(rcp, oldScannedCell);
+        if (cells != null) {
+            if (isRescanMode() && oldCells != null) {
+                // rescan: merge previous scan with new in case the scanner
+                // wasn't
+                // able to scan well
+                for (RowColPos rcp : oldCells.keySet()) {
+                    PalletCell oldScannedCell = oldCells.get(rcp);
+                    PalletCell newScannedCell = cells.get(rcp);
+                    if (PalletCell.hasValue(oldScannedCell)
+                        && PalletCell.hasValue(newScannedCell)
+                        && !oldScannedCell.getValue().equals(
+                            newScannedCell.getValue())) {
+                        cells = oldCells;
+                        throw new Exception(
+                            "Scan Aborted: previously scanned aliquot has been replaced. "
+                                + "If this is not a re-scan, reset and start again.");
+                    }
+                    if (PalletCell.hasValue(oldScannedCell)) {
+                        cells.put(rcp, oldScannedCell);
+                    }
                 }
             }
+            setScanHasBeenLauched(true);
+            appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
+                cells.keySet().size());
+        } else {
+            setScanNotLauched(true);
         }
-        setScanHasBeenLauched(true);
-        appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
-            cells.keySet().size());
     }
 
     @SuppressWarnings("unused")
@@ -266,7 +282,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void setScanNotLauched() {
-        scanLaunchedValue.setValue(false);
+        scanHasBeenLaunchedValue.setValue(false);
     }
 
     protected void setScanNotLauched(boolean async) {
@@ -280,8 +296,16 @@ public abstract class AbstractPalletAliquotAdminForm extends
             setScanNotLauched();
     }
 
+    protected void setScanValid(final boolean valid) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                scanValidValue.setValue(valid);
+            }
+        });
+    }
+
     protected void setScanHasBeenLauched() {
-        scanLaunchedValue.setValue(true);
+        scanHasBeenLaunchedValue.setValue(true);
     }
 
     protected void setScanHasBeenLauched(boolean async) {
@@ -304,7 +328,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         rescanMode = false;
     }
 
-    protected void enableScan(boolean enabled) {
+    private void enableScan(boolean enabled) {
         scanButton.setEnabled(enabled);
     }
 
@@ -324,5 +348,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected CancelConfirmWidget getCancelConfirmWidget() {
         return cancelConfirmWidget;
+    }
+
+    protected void setCanLaunchScan(boolean canLauch) {
+        canLaunchScanValue.setValue(canLauch);
     }
 }

@@ -5,7 +5,7 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar" sourcepath="C:/Users/aaron/Documents/jasperreports-3.7.0-project/jasperreports-3.7.0/src"/>
+	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-digester-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/iText-2.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.8.0.jar"/>
@@ -15,7 +15,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/scanlib.jar"/>
 	<classpathentry kind="con" path="org.eclipse.tptp.platform.instrumentation.ui.ContainerInitializer/Build to Manage Libraries"/>
 	<classpathentry kind="lib" path="lib/DynamicJasper-3.0.14.jar">
 		<attributes>

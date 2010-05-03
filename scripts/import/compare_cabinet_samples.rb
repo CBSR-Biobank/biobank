@@ -11,18 +11,6 @@ require 'date'
 
 class Script < ScriptBase
 
-  BBPDB_QUERY1 = <<BBPDB_QUERY_END
-SELECT inventory_id,date(process_date),study_name_short,dec_chr_nr,date_received,sample_name_short,
-cnum,drawer, bin, binpos
-FROM cabinet
-join patient_visit on patient_visit.visit_nr=cabinet.visit_nr
-join patient on patient.patient_nr=patient_visit.patient_nr
-join study_list on study_list.study_nr=patient_visit.study_nr
-join sample_list on sample_list.sample_nr=cabinet.sample_nr
-where process_date>='2010-04-15'
-order by inventory_id
-BBPDB_QUERY_END
-
   BBPDB_QUERY = <<BBPDB_QUERY_END
 SELECT inventory_id,date(process_date),study_name_short,dec_chr_nr,date_received,sample_name_short,
 cnum,drawer, bin, binpos
@@ -65,7 +53,7 @@ BB2_QUERY
   def getBbpdbCabinetSamples
     getDbConnection("bbpdb")
     res = @dbh.query(BBPDB_QUERY)
-    f = File.new("bbpdb.csv", "w")
+    f = File.new("bbpdb_cabinet.csv", "w")
     while row = res.fetch_row do
       buf = ','
       label = sprintf("%02d%s%02d%s", row[6], row[7], row[8], row[9])
@@ -77,7 +65,7 @@ BB2_QUERY
   def getBiobank2CabinetSamples
     getDbConnection("biobank2")
     res = @dbh.query(BB2_QUERY)
-    f = File.new("biobank2.csv", "w")
+    f = File.new("biobank2_cabinet.csv", "w")
     while row = res.fetch_row do
       buf = ','
       label = sprintf("%s%c%c", row[6], CBSR_ALPHA[row[7].to_i / CBSR_ALPHA.length], CBSR_ALPHA[row[7].to_i % CBSR_ALPHA.length])

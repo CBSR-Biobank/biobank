@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.biobank.widgets.grids.ScanLinkPalletWidget;
-import edu.ualberta.med.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -411,7 +411,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     appService, SessionManager.getInstance().getCurrentSite()
                         .getId());
             } catch (Exception ex) {
-                BioBankPlugin.openError("Fake Scan problem", ex); //$NON-NLS-1$
+                BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
             }
         }
     }
@@ -590,7 +590,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         linkFormPatientManagement.reset(resetAll);
         getCancelConfirmWidget().reset();
         removeRescanMode();
-        enableScan(false);
+        setScanHasBeenLauched(false);
         setScanNotLauched();
         if (resetAll) {
             resetPlateToScan();

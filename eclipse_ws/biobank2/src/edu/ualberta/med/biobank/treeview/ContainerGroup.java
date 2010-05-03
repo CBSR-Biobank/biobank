@@ -17,6 +17,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -45,15 +46,19 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Add a Container");
-        mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addContainer(ContainerGroup.this
-                    .getParentFromClass(SiteAdapter.class), false);
-            }
-        });
+        if (SessionManager.canCreate(ContainerWrapper.class)
+            && SecurityHelper.isContainerAdministrator(SessionManager
+                .getAppService())) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add a Container");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    addContainer(ContainerGroup.this
+                        .getParentFromClass(SiteAdapter.class), false);
+                }
+            });
+        }
     }
 
     @Override

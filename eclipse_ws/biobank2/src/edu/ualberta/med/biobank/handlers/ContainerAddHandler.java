@@ -48,4 +48,9 @@ public class ContainerAddHandler extends AbstractHandler {
         }
         return null;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return SessionManager.canCreate(ContainerWrapper.class);
+    }
 }

@@ -12,12 +12,12 @@ public class NonEmptyStringValidator extends AbstractValidator {
 
     @Override
     public IStatus validate(Object value) {
-        if (!(value instanceof String)) {
+        if (value != null && !(value instanceof String)) {
             throw new RuntimeException(
                 "Not supposed to be called for non-strings.");
         }
 
-        if (((String) value).length() != 0) {
+        if (value != null && ((String) value).length() != 0) {
             hideDecoration();
             return Status.OK_STATUS;
         }

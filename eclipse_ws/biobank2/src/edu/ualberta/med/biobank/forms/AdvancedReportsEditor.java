@@ -96,7 +96,7 @@ public class AdvancedReportsEditor extends EditorPart {
         setSite(site);
         setInput(input);
 
-        node = ((ReportInput) input).node;
+        node = ((ReportInput) input).getNode();
 
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());
@@ -531,25 +531,18 @@ public class AdvancedReportsEditor extends EditorPart {
     }
 
     protected void printTable(@SuppressWarnings("unused") boolean b) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void doSave(IProgressMonitor monitor) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void doSaveAs() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isDirty() {
-        // TODO Auto-generated method stub
         return false;
     }
 
