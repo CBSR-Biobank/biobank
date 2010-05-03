@@ -59,7 +59,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private AliquotListInfoTable samplesWidget;
+    private AliquotListInfoTable aliquotsWidget;
 
     private Text siteLabel;
 
@@ -118,9 +118,9 @@ public class ContainerViewForm extends BiobankViewForm {
         createContainerSection();
 
         if (container.getContainerType().getSampleTypeCollection().size() > 0) {
-            // only show samples section this if this container type does not
+            // only show aliquots section this if this container type does not
             // have child containers
-            createSamplesSection();
+            createAliquotsSection();
         }
     }
 
@@ -434,13 +434,13 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void createSamplesSection() {
-        Composite parent = createSectionWithClient("Samples");
-        List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
+    private void createAliquotsSection() {
+        Composite parent = createSectionWithClient("Aliquots");
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>(container
             .getAliquots().values());
-        samplesWidget = new AliquotListInfoTable(parent, samples);
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
+        aliquotsWidget.adaptToToolkit(toolkit, true);
+        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
