@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
 public class AliquotStatusDialog extends BiobankDialog {
 
@@ -21,7 +20,7 @@ public class AliquotStatusDialog extends BiobankDialog {
 
     ComboViewer combo;
 
-    protected AliquotStatusDialog(Shell parentShell, AliquotWrapper aliquot) {
+    public AliquotStatusDialog(Shell parentShell, AliquotWrapper aliquot) {
         super(parentShell);
         this.aliquot = aliquot;
     }
