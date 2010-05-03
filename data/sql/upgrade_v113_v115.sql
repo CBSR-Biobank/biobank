@@ -1,5 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+ALTER TABLE aliquot
+    ADD ACTIVITY_STATUS_ID int(11) NOT NULL;
+
 CREATE TABLE shipping_method (
     ID int(11) NOT NULL,
     NAME varchar(255) NULL DEFAULT NULL COMMENT '' COLLATE latin1_swedish_ci,

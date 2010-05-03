@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -536,7 +537,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == AliquotCellStatus.TYPE) {
                 patientVisit.addNewAliquot(cell.getValue(), cell.getType(),
-                    sampleStorages);
+                    sampleStorages, ActivityStatusWrapper.getActivityStatus(
+                        appService, "Active"));
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),

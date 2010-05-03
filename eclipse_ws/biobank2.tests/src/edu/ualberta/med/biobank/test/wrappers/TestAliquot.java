@@ -45,8 +45,6 @@ public class TestAliquot extends TestDatabase {
 
     private AliquotWrapper aliquot;
 
-    private SiteWrapper site;
-
     private Integer siteId;
 
     private ContainerWrapper topContainer;
@@ -103,7 +101,7 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testPersistFailActivityStatusNull() throws Exception {
         AliquotWrapper pAliquot = AliquotHelper.newAliquot(aliquot
-            .getSampleType());
+            .getSampleType(), null);
         pAliquot.setPatientVisit(aliquot.getPatientVisit());
 
         try {

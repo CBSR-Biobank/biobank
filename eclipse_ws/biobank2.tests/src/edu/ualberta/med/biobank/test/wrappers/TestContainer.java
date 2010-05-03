@@ -918,8 +918,8 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                childL3.addAliquot(row, col, AliquotHelper
-                    .newAliquot(sampleType));
+                childL3.addAliquot(row, col, AliquotHelper.newAliquot(
+                    sampleType, "Active"));
                 AliquotWrapper aliquot = childL3.getAliquot(row, col);
                 aliquot.setPatientVisit(pv);
                 aliquot.persist();
