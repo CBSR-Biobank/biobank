@@ -43,6 +43,8 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text dateDrawnLabel;
 
+    private Text activityStatusLabel;
+
     private Text commentLabel;
 
     private Text positionLabel;
@@ -92,15 +94,18 @@ public class AliquotViewForm extends BiobankViewForm {
         shipmentWaybillLabel = createReadOnlyField(client, SWT.NONE,
             "Shipment Waybill");
         patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
-        dateProcessedLabel = createReadOnlyField(client, SWT.NONE, "Date Processed");
+        dateProcessedLabel = createReadOnlyField(client, SWT.NONE,
+            "Date Processed");
         dateDrawnLabel = createReadOnlyField(client, SWT.NONE, "Date Drawn");
+        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+            "Activity Status");
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
         positionLabel = createReadOnlyField(client, SWT.WRAP, "Position");
     }
 
     private void createContainersSection() {
         if (aliquot.getParent() != null) {
-            Section section = createSection("Containers Visualization");
+            Section section = createSection("Container Visualization");
             Composite containersComposite = toolkit.createComposite(section);
             section.setClient(containersComposite);
             section.setExpanded(false);
@@ -153,6 +158,7 @@ public class AliquotViewForm extends BiobankViewForm {
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
             .getFormattedDateDrawn());
+        setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
