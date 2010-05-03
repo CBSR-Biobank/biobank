@@ -479,13 +479,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
      * @param studySampleStorages
      */
     public AliquotWrapper addNewAliquot(String inventoryId,
-        SampleTypeWrapper type, List<SampleStorageWrapper> studySampleStorages)
-        throws Exception {
+        SampleTypeWrapper type, List<SampleStorageWrapper> studySampleStorages,
+        ActivityStatusWrapper activityStatus) throws Exception {
         AliquotWrapper aliquot = new AliquotWrapper(appService);
         aliquot.setInventoryId(inventoryId);
         aliquot.setPatientVisit(this);
         aliquot.setLinkDate(new Date());
         aliquot.setSampleType(type);
+        aliquot.setActivityStatus(activityStatus);
         Double volume = null;
         for (SampleStorageWrapper ss : studySampleStorages) {
             if (ss.getSampleType().getId().equals(type.getId())) {
