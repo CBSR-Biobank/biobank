@@ -3,13 +3,20 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -43,11 +50,15 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text dateDrawnLabel;
 
-    private Text activityStatusLabel;
+    private Label activityStatusLabel;
 
     private Text commentLabel;
 
     private Text positionLabel;
+
+    private Button activityStatusButton;
+
+    private Text activityStatusText;
 
     @Override
     public void init() {
@@ -97,8 +108,43 @@ public class AliquotViewForm extends BiobankViewForm {
         dateProcessedLabel = createReadOnlyField(client, SWT.NONE,
             "Date Processed");
         dateDrawnLabel = createReadOnlyField(client, SWT.NONE, "Date Drawn");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
-            "Activity Status");
+        activityStatusLabel = toolkit.createLabel(client, "Activity Status:",
+            SWT.SINGLE);
+        Composite activityArea = new Composite(client, SWT.NONE);
+        GridLayout activityLayout = new GridLayout(2, false);
+        activityLayout.marginWidth = 0;
+        GridData activityAreaData = new GridData();
+        activityAreaData.grabExcessHorizontalSpace = true;
+        activityAreaData.horizontalAlignment = SWT.FILL;
+        activityArea.setLayoutData(activityAreaData);
+        activityArea.setLayout(activityLayout);
+        toolkit.adapt(activityArea);
+        activityStatusText = new Text(activityArea, SWT.BORDER);
+        GridData textData = new GridData();
+        textData.horizontalAlignment = SWT.FILL;
+        textData.grabExcessHorizontalSpace = true;
+        activityStatusText.setLayoutData(textData);
+        activityStatusButton = new Button(activityArea, SWT.NONE);
+        activityStatusButton.setImage(BioBankPlugin.getDefault()
+            .getImageRegistry().get(BioBankPlugin.IMG_EDIT_FORM));
+        activityStatusButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AliquotStatusDialog dlg = new AliquotStatusDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    aliquot);
+                if (dlg.open() == Dialog.OK) {
+                    aliquot.setActivityStatus(dlg.getActivityStatus());
+                    try {
+                        aliquot.persist();
+                    } catch (Exception e1) {
+                        BioBankPlugin
+                            .openAsyncError("Error saving aliquot", e1);
+                    }
+                    AliquotViewForm.this.reload();
+                }
+            }
+        });
         commentLabel = createReadOnlyField(client, SWT.WRAP, "Comment");
         positionLabel = createReadOnlyField(client, SWT.WRAP, "Position");
     }
@@ -158,7 +204,7 @@ public class AliquotViewForm extends BiobankViewForm {
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
             .getFormattedDateDrawn());
-        setTextValue(activityStatusLabel, aliquot.getActivityStatus());
+        setTextValue(activityStatusText, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
