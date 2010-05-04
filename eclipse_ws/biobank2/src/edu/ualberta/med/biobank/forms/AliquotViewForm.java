@@ -214,7 +214,7 @@ public class AliquotViewForm extends BiobankViewForm {
             });
         } else {
             activityStatusLabel = createReadOnlyLabelledField(client, SWT.WRAP,
-                "Activity Status:");
+                "Activity Status");
         }
     }
 
