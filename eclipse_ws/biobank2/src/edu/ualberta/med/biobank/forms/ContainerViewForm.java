@@ -436,8 +436,10 @@ public class ContainerViewForm extends BiobankViewForm {
                 setTextValue(colLabel, container.getPosition().col);
             }
         }
-        aliquotsWidget.setCollection(new ArrayList<AliquotWrapper>(container
-            .getAliquots().values()));
+        if (aliquotsWidget != null) {
+            aliquotsWidget.setCollection(new ArrayList<AliquotWrapper>(
+                container.getAliquots().values()));
+        }
     }
 
     private void createAliquotsSection() {
