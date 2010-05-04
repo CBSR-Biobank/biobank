@@ -122,7 +122,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
+        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, site.getName());
 
         if (shipmentWrapper.isNew()) {
@@ -151,7 +151,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     }
                 });
         } else {
-            Text clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
+            Text clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
             if (shipmentWrapper.getClinic() != null) {
                 clinicLabel.setText(shipmentWrapper.getClinic().getName());
             }

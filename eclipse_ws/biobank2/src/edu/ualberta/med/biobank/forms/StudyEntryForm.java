@@ -108,7 +108,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyField(client, SWT.NONE,
+        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, study.getSite().getName());
 

@@ -97,26 +97,26 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
-        clinicCountLabel = createReadOnlyField(client, SWT.NONE,
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        clinicCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Clinics");
-        studyCountLabel = createReadOnlyField(client, SWT.NONE, "Total Studies");
-        containerTypeCountLabel = createReadOnlyField(client, SWT.NONE,
+        studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE, "Total Studies");
+        containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Container Types");
-        topContainerCountLabel = createReadOnlyField(client, SWT.NONE,
+        topContainerCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Top Level Containers");
-        shipmentCountLabel = createReadOnlyField(client, SWT.NONE,
+        shipmentCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Shipments");
-        patientCountLabel = createReadOnlyField(client, SWT.NONE,
+        patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patients");
-        patientVisitCountLabel = createReadOnlyField(client, SWT.NONE,
+        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patient Visits");
-        sampleCountLabel = createReadOnlyField(client, SWT.NONE,
+        sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Samples");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
         setSiteSectionValues();
     }
 

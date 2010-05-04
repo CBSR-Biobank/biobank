@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class QueryTreeNode extends Object {
     private HQLField nodeInfo;
@@ -122,15 +121,24 @@ public class QueryTreeNode extends Object {
     }
 
     public static QueryTreeNode getTreeFromFile(File file) throws IOException {
-        XStream xStream = new XStream(new DomDriver());
+
+        XStream xStream = new XStream();
         xStream.alias("QueryTreeNode", QueryTreeNode.class);
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        String xml = "";
+        StringBuilder xml = new StringBuilder();
         while (reader.ready()) {
-            xml += reader.readLine();
+            xml.append(reader.readLine());
         }
         reader.close();
-        return (QueryTreeNode) xStream.fromXML(xml);
+        return (QueryTreeNode) xStream.fromXML(xml.toString());
 
     }
+
+    public void setDisplayable(Boolean displayable) {
+        for (HQLField field : fieldData)
+            field.setDisplay(displayable);
+        for (QueryTreeNode child : children)
+            child.setDisplayable(displayable);
+    }
+
 }
