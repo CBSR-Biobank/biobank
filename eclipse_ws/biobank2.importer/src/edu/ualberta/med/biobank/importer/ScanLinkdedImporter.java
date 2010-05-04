@@ -1,0 +1,157 @@
+package edu.ualberta.med.biobank.importer;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+public class ScanLinkdedImporter {
+
+    private static final Logger logger = Logger
+        .getLogger(ScanLinkdedImporter.class.getName());
+
+    private static Map<String, String> dupInvIdErrFix;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("NUAW522752", "AA0204");
+        aMap.put("NUBS371089", "2234");
+        aMap.put("NUBS371353", "2234");
+        aMap.put("NUBS371584", "2234");
+        aMap.put("NUBS371672", "2234");
+        aMap.put("NUBS371821", "2234");
+        aMap.put("NUBT477520", "AA0204");
+        aMap.put("NUBT485617", "AA0204");
+        aMap.put("NUBT485769", "AA0204");
+        aMap.put("NUBT485839", "AA0204");
+        aMap.put("NUBT485875", "AA0204");
+        aMap.put("NUBT485927", "AA0204");
+        aMap.put("NUBT485945", "AA0204");
+        aMap.put("NUBT485981", "AA0204");
+        aMap.put("NUBT486078", "AA0204");
+        aMap.put("NUBT486148", "AA0204");
+        aMap.put("NUBT486157", "AA0204");
+        aMap.put("NUBT486315", "AA0204");
+        aMap.put("NUBT486379", "AA0204");
+        aMap.put("NUBT486388", "AA0204");
+        aMap.put("NUBT486449", "AA0204");
+        aMap.put("NUBT486458", "AA0204");
+        aMap.put("NUBT486467", "AA0204");
+        aMap.put("NUBT486500", "AA0204");
+        aMap.put("NUBT602834", "AA0394");
+        aMap.put("NUBT347715", "AA0394");
+        aMap.put("NUCU131660", "AA0394");
+        aMap.put("NUCU132058", "AA0394");
+        aMap.put("NUCU132243", "AA0394");
+        aMap.put("NUCU145548", "GR0287");
+        aMap.put("NUCU145973", "GR0287");
+        aMap.put("NUCU145982", "GR0287");
+        aMap.put("NUCU146495", "GR0287");
+        aMap.put("NUCU146714", "GR0287");
+        dupInvIdErrFix = Collections.unmodifiableMap(aMap);
+    };
+
+    protected WritableApplicationService appService;
+    protected Connection con;
+    protected final SiteWrapper site;
+    protected int sampleImportCount;
+
+    public ScanLinkdedImporter(WritableApplicationService appService,
+        Connection con, final SiteWrapper site) throws Exception {
+        this.con = con;
+        this.site = site;
+        sampleImportCount = 0;
+        doImport();
+    }
+
+    public void doImport() throws Exception {
+        logger.info("importing scan assigned only aliquots ...");
+
+        String qryPart = "from freezer_link "
+            + "join sample_list on sample_list.sample_nr=freezer_link.sample_nr "
+            + "join patient_visit on patient_visit.visit_nr=freezer_link.visit_nr "
+            + "join patient on patient.patient_nr=patient_visit.patient_nr "
+            + "join study_list on study_list.study_nr=patient_visit.study_nr "
+            + "left join freezer on freezer.inventory_id=freezer_link.inventory_id "
+            + "where fnum is null order by link_date desc";
+
+        Statement s = con.createStatement();
+        s.execute("select count(*) " + qryPart);
+        ResultSet rs = s.getResultSet();
+        rs.next();
+        int numSamples = rs.getInt(1);
+
+        s.execute("select study_name_short,dec_chr_nr,"
+            + "patient_visit.bb2_pv_id,"
+            + "patient_visit.date_received,patient_visit.date_taken,"
+            + "sample_name_short,freezer_link.link_date,"
+            + "freezer_link.inventory_id " + qryPart);
+
+        rs = s.getResultSet();
+        if (rs == null) {
+            throw new Exception("Database query returned null");
+        }
+
+        String studyNameShort;
+        String patientNr;
+        int visitId;
+        String dateProcessedStr;
+        String dateTakenStr;
+        String sampleTypeNameShort;
+        String linkDateStr;
+        String inventoryId;
+
+        int count = 1;
+        while (rs.next()) {
+            studyNameShort = rs.getString(1);
+            patientNr = rs.getString(2);
+            visitId = rs.getInt(3);
+            dateProcessedStr = rs.getString(4);
+            dateTakenStr = rs.getString(5);
+            sampleTypeNameShort = rs.getString(6);
+            linkDateStr = rs.getString(7);
+            inventoryId = rs.getString(8);
+
+            String dupInvIdErr = dupInvIdErrFix.get(inventoryId);
+            if ((dupInvIdErr != null) && !dupInvIdErr.equals(patientNr)) {
+                // this is an invalid aliquot
+                continue;
+            }
+
+            AliquotWrapper aliquot = Importer.createAliquot(site,
+                studyNameShort, patientNr, visitId, dateProcessedStr,
+                dateTakenStr, inventoryId, sampleTypeNameShort, linkDateStr);
+
+            if (aliquot == null) {
+                return;
+            }
+
+            if (dupInvIdErr != null) {
+                aliquot.setActivityStatus(ActivityStatusWrapper
+                    .getActivityStatus(appService, "Flagged"));
+            }
+
+            aliquot.persist();
+
+            ++count;
+
+            logger.debug(String.format(
+                "importing scan linked only aliquot %s (%d/%d)", inventoryId,
+                count, numSamples));
+            ++sampleImportCount;
+        }
+    }
+
+    public int getSamplesImported() {
+        return sampleImportCount;
+    }
+
+}
