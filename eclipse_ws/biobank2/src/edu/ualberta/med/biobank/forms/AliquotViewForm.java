@@ -60,6 +60,8 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text activityStatusText;
 
+    private Text activityStatusLabel;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof AliquotAdapter),
@@ -160,53 +162,60 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void createActivityStatusSection(Composite client) {
-        toolkit.createLabel(client, "Activity Status:", SWT.SINGLE);
-        Composite activityArea = new Composite(client, SWT.BORDER);
-        toolkit.adapt(activityArea);
+        if (aliquot.canEdit()) {
+            toolkit.createLabel(client, "Activity Status:", SWT.SINGLE);
+            Composite activityArea = new Composite(client, SWT.BORDER);
+            toolkit.adapt(activityArea);
 
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginTop = 0;
-        layout.marginBottom = 0;
-        activityArea.setLayout(layout);
+            GridLayout layout = new GridLayout(2, false);
+            layout.marginTop = 0;
+            layout.marginBottom = 0;
+            activityArea.setLayout(layout);
 
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        activityArea.setLayoutData(gd);
+            GridData gd = new GridData();
+            gd.grabExcessHorizontalSpace = true;
+            gd.horizontalAlignment = SWT.FILL;
+            activityArea.setLayoutData(gd);
 
-        activityStatusText = createReadOnlyWidget(activityArea, SWT.READ_ONLY
-            | SWT.BEGINNING, aliquot.getActivityStatus().getName());
-        activityStatusText.setLayoutData(new GridData(SWT.BEGINNING,
-            SWT.CENTER, false, false));
+            activityStatusText = createReadOnlyWidget(activityArea,
+                SWT.READ_ONLY | SWT.BEGINNING, aliquot.getActivityStatus()
+                    .getName());
+            activityStatusText.setLayoutData(new GridData(SWT.BEGINNING,
+                SWT.CENTER, false, false));
 
-        activityStatusButton = new Button(activityArea, SWT.NONE | SWT.BORDER);
-        activityStatusButton.setImage(BioBankPlugin.getDefault()
-            .getImageRegistry().get(BioBankPlugin.IMG_EDIT_FORM));
-        activityStatusButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                AliquotStatusDialog dlg = new AliquotStatusDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    aliquot);
-                if (dlg.open() == Dialog.OK) {
-                    aliquot.setActivityStatus(dlg.getActivityStatus());
-                    BusyIndicator.showWhile(Display.getDefault(),
-                        new Runnable() {
-                            public void run() {
-                                try {
-                                    aliquot.persist();
-                                } catch (Exception e) {
-                                    BioBankPlugin.openAsyncError(
-                                        "Error saving aliquot", e);
+            activityStatusButton = new Button(activityArea, SWT.NONE
+                | SWT.BORDER);
+            activityStatusButton.setImage(BioBankPlugin.getDefault()
+                .getImageRegistry().get(BioBankPlugin.IMG_EDIT_FORM));
+            activityStatusButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    AliquotStatusDialog dlg = new AliquotStatusDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), aliquot);
+                    if (dlg.open() == Dialog.OK) {
+                        aliquot.setActivityStatus(dlg.getActivityStatus());
+                        BusyIndicator.showWhile(Display.getDefault(),
+                            new Runnable() {
+                                public void run() {
+                                    try {
+                                        aliquot.persist();
+                                    } catch (Exception e) {
+                                        BioBankPlugin.openAsyncError(
+                                            "Error saving aliquot", e);
+                                    }
+                                    setTextValue(activityStatusText, aliquot
+                                        .getActivityStatus());
+                                    activityStatusText.getParent().layout();
                                 }
-                                setTextValue(activityStatusText, aliquot
-                                    .getActivityStatus());
-                                activityStatusText.getParent().layout();
-                            }
-                        });
+                            });
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            activityStatusLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+                "Activity Status:");
+        }
     }
 
     private void setValues() {
@@ -222,6 +231,11 @@ public class AliquotViewForm extends BiobankViewForm {
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
             .getFormattedDateDrawn());
+        if (activityStatusText != null) {
+            setTextValue(activityStatusText, aliquot.getActivityStatus());
+        } else if (activityStatusLabel != null) {
+            setTextValue(activityStatusLabel, aliquot.getActivityStatus());
+        }
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
