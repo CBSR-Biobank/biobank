@@ -37,6 +37,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -672,6 +673,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (radioNew.getSelection()) {
             aliquot.setLinkDate(new Date());
             aliquot.setQuantityFromType();
+            aliquot.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
         aliquot.persist();
         String posStr = aliquot.getPositionString(true, false);
