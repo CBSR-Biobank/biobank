@@ -81,18 +81,18 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.READ_ONLY,
+        siteLabel = createReadOnlyLabelledField(client, SWT.READ_ONLY,
             "Repository Site");
-        nameLabel = createReadOnlyField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyField(client, SWT.NONE, "Short Name");
-        hasShipmentsButton = (Button) createWidget(client, Button.class,
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        hasShipmentsButton = (Button) createLabelledWidget(client, Button.class,
             SWT.NONE, "Sends Shipments");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyField(client, SWT.NONE, "Comments");
-        shipmentTotal = createReadOnlyField(client, SWT.NONE, "Total Shipments");
-        patientTotal = createReadOnlyField(client, SWT.NONE, "Total Patients");
-        visitTotal = createReadOnlyField(client, SWT.NONE,
+        commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
+        shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE, "Total Shipments");
+        patientTotal = createReadOnlyLabelledField(client, SWT.NONE, "Total Patients");
+        visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patient Visits");
 
         setClinicValues();

@@ -420,22 +420,22 @@ public class ContainerWrapper extends
 
     @SuppressWarnings("unchecked")
     public Map<RowColPos, AliquotWrapper> getAliquots() {
-        Map<RowColPos, AliquotWrapper> samples = (Map<RowColPos, AliquotWrapper>) propertiesMap
-            .get("samples");
-        if (samples == null) {
+        Map<RowColPos, AliquotWrapper> aliquots = (Map<RowColPos, AliquotWrapper>) propertiesMap
+            .get("aliquots");
+        if (aliquots == null) {
             Collection<AliquotPosition> positions = wrappedObject
                 .getAliquotPositionCollection();
             if (positions != null) {
-                samples = new TreeMap<RowColPos, AliquotWrapper>();
+                aliquots = new TreeMap<RowColPos, AliquotWrapper>();
                 for (AliquotPosition position : positions) {
-                    samples.put(new RowColPos(position.getRow(), position
+                    aliquots.put(new RowColPos(position.getRow(), position
                         .getCol()), new AliquotWrapper(appService, position
                         .getAliquot()));
                 }
-                propertiesMap.put("samples", samples);
+                propertiesMap.put("aliquots", aliquots);
             }
         }
-        return samples;
+        return aliquots;
     }
 
     public boolean hasAliquots() {
@@ -465,10 +465,10 @@ public class ContainerWrapper extends
         aliquotPosition.setRow(row);
         aliquotPosition.setCol(col);
         aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, AliquotWrapper> samples = getAliquots();
-        if (samples == null) {
-            samples = new TreeMap<RowColPos, AliquotWrapper>();
-            propertiesMap.put("aliquots", samples);
+        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
+        if (aliquots == null) {
+            aliquots = new TreeMap<RowColPos, AliquotWrapper>();
+            propertiesMap.put("aliquots", aliquots);
         } else if (!canHoldAliquot(aliquot)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
@@ -485,7 +485,7 @@ public class ContainerWrapper extends
         }
         aliquot.setPosition(row, col);
         aliquot.setParent(this);
-        samples.put(new RowColPos(row, col), aliquot);
+        aliquots.put(new RowColPos(row, col), aliquot);
         addedAliquots.add(aliquot);
     }
 

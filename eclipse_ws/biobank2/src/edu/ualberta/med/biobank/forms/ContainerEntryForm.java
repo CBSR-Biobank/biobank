@@ -103,7 +103,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyField(client, SWT.NONE,
+        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, container.getSite().getName());
 
@@ -116,7 +116,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     container, "label"), new NonEmptyStringValidator(
                     MSG_CONTAINER_NAME_EMPTY));
         } else {
-            Text l = createReadOnlyField(client, SWT.NONE, "Label");
+            Text l = createReadOnlyLabelledField(client, SWT.NONE, "Label");
             setTextValue(l, container.getLabel());
         }
 

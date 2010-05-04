@@ -31,8 +31,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
             posWrapper.setCol(rowColPosition.col);
         }
         super.persist();
-        rowColPosition = null;
-        positionWrapper = null;
     }
 
     @Override

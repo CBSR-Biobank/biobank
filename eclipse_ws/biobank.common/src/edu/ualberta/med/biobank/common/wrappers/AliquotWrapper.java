@@ -329,6 +329,26 @@ public class AliquotWrapper extends
         return list;
     }
 
+    public static List<AliquotWrapper> getAliquotsNonActive(
+        WritableApplicationService appService, SiteWrapper site)
+        throws Exception {
+        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, "Active");
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Aliquot.class.getName()
+                + " where patientVisit.patient.study.site.id = ? and activityStatus != ?",
+            Arrays.asList(new Object[] { site.getId(),
+                activeStatus.getWrappedObject() }));
+        List<Aliquot> aliquots = appService.query(criteria);
+        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
+
+        for (Aliquot aliquot : aliquots) {
+            list.add(new AliquotWrapper(appService, aliquot));
+        }
+        return list;
+    }
+
     public static List<AliquotWrapper> getAliquotsInSiteWithPositionLabel(
         WritableApplicationService appService, SiteWrapper site,
         String positionString) throws ApplicationException,

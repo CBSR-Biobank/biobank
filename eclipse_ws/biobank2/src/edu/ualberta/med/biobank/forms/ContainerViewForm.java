@@ -59,7 +59,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private AliquotListInfoTable samplesWidget;
+    private AliquotListInfoTable aliquotsWidget;
 
     private Text siteLabel;
 
@@ -118,9 +118,9 @@ public class ContainerViewForm extends BiobankViewForm {
         createContainerSection();
 
         if (container.getContainerType().getSampleTypeCollection().size() > 0) {
-            // only show samples section this if this container type does not
+            // only show aliquots section this if this container type does not
             // have child containers
-            createSamplesSection();
+            createAliquotsSection();
         }
     }
 
@@ -133,16 +133,20 @@ public class ContainerViewForm extends BiobankViewForm {
         client.setLayoutData(gridData);
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Repository Site");
-        containerLabelLabel = createReadOnlyField(client, SWT.NONE, "Label");
-        productBarcodeLabel = createReadOnlyField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Repository Site");
+        containerLabelLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Label");
+        productBarcodeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Product Bar Code");
-        activityStatusLabel = createReadOnlyField(client, SWT.NONE,
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentsLabel = createReadOnlyField(client, SWT.NONE, "Comments");
-        containerTypeLabel = createReadOnlyField(client, SWT.NONE,
+        commentsLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Comments");
+        containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Container Type");
-        temperatureLabel = createReadOnlyField(client, SWT.NONE, "Temperature");
+        temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Temperature");
 
         setContainerValues();
 
@@ -434,13 +438,13 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void createSamplesSection() {
-        Composite parent = createSectionWithClient("Samples");
-        List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>(container
+    private void createAliquotsSection() {
+        Composite parent = createSectionWithClient("Aliquots");
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>(container
             .getAliquots().values());
-        samplesWidget = new AliquotListInfoTable(parent, samples);
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
+        aliquotsWidget.adaptToToolkit(toolkit, true);
+        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
@@ -453,6 +457,10 @@ public class ContainerViewForm extends BiobankViewForm {
                 .size() > 0)
                 refreshVis();
             setContainerValues();
+            if (aliquotsWidget != null) {
+                aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
+                    container.getAliquots().values()));
+            }
         }
     }
 

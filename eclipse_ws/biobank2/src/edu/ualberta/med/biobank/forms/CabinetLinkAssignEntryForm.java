@@ -37,6 +37,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -572,9 +573,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         PatientWrapper patient = aliquot.getPatientVisit().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient, aliquot
             .getPatientVisit());
-        positionText.setText(aliquot.getPositionString(true, false));
-        initParentContainersFromPosition(positionText.getText());
-        setTypeCombosLists();
+        String positionString = aliquot.getPositionString(true, false);
+        if (positionString != null) {
+            positionText.setText(positionString);
+            initParentContainersFromPosition(positionString);
+            setTypeCombosLists();
+        }
         String posStr = aliquot.getPositionString(true, false);
         if (posStr == null) {
             posStr = "none"; //$NON-NLS-1$
@@ -647,6 +651,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     public void reset() throws Exception {
         aliquot.resetToNewObject();
+        aliquot.reset(); // reset internal values
         cabinet = null;
         drawer = null;
         bin = null;
@@ -668,6 +673,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (radioNew.getSelection()) {
             aliquot.setLinkDate(new Date());
             aliquot.setQuantityFromType();
+            aliquot.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         }
         aliquot.persist();
         String posStr = aliquot.getPositionString(true, false);

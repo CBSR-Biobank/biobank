@@ -88,18 +88,18 @@ public class PatientVisitViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
-        studyLabel = createReadOnlyField(client, SWT.NONE, "Study");
-        clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
-        shipmentLabel = createReadOnlyField(client, SWT.NONE, "Shipment");
-        patientLabel = createReadOnlyField(client, SWT.NONE, "Patient");
-        dateProcessedLabel = createReadOnlyField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
+        clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
+        shipmentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Shipment");
+        patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
+        dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
-        dateDrawnLabel = createReadOnlyField(client, SWT.NONE, "Date Drawn");
+        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE, "Date Drawn");
 
         createPvDataSection(client);
 
-        commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comments");
 
         setPatientVisitValues();
     }
@@ -131,7 +131,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
                 combinedPvInfo.setValue(value);
             }
 
-            combinedPvInfo.widget = createReadOnlyField(client, style, label,
+            combinedPvInfo.widget = createReadOnlyLabelledField(client, style, label,
                 combinedPvInfo.getValue());
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
             combinedPvInfo.widget.setLayoutData(gd);

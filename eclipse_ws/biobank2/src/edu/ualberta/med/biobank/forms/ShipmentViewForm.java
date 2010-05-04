@@ -97,18 +97,18 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
-        waybillLabel = createReadOnlyField(client, SWT.NONE, "Waybill");
-        clinicLabel = createReadOnlyField(client, SWT.NONE, "Clinic");
-        dateShippedLabel = createReadOnlyField(client, SWT.NONE, "Date Shipped");
-        shippingMethodLabel = createReadOnlyField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
+        clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
+        dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE, "Date Shipped");
+        shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipping Method");
-        boxNumberLabel = createReadOnlyField(client, SWT.NONE, "Box number");
-        dateReceivedLabel = createReadOnlyField(client, SWT.NONE,
+        boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE, "Box number");
+        dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date received");
-        commentLabel = createReadOnlyField(client, SWT.WRAP, "Comments");
-        patientCountLabel = createReadOnlyField(client, SWT.WRAP, "Patients");
-        patientVisitCountLabel = createReadOnlyField(client, SWT.WRAP,
+        commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comments");
+        patientCountLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Patients");
+        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
             "Patient Visits");
 
         setShipmentValues();

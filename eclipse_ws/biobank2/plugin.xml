@@ -1717,13 +1717,19 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
             name="Source Vessel Entry">
-            </editor>
-		<editor
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.DecodePlateForm"
             default="false"
             icon="icons/scanLink.png"
             id="edu.ualberta.med.biobank.forms.DecodePlateForm"
             name="Decode Plate">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.AliquotListViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.AliquotListViewForm"
+            name="Aliquot List">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ScanPlateForm"

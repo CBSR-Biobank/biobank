@@ -467,16 +467,14 @@ public class WidgetCreator {
         for (String label : fieldsMap.keySet()) {
             fi = fieldsMap.get(label);
 
-            Control control = createWidget(parent, fi.widgetClass, SWT.NONE,
-                fi.label, null);
+            Control control = createLabelledWidget(parent, fi.widgetClass,
+                SWT.NONE, fi.label, null);
             controls.put(label, control);
         }
     }
 
     public Control createWidget(Composite parent, Class<?> widgetClass,
-        int widgetOptions, String fieldLabel, String value) {
-        Label label = createLabel(parent, fieldLabel);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        int widgetOptions, String value) {
         if ((widgetClass == Combo.class) || (widgetClass == Text.class)
             || (widgetClass == Label.class)) {
             if (widgetOptions == SWT.NONE) {
@@ -503,5 +501,12 @@ public class WidgetCreator {
                 + widgetClass.getName());
         }
         return null;
+    }
+
+    public Control createLabelledWidget(Composite parent, Class<?> widgetClass,
+        int widgetOptions, String fieldLabel, String value) {
+        Label label = createLabel(parent, fieldLabel);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        return createWidget(parent, widgetClass, widgetOptions, value);
     }
 }

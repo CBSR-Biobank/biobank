@@ -69,10 +69,10 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyField(client, SWT.NONE, "Site");
-        studyLabel = createReadOnlyField(client, SWT.NONE, "Study");
-        visitCountLabel = createReadOnlyField(client, SWT.NONE, "Total Visits");
-        sampleCountLabel = createReadOnlyField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
+        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE, "Total Visits");
+        sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Samples");
     }
 

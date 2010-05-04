@@ -278,15 +278,21 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     protected Control createWidget(Composite parent, Class<?> widgetClass,
-        int widgetOptions, String fieldLabel, String value) {
+        int widgetOptions, String value) {
         return widgetCreator.createWidget(parent, widgetClass, widgetOptions,
-            fieldLabel, value);
+            value);
     }
 
-    protected Control createWidget(Composite parent, Class<?> widgetClass,
-        int widgetOptions, String fieldLabel) {
-        return createWidget(parent, widgetClass, widgetOptions, fieldLabel,
-            null);
+    protected Control createLabelledWidget(Composite parent,
+        Class<?> widgetClass, int widgetOptions, String fieldLabel, String value) {
+        return widgetCreator.createLabelledWidget(parent, widgetClass,
+            widgetOptions, fieldLabel, value);
+    }
+
+    protected Control createLabelledWidget(Composite parent,
+        Class<?> widgetClass, int widgetOptions, String fieldLabel) {
+        return createLabelledWidget(parent, widgetClass, widgetOptions,
+            fieldLabel, null);
     }
 
     protected void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
@@ -294,22 +300,30 @@ public abstract class BiobankFormBase extends EditorPart {
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
 
-    protected Text createReadOnlyField(Composite parent, int widgetOptions,
-        String fieldLabel, String value) {
-        Text result = (Text) createWidget(parent, Text.class, SWT.READ_ONLY
-            | widgetOptions, fieldLabel, value);
+    protected Text createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel, String value) {
+        Text result = (Text) createLabelledWidget(parent, Text.class,
+            SWT.READ_ONLY | widgetOptions, fieldLabel, value);
         return result;
     }
 
-    protected Text createReadOnlyField(Composite parent, int widgetOptions,
-        String fieldLabel) {
-        return createReadOnlyField(parent, widgetOptions, fieldLabel, null);
+    protected Text createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel) {
+        return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
+            null);
     }
 
     public static void setTextValue(Text label, String value) {
         if (value != null && !label.isDisposed()) {
             label.setText(value);
         }
+    }
+
+    protected Text createReadOnlyWidget(Composite parent, int widgetOptions,
+        String value) {
+        Text result = (Text) createWidget(parent, Text.class, SWT.READ_ONLY
+            | widgetOptions, value);
+        return result;
     }
 
     public static void setTextValue(Text label, Object value) {
