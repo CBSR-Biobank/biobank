@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -36,8 +35,7 @@ public class LinkFormPatientManagement {
     protected ComboViewer viewerVisits;
     private Button visitsListCheck;
 
-    private static IObservableValue visitsListCheckValue = new WritableValue(
-        Boolean.TRUE, Boolean.class);
+    private static Boolean visitsListCheckSelection = true;
 
     // currentPatient
     protected PatientWrapper currentPatient;
@@ -130,7 +128,7 @@ public class LinkFormPatientManagement {
         });
         visitsListCheck = aliquotAdminForm.toolkit.createButton(
             compositeFields, "Last 7 days", SWT.CHECK);
-        visitsListCheck.setSelection(true);
+        visitsListCheck.setSelection(visitsListCheckSelection);
         visitsListCheck.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -217,7 +215,9 @@ public class LinkFormPatientManagement {
 
     public void onClose() {
         if (aliquotAdminForm.finished) {
-            visitsListCheckValue.setValue(true);
+            visitsListCheckSelection = true;
+        } else {
+            visitsListCheckSelection = visitsListCheck.getSelection();
         }
     }
 
@@ -226,6 +226,9 @@ public class LinkFormPatientManagement {
         currentPatient = null;
         if (resetAll) {
             patientNumberText.setText(""); //$NON-NLS-1$
+            if (visitText != null) {
+                visitText.setText("");
+            }
         }
     }
 
@@ -235,7 +238,6 @@ public class LinkFormPatientManagement {
 
     public void setCurrentPatientAndVisit(PatientWrapper patient,
         PatientVisitWrapper patientVisit) {
-        visitsListCheckValue.setValue(false);
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
         List<PatientVisitWrapper> collection = patient
@@ -254,6 +256,7 @@ public class LinkFormPatientManagement {
     public void enabledVisitsList(boolean enabled) {
         viewerVisits.getCombo().setEnabled(enabled);
         visitsListCheck.setEnabled(enabled);
+        showVisitText(!enabled);
     }
 
     public void setPatientTextCallback(PatientTextCallback callback) {

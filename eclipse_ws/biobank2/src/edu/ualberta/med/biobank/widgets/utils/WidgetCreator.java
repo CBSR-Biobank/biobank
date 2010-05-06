@@ -618,4 +618,12 @@ public class WidgetCreator {
         widget.setVisible(show);
         ((GridData) widget.getLayoutData()).exclude = !show;
     }
+
+    public void showWidget(Control widget) {
+        showWidget(widget, true);
+    }
+
+    public void hideWidget(Control widget) {
+        showWidget(widget, false);
+    }
 }
