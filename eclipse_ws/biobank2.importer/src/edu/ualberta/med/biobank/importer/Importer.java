@@ -1380,14 +1380,17 @@ public class Importer {
 
         String labels = "";
         for (AliquotWrapper aliquot : aliquots) {
-            labels += aliquot.getPositionString(true, true) + ", ";
+            String pos = aliquot.getPositionString(true, true);
+            if (pos != null) {
+                labels += pos + ", ";
+            }
         }
-        if (labels.length() != 0) {
+        if (labels.length() > 0) {
             logger.error("an aliquot with inventory id " + inventoryId
                 + " already exists at " + labels);
         }
         logger.error("an aliquot with inventory id " + inventoryId
-            + " already fro patient "
+            + " already exists for patient "
             + aliquots.get(0).getPatientVisit().getPatient().getPnumber());
         return false;
     }

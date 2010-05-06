@@ -313,12 +313,12 @@ public class AliquotWrapper extends
 
     public static List<AliquotWrapper> getAliquotsInSite(
         WritableApplicationService appService, String inventoryId,
-        SiteWrapper siteWrapper) throws ApplicationException {
+        SiteWrapper site) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
                 + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
-            Arrays.asList(new Object[] { inventoryId, siteWrapper.getId() }));
+            Arrays.asList(new Object[] { inventoryId, site.getId() }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         for (Aliquot aliquot : aliquots) {
