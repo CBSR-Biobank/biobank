@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -37,7 +36,7 @@ public class ScanLinkdedImporter {
         invIdNotImported = Collections.unmodifiableList(aList);
     };
 
-    private static Map<String, String> dupInvIdErrFix;
+    private static Map<String, String> dupInvIdPnumberErrFix;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
         aMap.put("NUAW522752", "AA0204");
@@ -74,7 +73,29 @@ public class ScanLinkdedImporter {
         aMap.put("NUCU145982", "GR0287");
         aMap.put("NUCU146495", "GR0287");
         aMap.put("NUCU146714", "GR0287");
-        dupInvIdErrFix = Collections.unmodifiableMap(aMap);
+        aMap.put("NUAD358701", "6832");
+        aMap.put("NUAD379500", "6832");
+        aMap.put("NUAD492528", "6832");
+        aMap.put("NUAD531100", "6832");
+        aMap.put("NUAD531854", "6832");
+        aMap.put("NUAD532349", "6832");
+        aMap.put("NUAD532695", "6832");
+        aMap.put("NUAD551654", "6832");
+        aMap.put("NUAD551867", "6832");
+        aMap.put("NUAD557180", "6832");
+        aMap.put("NUAD557658", "6832");
+
+        dupInvIdPnumberErrFix = Collections.unmodifiableMap(aMap);
+    };
+
+    // these are duplicates which will not be imported
+    private static Map<String, String> dupInvIdSampleTypeErrFix;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("NUBR489123", "Urine");
+        aMap.put("NUBT538025", "Cells");
+
+        dupInvIdSampleTypeErrFix = Collections.unmodifiableMap(aMap);
     };
 
     protected WritableApplicationService appService;
@@ -143,7 +164,6 @@ public class ScanLinkdedImporter {
             linkDateStr = rs.getString(7);
             inventoryId = rs.getString(8);
 
-            // if (inventoryId.equals("NUAW522752")) {
             if (inventoryId.equals("NUAW522752")) {
                 System.out.println("here");
             }
@@ -151,6 +171,27 @@ public class ScanLinkdedImporter {
             if (invIdNotImported.contains(inventoryId)) {
                 logger.info("duplicate kit, not importing inventory id: "
                     + "inventoryId/" + inventoryId);
+                continue;
+            }
+
+            String dupInvIdPnumberErr = dupInvIdPnumberErrFix.get(inventoryId);
+            if ((dupInvIdPnumberErr != null)
+                && !dupInvIdPnumberErr.equals(patientNr)) {
+                logger.info("ignoring duplicate inventory id: "
+                    + "inventoryId/" + inventoryId + " visitId/" + visitId
+                    + " patientNr/" + patientNr + " sampleTypeNameShort/"
+                    + sampleTypeNameShort);
+                continue;
+            }
+
+            String dupInvIdSampleTypeErr = dupInvIdSampleTypeErrFix
+                .get(inventoryId);
+            if ((dupInvIdSampleTypeErr != null)
+                && !dupInvIdSampleTypeErr.equals(sampleTypeNameShort)) {
+                logger.info("ignoring duplicate inventory id: "
+                    + "inventoryId/" + inventoryId + " visitId/" + visitId
+                    + " patientNr/" + patientNr + " sampleTypeNameShort/"
+                    + sampleTypeNameShort);
                 continue;
             }
 
@@ -169,15 +210,6 @@ public class ScanLinkdedImporter {
                 continue;
             }
 
-            String dupInvIdErr = dupInvIdErrFix.get(inventoryId);
-            if ((dupInvIdErr != null) && !dupInvIdErr.equals(patientNr)) {
-                logger.info("ignoring duplicate inventory id: "
-                    + "inventoryId/" + inventoryId + " visitId/" + visitId
-                    + " patientNr/" + patientNr + " sampleTypeNameShort/"
-                    + sampleTypeNameShort);
-                continue;
-            }
-
             aliquot = Importer.createAliquot(site, studyNameShort, patientNr,
                 visitId, dateProcessedStr, dateTakenStr, inventoryId,
                 sampleTypeNameShort, linkDateStr);
@@ -189,7 +221,8 @@ public class ScanLinkdedImporter {
                         + " sampleTypeNameShort/" + sampleTypeNameShort);
                 continue;
             }
-            if (dupInvIdErr != null) {
+
+            if ((dupInvIdPnumberErr != null) || (dupInvIdSampleTypeErr != null)) {
                 aliquot.setActivityStatus(ActivityStatusWrapper
                     .getActivityStatus(appService, "Flagged"));
                 logger.info("flagging duplicate inventory id: "
@@ -214,6 +247,8 @@ public class ScanLinkdedImporter {
         throws Exception {
         List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
             appService, inventoryId, site);
+        sampleTypeNameShort = Importer.getSampleType(sampleTypeNameShort)
+            .getNameShort();
         if (aliquots.size() > 0) {
             // check if this is a duplicate
             for (AliquotWrapper a : aliquots) {
@@ -228,16 +263,6 @@ public class ScanLinkdedImporter {
             logger.error("duplicate inventory id found: inventoryId/"
                 + inventoryId + " visitId/" + visitId + " patientNr/"
                 + patientNr + " sampleTypeNameShort/" + sampleTypeNameShort);
-        }
-        return null;
-    }
-
-    private AliquotWrapper getAliquot(String inventoryId) throws Exception {
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
-            appService, inventoryId, site);
-        Assert.isTrue(aliquots.size() <= 1);
-        if (aliquots.size() == 1) {
-            return aliquots.get(0);
         }
         return null;
     }
