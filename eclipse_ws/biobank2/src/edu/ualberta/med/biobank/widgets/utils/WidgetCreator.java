@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -58,6 +59,8 @@ public class WidgetCreator {
 
     protected Map<String, Control> controls;
 
+    protected Map<String, Binding> bindings;
+
     private FormToolkit toolkit;
 
     private KeyListener keyListener;
@@ -72,6 +75,7 @@ public class WidgetCreator {
 
     public void initDataBinding() {
         dbc = new DataBindingContext();
+        bindings = new HashMap<String, Binding>();
     }
 
     public void setToolkit(FormToolkit toolkit) {
@@ -113,12 +117,22 @@ public class WidgetCreator {
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues,
         IObservableValue modelObservableValue, AbstractValidator validator) {
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, modelObservableValue,
+            validator, null);
+    }
+
+    public Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues,
+        IObservableValue modelObservableValue, AbstractValidator validator,
+        String bindingKey) {
         Label label;
 
         label = createLabel(composite, fieldLabel);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         return createBoundWidget(composite, widgetClass, widgetOptions, label,
-            widgetValues, modelObservableValue, validator);
+            widgetValues, modelObservableValue, validator, bindingKey);
 
     }
 
@@ -126,6 +140,14 @@ public class WidgetCreator {
         Class<? extends Widget> widgetClass, int widgetOptions,
         String[] widgetValues, IObservableValue modelObservableValue,
         IValidator validator) {
+        return createBoundWidget(composite, widgetClass, widgetOptions,
+            widgetValues, modelObservableValue, validator, null);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String[] widgetValues, IObservableValue modelObservableValue,
+        IValidator validator, String bindingKey) {
         Assert.isNotNull(dbc);
         UpdateValueStrategy uvs = null;
         if (validator != null) {
@@ -134,12 +156,13 @@ public class WidgetCreator {
         }
         if (widgetClass == Text.class) {
             return createText(composite, widgetOptions, modelObservableValue,
-                uvs);
+                uvs, bindingKey);
         } else if (widgetClass == Combo.class) {
             return createCombo(composite, widgetOptions, widgetValues,
-                modelObservableValue, uvs);
+                modelObservableValue, uvs, bindingKey);
         } else if (widgetClass == Button.class) {
-            return createButton(composite, modelObservableValue, uvs);
+            return createButton(composite, modelObservableValue, uvs,
+                bindingKey);
         } else {
             Assert.isTrue(false, "invalid widget class "
                 + widgetClass.getName());
@@ -148,13 +171,18 @@ public class WidgetCreator {
     }
 
     private Control createButton(Composite composite,
-        IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
+        IObservableValue modelObservableValue, UpdateValueStrategy uvs,
+        String bindingKey) {
         Button button = new Button(composite, SWT.CHECK);
         if (toolkit != null) {
             toolkit.adapt(button, true, true);
         }
-        dbc.bindValue(SWTObservables.observeSelection(button),
-            modelObservableValue, uvs, null);
+        Binding binding = dbc.bindValue(
+            SWTObservables.observeSelection(button), modelObservableValue, uvs,
+            null);
+        if (bindingKey != null) {
+            bindings.put(bindingKey, binding);
+        }
         if (selectionListener != null) {
             button.addSelectionListener(selectionListener);
         }
@@ -163,7 +191,7 @@ public class WidgetCreator {
 
     private Combo createCombo(Composite composite, int options,
         String[] widgetValues, final IObservableValue modelObservableValue,
-        UpdateValueStrategy uvs) {
+        UpdateValueStrategy uvs, String bindingKey) {
         final Combo combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER
             | options);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
@@ -172,8 +200,11 @@ public class WidgetCreator {
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
         }
-        dbc.bindValue(SWTObservables.observeSelection(combo),
+        Binding binding = dbc.bindValue(SWTObservables.observeSelection(combo),
             modelObservableValue, uvs, null);
+        if (bindingKey != null) {
+            bindings.put(bindingKey, binding);
+        }
         if (selectionListener != null) {
             combo.addSelectionListener(selectionListener);
         }
@@ -202,6 +233,13 @@ public class WidgetCreator {
 
     public Text createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
+        return createText(composite, widgetOptions, modelObservableValue, uvs,
+            null);
+    }
+
+    public Text createText(Composite composite, int widgetOptions,
+        IObservableValue modelObservableValue, UpdateValueStrategy uvs,
+        String bindingKey) {
         if (widgetOptions == SWT.NONE) {
             widgetOptions = SWT.SINGLE;
         }
@@ -230,8 +268,11 @@ public class WidgetCreator {
             text.addKeyListener(keyListener);
         }
         if (modelObservableValue != null) {
-            dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
-                modelObservableValue, uvs, null);
+            Binding binding = dbc.bindValue(SWTObservables.observeText(text,
+                SWT.Modify), modelObservableValue, uvs, null);
+            if (bindingKey != null) {
+                bindings.put(bindingKey, binding);
+            }
         }
         return text;
     }
@@ -240,6 +281,14 @@ public class WidgetCreator {
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, IObservableValue modelObservableValue,
         AbstractValidator validator) {
+        return createBoundWidget(composite, widgetClass, widgetOptions, label,
+            widgetValues, modelObservableValue, validator, null);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, IObservableValue modelObservableValue,
+        AbstractValidator validator, String bindingKey) {
 
         if (validator != null) {
             validator.setControlDecoration(BiobankWidget.createDecorator(label,
@@ -247,7 +296,29 @@ public class WidgetCreator {
         }
 
         return createBoundWidget(composite, widgetClass, widgetOptions,
-            widgetValues, modelObservableValue, validator);
+            widgetValues, modelObservableValue, validator, bindingKey);
+    }
+
+    public <T> ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
+        String errorMessage) {
+        return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
+            input, selection, errorMessage, false);
+    }
+
+    public <T> ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
+        String errorMessage, boolean useDefaultComparator) {
+        return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
+            input, selection, errorMessage, useDefaultComparator, null);
+    }
+
+    public <T> ComboViewer createComboViewerWithNoSelectionValidator(
+        Composite parent, String fieldLabel, Collection<T> input, T selection,
+        String errorMessage, boolean useDefaultComparator, String bindingKey) {
+        Label label = createLabel(parent, fieldLabel);
+        return createComboViewerWithNoSelectionValidator(parent, label, input,
+            selection, errorMessage, useDefaultComparator, bindingKey);
     }
 
     /**
@@ -258,11 +329,9 @@ public class WidgetCreator {
      * @see BiobankLabelProvider#getColumnText
      */
     public <T> ComboViewer createComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage, boolean useDefaultComparator) {
+        Composite parent, Label fieldLabel, Collection<T> input, T selection,
+        String errorMessage, boolean useDefaultComparator, String bindingKey) {
         Assert.isNotNull(dbc);
-        Label label = createLabel(parent, fieldLabel);
-
         Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
         ComboViewer comboViewer = new ComboViewer(combo);
         comboViewer.setContentProvider(new ArrayContentProvider());
@@ -277,13 +346,16 @@ public class WidgetCreator {
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             errorMessage);
-        validator.setControlDecoration(BiobankWidget.createDecorator(label,
-            errorMessage));
+        validator.setControlDecoration(BiobankWidget.createDecorator(
+            fieldLabel, errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
         IObservableValue selectedValue = new WritableValue("", String.class);
-        dbc.bindValue(SWTObservables.observeSelection(combo), selectedValue,
-            uvs, null);
+        Binding binding = dbc.bindValue(SWTObservables.observeSelection(combo),
+            selectedValue, uvs, null);
+        if (bindingKey != null) {
+            bindings.put(bindingKey, binding);
+        }
 
         if (selection != null) {
             comboViewer.setSelection(new StructuredSelection(selection));
@@ -292,13 +364,6 @@ public class WidgetCreator {
             combo.addModifyListener(modifyListener);
         }
         return comboViewer;
-    }
-
-    public <T> ComboViewer createComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage) {
-        return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
-            input, selection, errorMessage, false);
     }
 
     public Label createLabel(Composite parent, String fieldLabel) {
@@ -325,20 +390,41 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, -1);
+            modelObservableValue, emptyMessage, null);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, String bindingKey) {
+        return createDateTimeWidget(client, nameLabel, date,
+            modelObservableValue, emptyMessage, -1, bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage, int typeShown) {
+        return createDateTimeWidget(client, nameLabel, date,
+            modelObservableValue, emptyMessage, typeShown, null);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, int typeShown, String bindingKey) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
         return createDateTimeWidget(client, label, date, modelObservableValue,
-            emptyMessage, typeShown);
+            emptyMessage, typeShown, bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, IObservableValue modelObservableValue,
         final String emptyMessage, int typeShown) {
+        return createDateTimeWidget(client, label, date, modelObservableValue,
+            emptyMessage, typeShown, null);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, IObservableValue modelObservableValue,
+        final String emptyMessage, int typeShown, String bindingKey) {
         final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
             date, typeShown);
         if (selectionListener != null) {
@@ -357,8 +443,12 @@ public class WidgetCreator {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
             }
-            dbc.bindValue(new DateTimeObservableValue(widget),
-                modelObservableValue, uvs, null);
+            Binding binding = dbc.bindValue(
+                new DateTimeObservableValue(widget), modelObservableValue, uvs,
+                null);
+            if (bindingKey != null) {
+                bindings.put(bindingKey, binding);
+            }
         }
         return widget;
     }
@@ -436,8 +526,22 @@ public class WidgetCreator {
         dbc.removeBinding(binding);
     }
 
+    public void removeBinding(String bindingKey) {
+        Assert.isNotNull(dbc);
+        Binding binding = bindings.get(bindingKey);
+        Assert.isNotNull(binding);
+        dbc.removeBinding(binding);
+    }
+
     public void addBinding(Binding binding) {
         Assert.isNotNull(dbc);
+        dbc.addBinding(binding);
+    }
+
+    public void addBinding(String bindingKey) {
+        Assert.isNotNull(dbc);
+        Binding binding = bindings.get(bindingKey);
+        Assert.isNotNull(binding);
         dbc.addBinding(binding);
     }
 
@@ -508,5 +612,10 @@ public class WidgetCreator {
         Label label = createLabel(parent, fieldLabel);
         label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         return createWidget(parent, widgetClass, widgetOptions, value);
+    }
+
+    public void showWidget(Control widget, boolean show) {
+        widget.setVisible(show);
+        ((GridData) widget.getLayoutData()).exclude = !show;
     }
 }

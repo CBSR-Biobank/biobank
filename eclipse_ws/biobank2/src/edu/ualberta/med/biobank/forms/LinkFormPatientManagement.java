@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -18,6 +17,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -47,6 +47,14 @@ public class LinkFormPatientManagement {
     private AbstractAliquotAdminForm aliquotAdminForm;
 
     private PatientTextCallback patientTextCallback;
+    private Label patientLabel;
+    private NonEmptyStringValidator patientValidator;
+    private Label visitTextLabel;
+    private Text visitText;
+    private Label visitComboLabel;
+
+    private static final String PATIENT_NUMBER_BINDING = "patient-binding";
+    private static final String VISIT_BINDING = "visit-binding";
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
         AbstractAliquotAdminForm aliquotAdminForm) {
@@ -54,12 +62,17 @@ public class LinkFormPatientManagement {
         this.aliquotAdminForm = aliquotAdminForm;
     }
 
-    protected void initPatientNumberText(Composite parent) {
-        patientNumberText = (Text) widgetCreator.createBoundWidgetWithLabel(
-            parent, Text.class, SWT.NONE, Messages
-                .getString("ScanLink.patientNumber.label"), new String[0], //$NON-NLS-1$
-            new WritableValue("", String.class), new NonEmptyStringValidator( //$NON-NLS-1$
-                Messages.getString("ScanLink.patientNumber.validationMsg"))); //$NON-NLS-1$
+    protected void createPatientNumberText(Composite parent) {
+        patientLabel = widgetCreator.createLabel(parent, Messages
+            .getString("ScanLink.patientNumber.label"));
+        patientLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        patientValidator = new NonEmptyStringValidator(Messages
+            .getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
+        patientNumberText = (Text) widgetCreator.createBoundWidget(parent,
+            Text.class, SWT.NONE, patientLabel, new String[0],
+            new WritableValue("", String.class), patientValidator,
+            PATIENT_NUMBER_BINDING);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -89,10 +102,15 @@ public class LinkFormPatientManagement {
     }
 
     protected void createVisitCombo(Composite compositeFields) {
-        viewerVisits = widgetCreator.createComboViewerWithNoSelectionValidator(
-            compositeFields,
-            Messages.getString("ScanLink.visit.label"), null, null, //$NON-NLS-1$
-            Messages.getString("ScanLink.visit.validationMsg")); //$NON-NLS-1$
+        visitComboLabel = widgetCreator.createLabel(compositeFields, Messages
+            .getString("ScanLink.visit.label"));
+        viewerVisits = widgetCreator
+            .createComboViewerWithNoSelectionValidator(
+                compositeFields,
+                visitComboLabel,
+                null,
+                null,
+                Messages.getString("ScanLink.visit.validationMsg"), false, VISIT_BINDING); //$NON-NLS-1$
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -119,9 +137,20 @@ public class LinkFormPatientManagement {
                 setVisitsList();
             }
         });
-        widgetCreator.bindValue(SWTObservables
-            .observeSelection(visitsListCheck), visitsListCheckValue, null,
-            null);
+    }
+
+    /**
+     * Specific to Cabinet move mode
+     */
+    protected void createVisitText(Composite compositeFields) {
+        visitTextLabel = widgetCreator.createLabel(compositeFields, Messages
+            .getString("ScanLink.visit.label"));
+        visitTextLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        visitText = (Text) widgetCreator.createWidget(compositeFields,
+            Text.class, SWT.NONE, "");
+        visitText.setEnabled(false);
+        ((GridData) visitText.getLayoutData()).horizontalSpan = 2;
     }
 
     protected PatientVisitWrapper getSelectedPatientVisit() {
@@ -181,6 +210,9 @@ public class LinkFormPatientManagement {
         } else {
             viewerVisits.setInput(null);
         }
+        if (visitText != null) {
+            visitText.setText("");
+        }
     }
 
     public void onClose() {
@@ -210,6 +242,9 @@ public class LinkFormPatientManagement {
             .getPatientVisitCollection();
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(patientVisit));
+        if (visitText != null) {
+            visitText.setText(patientVisit.getFormattedDateProcessed());
+        }
     }
 
     public void enabledPatientText(boolean enabled) {
@@ -230,4 +265,27 @@ public class LinkFormPatientManagement {
 
         public void textModified();
     }
+
+    public void enableValidators(boolean enabled) {
+        if (enabled) {
+            widgetCreator.addBinding(PATIENT_NUMBER_BINDING);
+            patientValidator.validate(patientNumberText.getText());
+            widgetCreator.addBinding(VISIT_BINDING);
+        } else {
+            widgetCreator.removeBinding(PATIENT_NUMBER_BINDING);
+            patientValidator.validate("**");
+            widgetCreator.removeBinding(VISIT_BINDING);
+        }
+    }
+
+    public void showVisitText(boolean show) {
+        widgetCreator.showWidget(visitComboLabel, !show);
+        widgetCreator.showWidget(visitsListCheck, !show);
+        widgetCreator.showWidget(viewerVisits.getCombo(), !show);
+        if (visitText != null) {
+            widgetCreator.showWidget(visitTextLabel, show);
+            widgetCreator.showWidget(visitText, show);
+        }
+    }
+
 }

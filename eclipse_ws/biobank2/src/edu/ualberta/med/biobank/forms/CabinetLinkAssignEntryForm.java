@@ -99,9 +99,25 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean positionTextModified;
 
-    private CabinetLabelValidator cabinetPositionvalidator;
+    private CabinetLabelValidator cabinetPositionValidator;
 
     protected boolean inventoryIdModified;
+
+    private Text oldCabinetPosition;
+
+    private Text oldCabinetPositionCheck;
+
+    private Label oldCabinetPositionLabel;
+
+    private Label oldCabinetPositionCheckLabel;
+
+    private Text sampleTypeText;
+
+    private Label sampleTypeTextLabel;
+
+    private Label sampleTypeComboLabel;
+
+    private static final String SAMPLE_TYPE_LIST_BINDING = "sample-type-list-binding";
 
     @Override
     protected void init() {
@@ -218,7 +234,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        linkFormPatientManagement.initPatientNumberText(fieldsComposite);
+        linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement
             .setPatientTextCallback(new PatientTextCallback() {
                 @Override
@@ -233,6 +249,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             });
 
         linkFormPatientManagement.createVisitCombo(fieldsComposite);
+        linkFormPatientManagement.createVisitText(fieldsComposite);
 
         inventoryIDValidator = new CabinetInventoryIDValidator();
         inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
@@ -266,21 +283,43 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        cabinetPositionvalidator = new CabinetLabelValidator(Messages
+        oldCabinetPositionLabel = widgetCreator.createLabel(fieldsComposite,
+            Messages.getString("Cabinet.old.position.label"));
+        oldCabinetPositionLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        oldCabinetPosition = (Text) widgetCreator.createBoundWidget(
+            fieldsComposite, Text.class, SWT.NONE, oldCabinetPositionLabel,
+            new String[0], null, null);
+        gd = (GridData) oldCabinetPosition.getLayoutData();
+        gd.horizontalSpan = 2;
+        oldCabinetPositionCheckLabel = widgetCreator.createLabel(
+            fieldsComposite, Messages
+                .getString("Cabinet.old.position.check.label"));
+        oldCabinetPositionCheckLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        oldCabinetPositionCheck = (Text) widgetCreator.createBoundWidget(
+            fieldsComposite, Text.class, SWT.NONE,
+            oldCabinetPositionCheckLabel, new String[0], null, null);
+        gd = (GridData) oldCabinetPositionCheck.getLayoutData();
+        gd.horizontalSpan = 2;
+        displayOldCabinetFields(false);
+        oldCabinetPosition.setEnabled(false);
+        cabinetPositionValidator = new CabinetLabelValidator(Messages
             .getString("Cabinet.position.validationMsg"));
+        displayOldCabinetFields(false);
         positionText = (Text) createBoundWidgetWithLabel(
             fieldsComposite,
             Text.class,
             SWT.NONE,
             Messages.getString("Cabinet.position.label"), new String[0], positionValue, //$NON-NLS-1$
-            cabinetPositionvalidator); //$NON-NLS-1$
+            cabinetPositionValidator); //$NON-NLS-1$
         gd = (GridData) positionText.getLayoutData();
         gd.horizontalSpan = 2;
         positionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 if (positionTextModified
-                    && cabinetPositionvalidator
+                    && cabinetPositionValidator
                         .validate(positionText.getText()) == Status.OK_STATUS) {
                     BusyIndicator.showWhile(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell().getDisplay(),
@@ -322,6 +361,18 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 checkPositionAndAliquot();
             }
         });
+    }
+
+    private void displayOldCabinetFields(boolean display) {
+        oldCabinetPositionLabel.setVisible(display);
+        ((GridData) oldCabinetPositionLabel.getLayoutData()).exclude = !display;
+        oldCabinetPosition.setVisible(display);
+        ((GridData) oldCabinetPosition.getLayoutData()).exclude = !display;
+        oldCabinetPositionCheckLabel.setVisible(display);
+        ((GridData) oldCabinetPositionCheckLabel.getLayoutData()).exclude = !display;
+        oldCabinetPositionCheck.setVisible(display);
+        ((GridData) oldCabinetPositionCheck.getLayoutData()).exclude = !display;
+        form.layout(true, true);
     }
 
     protected void initContainersFromPosition() {
@@ -377,19 +428,41 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             inventoryIDValidator.setManageOldInventoryIDs(moveMode);
             // Validator has change: we need to re-validate
             inventoryIDValidator.validate(inventoryId);
+            displayOldCabinetFields(moveMode);
+            linkFormPatientManagement.enableValidators(!moveMode);
+            linkFormPatientManagement.showVisitText(moveMode);
+            enableSampleTypeCombo(!moveMode);
+            form.layout(true, true);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error setting move mode " + moveMode, //$NON-NLS-1$
                 ex);
         }
     }
 
+    private void enableSampleTypeCombo(boolean enable) {
+        if (enable) {
+            widgetCreator.addBinding(SAMPLE_TYPE_LIST_BINDING);
+        } else {
+            widgetCreator.removeBinding(SAMPLE_TYPE_LIST_BINDING);
+        }
+        widgetCreator.showWidget(sampleTypeComboLabel, enable);
+        widgetCreator.showWidget(viewerSampleTypes.getCombo(), enable);
+        widgetCreator.showWidget(sampleTypeTextLabel, !enable);
+        widgetCreator.showWidget(sampleTypeText, !enable);
+    }
+
     private void createTypeCombo(Composite fieldsComposite)
         throws ApplicationException {
         initCabinetContainerTypesList();
-        viewerSampleTypes = createComboViewerWithNoSelectionValidator(
-            fieldsComposite,
-            Messages.getString("Cabinet.sampleType.label"), null, null, //$NON-NLS-1$
-            Messages.getString("Cabinet.sampleType.validationMsg")); //$NON-NLS-1$
+        sampleTypeComboLabel = widgetCreator.createLabel(fieldsComposite,
+            Messages.getString("Cabinet.sampleType.label"));
+        viewerSampleTypes = widgetCreator
+            .createComboViewerWithNoSelectionValidator(
+                fieldsComposite,
+                sampleTypeComboLabel,
+                null,
+                null,
+                Messages.getString("Cabinet.sampleType.validationMsg"), true, SAMPLE_TYPE_LIST_BINDING); //$NON-NLS-1$
         GridData gd = (GridData) viewerSampleTypes.getCombo().getLayoutData();
         gd.horizontalSpan = 2;
         viewerSampleTypes
@@ -402,6 +475,18 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         .getFirstElement());
                 }
             });
+
+        // for move mode
+        sampleTypeTextLabel = widgetCreator.createLabel(fieldsComposite,
+            Messages.getString("Cabinet.sampleType.label"));
+        sampleTypeTextLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        sampleTypeText = (Text) widgetCreator.createBoundWidget(
+            fieldsComposite, Text.class, SWT.NONE, sampleTypeTextLabel,
+            new String[0],
+            BeansObservables.observeValue(aliquot, "sampleType"), null);
+        ((GridData) sampleTypeText.getLayoutData()).horizontalSpan = 2;
+        sampleTypeText.setEnabled(false);
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
