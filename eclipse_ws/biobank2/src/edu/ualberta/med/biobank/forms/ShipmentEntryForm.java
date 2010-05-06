@@ -2,11 +2,8 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
-import org.eclipse.core.databinding.Binding;
-import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -31,7 +28,6 @@ import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView.ShipmentListener;
-import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -67,9 +63,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private Label waybillLabel;
 
-    private Binding waybillBinding;
-
     private NonEmptyStringValidator waybillValidator;
+
+    private static final String WAYBILL_BINDING = "shipment-waybill-binding";
 
     @Override
     protected void init() throws Exception {
@@ -151,7 +147,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     }
                 });
         } else {
-            Text clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
+            Text clinicLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Clinic");
             if (shipmentWrapper.getClinic() != null) {
                 clinicLabel.setText(shipmentWrapper.getClinic().getName());
             }
@@ -162,15 +159,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
-        waybillValidator.setControlDecoration(BiobankWidget.createDecorator(
-            waybillLabel, waybillValidator.getErrorMessage()));
-        waybillText = widgetCreator.createText(client, SWT.NONE, null, null);
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterGetValidator(waybillValidator);
-        waybillBinding = widgetCreator.bindValue(SWTObservables.observeText(
-            waybillText, SWT.Modify), BeansObservables.observeValue(
-            shipmentWrapper, "waybill"), uvs, null);
-
+        waybillText = (Text) widgetCreator.createBoundWidget(client,
+            Text.class, SWT.NONE, waybillLabel, new String[0], BeansObservables
+                .observeValue(shipmentWrapper, "waybill"), waybillValidator,
+            WAYBILL_BINDING);
         activateWaybillField(false);
 
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
@@ -204,10 +196,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         waybillLabel.setVisible(activate);
         ((GridData) waybillLabel.getLayoutData()).exclude = !activate;
         if (activate) {
-            widgetCreator.addBinding(waybillBinding);
+            widgetCreator.addBinding(WAYBILL_BINDING);
             waybillValidator.validate(waybillText.getText());
         } else {
-            widgetCreator.removeBinding(waybillBinding);
+            widgetCreator.removeBinding(WAYBILL_BINDING);
             waybillValidator.validate("test");
         }
         form.layout(true, true);

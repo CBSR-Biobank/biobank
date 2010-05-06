@@ -165,13 +165,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return ContainerType.class;
     }
 
-    public Collection<ContainerTypeWrapper> getAllChildren()
+    public Collection<ContainerTypeWrapper> getChildrenRecursively()
         throws ApplicationException {
         List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
         List<ContainerTypeWrapper> children = getChildContainerTypeCollection();
         if (children != null) {
             for (ContainerTypeWrapper type : children) {
-                allChildren.addAll(type.getAllChildren());
+                allChildren.addAll(type.getChildrenRecursively());
                 allChildren.add(type);
             }
         }
