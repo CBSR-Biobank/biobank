@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.reports;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -57,11 +56,7 @@ public class QAFreezerAliquots extends QueryObject {
 
     @Override
     public List<Object> postProcess(List<Object> results) {
-        ArrayList<Object> newList = new ArrayList<Object>();
-        int max = Math.min(numResults, results.size());
-        for (int i = 0; i < max; i++)
-            newList.add(results.get(i));
-        return newList;
+        return results.subList(0, numResults);
     }
 
 }

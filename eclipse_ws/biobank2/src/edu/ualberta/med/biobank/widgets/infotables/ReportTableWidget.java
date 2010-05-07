@@ -78,7 +78,6 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 public class ReportTableWidget<T> extends BiobankWidget {
 
     class PageInformation {
-        int pageTotal;
         int page;
         int rowsPerPage;
     }
@@ -123,8 +122,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
     private List<T> collection;
 
-    private boolean reloadData;
-
     protected int start;
 
     protected int end;
@@ -133,7 +130,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
-        reloadData = true;
         pageInfo.rowsPerPage = 0;
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
@@ -142,9 +138,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;
-        if (isEditMode()) {
-            style |= SWT.MULTI;
-        }
 
         tableViewer = new TableViewer(this, style);
 
@@ -197,14 +190,7 @@ public class ReportTableWidget<T> extends BiobankWidget {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                if (element instanceof BiobankCollectionModel) {
-                    BiobankCollectionModel m = (BiobankCollectionModel) element;
-                    if (m.o != null) {
-                        return getColumnText(m.o, columnIndex);
-                    } else if (columnIndex == 0) {
-                        return "loading ...";
-                    }
-                } else if (element instanceof Object[]) {
+                if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
                         return "";
@@ -228,17 +214,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         if (collection != null) {
             setCollection(collection);
         }
-        resizeTable();
-    }
-
-    /**
-     * Derived classes should override this method if info table support editing
-     * of items in the table.
-     * 
-     * @return true if editing is allowed.
-     */
-    protected boolean isEditMode() {
-        return false;
     }
 
     private void addClipboadCopySupport() {
@@ -271,13 +246,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         });
     }
 
-    protected void sortOnFirstColumn() {
-        Table table = tableViewer.getTable();
-        table.setSortDirection(SWT.DOWN);
-        table.setSortColumn(table.getColumn(0));
-        tableViewer.refresh();
-    }
-
     @Override
     public boolean setFocus() {
         tableViewer.getControl().setFocus();
@@ -292,22 +260,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         return tableViewer;
     }
 
-    /**
-     * Should be used by info tables that allow editing of data. Use this method
-     * instead of setCollection().
-     * 
-     * @param collection
-     */
-    public void reloadCollection(final List<T> collection, T selection) {
-        reloadData = true;
-        setCollection(collection, selection);
-    }
-
-    public void reloadCollection(final List<T> collection) {
-        reloadData = true;
-        setCollection(collection, null);
-    }
-
     public void setCollection(final List<T> collection) {
         setCollection(collection, null);
     }
@@ -318,28 +270,12 @@ public class ReportTableWidget<T> extends BiobankWidget {
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
         }
-
-        if (!isEditMode() && (pageInfo.rowsPerPage != 0)
-            && (collection.size() > pageInfo.rowsPerPage)
-            && !paginationWidget.getVisible()) {
+        if (paginationRequired) {
             pageInfo.page = 0;
-            Double size = new Double(collection.size());
-            Double pageSize = new Double(pageInfo.rowsPerPage);
-            if (size < 1000)
-                pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
-                    .intValue();
-            else
-                pageInfo.pageTotal = -1;
             setPageLabelText();
             showPaginationWidget();
-            paginationRequired = true;
+            enablePaginationWidget(true);
         }
-
-        if (paginationRequired) {
-            enablePaginationWidget(false);
-        }
-
-        resizeTable();
 
         backgroundThread = new Thread() {
             @Override
@@ -350,11 +286,10 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
                 if (paginationRequired) {
                     start = pageInfo.page * pageInfo.rowsPerPage;
-                    end = Math.min(start + pageInfo.rowsPerPage, collection
-                        .size());
+                    end = start + pageInfo.rowsPerPage;
                 } else {
                     start = 0;
-                    end = collection.size();
+                    end = pageInfo.rowsPerPage;
                 }
 
                 final Collection<T> collSubList = collection
@@ -374,7 +309,10 @@ public class ReportTableWidget<T> extends BiobankWidget {
                         if (table.isDisposed())
                             return;
                         final Object item = collection.get(i);
-
+                        if (item == null) {
+                            end = i;
+                            break;
+                        }
                         display.syncExec(new Runnable() {
                             public void run() {
                                 if (!table.isDisposed()) {
@@ -387,7 +325,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
                             selItem = item;
                         }
                     }
-                    reloadData = false;
 
                     final Object selectedItem = selItem;
                     display.syncExec(new Runnable() {
@@ -442,6 +379,7 @@ public class ReportTableWidget<T> extends BiobankWidget {
                 firstPage();
             }
         });
+        firstButton.setEnabled(false);
 
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -453,6 +391,7 @@ public class ReportTableWidget<T> extends BiobankWidget {
                 prevPage();
             }
         });
+        prevButton.setEnabled(false);
 
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
@@ -466,16 +405,12 @@ public class ReportTableWidget<T> extends BiobankWidget {
                 nextPage();
             }
         });
+        nextButton.setEnabled(false);
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
-        lastButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                lastPage();
-            }
-        });
+        lastButton.setEnabled(false);
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
@@ -501,15 +436,13 @@ public class ReportTableWidget<T> extends BiobankWidget {
             prevButton.setEnabled(false);
         }
 
-        if (enable && (pageInfo.page < pageInfo.pageTotal - 1)) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        } else if (enable && (pageInfo.pageTotal == -1)) {
-            nextButton.setEnabled(true);
+        if (!enable
+            || getTableViewer().getTable().getItemCount() < pageInfo.rowsPerPage) {
+            nextButton.setEnabled(false);
             lastButton.setEnabled(false);
         } else {
             lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
+            nextButton.setEnabled(true);
         }
         layout(true);
     }
@@ -524,16 +457,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         setCollection(collection);
     }
 
-    private void lastPage() {
-        pageInfo.page = pageInfo.pageTotal - 1;
-        firstButton.setEnabled(true);
-        prevButton.setEnabled(true);
-        lastButton.setEnabled(false);
-        nextButton.setEnabled(false);
-        setPageLabelText();
-        setCollection(collection);
-    }
-
     private void prevPage() {
         if (pageInfo.page == 0)
             return;
@@ -542,50 +465,21 @@ public class ReportTableWidget<T> extends BiobankWidget {
             firstButton.setEnabled(false);
             prevButton.setEnabled(false);
         }
-        if (pageInfo.page == pageInfo.pageTotal - 2) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        }
         setPageLabelText();
         setCollection(collection);
     }
 
     private void nextPage() {
-        if (pageInfo.page >= pageInfo.pageTotal && pageInfo.pageTotal != -1)
-            return;
         pageInfo.page++;
         if (pageInfo.page == 1) {
             firstButton.setEnabled(true);
             prevButton.setEnabled(true);
         }
-        if (pageInfo.page == pageInfo.pageTotal - 1) {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        }
         setPageLabelText();
         setCollection(collection);
-        paginationWidget.layout(true);
     }
 
     private void setPageLabelText() {
-        if (pageInfo.pageTotal == -1)
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
-        else
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
-                + pageInfo.pageTotal);
-    }
-
-    private void resizeTable() {
-        int rows = 5;
-        if (!isEditMode() && (pageInfo.rowsPerPage > 0) && (collection != null)) {
-            rows = Math.min(collection.size(), pageInfo.rowsPerPage);
-        } else if (!isEditMode() && (collection != null)) {
-            rows = Math.min(collection.size(), rows);
-        }
-
-        Table table = getTableViewer().getTable();
-        GridData gd = (GridData) table.getLayoutData();
-        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
-        layout(true);
+        pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
     }
 }

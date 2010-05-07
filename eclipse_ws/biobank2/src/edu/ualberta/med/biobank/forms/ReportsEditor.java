@@ -215,7 +215,7 @@ public class ReportsEditor extends BiobankFormBase {
                                 exportButton.setEnabled(false);
                             }
                             reportTable.dispose();
-                            if (reportData.size() == 1000)
+                            if (reportData.size() == -1)
                                 printButton.setEnabled(false);
                             reportTable = new ReportTableWidget(form.getBody(),
                                 reportData, query.getColumnNames(),

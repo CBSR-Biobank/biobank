@@ -24,18 +24,13 @@ public class BiobankListProxy implements List<Object> {
     private int offset;
     private ApplicationService appService;
     private HQLCriteria criteria;
-    private int size;
-
-    // don't worry, this isn't as inefficient as you might think
-    private static int MAX_POSSIBLE_SIZE = 400000;
 
     public BiobankListProxy(ApplicationService appService, HQLCriteria criteria) {
         this.appService = appService;
         this.offset = 0;
         this.pageSize = appService.getMaxRecordsCount();
         this.criteria = criteria;
-        updateListChunk(-1);
-        size = listChunk.size();
+        this.listChunk = updateListChunk(-1);
     }
 
     @Override
@@ -74,23 +69,23 @@ public class BiobankListProxy implements List<Object> {
     @Override
     public Object get(int index) {
         Assert.isTrue(index >= 0);
-        updateListChunk(index);
-        if (listChunk.size() > 0)
+        listChunk = updateListChunk(index);
+        if (listChunk.size() > 0 && listChunk.size() > index - offset)
             return listChunk.get(index - offset);
         else
             return null;
     }
 
-    private void updateListChunk(int index) {
+    private List<Object> updateListChunk(int index) {
         if (index - offset >= pageSize || index < offset) {
             offset = (index / pageSize) * pageSize;
             try {
-                listChunk = appService.query(criteria, offset, Site.class
-                    .getName());
+                return appService.query(criteria, offset, Site.class.getName());
             } catch (ApplicationException e) {
                 e.printStackTrace();
             }
         }
+        return listChunk;
     }
 
     @Override
@@ -153,20 +148,19 @@ public class BiobankListProxy implements List<Object> {
         // bsearch was still too slow, hqlcounts too complicated
         // going to have to operate without size
         // only set this once... this is only the size of the FIRST CHUNK
-        return size;
+        return -1;
     }
 
     @Override
     public List<Object> subList(int fromIndex, int toIndex) {
         Assert.isTrue(fromIndex >= 0 && toIndex > 0);
         Assert.isTrue(fromIndex < toIndex);
-        updateListChunk(fromIndex);
+        listChunk = updateListChunk(fromIndex);
         List<Object> subList = new ArrayList<Object>();
-        subList.addAll(listChunk.subList(fromIndex - offset, Math.min(toIndex,
-            offset + pageSize)
-            - offset));
+        subList.addAll(listChunk.subList(fromIndex - offset, Math.min(listChunk
+            .size(), Math.min(toIndex, offset + pageSize) - offset)));
         while (offset + pageSize < toIndex && listChunk.size() == pageSize) {
-            updateListChunk(offset + pageSize);
+            listChunk = updateListChunk(offset + pageSize);
             subList.addAll(listChunk.subList(0, Math.min(listChunk.size(), Math
                 .min(toIndex, offset + pageSize)
                 - offset)));

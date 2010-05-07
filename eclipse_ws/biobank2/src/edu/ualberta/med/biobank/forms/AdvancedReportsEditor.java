@@ -387,7 +387,7 @@ public class AdvancedReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
-                            if (reportData.size() == 1000)
+                            if (reportData.size() == -1)
                                 printButton.setEnabled(false);
                             String[] names = tree.getSelectClauses().keySet()
                                 .toArray(new String[] {});
@@ -397,13 +397,6 @@ public class AdvancedReportsEditor extends EditorPart {
                                 headingSizes[i] = 100;
                             reportTable = new SearchResultsInfoTable(top,
                                 reportData, names, headingSizes, 40);
-                            GridData gd = new GridData();
-                            gd.grabExcessHorizontalSpace = true;
-                            gd.grabExcessVerticalSpace = true;
-                            gd.horizontalSpan = 2;
-                            gd.horizontalAlignment = SWT.FILL;
-                            gd.verticalAlignment = SWT.FILL;
-                            reportTable.setLayoutData(gd);
                             setEnabled(true);
                             top.layout();
                         }
@@ -423,13 +416,6 @@ public class AdvancedReportsEditor extends EditorPart {
         }
         reportTable = new SearchResultsInfoTable(top, null,
             new String[] { " " }, new int[] { 500 });
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.grabExcessVerticalSpace = true;
-        gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.FILL;
-        gd.verticalAlignment = SWT.FILL;
-        reportTable.setLayoutData(gd);
     }
 
     public void resetSearch() {

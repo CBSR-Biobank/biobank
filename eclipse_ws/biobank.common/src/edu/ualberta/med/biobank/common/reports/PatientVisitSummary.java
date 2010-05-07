@@ -68,7 +68,7 @@ public class PatientVisitSummary extends QueryObject {
 
     @Override
     public List<Object> postProcess(List<Object> results) {
-        if (results.size() == 0)
+        if (results.get(0) == null)
             return results;
         List<Object> totalledResults = new ArrayList<Object>();
         String lastStudy = (String) ((Object[]) results.get(0))[0];
