@@ -1675,8 +1675,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.AliquotViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.SampleViewForm"
-            name="Sample View">
+            id="edu.ualberta.med.biobank.forms.AliquotViewForm"
+            name="Aliquot View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.AliquotEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.AliquotEntryForm"
+            name="Aliquot Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"

@@ -44,7 +44,7 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
         form.getBody().setLayout(new GridLayout(1, false));
 
         createGlobalSourceVesselSection();
-        firstControl = globalSourceWidget;
+        setFirstControl(globalSourceWidget);
 
     }
 

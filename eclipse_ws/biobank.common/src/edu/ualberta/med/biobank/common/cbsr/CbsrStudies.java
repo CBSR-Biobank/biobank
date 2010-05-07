@@ -104,7 +104,7 @@ public class CbsrStudies {
         addStudySourceVessel("AHFEM", "5mL gold top serum tube");
         addStudySourceVessel("AHFEM",
             "6ml light green top lithium heparin tube");
-        addStudySourceVessel("AHFEM", "AHFEM processing pallet ");
+        addStudySourceVessel("AHFEM", "AHFEM processing pallet");
         addStudySourceVessel("AHFEM", "EDTA cryovial");
         addStudySourceVessel("BBPSP", "10mL lavender top EDTA tube");
         addStudySourceVessel("BBPSP", "10ml orange top PAXgene tube");
@@ -156,7 +156,7 @@ public class CbsrStudies {
         addStudySourceVessel("LCS", "6mL lavender top EDTA tube");
         addStudySourceVessel("LCS", "6ml beige top tube (tap water)");
         addStudySourceVessel("LCS", "6ml light green top lithium heparin tube");
-        addStudySourceVessel("LCS", "AHFEM processing pallet ");
+        addStudySourceVessel("LCS", "AHFEM processing pallet");
         addStudySourceVessel("LCS", "Breast milk");
         addStudySourceVessel("LCS", "EDTA cryovial");
         addStudySourceVessel("LCS", "ERCIN Serum processing pallet");

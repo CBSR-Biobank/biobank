@@ -350,7 +350,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
-        linkFormPatientManagement.initPatientNumberText(fieldsComposite);
+        linkFormPatientManagement.createPatientNumberText(fieldsComposite);
 
         linkFormPatientManagement.createVisitCombo(fieldsComposite);
 

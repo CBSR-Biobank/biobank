@@ -3,25 +3,16 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.dialogs.AliquotStatusDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -32,7 +23,7 @@ public class AliquotViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AliquotViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SampleViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotViewForm";
 
     private AliquotAdapter aliquotAdapter;
 
@@ -52,15 +43,11 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private Text dateDrawnLabel;
 
+    private Text activityStatusLabel;
+
     private Text commentLabel;
 
     private Text positionLabel;
-
-    private Button activityStatusButton;
-
-    private Text activityStatusText;
-
-    private Text activityStatusLabel;
 
     @Override
     public void init() {
@@ -113,7 +100,8 @@ public class AliquotViewForm extends BiobankViewForm {
             "Date Processed");
         dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Drawn");
-        createActivityStatusSection(client);
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Activity Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comment");
         positionLabel = createReadOnlyLabelledField(client, SWT.WRAP,
             "Position");
@@ -161,63 +149,6 @@ public class AliquotViewForm extends BiobankViewForm {
         }
     }
 
-    private void createActivityStatusSection(Composite client) {
-        if (aliquot.canEdit()) {
-            toolkit.createLabel(client, "Activity Status:", SWT.SINGLE);
-            Composite activityArea = new Composite(client, SWT.BORDER);
-            toolkit.adapt(activityArea);
-
-            GridLayout layout = new GridLayout(2, false);
-            layout.marginTop = 0;
-            layout.marginBottom = 0;
-            activityArea.setLayout(layout);
-
-            GridData gd = new GridData();
-            gd.grabExcessHorizontalSpace = true;
-            gd.horizontalAlignment = SWT.FILL;
-            activityArea.setLayoutData(gd);
-
-            activityStatusText = createReadOnlyWidget(activityArea,
-                SWT.READ_ONLY | SWT.BEGINNING, aliquot.getActivityStatus()
-                    .getName());
-            activityStatusText.setLayoutData(new GridData(SWT.BEGINNING,
-                SWT.CENTER, false, false));
-
-            activityStatusButton = new Button(activityArea, SWT.NONE
-                | SWT.BORDER);
-            activityStatusButton.setImage(BioBankPlugin.getDefault()
-                .getImageRegistry().get(BioBankPlugin.IMG_EDIT_FORM));
-            activityStatusButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    AliquotStatusDialog dlg = new AliquotStatusDialog(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), aliquot);
-                    if (dlg.open() == Dialog.OK) {
-                        aliquot.setActivityStatus(dlg.getActivityStatus());
-                        BusyIndicator.showWhile(Display.getDefault(),
-                            new Runnable() {
-                                public void run() {
-                                    try {
-                                        aliquot.persist();
-                                    } catch (Exception e) {
-                                        BioBankPlugin.openAsyncError(
-                                            "Error saving aliquot", e);
-                                    }
-                                    setTextValue(activityStatusText, aliquot
-                                        .getActivityStatus());
-                                    activityStatusText.getParent().layout();
-                                }
-                            });
-                    }
-                }
-            });
-        } else {
-            activityStatusLabel = createReadOnlyLabelledField(client, SWT.WRAP,
-                "Activity Status");
-        }
-    }
-
     private void setValues() {
         setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
@@ -231,11 +162,7 @@ public class AliquotViewForm extends BiobankViewForm {
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
             .getFormattedDateDrawn());
-        if (activityStatusText != null) {
-            setTextValue(activityStatusText, aliquot.getActivityStatus());
-        } else if (activityStatusLabel != null) {
-            setTextValue(activityStatusLabel, aliquot.getActivityStatus());
-        }
+        setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
