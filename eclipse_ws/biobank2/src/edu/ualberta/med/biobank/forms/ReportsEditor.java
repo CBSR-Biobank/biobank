@@ -180,11 +180,6 @@ public class ReportsEditor extends BiobankFormBase {
                                     new Object[] { op, site.getId() });
                                 reportData = query.generate(SessionManager
                                     .getAppService(), params);
-                                if (reportData.size() >= 1000)
-                                    BioBankPlugin
-                                        .openAsyncError(
-                                            "Size Limit Exceeded",
-                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
                             } catch (Exception e) {
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
@@ -219,17 +214,11 @@ public class ReportsEditor extends BiobankFormBase {
                                 exportButton.setEnabled(false);
                             }
                             reportTable.dispose();
+                            if (reportData.size() >= 1000)
+                                printButton.setEnabled(false);
                             reportTable = new SearchResultsInfoTable(form
                                 .getBody(), reportData, query.getColumnNames(),
-                                columnWidths.get(query.getClass()));
-                            GridData gd = new GridData();
-                            gd.grabExcessHorizontalSpace = true;
-                            gd.grabExcessVerticalSpace = true;
-                            gd.horizontalSpan = 2;
-                            gd.horizontalAlignment = SWT.FILL;
-                            gd.verticalAlignment = SWT.FILL;
-                            reportTable.setLayoutData(gd);
-                            reportTable.adaptToToolkit(toolkit, true);
+                                columnWidths.get(query.getClass()), 40);
                             form.layout(true, true);
                         }
                     });
@@ -247,14 +236,6 @@ public class ReportsEditor extends BiobankFormBase {
         }
         reportTable = new SearchResultsInfoTable(form.getBody(), null,
             new String[] { " " }, new int[] { 500 });
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.grabExcessVerticalSpace = true;
-        gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.FILL;
-        gd.verticalAlignment = SWT.FILL;
-        reportTable.setLayoutData(gd);
-        reportTable.adaptToToolkit(toolkit, true);
     }
 
     public void resetSearch() {

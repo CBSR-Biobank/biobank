@@ -354,11 +354,6 @@ public class AdvancedReportsEditor extends EditorPart {
                                     null, tree.compileQuery(), new String[] {});
                                 reportData = tempQuery.generate(SessionManager
                                     .getAppService(), null);
-                                if (reportData.size() >= 1000)
-                                    BioBankPlugin
-                                        .openAsyncError(
-                                            "Size Limit Exceeded",
-                                            "Your search criteria is too general. Please try refining your search. Displaying the first 1000 results.");
                             } catch (Exception e) {
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
@@ -392,6 +387,8 @@ public class AdvancedReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
+                            if (reportData.size() >= 1000)
+                                printButton.setEnabled(false);
                             String[] names = tree.getSelectClauses().keySet()
                                 .toArray(new String[] {});
                             reportTable.dispose();
@@ -399,7 +396,7 @@ public class AdvancedReportsEditor extends EditorPart {
                             for (int i = 0; i < names.length; i++)
                                 headingSizes[i] = 100;
                             reportTable = new SearchResultsInfoTable(top,
-                                reportData, names, headingSizes);
+                                reportData, names, headingSizes, 40);
                             GridData gd = new GridData();
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;

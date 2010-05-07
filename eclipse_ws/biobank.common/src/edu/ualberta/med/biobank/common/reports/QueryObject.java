@@ -8,7 +8,6 @@ import java.util.TreeMap;
 
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.client.proxy.ListProxy;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class QueryObject {
@@ -130,7 +129,7 @@ public abstract class QueryObject {
         List<Object> params) throws ApplicationException {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        return ((ListProxy) appService.query(c)).getListChunk();
+        return new BiobankListProxy(appService, c);
     }
 
     protected List<Object> preProcess(List<Object> params) {
