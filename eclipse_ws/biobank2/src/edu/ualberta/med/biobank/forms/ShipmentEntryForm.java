@@ -169,7 +169,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Date Shipped", shipmentWrapper.getDateShipped(), BeansObservables
                 .observeValue(shipmentWrapper, "dateShipped"),
             "Date shipped should be set");
-        firstControl = dateShippedWidget;
+        setFirstControl(dateShippedWidget);
 
         ShippingMethodWrapper selectedShippingMethod = shipmentWrapper
             .getShippingMethod();

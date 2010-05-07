@@ -115,8 +115,7 @@ public class ScanLinkdedImporter {
     public void doImport() throws Exception {
         logger.info("importing scan assigned only aliquots ...");
 
-        // String freezerLinkTable = "freezer_link";
-        String freezerLinkTable = "freezer_link_multiple";
+        String freezerLinkTable = "freezer_link";
 
         String qryPart = "from " + freezerLinkTable
             + " join sample_list on sample_list.sample_nr=" + freezerLinkTable

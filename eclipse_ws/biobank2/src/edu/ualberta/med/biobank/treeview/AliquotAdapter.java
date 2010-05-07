@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.forms.AliquotEntryForm;
 import edu.ualberta.med.biobank.forms.AliquotViewForm;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -72,7 +73,7 @@ public class AliquotAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return null;
+        return AliquotEntryForm.ID;
     }
 
     @Override

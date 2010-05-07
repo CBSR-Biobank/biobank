@@ -78,7 +78,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
             oldContainerLabel = container.getLabel();
         }
         setPartName(tabName);
-        firstControl = null;
     }
 
     @Override
@@ -111,10 +110,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
             || (container.getContainerType() != null && Boolean.TRUE
                 .equals(container.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
-            firstControl = createBoundWidgetWithLabel(client, Text.class,
+            setFirstControl(createBoundWidgetWithLabel(client, Text.class,
                 SWT.NONE, "Label", null, BeansObservables.observeValue(
                     container, "label"), new NonEmptyStringValidator(
-                    MSG_CONTAINER_NAME_EMPTY));
+                    MSG_CONTAINER_NAME_EMPTY)));
         } else {
             Text l = createReadOnlyLabelledField(client, SWT.NONE, "Label");
             setTextValue(l, container.getLabel());
@@ -123,8 +122,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         Control c = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
             "Product Barcode", null, BeansObservables.observeValue(container,
                 "productBarcode"), null);
-        if (firstControl == null)
-            firstControl = c;
+        if (getFirstControl() == null)
+            setFirstControl(c);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper

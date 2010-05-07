@@ -16,6 +16,10 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
 
+    public enum ColumnsShown {
+        DEFAULT, PNUMBER
+    }
+
     protected class TableRowData {
         AliquotWrapper aliquot;
         String inventoryId;
@@ -25,6 +29,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         Double quantity;
         String activityStatus;
         String comment;
+        String pnumber;
 
         @Override
         public String toString() {
@@ -79,16 +84,30 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Inventory ID",
-        "Type", "Position", "Link Date", "Quantity (ml)", "Activity Status",
-        "Comment" };
+    private static final String[] HEADINGS_DFLT = new String[] {
+        "Inventory ID", "Type", "Position", "Link Date", "Quantity (ml)",
+        "Activity Status", "Comment" };
+
+    private static final String[] HEADINGS_PNUMBER = new String[] {
+        "Inventory ID", "Type", "Position", "Link Date", "Patient Number",
+        "Activity Status", "Comment" };
 
     private static final int[] BOUNDS = new int[] { 80, 80, 120, 120, 80, 80,
         80, -1 };
 
+    private boolean showPatientNumber;
+
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection) {
-        super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
+        super(parent, aliquotCollection, HEADINGS_DFLT, BOUNDS, 20);
+    }
+
+    public AliquotListInfoTable(Composite parent,
+        List<AliquotWrapper> aliquotCollection, ColumnsShown columnsShown) {
+        super(parent, aliquotCollection,
+            (columnsShown == ColumnsShown.PNUMBER) ? HEADINGS_PNUMBER
+                : HEADINGS_DFLT, BOUNDS, 20);
+        this.showPatientNumber = (columnsShown == ColumnsShown.PNUMBER);
     }
 
     @Override
@@ -113,6 +132,9 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
                 case 3:
                     return info.linkDate;
                 case 4:
+                    if (showPatientNumber) {
+                        return info.pnumber;
+                    }
                     return (info.quantity != null) ? info.quantity.toString()
                         : "";
                 case 5:
@@ -146,6 +168,10 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         info.quantity = aliquot.getQuantity();
         info.activityStatus = aliquot.getActivityStatus().getName();
         info.comment = aliquot.getComment();
+
+        if (showPatientNumber) {
+            info.pnumber = aliquot.getPatientVisit().getPatient().getPnumber();
+        }
         return info;
     }
 
@@ -153,7 +179,13 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
     protected String getCollectionModelObjectToString(Object o) {
         if (o == null)
             return null;
-        return ((TableRowData) o).toString();
+        TableRowData r = (TableRowData) o;
+        if (showPatientNumber) {
+            return StringUtils.join(
+                new String[] { r.inventoryId, r.type, r.position, r.linkDate,
+                    r.pnumber, r.activityStatus, r.comment }, "\t");
+        }
+        return r.toString();
     }
 
     public void setSelection(AliquotWrapper selectedSample) {

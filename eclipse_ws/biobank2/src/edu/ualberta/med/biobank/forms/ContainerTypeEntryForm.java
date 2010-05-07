@@ -153,9 +153,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
-        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, BeansObservables.observeValue(containerType, "name"),
-            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME));
+        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Name", null, BeansObservables.observeValue(
+                containerType, "name"), new NonEmptyStringValidator(
+                MSG_NO_CONTAINER_TYPE_NAME)));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(containerType, "nameShort"),
@@ -239,7 +240,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         ((GridData) samplesMultiSelect.getLayoutData()).exclude = !show;
         childContainerTypesMultiSelect.setVisible(!show);
         ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude = show;
-//        form.layout(true, true);
+        // form.layout(true, true);
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {

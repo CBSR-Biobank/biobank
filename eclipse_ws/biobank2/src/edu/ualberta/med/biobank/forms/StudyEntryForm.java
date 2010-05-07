@@ -112,9 +112,10 @@ public class StudyEntryForm extends BiobankEntryForm {
             "Repository Site");
         setTextValue(siteLabel, study.getSite().getName());
 
-        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, BeansObservables.observeValue(study, "name"),
-            new NonEmptyStringValidator("Study name cannot be blank"));
+        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Name", null, BeansObservables
+                .observeValue(study, "name"), new NonEmptyStringValidator(
+                "Study name cannot be blank")));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(study, "nameShort"),
