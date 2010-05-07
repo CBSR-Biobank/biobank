@@ -75,7 +75,7 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public class ReportTableWidget<T> extends BiobankWidget {
+public class ReportTableWidget extends BiobankWidget {
 
     class PageInformation {
         int page;
@@ -120,13 +120,13 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
     private Label pageLabel;
 
-    private List<T> collection;
+    private List<Object> collection;
 
     protected int start;
 
     protected int end;
 
-    public ReportTableWidget(Composite parent, List<T> collection,
+    public ReportTableWidget(Composite parent, List<Object> collection,
         String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
@@ -207,7 +207,7 @@ public class ReportTableWidget<T> extends BiobankWidget {
         };
     }
 
-    public ReportTableWidget(Composite parent, List<T> collection,
+    public ReportTableWidget(Composite parent, List<Object> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         this(parent, null, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
@@ -260,11 +260,12 @@ public class ReportTableWidget<T> extends BiobankWidget {
         return tableViewer;
     }
 
-    public void setCollection(final List<T> collection) {
+    public void setCollection(final List<Object> collection) {
         setCollection(collection, null);
     }
 
-    public void setCollection(final List<T> collection, final T selection) {
+    public void setCollection(final List<Object> collection,
+        final Object selection) {
         this.collection = collection;
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
@@ -292,8 +293,8 @@ public class ReportTableWidget<T> extends BiobankWidget {
                     end = pageInfo.rowsPerPage;
                 }
 
-                final Collection<T> collSubList = collection
-                    .subList(start, end);
+                final Collection<Object> collSubList = collection.subList(
+                    start, end);
 
                 display.syncExec(new Runnable() {
                     public void run() {

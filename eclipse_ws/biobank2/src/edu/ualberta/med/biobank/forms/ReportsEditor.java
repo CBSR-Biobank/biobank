@@ -60,7 +60,6 @@ import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
 import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
 import edu.ualberta.med.biobank.common.reports.AliquotRequest;
 import edu.ualberta.med.biobank.common.reports.AliquotSCount;
-import edu.ualberta.med.biobank.common.reports.BiobankListProxy;
 import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
@@ -235,8 +234,8 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget<BiobankListProxy>(form.getBody(),
-            null, new String[] { " " }, new int[] { 500 });
+        reportTable = new ReportTableWidget(form.getBody(), null,
+            new String[] { " " }, new int[] { 500 });
     }
 
     public void resetSearch() {
