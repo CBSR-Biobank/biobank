@@ -118,6 +118,8 @@ public class SearchView extends ViewPart {
 
     private void setSearchEnable(Integer siteId) {
         boolean enable = (siteId != null && siteId >= 0);
+        searchTypeCombo.getCombo().setEnabled(enable);
+        searchText.setEnabled(enable);
         searchButton.setEnabled(enable);
     }
 
