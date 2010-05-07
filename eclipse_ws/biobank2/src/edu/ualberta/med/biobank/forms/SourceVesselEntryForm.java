@@ -8,6 +8,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -103,4 +105,16 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
             globalSourceWidget.setLists(globalSourceVessels);
         }
     }
+
+    @Override
+    protected void checkEditAccess() {
+        if (!SessionManager.canUpdate(SourceVesselWrapper.class)
+            && !SessionManager.canCreate(SourceVesselWrapper.class)
+            && !SessionManager.canDelete(SourceVesselWrapper.class)) {
+            BioBankPlugin.openAccessDeniedErrorMessage();
+            throw new RuntimeException(
+                "Cannot access Source Vessel editor. Access Denied.");
+        }
+    }
+
 }
