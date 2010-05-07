@@ -13,7 +13,7 @@ public class Configuration {
     private boolean importPatientVisits;
     private Map<Integer, String> importCabinets;
     private Map<Integer, String> importFreezers;
-    private boolean importScanAssigned;
+    private boolean importScanLinked;
 
     Configuration(String configFilename) throws Exception {
         importPatients = false;
@@ -21,7 +21,7 @@ public class Configuration {
         importPatientVisits = false;
         importCabinets = new HashMap<Integer, String>();
         importFreezers = new HashMap<Integer, String>();
-        importScanAssigned = false;
+        importScanLinked = false;
 
         Properties configProps = new Properties();
         InputStream in = Thread.currentThread().getContextClassLoader()
@@ -70,9 +70,9 @@ public class Configuration {
             }
         }
 
-        property = configProps.getProperty("cbsr.import.scan_assigned");
+        property = configProps.getProperty("cbsr.import.scan_linked");
         if (property != null) {
-            importScanAssigned = property.equals("yes");
+            importScanLinked = property.equals("yes");
         }
     }
 
@@ -171,7 +171,7 @@ public class Configuration {
     }
 
     public boolean importScanLinked() {
-        return importScanAssigned;
+        return importScanLinked;
     }
 
 }

@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -345,7 +346,11 @@ public class Importer {
         }
 
         if (configuration.importScanLinked()) {
-            importScanLinkedSamples();
+            ScanLinkdedImporter scanLinkdedImporter = new ScanLinkdedImporter(
+                appService, con, cbsrSite);
+            importCounts.samples += scanLinkdedImporter.getSamplesImported();
+        } else {
+            logger.info("not configured for importing scanned linked aliquots");
         }
 
         if (configuration.importCabinets() || configuration.importFreezers()) {
@@ -354,7 +359,8 @@ public class Importer {
             importCabinetSamples();
 
         } else {
-            logger.info("not configured for importing samples from containers");
+            logger
+                .info("not configured for importing aliquots from containers");
         }
     }
 
@@ -1077,73 +1083,6 @@ public class Importer {
         }
     }
 
-    private static void importScanLinkedSamples() throws Exception {
-        logger.info("importing scan assigned only aliquots ...");
-
-        String qryPart = "from freezer_link "
-            + "join sample_list on sample_list.sample_nr=freezer_link.sample_nr "
-            + "join patient_visit on patient_visit.visit_nr=freezer_link.visit_nr "
-            + "join patient on patient.patient_nr=patient_visit.patient_nr "
-            + "join study_list on study_list.study_nr=patient_visit.study_nr "
-            + "left join freezer on freezer.inventory_id=freezer_link.inventory_id "
-            + "where fnum is null order by link_date desc";
-
-        Statement s = con.createStatement();
-        s.execute("select count(*) " + qryPart);
-        ResultSet rs = s.getResultSet();
-        rs.next();
-        int numSamples = rs.getInt(1);
-
-        s.execute("select study_name_short,dec_chr_nr,"
-            + "patient_visit.bb2_pv_id,"
-            + "patient_visit.date_received,patient_visit.date_taken,"
-            + "sample_name_short,freezer_link.link_date,"
-            + "freezer_link.inventory_id " + qryPart);
-
-        rs = s.getResultSet();
-        if (rs == null) {
-            throw new Exception("Database query returned null");
-        }
-
-        String studyNameShort;
-        String patientNr;
-        int visitId;
-        String dateProcessedStr;
-        String dateTakenStr;
-        String sampleTypeNameShort;
-        String linkDateStr;
-        String inventoryId;
-
-        int count = 1;
-        while (rs.next()) {
-            studyNameShort = rs.getString(1);
-            patientNr = rs.getString(2);
-            visitId = rs.getInt(3);
-            dateProcessedStr = rs.getString(4);
-            dateTakenStr = rs.getString(5);
-            sampleTypeNameShort = rs.getString(6);
-            linkDateStr = rs.getString(7);
-            inventoryId = rs.getString(8);
-
-            AliquotWrapper aliquot = createAliquot(cbsrSite, studyNameShort,
-                patientNr, visitId, dateProcessedStr, dateTakenStr,
-                inventoryId, sampleTypeNameShort, linkDateStr);
-
-            if (aliquot == null) {
-                return;
-            }
-
-            aliquot.persist();
-
-            ++count;
-
-            logger.debug(String.format(
-                "importing scan assigned only aliquot %s (%d/%d)", inventoryId,
-                count, numSamples));
-            ++importCounts.samples;
-        }
-    }
-
     private static void importCabinetSamples() throws Exception {
         Map<Integer, ContainerWrapper> cabinetsMap = new HashMap<Integer, ContainerWrapper>();
 
@@ -1427,6 +1366,8 @@ public class Importer {
         aliquot.setLinkDate(Importer.getDateFromStr(linkDateStr));
         aliquot.setPatientVisit(visit);
         aliquot.setQuantity(ss.getVolume());
+        aliquot.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
+            appService, "Active"));
         return aliquot;
     }
 
@@ -1439,14 +1380,17 @@ public class Importer {
 
         String labels = "";
         for (AliquotWrapper aliquot : aliquots) {
-            labels += aliquot.getPositionString(true, true) + ", ";
+            String pos = aliquot.getPositionString(true, true);
+            if (pos != null) {
+                labels += pos + ", ";
+            }
         }
-        if (labels.length() != 0) {
+        if (labels.length() > 0) {
             logger.error("an aliquot with inventory id " + inventoryId
                 + " already exists at " + labels);
         }
         logger.error("an aliquot with inventory id " + inventoryId
-            + " already fro patient "
+            + " already exists for patient "
             + aliquots.get(0).getPatientVisit().getPatient().getPnumber());
         return false;
     }

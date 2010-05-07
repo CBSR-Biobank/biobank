@@ -331,21 +331,21 @@ public class TestContainerType extends TestDatabase {
         childTypeL2 = containerTypeMap.get("ChildCtL2");
         childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        Collection<ContainerTypeWrapper> children = topType.getAllChildren();
+        Collection<ContainerTypeWrapper> children = topType.getChildrenRecursively();
         Assert.assertEquals(3, children.size());
         Assert.assertTrue(children.contains(childTypeL1));
         Assert.assertTrue(children.contains(childTypeL2));
         Assert.assertTrue(children.contains(childTypeL3));
         Assert.assertFalse(children.contains(topType));
 
-        children = childTypeL1.getAllChildren();
+        children = childTypeL1.getChildrenRecursively();
         Assert.assertEquals(2, children.size());
         Assert.assertTrue(children.contains(childTypeL2));
         Assert.assertTrue(children.contains(childTypeL3));
         Assert.assertFalse(children.contains(topType));
         Assert.assertFalse(children.contains(childTypeL1));
 
-        children = childTypeL2.getAllChildren();
+        children = childTypeL2.getChildrenRecursively();
         Assert.assertEquals(1, children.size());
         Assert.assertTrue(children.contains(childTypeL3));
         Assert.assertFalse(children.contains(topType));

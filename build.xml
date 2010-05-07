@@ -17,7 +17,7 @@
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
-  <property name="eclipse.proj.dir.server" 
+  <property name="eclipse.proj.dir.server"
             location="eclipse_ws/biobank.server" />
   <property name="eclipse.proj.dir.importer"
             location="eclipse_ws/biobank2.importer" />
@@ -69,8 +69,13 @@
       <isfalse value="${isHostCbsr}" />
     </and>
   </condition>
-  <condition property="isCaCoreFolderExists">
-    <available file="${cacore.sdk.dir}" type="dir"/>
+  <condition property="cacore.sdk.tar.available">
+    <available file="${cacore.sdk.filename}"
+               property="cacore.sdk.tar.available" />
+  </condition>
+  <condition property="cacore.sdk.available">
+    <available file="${cacore.sdk.dir}/build.xml"
+               property="cacore.sdk.available" />
   </condition>
 
   <!--
@@ -131,27 +136,27 @@
     </or>
   </condition>
   <!-- end of copied part -->
-
-  <target name="check-cacore-sdk-available">
-    <available file="${cacore.sdk.dir}/build.xml"
-               property="cacore.sdk.available" />
-  </target>
   <!-- caCORE SDK -->
-  <target name="cacore-download" depends="check-cacore-sdk-available"
-          unless="cacore.sdk.available"
+  <target name="cacore-download"
+          unless="cacore.sdk.tar.available"
           description="downloads caCORE SDK from the host machine">
-    <mkdir dir="caCORE_SDK" />
     <echo message="downloading caCORE SDK..." />
     <exec executable="curl">
       <arg value="--silent" />
       <arg value="-o${cacore.sdk.filename}" />
       <arg value="http://${host}/${cacore.sdk.filename}" />
     </exec>
-    <mkdir dir="${cacore.sdk.dir}" />
+  </target>
+  <target name="cacore-untar" depends="cacore-download"
+          unless="cacore.sdk.available"
+          description="untars the caCORE SDK tarball">
+    <echo message="untaring caCORE SDK..." />
     <untar src="${cacore.sdk.filename}" compression="gzip"
            dest="${cacore.sdk.dir}" />
   </target>
-  <target name="check-cacore-sdk-uptodate">
+  <target name="check-cacore-sdk-uptodate"
+          depends="cacore-untar"
+          unless="cacore.sdk.available">
     <uptodate property="cacore.sdk.uptodate"
               targetfile="${cacore.sdk.dir}/output/biobank2">
       <srcfiles file="sdk_conf/deploy.properties" />
@@ -162,7 +167,7 @@
       <srcfiles file="model/biobank2.uml" />
     </uptodate>
   </target>
-  <target name="sdk" depends="cacore-download,check-cacore-sdk-uptodate, build-server-project"
+  <target name="sdk" depends="check-cacore-sdk-uptodate, build-server-project"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
@@ -187,7 +192,7 @@
       <map from="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/"
            to="" />
     </pathconvert>
-    
+
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib" id="sdk.local.jar.files">
       <include name="*.jar" />
     </fileset>
@@ -251,7 +256,7 @@
     </copy>
     <copy todir="${eclipse.proj.dir.common}/lib"
           file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-    <copy todir="${eclipse.proj.dir.common}/lib" 
+    <copy todir="${eclipse.proj.dir.common}/lib"
           file="${cacore.sdk.dir}/system/lib/hibernate-validator.jar" />
     <copy todir="${eclipse.proj.dir.importer}/lib"
           file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
@@ -263,7 +268,7 @@
     <copy todir="${eclipse.proj.dir}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib" 
+    <copy todir="${eclipse.proj.dir.common}/lib"
           file="${eclipse.proj.dir.server}/output/biobank-remote.jar" />
     <copy todir="${eclipse.proj.dir.importer}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}"/>
@@ -490,7 +495,8 @@
     <ant target="clean-jars" />
   </target>
 
-  <target name="clean-caCore" if="isCaCoreFolderExists">
+  <target name="clean-caCore"
+          unless="cacore.sdk.available">
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
   </target>
 

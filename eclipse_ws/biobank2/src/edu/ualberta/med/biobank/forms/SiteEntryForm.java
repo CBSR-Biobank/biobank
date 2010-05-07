@@ -91,9 +91,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_SITE));
 
-        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, BeansObservables.observeValue(site, "name"),
-            new NonEmptyStringValidator(MSG_NO_SITE_NAME));
+        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Name", null,
+            BeansObservables.observeValue(site, "name"),
+            new NonEmptyStringValidator(MSG_NO_SITE_NAME)));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(site, "nameShort"),

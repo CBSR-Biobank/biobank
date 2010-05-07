@@ -77,7 +77,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected IStatus currentStatus;
 
     // The widget that is to get the focus when the form is created
-    protected Control firstControl;
+    private Control firstControl;
 
     private Action confirmAction;
 
@@ -219,6 +219,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         this.sessionName = sessionName;
     }
 
+    protected Control getFirstControl() {
+        return firstControl;
+    }
+
+    protected void setFirstControl(Control c) {
+        firstControl = c;
+    }
+
     protected void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
         widgetCreator.addBooleanBinding(writableValue, observableValue,
@@ -264,8 +272,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * Applies a background color to the read only field.
      */
     @Override
-    protected Text createReadOnlyLabelledField(Composite parent, int widgetOptions,
-        String fieldLabel, String value) {
+    protected Text createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel, String value) {
         Text widget = super.createReadOnlyLabelledField(parent, widgetOptions,
             fieldLabel, value);
         widget.setBackground(READ_ONLY_TEXT_BGR);

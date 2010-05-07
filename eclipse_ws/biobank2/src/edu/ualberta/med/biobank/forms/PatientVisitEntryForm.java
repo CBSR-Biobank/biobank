@@ -131,13 +131,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Site", patient.getStudy()
-            .getSite().getName());
+        createReadOnlyLabelledField(client, SWT.NONE, "Site", patient
+            .getStudy().getSite().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Study", patient.getStudy()
-            .getName());
+        createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
+            .getStudy().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Patient", patient.getPnumber());
+        createReadOnlyLabelledField(client, SWT.NONE, "Patient", patient
+            .getPnumber());
 
         List<ShipmentWrapper> allShipments = patient.getShipmentCollection();
         List<ShipmentWrapper> recentShipments = new ArrayList<ShipmentWrapper>();
@@ -160,7 +161,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Shipment", recentShipments, selectedShip,
             "A shipment should be selected");
-        firstControl = shipmentsComboViewer.getControl();
+        setFirstControl(shipmentsComboViewer.getControl());
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());

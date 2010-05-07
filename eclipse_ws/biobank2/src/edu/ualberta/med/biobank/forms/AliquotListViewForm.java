@@ -35,7 +35,8 @@ public class AliquotListViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_BOX));
 
-        samplesWidget = new AliquotListInfoTable(form.getBody(), aliquots);
+        samplesWidget = new AliquotListInfoTable(form.getBody(), aliquots,
+            AliquotListInfoTable.ColumnsShown.PNUMBER);
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
     }

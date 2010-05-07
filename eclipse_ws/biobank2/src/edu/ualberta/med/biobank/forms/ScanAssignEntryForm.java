@@ -175,7 +175,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         palletproductBarcodeText.setLayoutData(gd);
-        firstControl = palletproductBarcodeText;
+        setFirstControl(palletproductBarcodeText);
         palletproductBarcodeText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {

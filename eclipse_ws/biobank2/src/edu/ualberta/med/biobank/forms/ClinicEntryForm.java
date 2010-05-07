@@ -81,8 +81,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() throws ApplicationException {
         form.setText("Clinic Information");
-        GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
+        form.getBody().setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CLINIC));
 
@@ -109,13 +108,12 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
-        setTextValue(siteLabel, clinic.getSite().getName());
+        createReadOnlyLabelledField(client, SWT.NONE, "Repository Site", clinic
+            .getSite().getName());
 
-        firstControl = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-            "Name", null, BeansObservables.observeValue(clinic, "name"),
-            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
+        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+            SWT.NONE, "Name", null, BeansObservables.observeValue(clinic,
+                "name"), new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
             null, BeansObservables.observeValue(clinic, "nameShort"),
