@@ -60,6 +60,7 @@ import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
 import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
 import edu.ualberta.med.biobank.common.reports.AliquotRequest;
 import edu.ualberta.med.biobank.common.reports.AliquotSCount;
+import edu.ualberta.med.biobank.common.reports.BiobankListProxy;
 import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
@@ -91,7 +92,7 @@ import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
-import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportsEditor extends BiobankFormBase {
@@ -102,7 +103,7 @@ public class ReportsEditor extends BiobankFormBase {
     private Composite buttonSection;
     private Composite parameterSection;
 
-    private SearchResultsInfoTable reportTable;
+    private ReportTableWidget reportTable;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -214,10 +215,10 @@ public class ReportsEditor extends BiobankFormBase {
                                 exportButton.setEnabled(false);
                             }
                             reportTable.dispose();
-                            if (reportData.size() >= 1000)
+                            if (reportData.size() == 1000)
                                 printButton.setEnabled(false);
-                            reportTable = new SearchResultsInfoTable(form
-                                .getBody(), reportData, query.getColumnNames(),
+                            reportTable = new ReportTableWidget(form.getBody(),
+                                reportData, query.getColumnNames(),
                                 columnWidths.get(query.getClass()), 40);
                             form.layout(true, true);
                         }
@@ -234,8 +235,8 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new SearchResultsInfoTable(form.getBody(), null,
-            new String[] { " " }, new int[] { 500 });
+        reportTable = new ReportTableWidget<BiobankListProxy>(form.getBody(),
+            null, new String[] { " " }, new int[] { 500 });
     }
 
     public void resetSearch() {
