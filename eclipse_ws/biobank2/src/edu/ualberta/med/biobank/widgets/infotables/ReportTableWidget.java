@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -82,11 +81,6 @@ public class ReportTableWidget extends BiobankWidget {
         int rowsPerPage;
     }
 
-    /*
-     * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
-     * .html for how to set row height.
-     */
-
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ReportTableWidget.class.getName());
 
@@ -95,14 +89,6 @@ public class ReportTableWidget extends BiobankWidget {
     private Thread backgroundThread;
 
     protected Menu menu;
-
-    protected ListenerList addItemListeners = new ListenerList();
-
-    protected ListenerList editItemListeners = new ListenerList();
-
-    protected ListenerList deleteItemListeners = new ListenerList();
-
-    protected ListenerList doubleClickListeners = new ListenerList();
 
     private boolean paginationRequired;
 
@@ -131,6 +117,7 @@ public class ReportTableWidget extends BiobankWidget {
         super(parent, SWT.NONE);
 
         pageInfo.rowsPerPage = 0;
+        pageInfo.page = 0;
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
         setLayout(gl);
@@ -178,12 +165,14 @@ public class ReportTableWidget extends BiobankWidget {
         tableViewer.getTable().setMenu(menu);
 
         if (collection != null) {
-            getTableViewer().refresh();
+            if (collection.get(pageInfo.rowsPerPage) != null) {
+                paginationRequired = true;
+                addPaginationWidget();
+            }
             setCollection(collection);
         }
 
         addClipboadCopySupport();
-        addPaginationWidget();
     }
 
     private IBaseLabelProvider getLabelProvider() {
@@ -209,11 +198,8 @@ public class ReportTableWidget extends BiobankWidget {
 
     public ReportTableWidget(Composite parent, List<Object> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
-        this(parent, null, headings, columnWidths);
+        this(parent, collection, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
-        if (collection != null) {
-            setCollection(collection);
-        }
     }
 
     private void addClipboadCopySupport() {
@@ -272,10 +258,9 @@ public class ReportTableWidget extends BiobankWidget {
             return;
         }
         if (paginationRequired) {
-            pageInfo.page = 0;
             setPageLabelText();
             showPaginationWidget();
-            enablePaginationWidget(true);
+            enablePaginationWidget(false);
         }
 
         backgroundThread = new Thread() {
