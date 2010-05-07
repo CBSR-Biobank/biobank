@@ -387,7 +387,7 @@ public class AdvancedReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
-                            if (reportData.size() >= 1000)
+                            if (reportData.size() == 1000)
                                 printButton.setEnabled(false);
                             String[] names = tree.getSelectClauses().keySet()
                                 .toArray(new String[] {});
