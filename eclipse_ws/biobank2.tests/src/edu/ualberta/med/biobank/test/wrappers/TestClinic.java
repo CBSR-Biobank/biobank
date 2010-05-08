@@ -455,8 +455,8 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testHasShipments() throws Exception {
-        String name = "testHasShipments" + r.nextInt();
+    public void testGetShipmentCount() throws Exception {
+        String name = "testGetShipmentCount" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
@@ -472,21 +472,21 @@ public class TestClinic extends TestDatabase {
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
 
-        Assert.assertFalse(clinic.sendsShipments());
+        Assert.assertEquals(0, clinic.getShipmentCount());
 
         ShipmentWrapper shipment1 = ShipmentHelper
             .addShipment(clinic, patient1);
         ShipmentWrapper shipment2 = ShipmentHelper
             .addShipment(clinic, patient2);
 
-        Assert.assertTrue(clinic.sendsShipments());
+        Assert.assertEquals(2, clinic.getShipmentCount());
 
         clinic.reload();
         shipment1.delete();
         shipment2.delete();
         clinic.reload();
 
-        Assert.assertFalse(clinic.sendsShipments());
+        Assert.assertEquals(0, clinic.getShipmentCount());
     }
 
     @Test

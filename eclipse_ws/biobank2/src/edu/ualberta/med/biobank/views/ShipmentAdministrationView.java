@@ -136,8 +136,6 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             }
         } else {
             // can find more than one shipments
-            System.out.println("search with date:"
-                + dateReceivedWidget.getDate());
             return ShipmentWrapper.getShipmentsInSite(SessionManager
                 .getAppService(), dateReceivedWidget.getDate(), SessionManager
                 .getInstance().getCurrentSite());

@@ -82,13 +82,16 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Repository Site");
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Repository Site");
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Short Name");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comments");
-        patientTotal = createReadOnlyLabelledField(client, SWT.NONE, "Total Patients");
+        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Patients");
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patient Visits");
 
@@ -138,7 +141,7 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(nameShortLabel, study.getNameShort());
         setTextValue(activityStatusLabel, study.getActivityStatus());
         setTextValue(commentLabel, study.getComment());
-        setTextValue(patientTotal, study.getPatientCollection().size());
+        setTextValue(patientTotal, study.getPatientCount());
         setTextValue(visitTotal, study.getPatientVisitCount());
     }
 
@@ -196,8 +199,8 @@ public class StudyViewForm extends BiobankViewForm {
             if (pvCustomInfo.getAllowedValues() != null) {
                 subcomp.setLayout(new GridLayout(2, false));
 
-                pvCustomInfo.wiget = createReadOnlyLabelledField(subcomp, SWT.NONE,
-                    pvCustomInfo.getLabel());
+                pvCustomInfo.wiget = createReadOnlyLabelledField(subcomp,
+                    SWT.NONE, pvCustomInfo.getLabel());
             } else {
                 subcomp.setLayout(new GridLayout(1, false));
                 toolkit.createLabel(subcomp, pvCustomInfo.getLabel());

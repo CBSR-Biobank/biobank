@@ -705,6 +705,20 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return result.get(0) > 0;
     }
 
+    public long getPatientCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(patient) from "
+                + Study.class.getName()
+                + " as study inner join study.patientCollection as patient where study.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Long> results = appService.query(criteria);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0);
+    }
+
     private void setPatientCollection(Collection<Patient> allPatientObjects,
         List<PatientWrapper> allPatientWrappers) {
         Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
