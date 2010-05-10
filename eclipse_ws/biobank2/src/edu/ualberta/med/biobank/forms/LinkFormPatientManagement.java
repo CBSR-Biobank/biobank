@@ -51,9 +51,6 @@ public class LinkFormPatientManagement {
     private Text visitText;
     private Label visitComboLabel;
 
-    private static final String PATIENT_NUMBER_BINDING = "patient-binding";
-    private static final String VISIT_BINDING = "visit-binding";
-
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
         AbstractAliquotAdminForm aliquotAdminForm) {
         this.widgetCreator = widgetCreator;
@@ -69,8 +66,7 @@ public class LinkFormPatientManagement {
             .getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
         patientNumberText = (Text) widgetCreator.createBoundWidget(parent,
             Text.class, SWT.NONE, patientLabel, new String[0],
-            new WritableValue("", String.class), patientValidator,
-            PATIENT_NUMBER_BINDING);
+            new WritableValue("", String.class), patientValidator);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -102,13 +98,9 @@ public class LinkFormPatientManagement {
     protected void createVisitCombo(Composite compositeFields) {
         visitComboLabel = widgetCreator.createLabel(compositeFields, Messages
             .getString("ScanLink.visit.label"));
-        viewerVisits = widgetCreator
-            .createComboViewerWithNoSelectionValidator(
-                compositeFields,
-                visitComboLabel,
-                null,
-                null,
-                Messages.getString("ScanLink.visit.validationMsg"), false, VISIT_BINDING); //$NON-NLS-1$
+        viewerVisits = widgetCreator.createComboViewerWithNoSelectionValidator(
+            compositeFields, visitComboLabel, null, null, Messages
+                .getString("ScanLink.visit.validationMsg"), false, null); //$NON-NLS-1$
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -271,13 +263,12 @@ public class LinkFormPatientManagement {
 
     public void enableValidators(boolean enabled) {
         if (enabled) {
-            widgetCreator.addBinding(PATIENT_NUMBER_BINDING);
-            patientValidator.validate(patientNumberText.getText());
-            widgetCreator.addBinding(VISIT_BINDING);
+            patientNumberText.setText("");
+            viewerVisits.getCombo().deselectAll();
         } else {
-            widgetCreator.removeBinding(PATIENT_NUMBER_BINDING);
-            patientValidator.validate("**");
-            widgetCreator.removeBinding(VISIT_BINDING);
+            patientNumberText.setText("?");
+            viewerVisits.setInput(new String[] { "?" });
+            viewerVisits.getCombo().select(0);
         }
     }
 
