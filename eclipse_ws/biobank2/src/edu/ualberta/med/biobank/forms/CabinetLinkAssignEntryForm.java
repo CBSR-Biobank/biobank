@@ -217,7 +217,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioNew.getSelection()) {
-                    System.out.println("selection radio new");
                     setMoveMode(false);
                 }
             }
@@ -356,22 +355,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 String.class), oldCabinetPositionCheckValidator);
         gd = (GridData) oldCabinetPositionCheck.getLayoutData();
         gd.horizontalSpan = 2;
-        // oldCabinetPositionCheck.addFocusListener(new FocusAdapter() {
-        // @Override
-        // public void focusLost(FocusEvent e) {
-        // System.out.println("lost focus oldPosition");
-        // if (oldPositionCheckModified && !radioNew.getSelection()) {
-        // checkOldPosition();
-        // }
-        // oldPositionCheckModified = false;
-        // }
-        // });
-        // oldCabinetPositionCheck.addModifyListener(new ModifyListener() {
-        // @Override
-        // public void modifyText(ModifyEvent e) {
-        // oldPositionCheckModified = true;
-        // }
-        // });
 
         // for all modes: position to be assigned to the aliquot
         newCabinetPositionLabel = widgetCreator.createLabel(fieldsComposite,
