@@ -153,7 +153,7 @@ public class BiobankListProxy implements List<Object> {
     @Override
     public List<Object> subList(int fromIndex, int toIndex) {
         Assert.isTrue(fromIndex >= 0 && toIndex > 0);
-        Assert.isTrue(fromIndex < toIndex);
+        Assert.isTrue(fromIndex <= toIndex);
         listChunk = updateListChunk(fromIndex);
         List<Object> subList = new ArrayList<Object>();
         subList.addAll(listChunk.subList(fromIndex - offset, Math.min(listChunk
