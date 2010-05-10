@@ -14,7 +14,7 @@ public class BiobankListProxyIterator implements Iterator<Object> {
 
     @Override
     public boolean hasNext() {
-        return index < proxy.size() - 1;
+        return proxy.get(index + 1) != null;
     }
 
     @Override

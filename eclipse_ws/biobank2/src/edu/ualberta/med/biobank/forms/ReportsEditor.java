@@ -566,8 +566,12 @@ public class ReportsEditor extends BiobankFormBase {
                         widget = null;
                     }
                 else if (option.getName().compareTo("Study") == 0) {
-                    Collection<StudyWrapper> studyWrappers = site
-                        .getStudyCollection(true);
+                    Collection<StudyWrapper> studyWrappers;
+                    if (site.getName().compareTo("All Sites") != 0)
+                        studyWrappers = site.getStudyCollection(true);
+                    else
+                        studyWrappers = StudyWrapper
+                            .getAllStudies(SessionManager.getAppService());
                     ArrayList<String> studyNames = new ArrayList<String>();
                     for (StudyWrapper s : studyWrappers)
                         studyNames.add(s.getNameShort());

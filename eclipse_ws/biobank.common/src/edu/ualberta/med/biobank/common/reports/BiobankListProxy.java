@@ -147,7 +147,6 @@ public class BiobankListProxy implements List<Object> {
     public int size() {
         // bsearch was still too slow, hqlcounts too complicated
         // going to have to operate without size
-        // only set this once... this is only the size of the FIRST CHUNK
         return -1;
     }
 

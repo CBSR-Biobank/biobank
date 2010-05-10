@@ -164,7 +164,8 @@ public class ReportTableWidget extends BiobankWidget {
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
 
-        if (collection != null) {
+        if (collection != null
+            && (collection.size() == -1 || collection.size() > pageInfo.rowsPerPage)) {
             if (collection.get(pageInfo.rowsPerPage) != null) {
                 paginationRequired = true;
                 addPaginationWidget();
@@ -277,9 +278,15 @@ public class ReportTableWidget extends BiobankWidget {
                     start = 0;
                     end = pageInfo.rowsPerPage;
                 }
+                final Collection<Object> collSubList;
 
-                final Collection<Object> collSubList = collection.subList(
-                    start, end);
+                // if we are not dealing with a biobanklistproxy we need to
+                // check for bounds
+                if (collection.size() != -1) {
+                    start = Math.min(start, collection.size());
+                    end = Math.min(end, collection.size());
+                }
+                collSubList = collection.subList(start, end);
 
                 display.syncExec(new Runnable() {
                     public void run() {

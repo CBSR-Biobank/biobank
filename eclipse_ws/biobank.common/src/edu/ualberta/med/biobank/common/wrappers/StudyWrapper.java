@@ -854,6 +854,21 @@ public class StudyWrapper extends ModelWrapper<Study> {
         deletedStudyPvAttr.clear();
     }
 
+    public static List<StudyWrapper> getAllStudies(
+        WritableApplicationService appService) {
+        List<Study> studies = new ArrayList<Study>();
+        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
+        HQLCriteria c = new HQLCriteria("from " + Study.class.getName());
+        try {
+            studies = appService.query(c);
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
+        for (Study study : studies)
+            wrappers.add(new StudyWrapper(appService, study));
+        return wrappers;
+    }
+
     @Override
     public String toString() {
         return getName();
