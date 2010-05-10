@@ -236,6 +236,7 @@ public class ReportsEditor extends BiobankFormBase {
         }
         reportTable = new ReportTableWidget(form.getBody(), null,
             new String[] { " " }, new int[] { 500 });
+        form.layout(true, true);
     }
 
     public void resetSearch() {

@@ -108,6 +108,7 @@ public class SearchUtils {
             else
                 path = path + "clinic.";
             add(searchableFields, path, "name", String.class);
+            add(searchableFields, path, "activityStatus.name", String.class);
         } else if (c == Address.class) {
             path = path + "address.";
             add(searchableFields, path, "street1", String.class);
