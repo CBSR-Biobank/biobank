@@ -16,7 +16,7 @@ public class StudyHelper extends DbHelper {
             if (name.length() < 50) {
                 study.setNameShort(name);
             } else {
-                study.setNameShort(name.substring(0, 49));
+                study.setNameShort(name.substring(name.length() - 49));
             }
         }
         study.setSite(site);
