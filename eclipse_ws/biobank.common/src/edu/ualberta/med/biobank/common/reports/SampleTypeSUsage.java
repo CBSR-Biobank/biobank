@@ -15,12 +15,12 @@ public class SampleTypeSUsage extends QueryObject {
 
     public static String NAME = "Sample Type Usage by Study";
 
-    private static String query1 = "select ss.sampleType.nameShort, "
+    private String query1 = "select ss.sampleType.nameShort, "
         + "ss.study.nameShort from "
         + SampleStorage.class.getName()
         + " ss "
         + "where ss.study.site = {0,number,#} OR {0,number,#}=-9999 ORDER BY ss.sampleType.nameShort";
-    private static String query2 = "select st.nameShort from "
+    private String query2 = "select st.nameShort from "
         + SampleType.class.getName()
         + " st where st not in (select ss.sampleType from "
         + SampleStorage.class.getName()
@@ -31,7 +31,7 @@ public class SampleTypeSUsage extends QueryObject {
         super(
             "Lists sample types, and the associated studies permitting them as valid sample storage.",
             "", new String[] { "Sample Type", "Study" });
-        query1 = MessageFormat.format(query1, siteId);
+        query1 = MessageFormat.format(query1, siteId, "nob");
         query2 = MessageFormat.format(query2, siteId);
     }
 
