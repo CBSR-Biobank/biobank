@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,53 +39,12 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
-/**
- * Used to display tabular information for an object in the object model or
- * combined information from several objects in the object model.
- * <p>
- * The information in the table is loaded in a background thread. By loading
- * object model data in a background thread, the main UI thread is not blocked
- * when displaying the cells of the table.
- * <p>
- * This widget supports the following listeners: double click listener, edit
- * listener, and delete listener. The double click listener is invoked when the
- * user double clicks on a row in the table. The edit and delete listeners are
- * invoked via the table's context menu. When one of these listeners is
- * registered, the widget adds an "Edit" and / or "Delete" item to the context
- * menu. The corresponding listener is then invoked when the user selects either
- * one of the two menu choices. The event passed to the listener contains the
- * current selection for the table.
- * <p>
- * This widget also allows for a row of information to be copied to the
- * clipboard. The "Copy" command is made available in the context menu. When
- * this command is selected by the user the rows that are currently selected are
- * copied to the clipboard.
- * <p>
- * If neither the edit or delete listeners are registered, then the table is
- * configured to be in multi select mode and the selection of multiple lines is
- * available to the user.
- * <p>
- * NOTE:
- * <p>
- * Care should be taken in the label provider so that blocking calls are not
- * made to the object model. All calls to the object model should be done in
- * abstract method getCollectionModelObject().
- * 
- * @param <T> The model object wrapper the table is based on.
- * 
- */
-public class ReportTableWidget<T> extends BiobankWidget {
+public class ReportTableWidget extends BiobankWidget {
 
     class PageInformation {
-        int pageTotal;
         int page;
         int rowsPerPage;
     }
-
-    /*
-     * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
-     * .html for how to set row height.
-     */
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ReportTableWidget.class.getName());
@@ -96,14 +54,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
     private Thread backgroundThread;
 
     protected Menu menu;
-
-    protected ListenerList addItemListeners = new ListenerList();
-
-    protected ListenerList editItemListeners = new ListenerList();
-
-    protected ListenerList deleteItemListeners = new ListenerList();
-
-    protected ListenerList doubleClickListeners = new ListenerList();
 
     private boolean paginationRequired;
 
@@ -121,20 +71,18 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
     private Label pageLabel;
 
-    private List<T> collection;
-
-    private boolean reloadData;
+    private List<Object> collection;
 
     protected int start;
 
     protected int end;
 
-    public ReportTableWidget(Composite parent, List<T> collection,
+    public ReportTableWidget(Composite parent, List<Object> collection,
         String[] headings, int[] columnWidths) {
         super(parent, SWT.NONE);
 
-        reloadData = true;
         pageInfo.rowsPerPage = 0;
+        pageInfo.page = 0;
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
         setLayout(gl);
@@ -142,9 +90,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
         int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
             | SWT.FULL_SELECTION | SWT.VIRTUAL;
-        if (isEditMode()) {
-            style |= SWT.MULTI;
-        }
 
         tableViewer = new TableViewer(this, style);
 
@@ -184,27 +129,23 @@ public class ReportTableWidget<T> extends BiobankWidget {
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
 
-        if (collection != null) {
-            getTableViewer().refresh();
+        if (collection != null
+            && (collection.size() == -1 || collection.size() > pageInfo.rowsPerPage)) {
+            if (collection.get(pageInfo.rowsPerPage) != null) {
+                paginationRequired = true;
+                addPaginationWidget();
+            }
             setCollection(collection);
         }
 
         addClipboadCopySupport();
-        addPaginationWidget();
     }
 
     private IBaseLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                if (element instanceof BiobankCollectionModel) {
-                    BiobankCollectionModel m = (BiobankCollectionModel) element;
-                    if (m.o != null) {
-                        return getColumnText(m.o, columnIndex);
-                    } else if (columnIndex == 0) {
-                        return "loading ...";
-                    }
-                } else if (element instanceof Object[]) {
+                if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
                         return "";
@@ -221,24 +162,10 @@ public class ReportTableWidget<T> extends BiobankWidget {
         };
     }
 
-    public ReportTableWidget(Composite parent, List<T> collection,
+    public ReportTableWidget(Composite parent, List<Object> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
-        this(parent, null, headings, columnWidths);
+        this(parent, collection, headings, columnWidths);
         pageInfo.rowsPerPage = rowsPerPage;
-        if (collection != null) {
-            setCollection(collection);
-        }
-        resizeTable();
-    }
-
-    /**
-     * Derived classes should override this method if info table support editing
-     * of items in the table.
-     * 
-     * @return true if editing is allowed.
-     */
-    protected boolean isEditMode() {
-        return false;
     }
 
     private void addClipboadCopySupport() {
@@ -271,13 +198,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         });
     }
 
-    protected void sortOnFirstColumn() {
-        Table table = tableViewer.getTable();
-        table.setSortDirection(SWT.DOWN);
-        table.setSortColumn(table.getColumn(0));
-        tableViewer.refresh();
-    }
-
     @Override
     public boolean setFocus() {
         tableViewer.getControl().setFocus();
@@ -292,54 +212,22 @@ public class ReportTableWidget<T> extends BiobankWidget {
         return tableViewer;
     }
 
-    /**
-     * Should be used by info tables that allow editing of data. Use this method
-     * instead of setCollection().
-     * 
-     * @param collection
-     */
-    public void reloadCollection(final List<T> collection, T selection) {
-        reloadData = true;
-        setCollection(collection, selection);
-    }
-
-    public void reloadCollection(final List<T> collection) {
-        reloadData = true;
+    public void setCollection(final List<Object> collection) {
         setCollection(collection, null);
     }
 
-    public void setCollection(final List<T> collection) {
-        setCollection(collection, null);
-    }
-
-    public void setCollection(final List<T> collection, final T selection) {
+    public void setCollection(final List<Object> collection,
+        final Object selection) {
         this.collection = collection;
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
         }
-
-        if (!isEditMode() && (pageInfo.rowsPerPage != 0)
-            && (collection.size() > pageInfo.rowsPerPage)
-            && !paginationWidget.getVisible()) {
-            pageInfo.page = 0;
-            Double size = new Double(collection.size());
-            Double pageSize = new Double(pageInfo.rowsPerPage);
-            if (size < 1000)
-                pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
-                    .intValue();
-            else
-                pageInfo.pageTotal = -1;
+        if (paginationRequired) {
             setPageLabelText();
             showPaginationWidget();
-            paginationRequired = true;
-        }
-
-        if (paginationRequired) {
             enablePaginationWidget(false);
         }
-
-        resizeTable();
 
         backgroundThread = new Thread() {
             @Override
@@ -350,15 +238,20 @@ public class ReportTableWidget<T> extends BiobankWidget {
 
                 if (paginationRequired) {
                     start = pageInfo.page * pageInfo.rowsPerPage;
-                    end = Math.min(start + pageInfo.rowsPerPage, collection
-                        .size());
+                    end = start + pageInfo.rowsPerPage;
                 } else {
                     start = 0;
-                    end = collection.size();
+                    end = pageInfo.rowsPerPage;
                 }
+                final Collection<Object> collSubList;
 
-                final Collection<T> collSubList = collection
-                    .subList(start, end);
+                // if we are not dealing with a biobanklistproxy we need to
+                // check for bounds
+                if (collection.size() != -1) {
+                    start = Math.min(start, collection.size());
+                    end = Math.min(end, collection.size());
+                }
+                collSubList = collection.subList(start, end);
 
                 display.syncExec(new Runnable() {
                     public void run() {
@@ -374,7 +267,10 @@ public class ReportTableWidget<T> extends BiobankWidget {
                         if (table.isDisposed())
                             return;
                         final Object item = collection.get(i);
-
+                        if (item == null) {
+                            end = i;
+                            break;
+                        }
                         display.syncExec(new Runnable() {
                             public void run() {
                                 if (!table.isDisposed()) {
@@ -387,7 +283,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
                             selItem = item;
                         }
                     }
-                    reloadData = false;
 
                     final Object selectedItem = selItem;
                     display.syncExec(new Runnable() {
@@ -442,6 +337,7 @@ public class ReportTableWidget<T> extends BiobankWidget {
                 firstPage();
             }
         });
+        firstButton.setEnabled(false);
 
         prevButton = new Button(paginationWidget, SWT.NONE);
         prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -453,6 +349,7 @@ public class ReportTableWidget<T> extends BiobankWidget {
                 prevPage();
             }
         });
+        prevButton.setEnabled(false);
 
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
@@ -466,16 +363,12 @@ public class ReportTableWidget<T> extends BiobankWidget {
                 nextPage();
             }
         });
+        nextButton.setEnabled(false);
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
-        lastButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                lastPage();
-            }
-        });
+        lastButton.setEnabled(false);
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
@@ -501,15 +394,13 @@ public class ReportTableWidget<T> extends BiobankWidget {
             prevButton.setEnabled(false);
         }
 
-        if (enable && (pageInfo.page < pageInfo.pageTotal - 1)) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        } else if (enable && (pageInfo.pageTotal == -1)) {
-            nextButton.setEnabled(true);
+        if (!enable
+            || getTableViewer().getTable().getItemCount() < pageInfo.rowsPerPage) {
+            nextButton.setEnabled(false);
             lastButton.setEnabled(false);
         } else {
             lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
+            nextButton.setEnabled(true);
         }
         layout(true);
     }
@@ -524,16 +415,6 @@ public class ReportTableWidget<T> extends BiobankWidget {
         setCollection(collection);
     }
 
-    private void lastPage() {
-        pageInfo.page = pageInfo.pageTotal - 1;
-        firstButton.setEnabled(true);
-        prevButton.setEnabled(true);
-        lastButton.setEnabled(false);
-        nextButton.setEnabled(false);
-        setPageLabelText();
-        setCollection(collection);
-    }
-
     private void prevPage() {
         if (pageInfo.page == 0)
             return;
@@ -542,50 +423,21 @@ public class ReportTableWidget<T> extends BiobankWidget {
             firstButton.setEnabled(false);
             prevButton.setEnabled(false);
         }
-        if (pageInfo.page == pageInfo.pageTotal - 2) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        }
         setPageLabelText();
         setCollection(collection);
     }
 
     private void nextPage() {
-        if (pageInfo.page >= pageInfo.pageTotal && pageInfo.pageTotal != -1)
-            return;
         pageInfo.page++;
         if (pageInfo.page == 1) {
             firstButton.setEnabled(true);
             prevButton.setEnabled(true);
         }
-        if (pageInfo.page == pageInfo.pageTotal - 1) {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        }
         setPageLabelText();
         setCollection(collection);
-        paginationWidget.layout(true);
     }
 
     private void setPageLabelText() {
-        if (pageInfo.pageTotal == -1)
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
-        else
-            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
-                + pageInfo.pageTotal);
-    }
-
-    private void resizeTable() {
-        int rows = 5;
-        if (!isEditMode() && (pageInfo.rowsPerPage > 0) && (collection != null)) {
-            rows = Math.min(collection.size(), pageInfo.rowsPerPage);
-        } else if (!isEditMode() && (collection != null)) {
-            rows = Math.min(collection.size(), rows);
-        }
-
-        Table table = getTableViewer().getTable();
-        GridData gd = (GridData) table.getLayoutData();
-        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
-        layout(true);
+        pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
     }
 }

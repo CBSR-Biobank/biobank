@@ -124,6 +124,7 @@ public abstract class QueryObject {
         return postProcess(executeQuery(appService, preProcess(params)));
     }
 
+    @SuppressWarnings("unused")
     protected List<Object> executeQuery(WritableApplicationService appService,
         List<Object> params) throws ApplicationException {
         HQLCriteria c = new HQLCriteria(queryString);

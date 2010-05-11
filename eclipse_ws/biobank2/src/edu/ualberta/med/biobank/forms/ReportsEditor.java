@@ -60,7 +60,6 @@ import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
 import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
 import edu.ualberta.med.biobank.common.reports.AliquotRequest;
 import edu.ualberta.med.biobank.common.reports.AliquotSCount;
-import edu.ualberta.med.biobank.common.reports.BiobankListProxy;
 import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
@@ -215,7 +214,7 @@ public class ReportsEditor extends BiobankFormBase {
                                 exportButton.setEnabled(false);
                             }
                             reportTable.dispose();
-                            if (reportData.size() == 1000)
+                            if (reportData.size() == -1)
                                 printButton.setEnabled(false);
                             reportTable = new ReportTableWidget(form.getBody(),
                                 reportData, query.getColumnNames(),
@@ -235,8 +234,9 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget<BiobankListProxy>(form.getBody(),
-            null, new String[] { " " }, new int[] { 500 });
+        reportTable = new ReportTableWidget(form.getBody(), null,
+            new String[] { " " }, new int[] { 500 });
+        form.layout(true, true);
     }
 
     public void resetSearch() {
@@ -567,8 +567,12 @@ public class ReportsEditor extends BiobankFormBase {
                         widget = null;
                     }
                 else if (option.getName().compareTo("Study") == 0) {
-                    Collection<StudyWrapper> studyWrappers = site
-                        .getStudyCollection(true);
+                    Collection<StudyWrapper> studyWrappers;
+                    if (site.getName().compareTo("All Sites") != 0)
+                        studyWrappers = site.getStudyCollection(true);
+                    else
+                        studyWrappers = StudyWrapper
+                            .getAllStudies(SessionManager.getAppService());
                     ArrayList<String> studyNames = new ArrayList<String>();
                     for (StudyWrapper s : studyWrappers)
                         studyNames.add(s.getNameShort());

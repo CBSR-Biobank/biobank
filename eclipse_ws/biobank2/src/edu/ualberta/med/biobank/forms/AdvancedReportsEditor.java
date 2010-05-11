@@ -35,11 +35,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.EditorPart;
 
 import ar.com.fdvs.dj.core.DynamicJasperHelper;
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
@@ -62,9 +58,9 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.infotables.SearchResultsInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
-public class AdvancedReportsEditor extends EditorPart {
+public class AdvancedReportsEditor extends BiobankFormBase {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AdvancedReportsEditor";
 
@@ -83,7 +79,7 @@ public class AdvancedReportsEditor extends EditorPart {
     protected ArrayList<Button> includedFields;
     private ArrayList<Label> textLabels;
 
-    private SearchResultsInfoTable reportTable;
+    private ReportTableWidget reportTable;
     private List<Object> reportData;
     private ReportTreeNode node;
 
@@ -91,23 +87,17 @@ public class AdvancedReportsEditor extends EditorPart {
     private QueryTreeNode selectedNode;
 
     @Override
-    public void init(IEditorSite site, IEditorInput input)
-        throws PartInitException {
-        setSite(site);
-        setInput(input);
+    public void createFormContent() {
 
-        node = ((ReportInput) input).getNode();
+        GridLayout formLayout = new GridLayout();
+        formLayout.marginWidth = 0;
+        form.getBody().setLayout(formLayout);
 
-        reportData = new ArrayList<Object>();
-        this.setPartName(node.getLabel());
-
-    }
-
-    @Override
-    public void createPartControl(Composite parent) {
-
-        top = new Composite(parent, SWT.BORDER);
+        top = toolkit.createComposite(form.getBody(), SWT.BORDER);
         GridData gdfill = new GridData();
+        gdfill.grabExcessHorizontalSpace = true;
+        gdfill.grabExcessVerticalSpace = true;
+        gdfill.verticalAlignment = SWT.FILL;
         gdfill.horizontalAlignment = SWT.FILL;
         GridLayout layout = new GridLayout();
         layout.numColumns = 2;
@@ -134,19 +124,20 @@ public class AdvancedReportsEditor extends EditorPart {
         gd.widthHint = 250;
         tree.getTree().setLayoutData(gd);
 
-        parameterSection = new Composite(top, SWT.NONE);
+        parameterSection = toolkit.createComposite(top, SWT.NONE);
         GridData pgd = new GridData();
         pgd.horizontalAlignment = SWT.FILL;
         pgd.grabExcessHorizontalSpace = true;
         parameterSection.setLayoutData(pgd);
 
-        buttonSection = new Composite(top, SWT.NONE);
+        buttonSection = toolkit.createComposite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.numColumns = 4;
         buttonSection.setLayout(gl);
+        toolkit.adapt(buttonSection);
 
-        generateButton = new Button(buttonSection, SWT.NONE);
-        generateButton.setText("Generate");
+        generateButton = toolkit.createButton(buttonSection, "Generate",
+            SWT.NONE);
         generateButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -154,8 +145,7 @@ public class AdvancedReportsEditor extends EditorPart {
             }
         });
 
-        saveButton = new Button(buttonSection, SWT.NONE);
-        saveButton.setText("Save");
+        saveButton = toolkit.createButton(buttonSection, "Save", SWT.NONE);
         saveButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -196,10 +186,9 @@ public class AdvancedReportsEditor extends EditorPart {
             }
         });
 
-        printButton = new Button(buttonSection, SWT.NONE);
+        printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
         printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PRINTER));
-        printButton.setText("Print");
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -238,7 +227,7 @@ public class AdvancedReportsEditor extends EditorPart {
             parameterSection.dispose();
         Boolean allOrNone = node.getParent().getLabel().compareTo("All") == 0
             || node.getParent().getLabel().compareTo("None") == 0;
-        parameterSection = new Composite(top, SWT.NONE);
+        parameterSection = toolkit.createComposite(top, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.marginWidth = 0;
         gl.numColumns = 5;
@@ -387,7 +376,7 @@ public class AdvancedReportsEditor extends EditorPart {
                                 printButton.setEnabled(false);
                                 exportButton.setEnabled(false);
                             }
-                            if (reportData.size() == 1000)
+                            if (reportData.size() == -1)
                                 printButton.setEnabled(false);
                             String[] names = tree.getSelectClauses().keySet()
                                 .toArray(new String[] {});
@@ -395,12 +384,12 @@ public class AdvancedReportsEditor extends EditorPart {
                             int[] headingSizes = new int[names.length];
                             for (int i = 0; i < names.length; i++)
                                 headingSizes[i] = 100;
-                            reportTable = new SearchResultsInfoTable(top,
+                            reportTable = new ReportTableWidget(top,
                                 reportData, names, headingSizes, 40);
                             GridData gd = new GridData();
+                            gd.horizontalSpan = 2;
                             gd.grabExcessHorizontalSpace = true;
                             gd.grabExcessVerticalSpace = true;
-                            gd.horizontalSpan = 2;
                             gd.horizontalAlignment = SWT.FILL;
                             gd.verticalAlignment = SWT.FILL;
                             reportTable.setLayoutData(gd);
@@ -421,12 +410,12 @@ public class AdvancedReportsEditor extends EditorPart {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new SearchResultsInfoTable(top, null,
-            new String[] { " " }, new int[] { 500 });
+        reportTable = new ReportTableWidget(top, null, new String[] { " " },
+            new int[] { 500 });
         GridData gd = new GridData();
+        gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.grabExcessVerticalSpace = true;
-        gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;
         reportTable.setLayoutData(gd);
@@ -551,6 +540,15 @@ public class AdvancedReportsEditor extends EditorPart {
     @Override
     public void setFocus() {
         ReportsView.getTree().setSelection(new StructuredSelection(node));
+    }
+
+    @Override
+    protected void init() throws Exception {
+        node = ((ReportInput) getEditorInput()).getNode();
+
+        reportData = new ArrayList<Object>();
+        this.setPartName(node.getLabel());
+
     }
 
 }
