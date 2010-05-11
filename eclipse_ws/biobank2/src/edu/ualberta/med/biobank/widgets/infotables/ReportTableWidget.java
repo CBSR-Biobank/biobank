@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -253,58 +252,14 @@ public class ReportTableWidget extends BiobankWidget {
                 }
                 collSubList = collection.subList(start, end);
 
-                display.syncExec(new Runnable() {
+                display.asyncExec(new Runnable() {
                     public void run() {
                         if (!table.isDisposed()) {
                             tableViewer.setInput(collSubList);
                         }
                     }
                 });
-
-                try {
-                    Object selItem = null;
-                    for (int i = start; i < end; ++i) {
-                        if (table.isDisposed())
-                            return;
-                        final Object item = collection.get(i);
-                        if (item == null) {
-                            end = i;
-                            break;
-                        }
-                        display.syncExec(new Runnable() {
-                            public void run() {
-                                if (!table.isDisposed()) {
-                                    viewer.refresh(item, false);
-                                }
-                            }
-                        });
-
-                        if ((selection != null) && selection.equals(item)) {
-                            selItem = item;
-                        }
-                    }
-
-                    final Object selectedItem = selItem;
-                    display.syncExec(new Runnable() {
-                        public void run() {
-                            if (!table.isDisposed()) {
-                                if (paginationRequired) {
-                                    enablePaginationWidget(true);
-                                }
-
-                                if (selectedItem != null) {
-                                    tableViewer
-                                        .setSelection(new StructuredSelection(
-                                            selectedItem));
-                                }
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    logger.error("setCollection error", e);
-                }
             }
-
         };
         backgroundThread.start();
     }
