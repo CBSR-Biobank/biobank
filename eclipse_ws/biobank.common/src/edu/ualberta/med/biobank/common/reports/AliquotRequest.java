@@ -20,7 +20,7 @@ public class AliquotRequest extends QueryObject {
                 + " s where s.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " and s.aliquotPosition.container.label not like 'SS%' and s.patientVisit.patient.study.nameShort like ? and datediff(s.linkDate, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
+                + " and s.aliquotPosition.container.label not like 'SS%' and s.patientVisit.patient.study.nameShort like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
             new String[] { "Study", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
