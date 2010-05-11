@@ -31,7 +31,7 @@ public class SampleTypeSUsage extends QueryObject {
         super(
             "Lists sample types, and the associated studies permitting them as valid sample storage.",
             "", new String[] { "Sample Type", "Study" });
-        query1 = MessageFormat.format(query1, siteId, "nob");
+        query1 = MessageFormat.format(query1, siteId);
         query2 = MessageFormat.format(query2, siteId);
     }
 
