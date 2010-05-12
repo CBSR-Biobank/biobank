@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
@@ -86,7 +87,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         setLayout(gl);
         setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL;
+        int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.MULTI;
 
         tableViewer = new TableViewer(this, style);
 
@@ -129,12 +130,12 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
 
-        addClipboadCopySupport();
+        addClipboardCopySupport();
     }
 
     protected abstract IBaseLabelProvider getLabelProvider();
 
-    private void addClipboadCopySupport() {
+    private void addClipboardCopySupport() {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
         item.setText("Copy");
@@ -142,19 +143,28 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             @SuppressWarnings("unchecked")
             @Override
             public void widgetSelected(SelectionEvent event) {
+                BiobankLabelProvider lp = (BiobankLabelProvider) getLabelProvider();
+                int numCols = getTableViewer().getTable().getColumnCount();
                 List<Object> selectedRows = new ArrayList<Object>();
                 IStructuredSelection sel = (IStructuredSelection) tableViewer
                     .getSelection();
                 for (Iterator<Object> iterator = sel.iterator(); iterator
                     .hasNext();) {
-                    selectedRows.add(iterator.next());
+                    Object item = iterator.next();
+                    String row = "";
+                    for (int i = 0; i < numCols; i++) {
+                        row += lp.getColumnText(item, i);
+                        if (i < numCols - 1)
+                            row += ", ";
+                    }
+                    selectedRows.add(row);
                 }
                 StringBuilder sb = new StringBuilder();
                 for (Object row : selectedRows) {
                     if (sb.length() != 0) {
                         sb.append(System.getProperty("line.separator"));
                     }
-                    sb.append(row);
+                    sb.append(row.toString());
                 }
                 TextTransfer textTransfer = TextTransfer.getInstance();
                 Clipboard cb = new Clipboard(Display.getDefault());
