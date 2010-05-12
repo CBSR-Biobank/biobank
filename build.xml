@@ -73,12 +73,10 @@
     </and>
   </condition>
   <condition property="cacore.sdk.tar.available">
-    <available file="${cacore.sdk.filename}"
-               property="cacore.sdk.tar.available" />
+    <available file="${cacore.sdk.filename}"/>
   </condition>
   <condition property="cacore.sdk.available">
-    <available file="${cacore.sdk.dir}/build.xml"
-               property="cacore.sdk.available" />
+    <available file="${cacore.sdk.dir}/build.xml"/>
   </condition>
 
   <!--
@@ -500,7 +498,7 @@
   </target>
 
   <target name="clean-caCore"
-          unless="cacore.sdk.available">
+          if="cacore.sdk.available">
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
   </target>
 
