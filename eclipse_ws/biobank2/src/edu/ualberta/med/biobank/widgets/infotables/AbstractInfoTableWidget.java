@@ -69,12 +69,17 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     protected int end;
 
+    private boolean fitToInputSize;
+
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths) {
+        String[] headings, int[] columnWidths, int rowsPerPage,
+        boolean fitToInputSize) {
         super(parent, SWT.NONE);
 
+        this.fitToInputSize = fitToInputSize;
+
         pageInfo = new PageInformation();
-        pageInfo.rowsPerPage = 0;
+        pageInfo.rowsPerPage = rowsPerPage;
         pageInfo.page = 0;
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
@@ -119,7 +124,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         tableViewer.setLabelProvider(getLabelProvider());
         tableViewer.setContentProvider(new ArrayContentProvider());
 
-        this.collection = collection;
+        if (collection != null)
+            setCollection(collection);
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
@@ -190,14 +196,16 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     }
 
     public void setCollection(final List<T> collection, final T selection) {
-        this.collection = collection;
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
+        } else if (this.collection != collection) {
+            this.collection = collection;
+            init(collection);
+            setPaginationParams(collection);
         }
 
-        if (!paginationRequired)
-            setPaginationParams(collection);
+        resizeTable();
 
         if (paginationRequired) {
             setPageLabelText();
@@ -213,6 +221,30 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         };
         backgroundThread.start();
+    }
+
+    protected abstract void init(List<T> collection);
+
+    protected void fitToInputSize(boolean fit) {
+        this.fitToInputSize = fit;
+    }
+
+    private void resizeTable() {
+        Table table = getTableViewer().getTable();
+        GridData gd = (GridData) table.getLayoutData();
+
+        int rows = 5;
+        if (fitToInputSize && (pageInfo.rowsPerPage > 0)) {
+            rows = Math.min(collection.size(), pageInfo.rowsPerPage);
+        } else if (fitToInputSize && (collection != null)) {
+            rows = Math.min(collection.size(), rows);
+        } else if (!fitToInputSize) {
+            rows = pageInfo.rowsPerPage;
+        }
+
+        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
+        table.layout(true);
+        layout(true, true);
     }
 
     protected abstract void setPaginationParams(List<T> collection);

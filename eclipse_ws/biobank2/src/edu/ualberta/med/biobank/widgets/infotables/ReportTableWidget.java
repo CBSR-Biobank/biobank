@@ -22,15 +22,12 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths);
-        pageInfo.rowsPerPage = 0;
-        pageInfo.page = 0;
+        super(parent, collection, headings, columnWidths, 40, false);
     }
 
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
-        this(parent, collection, headings, columnWidths);
-        pageInfo.rowsPerPage = rowsPerPage;
+        super(parent, collection, headings, columnWidths, rowsPerPage, false);
     }
 
     @Override
@@ -201,6 +198,11 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
     @Override
     protected void setPageLabelText() {
         pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
+    }
+
+    @Override
+    protected void init(List<T> collection) {
+
     }
 
 }

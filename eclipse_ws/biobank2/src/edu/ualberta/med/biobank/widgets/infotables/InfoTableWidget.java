@@ -13,7 +13,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
@@ -81,13 +80,20 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths);
+        super(parent, collection, headings, columnWidths, 5, true);
+    }
 
+    public InfoTableWidget(Composite parent, List<T> collection,
+        String[] headings, int[] columnWidths, int rowsPerPage) {
+        super(parent, collection, headings, columnWidths, rowsPerPage, true);
+    }
+
+    @Override
+    protected void init(List<T> collection) {
         reloadData = true;
-        model = new ArrayList<BiobankCollectionModel>();
 
-        if (collection != null)
-            initModel(collection);
+        model = new ArrayList<BiobankCollectionModel>();
+        initModel(collection);
 
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override
@@ -98,17 +104,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             }
         });
         setSorter();
-    }
-
-    public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths, int rowsPerPage) {
-        this(parent, null, headings, columnWidths);
-        pageInfo.rowsPerPage = rowsPerPage;
-        if (collection != null) {
-            initModel(collection);
-            setCollection(collection);
-        }
-        resizeTable();
     }
 
     @Override
@@ -124,8 +119,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             addPaginationWidget();
             getTableViewer().refresh();
         }
-        if (model.size() == 0)
-            initModel(collection);
     }
 
     /**
@@ -231,7 +224,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             public void run() {
                 if (!table.isDisposed()) {
                     tableViewer.setInput(modelSubList);
-                    resizeTable();
                 }
             }
         });
@@ -484,17 +476,4 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             + pageInfo.pageTotal);
     }
 
-    private void resizeTable() {
-        int rows = 5;
-        if (!isEditMode() && (pageInfo.rowsPerPage > 0) && (model != null)) {
-            rows = Math.min(model.size(), pageInfo.rowsPerPage);
-        } else if (!isEditMode() && (model != null)) {
-            rows = Math.min(model.size(), rows);
-        }
-
-        Table table = getTableViewer().getTable();
-        GridData gd = (GridData) table.getLayoutData();
-        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
-        layout(true);
-    }
 }
