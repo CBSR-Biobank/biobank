@@ -219,7 +219,7 @@ public class ReportsEditor extends BiobankFormBase {
                             reportTable = new ReportTableWidget<Object>(form
                                 .getBody(), reportData, query.getColumnNames(),
                                 columnWidths.get(query.getClass()), 40);
-                            form.layout(true, true);
+                            form.reflow(true);
                         }
                     });
 

@@ -86,8 +86,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         setLayout(gl);
         setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        int style = SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
-            | SWT.FULL_SELECTION | SWT.VIRTUAL;
+        int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL;
 
         tableViewer = new TableViewer(this, style);
 
