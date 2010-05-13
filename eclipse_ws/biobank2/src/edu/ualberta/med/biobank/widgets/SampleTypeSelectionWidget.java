@@ -139,6 +139,14 @@ public class SampleTypeSelectionWidget {
         textNumber.setText(text);
     }
 
+    public void addOneToNumber() {
+        this.number++;
+        setNumber(number);
+        if (getSelection() != null) {
+            selectionDone.setValue(true);
+        }
+    }
+
     /**
      * return true if this selection need to be save, i.e. number > 0
      */

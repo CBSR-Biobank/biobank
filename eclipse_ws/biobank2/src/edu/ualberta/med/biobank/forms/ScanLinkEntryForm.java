@@ -13,6 +13,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -143,6 +145,43 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     customSelection.setNumber(mse.selections);
                 }
             });
+        spw.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                scanTubeAlone(e);
+            }
+        });
+    }
+
+    private void scanTubeAlone(MouseEvent e) {
+        if (isScanHasBeenLaunched()) {
+            RowColPos rcp = ((ScanLinkPalletWidget) e.widget)
+                .getPositionAtCoordinates(e.x, e.y);
+            if (rcp != null) {
+                PalletCell cell = cells.get(rcp);
+                if (cell == null
+                    || (cell.getStatus() == AliquotCellStatus.EMPTY)) {
+                    String value = scanTubeAlone();
+                    if (value != null && !value.isEmpty()) {
+                        if (cell == null) {
+                            cell = new PalletCell(new ScanCell(rcp.row,
+                                rcp.col, value));
+                            cells.put(rcp, cell);
+                        } else {
+                            cell.setValue(value);
+                        }
+                        try {
+                            processCellStatus(cell, true);
+                        } catch (ApplicationException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                        spw.redraw();
+                        form.layout();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -398,6 +437,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
+                form.layout(true, true);
             }
         });
     }
@@ -490,10 +530,15 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
     }
 
+    private void processCellStatus(PalletCell cell) throws ApplicationException {
+        processCellStatus(cell, false);
+    }
+
     /**
      * Process the cell: apply a status and set correct information
      */
-    private void processCellStatus(PalletCell cell) throws ApplicationException {
+    private void processCellStatus(PalletCell cell, boolean independantProcess)
+        throws ApplicationException {
         if (cell != null) {
             String value = cell.getValue();
             if (value != null) {
@@ -514,6 +559,16 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                             .getPatientVisit().getPatient().getPnumber());
                 } else {
                     cell.setStatus(AliquotCellStatus.NO_TYPE);
+                    if (independantProcess) {
+                        SampleTypeSelectionWidget widget = sampleTypeWidgets
+                            .get(cell.getRow());
+                        widget.addOneToNumber();
+                        SampleTypeWrapper type = widget.getSelection();
+                        if (type != null) {
+                            cell.setType(type);
+                            cell.setStatus(AliquotCellStatus.TYPE);
+                        }
+                    }
                 }
             } else {
                 cell.setStatus(AliquotCellStatus.EMPTY);
@@ -572,10 +627,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                             if (PalletCell.hasValue(cell)) {
                                 cell.setType(type);
                                 cell.setStatus(AliquotCellStatus.TYPE);
-                                spw.redraw();
                             }
                         }
                     }
+                    spw.redraw();
                 }
             }
         }

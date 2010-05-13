@@ -6,6 +6,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -26,6 +27,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -308,6 +310,10 @@ public abstract class AbstractPalletAliquotAdminForm extends
         scanHasBeenLaunchedValue.setValue(true);
     }
 
+    protected boolean isScanHasBeenLaunched() {
+        return scanHasBeenLaunchedValue.getValue().equals(true);
+    }
+
     protected void setScanHasBeenLauched(boolean async) {
         if (async)
             Display.getDefault().asyncExec(new Runnable() {
@@ -352,5 +358,14 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void setCanLaunchScan(boolean canLauch) {
         canLaunchScanValue.setValue(canLauch);
+    }
+
+    protected String scanTubeAlone() {
+        ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell());
+        if (dlg.open() == Dialog.OK) {
+            return dlg.getScannedValue();
+        }
+        return null;
     }
 }

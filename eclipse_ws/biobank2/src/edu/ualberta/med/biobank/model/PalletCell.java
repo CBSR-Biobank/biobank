@@ -157,6 +157,12 @@ public class PalletCell extends Cell {
         return null;
     }
 
+    public void setValue(String value) {
+        if (scanCell != null) {
+            scanCell.setValue(value);
+        }
+    }
+
     @Override
     public Integer getRow() {
         if (scanCell != null) {
