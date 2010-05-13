@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.views;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -28,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
@@ -147,14 +149,26 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
         if (wrapper instanceof ShipmentWrapper) {
             ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
-            ClinicAdapter clinicAdapter = (ClinicAdapter) parentNode
+
+            AdapterBase topNode = parentNode;
+            if (parentNode.equals(searchedNode) && !radioWaybill.getSelection()) {
+                Date date = dateReceivedWidget.getDate();
+                AdapterBase dateNode = parentNode
+                    .accept(new ShipmentViewNodeSearchVisitor(date));
+                if (dateNode == null) {
+                    dateNode = new DateNode(parentNode, dateReceivedWidget
+                        .getDate());
+                    parentNode.addChild(dateNode);
+                }
+                topNode = dateNode;
+            }
+            ClinicAdapter clinicAdapter = (ClinicAdapter) topNode
                 .accept(new ShipmentViewNodeSearchVisitor(shipment.getClinic()));
             if (clinicAdapter == null) {
-                clinicAdapter = new ClinicAdapter(parentNode, shipment
-                    .getClinic());
+                clinicAdapter = new ClinicAdapter(topNode, shipment.getClinic());
                 clinicAdapter.setEditable(false);
                 clinicAdapter.setLoadChildrenInBackground(false);
-                parentNode.addChild(clinicAdapter);
+                topNode.addChild(clinicAdapter);
             }
             ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
                 .accept(new ShipmentViewNodeSearchVisitor(shipment));
