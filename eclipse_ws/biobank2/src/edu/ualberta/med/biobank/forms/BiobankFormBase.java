@@ -303,7 +303,7 @@ public abstract class BiobankFormBase extends EditorPart {
     protected Text createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
         Text result = (Text) createLabelledWidget(parent, Text.class,
-            SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+            SWT.READ_ONLY | SWT.MULTI | widgetOptions, fieldLabel, value);
         return result;
     }
 
