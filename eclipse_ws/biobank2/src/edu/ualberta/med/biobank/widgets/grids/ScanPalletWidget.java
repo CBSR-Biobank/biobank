@@ -158,13 +158,20 @@ public class ScanPalletWidget extends AbstractGridWidget {
         if (cells == null) {
             return null;
         }
-        int col = xPosition / getCellWidth();
-        int row = yPosition / getCellHeight();
-        if (col >= 0 && col < ScanCell.COL_MAX && row >= 0
-            && row < ScanCell.ROW_MAX) {
-            return cells.get(new RowColPos(row, col));
+        RowColPos rcp = getPositionAtCoordinates(xPosition, yPosition);
+        if (rcp != null) {
+            return cells.get(rcp);
         }
         return null;
     }
 
+    public RowColPos getPositionAtCoordinates(int xPosition, int yPosition) {
+        int col = xPosition / getCellWidth();
+        int row = yPosition / getCellHeight();
+        if (col >= 0 && col < ScanCell.COL_MAX && row >= 0
+            && row < ScanCell.ROW_MAX) {
+            return new RowColPos(row, col);
+        }
+        return null;
+    }
 }
