@@ -92,7 +92,7 @@ public class LinkFormPatientManagement {
         patientNumberText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
-        aliquotAdminForm.setFirstControl(patientNumberText);
+        setFirstControl();
     }
 
     protected void createVisitCombo(Composite compositeFields) {
@@ -282,4 +282,7 @@ public class LinkFormPatientManagement {
         }
     }
 
+    public void setFirstControl() {
+        aliquotAdminForm.setFirstControl(patientNumberText);
+    }
 }

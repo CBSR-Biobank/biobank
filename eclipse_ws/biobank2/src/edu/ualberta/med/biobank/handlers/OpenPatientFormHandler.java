@@ -45,7 +45,7 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
                     .getActivePage();
                 // open the editor
                 AdapterBase.openForm(new FormInput(SessionManager.getInstance()
-                    .getSession()), editorId);
+                    .getSession()), editorId, true);
                 hideConsoleViewIcons(page);
             }
         } catch (WorkbenchException e) {

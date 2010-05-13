@@ -547,11 +547,16 @@ public abstract class AdapterBase {
     }
 
     public static IEditorPart openForm(FormInput input, String id) {
+        return openForm(input, id, false);
+    }
+
+    public static IEditorPart openForm(FormInput input, String id,
+        boolean focusOnEditor) {
         closeEditor(input);
         try {
             IEditorPart part = PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().openEditor(input,
-                    id, false);
+                    id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
             logger.error("Can't open form with id " + id, e);
