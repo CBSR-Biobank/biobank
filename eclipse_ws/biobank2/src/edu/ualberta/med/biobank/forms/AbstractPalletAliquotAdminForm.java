@@ -12,6 +12,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -28,10 +29,12 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
+import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 
@@ -64,6 +67,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private Button scanChoiceSimple;
     private boolean isScanChoiceSimple;
+
+    private boolean scanTubeAloneMode = true;
 
     @Override
     protected void init() {
@@ -360,12 +365,47 @@ public abstract class AbstractPalletAliquotAdminForm extends
         canLaunchScanValue.setValue(canLauch);
     }
 
-    protected String scanTubeAlone() {
+    private String scanTubeAloneDialog() {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell());
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
         return null;
+    }
+
+    protected void scanTubeAlone(MouseEvent e) {
+        if (scanTubeAloneMode && isScanHasBeenLaunched()) {
+            RowColPos rcp = ((ScanPalletWidget) e.widget)
+                .getPositionAtCoordinates(e.x, e.y);
+            if (rcp != null) {
+                PalletCell cell = cells.get(rcp);
+                if (cell == null
+                    || (cell.getStatus() == AliquotCellStatus.EMPTY)) {
+                    String value = scanTubeAloneDialog();
+                    if (value != null && !value.isEmpty()) {
+                        if (cell == null) {
+                            cell = new PalletCell(new ScanCell(rcp.row,
+                                rcp.col, value));
+                            cells.put(rcp, cell);
+                        } else {
+                            cell.setValue(value);
+                        }
+                        try {
+                            postprocessScanTubeAlone(cell);
+                        } catch (Exception ex) {
+                            BioBankPlugin.openAsyncError("Scan tube error", ex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected abstract void postprocessScanTubeAlone(PalletCell cell)
+        throws Exception;
+
+    protected boolean isScanTubeAloneMode() {
+        return scanTubeAloneMode;
     }
 }

@@ -44,11 +44,9 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
-import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
@@ -346,26 +344,35 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
-                    .getObjectAtCoordinates(e.x, e.y);
-                manageCellProblem((PalletCell) cell);
+                manageDoubleClick(e);
             }
         });
-
         showOnlyPallet(true);
     }
 
-    protected void manageCellProblem(PalletCell cell) {
-        if (cell != null) {
-            switch (cell.getStatus()) {
-            case ERROR:
-                // do something ?
-                break;
-            case MISSING:
-                SessionManager.openViewForm(cell.getExpectedAliquot());
-                break;
+    protected void manageDoubleClick(MouseEvent e) {
+        if (isScanTubeAloneMode()) {
+            scanTubeAlone(e);
+        } else {
+            PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
+                .getObjectAtCoordinates(e.x, e.y);
+            if (cell != null) {
+                switch (cell.getStatus()) {
+                case ERROR:
+                    // do something ?
+                    break;
+                case MISSING:
+                    SessionManager.openViewForm(cell.getExpectedAliquot());
+                    break;
+                }
             }
         }
+    }
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        processCellStatus(cell);
+        palletWidget.redraw();
     }
 
     private GridLayout getNeutralGridLayout() {
@@ -486,8 +493,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                         expectedAliquot = expectedAliquots.get(rcp);
                         if (expectedAliquot != null) {
                             if (cell == null) {
-                                cell = new PalletCell(new ScanCell(row, col,
-                                    null));
+                                cell = new PalletCell(new ScanCell(rcp.row,
+                                    rcp.col, null));
                                 cells.put(rcp, cell);
                             }
                             cell.setExpectedAliquot(expectedAliquot);
