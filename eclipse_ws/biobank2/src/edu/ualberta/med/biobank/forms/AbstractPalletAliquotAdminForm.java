@@ -12,6 +12,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,6 +22,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -68,7 +70,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private Button scanChoiceSimple;
     private boolean isScanChoiceSimple;
 
-    private boolean scanTubeAloneMode = true;
+    private boolean scanTubeAloneMode = false;
+
+    private Label scanTubeAloneSwitch;
 
     @Override
     protected void init() {
@@ -290,6 +294,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void setScanNotLauched() {
         scanHasBeenLaunchedValue.setValue(false);
+        scanTubeAloneSwitch.setVisible(false);
     }
 
     protected void setScanNotLauched(boolean async) {
@@ -313,6 +318,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void setScanHasBeenLauched() {
         scanHasBeenLaunchedValue.setValue(true);
+        scanTubeAloneSwitch.setVisible(true);
     }
 
     protected boolean isScanHasBeenLaunched() {
@@ -365,9 +371,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
         canLaunchScanValue.setValue(canLauch);
     }
 
-    private String scanTubeAloneDialog() {
+    private String scanTubeAloneDialog(RowColPos rcp) {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell());
+            .getActiveWorkbenchWindow().getShell(), cells, rcp);
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
@@ -380,9 +386,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 .getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
                 PalletCell cell = cells.get(rcp);
-                if (cell == null
-                    || (cell.getStatus() == AliquotCellStatus.EMPTY)) {
-                    String value = scanTubeAloneDialog();
+                if (canScanTubeAlone(cell)) {
+                    String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
                             cell = new PalletCell(new ScanCell(rcp.row,
@@ -402,10 +407,38 @@ public abstract class AbstractPalletAliquotAdminForm extends
         }
     }
 
+    protected boolean canScanTubeAlone(PalletCell cell) {
+        return cell == null || cell.getStatus() == AliquotCellStatus.EMPTY;
+    }
+
     protected abstract void postprocessScanTubeAlone(PalletCell cell)
         throws Exception;
 
     protected boolean isScanTubeAloneMode() {
         return scanTubeAloneMode;
+    }
+
+    protected void createScanTubeAloneButton(Composite parent) {
+        scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE);
+        GridData gd = new GridData();
+        gd.verticalAlignment = SWT.TOP;
+        scanTubeAloneSwitch.setLayoutData(gd);
+        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+            .getImageRegistry().get(BioBankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                scanTubeAloneMode = !scanTubeAloneMode;
+                if (scanTubeAloneMode) {
+                    scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                        .getImageRegistry().get(
+                            BioBankPlugin.IMG_SCAN_CLOSE_EDIT));
+                } else {
+                    scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                        .getImageRegistry().get(BioBankPlugin.IMG_SCAN_EDIT));
+                }
+            }
+        });
+        scanTubeAloneSwitch.setVisible(false);
     }
 }
