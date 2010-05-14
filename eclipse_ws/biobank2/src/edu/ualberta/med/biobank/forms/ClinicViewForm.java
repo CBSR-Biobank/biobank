@@ -90,7 +90,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
             Button.class, SWT.NONE, "Sends Shipments");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.MULTI | SWT.WRAP, "Comments");
         shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Shipments");
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,

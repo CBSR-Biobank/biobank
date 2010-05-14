@@ -132,8 +132,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-                container, "comment"), null);
+            SWT.MULTI | SWT.WRAP, "Comments", null, BeansObservables
+                .observeValue(container, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

@@ -176,8 +176,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createPvDataSection(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
-            null, BeansObservables.observeValue(patientVisit, "comment"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI | SWT.WRAP,
+            "Comments", null, BeansObservables.observeValue(patientVisit,
+                "comment"), null);
     }
 
     private void createSourcesSection() {

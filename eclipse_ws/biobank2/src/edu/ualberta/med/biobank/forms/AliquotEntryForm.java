@@ -107,11 +107,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
             true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(aliquot,
-                "comment"), null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
+            SWT.WRAP | SWT.MULTI, "Comments", null, BeansObservables
+                .observeValue(aliquot, "comment"), null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }

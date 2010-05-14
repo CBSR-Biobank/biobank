@@ -99,12 +99,15 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Repository Site");
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Repository Site");
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Short Name");
         isTopLevelButton = (Button) createLabelledWidget(client, Button.class,
             SWT.NONE, "Top Level Container");
-        rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE, "Maximum Rows");
+        rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Maximum Rows");
         colCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Maximum Columns");
         defaultTempLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -113,7 +116,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             "Child Labeling Scheme");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.MULTI | SWT.WRAP, "Comments");
 
         setContainerTypeValues();
     }

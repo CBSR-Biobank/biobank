@@ -102,7 +102,8 @@ public class AliquotViewForm extends BiobankViewForm {
             "Date Drawn");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comment");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.WRAP | SWT.MULTI, "Comment");
         positionLabel = createReadOnlyLabelledField(client, SWT.WRAP,
             "Position");
     }

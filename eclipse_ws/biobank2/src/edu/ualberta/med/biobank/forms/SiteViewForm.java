@@ -98,10 +98,12 @@ public class SiteViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Short Name");
         clinicCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Clinics");
-        studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE, "Total Studies");
+        studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Studies");
         containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Container Types");
         topContainerCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -116,7 +118,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             "Total Samples");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.MULTI | SWT.WRAP, "Comments");
         setSiteSectionValues();
     }
 
