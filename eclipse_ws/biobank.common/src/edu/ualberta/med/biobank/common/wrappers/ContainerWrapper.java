@@ -942,19 +942,19 @@ public class ContainerWrapper extends
         return null;
     }
 
-    /**
-     * init this wrapper with the given containerWrapper.
-     * 
-     * @throws WrapperException
-     */
-    public void initObjectWith(ContainerWrapper containerWrapper)
-        throws WrapperException {
-        if (containerWrapper == null) {
-            throw new WrapperException(
-                "Cannot init internal object with a null container");
-        }
-        setWrappedObject(containerWrapper.wrappedObject);
-    }
+    // /**
+    // * init this wrapper with the given containerWrapper.
+    // *
+    // * @throws WrapperException
+    // */
+    // public void initObjectWith(ContainerWrapper containerWrapper)
+    // throws WrapperException {
+    // if (containerWrapper == null) {
+    // throw new WrapperException(
+    // "Cannot init internal object with a null container");
+    // }
+    // setWrappedObject(containerWrapper.wrappedObject);
+    // }
 
     @Override
     protected void resetInternalField() {
