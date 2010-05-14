@@ -62,7 +62,7 @@
 		</property>
 	</bean>
 
-	<bean id="csmAuthenticationProvider" class="gov.nih.nci.system.security.acegi.authentication.CSMAuthenticationProvider">
+	<bean id="csmAuthenticationProvider" class="edu.ualberta.med.biobank.server.security.BiobankAuthenticationProvider">
 		<property name="userDetailsService">
 			<ref bean="userDetailsService"/>
 		</property>

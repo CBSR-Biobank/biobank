@@ -44,11 +44,9 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
-import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
@@ -306,7 +304,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private void createContainersVisualisationSection() {
         containersComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = getNeutralGridLayout();
-        layout.numColumns = 2;
+        layout.numColumns = 3;
         containersComposite.setLayout(layout);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.CENTER;
@@ -318,7 +316,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             .createComposite(containersComposite);
         freezerComposite.setLayout(getNeutralGridLayout());
         GridData gdFreezer = new GridData();
-        gdFreezer.horizontalSpan = 2;
+        gdFreezer.horizontalSpan = 3;
         gdFreezer.horizontalAlignment = SWT.RIGHT;
         freezerComposite.setLayoutData(gdFreezer);
         freezerLabel = toolkit.createLabel(freezerComposite, "Freezer"); //$NON-NLS-1$
@@ -346,26 +344,45 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
-                    .getObjectAtCoordinates(e.x, e.y);
-                manageCellProblem((PalletCell) cell);
+                manageDoubleClick(e);
             }
         });
-
         showOnlyPallet(true);
+
+        createScanTubeAloneButton(containersComposite);
     }
 
-    protected void manageCellProblem(PalletCell cell) {
-        if (cell != null) {
-            switch (cell.getStatus()) {
-            case ERROR:
-                // do something ?
-                break;
-            case MISSING:
-                SessionManager.openViewForm(cell.getExpectedAliquot());
-                break;
+    protected void manageDoubleClick(MouseEvent e) {
+        if (isScanTubeAloneMode()) {
+            scanTubeAlone(e);
+        } else {
+            PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
+                .getObjectAtCoordinates(e.x, e.y);
+            if (cell != null) {
+                switch (cell.getStatus()) {
+                case ERROR:
+                    // do something ?
+                    break;
+                case MISSING:
+                    SessionManager.openViewForm(cell.getExpectedAliquot());
+                    break;
+                }
             }
         }
+    }
+
+    @Override
+    protected boolean canScanTubeAlone(PalletCell cell) {
+        return super.canScanTubeAlone(cell)
+            || cell.getStatus() == AliquotCellStatus.MISSING;
+    }
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        processCellStatus(cell);
+        currentScanState = currentScanState.mergeWith(cell.getStatus());
+        setScanValid(currentScanState != AliquotCellStatus.ERROR);
+        palletWidget.redraw();
     }
 
     private GridLayout getNeutralGridLayout() {
@@ -486,8 +503,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                         expectedAliquot = expectedAliquots.get(rcp);
                         if (expectedAliquot != null) {
                             if (cell == null) {
-                                cell = new PalletCell(new ScanCell(row, col,
-                                    null));
+                                cell = new PalletCell(new ScanCell(rcp.row,
+                                    rcp.col, null));
                                 cells.put(rcp, cell);
                             }
                             cell.setExpectedAliquot(expectedAliquot);
@@ -855,6 +872,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (!beforeScan) {
             setDirty(false);
         }
+        setFocus();
     }
 
     private void initPalletValues() {

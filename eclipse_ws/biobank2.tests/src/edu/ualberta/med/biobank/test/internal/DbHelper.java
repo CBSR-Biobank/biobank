@@ -60,6 +60,7 @@ public class DbHelper {
 
         for (StudyWrapper study : studies) {
             deletePatients(study.getPatientCollection());
+            deleteFromList(study.getSampleStorageCollection());
             study.reload();
             study.delete();
         }

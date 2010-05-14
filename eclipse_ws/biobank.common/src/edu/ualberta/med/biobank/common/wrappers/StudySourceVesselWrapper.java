@@ -25,7 +25,7 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "sourceVessel", "study", "needTimeDrawn",
-            "needRealVolume" };
+            "needOriginalVolume" };
     }
 
     @Override
@@ -95,14 +95,14 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
         return wrappedObject.getNeedTimeDrawn();
     }
 
-    public void setNeedRealVolume(Boolean needRealVolume) {
-        Boolean oldNeedRealVolume = wrappedObject.getNeedRealVolume();
-        wrappedObject.setNeedRealVolume(needRealVolume);
-        propertyChangeSupport.firePropertyChange("needRealVolume",
-            oldNeedRealVolume, needRealVolume);
+    public void setNeedOriginalVolume(Boolean needOriginalVolume) {
+        Boolean oldNeedOriginalVolume = wrappedObject.getNeedRealVolume();
+        wrappedObject.setNeedRealVolume(needOriginalVolume);
+        propertyChangeSupport.firePropertyChange("needOriginalVolume",
+            oldNeedOriginalVolume, needOriginalVolume);
     }
 
-    public Boolean getNeedRealVolume() {
+    public Boolean getNeedOriginalVolume() {
         return wrappedObject.getNeedRealVolume();
     }
 

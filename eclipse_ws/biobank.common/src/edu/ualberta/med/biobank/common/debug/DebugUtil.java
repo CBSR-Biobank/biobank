@@ -68,7 +68,8 @@ public class DebugUtil {
             .asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (Aliquot aliquot : aliquots) {
+        for (int i = 0; i < aliquots.size() && i < 100; i++) {
+            Aliquot aliquot = aliquots.get(i);
             list.add(new AliquotWrapper(appService, aliquot));
         }
         return list;

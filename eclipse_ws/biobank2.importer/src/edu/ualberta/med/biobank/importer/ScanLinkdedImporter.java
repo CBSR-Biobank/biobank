@@ -119,7 +119,7 @@ public class ScanLinkdedImporter {
 
         String qryPart = "from " + freezerLinkTable
             + " join sample_list on sample_list.sample_nr=" + freezerLinkTable
-            + ".sample_nr " + "join patient_visit on patient_visit.visit_nr="
+            + ".sample_nr join patient_visit on patient_visit.visit_nr="
             + freezerLinkTable + ".visit_nr "
             + "join patient on patient.patient_nr=patient_visit.patient_nr "
             + "join study_list on study_list.study_nr=patient_visit.study_nr "

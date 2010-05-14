@@ -52,7 +52,10 @@
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
-  <condition property="debugMode" value="-debug" else="">
+  <condition property="debugFileExtension" value="-debug" else="">
+    <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+  </condition>
+  <condition property="LOG4J_LEVEL" value="info" else="error">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
@@ -70,12 +73,10 @@
     </and>
   </condition>
   <condition property="cacore.sdk.tar.available">
-    <available file="${cacore.sdk.filename}"
-               property="cacore.sdk.tar.available" />
+    <available file="${cacore.sdk.filename}"/>
   </condition>
   <condition property="cacore.sdk.available">
-    <available file="${cacore.sdk.dir}/build.xml"
-               property="cacore.sdk.available" />
+    <available file="${cacore.sdk.dir}/build.xml"/>
   </condition>
 
   <!--
@@ -178,7 +179,8 @@
     <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
     <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
     <copy file="security-logs/clm-log4j/log4j.xml"
-          tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" />
+          tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
+    <replace file="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}"/>
     <copy todir="${cacore.sdk.dir}/system/lib/"  file="${eclipse.proj.dir.server}/output/biobank-validators.jar" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
@@ -306,7 +308,7 @@
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
           overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/server${debugMode}.xml"
+    <copy file="${secu-log.dir}/jboss/server${debugFileExtension}.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
           overwrite="true" />
     <!-- for compatibility: this file has been split -->
@@ -496,7 +498,7 @@
   </target>
 
   <target name="clean-caCore"
-          unless="cacore.sdk.available">
+          if="cacore.sdk.available">
     <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
   </target>
 

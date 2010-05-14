@@ -120,13 +120,13 @@ public class TestStudySourceVessel extends TestDatabase {
         SourceVesselWrapper ss1 = SourceVesselHelper.addSourceVessel(name);
         StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
             .newStudySourceVessel(study, ss1);
-        ssv1.setNeedRealVolume(true);
+        ssv1.setNeedOriginalVolume(true);
         ssv1.persist();
 
-        Boolean oldNeedVolume = ssv1.getNeedRealVolume();
-        ssv1.setNeedRealVolume(false);
+        Boolean oldNeedVolume = ssv1.getNeedOriginalVolume();
+        ssv1.setNeedOriginalVolume(false);
         ssv1.reset();
-        Assert.assertEquals(oldNeedVolume, ssv1.getNeedRealVolume());
+        Assert.assertEquals(oldNeedVolume, ssv1.getNeedOriginalVolume());
     }
 
     @Test
@@ -139,10 +139,10 @@ public class TestStudySourceVessel extends TestDatabase {
         StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
             .newStudySourceVessel(study, ss1);
 
-        Boolean oldNeedVolume = ssv1.getNeedRealVolume();
-        ssv1.setNeedRealVolume(false);
+        Boolean oldNeedVolume = ssv1.getNeedOriginalVolume();
+        ssv1.setNeedOriginalVolume(false);
         ssv1.reset();
-        Assert.assertEquals(oldNeedVolume, ssv1.getNeedRealVolume());
+        Assert.assertEquals(oldNeedVolume, ssv1.getNeedOriginalVolume());
     }
 
     @Test

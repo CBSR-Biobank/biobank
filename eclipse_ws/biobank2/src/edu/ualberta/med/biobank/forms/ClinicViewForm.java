@@ -84,14 +84,17 @@ public class ClinicViewForm extends AddressViewFormCommon {
         siteLabel = createReadOnlyLabelledField(client, SWT.READ_ONLY,
             "Repository Site");
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
-        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
-        hasShipmentsButton = (Button) createLabelledWidget(client, Button.class,
-            SWT.NONE, "Sends Shipments");
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Short Name");
+        hasShipmentsButton = (Button) createLabelledWidget(client,
+            Button.class, SWT.NONE, "Sends Shipments");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.NONE, "Comments");
-        shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE, "Total Shipments");
-        patientTotal = createReadOnlyLabelledField(client, SWT.NONE, "Total Patients");
+        shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Shipments");
+        patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Patients");
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patient Visits");
 
@@ -105,9 +108,9 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
-        setTextValue(shipmentTotal, clinic.getShipmentCollection().size());
+        setTextValue(shipmentTotal, clinic.getShipmentCount());
         setTextValue(patientTotal, clinic.getPatientCount());
-        setTextValue(visitTotal, clinic.getPatientVisitCollection().size());
+        setTextValue(visitTotal, clinic.getPatientVisitCount());
     }
 
     private void createContactsSection() {

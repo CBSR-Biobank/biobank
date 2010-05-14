@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -50,9 +51,9 @@ import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallb
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
@@ -113,12 +114,11 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean oldPositionCheckModified;
 
-    private NonEmptyStringValidator oldCabinetPositionCheckValidator;
+    private AbstractValidator oldCabinetPositionCheckValidator;
 
     private List<SampleTypeWrapper> cabinetSampleTypes;
 
     private static final String SAMPLE_TYPE_LIST_BINDING = "sample-type-list-binding";
-    private static final String OLD_POSITION_BINDING = "old-position-binding";
 
     @Override
     protected void init() {
@@ -329,30 +329,32 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getString("Cabinet.old.position.check.label"));
         oldCabinetPositionCheckLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        oldCabinetPositionCheckValidator = new NonEmptyStringValidator(
-            "Enter old position");
+        oldCabinetPositionCheckValidator = new AbstractValidator(
+            "Enter correct old position") {
+            @Override
+            public IStatus validate(Object value) {
+                if (value != null && !(value instanceof String)) {
+                    throw new RuntimeException(
+                        "Not supposed to be called for non-strings.");
+                }
+
+                if (value != null) {
+                    String s = (String) value;
+                    if (s.equals(oldCabinetPosition.getText())) {
+                        hideDecoration();
+                        return Status.OK_STATUS;
+                    }
+                }
+                showDecoration();
+                return ValidationStatus.error(errorMessage);
+            }
+        };
         oldCabinetPositionCheck = (Text) widgetCreator.createBoundWidget(
             fieldsComposite, Text.class, SWT.NONE,
             oldCabinetPositionCheckLabel, new String[0], new WritableValue("",
-                String.class), oldCabinetPositionCheckValidator,
-            OLD_POSITION_BINDING);
+                String.class), oldCabinetPositionCheckValidator);
         gd = (GridData) oldCabinetPositionCheck.getLayoutData();
         gd.horizontalSpan = 2;
-        oldCabinetPositionCheck.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (oldPositionCheckModified) {
-                    checkOldPosition();
-                }
-                oldPositionCheckModified = false;
-            }
-        });
-        oldCabinetPositionCheck.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                oldPositionCheckModified = true;
-            }
-        });
 
         // for all modes: position to be assigned to the aliquot
         newCabinetPositionLabel = widgetCreator.createLabel(fieldsComposite,
@@ -402,20 +404,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         displayOldCabinetFields(false);
     }
 
-    protected void checkOldPosition() {
-        String userOldPosition = oldCabinetPositionCheck.getText();
-        if (aliquot != null) {
-            if (aliquot.getPositionString(true, false).equals(userOldPosition)) {
-                canLaunchCheck.setValue(true);
-            } else {
-                BioBankPlugin
-                    .openAsyncError("Old Position",
-                        "Old position entered doesn't match the current position in database");
-                canLaunchCheck.setValue(false);
-            }
-        }
-    }
-
     private void displayOldCabinetFields(boolean displayOld) {
         oldCabinetPositionLabel.setVisible(displayOld);
         ((GridData) oldCabinetPositionLabel.getLayoutData()).exclude = !displayOld;
@@ -428,16 +416,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (displayOld) {
             newCabinetPositionLabel.setText(Messages
                 .getString("Cabinet.new.position.label"));
-            widgetCreator.addBinding(OLD_POSITION_BINDING);
-            oldCabinetPositionCheckValidator.validate(oldCabinetPositionCheck
-                .getText());
+            oldCabinetPositionCheck.setText("");
         } else {
             newCabinetPositionLabel.setText(Messages
                 .getString("Cabinet.position.label"));
-            widgetCreator.removeBinding(OLD_POSITION_BINDING);
-            oldCabinetPositionCheckValidator.validate("**");
+            oldCabinetPositionCheck.setText(oldCabinetPosition.getText());
         }
-
         form.layout(true, true);
     }
 
@@ -494,6 +478,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             displayOldCabinetFields(moveMode);
             enableAndShowSampleTypeCombo(!moveMode);
             canLaunchCheck.setValue(true);
+            if (moveMode) {
+                setFirstControl(oldCabinetPositionCheck);
+                setFocus();
+            } else {
+                linkFormPatientManagement.setFirstControl();
+                setFocus();
+            }
 
             form.layout(true, true);
         } catch (Exception ex) {
@@ -711,7 +702,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         reset();
         aliquot.setInventoryId(inventoryId);
         inventoryIdText.setText(inventoryId);
-        oldCabinetPositionCheck.setText("");
+        oldCabinetPositionCheck.setText("?");
 
         appendLogNLS("Cabinet.activitylog.gettingInfoId", //$NON-NLS-1$
             aliquot.getInventoryId());
@@ -734,7 +725,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         List<SampleTypeWrapper> possibleTypes = getCabinetSampleTypes();
         if (!possibleTypes.contains(aliquot.getSampleType())) {
             canLaunchCheck.setValue(false);
-
             throw new Exception(
                 "This aliquot is of type " + aliquot.getSampleType().getNameShort() //$NON-NLS-1$
                     + ": this is not a cabinet type");
@@ -747,12 +737,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (positionString == null) {
             widgetCreator.hideWidget(oldCabinetPositionCheckLabel);
             widgetCreator.hideWidget(oldCabinetPositionCheck);
-            widgetCreator.removeBinding(OLD_POSITION_BINDING);
+            oldCabinetPositionCheck.setText("");
             positionString = "none"; //$NON-NLS-1$
         } else {
             widgetCreator.showWidget(oldCabinetPositionCheckLabel);
             widgetCreator.showWidget(oldCabinetPositionCheck);
-            widgetCreator.addBinding(OLD_POSITION_BINDING);
+            oldCabinetPositionCheck.setText(oldCabinetPositionCheck.getText());
         }
         oldCabinetPosition.setText(positionString);
         sampleTypeText.setText(aliquot.getSampleType().getNameShort());
@@ -845,6 +835,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             viewerSampleTypes.getCombo().deselectAll();
         }
         setDirty(false);
+        setFocus();
     }
 
     @Override

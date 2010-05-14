@@ -380,7 +380,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (sendsShipments()) {
+        if (getShipmentCount() > 0) {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName() + ". All defined shipments must be removed first.");
         }
@@ -389,20 +389,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName() + ". No more study reference should exist.");
         }
-    }
-
-    public boolean sendsShipments() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(shipment) from "
-                + Clinic.class.getName()
-                + " as clinic inner join clinic.shipmentCollection as shipment where clinic.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return result.get(0) > 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -421,6 +407,20 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             }
         }
         return shipmentCollection;
+    }
+
+    public long getShipmentCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(shipment) from "
+                + Clinic.class.getName()
+                + " as clinic inner join clinic.shipmentCollection as shipment where clinic.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
     }
 
     public void addShipments(Collection<ShipmentWrapper> newShipments) {
@@ -533,6 +533,19 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             propertiesMap.put("patientVisitCollection", pvCollection);
         }
         return pvCollection;
+    }
+
+    public long getPatientVisitCount() throws ApplicationException,
+        BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(distinct pv) from "
+            + PatientVisit.class.getName()
+            + " as pv where shipment.clinic.id = ?", Arrays
+            .asList(new Object[] { getId() }));
+        List<Long> result = appService.query(c);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
     }
 
     @Override

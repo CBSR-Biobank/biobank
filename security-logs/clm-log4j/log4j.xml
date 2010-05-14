@@ -21,33 +21,22 @@
 @ENABLE_CLM_LOGGER_CFG_GENERATION_END@	
 
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
-		<!--      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>-->
 		<param name="Target" value="System.out" />
-		<param name="Threshold" value="INFO" />
+		<param name="Threshold" value="@LOG4J_LEVEL@" />
 		<layout class="org.apache.log4j.PatternLayout">
-			<!-- The default pattern: Date Priority [Category] Message\n -->
 			<param name="ConversionPattern"
 				value="%d{ABSOLUTE} %-5p [%c{1}] %m%n" />
 		</layout>
 	</appender>
 
-	<appender name="hibernateLog"
-		class="org.apache.log4j.FileAppender">
-		<param name="Append" value="false" />
-		<param name="File"
-			value="${jboss_home}/server/default/log/hibernate.log" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern"
-				value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
-		</layout>
-	</appender>
 
-<!--	
+<!--
         <category name="CSM.Audit.Logging.Event.Authentication">
 		<level value="info" />
 		<appender-ref ref="CLM_APPENDER" />
 	</category>
 -->
+
 @ENABLE_CLM_LOGGER_CFG_GENERATION_START@
 	<category name="CSM.Audit.Logging.Event.Authorization">
 		<level value="info" />
@@ -60,17 +49,17 @@
 @ENABLE_CLM_LOGGER_CFG_GENERATION_END@
 
 	<category name="org.apache.dbcp">
-		<level value="INFO" />
+		<level value="@LOG4J_LEVEL@" />
 		<appender-ref ref="CONSOLE" />
 	</category>
 
 	<category name="com.mchange.v2.c3p0">
-		<level value="INFO" />
+		<level value="@LOG4J_LEVEL@" />
 		<appender-ref ref="CONSOLE" />
 	</category>
 
 	<logger name="org.hibernate">
-		<level value="info" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger name="org.apache">
@@ -78,35 +67,35 @@
 	</logger>
 
 	<logger name="org.hibernate.SQL">
-		<level value="debug" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger name="org.hibernate.type">
-		<level value="info" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger name="org.hibernate.tool.hbm2ddl">
-		<level value="info" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger name="org.hibernate.cache">
-		<level value="debug" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger name="org.hibernate.jdbc">
-		<level value="debug" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger	name="org.hibernate.connection.DriverManagerConnectionProvider">
-		<level value="trace" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 
 	<logger name="gov.nih.nci">
-		<level value="info" />
+		<level value="@LOG4J_LEVEL@" />
 	</logger>
 	
 	<root>
-		<priority value="debug" />
+		<priority value="@LOG4J_LEVEL@" />
 		<appender-ref ref="CONSOLE" />
 	</root>
 </log4j:configuration>

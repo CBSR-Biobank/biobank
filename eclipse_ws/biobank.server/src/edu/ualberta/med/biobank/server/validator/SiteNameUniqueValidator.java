@@ -12,7 +12,7 @@ public class SiteNameUniqueValidator implements Validator<SiteNameUnique> {
 
     @Override
     public boolean isValid(Object value) {
-        System.out.println("*********************" + value.getClass());
+        // System.out.println("*********************" + value.getClass());
         // HQLCriteria c;
         // if (isNew()) {
         // c = new HQLCriteria("from " + Site.class.getName()

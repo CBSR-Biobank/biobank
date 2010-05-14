@@ -189,7 +189,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         boolean enableTimeDrawn = (currentSourceVessel != null)
             && (ssv == null || Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));
         boolean enableVolume = (currentSourceVessel != null)
-            && (ssv == null || Boolean.TRUE.equals(ssv.getNeedRealVolume()));
+            && (ssv == null || Boolean.TRUE.equals(ssv.getNeedOriginalVolume()));
         timeDrawnLabel.setVisible(enableTimeDrawn);
         timeDrawnWidget.setVisible(enableTimeDrawn);
         volumeLabel.setVisible(enableVolume);

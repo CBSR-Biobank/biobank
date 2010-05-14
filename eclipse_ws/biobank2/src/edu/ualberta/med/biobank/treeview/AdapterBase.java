@@ -445,8 +445,12 @@ public abstract class AdapterBase {
                     } catch (final RemoteAccessException exp) {
                         BioBankPlugin.openRemoteAccessErrorMessage();
                     } catch (Exception e) {
+                        String modelString = "'unknown'";
+                        if (modelObject != null) {
+                            modelString = modelObject.toString();
+                        }
                         logger.error("Error while loading children of node "
-                            + modelObject.toString() + " in background", e);
+                            + modelString + " in background", e);
                     }
 
                     loadChildrenSemaphore.release();
@@ -543,14 +547,22 @@ public abstract class AdapterBase {
     }
 
     public static IEditorPart openForm(FormInput input, String id) {
+        return openForm(input, id, false);
+    }
+
+    public static IEditorPart openForm(FormInput input, String id,
+        boolean focusOnEditor) {
         closeEditor(input);
         try {
-            return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().openEditor(input, id, false);
+            IEditorPart part = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().openEditor(input,
+                    id, focusOnEditor);
+            return part;
         } catch (PartInitException e) {
             logger.error("Can't open form with id " + id, e);
             return null;
         }
+
     }
 
     @SuppressWarnings("unchecked")

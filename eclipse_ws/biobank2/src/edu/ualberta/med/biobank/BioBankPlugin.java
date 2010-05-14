@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
@@ -101,6 +102,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SEARCH = "search";
     public static final String IMG_TODAY = "today";
     public static final String IMG_CALENDAR = "calendar";
+    public static final String IMG_SCAN_EDIT = "scanEdit";
+    public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -138,6 +141,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_SEARCH);
         classToImageKey.put(ShipmentTodayNode.class.getName(),
             BioBankPlugin.IMG_TODAY);
+        classToImageKey.put(DateNode.class.getName(),
+            BioBankPlugin.IMG_CALENDAR);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
@@ -220,6 +225,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_RESULTSET_PREV, "resultset_previous.png");
         registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
         registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
+        registerImage(registry, IMG_SCAN_EDIT, "scan_edit.png");
+        registerImage(registry, IMG_SCAN_CLOSE_EDIT, "scan_close_edit.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
         registerImage(registry, IMG_SHIPMENT, "shipment.png");
         registerImage(registry, IMG_SITE, "site.png");

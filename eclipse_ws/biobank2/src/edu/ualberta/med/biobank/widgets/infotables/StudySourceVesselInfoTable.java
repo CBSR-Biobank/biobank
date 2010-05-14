@@ -20,14 +20,15 @@ public class StudySourceVesselInfoTable extends
         StudySourceVesselWrapper studySourceVessel;
         String name;
         Boolean needTimeDrawn;
-        Boolean needRealVolume;
+        Boolean needOriginalVolume;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { name,
+            return StringUtils.join(new String[] {
+                name,
                 (needTimeDrawn != null) ? needTimeDrawn.toString() : "",
-                (needRealVolume != null) ? needRealVolume.toString() : "" },
-                "\t");
+                (needOriginalVolume != null) ? needOriginalVolume.toString()
+                    : "" }, "\t");
         }
     }
 
@@ -51,7 +52,7 @@ public class StudySourceVesselInfoTable extends
                 rc = compare(i1.needTimeDrawn, i2.needTimeDrawn);
                 break;
             case 2:
-                rc = compare(i1.needRealVolume, i2.needRealVolume);
+                rc = compare(i1.needOriginalVolume, i2.needOriginalVolume);
                 break;
             default:
                 rc = 0;
@@ -65,7 +66,7 @@ public class StudySourceVesselInfoTable extends
     }
 
     private final static String[] HEADINGS = new String[] { "Name",
-        "Need Time Drawn", "Need Real Volume" };
+        "Need Time Drawn", "Need Original Volume" };
 
     private final static int[] BOUNDS = new int[] { 250, 150, -1, -1, -1 };
 
@@ -93,8 +94,9 @@ public class StudySourceVesselInfoTable extends
                     return (info.needTimeDrawn != null) ? info.needTimeDrawn
                         .toString() : Boolean.FALSE.toString();
                 case 2:
-                    return (info.needRealVolume != null) ? info.needRealVolume
-                        .toString() : Boolean.FALSE.toString();
+                    return (info.needOriginalVolume != null) ? info.needOriginalVolume
+                        .toString()
+                        : Boolean.FALSE.toString();
                 default:
                     return "";
                 }
@@ -117,7 +119,7 @@ public class StudySourceVesselInfoTable extends
             "study source vessel has null for source vessel");
         info.name = studySourceVessel.getSourceVessel().getName();
         info.needTimeDrawn = studySourceVessel.getNeedTimeDrawn();
-        info.needRealVolume = studySourceVessel.getNeedRealVolume();
+        info.needOriginalVolume = studySourceVessel.getNeedOriginalVolume();
         return info;
     }
 

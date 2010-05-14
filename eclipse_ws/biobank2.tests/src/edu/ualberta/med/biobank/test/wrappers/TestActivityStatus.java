@@ -80,7 +80,7 @@ public class TestActivityStatus extends TestDatabase {
     public void testGetAllActivityStatuses() throws Exception {
         Collection<ActivityStatusWrapper> list = ActivityStatusWrapper
             .getAllActivityStatuses(appService);
-        Assert.assertTrue(list.size() == 3);
+        Assert.assertTrue(list.size() == 4);
 
         List<String> names = new ArrayList<String>();
         for (ActivityStatusWrapper as : list) {
@@ -89,6 +89,7 @@ public class TestActivityStatus extends TestDatabase {
         Assert.assertTrue(names.contains("Active"));
         Assert.assertTrue(names.contains("Closed"));
         Assert.assertTrue(names.contains("Disabled"));
+        Assert.assertTrue(names.contains("Flagged"));
 
         // invoke one more time to make sure a database access is not made
         list = ActivityStatusWrapper.getAllActivityStatuses(appService);
