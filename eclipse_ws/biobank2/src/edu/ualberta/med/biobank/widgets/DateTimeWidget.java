@@ -151,12 +151,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        if (dateEntry != null) {
-            dateEntry.setSelection(date);
-        }
+        dateEntry.setSelection(date);
     }
 
     public void addModifyListener(ModifyListener modifyListener) {
