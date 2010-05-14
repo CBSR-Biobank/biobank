@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -11,6 +14,10 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 
 public class AliquotEntryForm extends BiobankEntryForm {
@@ -22,6 +29,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     private AliquotWrapper aliquot;
 
     private ComboViewer activityStatusComboViewer;
+
+    private ComboViewer sampleTypeComboViewer;
 
     @Override
     protected void init() throws Exception {
@@ -44,8 +53,31 @@ public class AliquotEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Type", aliquot
-            .getSampleType().getName());
+        StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
+        study.reload();
+
+        List<SampleStorageWrapper> allowedSampleStorage = study
+            .getSampleStorageCollection();
+
+        ContainerTypeWrapper ct = aliquot.getParent().getContainerType();
+        ct.reload();
+
+        List<SampleTypeWrapper> containerSampleTypeList = ct
+            .getSampleTypeCollection();
+
+        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+
+        for (SampleStorageWrapper ss : allowedSampleStorage) {
+            SampleTypeWrapper sst = ss.getSampleType();
+            for (SampleTypeWrapper st : containerSampleTypeList) {
+                if (sst.equals(st))
+                    sampleTypes.add(st);
+            }
+        }
+
+        sampleTypeComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Type", sampleTypes, aliquot.getSampleType(),
+            "Aliquot must have a sample type", true);
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date", aliquot
             .getFormattedLinkDate());
@@ -75,13 +107,10 @@ public class AliquotEntryForm extends BiobankEntryForm {
             true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(aliquot,
-                "comment"), null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
+            SWT.WRAP | SWT.MULTI, "Comments", null, BeansObservables
+                .observeValue(aliquot, "comment"), null);
 
-        setFirstControl(activityStatusComboViewer.getControl());
+        setFirstControl(sampleTypeComboViewer.getControl());
     }
 
     @Override
@@ -89,6 +118,9 @@ public class AliquotEntryForm extends BiobankEntryForm {
         ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
             .getSelection()).getFirstElement();
         aliquot.setActivityStatus(activity);
+        SampleTypeWrapper st = (SampleTypeWrapper) ((StructuredSelection) sampleTypeComboViewer
+            .getSelection()).getFirstElement();
+        aliquot.setSampleType(st);
         aliquot.persist();
     }
 
@@ -113,6 +145,12 @@ public class AliquotEntryForm extends BiobankEntryForm {
         } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
             activityStatusComboViewer.getCombo().deselectAll();
         }
+
+        SampleTypeWrapper currentSampleType = aliquot.getSampleType();
+        if (currentSampleType != null)
+            sampleTypeComboViewer.setSelection(new StructuredSelection(
+                currentSampleType));
+
     }
 
 }

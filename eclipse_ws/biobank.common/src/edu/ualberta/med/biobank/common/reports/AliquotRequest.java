@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Aliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -28,17 +29,21 @@ public class AliquotRequest extends QueryObject {
 
     @Override
     protected List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
+        List<Object> params) throws ApplicationException, BiobankCheckException {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;
-        for (int i = 0; i + 4 <= params.size(); i += 4) {
-            c = new HQLCriteria(queryString);
-            c.setParameters(params.subList(i, i + 3));
-            // need to limit query size but not possible in hql
-            Integer maxResults = (Integer) params.get(i + 3);
-            List<Object> queried = appService.query(c);
-            for (int j = 0; j < queried.size() && j < maxResults; j++)
-                results.add(queried.get(j));
+        try {
+            for (int i = 0; i + 4 <= params.size(); i += 4) {
+                c = new HQLCriteria(queryString);
+                c.setParameters(params.subList(i, i + 3));
+                // need to limit query size but not possible in hql
+                Integer maxResults = (Integer) params.get(i + 3);
+                List<Object> queried = appService.query(c);
+                for (int j = 0; j < queried.size() && j < maxResults; j++)
+                    results.add(queried.get(j));
+            }
+        } catch (Exception e) {
+            throw new BiobankCheckException("Failed to parse CSV.");
         }
         return results;
     }

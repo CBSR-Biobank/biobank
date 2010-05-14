@@ -243,6 +243,11 @@ public class WidgetCreator {
         if (widgetOptions == SWT.NONE) {
             widgetOptions = SWT.SINGLE;
         }
+
+        if ((widgetOptions & SWT.MULTI) != 0) {
+            widgetOptions = widgetOptions | SWT.V_SCROLL;
+        }
+
         Text text = null;
         if (toolkit == null) {
             text = new Text(composite, SWT.BORDER | widgetOptions);
@@ -251,7 +256,7 @@ public class WidgetCreator {
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         if ((widgetOptions & SWT.MULTI) != 0) {
-            gd.heightHint = 40;
+            gd.heightHint = 90;
             text.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent e) {
@@ -590,7 +595,6 @@ public class WidgetCreator {
 
             // Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
             // | SWT.BORDER, false);
-            field.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
             if (value != null) {
                 field.setText(value);
             }

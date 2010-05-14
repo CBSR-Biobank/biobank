@@ -81,6 +81,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     private Action confirmAction;
 
+    private static ImageDescriptor printActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PRINTER));
+
     private static ImageDescriptor resetActionImage = ImageDescriptor
         .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_RESET_FORM));
@@ -375,6 +379,30 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         };
         cancel.setImageDescriptor(cancelActionImage);
         form.getToolBarManager().add(cancel);
+    }
+
+    protected void addPrintAction() {
+        Action print = new Action("Print") {
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
+                        try {
+                            BiobankEntryForm.this.print();
+                        } catch (Exception ex) {
+                            BioBankPlugin.openAsyncError("Error printing.", ex);
+                        }
+                    }
+                });
+            }
+        };
+        print.setImageDescriptor(printActionImage);
+        form.getToolBarManager().add(print);
+    }
+
+    protected boolean print() {
+        // override me
+        return false;
     }
 
     protected void addResetAction() {

@@ -45,8 +45,6 @@ public class DateTimeWidget extends BiobankWidget {
 
     private Button dateButton;
 
-    private DateTime timeEntry;
-
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
 
     /**
@@ -72,8 +70,9 @@ public class DateTimeWidget extends BiobankWidget {
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         if (typeShown != SWT.TIME) {
-            dateEntry = new CDateTime(this, CDT.BORDER);
-            dateEntry.setPattern("yyyy-MM-dd");
+            dateEntry = new CDateTime(this, CDT.CLOCK_24_HOUR | CDT.BORDER
+                | CDT.CLOCK_DISCRETE | CDT.TIME_SHORT);
+            dateEntry.setPattern("yyyy-MM-dd  HH:mm");
             Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
             GridData gd = new GridData();
             gd.widthHint = size.x + 10;
@@ -103,10 +102,9 @@ public class DateTimeWidget extends BiobankWidget {
                     calendar.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseDoubleClick(MouseEvent e) {
-                            // not perfect... a double click can close widget
-                            // even
-                            // if its on a month or year (or on nothing at all)
                             Calendar c = Calendar.getInstance();
+                            if (dateEntry.getSelection() != null)
+                                c.setTime(dateEntry.getSelection());
                             c.set(Calendar.DAY_OF_MONTH, calendar.getDay());
                             c.set(Calendar.MONTH, calendar.getMonth());
                             c.set(Calendar.YEAR, calendar.getYear());
@@ -129,16 +127,6 @@ public class DateTimeWidget extends BiobankWidget {
                 }
             });
         }
-        if (typeShown != SWT.DATE) {
-            timeEntry = new DateTime(this, SWT.BORDER | SWT.TIME | SWT.SHORT);
-            timeEntry.setTime(0, 0, 0);
-            timeEntry.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fireModifyListeners();
-                }
-            });
-        }
         if (date != null) {
             setDate(date);
         }
@@ -150,22 +138,9 @@ public class DateTimeWidget extends BiobankWidget {
 
     public Date getDate() {
         Calendar cal = new GregorianCalendar();
-        if (dateEntry == null) {
-            // can modify only time
-            if (timeEntry != null) {
-                cal.set(Calendar.HOUR_OF_DAY, timeEntry.getHours());
-                cal.set(Calendar.MINUTE, timeEntry.getMinutes());
-                return cal.getTime();
-            }
-        } else {
-            if (dateEntry.getSelection() != null) {
-                cal.setTime(dateEntry.getSelection());
-                if (timeEntry != null) {
-                    cal.set(Calendar.HOUR_OF_DAY, timeEntry.getHours());
-                    cal.set(Calendar.MINUTE, timeEntry.getMinutes());
-                }
-                return cal.getTime();
-            }
+        if (dateEntry.getSelection() != null) {
+            cal.setTime(dateEntry.getSelection());
+            return cal.getTime();
         }
         return null;
     }
@@ -176,18 +151,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-
-        if (timeEntry != null) {
-            timeEntry.setTime(cal.get(Calendar.HOUR_OF_DAY), cal
-                .get(Calendar.MINUTE), cal.get(Calendar.SECOND));
-        }
-
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        if (dateEntry != null) {
-            dateEntry.setSelection(date);
-        }
+        dateEntry.setSelection(date);
     }
 
     public void addModifyListener(ModifyListener modifyListener) {
@@ -213,9 +177,6 @@ public class DateTimeWidget extends BiobankWidget {
         super.setEnabled(enabled);
         if (dateEntry != null) {
             dateEntry.setEnabled(enabled);
-        }
-        if (timeEntry != null) {
-            timeEntry.setEnabled(enabled);
         }
     }
 }

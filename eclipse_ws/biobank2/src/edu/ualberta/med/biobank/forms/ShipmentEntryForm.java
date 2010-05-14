@@ -185,9 +185,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             .getDateReceived(), BeansObservables.observeValue(shipmentWrapper,
             "dateReceived"), "Date received should be set");
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI, "Comments",
-            null, BeansObservables.observeValue(shipmentWrapper, "comment"),
-            null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI | SWT.WRAP,
+            "Comments", null, BeansObservables.observeValue(shipmentWrapper,
+                "comment"), null);
     }
 
     private void activateWaybillField(boolean activate) {

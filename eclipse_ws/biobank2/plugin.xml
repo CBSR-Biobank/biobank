@@ -140,6 +140,10 @@
             name="Edit Source Vessels">
       </command>
       <command
+            id="edu.ualberta.med.biobank.commands.editShippingMethods"
+            name="Edit Shipping Methods">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.reports"
             name="Reports">
       </command>
@@ -353,6 +357,15 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.EditSourceVesselsHandler"
             commandId="edu.ualberta.med.biobank.commands.editSourceVessels">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditShippingMethodsHandler"
+            commandId="edu.ualberta.med.biobank.commands.editShippingMethods">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -807,6 +820,12 @@
                       commandId="edu.ualberta.med.biobank.commands.editSourceVessels"
                       id="edu.ualberta.med.biobank.menu.editSourceVessels"
                       label="Edit Source Vessels"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
+                      id="edu.ualberta.med.biobank.menu.editShippingMethods"
+                      label="Edit Shipping Methods"
                       style="push">
                 </command>
                <visibleWhen
@@ -1723,6 +1742,12 @@
             default="false"
             id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
             name="Source Vessel Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
+            name="Shipping Method Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.DecodePlateForm"

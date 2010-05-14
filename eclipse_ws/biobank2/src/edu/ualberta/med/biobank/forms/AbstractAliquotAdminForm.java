@@ -50,12 +50,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
                         "Print", "Do you want to print information ?");
                     if (doPrint) {
-                        if (print())
-                            printed = true;
-                        else {
-                            printed = false;
-                            return false;
-                        }
+                        print();
                     }
                 }
             }
@@ -68,6 +63,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         return false;
     }
 
+    @Override
     public boolean print() {
         if (appender == null) {
             BioBankPlugin.openError("Print error", "Can't print: log error.");
@@ -81,9 +77,11 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             JasperPrint jp = ReportingUtils.createStandardReport(
                 "ActivityReportForm", map, logsList);
             ReportingUtils.printReport(jp);
+            printed = true;
             return true;
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);
+            printed = false;
             return false;
         }
     }
@@ -113,6 +111,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
     @Override
     protected void addToolbarButtons() {
+        addPrintAction();
         addResetAction();
         addConfirmAction();
         form.updateToolBar();

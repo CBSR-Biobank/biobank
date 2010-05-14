@@ -106,8 +106,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             "Site must have an activity status", true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(site,
-                "comment"), null);
+            SWT.MULTI | SWT.WRAP, "Comments", null, BeansObservables
+                .observeValue(site, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

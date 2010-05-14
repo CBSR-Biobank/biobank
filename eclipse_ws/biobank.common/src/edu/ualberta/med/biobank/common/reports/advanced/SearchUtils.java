@@ -125,7 +125,7 @@ public class SearchUtils {
             add(searchableFields, path, "position", String.class);
             add(searchableFields, path, "linkDate", Date.class);
             add(searchableFields, path, "quantity", Integer.class);
-            add(searchableFields, path, "oldComment", String.class);
+            add(searchableFields, path, "comment", String.class);
             add(searchableFields, path, "sampleType.name", String.class);
         } else if (c == Patient.class) {
             if (collection)
