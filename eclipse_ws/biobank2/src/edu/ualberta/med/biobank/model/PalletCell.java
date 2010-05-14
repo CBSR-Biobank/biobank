@@ -92,15 +92,15 @@ public class PalletCell extends Cell {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsNotAssigned(appService, siteId);
-        if (randomAliquots.size() > 1) {
-            // Random r = new Random();
-            // int sample1 = r.nextInt(samples.size());
-            // int sample2 = r.nextInt(samples.size());
-            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-                0, 0, randomAliquots.get(0).getInventoryId())));
-            // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
-            // .get(1).getInventoryId()));
-        }
+        // if (randomAliquots.size() > 1) {
+        // // Random r = new Random();
+        // // int sample1 = r.nextInt(samples.size());
+        // // int sample2 = r.nextInt(samples.size());
+        // palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+        // 0, 0, randomAliquots.get(0).getInventoryId())));
+        // // palletScanned[2][4] = new PalletCell(new ScanCell(2, 4, samples
+        // // .get(1).getInventoryId()));
+        // }
         return palletScanned;
     }
 
@@ -155,6 +155,12 @@ public class PalletCell extends Cell {
             return scanCell.getValue();
         }
         return null;
+    }
+
+    public void setValue(String value) {
+        if (scanCell != null) {
+            scanCell.setValue(value);
+        }
     }
 
     @Override
