@@ -4,7 +4,6 @@ Bundle-Name: Biobank Commons
 Bundle-SymbolicName: biobank.common
 Bundle-Version: 1.1.0
 Bundle-ClassPath: conf/,
- bin/,
  lib/acegi-security-1.0.4.jar,
  lib/antlr-2.7.6.jar,
  lib/asm.jar,
@@ -30,7 +29,9 @@ Bundle-ClassPath: conf/,
  lib/xercesImpl.jar,
  lib/xpp3-1.1.3.4.C.jar,
  lib/biobank-remote.jar,
- lib/xstream-1.3.1.jar
+ lib/xstream-1.3.1.jar,
+ lib/hibernate-validator.jar,
+ bin/
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,

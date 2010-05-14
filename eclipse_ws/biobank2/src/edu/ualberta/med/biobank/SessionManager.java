@@ -44,8 +44,6 @@ public class SessionManager {
 
     private SiteManager siteManager;
 
-    public static HashMap<String, Integer> failedLoginAttempts = new HashMap<String, Integer>();
-
     /**
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
      * perspective is set

@@ -29,12 +29,14 @@
 		</layout>
 	</appender>
 
-<!--	
+
+<!--
         <category name="CSM.Audit.Logging.Event.Authentication">
 		<level value="info" />
 		<appender-ref ref="CLM_APPENDER" />
 	</category>
 -->
+
 @ENABLE_CLM_LOGGER_CFG_GENERATION_START@
 	<category name="CSM.Audit.Logging.Event.Authorization">
 		<level value="info" />

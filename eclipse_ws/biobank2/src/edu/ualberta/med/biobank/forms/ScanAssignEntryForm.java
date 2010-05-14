@@ -855,6 +855,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (!beforeScan) {
             setDirty(false);
         }
+        setFocus();
     }
 
     private void initPalletValues() {

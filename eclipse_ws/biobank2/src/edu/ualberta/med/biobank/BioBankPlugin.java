@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
@@ -138,6 +139,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_SEARCH);
         classToImageKey.put(ShipmentTodayNode.class.getName(),
             BioBankPlugin.IMG_TODAY);
+        classToImageKey.put(DateNode.class.getName(),
+            BioBankPlugin.IMG_CALENDAR);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {

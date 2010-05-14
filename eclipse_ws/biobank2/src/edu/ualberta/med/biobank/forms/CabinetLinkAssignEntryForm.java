@@ -478,6 +478,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             displayOldCabinetFields(moveMode);
             enableAndShowSampleTypeCombo(!moveMode);
             canLaunchCheck.setValue(true);
+            if (moveMode) {
+                setFirstControl(oldCabinetPositionCheck);
+                setFocus();
+            } else {
+                linkFormPatientManagement.setFirstControl();
+                setFocus();
+            }
 
             form.layout(true, true);
         } catch (Exception ex) {
@@ -828,6 +835,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             viewerSampleTypes.getCombo().deselectAll();
         }
         setDirty(false);
+        setFocus();
     }
 
     @Override

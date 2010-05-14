@@ -45,8 +45,8 @@ public class StudySourceVesselDialog extends BiobankDialog {
             .getSourceVessel());
         this.studySourceVessel.setNeedTimeDrawn(studySourceVessel
             .getNeedTimeDrawn());
-        this.studySourceVessel.setNeedRealVolume(studySourceVessel
-            .getNeedRealVolume());
+        this.studySourceVessel.setNeedReceivedVolume(studySourceVessel
+            .getNeedReceivedVolume());
         allSourceVesselsMap = sourceVessels;
     }
 
@@ -107,8 +107,8 @@ public class StudySourceVesselDialog extends BiobankDialog {
                 studySourceVessel, "needTimeDrawn"), null);
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Real Volume", new String[0], PojoObservables.observeValue(
-                studySourceVessel, "needRealVolume"), null);
+            "Need Received Volume", new String[0], PojoObservables
+                .observeValue(studySourceVessel, "needReceivedVolume"), null);
     }
 
     @Override
@@ -117,8 +117,8 @@ public class StudySourceVesselDialog extends BiobankDialog {
             .getSourceVessel());
         origStudySourceVessel.setNeedTimeDrawn(studySourceVessel
             .getNeedTimeDrawn());
-        origStudySourceVessel.setNeedRealVolume(studySourceVessel
-            .getNeedRealVolume());
+        origStudySourceVessel.setNeedReceivedVolume(studySourceVessel
+            .getNeedReceivedVolume());
         super.okPressed();
     }
 
