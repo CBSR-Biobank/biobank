@@ -304,7 +304,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private void createContainersVisualisationSection() {
         containersComposite = toolkit.createComposite(form.getBody());
         GridLayout layout = getNeutralGridLayout();
-        layout.numColumns = 2;
+        layout.numColumns = 3;
         containersComposite.setLayout(layout);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.CENTER;
@@ -316,7 +316,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             .createComposite(containersComposite);
         freezerComposite.setLayout(getNeutralGridLayout());
         GridData gdFreezer = new GridData();
-        gdFreezer.horizontalSpan = 2;
+        gdFreezer.horizontalSpan = 3;
         gdFreezer.horizontalAlignment = SWT.RIGHT;
         freezerComposite.setLayoutData(gdFreezer);
         freezerLabel = toolkit.createLabel(freezerComposite, "Freezer"); //$NON-NLS-1$
@@ -348,6 +348,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             }
         });
         showOnlyPallet(true);
+
+        createScanTubeAloneButton(containersComposite);
     }
 
     protected void manageDoubleClick(MouseEvent e) {
@@ -370,8 +372,16 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
+    protected boolean canScanTubeAlone(PalletCell cell) {
+        return super.canScanTubeAlone(cell)
+            || cell.getStatus() == AliquotCellStatus.MISSING;
+    }
+
+    @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         processCellStatus(cell);
+        currentScanState = currentScanState.mergeWith(cell.getStatus());
+        setScanValid(currentScanState != AliquotCellStatus.ERROR);
         palletWidget.redraw();
     }
 

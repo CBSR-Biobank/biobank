@@ -101,6 +101,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SEARCH = "search";
     public static final String IMG_TODAY = "today";
     public static final String IMG_CALENDAR = "calendar";
+    public static final String IMG_SCAN_EDIT = "scanEdit";
+    public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
 
     // 
     // ContainerTypeAdapter and Container missing on purpose.
@@ -220,6 +222,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_RESULTSET_PREV, "resultset_previous.png");
         registerImage(registry, IMG_SCAN_ASSIGN, "scanAssign.png");
         registerImage(registry, IMG_SCAN_LINK, "scanLink.png");
+        registerImage(registry, IMG_SCAN_EDIT, "scan_edit.png");
+        registerImage(registry, IMG_SCAN_CLOSE_EDIT, "scan_close_edit.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
         registerImage(registry, IMG_SHIPMENT, "shipment.png");
         registerImage(registry, IMG_SITE, "site.png");

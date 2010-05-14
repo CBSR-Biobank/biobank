@@ -126,7 +126,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private void createPalletSection() {
         Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(1, false);
+        GridLayout layout = new GridLayout(2, false);
         client.setLayout(layout);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.CENTER;
@@ -151,6 +151,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 scanTubeAlone(e);
             }
         });
+        createScanTubeAloneButton(client);
     }
 
     /**
