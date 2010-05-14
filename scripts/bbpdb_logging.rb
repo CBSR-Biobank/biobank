@@ -13,20 +13,23 @@ join users on users.user_nr=logging.user_nr
 join forms on forms.form_nr=logging.form_nr
 join actions on actions.shortform=logging.action
 order by timestamp desc
-limit 1000
+limit 2000
 BBPDB_QUERY_END
 
+  HEADINGS = [ 'login_id', 'timestamp', 'patient_nr', 'inventory_id', 'action', 'form_name', 'cindex_nr',
+               'findex_nr', 'punches', 'details' ]
+
   def initialize
-    headings = false
     getDbConnection("bbpdb", 'aicml-med')
     res = @dbh.query(BBPDB_QUERY)
     f = File.new("bbpdb_logging.csv", "w")
+    f.write CSV.generate_line(HEADINGS, ',') << "\n"
     while row = res.fetch_hash do
-      if (!headings)
-        f.write CSV.generate_line(row.keys, ',') << "\n"
-        headings = true
+      values = Array.new
+      HEADINGS.each do | heading |
+        values << row[heading]
       end
-      f.write CSV.generate_line(row.values, ',') << "\n"
+      f.write CSV.generate_line(values, ',') << "\n"
     end
     f.close
     res.free
