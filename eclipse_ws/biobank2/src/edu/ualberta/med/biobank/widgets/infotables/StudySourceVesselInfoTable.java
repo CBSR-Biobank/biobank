@@ -20,14 +20,14 @@ public class StudySourceVesselInfoTable extends
         StudySourceVesselWrapper studySourceVessel;
         String name;
         Boolean needTimeDrawn;
-        Boolean needReceivedVolume;
+        Boolean needOriginalVolume;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] {
                 name,
                 (needTimeDrawn != null) ? needTimeDrawn.toString() : "",
-                (needReceivedVolume != null) ? needReceivedVolume.toString()
+                (needOriginalVolume != null) ? needOriginalVolume.toString()
                     : "" }, "\t");
         }
     }
@@ -52,7 +52,7 @@ public class StudySourceVesselInfoTable extends
                 rc = compare(i1.needTimeDrawn, i2.needTimeDrawn);
                 break;
             case 2:
-                rc = compare(i1.needReceivedVolume, i2.needReceivedVolume);
+                rc = compare(i1.needOriginalVolume, i2.needOriginalVolume);
                 break;
             default:
                 rc = 0;
@@ -66,7 +66,7 @@ public class StudySourceVesselInfoTable extends
     }
 
     private final static String[] HEADINGS = new String[] { "Name",
-        "Need Time Drawn", "Need Received Volume" };
+        "Need Time Drawn", "Need Original Volume" };
 
     private final static int[] BOUNDS = new int[] { 250, 150, -1, -1, -1 };
 
@@ -94,7 +94,7 @@ public class StudySourceVesselInfoTable extends
                     return (info.needTimeDrawn != null) ? info.needTimeDrawn
                         .toString() : Boolean.FALSE.toString();
                 case 2:
-                    return (info.needReceivedVolume != null) ? info.needReceivedVolume
+                    return (info.needOriginalVolume != null) ? info.needOriginalVolume
                         .toString()
                         : Boolean.FALSE.toString();
                 default:
@@ -119,7 +119,7 @@ public class StudySourceVesselInfoTable extends
             "study source vessel has null for source vessel");
         info.name = studySourceVessel.getSourceVessel().getName();
         info.needTimeDrawn = studySourceVessel.getNeedTimeDrawn();
-        info.needReceivedVolume = studySourceVessel.getNeedReceivedVolume();
+        info.needOriginalVolume = studySourceVessel.getNeedOriginalVolume();
         return info;
     }
 
