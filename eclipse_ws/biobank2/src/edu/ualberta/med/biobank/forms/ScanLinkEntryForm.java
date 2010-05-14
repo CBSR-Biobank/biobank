@@ -71,7 +71,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     // custom selection with mouse
     private Composite typesSelectionCustomComposite;
-    private SampleTypeSelectionWidget customSelection;
+    private SampleTypeSelectionWidget customSelectionWidget;
 
     // should be set to true when all scanned aliquots have a type set
     private IObservableValue typesFilledValue = new WritableValue(Boolean.TRUE,
@@ -142,7 +142,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             new MultiSelectionListener() {
                 @Override
                 public void selectionChanged(MultiSelectionEvent mse) {
-                    customSelection.setNumber(mse.selections);
+                    customSelectionWidget.setNumber(mse.selections);
                 }
             });
         spw.addMouseListener(new MouseAdapter() {
@@ -151,37 +151,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 scanTubeAlone(e);
             }
         });
-    }
-
-    private void scanTubeAlone(MouseEvent e) {
-        if (isScanHasBeenLaunched()) {
-            RowColPos rcp = ((ScanLinkPalletWidget) e.widget)
-                .getPositionAtCoordinates(e.x, e.y);
-            if (rcp != null) {
-                PalletCell cell = cells.get(rcp);
-                if (cell == null
-                    || (cell.getStatus() == AliquotCellStatus.EMPTY)) {
-                    String value = scanTubeAlone();
-                    if (value != null && !value.isEmpty()) {
-                        if (cell == null) {
-                            cell = new PalletCell(new ScanCell(rcp.row,
-                                rcp.col, value));
-                            cells.put(rcp, cell);
-                        } else {
-                            cell.setValue(value);
-                        }
-                        try {
-                            processCellStatus(cell, true);
-                        } catch (ApplicationException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
-                        spw.redraw();
-                        form.layout();
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -234,7 +203,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         sampleType.addBinding(widgetCreator);
                         sampleType.resetValues(false);
                     }
-                    customSelection.addBinding(widgetCreator);
+                    customSelectionWidget.addBinding(widgetCreator);
                     spw.getMultiSelectionManager().disableMultiSelection();
                     typesFilledValue.setValue(Boolean.TRUE);
                     spw.redraw();
@@ -250,7 +219,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
                         sampleType.removeBinding(widgetCreator);
                     }
-                    customSelection.addBinding(widgetCreator);
+                    customSelectionWidget.addBinding(widgetCreator);
                     spw.getMultiSelectionManager().enableMultiSelection(
                         new MultiSelectionSpecificBehaviour() {
                             @Override
@@ -303,16 +272,16 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 3;
         label.setLayoutData(gd);
 
-        customSelection = new SampleTypeSelectionWidget(
+        customSelectionWidget = new SampleTypeSelectionWidget(
             typesSelectionCustomComposite, null, sampleTypes, toolkit);
-        customSelection.resetValues(true);
+        customSelectionWidget.resetValues(true);
 
         Button applyType = toolkit.createButton(typesSelectionCustomComposite,
             "Apply", SWT.PUSH); //$NON-NLS-1$
         applyType.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                SampleTypeWrapper type = customSelection.getSelection();
+                SampleTypeWrapper type = customSelectionWidget.getSelection();
                 if (type != null) {
                     for (Cell cell : spw.getMultiSelectionManager()
                         .getSelectedCells()) {
@@ -321,7 +290,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         pCell.setStatus(AliquotCellStatus.TYPE);
                     }
                     spw.getMultiSelectionManager().clearMultiSelection();
-                    customSelection.resetValues(true);
+                    customSelectionWidget.resetValues(true);
                     typesFilledValue.setValue(spw.isEverythingTyped());
                     spw.redraw();
                 }
@@ -683,5 +652,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     public boolean onClose() {
         linkFormPatientManagement.onClose();
         return super.onClose();
+    }
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        processCellStatus(cell, true);
+        spw.redraw();
+        form.layout();
     }
 }
