@@ -134,8 +134,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             true);
 
         Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI, "Comments", null, BeansObservables.observeValue(clinic,
-                "comment"), null);
+            SWT.MULTI | SWT.WRAP, "Comments", null, BeansObservables
+                .observeValue(clinic, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

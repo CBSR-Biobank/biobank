@@ -102,7 +102,7 @@ public class ReportsEditor extends BiobankFormBase {
     private Composite buttonSection;
     private Composite parameterSection;
 
-    private ReportTableWidget reportTable;
+    private ReportTableWidget<Object> reportTable;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -216,10 +216,10 @@ public class ReportsEditor extends BiobankFormBase {
                             reportTable.dispose();
                             if (reportData.size() == -1)
                                 printButton.setEnabled(false);
-                            reportTable = new ReportTableWidget(form.getBody(),
-                                reportData, query.getColumnNames(),
+                            reportTable = new ReportTableWidget<Object>(form
+                                .getBody(), reportData, query.getColumnNames(),
                                 columnWidths.get(query.getClass()), 40);
-                            form.layout(true, true);
+                            form.reflow(true);
                         }
                     });
 
@@ -234,7 +234,7 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget(form.getBody(), null,
+        reportTable = new ReportTableWidget<Object>(form.getBody(), null,
             new String[] { " " }, new int[] { 500 });
         form.layout(true, true);
     }

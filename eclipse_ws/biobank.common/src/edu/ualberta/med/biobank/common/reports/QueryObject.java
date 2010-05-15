@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -120,13 +121,13 @@ public abstract class QueryObject {
     }
 
     public List<Object> generate(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
+        List<Object> params) throws Exception {
         return postProcess(executeQuery(appService, preProcess(params)));
     }
 
     @SuppressWarnings("unused")
     protected List<Object> executeQuery(WritableApplicationService appService,
-        List<Object> params) throws ApplicationException {
+        List<Object> params) throws ApplicationException, BiobankCheckException {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
         return new BiobankListProxy(appService, c);

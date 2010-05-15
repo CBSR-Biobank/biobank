@@ -89,7 +89,8 @@ public class StudyViewForm extends BiobankViewForm {
             "Short Name");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comments");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.MULTI | SWT.WRAP, "Comments");
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patients");
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,

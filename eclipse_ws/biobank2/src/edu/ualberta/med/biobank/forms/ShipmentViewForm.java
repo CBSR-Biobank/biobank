@@ -100,14 +100,18 @@ public class ShipmentViewForm extends BiobankViewForm {
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
-        dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE, "Date Shipped");
+        dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Date Shipped");
         shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipping Method");
-        boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE, "Box number");
+        boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Box number");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date received");
-        commentLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Comments");
-        patientCountLabel = createReadOnlyLabelledField(client, SWT.WRAP, "Patients");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.MULTI | SWT.WRAP, "Comments");
+        patientCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+            "Patients");
         patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
             "Patient Visits");
 

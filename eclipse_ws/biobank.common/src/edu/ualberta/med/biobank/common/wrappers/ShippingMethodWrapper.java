@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,7 @@ import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
 
@@ -106,4 +108,68 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     public String toString() {
         return getName();
     }
+
+    public boolean isUsed() throws ApplicationException, BiobankCheckException {
+        String queryString = "select count(s) from " + Shipment.class.getName()
+            + " as s where s.shippingMethod=?)";
+        HQLCriteria c = new HQLCriteria(queryString, Arrays
+            .asList(new Object[] { wrappedObject }));
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        if (results.get(0) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public void checkUnique() throws BiobankCheckException,
+        ApplicationException {
+        String globalMsg = "global";
+        checkNoDuplicates("name", getName(), "A " + globalMsg
+            + " shipping method with name \"" + getName()
+            + "\" already exists.");
+    }
+
+    private void checkNoDuplicates(String propertyName, String value,
+        String errorMessage) throws ApplicationException, BiobankCheckException {
+        List<Object> parameters = new ArrayList<Object>(Arrays
+            .asList(new Object[] { value }));
+
+        // if global type, check the name is use nowhere
+
+        String notSameObject = "";
+        if (!isNew()) {
+            notSameObject = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("select count(*) from "
+            + ShippingMethod.class.getName() + " where " + propertyName + "=? "
+            + notSameObject, parameters);
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        if (result.get(0) > 0) {
+            throw new BiobankCheckException(errorMessage);
+        }
+    }
+
+    public static void persistShippingMethods(
+        List<ShippingMethodWrapper> addedOrModifiedTypes,
+        List<ShippingMethodWrapper> typesToDelete)
+        throws BiobankCheckException, Exception {
+        if (addedOrModifiedTypes != null) {
+            for (ShippingMethodWrapper ss : addedOrModifiedTypes) {
+                ss.persist();
+            }
+        }
+        if (typesToDelete != null) {
+            for (ShippingMethodWrapper ss : typesToDelete) {
+                ss.delete();
+            }
+        }
+    }
+
 }

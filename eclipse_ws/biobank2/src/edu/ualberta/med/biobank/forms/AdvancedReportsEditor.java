@@ -79,7 +79,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
     protected ArrayList<Button> includedFields;
     private ArrayList<Label> textLabels;
 
-    private ReportTableWidget reportTable;
+    private ReportTableWidget<Object> reportTable;
     private List<Object> reportData;
     private ReportTreeNode node;
 
@@ -384,7 +384,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                             int[] headingSizes = new int[names.length];
                             for (int i = 0; i < names.length; i++)
                                 headingSizes[i] = 100;
-                            reportTable = new ReportTableWidget(top,
+                            reportTable = new ReportTableWidget<Object>(top,
                                 reportData, names, headingSizes, 40);
                             GridData gd = new GridData();
                             gd.horizontalSpan = 2;
@@ -410,8 +410,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget(top, null, new String[] { " " },
-            new int[] { 500 });
+        reportTable = new ReportTableWidget<Object>(top, null,
+            new String[] { " " }, new int[] { 500 });
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
