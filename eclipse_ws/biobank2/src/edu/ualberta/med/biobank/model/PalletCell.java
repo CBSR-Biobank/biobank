@@ -90,8 +90,8 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots = DebugUtil
-            .getRandomAliquotsNotAssigned(appService, siteId);
+        // List<AliquotWrapper> randomAliquots =
+        DebugUtil.getRandomAliquotsNotAssigned(appService, siteId);
         // if (randomAliquots.size() > 1) {
         // // Random r = new Random();
         // // int sample1 = r.nextInt(samples.size());
@@ -157,7 +157,7 @@ public class PalletCell extends Cell {
         return null;
     }
 
-    public void setValue(String value) {
+    public void setValue(@SuppressWarnings("unused") String value) {
         if (scanCell != null) {
             // \scanCell.setValue(value);
         }

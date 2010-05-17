@@ -515,6 +515,16 @@ public class ContainerWrapper extends
     }
 
     @SuppressWarnings("unchecked")
+    public int getChildCount() {
+        Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
+            .get("children");
+        if (children != null) {
+            return children.size();
+        }
+        return wrappedObject.getChildPositionCollection().size();
+    }
+
+    @SuppressWarnings("unchecked")
     public Map<RowColPos, ContainerWrapper> getChildren() {
         Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
             .get("children");
