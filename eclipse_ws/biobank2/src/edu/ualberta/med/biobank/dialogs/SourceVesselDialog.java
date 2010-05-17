@@ -8,11 +8,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SourceVesselDialog extends BiobankDialog {
 
@@ -66,8 +66,8 @@ public class SourceVesselDialog extends BiobankDialog {
         content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(content, Text.class, SWT.BORDER, "Name",
-            null, PojoObservables.observeValue(sourceVessel, "name"),
+        createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
+            "Name", null, PojoObservables.observeValue(sourceVessel, "name"),
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
 
     }

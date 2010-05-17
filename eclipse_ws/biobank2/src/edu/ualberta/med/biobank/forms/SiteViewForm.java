@@ -7,7 +7,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
@@ -38,29 +38,29 @@ public class SiteViewForm extends AddressViewFormCommon {
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable topContainersTable;
 
-    private Text nameLabel;
+    private BiobankText nameLabel;
 
-    private Text nameShortLabel;
+    private BiobankText nameShortLabel;
 
-    private Text clinicCountLabel;
+    private BiobankText clinicCountLabel;
 
-    private Text studyCountLabel;
+    private BiobankText studyCountLabel;
 
-    private Text containerTypeCountLabel;
+    private BiobankText containerTypeCountLabel;
 
-    private Text topContainerCountLabel;
+    private BiobankText topContainerCountLabel;
 
-    private Text shipmentCountLabel;
+    private BiobankText shipmentCountLabel;
 
-    private Text patientCountLabel;
+    private BiobankText patientCountLabel;
 
-    private Text patientVisitCountLabel;
+    private BiobankText patientVisitCountLabel;
 
-    private Text sampleCountLabel;
+    private BiobankText sampleCountLabel;
 
-    private Text activityStatusLabel;
+    private BiobankText activityStatusLabel;
 
-    private Text commentLabel;
+    private BiobankText commentLabel;
 
     @Override
     public void init() {

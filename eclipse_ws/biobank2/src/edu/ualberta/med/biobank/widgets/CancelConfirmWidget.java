@@ -9,7 +9,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
@@ -20,7 +19,7 @@ public class CancelConfirmWidget extends BiobankWidget {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(CancelConfirmWidget.class.getName());
 
-    private Text confirmCancelText;
+    private BiobankText confirmCancelText;
 
     private Button confirmButton;
 
@@ -45,7 +44,7 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     private void createContents() {
         form.getToolkit().createLabel(this, "Cancel/Confirm barcode:");
-        confirmCancelText = form.getToolkit().createText(this, "");
+        confirmCancelText = new BiobankText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
         gd.widthHint = 100;
@@ -54,7 +53,7 @@ public class CancelConfirmWidget extends BiobankWidget {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.keyCode == 13) {
-                    String text = ((Text) e.widget).getText();
+                    String text = ((BiobankText) e.widget).getText();
                     if (BioBankPlugin.getDefault().isConfirmBarcode(text)
                         && confirmButton.isEnabled()) {
                         form.confirm();

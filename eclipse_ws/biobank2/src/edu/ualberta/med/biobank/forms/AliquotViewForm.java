@@ -7,7 +7,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.RowColPos;
@@ -15,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
@@ -29,25 +29,25 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private AliquotWrapper aliquot;
 
-    private Text sampleTypeLabel;
+    private BiobankText sampleTypeLabel;
 
-    private Text linkDateLabel;
+    private BiobankText linkDateLabel;
 
-    private Text volumeLabel;
+    private BiobankText volumeLabel;
 
-    private Text shipmentWaybillLabel;
+    private BiobankText shipmentWaybillLabel;
 
-    private Text patientLabel;
+    private BiobankText patientLabel;
 
-    private Text dateProcessedLabel;
+    private BiobankText dateProcessedLabel;
 
-    private Text dateDrawnLabel;
+    private BiobankText dateDrawnLabel;
 
-    private Text activityStatusLabel;
+    private BiobankText activityStatusLabel;
 
-    private Text commentLabel;
+    private BiobankText commentLabel;
 
-    private Text positionLabel;
+    private BiobankText positionLabel;
 
     @Override
     public void init() {

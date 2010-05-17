@@ -10,12 +10,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
@@ -25,25 +25,25 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private ContainerTypeWrapper containerType;
 
-    private Text siteLabel;
+    private BiobankText siteLabel;
 
-    private Text nameLabel;
+    private BiobankText nameLabel;
 
-    private Text nameShortLabel;
+    private BiobankText nameShortLabel;
 
     private Button isTopLevelButton;
 
-    private Text rowCapacityLabel;
+    private BiobankText rowCapacityLabel;
 
-    private Text colCapacityLabel;
+    private BiobankText colCapacityLabel;
 
-    private Text defaultTempLabel;
+    private BiobankText defaultTempLabel;
 
-    private Text numSchemeLabel;
+    private BiobankText numSchemeLabel;
 
-    private Text activityStatusLabel;
+    private BiobankText activityStatusLabel;
 
-    private Text commentLabel;
+    private BiobankText commentLabel;
 
     private ListViewer sampleTypesViewer;
 

@@ -159,7 +159,7 @@ public class PalletCell extends Cell {
 
     public void setValue(String value) {
         if (scanCell != null) {
-            // scanCell.setValue(value);
+            // \scanCell.setValue(value);
         }
     }
 

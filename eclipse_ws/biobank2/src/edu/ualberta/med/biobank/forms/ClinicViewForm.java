@@ -6,11 +6,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ShipmentInfoTable;
@@ -27,23 +27,23 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
-    private Text siteLabel;
+    private BiobankText siteLabel;
 
-    private Text nameLabel;
+    private BiobankText nameLabel;
 
-    private Text nameShortLabel;
+    private BiobankText nameShortLabel;
 
     private Button hasShipmentsButton;
 
-    private Text activityStatusLabel;
+    private BiobankText activityStatusLabel;
 
-    private Text commentLabel;
+    private BiobankText commentLabel;
 
-    private Text patientTotal;
+    private BiobankText patientTotal;
 
-    private Text visitTotal;
+    private BiobankText visitTotal;
 
-    private Text shipmentTotal;
+    private BiobankText shipmentTotal;
 
     private ShipmentInfoTable shipmentsTable;
 

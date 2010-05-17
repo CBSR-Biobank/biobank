@@ -1,0 +1,122 @@
+package edu.ualberta.med.biobank.widgets;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+
+public class BiobankText extends Composite {
+
+    private Text text;
+    private boolean alreadyFocused;
+
+    public BiobankText(Composite parent, int style) {
+        super(parent, SWT.NONE);
+        this.alreadyFocused = false;
+        this.text = new Text(this, style);
+        this.text.addFocusListener(getFocusListener());
+        this.text.addMouseListener(getMouseListener());
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        this.setLayout(layout);
+        text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        layout();
+    }
+
+    public BiobankText(Composite parent, int style, FormToolkit toolkit) {
+        super(parent, SWT.NONE);
+        this.alreadyFocused = false;
+        this.text = toolkit.createText(this, "", style);
+        this.text.addFocusListener(getFocusListener());
+        this.text.addMouseListener(getMouseListener());
+        GridLayout layout = new GridLayout();
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        this.setLayout(layout);
+        text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        layout();
+    }
+
+    private FocusListener getFocusListener() {
+        return new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                text.selectAll();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                alreadyFocused = false;
+            }
+        };
+    }
+
+    public MouseListener getMouseListener() {
+        return new MouseListener() {
+
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseDown(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseUp(MouseEvent e) {
+                if (!alreadyFocused) {
+                    text.selectAll();
+                    alreadyFocused = true;
+                } else
+                    alreadyFocused = false;
+            }
+
+        };
+    }
+
+    public void setText(String text) {
+        this.text.setText(text);
+    }
+
+    public String getText() {
+        return text.getText();
+    }
+
+    public Text getTextBox() {
+        return text;
+    }
+
+    public void setSelection(int start, int end) {
+        text.setSelection(start, end);
+    }
+
+    public void addModifyListener(ModifyListener modifyListener) {
+        text.addModifyListener(modifyListener);
+    }
+
+    public void removeModifyListener(ModifyListener modifyListener) {
+        text.addModifyListener(modifyListener);
+    }
+
+    public void selectAll() {
+        text.selectAll();
+    }
+
+    public String getLineDelimiter() {
+        return text.getLineDelimiter();
+    }
+
+    public void setEditable(boolean b) {
+        text.setEditable(b);
+    }
+}

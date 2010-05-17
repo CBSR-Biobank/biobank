@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -23,6 +22,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
  * The base class for all BioBank2 Java Client view forms. The forms are usually
@@ -98,9 +98,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             if (value != null) {
                 Control widget = getWidget(label);
                 if ((fi.widgetClass == Combo.class)
-                    || (fi.widgetClass == Text.class)
+                    || (fi.widgetClass == BiobankText.class)
                     || (fi.widgetClass == Label.class)) {
-                    ((Text) widget).setText((String) value);
+                    ((BiobankText) widget).setText((String) value);
                 }
             }
         }

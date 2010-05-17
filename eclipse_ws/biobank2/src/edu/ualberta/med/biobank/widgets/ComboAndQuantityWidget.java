@@ -8,13 +8,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 public class ComboAndQuantityWidget extends BiobankWidget {
 
     private Combo valuesCombo;
 
-    private Text quantitiesText;
+    private BiobankText quantitiesText;
 
     public ComboAndQuantityWidget(Composite parent, int style) {
         super(parent, style | SWT.BORDER);
@@ -27,7 +26,7 @@ public class ComboAndQuantityWidget extends BiobankWidget {
         valuesCombo = new Combo(this, SWT.NONE);
         Label l = new Label(this, SWT.NONE);
         l.setText("Quantity:");
-        quantitiesText = new Text(this, SWT.NONE);
+        quantitiesText = new BiobankText(this, SWT.NONE);
     }
 
     public void addValues(String[] values) {

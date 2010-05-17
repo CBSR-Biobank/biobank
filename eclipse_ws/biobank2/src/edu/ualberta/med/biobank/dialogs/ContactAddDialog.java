@@ -8,10 +8,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ContactAddDialog extends BiobankDialog {
 
@@ -61,36 +61,36 @@ public class ContactAddDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(contents, Text.class,
+        Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
             SWT.BORDER, "Name", new String[0], BeansObservables.observeValue(
                 contactWrapper, "name"), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Title",
-            new String[0], BeansObservables.observeValue(contactWrapper,
-                "title"), null);
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+            "Title", new String[0], BeansObservables.observeValue(
+                contactWrapper, "title"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "email",
-            new String[0], BeansObservables.observeValue(contactWrapper,
-                "emailAddress"), null);
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+            "email", new String[0], BeansObservables.observeValue(
+                contactWrapper, "emailAddress"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Mobile #", new String[0], BeansObservables.observeValue(
                 contactWrapper, "mobileNumber"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Pager #",
-            new String[0], BeansObservables.observeValue(contactWrapper,
-                "pagerNumber"), null);
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+            "Pager #", new String[0], BeansObservables.observeValue(
+                contactWrapper, "pagerNumber"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Office #", new String[0], BeansObservables.observeValue(
                 contactWrapper, "officeNumber"), null);
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER, "Fax #",
-            new String[0], BeansObservables.observeValue(contactWrapper,
-                "faxNumber"), null);
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+            "Fax #", new String[0], BeansObservables.observeValue(
+                contactWrapper, "faxNumber"), null);
     }
 
     public ContactWrapper getContactWrapper() {

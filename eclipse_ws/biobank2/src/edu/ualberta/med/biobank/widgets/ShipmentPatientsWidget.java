@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -50,7 +49,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
     private PatientInfoTable patientTable;
 
-    private Text newPatientText;
+    private BiobankText newPatientText;
 
     private SiteWrapper currentSite;
 
@@ -82,7 +81,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
-            newPatientText = toolkit.createText(this, "");
+            newPatientText = new BiobankText(this, SWT.NONE, toolkit);
             newPatientText.addListener(SWT.DefaultSelection, new Listener() {
                 public void handleEvent(Event e) {
                     addPatient();

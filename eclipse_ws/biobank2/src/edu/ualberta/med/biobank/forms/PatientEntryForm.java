@@ -13,7 +13,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
@@ -84,7 +84,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text labelSite = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        BiobankText labelSite = createReadOnlyLabelledField(client, SWT.NONE,
+            "Site");
         siteWrapper = SessionManager.getInstance().getCurrentSite();
         labelSite.setText(siteWrapper.getName());
 
@@ -103,7 +104,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         studiesViewer = createComboViewerWithNoSelectionValidator(client,
             "Study", studies, selectedStudy, "A study should be selected");
 
-        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Patient Number", null, BeansObservables.observeValue(
                 patientAdapter.getWrapper(), "pnumber"),
             new NonEmptyStringValidator(MSG_NO_PATIENT_NUMBER)));

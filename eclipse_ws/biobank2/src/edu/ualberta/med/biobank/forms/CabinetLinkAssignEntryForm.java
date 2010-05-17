@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -54,6 +53,7 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
@@ -73,17 +73,17 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private AbstractContainerDisplayWidget cabinetWidget;
     private AbstractContainerDisplayWidget drawerWidget;
 
-    private Text inventoryIdText;
+    private BiobankText inventoryIdText;
     private Label oldCabinetPositionLabel;
-    private Text oldCabinetPosition;
+    private BiobankText oldCabinetPosition;
     private Label oldCabinetPositionCheckLabel;
-    private Text oldCabinetPositionCheck;
+    private BiobankText oldCabinetPositionCheck;
     private Label newCabinetPositionLabel;
-    private Text newCabinetPosition;
+    private BiobankText newCabinetPosition;
     private Label sampleTypeComboLabel;
     private ComboViewer viewerSampleTypes;
     private Label sampleTypeTextLabel;
-    private Text sampleTypeText;
+    private BiobankText sampleTypeText;
     private Button checkButton;
 
     private CancelConfirmWidget cancelConfirmWidget;
@@ -255,8 +255,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
-        inventoryIdText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
+        inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
+            fieldsComposite, BiobankText.class, SWT.NONE, Messages
                 .getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
             BeansObservables.observeValue(aliquot, "inventoryId"), //$NON-NLS-1$
             inventoryIDValidator);
@@ -315,9 +315,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.old.position.label"));
         oldCabinetPositionLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        oldCabinetPosition = (Text) widgetCreator.createBoundWidget(
-            fieldsComposite, Text.class, SWT.NONE, oldCabinetPositionLabel,
-            new String[0], null, null);
+        oldCabinetPosition = (BiobankText) widgetCreator.createBoundWidget(
+            fieldsComposite, BiobankText.class, SWT.NONE,
+            oldCabinetPositionLabel, new String[0], null, null);
         gd = (GridData) oldCabinetPosition.getLayoutData();
         gd.horizontalSpan = 2;
         oldCabinetPosition.setEnabled(false);
@@ -349,10 +349,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 return ValidationStatus.error(errorMessage);
             }
         };
-        oldCabinetPositionCheck = (Text) widgetCreator.createBoundWidget(
-            fieldsComposite, Text.class, SWT.NONE,
-            oldCabinetPositionCheckLabel, new String[0], new WritableValue("",
-                String.class), oldCabinetPositionCheckValidator);
+        oldCabinetPositionCheck = (BiobankText) widgetCreator
+            .createBoundWidget(fieldsComposite, BiobankText.class, SWT.NONE,
+                oldCabinetPositionCheckLabel, new String[0], new WritableValue(
+                    "", String.class), oldCabinetPositionCheckValidator);
         gd = (GridData) oldCabinetPositionCheck.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -364,10 +364,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         newCabinetPositionValidator = new CabinetLabelValidator(Messages
             .getString("Cabinet.position.validationMsg"));
         displayOldCabinetFields(false);
-        newCabinetPosition = (Text) widgetCreator.createBoundWidget(
-            fieldsComposite, Text.class, SWT.NONE, newCabinetPositionLabel,
-            new String[0],
-            new WritableValue("", String.class), newCabinetPositionValidator); //$NON-NLS-1$
+        newCabinetPosition = (BiobankText) widgetCreator.createBoundWidget(
+            fieldsComposite, BiobankText.class, SWT.NONE,
+            newCabinetPositionLabel, new String[0], new WritableValue(
+                "", String.class), newCabinetPositionValidator); //$NON-NLS-1$
         gd = (GridData) newCabinetPosition.getLayoutData();
         gd.horizontalSpan = 2;
         newCabinetPosition.addFocusListener(new FocusAdapter() {
@@ -536,8 +536,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.sampleType.label"));
         sampleTypeTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        sampleTypeText = (Text) widgetCreator.createBoundWidget(
-            fieldsComposite, Text.class, SWT.NONE, sampleTypeTextLabel,
+        sampleTypeText = (BiobankText) widgetCreator.createBoundWidget(
+            fieldsComposite, BiobankText.class, SWT.NONE, sampleTypeTextLabel,
             new String[0], null, null);
         ((GridData) sampleTypeText.getLayoutData()).horizontalSpan = 2;
         sampleTypeText.setEnabled(false);

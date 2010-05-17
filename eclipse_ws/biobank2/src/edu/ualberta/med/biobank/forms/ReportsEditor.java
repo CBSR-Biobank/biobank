@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 
@@ -89,6 +88,7 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
@@ -251,13 +251,13 @@ public class ReportsEditor extends BiobankFormBase {
     private ArrayList<Object> getParams() {
         ArrayList<Object> params = new ArrayList<Object>();
         for (int i = 0; i < widgetFields.size(); i++) {
-            if (widgetFields.get(i) instanceof Text) {
-                if (((Text) widgetFields.get(i)).getText().compareTo("") == 0)
+            if (widgetFields.get(i) instanceof BiobankText) {
+                if (((BiobankText) widgetFields.get(i)).getText().compareTo("") == 0)
                     params.add(query.getOptions().get(i).getDefaultValue());
                 else
                     try {
-                        params.add(Integer
-                            .parseInt(((Text) widgetFields.get(i)).getText()));
+                        params.add(Integer.parseInt(((BiobankText) widgetFields
+                            .get(i)).getText()));
                     } catch (NumberFormatException e) {
                         BioBankPlugin
                             .openAsyncError("Invalid Number Format",
@@ -590,18 +590,18 @@ public class ReportsEditor extends BiobankFormBase {
                 IObservableValue numAliquots = new WritableValue("",
                     String.class);
                 widget = widgetCreator.createBoundWidget(parameterSection,
-                    Text.class, SWT.BORDER, fieldLabel, new String[0],
+                    BiobankText.class, SWT.BORDER, fieldLabel, new String[0],
                     numAliquots, new IntegerNumberValidator(
                         "Enter a valid integer.", false));
-                ((Text) widget).setLayoutData(widgetData);
+                ((BiobankText) widget).setLayoutData(widgetData);
             } else if (option.getType() == Double.class) {
                 IObservableValue numAliquots = new WritableValue("",
                     String.class);
                 widget = widgetCreator.createBoundWidget(parameterSection,
-                    Text.class, SWT.BORDER, fieldLabel, new String[0],
+                    BiobankText.class, SWT.BORDER, fieldLabel, new String[0],
                     numAliquots, new DoubleNumberValidator(
                         "Enter a valid integer.", false));
-                ((Text) widget).setText("0");
+                ((BiobankText) widget).setText("0");
             } else
                 widget = null;
             widgetFields.add(widget);

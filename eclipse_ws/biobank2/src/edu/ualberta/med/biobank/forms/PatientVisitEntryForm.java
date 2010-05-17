@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -35,6 +34,7 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
@@ -176,9 +176,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createPvDataSection(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI | SWT.WRAP,
-            "Comments", null, BeansObservables.observeValue(patientVisit,
-                "comment"), null);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
+            | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
+            patientVisit, "comment"), null);
     }
 
     private void createSourcesSection() {
@@ -224,12 +224,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         IObservableValue valueObserved = BeansObservables.observeValue(
             pvCustomInfo, "value");
         if (pvCustomInfo.getType().equals("number")) {
-            control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                pvCustomInfo.getLabel(), null, valueObserved,
+            control = createBoundWidgetWithLabel(client, BiobankText.class,
+                SWT.NONE, pvCustomInfo.getLabel(), null, valueObserved,
                 new DoubleNumberValidator("You should select a valid number"));
         } else if (pvCustomInfo.getType().equals("text")) {
-            control = createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
-                pvCustomInfo.getLabel(), null, valueObserved, null);
+            control = createBoundWidgetWithLabel(client, BiobankText.class,
+                SWT.NONE, pvCustomInfo.getLabel(), null, valueObserved, null);
         } else if (pvCustomInfo.getType().equals("date_time")) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
