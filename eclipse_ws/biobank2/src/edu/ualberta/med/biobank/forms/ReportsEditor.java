@@ -219,6 +219,7 @@ public class ReportsEditor extends BiobankFormBase {
                             reportTable = new ReportTableWidget<Object>(form
                                 .getBody(), reportData, query.getColumnNames(),
                                 columnWidths.get(query.getClass()), 40);
+                            reportTable.adaptToToolkit(toolkit, true);
                             form.reflow(true);
                         }
                     });
@@ -236,6 +237,7 @@ public class ReportsEditor extends BiobankFormBase {
         }
         reportTable = new ReportTableWidget<Object>(form.getBody(), null,
             new String[] { " " }, new int[] { 500 });
+        reportTable.adaptToToolkit(toolkit, true);
         form.layout(true, true);
     }
 

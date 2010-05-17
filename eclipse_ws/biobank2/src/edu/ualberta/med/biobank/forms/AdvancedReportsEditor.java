@@ -386,6 +386,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                                 headingSizes[i] = 100;
                             reportTable = new ReportTableWidget<Object>(top,
                                 reportData, names, headingSizes, 40);
+                            reportTable.adaptToToolkit(toolkit, true);
                             GridData gd = new GridData();
                             gd.horizontalSpan = 2;
                             gd.grabExcessHorizontalSpace = true;
@@ -412,6 +413,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         }
         reportTable = new ReportTableWidget<Object>(top, null,
             new String[] { " " }, new int[] { 500 });
+        reportTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
