@@ -1,8 +1,9 @@
-package edu.ualberta.med.biobank;
+package edu.ualberta.med.biobank.test;
 
 import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,7 +13,11 @@ import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AppServiceSpeedTest {
 
@@ -23,7 +28,7 @@ public class AppServiceSpeedTest {
 
     private SiteWrapper cbsrSite = null;
 
-    private Map<String, ContainerWrapper> topContainersMap = null;
+    private List<ContainerWrapper> topContainers = null;
 
     public static void main(String[] args) {
         try {
@@ -38,29 +43,51 @@ public class AppServiceSpeedTest {
         PropertyConfigurator.configure("conf/log4j.properties");
 
         File file = new File("conf/all.keystore");
-        URL url = file.toURI().toURL();
 
         appService = ServiceConnection.getAppService("https://"
             + System.getProperty("server", "cbsr.med.ualberta.ca:8443")
-            + "/biobank2", url, "testuser", "test");
+            + "/biobank2", file.toURI().toURL(), "testuser", "test");
 
         cbsrSite = getCbsrSite();
 
-        speedTestContainers();
+        speedTestContainerWrapper();
+        speedTestContainer();
     }
 
-    private void speedTestContainers() throws Exception {
+    private void speedTestContainerWrapper() throws Exception {
+        logger.info("speedTestContainerWrapper: test start");
         initTopContainersMap();
 
-        for (ContainerWrapper c : topContainersMap.values()) {
+        for (ContainerWrapper c : topContainers) {
             logger.info(c.getLabel() + ": number of children: "
                 + c.getChildCount());
             Map<RowColPos, ContainerWrapper> pos = c.getChildren();
             for (ContainerWrapper child : pos.values()) {
-                logger.info(child.getLabel() + ": number of children: "
+                logger.debug(child.getLabel() + ": number of children: "
                     + child.getChildCount());
             }
         }
+        logger.info("speedTestContainerWrapper: test end");
+    }
+
+    private void speedTestContainer() throws ApplicationException {
+        logger.info("speedTestContainer: test start");
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site.id = ? and containerType.topLevel = true", Arrays
+            .asList(new Object[] { cbsrSite.getId() }));
+        List<Container> containers = appService.query(criteria);
+        for (Container c : containers) {
+            logger.info(c.getLabel() + ": number of children: "
+                + c.getChildPositionCollection().size());
+            for (ContainerPosition childPos : c.getChildPositionCollection()) {
+                Container child = childPos.getContainer();
+                logger.debug(child.getLabel() + ": number of children: "
+                    + child.getChildPositionCollection().size());
+            }
+
+        }
+        logger.info("speedTestContainer: test end");
     }
 
     private SiteWrapper getCbsrSite() throws Exception {
@@ -73,9 +100,9 @@ public class AppServiceSpeedTest {
     }
 
     private void initTopContainersMap() throws Exception {
-        topContainersMap = new HashMap<String, ContainerWrapper>();
+        topContainers = new ArrayList<ContainerWrapper>();
         for (ContainerWrapper container : cbsrSite.getTopContainerCollection()) {
-            topContainersMap.put(container.getLabel(), container);
+            topContainers.add(container);
         }
     }
 

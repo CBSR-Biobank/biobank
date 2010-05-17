@@ -156,8 +156,7 @@
            dest="${cacore.sdk.dir}" />
   </target>
   <target name="check-cacore-sdk-uptodate"
-          depends="cacore-untar"
-          unless="cacore.sdk.available">
+          depends="cacore-untar">
     <uptodate property="cacore.sdk.uptodate"
               targetfile="${cacore.sdk.dir}/output/biobank2">
       <srcfiles file="sdk_conf/deploy.properties" />
@@ -302,7 +301,7 @@
     <fail unless="env.JBOSS_HOME" message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
