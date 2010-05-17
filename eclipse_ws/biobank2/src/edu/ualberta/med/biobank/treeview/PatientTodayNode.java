@@ -36,6 +36,11 @@ public class PatientTodayNode extends AbstractTodayNode {
     }
 
     @Override
+    protected int getWrapperChildCount() throws Exception {
+        return 0;
+    }
+
+    @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
         return PatientWrapper.getPatientsInTodayShipments(SessionManager

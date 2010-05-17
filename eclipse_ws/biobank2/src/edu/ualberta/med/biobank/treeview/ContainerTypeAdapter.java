@@ -83,6 +83,11 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
+    protected int getWrapperChildCount() throws Exception {
+        return 0;
+    }
+
+    @Override
     public String getEntryFormId() {
         return ContainerTypeEntryForm.ID;
     }

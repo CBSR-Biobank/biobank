@@ -392,14 +392,14 @@ public abstract class AdapterBase {
             return;
 
         try {
-            Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
-            if ((childObjects == null) || (childObjects.size() == 0)) {
+            int childCount = getWrapperChildCount();
+            if (childCount == 0) {
                 setHasChildren(false);
                 return;
             }
             setHasChildren(true);
             final List<AdapterBase> newNodes = new ArrayList<AdapterBase>();
-            for (int i = 0, n = childObjects.size() - children.size(); i < n; ++i) {
+            for (int i = 0, n = childCount - children.size(); i < n; ++i) {
                 final AdapterBase node = createChildNode(-i);
                 addChild(node);
                 newNodes.add(node);
@@ -535,6 +535,8 @@ public abstract class AdapterBase {
      */
     protected abstract Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception;
+
+    protected abstract int getWrapperChildCount() throws Exception;
 
     public static boolean closeEditor(FormInput input) {
         IWorkbenchPage page = PlatformUI.getWorkbench()
