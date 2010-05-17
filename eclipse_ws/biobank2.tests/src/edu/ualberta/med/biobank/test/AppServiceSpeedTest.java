@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +27,6 @@ public class AppServiceSpeedTest {
 
     private SiteWrapper cbsrSite = null;
 
-    private List<ContainerWrapper> topContainers = null;
-
     public static void main(String[] args) {
         try {
             new AppServiceSpeedTest();
@@ -50,15 +47,14 @@ public class AppServiceSpeedTest {
 
         cbsrSite = getCbsrSite();
 
-        speedTestContainerWrapper();
         speedTestContainer();
+        speedTestContainerWrapper();
     }
 
     private void speedTestContainerWrapper() throws Exception {
         logger.info("speedTestContainerWrapper: test start");
-        initTopContainersMap();
 
-        for (ContainerWrapper c : topContainers) {
+        for (ContainerWrapper c : cbsrSite.getTopContainerCollection()) {
             logger.info(c.getLabel() + ": number of children: "
                 + c.getChildCount());
             Map<RowColPos, ContainerWrapper> pos = c.getChildren();
@@ -97,13 +93,6 @@ public class AppServiceSpeedTest {
             }
         }
         return null;
-    }
-
-    private void initTopContainersMap() throws Exception {
-        topContainers = new ArrayList<ContainerWrapper>();
-        for (ContainerWrapper container : cbsrSite.getTopContainerCollection()) {
-            topContainers.add(container);
-        }
     }
 
 }
