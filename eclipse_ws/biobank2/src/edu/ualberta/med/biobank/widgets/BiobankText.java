@@ -3,12 +3,17 @@ package edu.ualberta.med.biobank.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -23,6 +28,7 @@ public class BiobankText extends Composite {
         this.text = new Text(this, style);
         this.text.addFocusListener(getFocusListener());
         this.text.addMouseListener(getMouseListener());
+        this.text.addModifyListener(getModifyListener());
         GridLayout layout = new GridLayout();
         layout.marginWidth = 0;
         layout.marginHeight = 0;
@@ -37,6 +43,7 @@ public class BiobankText extends Composite {
         this.text = toolkit.createText(this, "", style);
         this.text.addFocusListener(getFocusListener());
         this.text.addMouseListener(getMouseListener());
+        this.text.addModifyListener(getModifyListener());
         GridLayout layout = new GridLayout();
         layout.marginWidth = 0;
         layout.marginHeight = 0;
@@ -60,7 +67,7 @@ public class BiobankText extends Composite {
         };
     }
 
-    public MouseListener getMouseListener() {
+    private MouseListener getMouseListener() {
         return new MouseListener() {
 
             @Override
@@ -84,6 +91,16 @@ public class BiobankText extends Composite {
         };
     }
 
+    private ModifyListener getModifyListener() {
+        return new ModifyListener() {
+
+            @Override
+            public void modifyText(ModifyEvent e) {
+                alreadyFocused = false;
+            }
+        };
+    }
+
     public void setText(String text) {
         this.text.setText(text);
     }
@@ -98,6 +115,42 @@ public class BiobankText extends Composite {
 
     public void setSelection(int start, int end) {
         text.setSelection(start, end);
+    }
+
+    public void addSelectionListener(SelectionListener s) {
+        text.addSelectionListener(s);
+    }
+
+    public void removeSelectionListener(SelectionListener s) {
+        text.removeSelectionListener(s);
+    }
+
+    public void addVerifyListener(VerifyListener v) {
+        text.addVerifyListener(v);
+    }
+
+    public void removeVerifyListener(VerifyListener v) {
+        text.removeVerifyListener(v);
+    }
+
+    @Override
+    public void addKeyListener(KeyListener listener) {
+        text.addKeyListener(listener);
+    }
+
+    @Override
+    public void removeKeyListener(KeyListener listener) {
+        text.removeKeyListener(listener);
+    }
+
+    @Override
+    public void addListener(int eventType, Listener listener) {
+        text.addListener(eventType, listener);
+    }
+
+    @Override
+    public void removeListener(int eventType, Listener listener) {
+        text.removeListener(eventType, listener);
     }
 
     public void addModifyListener(ModifyListener modifyListener) {
