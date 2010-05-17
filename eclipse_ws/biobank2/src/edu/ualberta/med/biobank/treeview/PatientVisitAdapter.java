@@ -101,6 +101,11 @@ public class PatientVisitAdapter extends AdapterBase {
     }
 
     @Override
+    protected int getWrapperChildCount() throws Exception {
+        return 0;
+    }
+
+    @Override
     public String getEntryFormId() {
         return PatientVisitEntryForm.ID;
     }

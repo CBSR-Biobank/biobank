@@ -219,6 +219,11 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
+    protected int getWrapperChildCount() {
+        return getContainer().getChildCount();
+    }
+
+    @Override
     public String getEntryFormId() {
         return ContainerEntryForm.ID;
     }

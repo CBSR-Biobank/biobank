@@ -82,6 +82,11 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
+    protected int getWrapperChildCount() throws Exception {
+        return getWrapperChildren().size();
+    }
+
+    @Override
     public String getEntryFormId() {
         return ShipmentEntryForm.ID;
     }

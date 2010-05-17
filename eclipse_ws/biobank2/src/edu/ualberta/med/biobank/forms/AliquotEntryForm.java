@@ -106,9 +106,9 @@ public class AliquotEntryForm extends BiobankEntryForm {
                 .getActivityStatus(), "Aliquot must have an activity status",
             true);
 
-        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.WRAP | SWT.MULTI, "Comments", null, BeansObservables
-                .observeValue(aliquot, "comment"), null);
+        createBoundWidgetWithLabel(client, Text.class, SWT.WRAP | SWT.MULTI,
+            "Comments", null,
+            BeansObservables.observeValue(aliquot, "comment"), null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }

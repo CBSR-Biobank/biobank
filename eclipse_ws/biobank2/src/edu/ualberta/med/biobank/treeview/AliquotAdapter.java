@@ -72,6 +72,11 @@ public class AliquotAdapter extends AdapterBase {
     }
 
     @Override
+    protected int getWrapperChildCount() throws Exception {
+        return 0;
+    }
+
+    @Override
     public String getEntryFormId() {
         return AliquotEntryForm.ID;
     }
