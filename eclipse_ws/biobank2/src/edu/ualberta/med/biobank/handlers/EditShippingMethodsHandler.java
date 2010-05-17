@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ShippingMethodEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -28,6 +29,9 @@ public class EditShippingMethodsHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.getInstance().getSession() != null);
+        return (SessionManager.canCreate(ShippingMethodWrapper.class)
+            || SessionManager.canUpdate(ShippingMethodWrapper.class) || SessionManager
+            .canDelete(ShippingMethodWrapper.class))
+            && (SessionManager.getInstance().getSession() != null);
     }
 }
