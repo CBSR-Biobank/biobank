@@ -18,9 +18,15 @@ public class ServiceConnection {
 
     public static WritableApplicationService getAppService(String serverUrl,
         String userName, String password) throws Exception {
+        return getAppService(serverUrl, ServiceConnection.class
+            .getResource(KEYSTORE_FILE_PATH), userName, password);
+    }
+
+    public static WritableApplicationService getAppService(String serverUrl,
+        URL trustStoreUrl, String userName, String password) throws Exception {
         if (serverUrl.startsWith("https")
             && System.getProperty(TRUST_STORE_PROPERTY_NAME) == null) {
-            setTrustStore();
+            setTrustStore(trustStoreUrl);
         }
         if (userName == null) {
             return (WritableApplicationService) ApplicationServiceProvider
@@ -31,13 +37,16 @@ public class ServiceConnection {
     }
 
     public static void setTrustStore() throws Exception {
-        URL url = ServiceConnection.class.getResource(KEYSTORE_FILE_PATH);
-        if (url != null) {
-            if (resourceResolver != null) {
-                url = resourceResolver.resolveURL(url);
-            }
-            System.setProperty(TRUST_STORE_PROPERTY_NAME, url.getFile());
+        setTrustStore(ServiceConnection.class.getResource(KEYSTORE_FILE_PATH));
+    }
+
+    public static void setTrustStore(URL url) throws Exception {
+        if (url == null)
+            return;
+        if (resourceResolver != null) {
+            url = resourceResolver.resolveURL(url);
         }
+        System.setProperty(TRUST_STORE_PROPERTY_NAME, url.getFile());
     }
 
     public static WritableApplicationService getAppService(String serverUrl)
