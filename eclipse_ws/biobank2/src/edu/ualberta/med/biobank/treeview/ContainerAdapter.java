@@ -214,8 +214,11 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
-        return getContainer().getChildren().values();
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
+        Assert.isNotNull(modelObject, "site null");
+        ((ContainerWrapper) modelObject).reload();
+        return ((ContainerWrapper) modelObject).getChildren().values();
     }
 
     @Override

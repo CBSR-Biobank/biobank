@@ -58,9 +58,17 @@ public class SiteManager {
             public Integer getId() {
                 return -9999;
             }
+
+            @Override
+            public String getName() {
+                return "All Sites";
+            }
+
+            @Override
+            public String getNameShort() {
+                return "All Sites";
+            }
         };
-        allSitesWrapper.setName("All Sites");
-        allSitesWrapper.setNameShort("All Sites");
     }
 
     /*
