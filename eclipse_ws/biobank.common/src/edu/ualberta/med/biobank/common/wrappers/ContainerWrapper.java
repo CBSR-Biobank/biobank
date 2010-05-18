@@ -428,9 +428,14 @@ public class ContainerWrapper extends
             if (positions != null) {
                 aliquots = new TreeMap<RowColPos, AliquotWrapper>();
                 for (AliquotPosition position : positions) {
+                    AliquotWrapper aliquot = new AliquotWrapper(appService,
+                        position.getAliquot());
+                    try {
+                        aliquot.reload();
+                    } catch (Exception e) {
+                    }
                     aliquots.put(new RowColPos(position.getRow(), position
-                        .getCol()), new AliquotWrapper(appService, position
-                        .getAliquot()));
+                        .getCol()), aliquot);
                 }
                 propertiesMap.put("aliquots", aliquots);
             }

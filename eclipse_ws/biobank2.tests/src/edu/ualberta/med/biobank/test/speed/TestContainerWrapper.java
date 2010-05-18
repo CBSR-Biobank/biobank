@@ -9,20 +9,17 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SpeedTestContainerWrapper extends SpeedTest {
+public class TestContainerWrapper extends SpeedTest {
 
-    private static final Logger logger = Logger
-        .getLogger(SpeedTestContainer.class);
+    private static final Logger logger = Logger.getLogger(TestContainer.class);
 
-    public SpeedTestContainerWrapper(WritableApplicationService appService,
+    public TestContainerWrapper(WritableApplicationService appService,
         SiteWrapper site) {
         super(appService, site);
     }
 
     @Override
     public void doTest() throws Exception {
-        logger.info("speedTestContainerWrapper: test start");
-
         for (ContainerWrapper c : site.getTopContainerCollection()) {
             logger.info(c.getLabel() + ": number of children: "
                 + c.getChildCount());
@@ -32,6 +29,5 @@ public class SpeedTestContainerWrapper extends SpeedTest {
                     + child.getChildCount());
             }
         }
-        logger.info("speedTestContainerWrapper: test end");
     }
 }

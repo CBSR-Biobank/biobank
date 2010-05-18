@@ -33,21 +33,28 @@ public class AppServiceSpeedTest {
 
         File file = new File("conf/all.keystore");
 
-        appService = ServiceConnection.getAppService(
-            "https://" + System.getProperty("server", "136.159.173.90:9443")
-                + "/biobank2", file.toURI().toURL(), "testuser", "test");
+        String defaultServerUrl = "http://localhost:8080";
+        // String defaultServerUrl = "https://136.159.173.90:9443";
+        // String defaultServerUrl = "https://cbsr.med.ualberta.ca:8443";
+
+        appService = ServiceConnection.getAppService(System.getProperty(
+            "server.url", defaultServerUrl)
+            + "/biobank2", file.toURI().toURL(), "testuser", "test");
 
         cbsrSite = getCbsrSite();
 
-        doTest(new SpeedTestContainer(appService, cbsrSite));
-        doTest(new SpeedTestContainerWrapper(appService, cbsrSite));
+        doTest(new TestContainer(appService, cbsrSite));
+        // doTest(new TestContainerWrapper(appService, cbsrSite));
+        // doTest(new TestContainerAliquots(appService, cbsrSite));
     }
 
     private void doTest(SpeedTest test) throws Exception {
+        logger.info("starting test " + test.getClass().getName());
         long tsStart = (new Date()).getTime();
         test.doTest();
         long tsEnd = (new Date()).getTime();
-        logger.info("test execution time is: " + (tsEnd - tsStart) + " ms");
+        logger.info("test " + test.getClass().getName()
+            + " execution time is: " + (tsEnd - tsStart) + " ms");
     }
 
     private SiteWrapper getCbsrSite() throws Exception {
