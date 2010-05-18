@@ -403,7 +403,7 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage, String bindingKey) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, -1, bindingKey);
+            modelObservableValue, emptyMessage, SWT.DATE | SWT.TIME, bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
@@ -431,8 +431,8 @@ public class WidgetCreator {
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, IObservableValue modelObservableValue,
         final String emptyMessage, int typeShown, String bindingKey) {
-        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
-            date, typeShown);
+        final DateTimeWidget widget = new DateTimeWidget(client, typeShown,
+            date);
         if (selectionListener != null) {
             widget.addModifyListener(modifyListener);
         }
