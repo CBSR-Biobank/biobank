@@ -181,6 +181,7 @@ public class ReportsEditor extends BiobankFormBase {
                                 reportData = query.generate(SessionManager
                                     .getAppService(), params);
                             } catch (Exception e) {
+                                reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
                             }

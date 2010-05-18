@@ -42,23 +42,7 @@ public class FileBrowser extends BiobankWidget {
                 if (path != null) {
                     textfield.setText(path);
                     File file = new File(path);
-                    if (file.isFile()) {
-                        String contents = "";
-                        FileReader fileReader;
-                        try {
-                            fileReader = new FileReader(file);
-                            BufferedReader br = new BufferedReader(fileReader);
-                            while (br.ready())
-                                contents += br.readLine() + "\n";
-                        } catch (Exception e1) {
-                            BioBankPlugin.openError("IO Error",
-                                "Unable to read file.");
-                        }
-                        setText(contents);
-                    } else
-                        BioBankPlugin
-                            .openError("File Error",
-                                "Not a valid file. Please select a valid CSV and try again.");
+                    loadFile(file);
                 } else
                     BioBankPlugin
                         .openError("File Error",
@@ -68,11 +52,32 @@ public class FileBrowser extends BiobankWidget {
         // browse.setLayoutData(data);
     }
 
+    public void loadFile(File file) {
+        if (file.isFile()) {
+            String contents = "";
+            FileReader fileReader;
+            try {
+                fileReader = new FileReader(file);
+                BufferedReader br = new BufferedReader(fileReader);
+                while (br.ready())
+                    contents += br.readLine() + "\n";
+            } catch (Exception e1) {
+                BioBankPlugin.openError("IO Error", "Unable to read file.");
+            }
+            setText(contents);
+        } else
+            BioBankPlugin.openError("File Error",
+                "Not a valid file. Please select a valid CSV and try again.");
+
+    }
+
     public void setText(String text) {
         this.text = text;
     }
 
     public String getText() {
+        loadFile(new File(textfield.getText()));
         return text;
     }
+
 }
