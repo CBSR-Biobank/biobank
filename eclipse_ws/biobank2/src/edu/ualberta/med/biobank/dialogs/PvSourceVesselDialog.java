@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -31,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.PvSourceVesselEntryInfoTable;
 
@@ -177,9 +177,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
         });
         allSourceVesselCheckBox.setSelection(useStudyOnlySourceVessels);
 
-        Text quantityText = (Text) createBoundWidgetWithLabel(contents,
-            Text.class, SWT.BORDER, "Quantity", new String[0], BeansObservables
-                .observeValue(internalSourceVessel, "quantity"),
+        BiobankText quantityText = (BiobankText) createBoundWidgetWithLabel(
+            contents, BiobankText.class, SWT.BORDER, "Quantity", new String[0],
+            BeansObservables.observeValue(internalSourceVessel, "quantity"),
             new IntegerNumberValidator("quantity should be a whole number",
                 false));
         GridData gd = (GridData) quantityText.getLayoutData();
@@ -196,9 +196,10 @@ public class PvSourceVesselDialog extends BiobankDialog {
         volumeLabel = widgetCreator.createLabel(contents, "Volume (ml)");
         volumeLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        volumeText = widgetCreator.createBoundWidget(contents, Text.class,
-            SWT.BORDER, volumeLabel, new String[0], BeansObservables
-                .observeValue(internalSourceVessel, "volume"), null);
+        volumeText = widgetCreator
+            .createBoundWidget(contents, BiobankText.class, SWT.BORDER,
+                volumeLabel, new String[0], BeansObservables.observeValue(
+                    internalSourceVessel, "volume"), null);
         gd = (GridData) volumeText.getLayoutData();
         gd.horizontalSpan = 2;
 

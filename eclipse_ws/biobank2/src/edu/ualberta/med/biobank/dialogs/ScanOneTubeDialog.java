@@ -7,17 +7,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ScanOneTubeDialog extends BiobankDialog {
 
     private String scannedValue;
-    private Text valueText;
+    private BiobankText valueText;
     private RowColPos position;
     private Map<RowColPos, PalletCell> cells;
 

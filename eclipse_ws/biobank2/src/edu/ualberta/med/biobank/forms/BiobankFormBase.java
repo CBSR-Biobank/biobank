@@ -20,7 +20,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorInput;
@@ -41,6 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -300,33 +300,33 @@ public abstract class BiobankFormBase extends EditorPart {
         widgetCreator.createWidgetsFromMap(fieldsMap, parent);
     }
 
-    protected Text createReadOnlyLabelledField(Composite parent,
+    protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        Text result = (Text) createLabelledWidget(parent, Text.class,
-            SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        BiobankText result = (BiobankText) createLabelledWidget(parent,
+            BiobankText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
         return result;
     }
 
-    protected Text createReadOnlyLabelledField(Composite parent,
+    protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel) {
         return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
             null);
     }
 
-    public static void setTextValue(Text label, String value) {
+    public static void setTextValue(BiobankText label, String value) {
         if (value != null && !label.isDisposed()) {
             label.setText(value);
         }
     }
 
-    protected Text createReadOnlyWidget(Composite parent, int widgetOptions,
-        String value) {
-        Text result = (Text) createWidget(parent, Text.class, SWT.READ_ONLY
-            | widgetOptions, value);
+    protected BiobankText createReadOnlyWidget(Composite parent,
+        int widgetOptions, String value) {
+        BiobankText result = (BiobankText) createWidget(parent,
+            BiobankText.class, SWT.READ_ONLY | widgetOptions, value);
         return result;
     }
 
-    public static void setTextValue(Text label, Object value) {
+    public static void setTextValue(BiobankText label, Object value) {
         if (value != null) {
             setTextValue(label, value.toString());
         }

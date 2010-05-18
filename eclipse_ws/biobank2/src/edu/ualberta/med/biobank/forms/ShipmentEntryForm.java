@@ -15,7 +15,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView.ShipmentListener;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -59,7 +59,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ShipmentListener shipListener;
 
-    private Text waybillText;
+    private BiobankText waybillText;
 
     private Label waybillLabel;
 
@@ -118,7 +118,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Site");
         setTextValue(siteLabel, site.getName());
 
         if (shipmentWrapper.isNew()) {
@@ -147,8 +148,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     }
                 });
         } else {
-            Text clinicLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Clinic");
+            BiobankText clinicLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Clinic");
             if (shipmentWrapper.getClinic() != null) {
                 clinicLabel.setText(shipmentWrapper.getClinic().getName());
             }
@@ -159,10 +160,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
-        waybillText = (Text) widgetCreator.createBoundWidget(client,
-            Text.class, SWT.NONE, waybillLabel, new String[0], BeansObservables
-                .observeValue(shipmentWrapper, "waybill"), waybillValidator,
-            WAYBILL_BINDING);
+        waybillText = (BiobankText) widgetCreator.createBoundWidget(client,
+            BiobankText.class, SWT.NONE, waybillLabel, new String[0],
+            BeansObservables.observeValue(shipmentWrapper, "waybill"),
+            waybillValidator, WAYBILL_BINDING);
         activateWaybillField(false);
 
         DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
@@ -177,17 +178,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             client, "Shipping Method", ShippingMethodWrapper
                 .getShippingMethods(appService), selectedShippingMethod, null);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Box Number",
-            null, BeansObservables.observeValue(shipmentWrapper, "boxNumber"),
-            null);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Box Number", null, BeansObservables.observeValue(shipmentWrapper,
+                "boxNumber"), null);
 
         createDateTimeWidget(client, "Date Received", shipmentWrapper
             .getDateReceived(), BeansObservables.observeValue(shipmentWrapper,
             "dateReceived"), "Date received should be set");
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.MULTI | SWT.WRAP,
-            "Comments", null, BeansObservables.observeValue(shipmentWrapper,
-                "comment"), null);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
+            | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
+            shipmentWrapper, "comment"), null);
     }
 
     private void activateWaybillField(boolean activate) {

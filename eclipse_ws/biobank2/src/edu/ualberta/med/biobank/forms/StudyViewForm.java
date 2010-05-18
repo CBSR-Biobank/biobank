@@ -12,7 +12,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
@@ -32,20 +32,20 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyAdapter studyAdapter;
     private StudyWrapper study;
 
-    private Text siteLabel;
-    private Text nameLabel;
-    private Text nameShortLabel;
-    private Text activityStatusLabel;
-    private Text commentLabel;
-    private Text patientTotal;
-    private Text visitTotal;
+    private BiobankText siteLabel;
+    private BiobankText nameLabel;
+    private BiobankText nameShortLabel;
+    private BiobankText activityStatusLabel;
+    private BiobankText commentLabel;
+    private BiobankText patientTotal;
+    private BiobankText visitTotal;
 
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private StudySourceVesselInfoTable studySourceVesselsTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
-        public Text wiget;
+        public BiobankText wiget;
     }
 
     private List<StudyPvCustomInfo> pvCustomInfoList;

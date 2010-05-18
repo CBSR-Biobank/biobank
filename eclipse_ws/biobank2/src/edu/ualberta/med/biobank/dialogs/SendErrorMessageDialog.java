@@ -30,13 +30,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SendErrorMessageDialog extends BiobankDialog {
 
@@ -67,13 +67,14 @@ public class SendErrorMessageDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.NONE, "Title",
-            new String[0], PojoObservables.observeValue(email, "title"),
-            new NonEmptyStringValidator("Please enter a title"));
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
+            "Title", new String[0], PojoObservables
+                .observeValue(email, "title"), new NonEmptyStringValidator(
+                "Please enter a title"));
 
-        Text descText = (Text) createBoundWidgetWithLabel(contents, Text.class,
-            SWT.MULTI, "Description", new String[0], PojoObservables
-                .observeValue(email, "description"),
+        BiobankText descText = (BiobankText) createBoundWidgetWithLabel(
+            contents, BiobankText.class, SWT.MULTI, "Description",
+            new String[0], PojoObservables.observeValue(email, "description"),
             new NonEmptyStringValidator(
                 "Please enter at least a very small comment"));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);

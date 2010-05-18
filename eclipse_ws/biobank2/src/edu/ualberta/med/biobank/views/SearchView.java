@@ -19,7 +19,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -31,12 +30,13 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.utils.SearchType;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SearchView extends ViewPart {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SearchView";
 
-    private Text searchText;
+    private BiobankText searchText;
     private ComboViewer searchTypeCombo;
 
     private ISourceProviderListener siteStateListener;
@@ -70,7 +70,7 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        searchText = new Text(parent, SWT.BORDER);
+        searchText = new BiobankText(parent, SWT.BORDER);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;

@@ -5,13 +5,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -22,13 +22,13 @@ public class PatientViewForm extends BiobankViewForm {
 
     private PatientWrapper patient;
 
-    private Text siteLabel;
+    private BiobankText siteLabel;
 
-    private Text studyLabel;
+    private BiobankText studyLabel;
 
-    private Text visitCountLabel;
+    private BiobankText visitCountLabel;
 
-    private Text sampleCountLabel;
+    private BiobankText sampleCountLabel;
 
     private PatientVisitInfoTable visitsTable;
 
@@ -71,7 +71,8 @@ public class PatientViewForm extends BiobankViewForm {
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE, "Total Visits");
+        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Visits");
         sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Samples");
     }

@@ -9,7 +9,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -18,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
@@ -91,23 +91,24 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_SITE));
 
-        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
             BeansObservables.observeValue(site, "name"),
             new NonEmptyStringValidator(MSG_NO_SITE_NAME)));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
-            null, BeansObservables.observeValue(site, "nameShort"),
-            new NonEmptyStringValidator("Site short name cannot be blank"));
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Short Name", null, BeansObservables
+                .observeValue(site, "nameShort"), new NonEmptyStringValidator(
+                "Site short name cannot be blank"));
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), site.getActivityStatus(),
             "Site must have an activity status", true);
 
-        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI | SWT.WRAP, "Comments", null, BeansObservables
-                .observeValue(site, "comment"), null);
+        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
+            BeansObservables.observeValue(site, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

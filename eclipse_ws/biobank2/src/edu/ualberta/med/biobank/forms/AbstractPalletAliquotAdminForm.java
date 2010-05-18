@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -35,6 +34,7 @@ import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
@@ -43,7 +43,7 @@ import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {
 
-    private Text plateToScanText;
+    private BiobankText plateToScanText;
     private Button scanButton;
     private String scanButtonTitle;
 
@@ -145,8 +145,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void createPlateToScanField(Composite fieldsComposite) {
-        plateToScanText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
+        plateToScanText = (BiobankText) createBoundWidgetWithLabel(
+            fieldsComposite, BiobankText.class, SWT.NONE, Messages
                 .getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
             new String[0], plateToScanValue, new ScannerBarcodeValidator(
                 Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$

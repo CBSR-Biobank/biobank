@@ -17,7 +17,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -25,13 +24,14 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LinkFormPatientManagement {
 
     private boolean patientNumberTextModified = false;
-    protected Text patientNumberText;
+    protected BiobankText patientNumberText;
     protected ComboViewer viewerVisits;
     private Button visitsListCheck;
 
@@ -48,7 +48,7 @@ public class LinkFormPatientManagement {
     private Label patientLabel;
     private NonEmptyStringValidator patientValidator;
     private Label visitTextLabel;
-    private Text visitText;
+    private BiobankText visitText;
     private Label visitComboLabel;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
@@ -64,8 +64,8 @@ public class LinkFormPatientManagement {
             GridData.VERTICAL_ALIGN_BEGINNING));
         patientValidator = new NonEmptyStringValidator(Messages
             .getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
-        patientNumberText = (Text) widgetCreator.createBoundWidget(parent,
-            Text.class, SWT.NONE, patientLabel, new String[0],
+        patientNumberText = (BiobankText) widgetCreator.createBoundWidget(
+            parent, BiobankText.class, SWT.NONE, patientLabel, new String[0],
             new WritableValue("", String.class), patientValidator);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
@@ -137,8 +137,8 @@ public class LinkFormPatientManagement {
             .getString("ScanLink.visit.label"));
         visitTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        visitText = (Text) widgetCreator.createWidget(compositeFields,
-            Text.class, SWT.NONE, "");
+        visitText = (BiobankText) widgetCreator.createWidget(compositeFields,
+            BiobankText.class, SWT.NONE, "");
         visitText.setEnabled(false);
         ((GridData) visitText.getLayoutData()).horizontalSpan = 2;
     }
