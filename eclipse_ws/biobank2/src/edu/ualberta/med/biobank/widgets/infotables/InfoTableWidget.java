@@ -76,8 +76,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
-    private boolean reloadData;
-
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
         super(parent, collection, headings, columnWidths, 5, true);
@@ -131,7 +129,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         return false;
     }
 
-    private void initModel(List<T> collection) {
+    protected void initModel(List<T> collection) {
         if ((collection == null) || (model.size() == collection.size()))
             return;
 
@@ -208,6 +206,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         final TableViewer viewer = getTableViewer();
         final Table table = viewer.getTable();
         Display display = viewer.getTable().getDisplay();
+
+        initModel(collection);
 
         if (paginationRequired) {
             start = pageInfo.page * pageInfo.rowsPerPage;

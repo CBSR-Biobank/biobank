@@ -72,6 +72,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     private boolean fitToInputSize;
 
+    protected boolean reloadData = false;
+
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage,
         boolean fitToInputSize) {
