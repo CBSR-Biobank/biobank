@@ -10,6 +10,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
@@ -51,6 +52,8 @@ public class ContainerAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ContainerWrapper.class);
+        return SessionManager.canCreate(ContainerWrapper.class)
+            && SecurityHelper.isContainerAdministrator(SessionManager
+                .getAppService());
     }
 }
