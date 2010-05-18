@@ -81,7 +81,7 @@ public class BiobankText extends Composite {
 
             @Override
             public void mouseUp(MouseEvent e) {
-                if (!alreadyFocused) {
+                if (!alreadyFocused && text.getSelectionCount() == 0) {
                     text.selectAll();
                     alreadyFocused = true;
                 } else
