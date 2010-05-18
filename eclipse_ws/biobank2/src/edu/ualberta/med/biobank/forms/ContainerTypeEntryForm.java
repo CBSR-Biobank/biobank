@@ -18,7 +18,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -32,6 +31,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
@@ -150,17 +150,18 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
-        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null, BeansObservables.observeValue(
                 containerType, "name"), new NonEmptyStringValidator(
                 MSG_NO_CONTAINER_TYPE_NAME)));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
-            null, BeansObservables.observeValue(containerType, "nameShort"),
-            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Short Name", null, BeansObservables.observeValue(containerType,
+                "nameShort"), new NonEmptyStringValidator(
+                MSG_NO_CONTAINER_TYPE_NAME_SHORT));
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
@@ -170,17 +171,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 containerType, "topLevel"), null);
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Rows", null,
-            BeansObservables.observeValue(containerType, "rowCapacity"),
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Rows",
+            null, BeansObservables.observeValue(containerType, "rowCapacity"),
             new IntegerNumberValidator("Row capacity is not a valid number",
                 false));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Columns",
-            null, BeansObservables.observeValue(containerType, "colCapacity"),
-            new IntegerNumberValidator("Column capacity is not a valid nubmer",
-                false));
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Columns", null, BeansObservables.observeValue(containerType,
+                "colCapacity"), new IntegerNumberValidator(
+                "Column capacity is not a valid nubmer", false));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE,
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Default Temperature\n(Celcius)", null, BeansObservables
                 .observeValue(containerType, "defaultTemperature"),
             new DoubleNumberValidator(
@@ -199,9 +200,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 .getActivityStatus(),
             "Container type must have an activity status", true);
 
-        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI | SWT.WRAP, "Comments", null, BeansObservables
-                .observeValue(containerType, "comment"), null);
+        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
+            BeansObservables.observeValue(containerType, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

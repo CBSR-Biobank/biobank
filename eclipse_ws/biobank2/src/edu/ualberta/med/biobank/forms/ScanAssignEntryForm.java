@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -47,6 +46,7 @@ import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
@@ -59,8 +59,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ScanAssignEntryForm.class.getName());
 
-    private Text palletproductBarcodeText;
-    private Text palletPositionText;
+    private BiobankText palletproductBarcodeText;
+    private BiobankText palletPositionText;
     private ComboViewer palletTypesViewer;
 
     private Label freezerLabel;
@@ -163,8 +163,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletLabelValidator = new PalletBarCodeValidator(Messages
             .getString("ScanAssign.palletLabel.validationMsg"));
 
-        palletproductBarcodeText = (Text) createBoundWidgetWithLabel(
-            fieldsComposite, Text.class, SWT.NONE, Messages
+        palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
+            fieldsComposite, BiobankText.class, SWT.NONE, Messages
                 .getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
             null, BeansObservables.observeValue(currentPalletWrapper,
                 "productBarcode"), productBarcodeValidator); //$NON-NLS-1$
@@ -205,8 +205,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             }
         });
 
-        palletPositionText = (Text) createBoundWidgetWithLabel(fieldsComposite,
-            Text.class, SWT.NONE, Messages
+        palletPositionText = (BiobankText) createBoundWidgetWithLabel(
+            fieldsComposite, BiobankText.class, SWT.NONE, Messages
                 .getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
             BeansObservables.observeValue(currentPalletWrapper, "label"), //$NON-NLS-1$
             palletLabelValidator); //$NON-NLS-1$

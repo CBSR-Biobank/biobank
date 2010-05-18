@@ -8,7 +8,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -16,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.PvSourceVesselInfoTable;
 
@@ -30,28 +30,28 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private PatientVisitWrapper patientVisit;
 
-    private Text siteLabel;
+    private BiobankText siteLabel;
 
-    private Text studyLabel;
+    private BiobankText studyLabel;
 
     private AliquotListInfoTable aliquotWidget;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    private Text clinicLabel;
+    private BiobankText clinicLabel;
 
-    private Text shipmentLabel;
+    private BiobankText shipmentLabel;
 
-    private Text patientLabel;
+    private BiobankText patientLabel;
 
-    private Text dateProcessedLabel;
+    private BiobankText dateProcessedLabel;
 
-    private Text commentLabel;
+    private BiobankText commentLabel;
 
-    private Text dateDrawnLabel;
+    private BiobankText dateDrawnLabel;
 
     private class FormPvCustomInfo extends PvAttrCustom {
-        Text widget;
+        BiobankText widget;
     }
 
     @Override

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -15,6 +14,7 @@ import org.eclipse.ui.PartInitException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PostalCodeValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
 
@@ -24,15 +24,15 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     public static final Map<String, FieldInfo> ADDRESS_FIELDS;
     static {
         Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
-        aMap.put("street1", new FieldInfo("Street 1", Text.class, SWT.NONE,
-            null, null, null));
-        aMap.put("street2", new FieldInfo("Street 2", Text.class, SWT.NONE,
-            null, null, null));
-        aMap.put("city", new FieldInfo("City", Text.class, SWT.NONE, null,
-            NonEmptyStringValidator.class, "Enter a city"));
+        aMap.put("street1", new FieldInfo("Street 1", BiobankText.class,
+            SWT.NONE, null, null, null));
+        aMap.put("street2", new FieldInfo("Street 2", BiobankText.class,
+            SWT.NONE, null, null, null));
+        aMap.put("city", new FieldInfo("City", BiobankText.class, SWT.NONE,
+            null, NonEmptyStringValidator.class, "Enter a city"));
         aMap.put("province", new FieldInfo("Province", Combo.class, SWT.NONE,
             FormConstants.PROVINCES, null, null));
-        aMap.put("postalCode", new FieldInfo("Postal Code", Text.class,
+        aMap.put("postalCode", new FieldInfo("Postal Code", BiobankText.class,
             SWT.NONE, null, PostalCodeValidator.class, "Invalid postal code"));
         ADDRESS_FIELDS = Collections.unmodifiableMap(aMap);
     };

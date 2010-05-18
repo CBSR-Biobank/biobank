@@ -47,18 +47,11 @@ public class DateTimeWidget extends BiobankWidget {
 
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
 
-    /**
-     * Show date and time widget
-     */
-    public DateTimeWidget(Composite parent, int style, Date date) {
-        this(parent, style, date, -1);
-    }
-
-    /**
+    /*
      * Allow date to be null. it typeShown == SWT.DATE, show only date; if
      * typeShown == SWT.TIME, show only time otherwise show both of them
      */
-    public DateTimeWidget(Composite parent, int style, Date date, int typeShown) {
+    public DateTimeWidget(Composite parent, int style, Date date) {
         super(parent, style);
 
         GridLayout layout = new GridLayout(3, false);
@@ -69,64 +62,71 @@ public class DateTimeWidget extends BiobankWidget {
 
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        if (typeShown != SWT.TIME) {
-            dateEntry = new CDateTime(this, CDT.CLOCK_24_HOUR | CDT.BORDER
-                | CDT.CLOCK_DISCRETE | CDT.TIME_SHORT);
+        dateEntry = new CDateTime(this, CDT.CLOCK_24_HOUR | CDT.BORDER
+            | CDT.CLOCK_DISCRETE | style);
+        if ((style & SWT.TIME) != 0 && (style & SWT.DATE) != 0)
             dateEntry.setPattern("yyyy-MM-dd  HH:mm");
-            Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            GridData gd = new GridData();
-            gd.widthHint = size.x + 10;
-            gd.heightHint = size.y;
-            dateEntry.setLayoutData(gd);
+        else if ((style & SWT.TIME) != 0)
+            dateEntry.setPattern("HH:mm");
+        else
+            dateEntry.setPattern("yyyy-MM-dd");
 
-            dateButton = new Button(this, SWT.NONE);
-            dateButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_CALENDAR));
-            dateButton.addMouseListener(new MouseAdapter() {
+        Point size = dateEntry.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+        GridData gd = new GridData();
+        gd.widthHint = size.x + 10;
+        gd.heightHint = size.y;
+        dateEntry.setLayoutData(gd);
 
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    final Shell dialog = new Shell(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM);
-                    dialog.setLayout(new GridLayout(3, false));
+        dateButton = new Button(this, SWT.NONE);
+        dateButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_CALENDAR));
+        dateButton.addMouseListener(new MouseAdapter() {
 
-                    final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
-                        | SWT.BORDER);
-                    if (dateEntry.getSelection() != null) {
+            @Override
+            public void mouseUp(MouseEvent e) {
+                final Shell dialog = new Shell(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM);
+                dialog.setLayout(new GridLayout(3, false));
+
+                final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
+                    | SWT.BORDER);
+                if (dateEntry.getSelection() != null) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(dateEntry.getSelection());
+                    calendar.setDate(c.get(Calendar.YEAR), c
+                        .get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+                }
+                new Label(dialog, SWT.BORDER);
+                calendar.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseDoubleClick(MouseEvent e) {
                         Calendar c = Calendar.getInstance();
-                        c.setTime(dateEntry.getSelection());
-                        calendar.setDate(c.get(Calendar.YEAR), c
-                            .get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+                        if (dateEntry.getSelection() != null)
+                            c.setTime(dateEntry.getSelection());
+                        c.set(Calendar.DAY_OF_MONTH, calendar.getDay());
+                        c.set(Calendar.MONTH, calendar.getMonth());
+                        c.set(Calendar.YEAR, calendar.getYear());
+                        dateEntry.setSelection(c.getTime());
+                        fireModifyListeners();
+                        dialog.close();
                     }
-                    new Label(dialog, SWT.BORDER);
-                    calendar.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseDoubleClick(MouseEvent e) {
-                            Calendar c = Calendar.getInstance();
-                            if (dateEntry.getSelection() != null)
-                                c.setTime(dateEntry.getSelection());
-                            c.set(Calendar.DAY_OF_MONTH, calendar.getDay());
-                            c.set(Calendar.MONTH, calendar.getMonth());
-                            c.set(Calendar.YEAR, calendar.getYear());
-                            dateEntry.setSelection(c.getTime());
-                            fireModifyListeners();
-                            dialog.close();
-                        }
-                    });
-                    dialog.pack();
-                    dialog.open();
+                });
+                dialog.pack();
+                dialog.open();
 
-                }
+            }
 
-            });
+        });
 
-            dateEntry.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    fireModifyListeners();
-                }
-            });
-        }
+        if ((style & SWT.DATE) == 0)
+            dateButton.setVisible(false);
+
+        dateEntry.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                fireModifyListeners();
+            }
+        });
         if (date != null) {
             setDate(date);
         }

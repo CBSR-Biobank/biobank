@@ -5,12 +5,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 
 public class ShipmentViewForm extends BiobankViewForm {
@@ -22,25 +22,25 @@ public class ShipmentViewForm extends BiobankViewForm {
     private ShipmentAdapter shipmentAdapter;
     private ShipmentWrapper shipment;
 
-    private Text siteLabel;
+    private BiobankText siteLabel;
 
-    private Text clinicLabel;
+    private BiobankText clinicLabel;
 
-    private Text waybillLabel;
+    private BiobankText waybillLabel;
 
-    private Text dateShippedLabel;
+    private BiobankText dateShippedLabel;
 
-    private Text dateReceivedLabel;
+    private BiobankText dateReceivedLabel;
 
-    private Text commentLabel;
+    private BiobankText commentLabel;
 
-    private Text shippingMethodLabel;
+    private BiobankText shippingMethodLabel;
 
-    private Text boxNumberLabel;
+    private BiobankText boxNumberLabel;
 
-    private Text patientCountLabel;
+    private BiobankText patientCountLabel;
 
-    private Text patientVisitCountLabel;
+    private BiobankText patientVisitCountLabel;
 
     @Override
     protected void init() throws Exception {

@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -49,6 +48,7 @@ import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeObservableValue;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -154,7 +154,7 @@ public class WidgetCreator {
             uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
         }
-        if (widgetClass == Text.class) {
+        if (widgetClass == BiobankText.class) {
             return createText(composite, widgetOptions, modelObservableValue,
                 uvs, bindingKey);
         } else if (widgetClass == Combo.class) {
@@ -231,13 +231,13 @@ public class WidgetCreator {
         return combo;
     }
 
-    public Text createText(Composite composite, int widgetOptions,
+    public BiobankText createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs) {
         return createText(composite, widgetOptions, modelObservableValue, uvs,
             null);
     }
 
-    public Text createText(Composite composite, int widgetOptions,
+    public BiobankText createText(Composite composite, int widgetOptions,
         IObservableValue modelObservableValue, UpdateValueStrategy uvs,
         String bindingKey) {
         if (widgetOptions == SWT.NONE) {
@@ -248,11 +248,12 @@ public class WidgetCreator {
             widgetOptions = widgetOptions | SWT.V_SCROLL;
         }
 
-        Text text = null;
+        BiobankText text = null;
         if (toolkit == null) {
-            text = new Text(composite, SWT.BORDER | widgetOptions);
+            text = new BiobankText(composite, SWT.BORDER | widgetOptions);
         } else {
-            text = toolkit.createText(composite, "", widgetOptions);
+            text = new BiobankText(composite, SWT.BORDER | widgetOptions,
+                toolkit);
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         if ((widgetOptions & SWT.MULTI) != 0) {
@@ -273,8 +274,8 @@ public class WidgetCreator {
             text.addKeyListener(keyListener);
         }
         if (modelObservableValue != null) {
-            Binding binding = dbc.bindValue(SWTObservables.observeText(text,
-                SWT.Modify), modelObservableValue, uvs, null);
+            Binding binding = dbc.bindValue(SWTObservables.observeText(text
+                .getTextBox(), SWT.Modify), modelObservableValue, uvs, null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
@@ -402,7 +403,7 @@ public class WidgetCreator {
         String nameLabel, Date date, IObservableValue modelObservableValue,
         final String emptyMessage, String bindingKey) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, -1, bindingKey);
+            modelObservableValue, emptyMessage, SWT.DATE | SWT.TIME, bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
@@ -430,8 +431,8 @@ public class WidgetCreator {
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, IObservableValue modelObservableValue,
         final String emptyMessage, int typeShown, String bindingKey) {
-        final DateTimeWidget widget = new DateTimeWidget(client, SWT.NONE,
-            date, typeShown);
+        final DateTimeWidget widget = new DateTimeWidget(client, typeShown,
+            date);
         if (selectionListener != null) {
             widget.addModifyListener(modifyListener);
         }
@@ -584,14 +585,14 @@ public class WidgetCreator {
 
     public Control createWidget(Composite parent, Class<?> widgetClass,
         int widgetOptions, String value) {
-        if ((widgetClass == Combo.class) || (widgetClass == Text.class)
+        if ((widgetClass == Combo.class) || (widgetClass == BiobankText.class)
             || (widgetClass == Label.class)) {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
 
-            Text field = createText(parent, widgetOptions | SWT.LEFT, null,
-                null);
+            BiobankText field = createText(parent, widgetOptions | SWT.LEFT,
+                null, null);
 
             // Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
             // | SWT.BORDER, false);

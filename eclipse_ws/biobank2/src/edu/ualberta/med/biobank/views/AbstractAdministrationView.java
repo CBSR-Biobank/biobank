@@ -9,7 +9,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -26,10 +25,11 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
-    protected Text treeText;
+    protected BiobankText treeText;
 
     private ISourceProviderListener siteStateListener;
 
@@ -50,7 +50,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
         createTreeTextOptions(parent);
 
-        treeText = new Text(parent, SWT.SINGLE | SWT.BORDER);
+        treeText = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
         treeText.addListener(SWT.DefaultSelection, searchListener);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;

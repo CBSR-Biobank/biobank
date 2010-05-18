@@ -15,7 +15,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -23,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SampleStorageDialog extends BiobankDialog {
 
@@ -134,12 +134,12 @@ public class SampleStorageDialog extends BiobankDialog {
                 }
             });
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Volume (ml)", new String[0], PojoObservables.observeValue(
                 sampleStorage, "volume"), new DoubleNumberValidator(
                 "Volume should be a real number", false));
 
-        createBoundWidgetWithLabel(contents, Text.class, SWT.BORDER,
+        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Quantity", new String[0], PojoObservables.observeValue(
                 sampleStorage, "quantity"), new IntegerNumberValidator(
                 "Quantity should be a whole number", false));

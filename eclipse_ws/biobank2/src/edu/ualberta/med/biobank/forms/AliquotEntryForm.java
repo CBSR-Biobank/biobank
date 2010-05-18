@@ -10,7 +10,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -19,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class AliquotEntryForm extends BiobankEntryForm {
 
@@ -106,9 +106,9 @@ public class AliquotEntryForm extends BiobankEntryForm {
                 .getActivityStatus(), "Aliquot must have an activity status",
             true);
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.WRAP | SWT.MULTI,
-            "Comments", null,
-            BeansObservables.observeValue(aliquot, "comment"), null);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
+            | SWT.MULTI, "Comments", null, BeansObservables.observeValue(
+            aliquot, "comment"), null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }

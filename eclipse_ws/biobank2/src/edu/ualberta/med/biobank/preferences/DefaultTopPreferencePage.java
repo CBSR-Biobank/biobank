@@ -7,9 +7,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class DefaultTopPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
@@ -36,7 +37,7 @@ public class DefaultTopPreferencePage extends PreferencePage implements
         Composite composite = createScrolledComposite(parent);
 
         String description = "Expand the tree to edit preferences for a specific feature.";
-        Text text = new Text(composite, 8);
+        BiobankText text = new BiobankText(composite, 8);
 
         text.setBackground(composite.getBackground());
         text.setText(description);

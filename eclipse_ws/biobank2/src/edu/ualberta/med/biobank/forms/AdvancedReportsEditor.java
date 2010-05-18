@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.PlatformUI;
 
@@ -57,6 +56,7 @@ import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
@@ -283,21 +283,22 @@ public class AdvancedReportsEditor extends BiobankFormBase {
             ((DateTimeWidget) widget).setLayoutData(wgd);
             ((DateTimeWidget) widget).setDate((Date) field.getValue());
         } else if (field.getType() == String.class) {
-            widget = new Text(parameterSection, SWT.BORDER);
-            ((Text) widget).setLayoutData(wgd);
+            widget = new BiobankText(parameterSection, SWT.BORDER);
+            ((BiobankText) widget).setLayoutData(wgd);
             if (field.getValue() != null)
-                ((Text) widget).setText((String) field.getValue());
+                ((BiobankText) widget).setText((String) field.getValue());
         } else if (field.getType() == Integer.class) {
-            widget = new Text(parameterSection, SWT.BORDER);
-            ((Text) widget).setLayoutData(wgd);
+            widget = new BiobankText(parameterSection, SWT.BORDER);
+            ((BiobankText) widget).setLayoutData(wgd);
             if (field.getValue() != null)
-                ((Text) widget)
-                    .setText(((Integer) field.getValue()).toString());
+                ((BiobankText) widget).setText(((Integer) field.getValue())
+                    .toString());
         } else if (field.getType() == Double.class) {
-            widget = new Text(parameterSection, SWT.BORDER);
-            ((Text) widget).setLayoutData(wgd);
+            widget = new BiobankText(parameterSection, SWT.BORDER);
+            ((BiobankText) widget).setLayoutData(wgd);
             if (field.getValue() != null)
-                ((Text) widget).setText(((Double) field.getValue()).toString());
+                ((BiobankText) widget).setText(((Double) field.getValue())
+                    .toString());
         } else
             widget = null;
 
@@ -491,8 +492,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                 } else if (fields.get(i).getType() == Integer.class) {
                     Integer val;
                     try {
-                        val = Integer.parseInt(((Text) widgetFields.get(i))
-                            .getText());
+                        val = Integer.parseInt(((BiobankText) widgetFields
+                            .get(i)).getText());
                     } catch (NumberFormatException e) {
                         val = null;
                     }
@@ -501,8 +502,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                 } else if (fields.get(i).getType() == Double.class) {
                     Double val;
                     try {
-                        val = Double.parseDouble(((Text) widgetFields.get(i))
-                            .getText());
+                        val = Double.parseDouble(((BiobankText) widgetFields
+                            .get(i)).getText());
                     } catch (NumberFormatException e) {
                         val = null;
                     }
@@ -510,7 +511,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                     fields.get(i).setOperator(operatorFields.get(i).getText());
                 } else {
                     fields.get(i).setValue(
-                        ((Text) widgetFields.get(i)).getText());
+                        ((BiobankText) widgetFields.get(i)).getText());
                     fields.get(i).setOperator(operatorFields.get(i).getText());
                 }
                 fields.get(i).setDisplay(includedFields.get(i).getSelection());

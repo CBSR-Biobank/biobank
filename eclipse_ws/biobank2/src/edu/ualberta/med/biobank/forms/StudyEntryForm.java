@@ -15,7 +15,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -29,6 +28,7 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SampleStorageEntryInfoTable;
@@ -108,27 +108,28 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        Text siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Repository Site");
         setTextValue(siteLabel, study.getSite().getName());
 
-        setFirstControl(createBoundWidgetWithLabel(client, Text.class,
+        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null, BeansObservables
                 .observeValue(study, "name"), new NonEmptyStringValidator(
                 "Study name cannot be blank")));
 
-        createBoundWidgetWithLabel(client, Text.class, SWT.NONE, "Short Name",
-            null, BeansObservables.observeValue(study, "nameShort"),
-            new NonEmptyStringValidator("Study short name cannot be blank"));
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Short Name", null, BeansObservables.observeValue(study,
+                "nameShort"), new NonEmptyStringValidator(
+                "Study short name cannot be blank"));
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), study.getActivityStatus(),
             "Study must have an activity status", true);
 
-        Text comment = (Text) createBoundWidgetWithLabel(client, Text.class,
-            SWT.MULTI | SWT.WRAP, "Comments", null, BeansObservables
-                .observeValue(study, "comment"), null);
+        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
+            BeansObservables.observeValue(study, "comment"), null);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 40;
         comment.setLayoutData(gd);

@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -42,6 +41,7 @@ import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
@@ -62,23 +62,23 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private AliquotListInfoTable aliquotsWidget;
 
-    private Text siteLabel;
+    private BiobankText siteLabel;
 
-    private Text containerLabelLabel;
+    private BiobankText containerLabelLabel;
 
-    private Text productBarcodeLabel;
+    private BiobankText productBarcodeLabel;
 
-    private Text activityStatusLabel;
+    private BiobankText activityStatusLabel;
 
-    private Text commentsLabel;
+    private BiobankText commentsLabel;
 
-    private Text containerTypeLabel;
+    private BiobankText containerTypeLabel;
 
-    private Text temperatureLabel;
+    private BiobankText temperatureLabel;
 
-    private Text rowLabel = null;
+    private BiobankText rowLabel = null;
 
-    private Text colLabel;
+    private BiobankText colLabel;
 
     private AbstractContainerDisplayWidget containerWidget;
 
