@@ -100,10 +100,7 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
     }
 
     public void addPvSourceVessel() {
-        PvSourceVesselWrapper sourceVessel = new PvSourceVesselWrapper(
-            SessionManager.getAppService());
-        sourceVessel.setPatientVisit(patientVisit);
-        addOrEditPvSourceVessel(true, sourceVessel);
+        addOrEditPvSourceVessel(true, null);
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -131,17 +128,28 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
         PvSourceVesselWrapper pvSourceVessel) {
         PvSourceVesselDialog dlg = new PvSourceVesselDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            pvSourceVessel, studySourceVessels, allSourceVessels);
-        if (dlg.open() == Dialog.OK) {
-            if (add) {
-                // only add to the collection when adding and not editing
-                selectedPvSourceVessels.add(dlg.getPvSourceVessel());
-                addedPvSourceVessels.add(dlg.getPvSourceVessel());
-                sourceVesselsAdded.setValue(true);
-            }
+            pvSourceVessel, studySourceVessels, allSourceVessels, this);
+        if (add) {
+            dlg.setPatientVisit(patientVisit);
+        }
+        int res = dlg.open();
+        if (!add && res == Dialog.OK) {
             reloadCollection(selectedPvSourceVessels);
             notifyListeners();
         }
+    }
+
+    /**
+     * called from the dialog to add new source vessels into the table
+     * 
+     * @param pvSourceVessel
+     */
+    public void addPvSourceVessel(PvSourceVesselWrapper pvSourceVessel) {
+        selectedPvSourceVessels.add(pvSourceVessel);
+        addedPvSourceVessels.add(pvSourceVessel);
+        sourceVesselsAdded.setValue(true);
+        reloadCollection(selectedPvSourceVessels);
+        notifyListeners();
     }
 
     private void addEditSupport() {

@@ -456,4 +456,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
     }
+
+    public void initObjectWith(ModelWrapper<E> otherWrapper)
+        throws WrapperException {
+        if (otherWrapper == null) {
+            throw new WrapperException(
+                "Cannot init internal object with a null wrapper");
+        }
+        setWrappedObject(otherWrapper.wrappedObject);
+    }
 }

@@ -30,7 +30,7 @@ public abstract class BiobankDialog extends TitleAreaDialog {
 
     protected WidgetCreator widgetCreator;
 
-    private Boolean okButtonEnabled;
+    protected Boolean okButtonEnabled;
 
     private boolean setupFinished = false;
 

@@ -428,9 +428,14 @@ public class ContainerWrapper extends
             if (positions != null) {
                 aliquots = new TreeMap<RowColPos, AliquotWrapper>();
                 for (AliquotPosition position : positions) {
+                    AliquotWrapper aliquot = new AliquotWrapper(appService,
+                        position.getAliquot());
+                    try {
+                        aliquot.reload();
+                    } catch (Exception e) {
+                    }
                     aliquots.put(new RowColPos(position.getRow(), position
-                        .getCol()), new AliquotWrapper(appService, position
-                        .getAliquot()));
+                        .getCol()), aliquot);
                 }
                 propertiesMap.put("aliquots", aliquots);
             }
@@ -952,19 +957,19 @@ public class ContainerWrapper extends
         return null;
     }
 
-    /**
-     * init this wrapper with the given containerWrapper.
-     * 
-     * @throws WrapperException
-     */
-    public void initObjectWith(ContainerWrapper containerWrapper)
-        throws WrapperException {
-        if (containerWrapper == null) {
-            throw new WrapperException(
-                "Cannot init internal object with a null container");
-        }
-        setWrappedObject(containerWrapper.wrappedObject);
-    }
+    // /**
+    // * init this wrapper with the given containerWrapper.
+    // *
+    // * @throws WrapperException
+    // */
+    // public void initObjectWith(ContainerWrapper containerWrapper)
+    // throws WrapperException {
+    // if (containerWrapper == null) {
+    // throw new WrapperException(
+    // "Cannot init internal object with a null container");
+    // }
+    // setWrappedObject(containerWrapper.wrappedObject);
+    // }
 
     @Override
     protected void resetInternalField() {

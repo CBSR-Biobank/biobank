@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.forms.SourceVesselEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -28,6 +29,9 @@ public class EditSourceVesselsHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.getInstance().getSession() != null);
+        return (SessionManager.canCreate(SourceVesselWrapper.class)
+            || SessionManager.canUpdate(SourceVesselWrapper.class) || SessionManager
+            .canDelete(SourceVesselWrapper.class))
+            && (SessionManager.getInstance().getSession() != null);
     }
 }

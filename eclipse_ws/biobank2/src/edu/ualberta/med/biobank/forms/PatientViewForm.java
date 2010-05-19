@@ -92,7 +92,7 @@ public class PatientViewForm extends BiobankViewForm {
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel, patient.getPatientVisitCollection()
             .size());
-        setTextValue(sampleCountLabel, patient.getSampleCount());
+        setTextValue(sampleCountLabel, patient.getAliquotsCount());
     }
 
     @Override
