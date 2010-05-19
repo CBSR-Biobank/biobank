@@ -25,7 +25,7 @@ public class FileBrowser extends BiobankWidget {
         setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         setLayout(new GridLayout(2, true));
         GridData data = new GridData(GridData.FILL_BOTH);
-        textfield = new BiobankText(this, SWT.BORDER);
+        textfield = new BiobankText(this, SWT.NONE);
         textfield.setEditable(false);
         textfield.setLayoutData(data);
         browse = new Button(this, style);

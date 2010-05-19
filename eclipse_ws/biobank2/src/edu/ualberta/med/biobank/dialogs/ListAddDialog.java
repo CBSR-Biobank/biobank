@@ -47,7 +47,7 @@ public class ListAddDialog extends Dialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         Label label = new Label(contents, SWT.NONE);
         label.setText(prompt);
-        items = new BiobankText(contents, SWT.BORDER);
+        items = new BiobankText(contents, SWT.NONE);
         items.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         label = new Label(contents, SWT.NONE);
         label.setText(helpText);

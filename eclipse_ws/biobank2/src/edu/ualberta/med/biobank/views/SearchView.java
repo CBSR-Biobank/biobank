@@ -70,7 +70,7 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        searchText = new BiobankText(parent, SWT.BORDER);
+        searchText = new BiobankText(parent, SWT.NONE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
