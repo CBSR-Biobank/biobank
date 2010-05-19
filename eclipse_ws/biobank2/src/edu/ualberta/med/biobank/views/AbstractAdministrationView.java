@@ -153,7 +153,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
                     searchedNode.removeAll();
                     if (sourceValue != null
                         && !SessionManager.getInstance().isAllSitesSelected()) {
-                        reloadTodayNode();
+                        reload();
                     }
                 }
             }
@@ -168,7 +168,9 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             .addSourceProviderListener(siteStateListener);
     }
 
-    public void reloadTodayNode() {
+    @Override
+    public void reload() {
+        searchedNode.performExpand();
         todayNode.performExpand();
         getTreeViewer().expandToLevel(3);
     }
@@ -203,7 +205,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     @Override
     public void opened() {
-        reloadTodayNode();
+        reload();
     }
 
 }

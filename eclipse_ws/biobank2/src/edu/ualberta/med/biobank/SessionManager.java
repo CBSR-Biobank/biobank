@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -119,6 +120,14 @@ public class SessionManager {
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
+
+        int menusize = window.getShell().getMenuBar().getItemCount();
+        MenuItem help = window.getShell().getMenuBar().getItem(menusize - 1);
+        MenuItem[] items = help.getMenu().getItems();
+        for (MenuItem item : items) {
+            item.setEnabled(sessionAdapter != null);
+        }
+
     }
 
     public SessionAdapter getSession() {

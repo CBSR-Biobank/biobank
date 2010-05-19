@@ -36,6 +36,8 @@ public abstract class AbstractViewWithTree extends ViewPart implements
         return null;
     }
 
+    public abstract void reload();
+
     public AdapterBase searchNode(ModelWrapper<?> wrapper) {
         return rootNode.accept(new NodeSearchVisitor(wrapper));
     }
