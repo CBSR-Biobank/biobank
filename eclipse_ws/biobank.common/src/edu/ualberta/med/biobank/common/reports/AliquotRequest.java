@@ -15,7 +15,7 @@ public class AliquotRequest extends QueryObject {
 
     public AliquotRequest(String op, Integer siteId) {
         super(
-            "Given a CSV file detailing a request (Study, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
+            "Given a CSV file detailing a request (Patient Number, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
             "select s.patientVisit.patient.study.nameShort, s.inventoryId, s.patientVisit.dateDrawn, s.sampleType.name, s.aliquotPosition.container.label from "
                 + Aliquot.class.getName()
                 + " s where s.patientVisit.patient.study.site "
