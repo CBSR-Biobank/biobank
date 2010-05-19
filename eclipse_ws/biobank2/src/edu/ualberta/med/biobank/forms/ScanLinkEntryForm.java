@@ -407,7 +407,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
-                form.layout(true, true);
+                // not needed on windows. This was if the textfield number go
+                // after 9, needed to resize on linux : need to check that
+                // again
+                // form.layout(true, true);
             }
         });
     }
