@@ -9,13 +9,12 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.views.AbstractAdministrationView;
 import edu.ualberta.med.biobank.views.AbstractViewWithTree;
 
-public class ReloadTodayNodeHandler extends AbstractHandler implements
-    IHandler {
+public class ReloadTodayNodeHandler extends AbstractHandler implements IHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AbstractViewWithTree view = SessionManager.getCurrentViewWithTree();
         if (view instanceof AbstractAdministrationView) {
-            ((AbstractAdministrationView) view).reloadTodayNode();
+            ((AbstractAdministrationView) view).reload();
         }
         return null;
     }

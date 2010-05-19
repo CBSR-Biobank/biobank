@@ -28,4 +28,9 @@ public class SessionsView extends AbstractViewWithTree {
             getTreeViewer().expandToLevel(3);
         }
     }
+
+    @Override
+    public void reload() {
+        SessionManager.getInstance().rebuildSession();
+    }
 };

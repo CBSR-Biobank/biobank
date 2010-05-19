@@ -264,9 +264,9 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         }
 
         private void displayTodayObjects() {
-            ShipmentAdministrationView.getCurrent().reloadTodayNode();
+            ShipmentAdministrationView.getCurrent().reload();
             if (PatientAdministrationView.getCurrent() != null) {
-                PatientAdministrationView.getCurrent().reloadTodayNode();
+                PatientAdministrationView.getCurrent().reload();
             }
         }
     }
