@@ -4,6 +4,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
 
@@ -150,6 +151,13 @@ public class LabelingScheme {
         ContainerTypeWrapper containerType) {
         return getPositionString(rcp, containerType.getChildLabelingScheme(),
             containerType.getRowCapacity(), containerType.getColCapacity());
+    }
+
+    public static String getPositionString(RowColPos rcp,
+        ContainerType containerType) {
+        return getPositionString(rcp, containerType.getChildLabelingScheme()
+            .getId(), containerType.getCapacity().getRowCapacity(),
+            containerType.getCapacity().getColCapacity());
     }
 
     /**
