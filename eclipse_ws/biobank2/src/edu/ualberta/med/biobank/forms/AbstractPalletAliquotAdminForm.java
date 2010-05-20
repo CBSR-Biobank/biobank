@@ -441,4 +441,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
         });
         scanTubeAloneSwitch.setVisible(false);
     }
+
+    @Override
+    public void reset() throws Exception {
+        scanValidValue.setValue(true);
+    }
 }

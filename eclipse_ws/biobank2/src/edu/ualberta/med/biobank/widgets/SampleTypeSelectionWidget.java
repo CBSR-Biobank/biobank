@@ -105,6 +105,9 @@ public class SampleTypeSelectionWidget {
                 }
             }
         });
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        combo.setLayoutData(gd);
     }
 
     private boolean setNextFocus() {
