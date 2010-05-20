@@ -116,6 +116,7 @@ public class LabelingScheme {
     public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows,
         int totalCols) {
         int pos1, pos2, index;
+        int lettersLength = CBSR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
             index = rcp.col;
         } else if (totalCols == 1) {
@@ -124,9 +125,9 @@ public class LabelingScheme {
             index = totalRows * rcp.col + rcp.row;
         }
 
-        Assert.isTrue(index < 24 * 24);
-        pos1 = index / 24;
-        pos2 = index % 24;
+        Assert.isTrue(index < lettersLength * lettersLength);
+        pos1 = index / lettersLength;
+        pos2 = index % lettersLength;
 
         if (pos1 >= 0 && pos2 >= 0) {
             return String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos1))
@@ -140,6 +141,32 @@ public class LabelingScheme {
      */
     public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows) {
         return String.format("%02d", rcp.row + totalRows * rcp.col + 1);
+    }
+
+    /**
+     * Convert a position in row*column to Dewar labeling (AA, BB, CC...).
+     */
+    public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
+        int pos = rcp.col + (colCapacity * rcp.row);
+        String letter = String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos));
+        return letter + letter;
+    }
+
+    /**
+     * Get the RowColPos in the given container corresponding to the given label
+     * using the dewar labeling. Use the 2 last character in case we have a full
+     * position string (01AA)
+     */
+    public static RowColPos dewarToRowCol(String label, int totalCol) {
+        int len = label.length();
+        String letter = label.substring(len - 2);
+        int letterPosition = SBS_ROW_LABELLING_PATTERN
+            .indexOf(letter.charAt(0)); // letters are double (BB). need only
+        // one
+        RowColPos rowColPos = new RowColPos();
+        rowColPos.row = letterPosition / totalCol;
+        rowColPos.col = letterPosition % totalCol;
+        return rowColPos;
     }
 
     /**
@@ -168,6 +195,9 @@ public class LabelingScheme {
         case 3:
             // 2 char numeric
             return rowColToTwoCharNumeric(rcp, rowCapacity);
+        case 4:
+            // dewar
+            return rowColToDewar(rcp, colCapacity);
         }
         return null;
     }

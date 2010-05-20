@@ -198,6 +198,10 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void refreshVis() {
         initCells();
+        if (containerWidget == null) {
+            createVisualizeContainer();
+            form.layout(true, true);
+        }
         containerWidget.setCells(cells);
     }
 
