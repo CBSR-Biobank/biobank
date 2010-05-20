@@ -834,6 +834,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     public void reset() throws Exception {
+        super.reset();
         reset(false);
         fieldsComposite.setEnabled(true);
         showOnlyPallet(true);

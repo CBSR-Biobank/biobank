@@ -250,10 +250,9 @@ public class WidgetCreator {
 
         BiobankText text = null;
         if (toolkit == null) {
-            text = new BiobankText(composite, SWT.BORDER | widgetOptions);
+            text = new BiobankText(composite, widgetOptions);
         } else {
-            text = new BiobankText(composite, SWT.BORDER | widgetOptions,
-                toolkit);
+            text = new BiobankText(composite, widgetOptions, toolkit);
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         if ((widgetOptions & SWT.MULTI) != 0) {
