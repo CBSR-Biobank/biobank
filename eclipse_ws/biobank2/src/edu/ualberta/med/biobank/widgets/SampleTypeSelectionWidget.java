@@ -54,7 +54,7 @@ public class SampleTypeSelectionWidget {
         List<SampleTypeWrapper> types, FormToolkit toolkit) {
 
         if (letter != null) {
-            toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
+            toolkit.createLabel(parent, letter.toString(), SWT.NONE);
         }
 
         createCombo(parent, types);

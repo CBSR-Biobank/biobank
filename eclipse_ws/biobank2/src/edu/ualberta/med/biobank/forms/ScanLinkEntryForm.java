@@ -407,7 +407,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
-                form.layout(true, true);
             }
         });
     }
