@@ -2,10 +2,14 @@ package edu.ualberta.med.biobank.test.speed;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -19,8 +23,7 @@ public class TestContainer extends SpeedTest {
         super(appService, site);
     }
 
-    @Override
-    public void doTest() throws Exception {
+    public void testHql() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site.id = ? and containerType.topLevel = true", Arrays
@@ -50,8 +53,7 @@ public class TestContainer extends SpeedTest {
         }
     }
 
-    // @Override
-    public void doTestOld() throws Exception {
+    public void testNonWrapper() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
             + " where site.id = ? and containerType.topLevel = true", Arrays
@@ -67,5 +69,38 @@ public class TestContainer extends SpeedTest {
             }
 
         }
+    }
+
+    public void testWrapper() throws Exception {
+        for (ContainerWrapper c : site.getTopContainerCollection()) {
+            logger.info(c.getLabel() + ": number of children: "
+                + c.getChildCount());
+            Map<RowColPos, ContainerWrapper> pos = c.getChildren();
+            for (ContainerWrapper child : pos.values()) {
+                logger.debug(child.getLabel() + ": number of children: "
+                    + child.getChildCount());
+            }
+        }
+    }
+
+    public void testAliquots() throws Exception {
+        HQLCriteria criteria = new HQLCriteria(
+            "select distinct ap.container from "
+                + AliquotPosition.class.getName() + " as ap "
+                + "join ap.container as c " + "where c.site.id = ?", Arrays
+                .asList(new Object[] { site.getId() }));
+        List<Container> containers = appService.query(criteria);
+
+        int count = 0;
+        for (Container c : containers) {
+            logger.info(c.getLabel() + ": number of aliquots: "
+                + c.getAliquotPositionCollection().size());
+            ++count;
+
+            if (count >= 20)
+                break;
+
+        }
+
     }
 }

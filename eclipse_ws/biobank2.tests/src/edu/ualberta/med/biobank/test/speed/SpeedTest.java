@@ -13,6 +13,4 @@ public abstract class SpeedTest {
         this.site = site;
     }
 
-    public abstract void doTest() throws Exception;
-
 }
