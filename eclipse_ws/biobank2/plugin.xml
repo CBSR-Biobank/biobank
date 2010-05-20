@@ -944,6 +944,12 @@
                label="Reports View"
                style="push">
             </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.search"
+               icon="icons/search.png"
+               label="Search View"
+               style="push">
+            </command>
          </menu>
          <menu
                id="edu.ualberta.med.biobank.menu.print"
@@ -1005,28 +1011,6 @@
             <control
                   class="edu.ualberta.med.biobank.rcp.SiteCombo">
             </control>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.search"
-                  icon="icons/search.png"
-                  label="Search"
-                  style="push"
-                  tooltip="Search">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <not>
-                        <reference
-                              definitionId="biobank2.sampleManagementPerspectiveSelected">
-                        </reference>
-                     </not>
-                     <not>
-                        <reference
-                              definitionId="biobank2.reportsPerspectiveSelected">
-                        </reference>
-                     </not>
-                  </and>
-               </visibleWhen>
-            </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -1083,6 +1067,13 @@
                   icon="icons/reportsPerspective.png"
                   label="Reports View"
                   style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
             </command>
          </toolbar>
       </menuContribution>
