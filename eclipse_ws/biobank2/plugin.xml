@@ -389,9 +389,14 @@
                      definitionId="biobank2.loggedIn">
                </reference>
                <not>
+               <or>
                 <reference
-                     definitionId="biobank2.reportsPerspectiveSelected">
-               </reference>
+                      definitionId="biobank2.reportsPerspectiveSelected">
+                </reference>
+                <reference
+                      definitionId="biobank2.sampleManagementPerspectiveSelected">
+                </reference>
+               </or>
                </not>
             </and>
          </enabledWhen>
@@ -424,9 +429,14 @@
          <enabledWhen>
          <and>
                   <not>
+                  <or>
                      <reference
                            definitionId="biobank2.mainPerspectiveSelected">
                      </reference>
+                     <reference
+                      definitionId="biobank2.sampleManagementPerspectiveSelected">
+                </reference>
+                </or>
                   </not>
                   <reference
                   definitionId="biobank2.loggedIn">
@@ -659,9 +669,14 @@
                      definitionId="biobank2.siteSelected">
                </reference>
                <not>
+               <or>
                 <reference
                      definitionId="biobank2.shipmentsPerspectiveSelected">
                </reference>
+               <reference
+                     definitionId="biobank2.sampleManagementPerspectiveSelected">
+               </reference>
+               </or>
                </not>
             </and>
          </enabledWhen>
