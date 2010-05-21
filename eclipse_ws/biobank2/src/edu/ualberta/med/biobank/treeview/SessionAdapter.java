@@ -24,18 +24,24 @@ public class SessionAdapter extends AdapterBase {
     private WritableApplicationService appService;
 
     private String userName;
+    private String serverName;
 
     private static final String ADDSITE_COMMAND_ID = "edu.ualberta.med.biobank.commands.siteAdd";
 
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
 
     public SessionAdapter(AdapterBase parent,
-        WritableApplicationService appService, int sessionId, String name,
-        String userName) {
+        WritableApplicationService appService, int sessionId,
+        String serverName, String userName) {
         super(parent, null, false);
         this.appService = appService;
         setId(sessionId);
-        setName(name);
+        if (userName != null && userName.isEmpty()) {
+            setName(serverName);
+        } else {
+            setName(serverName + " [" + userName + "]");
+        }
+        this.serverName = serverName;
         this.userName = userName;
     }
 
@@ -46,11 +52,7 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        if (userName.isEmpty()) {
-            return super.getLabel();
-        } else {
-            return super.getLabel() + " [" + userName + "]";
-        }
+        return "";
     }
 
     @Override
@@ -99,6 +101,10 @@ public class SessionAdapter extends AdapterBase {
 
     public String getUserName() {
         return userName;
+    }
+
+    public String getServerName() {
+        return serverName;
     }
 
     @Override
