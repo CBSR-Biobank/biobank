@@ -46,7 +46,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.validators.PalletBarCodeValidator;
+import edu.ualberta.med.biobank.validators.PalletLabelValidator;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
@@ -105,7 +105,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private NonEmptyStringValidator productBarcodeValidator;
 
-    private PalletBarCodeValidator palletLabelValidator;
+    private PalletLabelValidator palletLabelValidator;
 
     private ModifyListener palletPositionModifyListener;
 
@@ -160,7 +160,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
         productBarcodeValidator = new NonEmptyStringValidator( //$NON-NLS-1$
             Messages.getString("ScanAssign.productBarcode.validationMsg"));
-        palletLabelValidator = new PalletBarCodeValidator(Messages
+        palletLabelValidator = new PalletLabelValidator(Messages
             .getString("ScanAssign.palletLabel.validationMsg"));
 
         palletproductBarcodeText = (Text) createBoundWidgetWithLabel(
@@ -950,6 +950,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             }
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Check Pallet", ex); //$NON-NLS-1$
+            appendLogNLS("ScanAssign.activitylog.pallet.checkPosition.error", //$NON-NLS-1$
+                ex.getMessage());
+            palletTypesViewer.setInput(null);
         }
         return canContinue;
     }
@@ -984,8 +987,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             .getContainersWithSameLabelWithType(palletTypes);
         String palletLabel = currentPalletWrapper.getLabel();
         if (containersAtPosition.size() == 0) {
-            appendLogNLS("ScanAssign.activitylog.pallet.positionAvailable",
-                palletLabel);
             currentPalletWrapper.setPositionAndParentFromLabel(palletLabel,
                 palletTypes);
             palletTypes = palletContainerTypes;

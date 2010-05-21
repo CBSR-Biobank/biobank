@@ -29,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
@@ -396,6 +397,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                         } else {
                             cell.setValue(value);
                         }
+                        appendLogNLS("linkAssign.activitylog.scanTubeAlone",
+                            value, LabelingScheme.rowColToSbs(rcp));
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
