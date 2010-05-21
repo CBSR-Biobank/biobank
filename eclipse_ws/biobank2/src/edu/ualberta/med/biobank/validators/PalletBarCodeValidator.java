@@ -9,8 +9,7 @@ import org.eclipse.core.runtime.Status;
 
 public class PalletBarCodeValidator extends AbstractValidator {
 
-    private static final Pattern PATTERN = Pattern
-        .compile("^\\d{2}[A-Z]{2}\\d{2}");
+    private static final Pattern PATTERN = Pattern.compile("^([A-Z0-9]{2})+");
 
     public PalletBarCodeValidator(String message) {
         super(message);

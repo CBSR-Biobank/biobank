@@ -29,8 +29,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
-
-import edu.ualberta.med.biobank.widgets.BiobankText;
+import org.eclipse.swt.widgets.Text;
 
 public class Sleak {
     Display display;
@@ -38,7 +37,7 @@ public class Sleak {
     List list;
     Canvas canvas;
     Button start, stop, check;
-    BiobankText text;
+    Text text;
     Label label;
 
     Object[] oldObjects = new Object[0];
@@ -56,7 +55,7 @@ public class Sleak {
                 refreshObject();
             }
         });
-        text = new BiobankText(shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        text = new Text(shell, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         canvas = new Canvas(shell, SWT.BORDER);
         canvas.addListener(SWT.Paint, new Listener() {
             public void handleEvent(Event event) {

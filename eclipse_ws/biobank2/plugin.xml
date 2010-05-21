@@ -357,27 +357,42 @@
             class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
             commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.EditSourceVesselsHandler"
             commandId="edu.ualberta.med.biobank.commands.editSourceVessels">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.EditShippingMethodsHandler"
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
       <handler

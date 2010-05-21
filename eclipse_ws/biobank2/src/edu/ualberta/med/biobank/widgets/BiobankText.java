@@ -23,24 +23,17 @@ public class BiobankText extends Composite {
     private boolean alreadyFocused;
 
     public BiobankText(Composite parent, int style) {
-        super(parent, SWT.NONE);
-        this.alreadyFocused = false;
-        this.text = new Text(this, style);
-        this.text.addFocusListener(getFocusListener());
-        this.text.addMouseListener(getMouseListener());
-        this.text.addModifyListener(getModifyListener());
-        GridLayout layout = new GridLayout();
-        layout.marginWidth = 0;
-        layout.marginHeight = 0;
-        this.setLayout(layout);
-        text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        layout();
+        this(parent, style, null);
     }
 
     public BiobankText(Composite parent, int style, FormToolkit toolkit) {
         super(parent, SWT.NONE);
         this.alreadyFocused = false;
-        this.text = toolkit.createText(this, "", style);
+        if (toolkit == null) {
+            this.text = new Text(this, style | SWT.BORDER);
+        } else {
+            this.text = toolkit.createText(this, "", style | SWT.BORDER);
+        }
         this.text.addFocusListener(getFocusListener());
         this.text.addMouseListener(getMouseListener());
         this.text.addModifyListener(getModifyListener());

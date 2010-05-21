@@ -60,7 +60,7 @@ public class SampleTypeSelectionWidget {
         createCombo(parent, types);
         toolkit.adapt(combo, true, true);
 
-        textNumber = toolkit.createLabel(parent, "", SWT.RIGHT | SWT.BORDER);
+        textNumber = toolkit.createLabel(parent, "", SWT.BORDER);
         GridData data = new GridData();
         data.widthHint = 20;
         data.horizontalAlignment = SWT.LEFT;
@@ -105,6 +105,9 @@ public class SampleTypeSelectionWidget {
                 }
             }
         });
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        combo.setLayoutData(gd);
     }
 
     private boolean setNextFocus() {

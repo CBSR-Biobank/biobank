@@ -407,13 +407,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
-                form.layout(true, true);
             }
         });
     }
 
     @Override
-    protected void launchFakeScan() {
+    protected void launchFakeScan() throws Exception {
         if (isFakeScanRandom) {
             cells = PalletCell.getRandomScanLink();
         } else {
@@ -608,6 +607,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     public void reset() throws Exception {
+        super.reset();
         setDirty(false);
         reset(true);
         fieldsComposite.setEnabled(true);

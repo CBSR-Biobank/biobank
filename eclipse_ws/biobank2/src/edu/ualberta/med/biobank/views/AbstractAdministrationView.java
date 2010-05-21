@@ -50,7 +50,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
         createTreeTextOptions(parent);
 
-        treeText = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
+        treeText = new BiobankText(parent, SWT.SINGLE);
         treeText.addListener(SWT.DefaultSelection, searchListener);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;

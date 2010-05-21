@@ -283,18 +283,18 @@ public class AdvancedReportsEditor extends BiobankFormBase {
             ((DateTimeWidget) widget).setLayoutData(wgd);
             ((DateTimeWidget) widget).setDate((Date) field.getValue());
         } else if (field.getType() == String.class) {
-            widget = new BiobankText(parameterSection, SWT.BORDER);
+            widget = new BiobankText(parameterSection, SWT.NONE);
             ((BiobankText) widget).setLayoutData(wgd);
             if (field.getValue() != null)
                 ((BiobankText) widget).setText((String) field.getValue());
         } else if (field.getType() == Integer.class) {
-            widget = new BiobankText(parameterSection, SWT.BORDER);
+            widget = new BiobankText(parameterSection, SWT.NONE);
             ((BiobankText) widget).setLayoutData(wgd);
             if (field.getValue() != null)
                 ((BiobankText) widget).setText(((Integer) field.getValue())
                     .toString());
         } else if (field.getType() == Double.class) {
-            widget = new BiobankText(parameterSection, SWT.BORDER);
+            widget = new BiobankText(parameterSection, SWT.NONE);
             ((BiobankText) widget).setLayoutData(wgd);
             if (field.getValue() != null)
                 ((BiobankText) widget).setText(((Double) field.getValue())
