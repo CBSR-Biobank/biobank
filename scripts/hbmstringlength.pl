@@ -4,12 +4,13 @@ use Cwd;
 use File::Find;
 use File::Copy;
 
-if($#ARGV+1 < 2){
-	die "Usuage: translator.pl umlInputFilePath hmbProcessingDirectory [verbose=0]\n";
+if($#ARGV+1 < 3){
+	die "Usuage: translator.pl umlInputFilePath hmbProcessingDirectory outputPath [verbose=0]\n";
 }
 my $umlFile = $ARGV[0];
 my $hmbDir = $ARGV[1];
-my $verbose = $ARGV[2] or 0;
+my $outputPath = $ARGV[2];
+my $verbose = $ARGV[3] or 0;
 my %umlVarCharMap = ();
 my @hmbDirMap = ();
 
@@ -25,15 +26,16 @@ while (my $umlLine = <FH>) {
 close(FH);
 
 #Prints the %umlVarCharMap hash file
-if($verbose){
-    print "Found the following: \n\n";
-	print "Identifier = Varchar# \n";
-	print "--------------------------\n";
-	while ( my ($key, $value) = each(%umlVarCharMap) ) {
-			print "$key = $value\n";
-	}
-	print "--------------------------\n\n";
+print "Generating VarCharLengths.properies... ".">".$outputPath."VarCharLengths.properties";
+open(OUTP, ">".$outputPath."VarCharLengths.properties") or die("Error: cannot open file 'VarCharLengths.properties'\n");
+print OUTP "#Found the following: \n\n";
+print OUTP "#Identifier = Varchar# \n";
+print OUTP "#--------------------------\n";
+while ( my ($key, $value) = each(%umlVarCharMap) ) {
+	print OUTP "$key = $value\n";
 }
+print OUTP "#--------------------------\n\n";
+
 
 #Browses the input directory
 #Creates an array @hmbDirMap of all of the files

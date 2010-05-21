@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
@@ -178,6 +180,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     @SuppressWarnings("unchecked")
     public void persist() throws Exception {
+        checkFieldLimits();
         persistChecks();
         SDKQuery query;
         E origObject = null;
@@ -210,6 +213,28 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected abstract void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException;
+
+    protected void checkFieldLimits() throws BiobankCheckException {
+        String fieldValue = "";
+        try {
+            VarCharLengths properties = new VarCharLengths();
+            String[] fields = getPropertyChangeNames();
+            for (int i = 0; i < fields.length; i++) {
+                System.out.println(fields[i]);
+                int maxLen = properties.getMaxSize(fields[i]);
+                if (maxLen > 0) {
+                    Method f = this.getClass().getMethod(
+                        "get" + Character.toUpperCase(fields[i].charAt(0))
+                            + fields[i].substring(1));
+                    fieldValue = (String) f.invoke(this);
+                    Assert.isTrue(fieldValue.length() <= maxLen);
+                }
+            }
+        } catch (Exception e) {
+            throw new BiobankCheckException("Field " + fieldValue
+                + " exceeds max length.", e);
+        }
+    }
 
     /**
      * delete the object into the database
