@@ -18,7 +18,7 @@ public class DateTimeObservableValue extends AbstractObservableValue {
         public void modifyText(ModifyEvent e) {
             Date newValue = dateTimeToDate();
 
-            if (oldValue == null
+            if (oldValue == null || newValue == null
                 || !newValue.equals(DateTimeObservableValue.this.oldValue)) {
                 fireValueChange(Diffs.createValueDiff(
                     DateTimeObservableValue.this.oldValue, newValue));
