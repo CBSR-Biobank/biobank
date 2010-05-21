@@ -220,7 +220,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             VarCharLengths properties = new VarCharLengths();
             String[] fields = getPropertyChangeNames();
             for (int i = 0; i < fields.length; i++) {
-                System.out.println(fields[i]);
                 int maxLen = properties.getMaxSize(fields[i]);
                 if (maxLen > 0) {
                     Method f = this.getClass().getMethod(
