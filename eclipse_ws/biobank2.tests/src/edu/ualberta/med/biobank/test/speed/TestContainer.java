@@ -34,10 +34,9 @@ public class TestContainer extends SpeedTest {
                 + c.getChildPositionCollection().size());
 
             criteria = new HQLCriteria("from "
-                + ContainerPosition.class.getName()
+                + ContainerPosition.class.getName() + " as cp "
 
-                + " as cp "
-                // + " left join fetch cp.container as child"
+                + " left join fetch cp.container as child"
 
                 + " where cp.parentContainer.id = ?", Arrays
                 .asList(new Object[] { c.getId() }));
@@ -45,9 +44,9 @@ public class TestContainer extends SpeedTest {
 
             for (ContainerPosition childPos : childrenPos) {
                 Container child = childPos.getContainer();
-                logger.info(child.getLabel());
-                // logger.debug(child.getLabel() + ": number of children: "
-                // + child.getChildPositionCollection().size());
+                int count = child.getChildPositionCollection().size();
+                logger.debug(child.getLabel() + ": number of children: "
+                    + count);
             }
 
         }
@@ -64,8 +63,9 @@ public class TestContainer extends SpeedTest {
                 + c.getChildPositionCollection().size());
             for (ContainerPosition childPos : c.getChildPositionCollection()) {
                 Container child = childPos.getContainer();
+                int count = child.getChildPositionCollection().size();
                 logger.debug(child.getLabel() + ": number of children: "
-                    + child.getChildPositionCollection().size());
+                    + count);
             }
 
         }
@@ -77,13 +77,14 @@ public class TestContainer extends SpeedTest {
                 + c.getChildCount());
             Map<RowColPos, ContainerWrapper> pos = c.getChildren();
             for (ContainerWrapper child : pos.values()) {
+                int count = child.getChildCount();
                 logger.debug(child.getLabel() + ": number of children: "
-                    + child.getChildCount());
+                    + count);
             }
         }
     }
 
-    public void testAliquots() throws Exception {
+    public void t1estAliquots() throws Exception {
         HQLCriteria criteria = new HQLCriteria(
             "select distinct ap.container from "
                 + AliquotPosition.class.getName() + " as ap "
