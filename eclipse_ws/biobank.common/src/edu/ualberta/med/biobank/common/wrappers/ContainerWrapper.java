@@ -232,6 +232,7 @@ public class ContainerWrapper extends
     }
 
     public void setProductBarcode(String barcode) {
+        System.out.println("setProductBarcode:" + barcode);
         String oldBarcode = getProductBarcode();
         wrappedObject.setProductBarcode(barcode);
         propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
@@ -283,6 +284,7 @@ public class ContainerWrapper extends
      */
     public void setPositionAndParentFromLabel(String label,
         List<ContainerTypeWrapper> types) throws Exception {
+        System.out.println("setPositionAndParentFromLabel:" + label);
         String parentContainerLabel = label.substring(0, label.length() - 2);
         List<ContainerWrapper> possibleParents = ContainerWrapper
             .getContainersHoldingContainerTypes(appService,
@@ -330,7 +332,7 @@ public class ContainerWrapper extends
                 || rcp.col >= type.getColCapacity()) {
                 throw new Exception("Can't use position " + position
                     + " in container " + getFullInfoLabel()
-                    + "\nReason: capacity = " + type.getRowCapacity() + "*"
+                    + ". Reason: capacity = " + type.getRowCapacity() + "*"
                     + type.getColCapacity());
             }
             if (rcp.row < 0 || rcp.col < 0) {
@@ -358,6 +360,7 @@ public class ContainerWrapper extends
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {
+        System.out.println("setContainerType:" + containerType);
         if (containerType == null) {
             setContainerType((ContainerType) null);
         } else {
@@ -388,6 +391,7 @@ public class ContainerWrapper extends
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        System.out.println("setActivityStatus:" + activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -413,6 +417,7 @@ public class ContainerWrapper extends
     }
 
     public void setLabel(String label) {
+        System.out.println("setLabel:" + label);
         String oldLabel = getLabel();
         wrappedObject.setLabel(label);
         propertyChangeSupport.firePropertyChange("label", oldLabel, label);
