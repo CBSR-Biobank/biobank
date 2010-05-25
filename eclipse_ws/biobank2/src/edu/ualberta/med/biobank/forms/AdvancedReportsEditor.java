@@ -279,7 +279,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         GridData wgd = new GridData();
         wgd.horizontalAlignment = SWT.FILL;
         if (field.getType() == Date.class) {
-            widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+            widget = new DateTimeWidget(parameterSection, SWT.DATE | SWT.TIME,
+                null);
             ((DateTimeWidget) widget).setLayoutData(wgd);
             ((DateTimeWidget) widget).setDate((Date) field.getValue());
         } else if (field.getType() == String.class) {

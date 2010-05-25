@@ -226,7 +226,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                         "get" + Character.toUpperCase(fields[i].charAt(0))
                             + fields[i].substring(1));
                     fieldValue = (String) f.invoke(this);
-                    Assert.isTrue(fieldValue.length() <= maxLen);
+                    if (fieldValue != null)
+                        Assert.isTrue(fieldValue.length() <= maxLen);
                 }
             }
         } catch (Exception e) {
