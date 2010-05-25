@@ -250,7 +250,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * 
      * @throws Exception
      */
-    public void resetToNewObject() throws Exception {
+    private void resetToNewObject() throws Exception {
         E oldValue = wrappedObject;
         wrappedObject = getNewObject();
         firePropertyChanges(oldValue, wrappedObject);

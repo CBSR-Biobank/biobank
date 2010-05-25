@@ -7,11 +7,16 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class PalletBarCodeValidator extends AbstractValidator {
+public class PalletLabelValidator extends AbstractValidator {
 
-    private static final Pattern PATTERN = Pattern.compile("^([A-Z0-9]{2})+");
+    /**
+     * Accept combinations of 2 letters or 2 digits or one letter and one digit.
+     * Need at least 3 repetitions
+     */
+    private static final Pattern PATTERN = Pattern
+        .compile("^(([A-Z]{2})|([A-Z][0-9])|([0-9]{2})){3,}");
 
-    public PalletBarCodeValidator(String message) {
+    public PalletLabelValidator(String message) {
         super(message);
     }
 

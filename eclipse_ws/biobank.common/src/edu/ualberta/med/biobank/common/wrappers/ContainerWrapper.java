@@ -307,10 +307,14 @@ public class ContainerWrapper extends
                     + " have been found. This is ambiguous: check containers definitions.");
         }
         // has the parent container. Can now find the position using the
-        // parent labelling scheme
-        setParent(possibleParents.get(0));
-        possibleParents.get(0).addChild(label.substring(label.length() - 2),
-            this);
+        // parent labeling scheme
+        ContainerWrapper parent = possibleParents.get(0);
+        setParent(parent);
+        // possibleParents.get(0).addChild(label.substring(label.length() - 2),
+        // this);
+        RowColPos position = parent.getPositionFromLabelingScheme(label
+            .substring(label.length() - 2));
+        setPosition(position);
     }
 
     /**
@@ -330,7 +334,7 @@ public class ContainerWrapper extends
                 || rcp.col >= type.getColCapacity()) {
                 throw new Exception("Can't use position " + position
                     + " in container " + getFullInfoLabel()
-                    + "\nReason: capacity = " + type.getRowCapacity() + "*"
+                    + ". Reason: capacity = " + type.getRowCapacity() + "*"
                     + type.getColCapacity());
             }
             if (rcp.row < 0 || rcp.col < 0) {
@@ -544,7 +548,7 @@ public class ContainerWrapper extends
                     try {
                         // try to reload - will start with a fresh ModelObject
                         // not containing the whole object hierarchy it can hold
-                        child.reload();
+                        // child.reload();
                     } catch (Exception e) {
                     }
                     children.put(new RowColPos(position.getRow(), position

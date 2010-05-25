@@ -28,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
@@ -52,7 +53,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
     private IObservableValue canLaunchScanValue = new WritableValue(
-        Boolean.TRUE, Boolean.class);
+        Boolean.FALSE, Boolean.class);
     private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
     private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
@@ -99,22 +100,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected abstract void disableFields();
 
-    protected boolean canLaunchScan() {
-        return scanButton.isEnabled();
-    }
-
-    protected void addScanBindings() {
-        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            canLaunchScanValue, Messages
-                .getString("linkAssign.canLaunchScanValidationMsg")); //$NON-NLS-1$
-        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            scanHasBeenLaunchedValue, Messages
-                .getString("linkAssign.scanHasBeenLaunchedValidationMsg")); //$NON-NLS-1$
-        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-            scanValidValue, Messages
-                .getString("linkAssign.scanValidValidationMsg")); //$NON-NLS-1$
-    }
-
     protected void createScanButton(Composite parent) {
         scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
         if (BioBankPlugin.isRealScanEnabled()) {
@@ -141,7 +126,17 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 internalScanAndProcessResult();
             }
         });
-        addScanBindings();
+        scanButton.setEnabled(false);
+
+        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+            canLaunchScanValue, Messages
+                .getString("linkAssign.canLaunchScanValidationMsg")); //$NON-NLS-1$
+        addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
+            scanHasBeenLaunchedValue, Messages
+                .getString("linkAssign.scanHasBeenLaunchedValidationMsg")); //$NON-NLS-1$
+        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
+            scanValidValue, Messages
+                .getString("linkAssign.scanValidValidationMsg")); //$NON-NLS-1$
     }
 
     protected void createPlateToScanField(Composite fieldsComposite) {
@@ -182,11 +177,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 monitor.beginTask("Scan and process...",
                     IProgressMonitor.UNKNOWN);
                 try {
-                    if (isRescanMode()) {
-                        appendLog("--- Rescan ---");
-                    } else {
-                        appendLog("--- New Scan session ---");
-                    }
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
@@ -227,8 +217,11 @@ public abstract class AbstractPalletAliquotAdminForm extends
         monitor.subTask("Launching scan");
         setScanNotLauched(true);
         Map<RowColPos, PalletCell> oldCells = cells;
-        appendLogNLS("linkAssign.activitylog.scanning", //$NON-NLS-1$
-            currentPlateToScan);
+        String msgKey = "linkAssign.activitylog.scanning";//$NON-NLS-1$
+        if (isRescanMode()) {
+            msgKey = "linkAssign.activitylog.rescanning";//$NON-NLS-1$
+        }
+        appendLogNLS(msgKey, currentPlateToScan);
         if (BioBankPlugin.isRealScanEnabled()) {
             int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                 currentPlateToScan);
@@ -283,14 +276,16 @@ public abstract class AbstractPalletAliquotAdminForm extends
             form.setMessage(getOkMessage(), IMessageProvider.NONE);
             cancelConfirmWidget.setConfirmEnabled(true);
             setConfirmEnabled(true);
-            enableScan(true);
         } else {
             form.setMessage(status.getMessage(), IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
             setConfirmEnabled(false);
-            enableScan(isPlateValid());
+            scanButton.setEnabled((Boolean) canLaunchScanValue.getValue()
+                && fieldsValid());
         }
     }
+
+    protected abstract boolean fieldsValid();
 
     protected void setScanNotLauched() {
         scanHasBeenLaunchedValue.setValue(false);
@@ -345,10 +340,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
         rescanMode = false;
     }
 
-    private void enableScan(boolean enabled) {
-        scanButton.setEnabled(enabled);
-    }
-
     protected boolean isPlateValid() {
         return BioBankPlugin.getDefault().isValidPlateBarcode(
             plateToScanText.getText());
@@ -396,6 +387,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                         } else {
                             cell.setValue(value);
                         }
+                        appendLogNLS("linkAssign.activitylog.scanTubeAlone",
+                            value, LabelingScheme.rowColToSbs(rcp));
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {

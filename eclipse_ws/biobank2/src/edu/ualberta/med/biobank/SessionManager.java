@@ -256,6 +256,10 @@ public class SessionManager {
         return getInstance().getSession().getUserName();
     }
 
+    public static String getServer() {
+        return getInstance().getSession().getServerName();
+    }
+
     public static boolean canCreate(Class<?> clazz) {
         return SecurityHelper.canCreate(getAppService(), clazz);
     }

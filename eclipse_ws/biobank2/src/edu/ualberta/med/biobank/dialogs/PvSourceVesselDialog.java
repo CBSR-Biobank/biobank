@@ -290,7 +290,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
             newPvSourceVessel.initObjectWith(internalSourceVessel);
             newPvSourceVessel.setPatientVisit(patientVisit);
             infotable.addPvSourceVessel(newPvSourceVessel);
-            internalSourceVessel.resetToNewObject();
+            internalSourceVessel.reset();
             sourceVesselsComboViewer.getCombo().deselectAll();
             sourceVesselsComboViewer.getCombo().setFocus();
         } catch (Exception e) {
