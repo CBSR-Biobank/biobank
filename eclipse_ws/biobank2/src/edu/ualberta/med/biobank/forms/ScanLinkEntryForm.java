@@ -615,6 +615,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         setDirty(false);
         reset(true);
         fieldsComposite.setEnabled(true);
+        setScanValid(true);
     }
 
     public void reset(boolean resetAll) {
