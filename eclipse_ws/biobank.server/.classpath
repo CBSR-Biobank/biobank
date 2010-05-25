@@ -7,13 +7,13 @@
 	<classpathentry kind="lib" path="lib/sdk-core.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-client-framework.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-writable-client-framework.jar"/>
-	<classpathentry kind="lib" path="lib/spring.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate3.jar"/>
+	<classpathentry kind="lib" path="lib/spring.jar" sourcepath="/home/delphine/projects/sources/spring-framework/2.0.3/src"/>
+	<classpathentry kind="lib" path="lib/hibernate3.jar" sourcepath="/home/delphine/projects/sources/hibernate/hibernate-3.2/src"/>
 	<classpathentry kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-validator.jar"/>
 	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
 	<classpathentry kind="lib" path="lib/acegi-security-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="lib/clm-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar" sourcepath="/home/delphine/projects/sources/log4j-1.2.14-src/src"/>
+	<classpathentry kind="lib" path="lib/biobank2-beans.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

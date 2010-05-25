@@ -3,22 +3,18 @@
 
 <log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-@ENABLE_CLM_LOGGER_CFG_GENERATION_START@
-	<appender name="CLM_APPENDER"
-		class="gov.nih.nci.logging.api.appender.jdbc.JDBCAppender">
+	<appender name="BIOBANK_APPENDER"
+		class="edu.ualberta.med.biobank.server.logging.BiobankJDBCAppender">
 		<param name="application" value="@CLM_PROJECT_NAME@" />
-		<param name="maxBufferSize" value="1" />
 		<param name="dbDriverClass" value="@CLM_DB_DRIVER@" />
 		<param name="dbUrl" value="@CLM_DB_CONNECTION_URL@" />
 		<param name="dbUser" value="@CLM_DB_USERNAME@" />
 		<param name="dbPwd" value="@CLM_DB_PASSWORD@" />
-		<param name="useFilter" value="true" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern"
 				value=":: [%d{ISO8601}] %-5p %c{1}.%M() %x - %m%n" />
 		</layout>
 	</appender>
-@ENABLE_CLM_LOGGER_CFG_GENERATION_END@	
 
 	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
 		<param name="Target" value="System.out" />
@@ -30,23 +26,10 @@
 	</appender>
 
 
-<!--
-        <category name="CSM.Audit.Logging.Event.Authentication">
-		<level value="info" />
-		<appender-ref ref="CLM_APPENDER" />
-	</category>
--->
-
-@ENABLE_CLM_LOGGER_CFG_GENERATION_START@
-	<category name="CSM.Audit.Logging.Event.Authorization">
-		<level value="info" />
-		<appender-ref ref="CLM_APPENDER" />
-	</category>
-	<category name="CSM.Audit.Logging.ObjectState.Authorization">
+	<category name="Biobank.Activity">
 		<level value="INFO" />
-		<appender-ref ref="CLM_APPENDER" />
+		<appender-ref ref="BIOBANK_APPENDER" />
 	</category>
-@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
 
 	<category name="org.apache.dbcp">
 		<level value="@LOG4J_LEVEL@" />

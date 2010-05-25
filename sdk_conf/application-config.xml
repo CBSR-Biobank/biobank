@@ -55,7 +55,7 @@
 							<constructor-arg value="false"/>
 						</bean>
 						@ATTRIBUTE_LEVEL_SECURITY_END@
-						@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<bean class="gov.nih.nci.logging.api.logger.hibernate.ObjectStateInterceptor"/>@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+						<bean class="edu.ualberta.med.biobank.server.logging.BiobankObjectStateInterceptor"/>
 					</list>		
 				</constructor-arg>
 			</bean>
@@ -110,12 +110,12 @@
 			<list>
 				<idref local="exceptionHandler" />
 				<idref local="TxInterceptor" />
-				@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<idref local="CLMInterceptor" />@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+				<idref local="LogInterceptor" />
 			</list>
 		</property>
 	</bean>
 
-	@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<bean id="CLMInterceptor" class="gov.nih.nci.system.client.proxy.CLMProxy"/>@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
+	<bean id="LogInterceptor" class="edu.ualberta.med.biobank.server.logging.user.BiobankLogProxy"/>
 
 	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
 </beans>

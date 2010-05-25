@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class LogWrapper extends ModelWrapper<Log> {
 
@@ -114,4 +117,19 @@ public class LogWrapper extends ModelWrapper<Log> {
         wrappedObject.setDetails(details);
         propertyChangeSupport.firePropertyChange("details", old, details);
     }
+
+    public static List<LogWrapper> getLogs(
+        WritableApplicationService appService, String username, Date date,
+        String action, String patientNumber, String inventoryId,
+        String locationLabel, String details) throws Exception {
+        HQLCriteria criteria = new HQLCriteria("from " + Log.class.getName());
+        List<Log> logs = appService.query(criteria);
+
+        List<LogWrapper> wrappers = new ArrayList<LogWrapper>();
+        for (Log l : logs) {
+            wrappers.add(new LogWrapper(appService, l));
+        }
+        return wrappers;
+    }
+
 }

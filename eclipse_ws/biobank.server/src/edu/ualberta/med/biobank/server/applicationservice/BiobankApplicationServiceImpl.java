@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.acegisecurity.context.SecurityContextHolder;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -222,4 +224,15 @@ public class BiobankApplicationServiceImpl extends
         Method getIdMethod = siteObject.getClass().getMethod("getId");
         return getIdMethod.invoke(siteObject);
     }
+
+    @Override
+    public void logActivity(String action, String patientNumber,
+        String inventoryID, String locationLabel, String details)
+        throws ApplicationException {
+        Logger logger = Logger.getLogger("Biobank.Activity");
+        logger.log(Level.toLevel("INFO"), MessageGenerator
+            .generateStringMessage(action, patientNumber, inventoryID,
+                locationLabel, details));
+    }
+
 }
