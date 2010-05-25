@@ -10,6 +10,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -20,6 +21,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable.TableRowData;
 
 /**
  * Used to display tabular information for an object in the object model or
@@ -177,7 +180,34 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         tableViewer.refresh();
     }
 
-    protected abstract BiobankTableSorter getTableSorter();
+    protected BiobankTableSorter getTableSorter() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Viewer viewer, Object e1, Object e2) {
+                TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
+                TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+                if ((c1 == null) || (c2 == null)) {
+                    return -1;
+                }
+                BiobankLabelProvider lp = (BiobankLabelProvider) getLabelProvider();
+                int i = 0;
+                int rc = 0;
+                while (rc == 0) {
+                    String first = lp.getColumnText(c1, i);
+                    String second = lp.getColumnText(c2, i);
+                    if (first != null && second != null && rc == 0) {
+                        rc = compare(first, second);
+                        i++;
+                    }
+                }
+                // If descending order, flip the direction
+                if (direction == 1) {
+                    rc = -rc;
+                }
+                return rc;
+            }
+        };
+    }
 
     @Override
     public boolean setFocus() {
