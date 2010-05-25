@@ -417,6 +417,7 @@
         <include name="hibernate-validator*.*" />
         <include name="acegi-security*.*" />
         <include name="log4j*.*" />
+        <include name="clm*.*" />
       </fileset>
       <fileset dir="${cacore.sdk.dir}/writable-api/dist" includes="*.jar" />
       <fileset dir="${cacore.sdk.dir}/system/security/dist" includes="*.jar" />
