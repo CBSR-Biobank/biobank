@@ -455,6 +455,13 @@ public class WidgetCreator {
 
     public void addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
+        addBooleanBinding(writableValue, observableValue, errorMsg,
+            IStatus.ERROR);
+    }
+
+    public void addBooleanBinding(WritableValue writableValue,
+        IObservableValue observableValue, final String errorMsg,
+        final int statusType) {
         Assert.isNotNull(dbc);
         UpdateValueStrategy uvs = null;
         if (errorMsg != null) {
@@ -463,6 +470,9 @@ public class WidgetCreator {
                 @Override
                 public IStatus validate(Object value) {
                     if (value instanceof Boolean && !(Boolean) value) {
+                        if (statusType == IStatus.WARNING) {
+                            return ValidationStatus.warning(errorMsg);
+                        }
                         return ValidationStatus.error(errorMsg);
                     } else {
                         return Status.OK_STATUS;

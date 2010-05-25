@@ -93,6 +93,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
+        setCanLaunchScan(true);
     }
 
     @Override
@@ -663,5 +664,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         processCellStatus(cell, true);
         spw.redraw();
         form.layout();
+    }
+
+    @Override
+    protected boolean fieldsValid() {
+        return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 }

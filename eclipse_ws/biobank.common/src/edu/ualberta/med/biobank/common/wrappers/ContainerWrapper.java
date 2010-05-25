@@ -232,7 +232,6 @@ public class ContainerWrapper extends
     }
 
     public void setProductBarcode(String barcode) {
-        System.out.println("setProductBarcode:" + barcode);
         String oldBarcode = getProductBarcode();
         wrappedObject.setProductBarcode(barcode);
         propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
@@ -284,7 +283,6 @@ public class ContainerWrapper extends
      */
     public void setPositionAndParentFromLabel(String label,
         List<ContainerTypeWrapper> types) throws Exception {
-        System.out.println("setPositionAndParentFromLabel:" + label);
         String parentContainerLabel = label.substring(0, label.length() - 2);
         List<ContainerWrapper> possibleParents = ContainerWrapper
             .getContainersHoldingContainerTypes(appService,
@@ -309,10 +307,14 @@ public class ContainerWrapper extends
                     + " have been found. This is ambiguous: check containers definitions.");
         }
         // has the parent container. Can now find the position using the
-        // parent labelling scheme
-        setParent(possibleParents.get(0));
-        possibleParents.get(0).addChild(label.substring(label.length() - 2),
-            this);
+        // parent labeling scheme
+        ContainerWrapper parent = possibleParents.get(0);
+        setParent(parent);
+        // possibleParents.get(0).addChild(label.substring(label.length() - 2),
+        // this);
+        RowColPos position = parent.getPositionFromLabelingScheme(label
+            .substring(label.length() - 2));
+        setPosition(position);
     }
 
     /**
@@ -360,7 +362,6 @@ public class ContainerWrapper extends
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {
-        System.out.println("setContainerType:" + containerType);
         if (containerType == null) {
             setContainerType((ContainerType) null);
         } else {
@@ -391,7 +392,6 @@ public class ContainerWrapper extends
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        System.out.println("setActivityStatus:" + activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -417,7 +417,6 @@ public class ContainerWrapper extends
     }
 
     public void setLabel(String label) {
-        System.out.println("setLabel:" + label);
         String oldLabel = getLabel();
         wrappedObject.setLabel(label);
         propertyChangeSupport.firePropertyChange("label", oldLabel, label);
@@ -534,7 +533,7 @@ public class ContainerWrapper extends
                     try {
                         // try to reload - will start with a fresh ModelObject
                         // not containing the whole object hierarchy it can hold
-                        child.reload();
+                        // child.reload();
                     } catch (Exception e) {
                     }
                     children.put(new RowColPos(position.getRow(), position

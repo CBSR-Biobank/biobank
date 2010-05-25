@@ -70,7 +70,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     public void setPosition(RowColPos position) {
-        System.out.println("setPosition:" + position);
         RowColPos oldPosition = getPosition();
         this.rowColPosition = position;
         propertyChangeSupport.firePropertyChange("position", oldPosition,
@@ -78,7 +77,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     public void setPosition(Integer row, Integer col) {
-        System.out.println("setPosition:" + row + "," + col);
         setPosition(new RowColPos(row, col));
     }
 
@@ -91,7 +89,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     public void setParent(ContainerWrapper container) {
-        System.out.println("setParent:" + container);
         ContainerWrapper oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
         pos.setParent(container);

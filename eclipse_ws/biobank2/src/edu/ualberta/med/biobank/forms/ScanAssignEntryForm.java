@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
@@ -113,12 +115,17 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private boolean modificationMode;
 
+    private IObservableValue validationMade = new WritableValue(Boolean.TRUE,
+        Boolean.class);
+
     @Override
     protected void init() {
         super.init();
         setPartName(Messages.getString("ScanAssign.tabTitle")); //$NON-NLS-1$
         currentPalletWrapper = new ContainerWrapper(appService);
         initPalletValues();
+        addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
+            validationMade, "Validation needed: hit enter"); //$NON-NLS-1$
     }
 
     @Override
@@ -191,7 +198,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             public void modifyText(ModifyEvent e) {
                 if (!modificationMode) {
                     palletproductBarcodeTextModified = true;
-                    setCanLaunchScan(false);
+                    validationMade.setValue(false);
                 }
             }
         });
@@ -219,7 +226,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             public void modifyText(ModifyEvent e) {
                 if (!modificationMode) {
                     palletPositionTextModified = true;
-                    setCanLaunchScan(false);
+                    validationMade.setValue(false);
                 }
             }
         });
@@ -255,6 +262,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             setCanLaunchScan(false);
         }
         modificationMode = false;
+        validationMade.setValue(true);
     }
 
     @Override
@@ -290,6 +298,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                             if (oldContainerType != null) {
                                 validateValues();
                             }
+                            palletTypesViewer.getCombo().setFocus();
                         }
                     }
                 }
@@ -913,7 +922,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void initPalletValues() {
         try {
-            currentPalletWrapper.resetToNewObject();
+            currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
             currentPalletWrapper.setSite(SessionManager.getInstance()

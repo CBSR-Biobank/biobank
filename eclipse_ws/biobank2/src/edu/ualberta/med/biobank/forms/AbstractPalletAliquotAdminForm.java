@@ -285,9 +285,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         }
     }
 
-    protected boolean fieldsValid() {
-        return false;
-    }
+    protected abstract boolean fieldsValid();
 
     protected void setScanNotLauched() {
         scanHasBeenLaunchedValue.setValue(false);
