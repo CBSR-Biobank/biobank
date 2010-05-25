@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -495,15 +494,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 containersComposite.layout(true, true);
             }
         });
-    }
-
-    protected void disableScan() {
-        showOnlyPallet(true);
-        palletWidget.setCells(new TreeMap<RowColPos, PalletCell>());
-        setScanValid(false);
-        displayPalletPositions();
-        focusOnCancelConfirmText();
-        containersComposite.layout(true, true);
     }
 
     @Override
