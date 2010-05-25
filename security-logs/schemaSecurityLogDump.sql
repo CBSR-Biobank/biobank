@@ -263,7 +263,6 @@ INSERT INTO `csm_pg_pe` VALUES (465,41,14,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (466,41,34,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (467,41,15,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (468,41,36,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (470,11,50,'2010-05-11');
 INSERT INTO `csm_pg_pe` VALUES (471,18,24,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (472,18,10,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (473,18,13,'0000-00-00');
@@ -369,7 +368,6 @@ INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','','','',2,'2010-04-13');
 INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
 INSERT INTO `csm_protection_element` VALUES (47,'biobank.cbsr.container.administration','','biobank.cbsr.container.administration','','','',2,'2010-04-26');
-INSERT INTO `csm_protection_element` VALUES (50,'edu.ualberta.med.biobank.model.Site/CBSR','CBSR','edu.ualberta.med.biobank.model.Site','id','1',NULL,2,'2010-05-11');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
