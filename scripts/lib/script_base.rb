@@ -1,5 +1,6 @@
 #!/usr/bin/ruby -w
 
+require "rubygems"
 require "mysql"
 require "csv"
 
@@ -11,9 +12,9 @@ class ScriptBase
 
   @dbh = nil
 
-  def getDbConnection(dbname)
+  def getDbConnection(dbname, host = 'localhost')
     begin
-      @dbh = Mysql.real_connect("localhost", "dummy", "ozzy498", dbname)
+      @dbh = Mysql.real_connect(host, "dummy", "ozzy498", dbname)
     rescue Mysql::Error => e
       puts "Error message: #{e.error}"
       exit
