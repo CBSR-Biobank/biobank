@@ -13,8 +13,7 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
     public void perspectiveActivated(IWorkbenchPage page,
         IPerspectiveDescriptor perspective) {
         AbstractViewWithTree view = SessionManager.getCurrentViewWithTree();
-        if (view != null) {
+        if (view != null)
             view.reload();
-        }
     }
 }

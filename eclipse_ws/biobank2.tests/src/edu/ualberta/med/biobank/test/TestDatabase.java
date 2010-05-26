@@ -169,6 +169,24 @@ public class TestDatabase {
                     + getterInfo.getMethod.getName() + "()", parameter,
                     getResult);
             }
+
+            // maxlength for varchar test
+            if (returnType.equals(java.lang.String.class)) {
+                try {
+                    String longString = "ExcessivelyLongMassiveStringDesignedtoReachTheCharLimit."
+                        + "SomeVarCharsHaveVerySmallLimitsButThisOneWillBeTooLongForAllOfThem,"
+                        + "EvenThe255CharacterLimitFields."
+                        + "However,ThisFieldWillBeSavedCorrectlyForFieldsOfTypeTextInTheDatabase."
+                        + "AnExceptionShouldBeThrownByTheUnderlyingWrapperIfTheVarCharLimitIsViolated.";
+                    getterInfo.setMethod.invoke(w, longString);
+                    w.persist();
+                } catch (Exception e) {
+                    Assert.assertTrue("VARCHAR limits not enforced on field: "
+                        + getterInfo.setMethod.getName().replace("set", "")
+                        + ".", e.getMessage().startsWith("Field Excessively"));
+                }
+                w.reload();
+            }
         }
 
     }

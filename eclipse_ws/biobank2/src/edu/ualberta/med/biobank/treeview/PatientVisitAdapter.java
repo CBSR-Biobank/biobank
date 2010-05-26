@@ -26,7 +26,7 @@ public class PatientVisitAdapter extends AdapterBase {
     public PatientVisitAdapter(AdapterBase parent,
         PatientVisitWrapper patientVisitWrapper) {
         super(parent, patientVisitWrapper);
-        setEditable(parent instanceof PatientAdapter);
+        setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
     public PatientVisitWrapper getWrapper() {

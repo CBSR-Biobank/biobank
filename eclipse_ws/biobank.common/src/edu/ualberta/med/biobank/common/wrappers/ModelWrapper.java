@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
@@ -178,6 +179,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     @SuppressWarnings("unchecked")
     public void persist() throws Exception {
+        checkFieldLimits();
         persistChecks();
         SDKQuery query;
         E origObject = null;
@@ -210,6 +212,32 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected abstract void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException;
+
+    protected void checkFieldLimits() throws BiobankCheckException {
+        String fieldValue = "";
+        VarCharLengths properties = VarCharLengths.getInstance();
+        String[] fields = getPropertyChangeNames();
+        for (int i = 0; i < fields.length; i++) {
+            int maxLen = properties.getMaxSize(fields[i]);
+            if (maxLen > 0) {
+                Method f;
+                try {
+                    f = this.getClass().getMethod(
+                        "get" + Character.toUpperCase(fields[i].charAt(0))
+                            + fields[i].substring(1));
+                    fieldValue = (String) f.invoke(this);
+                    if ((fieldValue != null) && (fieldValue.length() <= maxLen)) {
+                        throw new BiobankCheckException("Field " + fields[i]
+                            + " with value \"" + fieldValue
+                            + "\" exceeds max length.");
+                    }
+                } catch (Exception e) {
+                    throw new BiobankCheckException(
+                        "Cannot get max length for field " + fields[i], e);
+                }
+            }
+        }
+    }
 
     /**
      * delete the object into the database

@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -59,6 +60,7 @@ import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
 import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
 import edu.ualberta.med.biobank.common.reports.AliquotRequest;
 import edu.ualberta.med.biobank.common.reports.AliquotSCount;
+import edu.ualberta.med.biobank.common.reports.AliquotsByPallet;
 import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
 import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
@@ -80,6 +82,7 @@ import edu.ualberta.med.biobank.common.reports.SampleTypePvCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
 import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
 import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -142,6 +145,7 @@ public class ReportsEditor extends BiobankFormBase {
             100 });
         aMap.put(QAFreezerAliquots.class, new int[] { 100, 100, 100, 100, 100,
             100 });
+        aMap.put(AliquotsByPallet.class, new int[] { 100, 100, 100, 100 });
         aMap.put(AliquotCount.class, new int[] { 100, 100 });
         aMap
             .put(AliquotInvoiceByClinic.class, new int[] { 100, 100, 150, 100 });
@@ -253,9 +257,13 @@ public class ReportsEditor extends BiobankFormBase {
 
     private ArrayList<Object> getParams() {
         ArrayList<Object> params = new ArrayList<Object>();
+        List<Option> queryOptions = query.getOptions();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof BiobankText) {
-                if (((BiobankText) widgetFields.get(i)).getText().compareTo("") == 0)
+                if (queryOptions.get(i).getName().compareTo("Pallet Label") == 0) {
+                    params.add(((BiobankText) widgetFields.get(i)).getText());
+                } else if (((BiobankText) widgetFields.get(i)).getText()
+                    .compareTo("") == 0)
                     params.add(query.getOptions().get(i).getDefaultValue());
                 else
                     try {
@@ -280,7 +288,7 @@ public class ReportsEditor extends BiobankFormBase {
             else if (widgetFields.get(i) instanceof FileBrowser) {
                 String csv = ((FileBrowser) widgetFields.get(i)).getText();
                 if (csv != null) {
-                    StringTokenizer st = new StringTokenizer(csv, ", \n");
+                    StringTokenizer st = new StringTokenizer(csv, ",\" \n");
                     while (st.hasMoreTokens()) {
                         String token = st.nextToken();
                         if (DateFormatter.parseToDate(token) == null)
@@ -296,14 +304,9 @@ public class ReportsEditor extends BiobankFormBase {
                         }
                     }
                 }
-            } else if (widgetFields.get(i) instanceof Combo) {
-                params
-                    .add(((Combo) widgetFields.get(i))
-                        .getItem(((Combo) widgetFields.get(i))
-                            .getSelectionIndex()));
             }
         }
-        List<Option> queryOptions = query.getOptions();
+
         for (int i = 0; i < queryOptions.size() && i < params.size(); i++) {
             Option option = queryOptions.get(i);
             if (params.get(i) == null)
@@ -569,7 +572,24 @@ public class ReportsEditor extends BiobankFormBase {
                     } catch (ApplicationException e1) {
                         widget = null;
                     }
-                else if (option.getName().compareTo("Study") == 0) {
+                else if (option.getName().compareTo("Top Container Type") == 0) {
+                    try {
+                        List<ContainerWrapper> cWrappers = site
+                            .getTopContainerCollection(true);
+                        HashSet<String> containerTypes = new HashSet<String>();
+                        for (ContainerWrapper c : cWrappers)
+                            containerTypes.add(c.getContainerType()
+                                .getNameShort());
+                        widget = new Combo(parameterSection, SWT.READ_ONLY);
+                        ((Combo) widget).setItems(containerTypes
+                            .toArray(new String[] {}));
+                        ((Combo) widget).select(0);
+                        ((Combo) widget).setLayoutData(widgetData);
+                        toolkit.adapt((Combo) widget, true, true);
+                    } catch (ApplicationException e1) {
+                        widget = null;
+                    }
+                } else if (option.getName().compareTo("Study") == 0) {
                     Collection<StudyWrapper> studyWrappers;
                     if (site.getName().compareTo("All Sites") != 0)
                         studyWrappers = site.getStudyCollection(true);
@@ -585,9 +605,11 @@ public class ReportsEditor extends BiobankFormBase {
                     ((Combo) widget).select(0);
                     ((Combo) widget).setLayoutData(widgetData);
                     toolkit.adapt((Combo) widget, true, true);
-                } else {
+                } else if (option.getName().compareTo("CSV File") == 0) {
                     widget = new FileBrowser(parameterSection, SWT.NONE);
                     toolkit.adapt((FileBrowser) widget, true, true);
+                } else {
+                    widget = new BiobankText(parameterSection, SWT.NONE);
                 }
             } else if (option.getType() == Integer.class) {
                 IObservableValue numAliquots = new WritableValue("",
