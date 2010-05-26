@@ -35,17 +35,17 @@ public class VarCharLengths {
 
     public int getMaxSize(String key) {
         try {
-            return Integer.parseInt(properties.getProperty(transform(key)));
+            return Integer.parseInt(properties.getProperty(camelCaseToUpper(key)));
         } catch (Exception e) {
             return -1;
         }
     }
 
-    public String transform(String key) {
+    public String camelCaseToUpper(String key) {
         char[] keyChars = key.toCharArray();
         for (int i = 0; i < keyChars.length; i++) {
             if (Character.isUpperCase(keyChars[i]))
-                return transform(key.replace(String.valueOf(keyChars[i]), "_"
+                return camelCaseToUpper(key.replace(String.valueOf(keyChars[i]), "_"
                     + Character.toLowerCase(keyChars[i])));
         }
         return key.toUpperCase();

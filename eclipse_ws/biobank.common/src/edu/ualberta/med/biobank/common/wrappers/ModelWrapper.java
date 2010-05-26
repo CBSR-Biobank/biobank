@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -213,7 +215,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected abstract void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException;
 
-    protected void checkFieldLimits() throws BiobankCheckException {
+    protected void checkFieldLimits() throws BiobankCheckException,
+        BiobankStringLengthException {
         String fieldValue = "";
         VarCharLengths properties = VarCharLengths.getInstance();
         String[] fields = getPropertyChangeNames();
@@ -226,12 +229,24 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                         "get" + Character.toUpperCase(fields[i].charAt(0))
                             + fields[i].substring(1));
                     fieldValue = (String) f.invoke(this);
-                    if ((fieldValue != null) && (fieldValue.length() <= maxLen)) {
-                        throw new BiobankCheckException("Field " + fields[i]
-                            + " with value \"" + fieldValue
-                            + "\" exceeds max length.");
+                    if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
+                        throw new BiobankStringLengthException(
+                            "Field exceeds max length: field: " + fields[i]
+                                + ", value \"" + fieldValue + "\"");
                     }
-                } catch (Exception e) {
+                } catch (SecurityException e) {
+                    throw new BiobankCheckException(
+                        "Cannot get max length for field " + fields[i], e);
+                } catch (NoSuchMethodException e) {
+                    throw new BiobankCheckException(
+                        "Cannot get max length for field " + fields[i], e);
+                } catch (IllegalArgumentException e) {
+                    throw new BiobankCheckException(
+                        "Cannot get max length for field " + fields[i], e);
+                } catch (IllegalAccessException e) {
+                    throw new BiobankCheckException(
+                        "Cannot get max length for field " + fields[i], e);
+                } catch (InvocationTargetException e) {
                     throw new BiobankCheckException(
                         "Cannot get max length for field " + fields[i], e);
                 }
