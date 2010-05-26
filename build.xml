@@ -338,7 +338,7 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate" description="creates the default tables">
+  <target name="dbcreate" depends="string-length-field-addition" description="creates the default tables">
     <sql driver="${mysql.driver.string}"
          url="jdbc:mysql://${database.host}:${database.port}/"
          userid="${database.username}" password="${database.password}">
