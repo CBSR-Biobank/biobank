@@ -7,6 +7,8 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 import edu.ualberta.med.biobank.model.Log;
@@ -17,7 +19,7 @@ import edu.ualberta.med.biobank.model.Log;
  * 
  * Copy from CLM
  */
-public class JDBCLogExecutor implements java.lang.Runnable {
+public class JDBCLogExecutor implements Runnable {
 
     private Log log;
     private Properties props;
@@ -25,6 +27,11 @@ public class JDBCLogExecutor implements java.lang.Runnable {
     private String dbDriverClass = null;
     private String dbUser = null;
     private String dbPwd = null;
+
+    public static final String COMMA = ",";
+
+    public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm");
 
     /**
      * Constructor for JDBCExcecutor.
@@ -52,82 +59,34 @@ public class JDBCLogExecutor implements java.lang.Runnable {
 
     }
 
-    /*
-     * Executes a batch insert of the messages into the RDBMS.
-     * 
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Runnable#run()
-     */
     public void run() {
         try {
-            insert();
+            Connection conn = null;
+            Statement stmt = null;
+            try {
+                conn = createConn();
+                conn.setAutoCommit(false);
+                stmt = conn.createStatement();
+                String statement = getLogMessageSQLStatement(log);
+                stmt.execute(statement);
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                conn.close();
+                throw e;
+            } finally {
+                try {
+                    stmt.close();
+                } catch (Exception ex) {
+                }
+                try {
+                    conn.close();
+                } catch (Exception ex) {
+                }
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             writeMsgToTmpFile(ex);
-        }
-    }
-
-    /**
-     * Writes fatal errors to a log file on the system's current directory.
-     * 
-     * @param t
-     */
-    private static void writeMsgToTmpFile(Throwable t) {
-        FileWriter writer = null;
-        try {
-            File f = new File("jdbcappender" + System.currentTimeMillis()
-                + ".log");
-            writer = new FileWriter(f);
-            writer.write(getErrorAndStack(t));
-            writer.flush();
-
-        } catch (Exception e) {
-        } finally {
-            try {
-                writer.close();
-            } catch (Exception e1) {
-            }
-        }
-    }
-
-    public static String getErrorAndStack(Throwable t) {
-        if (t == null) {
-            return null;
-        }
-        return t.getMessage() + System.getProperty("line.separator")
-            + getStackTrace(t).toString();
-    }
-
-    public static StringBuffer getStackTrace(Throwable t) {
-        StringWriter stringWriter = new java.io.StringWriter();
-        t.printStackTrace(new PrintWriter(stringWriter));
-        return stringWriter.getBuffer();
-    }
-
-    private void insert() throws Exception {
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            conn = createConn();
-            conn.setAutoCommit(false);
-            stmt = conn.createStatement();
-            String statement = SQLGenerator.getSQLStatement(log);
-            stmt.execute(statement);
-            conn.commit();
-        } catch (Exception e) {
-            conn.rollback();
-            conn.close();
-            throw e;
-        } finally {
-            try {
-                stmt.close();
-            } catch (Exception ex) {
-            }
-            try {
-                conn.close();
-            } catch (Exception ex) {
-            }
         }
     }
 
@@ -185,6 +144,90 @@ public class JDBCLogExecutor implements java.lang.Runnable {
 
     public void setDbUser(String dbUser) {
         this.dbUser = dbUser;
+    }
+
+    /**
+     * Returns a SQL Insert statement based on an Log Object instance.
+     */
+    private String getLogMessageSQLStatement(Log log) {
+
+        StringBuffer sql = new StringBuffer();
+        sql.append("INSERT INTO log (");
+        sql.append(LogProperty.USERNAME);
+        sql.append(COMMA + LogProperty.DATE);
+        sql.append(COMMA + LogProperty.ACTION);
+        sql.append(COMMA + LogProperty.PATIENT_NUMBER);
+        sql.append(COMMA + LogProperty.INVENTORY_ID);
+        sql.append(COMMA + LogProperty.LOCATION_LABEL);
+        sql.append(COMMA + LogProperty.DETAILS);
+        sql.append(") VALUES ('");
+        sql.append(initString(log.getUsername()));
+        sql.append("','");
+        sql.append(initString(log.getDate()));
+        sql.append("','");
+        sql.append(initString(log.getAction()));
+        sql.append("','");
+        sql.append(initString(log.getPatientNumber()));
+        sql.append("','");
+        sql.append(initString(log.getInventoryId()));
+        sql.append("','");
+        sql.append(initString(log.getLocationLabel()));
+        sql.append("','");
+        sql.append(initString(log.getDetails()));
+        sql.append("');");
+        return sql.toString();
+    }
+
+    public String initString(String str) {
+        String test = "";
+        if (str != null) {
+            test = str.trim();
+        }
+        return test;
+    }
+
+    public String initString(Date date) {
+        if (date == null) {
+            return "";
+        }
+        return dateTimeFormatter.format(date);
+    }
+
+    /**
+     * Writes fatal errors to a log file on the system's current directory.
+     * 
+     * @param t
+     */
+    private static void writeMsgToTmpFile(Throwable t) {
+        FileWriter writer = null;
+        try {
+            File f = new File("biobanklogappender" + System.currentTimeMillis()
+                + ".log");
+            writer = new FileWriter(f);
+            writer.write(getErrorAndStack(t));
+            writer.flush();
+
+        } catch (Exception e) {
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e1) {
+            }
+        }
+    }
+
+    public static String getErrorAndStack(Throwable t) {
+        if (t == null) {
+            return null;
+        }
+        return t.getMessage() + System.getProperty("line.separator")
+            + getStackTrace(t).toString();
+    }
+
+    public static StringBuffer getStackTrace(Throwable t) {
+        StringWriter stringWriter = new java.io.StringWriter();
+        t.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.getBuffer();
     }
 
 }

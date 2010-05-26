@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.server.logging.user.UserInfo;
  * Features include: <br>
  * --Inserts Logs Messages into the database in near real time <br>
  * --Uses a configurable buffer to perform batch processing <br>
- * --Spawns threads to execute the batch inserts to maximize performance <br>
+ * --Spawns threads to execute the batch inserts to maximise performance <br>
  * --Prepares all data for RDBMS by escaping quotes.
  * 
  * Copy from CLM JDBCAppender
@@ -84,30 +84,13 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
                 continue;
             String attributeName = messagetemp.substring(0, messagetemp
                 .indexOf("="));
-            if ("action".equalsIgnoreCase(attributeName)) {
-                String action = messagetemp
-                    .substring(messagetemp.indexOf("=") + 1);
-                log.setAction(action.trim());
-            }
-            if ("patientNumber".equalsIgnoreCase(attributeName)) {
-                String patientNumber = messagetemp.substring(messagetemp
-                    .indexOf("=") + 1);
-                log.setPatientNumber(patientNumber.trim());
-            }
-            if ("inventoryId".equalsIgnoreCase(attributeName)) {
-                String inventoryId = messagetemp.substring(messagetemp
-                    .indexOf("=") + 1);
-                log.setInventoryId(inventoryId.trim());
-            }
-            if ("locationLabel".equalsIgnoreCase(attributeName)) {
-                String locationLabel = messagetemp.substring(messagetemp
-                    .indexOf("=") + 1);
-                log.setLocationLabel(locationLabel.trim());
-            }
-            if ("details".equalsIgnoreCase(attributeName)) {
-                String details = messagetemp
-                    .substring(messagetemp.indexOf("=") + 1);
-                log.setDetails(details.trim());
+            String value = messagetemp.substring(messagetemp.indexOf("=") + 1);
+            for (LogProperty logProperties : LogProperty.values()) {
+                boolean set = logProperties.setLogValueIfInString(log,
+                    attributeName, value);
+                if (set) {
+                    break;
+                }
             }
         }
         return log;

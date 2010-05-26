@@ -11,7 +11,9 @@ import edu.ualberta.med.biobank.server.logging.user.BiobankThreadVariable;
 import edu.ualberta.med.biobank.server.logging.user.UserInfo;
 
 /**
- * This class logs the object state information. Copy from CLM
+ * This class logs the object state information.
+ * 
+ * Copy from CLM
  */
 
 public class BiobankObjectStateLogger {
