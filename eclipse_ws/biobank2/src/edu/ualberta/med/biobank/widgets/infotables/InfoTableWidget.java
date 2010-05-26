@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -22,7 +23,6 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable.TableRowData;
 
 /**
  * Used to display tabular information for an object in the object model or
@@ -109,9 +109,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void setPaginationParams(List<T> collection) {
-        if (!isEditMode() && (pageInfo.rowsPerPage != 0)
+        if (pageInfo.rowsPerPage != 0
             && (collection.size() > pageInfo.rowsPerPage)) {
-            pageInfo.page = 0;
             Double size = new Double(collection.size());
             Double pageSize = new Double(pageInfo.rowsPerPage);
             pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
@@ -119,7 +118,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             paginationRequired = true;
             addPaginationWidget();
             getTableViewer().refresh();
-        }
+        } else
+            paginationRequired = false;
     }
 
     /**
@@ -128,8 +128,18 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      * 
      * @return true if editing is allowed.
      */
+    @Override
     protected boolean isEditMode() {
         return false;
+    }
+
+    protected BiobankCollectionModel getSelectionInternal() {
+        Assert.isTrue(!tableViewer.getTable().isDisposed(),
+            "widget is disposed");
+        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
+            .getSelection();
+
+        return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
     protected void initModel(List<T> collection) {
@@ -184,8 +194,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         return new BiobankTableSorter() {
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
-                TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-                TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
+                Object c1 = ((BiobankCollectionModel) e1).o;
+                Object c2 = ((BiobankCollectionModel) e2).o;
                 if ((c1 == null) || (c2 == null)) {
                     return -1;
                 }

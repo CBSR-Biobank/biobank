@@ -43,7 +43,8 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                 paginationRequired = true;
                 addPaginationWidget();
             }
-        }
+        } else
+            paginationRequired = false;
     }
 
     @Override
@@ -203,6 +204,11 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
     @Override
     protected void init(List<T> collection) {
 
+    }
+
+    @Override
+    protected boolean isEditMode() {
+        return false;
     }
 
 }

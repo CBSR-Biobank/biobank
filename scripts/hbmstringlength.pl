@@ -12,6 +12,9 @@ use Getopt::Long;
 main();
 
 sub main {
+
+	my $verbose;
+
     if (!GetOptions ('verbose'  => \$verbose)) {
         die "ERROR: bad options in command line\n";
     }
@@ -23,7 +26,6 @@ sub main {
 	my $umlFile = $ARGV[0];
 	my $hbmDir=$ARGV[1];
 	my $outputPath = $ARGV[2];
-	my $verbose = $ARGV[3] or 0;
 	my %umlVarCharMap = ();
 	my %umlTextMap = ();
 	my @hbmDirList = ();
