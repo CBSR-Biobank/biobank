@@ -8,8 +8,9 @@ import org.apache.log4j.Logger;
 import edu.ualberta.med.biobank.server.logging.user.UserInfoHelper;
 
 /**
- * this is call before any call into the ApplicationService instance. See
- * application-config.xml.
+ * this is call before any call into the ApplicationService instance.
+ * 
+ * See use application-config.xml.
  */
 public class BiobankLogProxy implements MethodInterceptor {
 

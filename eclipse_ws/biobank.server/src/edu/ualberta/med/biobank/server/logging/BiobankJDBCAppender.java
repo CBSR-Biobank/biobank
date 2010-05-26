@@ -24,6 +24,8 @@ import edu.ualberta.med.biobank.server.logging.user.UserInfo;
  * --Spawns threads to execute the batch inserts to maximise performance <br>
  * --Prepares all data for RDBMS by escaping quotes.
  * 
+ * See use in log4j.xml
+ * 
  * Copy from CLM JDBCAppender
  * 
  */

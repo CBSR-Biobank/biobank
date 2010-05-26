@@ -122,8 +122,24 @@ public class LogWrapper extends ModelWrapper<Log> {
         WritableApplicationService appService, String username, Date date,
         String action, String patientNumber, String inventoryId,
         String locationLabel, String details) throws Exception {
-        HQLCriteria criteria = new HQLCriteria("from " + Log.class.getName());
-        List<Log> logs = appService.query(criteria);
+        StringBuffer parametersString = new StringBuffer();
+        List<Object> parametersArgs = new ArrayList<Object>();
+        addParam(parametersString, parametersArgs, "username", username);
+        addParam(parametersString, parametersArgs, "date", date);
+        addParam(parametersString, parametersArgs, "action", action);
+        addParam(parametersString, parametersArgs, "patientNumber",
+            patientNumber);
+        addParam(parametersString, parametersArgs, "inventoryId", inventoryId);
+        addParam(parametersString, parametersArgs, "locationLabel",
+            locationLabel);
+        addParam(parametersString, parametersArgs, "details", details);
+        String criteriaString = "from " + Log.class.getName();
+        if (parametersString.length() > 0) {
+            criteriaString += " where" + parametersString.toString();
+        }
+        System.out.println(criteriaString);
+        List<Log> logs = appService.query(new HQLCriteria(criteriaString,
+            parametersArgs));
 
         List<LogWrapper> wrappers = new ArrayList<LogWrapper>();
         for (Log l : logs) {
@@ -132,4 +148,14 @@ public class LogWrapper extends ModelWrapper<Log> {
         return wrappers;
     }
 
+    private static void addParam(StringBuffer sb, List<Object> parameters,
+        String property, Object value) {
+        if (value != null) {
+            if (sb.length() > 0) {
+                sb.append(" and");
+            }
+            sb.append(" ").append(property).append("=?");
+            parameters.add(value);
+        }
+    }
 }

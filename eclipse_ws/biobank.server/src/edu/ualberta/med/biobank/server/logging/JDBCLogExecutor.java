@@ -47,16 +47,15 @@ public class JDBCLogExecutor implements Runnable {
     private void setDBProperties() {
         if (this.props != null) {
 
-            this.setDbDriverClass(StringUtils.initString(this.props
+            this.setDbDriverClass(initString(this.props
                 .getProperty("hibernate.connection.driver_class")));
-            this.setDbPwd(StringUtils.initString(this.props
+            this.setDbPwd(initString(this.props
                 .getProperty("hibernate.connection.password")));
-            this.setDbUser(StringUtils.initString(this.props
+            this.setDbUser(initString(this.props
                 .getProperty("hibernate.connection.username")));
-            this.setDbUrl(StringUtils.initString(this.props
+            this.setDbUrl(initString(this.props
                 .getProperty("hibernate.connection.url")));
         }
-
     }
 
     public void run() {
