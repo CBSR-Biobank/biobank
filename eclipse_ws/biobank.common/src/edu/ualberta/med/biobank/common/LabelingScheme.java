@@ -4,6 +4,7 @@ import org.springframework.util.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.model.ContainerType;
 
 public class LabelingScheme {
 
@@ -146,6 +147,13 @@ public class LabelingScheme {
      * Get the 2 char string corresponding to a RowColPos position inside the
      * given containerType
      */
+    public static String getPositionString(RowColPos rcp,
+        ContainerType containerType) {
+        return getPositionString(rcp, containerType.getChildLabelingScheme()
+            .getId(), containerType.getCapacity().getRowCapacity(),
+            containerType.getCapacity().getColCapacity());
+    }
+
     public static String getPositionString(RowColPos rcp,
         ContainerTypeWrapper containerType) {
         return getPositionString(rcp, containerType.getChildLabelingScheme(),
