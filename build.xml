@@ -318,12 +318,6 @@
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
           overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/llt-ds.xml"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/llt-ds.xml"
-          overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/llt.war"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/llt.war"
-          overwrite="true" />
     <copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
           overwrite="true" />
