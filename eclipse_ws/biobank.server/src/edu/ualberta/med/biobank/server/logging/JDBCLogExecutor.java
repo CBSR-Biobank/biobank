@@ -180,7 +180,8 @@ public class JDBCLogExecutor implements Runnable {
     public String initString(String str) {
         String test = "";
         if (str != null) {
-            test = str.trim();
+            test = str.trim().replaceAll("'", "''");
+
         }
         return test;
     }
