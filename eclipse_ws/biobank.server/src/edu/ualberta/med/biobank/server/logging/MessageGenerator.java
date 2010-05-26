@@ -13,11 +13,13 @@ public class MessageGenerator {
         if (null == userInfo)
             userInfo = new UserInfo();
         StringBuffer sb = new StringBuffer();
-        append(sb, "action", action);
-        append(sb, "patientNumber", patientNumber);
-        append(sb, "inventoryID", inventoryID);
-        append(sb, "locationLabel", locationLabel);
-        append(sb, "details", details);
+        append(sb, LogProperty.ACTION.getPropertyName(), action);
+        append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(),
+            patientNumber);
+        append(sb, LogProperty.INVENTORY_ID.getPropertyName(), inventoryID);
+        append(sb, LogProperty.LOCATION_LABEL.getPropertyName(),
+            locationLabel);
+        append(sb, LogProperty.DETAILS.getPropertyName(), details);
         return sb.toString();
     }
 

@@ -1,24 +1,26 @@
-package edu.ualberta.med.biobank.server.logging;
+package edu.ualberta.med.biobank.server.logging.logger;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.hibernate.type.Type;
 
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.logging.user.BiobankThreadVariable;
 import edu.ualberta.med.biobank.server.logging.user.UserInfo;
 
 /**
- * This class logs the object state information. Copy from CLM
+ * This class logs the object state information.
+ * 
+ * Copy from CLM
  */
 
-public class BiobankObjectStateLogger {
+public abstract class BiobankObjectStateLogger {
     private static Logger logger = null;
-    private static BiobankObjectStateLogger myInstance = null;
 
-    private BiobankObjectStateLogger() {
+    static {
         logger = Logger.getLogger("Biobank.Activity");
     }
 
@@ -34,20 +36,21 @@ public class BiobankObjectStateLogger {
      * @param action -- the name of the operation being performed
      * 
      */
-    public void logMessage(Object obj, Serializable id, Object[] currentState,
-        Object[] prevState, String[] propertyNames, Type[] types, String action) {
-
-        String message = MessageGenerator.generateStringMessage(action, null,
-            null, null, null);
-        UserInfo userInfo = BiobankThreadVariable.get();
-        if (null == userInfo)
-            userInfo = new UserInfo();
-        if (userInfo.getIsIntransaction() == true) {
-            logToBuffer(message);
-        } else {
-            log(message);
+    public void logMessage(Object obj, String action) {
+        Log log = getLogObject(obj);
+        if (log != null) {
+            String message = MessageGenerator.generateStringMessage(action, log
+                .getPatientNumber(), log.getInventoryId(), log
+                .getLocationLabel(), log.getDetails());
+            UserInfo userInfo = BiobankThreadVariable.get();
+            if (null == userInfo)
+                userInfo = new UserInfo();
+            if (userInfo.getIsIntransaction() == true) {
+                logToBuffer(message);
+            } else {
+                log(message);
+            }
         }
-
     }
 
     /**
@@ -66,27 +69,26 @@ public class BiobankObjectStateLogger {
         logs.add(msg);
         userInfo.setTransactionLogs(logs);
         BiobankThreadVariable.set(userInfo);
-
     }
+
+    protected abstract Log getLogObject(Object obj);
 
     /**
      * This method logs the message
      * 
      * @param message -- message to be logged
      */
-    public void log(String message) {
+    public static void log(String message) {
         Level level = Level.toLevel("INFO");
         logger.log(level, message);
     }
 
-    /**
-     * @return -- Returns the singleton of this class
-     */
-    public static BiobankObjectStateLogger getInstance() {
-        if (myInstance == null) {
-            myInstance = new BiobankObjectStateLogger();
+    public static BiobankObjectStateLogger getlogger(
+        Class<? extends Object> clazz) {
+        if (clazz.equals(Aliquot.class)) {
+            return AliquotStateLogger.getInstance();
         }
-        return myInstance;
+        return null;
     }
 
 }

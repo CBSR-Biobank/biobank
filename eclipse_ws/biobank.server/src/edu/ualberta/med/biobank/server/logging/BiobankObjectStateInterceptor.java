@@ -8,7 +8,7 @@ import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
 
-import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.server.logging.logger.BiobankObjectStateLogger;
 import edu.ualberta.med.biobank.server.logging.user.BiobankThreadVariable;
 import edu.ualberta.med.biobank.server.logging.user.UserInfo;
 
@@ -19,6 +19,8 @@ import edu.ualberta.med.biobank.server.logging.user.UserInfo;
  * the audit information about the states of the entity object in different
  * stages.
  * 
+ * See use in application-config.xml
+ * 
  * Copy from the CLM API
  * 
  */
@@ -26,8 +28,15 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
 
     private static final long serialVersionUID = 1L;
 
-    private static BiobankObjectStateLogger logger = BiobankObjectStateLogger
-        .getInstance();
+    private void log(Object entity, Serializable id, Object[] state,
+        Object[] previousState, String[] propertyNames, Type[] types,
+        String action) {
+        BiobankObjectStateLogger logger = BiobankObjectStateLogger
+            .getlogger(entity.getClass());
+        if (logger != null) {
+            logger.logMessage(entity, action);
+        }
+    }
 
     /**
      * This method gets called before an object is saved.
@@ -35,10 +44,7 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
     @Override
     public boolean onSave(Object entity, Serializable id, Object[] state,
         String[] propertyNames, Type[] types) throws CallbackException {
-        if (entity instanceof Aliquot) {
-            logger.logMessage(entity, id, state, null, propertyNames, types,
-                "insert");
-        }
+        log(entity, id, state, null, propertyNames, types, "insert");
         return false;
     }
 
@@ -49,19 +55,25 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
     @Override
     public void onDelete(Object entity, Serializable id, Object[] state,
         String[] propertyNames, Type[] types) throws CallbackException {
-        logger.logMessage(entity, id, state, null, propertyNames, types,
-            "delete");
+        log(entity, id, state, null, propertyNames, types, "delete");
     }
 
+    /**
+     * 
+     * This method gets Called before an object is updated
+     */
     @Override
     public boolean onFlushDirty(Object entity, Serializable id,
         Object[] currentState, Object[] previousState, String[] propertyNames,
         Type[] types) throws CallbackException {
-        logger.logMessage(entity, id, currentState, previousState,
-            propertyNames, types, "update");
+        log(entity, id, currentState, previousState, propertyNames, types,
+            "update");
         return false;
     }
 
+    /**
+     * Really write logs registered in the buffer.
+     */
     @Override
     public void afterTransactionCompletion(Transaction arg0) {
         UserInfo user = BiobankThreadVariable.get();
@@ -69,7 +81,7 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
             Iterator<String> it = user.getTransactionLogs().iterator();
             while (it.hasNext()) {
                 String str = (String) it.next();
-                logger.log(str);
+                BiobankObjectStateLogger.log(str);
                 it.remove();
             }
         } else {
