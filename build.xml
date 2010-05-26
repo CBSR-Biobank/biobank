@@ -167,7 +167,7 @@
       <srcfiles file="model/biobank2.uml" />
     </uptodate>
   </target>
-  <target name="sdk" depends="check-cacore-sdk-uptodate, build-server-project"
+  <target name="sdk" depends="check-cacore-sdk-uptodate"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
@@ -177,13 +177,13 @@
     <copy file="sdk_conf/application-config.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
     <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
     <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
-    <copy file="security-logs/clm-log4j/log4j.xml"
+    <copy file="security-logs/log4j.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
     <replace file="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}"/>
     <copy todir="${cacore.sdk.dir}/system/lib/"  file="${eclipse.proj.dir.server}/output/biobank-validators.jar" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
-  <target name="sdk-files" depends="sdk">
+  <target name="sdk-files" depends="sdk, build-server-project">
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
              id="sdk.jar.files">
       <include name="*.jar" />
@@ -318,12 +318,6 @@
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
           overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/llt-ds.xml"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/llt-ds.xml"
-          overwrite="true" />
-    <copy file="${secu-log.dir}/jboss/llt.war"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/llt.war"
-          overwrite="true" />
     <copy file="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank2.war"
           overwrite="true" />
@@ -360,7 +354,8 @@
       <transaction src="${data.sql.dir}/sampleTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
-      <transaction src="${secu-log.dir}/schemaSecurityLogDump.sql" />
+      <transaction src="${secu-log.dir}/schemaSecurity.sql" />
+      <transaction src="${secu-log.dir}/schemaLog.sql" />
       <transaction>commit;</transaction>
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
@@ -423,6 +418,9 @@
       <fileset dir="${cacore.sdk.dir}/system/dist">
         <include name="sdk-core*.*" />
         <include name="sdk-client*.*" />
+      </fileset>
+      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib">
+        <include name="biobank2-beans*.*" />
       </fileset>
     </copy>
     <ant dir="${eclipse.proj.dir.server}" target="build-remote-lib" inheritRefs="false" />
