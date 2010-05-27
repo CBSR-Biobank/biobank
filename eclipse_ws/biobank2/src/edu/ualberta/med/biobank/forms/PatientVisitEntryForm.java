@@ -289,14 +289,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisit.removePvSourceVessels(pvSourceVesseltable
             .getRemovedPvSourceVessels());
 
-        setPvCustomInfo();
+        savePvCustomInfo();
         patientVisit.persist();
         patientAdapter.performExpand();
     }
 
-    private void setPvCustomInfo() throws Exception {
+    private void savePvCustomInfo() throws Exception {
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-            setPvInfoValueFromControlType(combinedPvInfo);
+            savePvInfoValueFromControlType(combinedPvInfo);
             String value = combinedPvInfo.getValue();
             if (value == null)
                 continue;
@@ -305,7 +305,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
 
-    private void setPvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {
+    private void savePvInfoValueFromControlType(FormPvCustomInfo pvCustomInfo) {
         // for text and combo, the databinding is used
         if (pvCustomInfo.control instanceof DateTimeWidget) {
             pvCustomInfo.setValue(((DateTimeWidget) pvCustomInfo.control)
