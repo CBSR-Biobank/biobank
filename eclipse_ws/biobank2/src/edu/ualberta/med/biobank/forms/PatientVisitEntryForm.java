@@ -328,7 +328,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
+        PatientWrapper patient = patientVisit.getPatient();
         super.reset();
+        // patient was set before the form is open, so keep it
+        patientVisit.setPatient(patient);
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());

@@ -148,11 +148,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
-            .getStudy().getStudyPvAttrCollection();
-        if (studyPvAttrCollection != null) {
-            for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
-                studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
+        if (getPatient() != null && getPatient().getStudy() != null) {
+            Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
+                .getStudy().getStudyPvAttrCollection();
+            if (studyPvAttrCollection != null) {
+                for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
+                    studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
+                }
             }
         }
         return studyPvAttrMap;
