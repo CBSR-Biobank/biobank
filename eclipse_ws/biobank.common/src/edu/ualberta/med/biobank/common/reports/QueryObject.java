@@ -122,7 +122,7 @@ public abstract class QueryObject {
     }
 
     public List<Object> generate(WritableApplicationService appService,
-        List<Object> params) throws Exception {
+        List<Object> params) throws ApplicationException, BiobankCheckException {
         return postProcess(executeQuery(appService, preProcess(params)));
     }
 
