@@ -11,6 +11,8 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.ServiceConnection;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
@@ -47,7 +49,9 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
                 "Please end aliquot management session before closing");
             return false;
         }
+        if (SessionManager.getInstance().isConnected()) {
+            ServiceConnection.logout(SessionManager.getAppService());
+        }
         return true;
-
     }
 }
