@@ -35,6 +35,7 @@ public class AliquotsByPallet extends QueryObject {
     protected List<Object> postProcess(List<Object> results) {
         AliquotPosition aliquotPosition;
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
+        // get the info
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
             aliquotPosition = a.getAliquotPosition();
@@ -46,18 +47,33 @@ public class AliquotsByPallet extends QueryObject {
                 new RowColPos(aliquotPosition.getRow(), aliquotPosition
                     .getCol()), aliquotPosition.getContainer()
                     .getContainerType());
-            modifiedResults.add(new Object[] { containerLabel + aliquotLabel,
+            modifiedResults.add(new Object[] { aliquotLabel, containerLabel,
                 inventoryId, pnumber, stName });
         }
+        // sort by location as an integer
         Collections.sort(modifiedResults, new Comparator<Object>() {
             @Override
             public int compare(Object o1, Object o2) {
                 Object[] castOb1 = ((Object[]) o1);
                 Object[] castOb2 = ((Object[]) o2);
-                return castOb1[0].toString().compareTo(castOb2[0].toString());
+                String s1 = (String) castOb1[0];
+                String s2 = (String) castOb2[0];
+                int compare = s1.substring(0, 1).compareTo(s2.substring(0, 1));
+                if (compare == 0)
+                    compare = ((Integer) Integer.parseInt(s1.substring(1)))
+                        .compareTo(Integer.parseInt(s2.substring(1)));
+                return compare;
             }
         });
-        return modifiedResults;
+        // recombine strings
+        ArrayList<Object> finalResults = new ArrayList<Object>();
+        for (Object ob : modifiedResults) {
+            Object[] castOb = ((Object[]) ob);
+            finalResults.add(new Object[] {
+                (String) castOb[1] + ((String) castOb[0]), castOb[2],
+                castOb[3], castOb[4] });
+        }
+        return finalResults;
     }
 
     @Override
