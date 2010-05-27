@@ -189,7 +189,8 @@ public class LinkFormPatientManagement {
                 }
             }
             if (collection == null) {
-                collection = currentPatient.getPatientVisitCollection();
+                collection = currentPatient.getPatientVisitCollection(true,
+                    false);
             }
             viewerVisits.setInput(collection);
             viewerVisits.getCombo().setFocus();
