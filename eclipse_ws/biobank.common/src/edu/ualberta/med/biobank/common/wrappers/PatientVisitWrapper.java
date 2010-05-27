@@ -311,11 +311,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         }
 
-        pvAttr = new PvAttrWrapper(appService, new PvAttr());
-        pvAttr.setPatientVisit(this);
-        pvAttr.setStudyPvAttr(studyPvAttr);
+        if (pvAttr == null) {
+            pvAttr = new PvAttrWrapper(appService);
+            pvAttr.setPatientVisit(this);
+            pvAttr.setStudyPvAttr(studyPvAttr);
+            pvAttrMap.put(label, pvAttr);
+        }
         pvAttr.setValue(value);
-        pvAttrMap.put(label, pvAttr);
     }
 
     public void setDateProcessed(Date date) {
