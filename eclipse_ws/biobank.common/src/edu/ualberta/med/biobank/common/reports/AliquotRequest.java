@@ -19,15 +19,15 @@ public class AliquotRequest extends QueryObject {
 
     public AliquotRequest(String op, Integer siteId) {
         super(
-            "Given a CSV file detailing a request (Patient Number, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
-            "select s from "
-                + Aliquot.class.getName()
-                + " s where s.patientVisit.patient.study.site "
-                + op
-                + siteId
-                + " and s.aliquotPosition.container.label not like 'SS%' and s.patientVisit.patient.pnumber like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.nameShort like ? ORDER BY RAND()",
-            new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
-                "Location" });
+            "Given a CSV file detailing a request (Patient Number, Date Drawn, "
+                + "Sample Type, # Requested), generate a list of aliquot locations.",
+            "select s from " + Aliquot.class.getName()
+                + " s where s.patientVisit.patient.study.site " + op + siteId
+                + " and s.aliquotPosition.container.label not like 'SS%'"
+                + " and s.patientVisit.patient.pnumber like ?"
+                + " and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1"
+                + " and s.sampleType.nameShort like ?", new String[] {
+                "Patient", "Inventory ID", "Date Drawn", "Type", "Location" });
         addOption("CSV File", String.class, "");
     }
 

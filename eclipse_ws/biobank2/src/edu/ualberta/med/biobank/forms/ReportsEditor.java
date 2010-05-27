@@ -207,7 +207,7 @@ public class ReportsEditor extends BiobankFormBase {
                             break;
                         }
                     }
-                    Display.getDefault().syncExec(new Runnable() {
+                    Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
                             monitor.done();

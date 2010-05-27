@@ -253,7 +253,7 @@ public class ReportTableWidget extends BiobankWidget {
                 }
                 collSubList = collection.subList(start, end);
 
-                display.syncExec(new Runnable() {
+                display.asyncExec(new Runnable() {
                     public void run() {
                         if (!table.isDisposed()) {
                             tableViewer.setInput(collSubList);
@@ -271,7 +271,7 @@ public class ReportTableWidget extends BiobankWidget {
                             end = i;
                             break;
                         }
-                        display.syncExec(new Runnable() {
+                        display.asyncExec(new Runnable() {
                             public void run() {
                                 if (!table.isDisposed()) {
                                     viewer.refresh(item, false);
@@ -285,7 +285,7 @@ public class ReportTableWidget extends BiobankWidget {
                     }
 
                     final Object selectedItem = selItem;
-                    display.syncExec(new Runnable() {
+                    display.asyncExec(new Runnable() {
                         public void run() {
                             if (!table.isDisposed()) {
                                 if (paginationRequired) {
@@ -402,7 +402,7 @@ public class ReportTableWidget extends BiobankWidget {
             lastButton.setEnabled(false);
             nextButton.setEnabled(true);
         }
-        layout(true);
+        paginationWidget.getParent().layout(true);
     }
 
     private void firstPage() {
