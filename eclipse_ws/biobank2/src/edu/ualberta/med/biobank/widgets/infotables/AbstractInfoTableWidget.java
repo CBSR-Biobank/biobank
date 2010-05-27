@@ -215,7 +215,9 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     public void setCollection(final List<T> collection) {
         setCollection(collection, null);
-        size = collection.size();
+        if (collection != null) {
+            size = collection.size();
+        }
     }
 
     public void setCollection(final List<T> collection, final T selection) {
