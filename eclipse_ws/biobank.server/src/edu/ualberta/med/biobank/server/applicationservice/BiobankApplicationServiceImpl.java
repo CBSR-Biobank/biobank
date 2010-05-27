@@ -208,8 +208,7 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public void logActivity(String action, String patientNumber,
-        String inventoryID, String locationLabel, String details)
-        throws ApplicationException {
+        String inventoryID, String locationLabel, String details) {
         Logger logger = Logger.getLogger("Biobank.Activity");
         logger.log(Level.toLevel("INFO"), MessageGenerator
             .generateStringMessage(action, patientNumber, inventoryID,

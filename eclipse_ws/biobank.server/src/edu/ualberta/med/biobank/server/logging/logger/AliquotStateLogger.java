@@ -21,13 +21,13 @@ public class AliquotStateLogger extends BiobankObjectStateLogger {
             log.setInventoryId(aliquot.getInventoryId());
             log.setLocationLabel(aliquot.getAliquotPosition().getContainer()
                 .getLabel());
-            log.setDetails(aliquot.getComment());
+            log.setDetails("Aliquot");
             return log;
         }
         return null;
     }
 
-    public static BiobankObjectStateLogger getInstance() {
+    public static AliquotStateLogger getInstance() {
         if (instance == null) {
             instance = new AliquotStateLogger();
         }

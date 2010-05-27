@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -341,5 +342,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             visits.add(new PatientVisitWrapper(appService, v));
         }
         return visits;
+    }
+
+    public void logLookup() {
+        ((BiobankApplicationService) appService).logActivity("select",
+            getPnumber(), null, null, "patient LOOKUP");
     }
 }

@@ -55,13 +55,14 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientVisitAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getWrapper();
+        patientVisit.logLookup();
         retrievePatientVisit();
 
         setPartName("Visit " + patientVisit.getFormattedDateProcessed());

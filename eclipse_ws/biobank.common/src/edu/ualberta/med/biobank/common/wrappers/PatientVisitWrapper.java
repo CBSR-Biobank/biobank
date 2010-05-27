@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -555,5 +556,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     public String toString() {
         return getFormattedDateProcessed();
+    }
+
+    public void logLookup() {
+        ((BiobankApplicationService) appService)
+            .logActivity("select", getPatient().getPnumber(), null, null,
+                "visit LOOKUP (date processed=" + getFormattedDateProcessed()
+                    + ")");
     }
 }

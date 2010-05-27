@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.logging.logger;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.apache.log4j.Level;
@@ -19,6 +20,8 @@ import edu.ualberta.med.biobank.server.logging.user.UserInfo;
 
 public abstract class BiobankObjectStateLogger {
     private static Logger logger = null;
+    public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm");
 
     static {
         logger = Logger.getLogger("Biobank.Activity");
