@@ -553,7 +553,8 @@ public class ReportsEditor extends BiobankFormBase {
                 ((Combo) widget).select(0);
                 toolkit.adapt((Combo) widget, true, true);
             } else if (option.getType() == Date.class) {
-                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+                widget = new DateTimeWidget(parameterSection, SWT.DATE
+                    | SWT.TIME, null);
                 ((DateTimeWidget) widget).adaptToToolkit(toolkit, true);
             } else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
