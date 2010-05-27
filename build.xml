@@ -382,7 +382,6 @@
       <arg value="${model.proj.dir}/biobank2.uml" />
       <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/" />
-      <arg value="0" />
     </exec>
   </target>
 
