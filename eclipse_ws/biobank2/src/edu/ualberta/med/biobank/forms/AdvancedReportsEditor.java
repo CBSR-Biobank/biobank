@@ -79,7 +79,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
     protected ArrayList<Button> includedFields;
     private ArrayList<Label> textLabels;
 
-    private ReportTableWidget reportTable;
+    private ReportTableWidget<Object> reportTable;
     private List<Object> reportData;
     private ReportTreeNode node;
 
@@ -279,22 +279,23 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         GridData wgd = new GridData();
         wgd.horizontalAlignment = SWT.FILL;
         if (field.getType() == Date.class) {
-            widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+            widget = new DateTimeWidget(parameterSection, SWT.DATE | SWT.TIME,
+                null);
             ((DateTimeWidget) widget).setLayoutData(wgd);
             ((DateTimeWidget) widget).setDate((Date) field.getValue());
         } else if (field.getType() == String.class) {
-            widget = new Text(parameterSection, SWT.BORDER);
+            widget = new Text(parameterSection, SWT.NONE);
             ((Text) widget).setLayoutData(wgd);
             if (field.getValue() != null)
                 ((Text) widget).setText((String) field.getValue());
         } else if (field.getType() == Integer.class) {
-            widget = new Text(parameterSection, SWT.BORDER);
+            widget = new Text(parameterSection, SWT.NONE);
             ((Text) widget).setLayoutData(wgd);
             if (field.getValue() != null)
                 ((Text) widget)
                     .setText(((Integer) field.getValue()).toString());
         } else if (field.getType() == Double.class) {
-            widget = new Text(parameterSection, SWT.BORDER);
+            widget = new Text(parameterSection, SWT.NONE);
             ((Text) widget).setLayoutData(wgd);
             if (field.getValue() != null)
                 ((Text) widget).setText(((Double) field.getValue()).toString());
@@ -384,8 +385,9 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                             int[] headingSizes = new int[names.length];
                             for (int i = 0; i < names.length; i++)
                                 headingSizes[i] = 100;
-                            reportTable = new ReportTableWidget(top,
+                            reportTable = new ReportTableWidget<Object>(top,
                                 reportData, names, headingSizes, 40);
+                            reportTable.adaptToToolkit(toolkit, true);
                             GridData gd = new GridData();
                             gd.horizontalSpan = 2;
                             gd.grabExcessHorizontalSpace = true;
@@ -410,8 +412,9 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget(top, null, new String[] { " " },
-            new int[] { 500 });
+        reportTable = new ReportTableWidget<Object>(top, null,
+            new String[] { " " }, new int[] { 500 });
+        reportTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;

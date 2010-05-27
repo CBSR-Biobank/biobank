@@ -105,7 +105,7 @@ public class ReportsEditor extends BiobankFormBase {
     private Composite buttonSection;
     private Composite parameterSection;
 
-    private ReportTableWidget reportTable;
+    private ReportTableWidget<Object> reportTable;
     private List<Widget> widgetFields;
     private List<Label> textLabels;
 
@@ -207,7 +207,7 @@ public class ReportsEditor extends BiobankFormBase {
                             break;
                         }
                     }
-                    Display.getDefault().asyncExec(new Runnable() {
+                    Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {
                             monitor.done();
@@ -221,9 +221,9 @@ public class ReportsEditor extends BiobankFormBase {
                             reportTable.dispose();
                             if (reportData.size() == -1)
                                 printButton.setEnabled(false);
-                            reportTable = new ReportTableWidget(form.getBody(),
-                                reportData, query.getColumnNames(),
-                                columnWidths.get(query.getClass()), 40);
+                            reportTable = new ReportTableWidget<Object>(form
+                                .getBody(), reportData, query.getColumnNames(),
+                                columnWidths.get(query.getClass()), 24);
                             reportTable.adaptToToolkit(toolkit, true);
                             form.reflow(true);
                         }
@@ -240,7 +240,7 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget(form.getBody(), null,
+        reportTable = new ReportTableWidget<Object>(form.getBody(), null,
             new String[] { " " }, new int[] { 500 });
         reportTable.adaptToToolkit(toolkit, true);
         form.layout(true, true);
@@ -552,7 +552,8 @@ public class ReportsEditor extends BiobankFormBase {
                 ((Combo) widget).select(0);
                 toolkit.adapt((Combo) widget, true, true);
             } else if (option.getType() == Date.class) {
-                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+                widget = new DateTimeWidget(parameterSection, SWT.DATE
+                    | SWT.TIME, null);
                 ((DateTimeWidget) widget).adaptToToolkit(toolkit, true);
             } else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
