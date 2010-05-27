@@ -187,13 +187,6 @@ public class LabelingScheme {
             containerType.getRowCapacity(), containerType.getColCapacity());
     }
 
-    public static String getPositionString(RowColPos rcp,
-        ContainerType containerType) {
-        return getPositionString(rcp, containerType.getChildLabelingScheme()
-            .getId(), containerType.getCapacity().getRowCapacity(),
-            containerType.getCapacity().getColCapacity());
-    }
-
     /**
      * Get the 2 char string corresponding to a RowColPos position inside the
      * given containerType
