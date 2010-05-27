@@ -1523,7 +1523,7 @@
                id="edu.ualberta.med.biobank.views.LoggingView"
                minimized="false"
                moveable="false"
-               ratio="0.4"
+               ratio="0.3"
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
@@ -1732,11 +1732,11 @@
             name="Scan Plate">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.editors.LoggingEditor"
+            class="edu.ualberta.med.biobank.forms.LoggingForm"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.LoggingEditor"
-            name="Logging Editor">
+            id="edu.ualberta.med.biobank.forms.LoggingForm"
+            name="Logging Form">
       </editor>
    </extension>
    <extension
