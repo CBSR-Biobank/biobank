@@ -267,7 +267,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 + "\" is locked, changes not premitted");
         }
 
-        if (value != null) {
+        if (value != null && value.compareTo("") != 0) {
             // validate the value
             value = value.trim();
             String type = studyPvAttr.getPvAttrType().getName();

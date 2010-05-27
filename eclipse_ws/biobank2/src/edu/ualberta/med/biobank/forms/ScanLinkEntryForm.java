@@ -93,6 +93,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
+        setCanLaunchScan(true);
     }
 
     @Override
@@ -407,6 +408,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
+                // not needed on windows. This was if the textfield number go
+                // after 9, needed to resize on linux : need to check that
+                // again
+                // form.layout(true, true);
             }
         });
     }
@@ -611,6 +616,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         setDirty(false);
         reset(true);
         fieldsComposite.setEnabled(true);
+        setScanValid(true);
     }
 
     public void reset(boolean resetAll) {
@@ -660,5 +666,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         processCellStatus(cell, true);
         spw.redraw();
         form.layout();
+    }
+
+    @Override
+    protected boolean fieldsValid() {
+        return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 }

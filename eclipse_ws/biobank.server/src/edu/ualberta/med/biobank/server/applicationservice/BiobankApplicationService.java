@@ -41,4 +41,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
+
+    public void logActivity(String action, String patientNumber,
+        String inventoryID, String locationLabel, String details)
+        throws ApplicationException;
 }

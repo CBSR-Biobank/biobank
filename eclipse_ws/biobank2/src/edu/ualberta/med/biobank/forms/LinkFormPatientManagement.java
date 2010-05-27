@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -285,4 +286,13 @@ public class LinkFormPatientManagement {
     public void setFirstControl() {
         aliquotAdminForm.setFirstControl(patientNumberText);
     }
+
+    public boolean fieldsValid() {
+        IStructuredSelection selection = (IStructuredSelection) viewerVisits
+            .getSelection();
+        return patientValidator.validate(patientNumberText.getText()).equals(
+            Status.OK_STATUS)
+            && selection.size() > 0;
+    }
+
 }

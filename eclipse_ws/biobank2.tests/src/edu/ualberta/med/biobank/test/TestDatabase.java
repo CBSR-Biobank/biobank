@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.test;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -168,6 +170,28 @@ public class TestDatabase {
                 Assert.assertEquals(w.getClass().getName() + "."
                     + getterInfo.getMethod.getName() + "()", parameter,
                     getResult);
+            }
+
+            // maxlength for varchar test
+            if (returnType.equals(java.lang.String.class)) {
+                String attrName = getterInfo.getMethod.getName().substring(3);
+                if (VarCharLengths.getInstance().getMaxSize(attrName) < 0)
+                    continue;
+
+                try {
+                    String longString = "ExcessivelyLongMassiveStringDesignedtoReachTheCharLimit."
+                        + "SomeVarCharsHaveVerySmallLimitsButThisOneWillBeTooLongForAllOfThem,"
+                        + "EvenThe255CharacterLimitFields."
+                        + "However,ThisFieldWillBeSavedCorrectlyForFieldsOfTypeTextInTheDatabase."
+                        + "AnExceptionShouldBeThrownByTheUnderlyingWrapperIfTheVarCharLimitIsViolated.";
+                    getterInfo.setMethod.invoke(w, longString);
+                    w.persist();
+                    Assert.fail("VARCHAR limits not enforced on field: "
+                        + attrName);
+                } catch (BiobankStringLengthException e) {
+                    Assert.assertTrue(true);
+                }
+                w.reload();
             }
         }
 

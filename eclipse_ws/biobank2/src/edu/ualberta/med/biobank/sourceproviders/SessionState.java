@@ -8,8 +8,8 @@ import org.eclipse.ui.ISources;
 
 public class SessionState extends AbstractSourceProvider {
     public final static String SESSION_STATE = "edu.ualberta.med.biobank.sourceprovider.loginState";
-    private final static String LOGGED_IN = "loggedIn";
-    private final static String LOGGED_OUT = "loggedOut";
+    public final static String LOGGED_IN = "loggedIn";
+    public final static String LOGGED_OUT = "loggedOut";
     boolean loggedIn;
 
     @Override

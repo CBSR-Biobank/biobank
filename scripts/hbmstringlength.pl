@@ -7,7 +7,7 @@ use File::Copy;
 use Getopt::Long;
 
 my $USAGE = <<USAGE_END;
-Usage: $0 [options] umlInputFilePath hmbProcessingDirectory
+Usage: $0 [options] umlInputFilePath hmbProcessingDirectory outputPath
 
 Fixes string fields in hibernate files to math those in the model.
 
@@ -17,82 +17,163 @@ Fixes string fields in hibernate files to math those in the model.
 USAGE_END
 
 my $umlFile;
-my $hmbDir;
+my $hbmDir;
 my %umlVarCharMap = ();
-my @hmbDirMap = ();
+my %umlTextMap = ();
+my @hbmDirList = ();
 my $verbose = 0;
+my $outputPath;
 
 main();
 
 sub main {
-    if (!GetOptions ('verbose'  => \$verbose)) {
+    if (!GetOptions ('verbose'  => \$verbose))
+    {
         die "ERROR: bad options in command line\n";
     }
 
-    if ($#ARGV+1 < 2) {
+    if ($#ARGV+1 < 2)
+    {
         die "$USAGE";
     }
 
 
     $umlFile = shift @ARGV;
-    $hmbDir = shift @ARGV;
+    $hbmDir = shift @ARGV;
+    $outputPath = shift @ARGV;
+
 
     #Parse the UML file
     #The key is the identifier
     #The value is the size of the varchar field
     open (FH, "<",$umlFile) or die $!;
-    while (my $umlLine = <FH>) {
-	if ($umlLine =~ m/>(.*) : VARCHAR\((\d+)\)/i) {
+    my %text;
+    while (my $umlLine = <FH>)
+    {
+	if ($umlLine =~ m/>(.*) : VARCHAR\((\d+)\)/i)
+        {
             $umlVarCharMap{ $1 } = $2;
+	}
+	if ($umlLine =~ m/>(.*) : TEXT</i)
+        {
+            $umlTextMap{$1} = 1;
 	}
     }
     close(FH);
 
+#Saves the %umlVarCharMap hash file
+    print "Generating VarCharLengths.properies... ".">".$outputPath."VarCharLengths.properties";
+    open(OUTP, ">".$outputPath."VarCharLengths.properties") or die("Error: cannot open file 'VarCharLengths.properties'\n");
+    print OUTP "#Found the following: \n\n";
+    print OUTP "#Identifier = Varchar# \n";
+    print OUTP "#--------------------------\n";
+    while ( my ($key, $value) = each(%umlVarCharMap) )
+    {
+	print OUTP "$key = $value\n";
+    }
+    print OUTP "#--------------------------\n\n";
+
     #Prints the %umlVarCharMap hash file
-    if ($verbose) {
+    if ($verbose)
+    {
         print "Found the following: \n\n";
-	print "Identifier = Varchar# \n";
+	print "VARCHAR fields\n";
 	print "--------------------------\n";
-	while ( my ($key, $value) = each(%umlVarCharMap) ) {
+	while ( my ($key, $value) = each(%umlVarCharMap) )
+        {
             print "$key = $value\n";
+	}
+	print "--------------------------\n\n";
+
+	print "TEXT fields\n";
+	print "--------------------------\n";
+	while ( my ($key, $value) = each(%umlTextMap) )
+        {
+            print "$key\n"
 	}
 	print "--------------------------\n\n";
     }
 
     #Browses the input directory
-    #Creates an array @hmbDirMap of all of the files
+    #Creates an array @hbmDirList of all of the files
     #that end with the extension hbm.xml
-    find( {wanted=> \&wanted=>, no_chdir => 1}, $hmbDir );
+    #find( {wanted=> \&wanted=>, no_chdir => 1}, $hbmDir );
+    opendir(IMD, $hbmDir) || die("Cannot open directory $hbmDir");
+    @hbmDirList = grep /hbm\.xml$/, readdir(IMD);
+    closedir(IMD);
 
-    #Prints the @hmbDirMap array file
-    if ($verbose) {
-	print "Files found in directory '$hmbDir'\n";
+    #Prints the @hbmDirList array file
+    if ($verbose)
+    {
+	print "Files found in directory '$hbmDir'\n";
 	print "--------------------------\n";
-	foreach (@hmbDirMap) {
+	foreach (@hbmDirList)
+        {
             print("$_\n");
 	}
 	print "--------------------------\n\n";
+
     }
 
     #Scan through each hbm.xml file in the input directory
     #Look for type="string" column="X", where X is a valid key in umlVarCharMap
     #Replace type="string" with type="VARCHAR(Y)" where Y is the value of the column key
     #Save changes in the same directory with .new appended to the file name
+    my $origfname;
+    my $newfname;
+
     my $linesChanged = 0;
-    foreach (@hmbDirMap) {
-	open (FO, ">>","$_.new") or die $!;
-	open (FH, "<",$_) or die $!;
-	while (my $line = <FH>) {
-            if ($line =~ m/<.*type="string".*column="(.*)"\/>/i and not ($line =~ /length="\d+"/i) ) {
-                if ($umlVarCharMap{ uc($1) }) {
+    foreach (@hbmDirList)
+    {
+        $origfname = "$hbmDir/$_";
+        $newfname = "$origfname.new";
+	open (FO, ">", $newfname) or die $!;
+	open (FH, "<", $origfname) or die $!;
+	while (my $line = <FH>)
+        {
+            if (($line =~ m/<.*type="string".*column="([^"]*)"\/>/i) && ($line =~ /length="(\d+)"/i))
+            {
+                if (exists $umlVarCharMap{ uc($1) })
+                {
+                    my $name = $1;
+                    $line =~ s/$2/$umlVarCharMap{uc($1)}/e;
+                    $linesChanged++;
+                    if ($verbose)
+                    {
+                        print("Found line with column '$name' in umlVarCharMap\n");
+                        print("\t$origfname: $line");
+                    }
+                }
+            }
+            elsif ($line =~ m/<.*type="string".*column="(.*)"\/>/i)
+            {
+                if (exists $umlVarCharMap{ uc($1) })
+                {
                     #if the column is found in umlVarCharMap
+                    my $name = $1;
                     my $s1 = "type=\"string\"";
                     my $s2 = "type=\"string\" length=\"$umlVarCharMap{uc($1)}\"";
                     $line =~ s/$s1/$s2/e;
                     $linesChanged++;
-                    if ($verbose) {
-                        print("Found line with column '$1' in umlVarCharMap\n");
-                        print("\t$line");
+                    if ($verbose)
+                    {
+                        print("Found line with column '$name' in umlVarCharMap\n");
+                        print("\t$origfname: $line");
+                    }
+
+                }
+                if (exists $umlTextMap{ uc($1) })
+                {
+                    #if the column is found in umlVarCharMap
+                    my $name = $1;
+                    my $s1 = "type=\"string\"";
+                    my $s2 = "type=\"string\" length=\"500\"";
+                    $line =~ s/$s1/$s2/e;
+                    $linesChanged++;
+                    if ($verbose)
+                    {
+                        print("Found line with column '$name' in umlVarCharMap\n");
+                        print("\t$origfname: $line");
                     }
 
                 }
@@ -103,19 +184,17 @@ sub main {
 	close(FO);
     }
 
-    if ($verbose) {
+    if ($verbose)
+    {
 	print("$linesChanged lines changed.\n\n");
     }
 
     #Remove the original files, Rename the new files
-    foreach (@hmbDirMap) {
-	unlink("$_") or die $!; #move("$_","$_.old") or die $!;
-	move("$_.new","$_") or die $!;
-    }
-}
-
-sub wanted {
-    if ($_ =~/hbm\.xml$/i) {
-        push(@hmbDirMap, $_);
+    foreach (@hbmDirList)
+    {
+        $origfname = "$hbmDir/$_";
+        $newfname = "$origfname.new";
+	unlink($origfname) or die $!; #move("$_","$_.old") or die $!;
+	move($newfname, $origfname) or die $!;
     }
 }

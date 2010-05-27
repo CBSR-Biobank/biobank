@@ -155,23 +155,27 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
                     Object item = iterator.next();
                     String row = "";
                     for (int i = 0; i < numCols; i++) {
-                        row += lp.getColumnText(item, i);
+                        String text = lp.getColumnText(item, i);
+                        if (text != null)
+                            row += text;
                         if (i < numCols - 1)
                             row += ", ";
                     }
                     selectedRows.add(row);
                 }
-                StringBuilder sb = new StringBuilder();
-                for (Object row : selectedRows) {
-                    if (sb.length() != 0) {
-                        sb.append(System.getProperty("line.separator"));
+                if (selectedRows.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Object row : selectedRows) {
+                        if (sb.length() != 0) {
+                            sb.append(System.getProperty("line.separator"));
+                        }
+                        sb.append(row.toString());
                     }
-                    sb.append(row.toString());
+                    TextTransfer textTransfer = TextTransfer.getInstance();
+                    Clipboard cb = new Clipboard(Display.getDefault());
+                    cb.setContents(new Object[] { sb.toString() },
+                        new Transfer[] { textTransfer });
                 }
-                TextTransfer textTransfer = TextTransfer.getInstance();
-                Clipboard cb = new Clipboard(Display.getDefault());
-                cb.setContents(new Object[] { sb.toString() },
-                    new Transfer[] { textTransfer });
             }
         });
     }
