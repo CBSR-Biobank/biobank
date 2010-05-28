@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -31,6 +30,10 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -95,7 +98,6 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportsEditor extends BiobankFormBase {
 
@@ -120,6 +122,9 @@ public class ReportsEditor extends BiobankFormBase {
     private ReportTreeNode node;
 
     private IObservableValue statusObservable;
+
+    private IObservableValue comboStatus = new WritableValue(Boolean.FALSE,
+        Boolean.class);
 
     private static Map<Class<?>, int[]> columnWidths;
 
@@ -223,7 +228,7 @@ public class ReportsEditor extends BiobankFormBase {
                                 printButton.setEnabled(false);
                             reportTable = new ReportTableWidget<Object>(form
                                 .getBody(), reportData, query.getColumnNames(),
-                                columnWidths.get(query.getClass()), 40);
+                                columnWidths.get(query.getClass()), 24);
                             reportTable.adaptToToolkit(toolkit, true);
                             form.reflow(true);
                         }
@@ -541,7 +546,7 @@ public class ReportsEditor extends BiobankFormBase {
                 .getName()
                 + ":", SWT.NONE);
             textLabels.add(fieldLabel);
-            Widget widget;
+            final Widget widget;
             GridData widgetData = new GridData();
             widgetData.horizontalAlignment = SWT.FILL;
 
@@ -557,45 +562,53 @@ public class ReportsEditor extends BiobankFormBase {
                     | SWT.TIME, null);
                 ((DateTimeWidget) widget).adaptToToolkit(toolkit, true);
             } else if (option.getType() == String.class) {
-                if (option.getName().compareTo("Sample Type") == 0)
-                    try {
-                        Collection<SampleTypeWrapper> sampleTypeWrappers = site
-                            .getAllSampleTypeCollection(true);
-                        ArrayList<String> sampleTypes = new ArrayList<String>();
-                        for (SampleTypeWrapper w : sampleTypeWrappers)
-                            sampleTypes.add(w.getNameShort());
-                        widget = new Combo(parameterSection, SWT.READ_ONLY);
-                        ((Combo) widget).setItems(sampleTypes
-                            .toArray(new String[] {}));
-                        ((Combo) widget).select(0);
-                        ((Combo) widget).setLayoutData(widgetData);
-                        toolkit.adapt((Combo) widget, true, true);
-                    } catch (ApplicationException e1) {
-                        widget = null;
-                    }
-                else if (option.getName().compareTo("Top Container Type") == 0) {
-                    try {
-                        List<ContainerWrapper> cWrappers = new ArrayList<ContainerWrapper>();
-                        if (site.getName().equals("All Sites")) {
-                            List<SiteWrapper> sites = SiteWrapper
-                                .getSites(SessionManager.getAppService());
-                            for (SiteWrapper s : sites)
-                                cWrappers.addAll(s.getTopContainerCollection());
-                        } else
-                            cWrappers.addAll(site.getTopContainerCollection());
-                        HashSet<String> containerTypes = new HashSet<String>();
-                        for (ContainerWrapper c : cWrappers)
-                            containerTypes.add(c.getContainerType()
-                                .getNameShort());
-                        widget = new Combo(parameterSection, SWT.READ_ONLY);
-                        ((Combo) widget).setItems(containerTypes
-                            .toArray(new String[] {}));
-                        ((Combo) widget).select(0);
-                        ((Combo) widget).setLayoutData(widgetData);
-                        toolkit.adapt((Combo) widget, true, true);
-                    } catch (ApplicationException e1) {
-                        widget = null;
-                    }
+                if (option.getName().compareTo("Sample Type") == 0) {
+                    Collection<SampleTypeWrapper> sampleTypeWrappers = site
+                        .getAllSampleTypeCollection(true);
+                    ArrayList<String> sampleTypes = new ArrayList<String>();
+                    for (SampleTypeWrapper w : sampleTypeWrappers)
+                        sampleTypes.add(w.getNameShort());
+                    widget = new Combo(parameterSection, SWT.READ_ONLY);
+                    ((Combo) widget).setItems(sampleTypes
+                        .toArray(new String[] {}));
+                    ((Combo) widget).select(0);
+                    ((Combo) widget).setLayoutData(widgetData);
+                    toolkit.adapt((Combo) widget, true, true);
+                } else if (option.getName().compareTo("Top Container Type") == 0) {
+                    widget = new Combo(parameterSection, SWT.READ_ONLY);
+                    ((Combo) widget).setLayoutData(widgetData);
+                    toolkit.adapt((Combo) widget, true, true);
+                    ((Combo) widget).setEnabled(false);
+                    widgetCreator.addBooleanBinding(new WritableValue(
+                        Boolean.FALSE, Boolean.class), comboStatus,
+                        "Pallet not found", IStatus.ERROR);
+                } else if (option.getName().compareTo("Pallet Label") == 0) {
+                    widget = new BiobankText(parameterSection, SWT.NONE);
+                    ((BiobankText) widget).addKeyListener(new KeyListener() {
+                        @Override
+                        public void keyPressed(KeyEvent e) {
+                        }
+
+                        @Override
+                        public void keyReleased(KeyEvent e) {
+                            if (e.keyCode == SWT.CR)
+                                populateTopCombos(((BiobankText) widget)
+                                    .getText());
+                        }
+                    });
+                    ((BiobankText) widget)
+                        .addModifyListener(new ModifyListener() {
+                            @Override
+                            public void modifyText(ModifyEvent e) {
+                                for (Widget widget : widgetFields)
+                                    if (widget instanceof Combo) {
+                                        ((Combo) widget).removeAll();
+                                        ((Combo) widget).setEnabled(false);
+                                        comboStatus.setValue(false);
+                                    }
+                            }
+
+                        });
                 } else if (option.getName().compareTo("Study") == 0) {
                     Collection<StudyWrapper> studyWrappers;
                     if (site.getName().compareTo("All Sites") != 0)
@@ -660,6 +673,48 @@ public class ReportsEditor extends BiobankFormBase {
         // update parents
         createEmptyReportTable();
         parameterSection.moveAbove(buttonSection);
+    }
+
+    protected void populateTopCombos(String label) {
+        appService = SessionManager.getAppService();
+        List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
+        List<String> topContainerTypes = new ArrayList<String>();
+        boolean enable = true;
+        try {
+            List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+            for (SiteWrapper site : sites) {
+                containers.addAll(ContainerWrapper.getContainersInSite(
+                    appService, site, label));
+            }
+            for (ContainerWrapper c : containers) {
+                for (int i = 0; i < (label.length() / 2) - 1; i++)
+                    c = c.getParent();
+                topContainerTypes.add(c.getContainerType().getNameShort());
+            }
+        } catch (Exception e) {
+            enable = false;
+        }
+        if (topContainerTypes.size() < 1)
+            enable = false;
+        if (enable) {
+            for (Widget widget : widgetFields) {
+                if (widget instanceof Combo) {
+                    ((Combo) widget).setItems(topContainerTypes
+                        .toArray(new String[] {}));
+                    ((Combo) widget).select(0);
+                    ((Combo) widget).setEnabled(true);
+                    comboStatus.setValue(true);
+                }
+            }
+        } else {
+            for (Widget widget : widgetFields) {
+                if (widget instanceof Combo) {
+                    ((Combo) widget).removeAll();
+                    ((Combo) widget).setEnabled(false);
+                    comboStatus.setValue(false);
+                }
+            }
+        }
     }
 
     @Override

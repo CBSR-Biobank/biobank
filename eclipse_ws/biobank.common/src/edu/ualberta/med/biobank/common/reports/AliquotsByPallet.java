@@ -27,8 +27,8 @@ public class AliquotsByPallet extends QueryObject {
                 + "and path2.container.containerType.nameShort like ?) "
                 + "and s.aliquotPosition.container.label = ?", new String[] {
                 "Location", "Inventory ID", "Patient", "Type" });
-        addOption("Top Container Type", String.class, "");
         addOption("Pallet Label", String.class, "");
+        addOption("Top Container Type", String.class, "");
     }
 
     @Override
