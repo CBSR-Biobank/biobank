@@ -10,8 +10,9 @@ Usage: $SCRIPT [OPTIONS]
 OPTIONS
   -e TABLE    Exclude table with name TABLE. This option can be used multiple
               times to exclude multiple tables.
-  -d DBNAME   The database name.
-  -H DBHOST   The hostname of the machine running the MySQL server.
+  -d DBNAME   The database name. Defaults to biobank2 if not specified.
+  -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
+              localhost if not specified.
   -u DBUSER   The user to use on the MySQL server.
   -p PWD      The password to use on the MySQL server.
   -o FILE     The file to save the dump file to.
@@ -72,7 +73,9 @@ if [ "${#CSM_TABLES[@]}" == "0" ]; then
     echo "ERROR: database does not contain any CSM tables"
 fi
 
-echo "" > csm_info.sql
+if [ -n "$OUTFILE" ]; then
+    echo "" > $OUTFILE
+fi
 
 for table in "${CSM_TABLES[@]}"
 do
