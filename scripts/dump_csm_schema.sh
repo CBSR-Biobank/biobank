@@ -2,18 +2,21 @@
 
 #set -o verbose
 
-USAGE='
-Usage: `basename $0` [OPTIONS]
+SCRIPT=`basename $0`
+
+USAGE="
+Usage: $SCRIPT [OPTIONS]
 
 OPTIONS
   -e TABLE    Exclude table with name TABLE. This option can be used multiple
               times to exclude multiple tables.
   -d DBNAME   The database name.
-  -h DBHOST   The hostname of the machine running the MySQL server.
+  -H DBHOST   The hostname of the machine running the MySQL server.
   -u DBUSER   The user to use on the MySQL server.
   -p PWD      The password to use on the MySQL server.
   -o FILE     The file to save the dump file to.
-'
+  -h          Help text.
+"
 
 MYSQL=/usr/bin/mysql
 MYSQLDUMP=/usr/bin/mysqldump
@@ -33,15 +36,16 @@ function in_array () {
 }
 
 
-while getopts "e:d:h:u:p:o:" OPTION
+while getopts "e:d:hH:u:p:o:" OPTION
 do
   case $OPTION in
         e) exclude=(${exclude[@]} $OPTARG );;
         d) DBNAME=$OPTARG;;
-        h) DBHOST=$OPTARG;;
+        H) DBHOST=$OPTARG;;
         u) DBUSER=$OPTARG;;
         p) DBPWD=$OPTARG;;
-        o) OUTFILE=$OPTARG
+        o) OUTFILE=$OPTARG;;
+        h) echo "$USAGE"; exit;;
   esac
 done
 
@@ -81,3 +85,7 @@ do
         fi
     fi
 done
+
+if [ -n "$OUTFILE" ]; then
+    echo "tables dumped to $OUTFILE"
+fi
