@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -17,6 +15,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -148,8 +147,8 @@ public class AliquotWrapper extends
 
     public void setAliquotPositionFromString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
-        RowColPos rcp = LabelingScheme.getRowColFromPositionString(
-            positionString, parentContainer.getContainerType());
+        RowColPos rcp = parentContainer.getContainerType()
+            .getRowColFromPositionString(positionString);
         if ((rcp.row > -1) && (rcp.col > -1)) {
             setPosition(rcp);
         } else {
@@ -268,7 +267,7 @@ public class AliquotWrapper extends
         }
 
         if (!fullString) {
-            return LabelingScheme.getPositionString(position, getParent());
+            return getPositionStringInParent(position, getParent());
         }
         ContainerWrapper directParent = getParent();
         ContainerWrapper topContainer = directParent;
@@ -278,10 +277,18 @@ public class AliquotWrapper extends
         String nameShort = topContainer.getContainerType().getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
-                + LabelingScheme.getPositionString(position, directParent)
-                + " (" + nameShort + ")";
+                + getPositionStringInParent(position, directParent) + " ("
+                + nameShort + ")";
         return directParent.getLabel()
-            + LabelingScheme.getPositionString(position, directParent);
+            + getPositionStringInParent(position, directParent);
+    }
+
+    private String getPositionStringInParent(RowColPos position,
+        ContainerWrapper parent) {
+        if (parent != null) {
+            return parent.getContainerType().getPositionString(position);
+        }
+        return null;
     }
 
     public void setQuantityFromType() {
@@ -379,8 +386,8 @@ public class AliquotWrapper extends
         for (ContainerWrapper container : containers) {
             RowColPos rcp = null;
             try {
-                rcp = LabelingScheme.getRowColFromPositionString(aliquotString,
-                    container.getContainerType());
+                rcp = container.getContainerType().getRowColFromPositionString(
+                    aliquotString);
             } catch (Exception e) {
                 // do nothing. The positionString doesn't fit the current
                 // container.

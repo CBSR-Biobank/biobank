@@ -32,7 +32,7 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
         Object[] previousState, String[] propertyNames, Type[] types,
         String action) {
         BiobankObjectStateLogger logger = BiobankObjectStateLogger
-            .getlogger(entity.getClass());
+            .getlogger(entity.getClass().getSimpleName());
         if (logger != null) {
             logger.logMessage(entity, action);
         }

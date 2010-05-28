@@ -16,7 +16,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -69,7 +68,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             tabName = "Container";
             if (container.hasParent()) {
                 container.setLabel(container.getParent().getLabel()
-                    + LabelingScheme.getPositionString(container));
+                    + container.getPositionString());
                 container
                     .setTemperature(container.getParent().getTemperature());
             }

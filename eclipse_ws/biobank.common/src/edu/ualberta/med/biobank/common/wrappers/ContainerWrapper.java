@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -22,6 +20,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -131,13 +130,20 @@ public class ContainerWrapper extends
             }
             if (labelChanged) {
                 // the label need to be modified
-                String label = parent.getLabel()
-                    + LabelingScheme.getPositionString(this);
+                String label = parent.getLabel() + getPositionString();
                 setLabel(label);
             }
         }
         persistChildren(labelChanged);
         persistAliquots();
+    }
+
+    public String getPositionString() {
+        ContainerWrapper parent = getParent();
+        if (parent != null) {
+            return parent.getContainerType().getPositionString(getPosition());
+        }
+        return null;
     }
 
     private void persistAliquots() throws Exception {
@@ -327,8 +333,7 @@ public class ContainerWrapper extends
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
         ContainerTypeWrapper type = getContainerType();
-        RowColPos rcp = LabelingScheme.getRowColFromPositionString(position,
-            type);
+        RowColPos rcp = type.getRowColFromPositionString(position);
         if (rcp != null) {
             if (rcp.row >= type.getRowCapacity()
                 || rcp.col >= type.getColCapacity()) {
@@ -593,19 +598,7 @@ public class ContainerWrapper extends
         if (label.startsWith(getLabel())) {
             label = label.substring(getLabel().length());
         }
-        RowColPos pos;
-        switch (containerType.getChildLabelingScheme()) {
-        case 1:
-            pos = LabelingScheme.sbsToRowCol(label);
-            break;
-        case 2:
-            pos = LabelingScheme.cbsrTwoCharToRowCol(label, getRowCapacity(),
-                getColCapacity(), containerType.getName());
-            break;
-        case 3:
-        default:
-            pos = LabelingScheme.twoCharNumericToRowCol(containerType, label);
-        }
+        RowColPos pos = containerType.getRowColFromPositionString(label);
         return getChild(pos);
     }
 

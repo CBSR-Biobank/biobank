@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.server.logging.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.logging.user.BiobankThreadVariable;
@@ -22,6 +22,8 @@ public abstract class BiobankObjectStateLogger {
     private static Logger logger = null;
     public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
         "yyyy-MM-dd HH:mm");
+
+    private static HashMap<String, BiobankObjectStateLogger> loggersMap = new HashMap<String, BiobankObjectStateLogger>();
 
     static {
         logger = Logger.getLogger("Biobank.Activity");
@@ -86,12 +88,22 @@ public abstract class BiobankObjectStateLogger {
         logger.log(level, message);
     }
 
-    public static BiobankObjectStateLogger getlogger(
-        Class<? extends Object> clazz) {
-        if (clazz.equals(Aliquot.class)) {
-            return AliquotStateLogger.getInstance();
+    public static BiobankObjectStateLogger getlogger(String entityTypeName) {
+        BiobankObjectStateLogger stateLogger = loggersMap.get(entityTypeName);
+        if (stateLogger == null) {
+            String className = entityTypeName + "StateLogger";
+            try {
+                Class<?> loggerClass = Class
+                    .forName(BiobankObjectStateLogger.class.getPackage()
+                        .getName()
+                        + "." + className);
+                stateLogger = (BiobankObjectStateLogger) loggerClass
+                    .newInstance();
+                loggersMap.put(entityTypeName, stateLogger);
+            } catch (Exception e) {
+                return null;
+            }
         }
-        return null;
+        return stateLogger;
     }
-
 }

@@ -1,10 +1,4 @@
-package edu.ualberta.med.biobank.common;
-
-import org.springframework.util.Assert;
-
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.ContainerType;
+package edu.ualberta.med.biobank.util;
 
 public class LabelingScheme {
 
@@ -52,19 +46,6 @@ public class LabelingScheme {
     }
 
     /**
-     * get the RowColPos in the given container type corresponding to the given
-     * label using the CBSR labeling. Use the 2 last character in case we have a
-     * full position string (01AA01A2)
-     */
-    public static RowColPos cbsrTwoCharToRowCol(
-        ContainerTypeWrapper containerType, String label) throws Exception {
-        Integer rowCap = containerType.getRowCapacity();
-        Integer colCap = containerType.getColCapacity();
-        return cbsrTwoCharToRowCol(label, rowCap, colCap, containerType
-            .getName());
-    }
-
-    /**
      * get the RowColPos in the given container corresponding to the given label
      * using the CBSR labeling. Use the 2 last character in case we have a full
      * position string (01AA01A2)
@@ -82,17 +63,6 @@ public class LabelingScheme {
         rowColPos.col = pos / rowCap;
         return rowColPos;
 
-    }
-
-    /**
-     * Get the RowColPos in the given container corresponding to the given label
-     * using the 2 char numeric labeling.Use the 2 last character in case we
-     * have a full position string (01AA01A2)
-     */
-    public static RowColPos twoCharNumericToRowCol(
-        ContainerTypeWrapper containerType, String label) throws Exception {
-        Integer rowCap = containerType.getRowCapacity();
-        return twoCharNumericToRowCol(label, rowCap);
     }
 
     /**
@@ -126,7 +96,7 @@ public class LabelingScheme {
             index = totalRows * rcp.col + rcp.row;
         }
 
-        Assert.isTrue(index < lettersLength * lettersLength);
+        assert index < lettersLength * lettersLength;
         pos1 = index / lettersLength;
         pos2 = index % lettersLength;
 
@@ -175,23 +145,6 @@ public class LabelingScheme {
      * given containerType
      */
     public static String getPositionString(RowColPos rcp,
-        ContainerTypeWrapper containerType) {
-        return getPositionString(rcp, containerType.getChildLabelingScheme(),
-            containerType.getRowCapacity(), containerType.getColCapacity());
-    }
-
-    public static String getPositionString(RowColPos rcp,
-        ContainerType containerType) {
-        return getPositionString(rcp, containerType.getChildLabelingScheme()
-            .getId(), containerType.getCapacity().getRowCapacity(),
-            containerType.getCapacity().getColCapacity());
-    }
-
-    /**
-     * Get the 2 char string corresponding to a RowColPos position inside the
-     * given containerType
-     */
-    public static String getPositionString(RowColPos rcp,
         Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity) {
         switch (childLabelingSchemeId) {
         case 1:
@@ -211,36 +164,22 @@ public class LabelingScheme {
     }
 
     /**
-     * Get the 2 char string corresponding to the given position
-     */
-    public static String getPositionString(RowColPos rcp,
-        ContainerWrapper parent) {
-        if (parent != null) {
-            return getPositionString(rcp, parent.getContainerType());
-        }
-        return null;
-    }
-
-    public static String getPositionString(ContainerWrapper container) {
-        return getPositionString(container.getPosition(), container.getParent());
-    }
-
-    /**
      * Get the RowColPos position corresponding to the 2 char string position
      * inside the given container type
      */
     public static RowColPos getRowColFromPositionString(String position,
-        ContainerTypeWrapper containerType) throws Exception {
-        switch (containerType.getChildLabelingScheme()) {
+        Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity)
+        throws Exception {
+        switch (childLabelingSchemeId) {
         case 1:
             // SBS standard
             return sbsToRowCol(position);
         case 2:
             // CBSR 2 char alphabetic
-            return cbsrTwoCharToRowCol(containerType, position);
+            return cbsrTwoCharToRowCol(position, rowCapacity, colCapacity, null);
         case 3:
             // 2 char numeric
-            return twoCharNumericToRowCol(containerType, position);
+            return twoCharNumericToRowCol(position, rowCapacity);
         }
         return null;
     }
