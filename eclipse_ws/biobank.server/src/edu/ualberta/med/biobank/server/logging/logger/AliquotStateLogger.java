@@ -21,7 +21,7 @@ public class AliquotStateLogger extends BiobankObjectStateLogger {
             log.setInventoryId(aliquot.getInventoryId());
             log.setLocationLabel(aliquot.getAliquotPosition().getContainer()
                 .getLabel());
-            log.setDetails("Aliquot");
+            log.setType("Aliquot");
             return log;
         }
         return null;

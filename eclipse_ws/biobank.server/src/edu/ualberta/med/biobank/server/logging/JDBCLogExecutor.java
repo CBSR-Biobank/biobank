@@ -159,6 +159,7 @@ public class JDBCLogExecutor implements Runnable {
         sql.append(COMMA + LogProperty.INVENTORY_ID);
         sql.append(COMMA + LogProperty.LOCATION_LABEL);
         sql.append(COMMA + LogProperty.DETAILS);
+        sql.append(COMMA + LogProperty.TYPE);
         sql.append(") VALUES ('");
         sql.append(initString(log.getUsername()));
         sql.append("','");
@@ -173,6 +174,8 @@ public class JDBCLogExecutor implements Runnable {
         sql.append(initString(log.getLocationLabel()));
         sql.append("','");
         sql.append(initString(log.getDetails()));
+        sql.append("','");
+        sql.append(initString(log.getType()));
         sql.append("');");
         return sql.toString();
     }

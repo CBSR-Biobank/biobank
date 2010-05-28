@@ -17,9 +17,10 @@ public class PatientVisitStateLogger extends BiobankObjectStateLogger {
             PatientVisit visit = (PatientVisit) obj;
             Log log = new Log();
             log.setPatientNumber(visit.getPatient().getPnumber());
-            // FIXME and worksheet ?
-            log.setDetails("Visit - "
+            // FIXME add worksheet ?
+            log.setDetails("date processed="
                 + dateTimeFormatter.format(visit.getDateProcessed()));
+            log.setType("Visit");
             return log;
         }
         return null;

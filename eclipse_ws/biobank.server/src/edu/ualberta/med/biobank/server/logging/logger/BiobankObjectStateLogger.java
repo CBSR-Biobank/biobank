@@ -44,7 +44,7 @@ public abstract class BiobankObjectStateLogger {
         if (log != null) {
             String message = MessageGenerator.generateStringMessage(action, log
                 .getPatientNumber(), log.getInventoryId(), log
-                .getLocationLabel(), log.getDetails());
+                .getLocationLabel(), log.getDetails(), log.getType());
             UserInfo userInfo = BiobankThreadVariable.get();
             if (null == userInfo)
                 userInfo = new UserInfo();

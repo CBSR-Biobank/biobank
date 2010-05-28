@@ -568,6 +568,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         ((BiobankApplicationService) appService)
             .logActivity("select", getPatient().getPnumber(), null, null,
                 "visit LOOKUP (date processed=" + getFormattedDateProcessed()
-                    + ")");
+                    + ")", "Visit");
     }
 }

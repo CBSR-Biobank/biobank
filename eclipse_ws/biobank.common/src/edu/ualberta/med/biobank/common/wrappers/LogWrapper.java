@@ -27,7 +27,7 @@ public class LogWrapper extends ModelWrapper<Log> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "username", "date", "action", "patientNumber",
-            "inventoryId", "positionLabel", "details" };
+            "inventoryId", "positionLabel", "details", "type" };
     }
 
     @Override
@@ -118,10 +118,20 @@ public class LogWrapper extends ModelWrapper<Log> {
         propertyChangeSupport.firePropertyChange("details", old, details);
     }
 
+    public String getType() {
+        return wrappedObject.getType();
+    }
+
+    public void setType(String type) {
+        String old = getType();
+        wrappedObject.setType(type);
+        propertyChangeSupport.firePropertyChange("type", old, type);
+    }
+
     public static List<LogWrapper> getLogs(
         WritableApplicationService appService, String username, Date date,
         String action, String patientNumber, String inventoryId,
-        String locationLabel, String details) throws Exception {
+        String locationLabel, String details, String type) throws Exception {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, "username", username);
@@ -133,6 +143,7 @@ public class LogWrapper extends ModelWrapper<Log> {
         addParam(parametersString, parametersArgs, "locationLabel",
             locationLabel);
         addParam(parametersString, parametersArgs, "details", details);
+        addParam(parametersString, parametersArgs, "type", type);
         String criteriaString = "from " + Log.class.getName();
         if (parametersString.length() > 0) {
             criteriaString += " where" + parametersString.toString();
@@ -157,5 +168,23 @@ public class LogWrapper extends ModelWrapper<Log> {
             sb.append(" ").append(property).append("=?");
             parameters.add(value);
         }
+    }
+
+    public static List<String> getPossibleUsernames(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria(
+            "select distinct(username) from " + Log.class.getName()));
+    }
+
+    public static List<String> getPossibleActions(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria("select distinct(action) from "
+            + Log.class.getName()));
+    }
+
+    public static List<String> getPossibleTypes(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria("select distinct(type) from "
+            + Log.class.getName()));
     }
 }
