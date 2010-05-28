@@ -121,7 +121,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private static final String SAMPLE_TYPE_LIST_BINDING = "sample-type-list-binding";
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         super.init();
         setPartName(Messages.getString("Cabinet.tabTitle")); //$NON-NLS-1$
         aliquot = new AliquotWrapper(appService);

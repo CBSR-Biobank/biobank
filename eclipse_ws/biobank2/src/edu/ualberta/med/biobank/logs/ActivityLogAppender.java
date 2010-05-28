@@ -31,6 +31,8 @@ public class ActivityLogAppender extends AppenderSkeleton {
     private List<LogInfo> logsList;
     private static final char[] SYSTEM_LINE_SEPARATOR = System.getProperty(
         "line.separator").toCharArray();
+    public static final PatternLayout layout = new PatternLayout(
+        "%d{HH:mm:ss} %m%n");
 
     public ActivityLogAppender(String name) {
         setName(name);
@@ -38,7 +40,7 @@ public class ActivityLogAppender extends AppenderSkeleton {
         ConsolePlugin.getDefault().getConsoleManager().addConsoles(
             new IConsole[] { messageConsole });
         consoleStream = messageConsole.newMessageStream();
-        setLayout(new PatternLayout("%d{HH:mm:ss} %m%n"));
+        setLayout(layout);
         logsList = new ArrayList<LogInfo>();
     }
 

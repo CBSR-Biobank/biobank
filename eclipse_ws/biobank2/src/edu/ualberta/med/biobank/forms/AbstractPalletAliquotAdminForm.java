@@ -76,7 +76,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private Label scanTubeAloneSwitch;
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         super.init();
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();

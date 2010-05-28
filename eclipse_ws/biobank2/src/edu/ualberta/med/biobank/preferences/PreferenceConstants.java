@@ -16,7 +16,11 @@ public class PreferenceConstants {
         "scanner.plate.barcode.3", "scanner.plate.barcode.4",
         "scanner.plate.barcode.5" };
 
-    public static final String LINK_ASSIGN_ASK_PRINT = "link.assign.ask_print";
+    public static final String LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE = "link.assign.activity.log.into.file";
+
+    public static final String LINK_ASSIGN_ACTIVITY_LOG_PATH = "link.assign.activity.log.path";
+
+    public static final String LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT = "link.assign.activity.log.ask_print";
 
     public static final String SCAN_LINK_ROW_SELECT_ONLY = "scan.link.row.select.only";
 

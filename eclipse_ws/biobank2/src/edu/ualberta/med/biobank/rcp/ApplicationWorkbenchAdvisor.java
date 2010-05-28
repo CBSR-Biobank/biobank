@@ -40,7 +40,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
                 .findPerspectiveWithId(MainPerspective.ID);
             page.setPerspective(main);
         }
-        if (BioBankPlugin.isAskPrint()
+        if (BioBankPlugin.isAskPrintActivityLog()
             && page.getPerspective().getId().equals(
                 AliquotManagementPerspective.ID)) {
             BioBankPlugin.openInformation("Can't close",

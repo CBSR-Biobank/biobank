@@ -118,7 +118,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Boolean.class);
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         super.init();
         setPartName(Messages.getString("ScanAssign.tabTitle")); //$NON-NLS-1$
         currentPalletWrapper = new ContainerWrapper(appService);
