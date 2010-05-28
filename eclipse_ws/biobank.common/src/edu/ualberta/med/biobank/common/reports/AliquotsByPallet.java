@@ -32,6 +32,12 @@ public class AliquotsByPallet extends QueryObject {
     }
 
     @Override
+    protected List<Object> preProcess(List<Object> params) {
+        params.add(params.remove(0));
+        return params;
+    }
+
+    @Override
     protected List<Object> postProcess(List<Object> results) {
         AliquotPosition aliquotPosition;
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
