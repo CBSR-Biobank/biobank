@@ -275,9 +275,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         study.removeSampleStorages(sampleStorageEntryTable
             .getDeletedSampleStorages());
 
-        study.addContacts(contactEntryTable.getAddedContacts());
-        study.removeContacts(contactEntryTable.getRemovedContacts());
-
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);
         study.setSite(siteAdapter.getWrapper());

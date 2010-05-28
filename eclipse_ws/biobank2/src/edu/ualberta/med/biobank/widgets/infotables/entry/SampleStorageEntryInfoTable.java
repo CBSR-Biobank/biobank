@@ -116,7 +116,9 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 @Override
                 public void editItem(InfoTableEvent event) {
                     SampleStorageWrapper sampleStorage = getSelection();
-                    addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
+                    if (sampleStorage != null)
+                        addOrEditSampleStorage(false, sampleStorage,
+                            allSampleTypes);
                 }
             });
         }
@@ -125,19 +127,21 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     SampleStorageWrapper sampleStorage = getSelection();
+                    if (sampleStorage != null) {
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Aliquot Storage",
+                            "Are you sure you want to delete sample storage \""
+                                + sampleStorage.getSampleType().getName()
+                                + "\"?")) {
+                            return;
+                        }
 
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Aliquot Storage",
-                        "Are you sure you want to delete sample storage \""
-                            + sampleStorage.getSampleType().getName() + "\"?")) {
-                        return;
+                        selectedSampleStorages.remove(sampleStorage);
+                        setCollection(selectedSampleStorages);
+                        deletedSampleStorages.add(sampleStorage);
+                        notifyListeners();
                     }
-
-                    selectedSampleStorages.remove(sampleStorage);
-                    setCollection(selectedSampleStorages);
-                    deletedSampleStorages.add(sampleStorage);
-                    notifyListeners();
                 }
             });
         }

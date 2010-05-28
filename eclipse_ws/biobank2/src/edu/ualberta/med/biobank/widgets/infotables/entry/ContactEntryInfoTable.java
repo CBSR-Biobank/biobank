@@ -50,7 +50,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    addOrEditContact(false, getSelection());
+                    ContactWrapper contact = getSelection();
+                    if (contact != null)
+                        addOrEditContact(false, contact);
                 }
             });
         }
@@ -59,26 +61,28 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     ContactWrapper contact = getSelection();
-                    if (!contact.deleteAllowed()) {
-                        BioBankPlugin
-                            .openError(
-                                "Contact Delete Error",
-                                "Cannot delete contact \""
-                                    + contact.getName()
-                                    + "\" since it is associated with one or more studies");
-                        return;
-                    }
+                    if (contact != null) {
+                        if (!contact.deleteAllowed()) {
+                            BioBankPlugin
+                                .openError(
+                                    "Contact Delete Error",
+                                    "Cannot delete contact \""
+                                        + contact.getName()
+                                        + "\" since it is associated with one or more studies");
+                            return;
+                        }
 
-                    if (!BioBankPlugin.openConfirm("Delete Contact",
-                        "Are you sure you want to delete contact \""
-                            + contact.getName() + "\"")) {
-                        return;
-                    }
+                        if (!BioBankPlugin.openConfirm("Delete Contact",
+                            "Are you sure you want to delete contact \""
+                                + contact.getName() + "\"")) {
+                            return;
+                        }
 
-                    deletedContacts.add(contact);
-                    selectedContacts.remove(contact);
-                    setCollection(selectedContacts);
-                    notifyListeners();
+                        deletedContacts.add(contact);
+                        selectedContacts.remove(contact);
+                        setCollection(selectedContacts);
+                        notifyListeners();
+                    }
                 }
             });
         }
