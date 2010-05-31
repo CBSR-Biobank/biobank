@@ -1,6 +1,6 @@
-drop table if exists LOG_MESSAGE;
-drop table if exists OBJECT_ATTRIBUTE;
-drop table if exists OBJECTATTRIBUTES;
+-- drop table if exists LOG_MESSAGE;
+-- drop table if exists OBJECT_ATTRIBUTE;
+-- drop table if exists OBJECTATTRIBUTES;
 
 drop table if exists LOG;
 create table LOG (ID integer not null AUTO_INCREMENT, 
