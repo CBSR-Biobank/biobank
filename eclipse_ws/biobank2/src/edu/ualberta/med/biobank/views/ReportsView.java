@@ -60,6 +60,11 @@ public class ReportsView extends AbstractViewWithTree {
 
     private TreeViewer querySelect;
 
+    @Override
+    public TreeViewer getTreeViewer() {
+        return getTree();
+    }
+
     public ReportsView() {
         SessionManager.addView(ReportsPerspective.ID, this);
         reportsView = this;

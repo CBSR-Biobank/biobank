@@ -557,7 +557,8 @@ public class ReportsEditor extends BiobankFormBase {
                 ((Combo) widget).select(0);
                 toolkit.adapt((Combo) widget, true, true);
             } else if (option.getType() == Date.class) {
-                widget = new DateTimeWidget(parameterSection, SWT.NONE, null);
+                widget = new DateTimeWidget(parameterSection, SWT.DATE
+                    | SWT.TIME, null);
                 ((DateTimeWidget) widget).adaptToToolkit(toolkit, true);
             } else if (option.getType() == String.class) {
                 if (option.getName().compareTo("Sample Type") == 0)
@@ -578,8 +579,14 @@ public class ReportsEditor extends BiobankFormBase {
                     }
                 else if (option.getName().compareTo("Top Container Type") == 0) {
                     try {
-                        List<ContainerWrapper> cWrappers = site
-                            .getTopContainerCollection(true);
+                        List<ContainerWrapper> cWrappers = new ArrayList<ContainerWrapper>();
+                        if (site.getName().equals("All Sites")) {
+                            List<SiteWrapper> sites = SiteWrapper
+                                .getSites(SessionManager.getAppService());
+                            for (SiteWrapper s : sites)
+                                cWrappers.addAll(s.getTopContainerCollection());
+                        } else
+                            cWrappers.addAll(site.getTopContainerCollection());
                         HashSet<String> containerTypes = new HashSet<String>();
                         for (ContainerWrapper c : cWrappers)
                             containerTypes.add(c.getContainerType()

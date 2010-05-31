@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -49,6 +50,7 @@ import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.util.RowColPos;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestPatientVisit extends TestDatabase {
 
@@ -516,6 +518,33 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
         visit.persist();
+    }
+
+    @Test
+    public void testDuplicatePvAttr() throws Exception {
+        addPvAttrs();
+        List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
+        Assert.assertEquals(5, labels.size());
+
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
+        visit.reload();
+
+        visit.setPvAttrValue("Worksheet", "abcdefghi");
+        visit.persist();
+
+        // change the worksheet value
+        visit.setPvAttrValue("Worksheet", "jklmnopqr");
+        visit.persist();
+
+        // make sure only one value in database
+        HQLCriteria c = new HQLCriteria("select pvattr from "
+            + PatientVisit.class.getName() + " as pv "
+            + "join pv.pvAttrCollection as pvattr "
+            + "join pvattr.studyPvAttr as spvattr where spvattr.label= ?",
+            Arrays.asList(new Object[] { "Worksheet" }));
+        List<PvAttr> results = appService.query(c);
+        Assert.assertEquals(1, results.size());
     }
 
     @Test
