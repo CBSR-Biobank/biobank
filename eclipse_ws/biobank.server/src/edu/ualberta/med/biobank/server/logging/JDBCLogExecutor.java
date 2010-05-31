@@ -31,7 +31,7 @@ public class JDBCLogExecutor implements Runnable {
     public static final String COMMA = ",";
 
     public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm");
+        "yyyy-MM-dd HH:mm:ss");
 
     /**
      * Constructor for JDBCExcecutor.

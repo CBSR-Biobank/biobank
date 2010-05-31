@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -135,7 +136,25 @@ public class LogWrapper extends ModelWrapper<Log> {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, "username", username);
-        addParam(parametersString, parametersArgs, "date", date);
+        if (date != null) { // want the logs of this day, not matter the time
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            // the day before at midnight
+            cal.set(Calendar.AM_PM, Calendar.AM);
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            Date startDate = cal.getTime();
+            // this day at midnight
+            cal.add(Calendar.DATE, 1);
+            Date endDate = cal.getTime();
+            if (parametersString.length() > 0) {
+                parametersString.append(" and");
+            }
+            parametersString.append(" date >= ? and date <= ?");
+            parametersArgs.add(startDate);
+            parametersArgs.add(endDate);
+        }
         addParam(parametersString, parametersArgs, "action", action);
         addParam(parametersString, parametersArgs, "patientNumber",
             patientNumber);
@@ -148,7 +167,6 @@ public class LogWrapper extends ModelWrapper<Log> {
         if (parametersString.length() > 0) {
             criteriaString += " where" + parametersString.toString();
         }
-        System.out.println(criteriaString);
         List<Log> logs = appService.query(new HQLCriteria(criteriaString,
             parametersArgs));
 
@@ -186,5 +204,13 @@ public class LogWrapper extends ModelWrapper<Log> {
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria("select distinct(type) from "
             + Log.class.getName()));
+    }
+
+    @Override
+    public String toString() {
+        return getDate() + " -- action: " + getAction() + " / type: "
+            + getType() + " / patientNumber: " + getPatientNumber()
+            + " / inventoryId: " + getInventoryId() + " / locationLabel: "
+            + getLocationLabel() + " / details: " + getDetails();
     }
 }

@@ -36,6 +36,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
         aliquot = aliquotAdapter.getAliquot();
+        aliquot.logEdit();
         setPartName("Aliquot Entry");
     }
 

@@ -344,8 +344,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return visits;
     }
 
-    public void logLookup() {
-        ((BiobankApplicationService) appService).logActivity("select",
-            getPnumber(), null, null, "patient LOOKUP", "Patient");
+    @Override
+    protected void log(String action, String details) {
+        ((BiobankApplicationService) appService).logActivity(action,
+            getPnumber(), null, null, "patient " + details, "Patient");
     }
 }

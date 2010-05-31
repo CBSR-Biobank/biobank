@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -434,19 +435,11 @@ public class AliquotWrapper extends
     public String toString() {
         return getInventoryId();
     }
-    //
-    // /**
-    // * init this wrapper with the given aliquotWrapper.
-    // *
-    // * @throws WrapperException
-    // */
-    // public void initObjectWith(AliquotWrapper aliquotWrapper)
-    // throws WrapperException {
-    // if (aliquotWrapper == null) {
-    // throw new WrapperException(
-    // "Cannot init internal object with a null aliquot");
-    // }
-    // setWrappedObject(aliquotWrapper.wrappedObject);
-    // }
 
+    @Override
+    protected void log(String action, String details) {
+        ((BiobankApplicationService) appService).logActivity(action,
+            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
+            getPositionString(true, false), "aliquot " + details, "Aliquot");
+    }
 }

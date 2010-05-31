@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -539,5 +540,17 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         Date dateReveived = getDateReceived();
         return dateReveived.compareTo(startDate) >= 0
             && dateReveived.compareTo(endDate) <= 0;
+    }
+
+    @Override
+    protected void log(String action, String details) {
+        String fullDetails = "shipment " + details + " - Received:"
+            + getFormattedDateReceived();
+        String waybill = getWaybill();
+        if (waybill != null) {
+            fullDetails += " - Waybill:" + waybill;
+        }
+        ((BiobankApplicationService) appService).logActivity(action, null,
+            null, null, fullDetails, "Shipment");
     }
 }

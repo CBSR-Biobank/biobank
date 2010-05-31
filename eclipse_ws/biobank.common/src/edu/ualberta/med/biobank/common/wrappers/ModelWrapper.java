@@ -508,4 +508,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
         setWrappedObject(otherWrapper.wrappedObject);
     }
+
+    public void logLookup() {
+        log("select", "LOOKUP");
+    }
+
+    public void logEdit() {
+        if (!isNew()) {
+            log("edit", "EDIT");
+        }
+    }
+
+    protected void log(@SuppressWarnings("unused") String action,
+        @SuppressWarnings("unused") String details) {
+
+    }
 }

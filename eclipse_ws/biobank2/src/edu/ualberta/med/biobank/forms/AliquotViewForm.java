@@ -58,6 +58,7 @@ public class AliquotViewForm extends BiobankViewForm {
         aliquotAdapter = (AliquotAdapter) adapter;
         aliquot = aliquotAdapter.getAliquot();
         retrieveAliquot();
+        aliquot.logLookup();
         setPartName("Aliquot: " + aliquot.getInventoryId());
     }
 
