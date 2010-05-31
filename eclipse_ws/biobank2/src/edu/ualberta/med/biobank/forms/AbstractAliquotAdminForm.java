@@ -31,8 +31,8 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     private static ActivityLogAppender appender;
     private static FileAppender fileAppender;
 
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat fileDateFormatter = new SimpleDateFormat(
+        "yyyy-MM-dd_HHmmss");
 
     @Override
     protected void init() throws Exception {
@@ -49,10 +49,9 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         if (fileAppender == null) {
             String path = BioBankPlugin.getActivityLogPath();
             if (path != null) {
-                System.out.println(path);
                 fileAppender = new FileAppender(ActivityLogAppender.layout,
                     path + File.separator + getClass().getSimpleName() + "_"
-                        + dateFormatter.format(new Date()) + ".log", true);
+                        + fileDateFormatter.format(new Date()) + ".log", true);
                 activityLogger.addAppender(fileAppender);
             }
         }
