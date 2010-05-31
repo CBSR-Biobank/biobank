@@ -88,7 +88,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean isFakeScanRandom;
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         super.init();
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
         linkFormPatientManagement = new LinkFormPatientManagement(
