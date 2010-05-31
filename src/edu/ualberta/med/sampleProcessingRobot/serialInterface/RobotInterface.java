@@ -389,14 +389,17 @@ public class RobotInterface {
     }
 
     private boolean connectToXSEL() {
-        if (xselPort.isOpen())
+        if ((xselPort != null) && xselPort.isOpen())
             return true;
         xselPort = new SerialInterface(COMM_PORT, 9600, SerialPort.DATABITS_8,
             SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
         if (!xselPort.isOpen()) {
             return false;
         }
-        if (xselPort.readString(CR).equals("SYNCH")) {
+        String result = xselPort.readString(CR);
+        if (result == null) return true;
+        
+        if (result.equals("SYNCH")) {        	
             xselPort.writeString("START\r");
             if (xselPort.readString(CR).equals("READY"))
                 ;
