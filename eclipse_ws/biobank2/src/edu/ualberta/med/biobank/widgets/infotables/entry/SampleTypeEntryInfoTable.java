@@ -168,6 +168,18 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
     private boolean addEditOk(SampleTypeWrapper type) {
         try {
+            for (SampleTypeWrapper st : selectedSampleTypes)
+                if (st.getId() != type.getId()
+                    && (st.getName().equals(type.getName()) || st
+                        .getNameShort().equals(type.getNameShort())))
+                    throw new BiobankCheckException(
+                        "That sample type has already been added.");
+            for (SampleTypeWrapper st : addedOrModifiedSampleTypes)
+                if (st.getId() != type.getId()
+                    && (st.getName().equals(type.getName()) || st
+                        .getNameShort().equals(type.getNameShort())))
+                    throw new BiobankCheckException(
+                        "That sample type has already been added.");
             type.checkNameAndShortNameUniquesForSiteAndGlobal();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);

@@ -162,6 +162,16 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
 
     private boolean addEditOk(SourceVesselWrapper type) {
         try {
+            for (SourceVesselWrapper sv : selectedSourceVessels)
+                if (sv.getId() != type.getId()
+                    && sv.getName().equals(type.getName()))
+                    throw new BiobankCheckException(
+                        "That source vessel has already been added.");
+            for (SourceVesselWrapper sv : addedOrModifiedSourceVessels)
+                if (sv.getId() != type.getId()
+                    && sv.getName().equals(type.getName()))
+                    throw new BiobankCheckException(
+                        "That source vessel has already been added.");
             type.checkUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);

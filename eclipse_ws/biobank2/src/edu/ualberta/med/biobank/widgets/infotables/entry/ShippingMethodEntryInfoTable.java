@@ -162,6 +162,16 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
 
     private boolean addEditOk(ShippingMethodWrapper type) {
         try {
+            for (ShippingMethodWrapper sm : selectedShippingMethods)
+                if (sm.getId() != type.getId()
+                    && sm.getName().equals(type.getName()))
+                    throw new BiobankCheckException(
+                        "That shipping method has already been added.");
+            for (ShippingMethodWrapper sm : addedOrModifiedShippingMethods)
+                if (sm.getId() != type.getId()
+                    && sm.getName().equals(type.getName()))
+                    throw new BiobankCheckException(
+                        "That shipping method has already been added.");
             type.checkUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
