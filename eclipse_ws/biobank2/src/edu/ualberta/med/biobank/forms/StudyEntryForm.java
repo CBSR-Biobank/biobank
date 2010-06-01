@@ -125,7 +125,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), study.getActivityStatus(),
-            "Study must have an activity status", true);
+            "Study must have an activity status");
 
         BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,

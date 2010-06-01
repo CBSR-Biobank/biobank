@@ -198,7 +198,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client, "Activity status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), containerType
                 .getActivityStatus(),
-            "Container type must have an activity status", true);
+            "Container type must have an activity status");
 
         BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,

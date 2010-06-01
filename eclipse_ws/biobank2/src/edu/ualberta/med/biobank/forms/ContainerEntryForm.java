@@ -137,8 +137,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), container
-                .getActivityStatus(), "Container must have an activity status",
-            true);
+                .getActivityStatus(), "Container must have an activity status");
 
         BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
@@ -169,7 +168,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         containerTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Container Type", containerTypes, currentContainerType,
-            MSG_CONTAINER_TYPE_EMPTY, true);
+            MSG_CONTAINER_TYPE_EMPTY);
         containerTypeComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override

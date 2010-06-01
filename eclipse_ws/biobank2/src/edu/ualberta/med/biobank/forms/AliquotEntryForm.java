@@ -78,7 +78,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
         sampleTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Type", sampleTypes, aliquot.getSampleType(),
-            "Aliquot must have a sample type", true);
+            "Aliquot must have a sample type");
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date", aliquot
             .getFormattedLinkDate());
@@ -104,8 +104,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), aliquot
-                .getActivityStatus(), "Aliquot must have an activity status",
-            true);
+                .getActivityStatus(), "Aliquot must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
             | SWT.MULTI, "Comments", null, BeansObservables.observeValue(
