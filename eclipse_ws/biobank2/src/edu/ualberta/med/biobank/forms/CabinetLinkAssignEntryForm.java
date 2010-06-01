@@ -321,6 +321,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         gd = (GridData) oldCabinetPosition.getLayoutData();
         gd.horizontalSpan = 2;
         oldCabinetPosition.setEnabled(false);
+        oldCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         // for move mode: field to enter old position. Check needed to be sure
         // nothing is wrong with the aliquot
@@ -355,6 +356,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     "", String.class), oldCabinetPositionCheckValidator);
         gd = (GridData) oldCabinetPositionCheck.getLayoutData();
         gd.horizontalSpan = 2;
+        oldCabinetPositionCheck
+            .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         // for all modes: position to be assigned to the aliquot
         newCabinetPositionLabel = widgetCreator.createLabel(fieldsComposite,
@@ -385,6 +388,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                                 int typeListSize = setTypeCombosLists();
                                 if (typeListSize == 0) {
                                     newCabinetPosition.setFocus();
+                                } else if (typeListSize == 1) {
+                                    checkButton.setFocus();
+                                } else {
+                                    viewerSampleTypes.getCombo().setFocus();
                                 }
                             }
                         });
@@ -401,6 +408,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             }
         });
+        newCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         displayOldCabinetFields(false);
     }
 
@@ -479,13 +487,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             enableAndShowSampleTypeCombo(!moveMode);
             canLaunchCheck.setValue(true);
             if (moveMode) {
-                setFirstControl(oldCabinetPositionCheck);
+                setFirstControl(inventoryIdText);
                 setFocus();
             } else {
                 linkFormPatientManagement.setFirstControl();
                 setFocus();
             }
-
             form.layout(true, true);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error setting move mode " + moveMode, //$NON-NLS-1$
