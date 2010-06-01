@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.logging.logger;
 
+import java.util.Date;
+
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Shipment;
 
@@ -13,8 +15,11 @@ public class ShipmentStateLogger extends BiobankObjectStateLogger {
         if (obj instanceof Shipment) {
             Shipment ship = (Shipment) obj;
             Log log = new Log();
-            String details = "Received:"
-                + dateTimeFormatter.format(ship.getDateReceived());
+            String details = "";
+            Date dateReceived = ship.getDateReceived();
+            if (dateReceived != null) {
+                details = "Received:" + dateTimeFormatter.format(dateReceived);
+            }
             String waybill = ship.getWaybill();
             if (waybill != null) {
                 details += " - Waybill:" + waybill;

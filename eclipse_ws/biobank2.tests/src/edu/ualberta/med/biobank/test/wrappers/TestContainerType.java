@@ -331,7 +331,8 @@ public class TestContainerType extends TestDatabase {
         childTypeL2 = containerTypeMap.get("ChildCtL2");
         childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        Collection<ContainerTypeWrapper> children = topType.getChildrenRecursively();
+        Collection<ContainerTypeWrapper> children = topType
+            .getChildrenRecursively();
         Assert.assertEquals(3, children.size());
         Assert.assertTrue(children.contains(childTypeL1));
         Assert.assertTrue(children.contains(childTypeL2));
@@ -960,8 +961,8 @@ public class TestContainerType extends TestDatabase {
         Map<Integer, String> map = ContainerTypeWrapper
             .getAllLabelingSchemes(appService);
 
-        // currently only 3 labeling schemes
-        Assert.assertEquals(3, map.size());
+        // currently only 4 labeling schemes
+        Assert.assertEquals(4, map.size());
     }
 
     @Test

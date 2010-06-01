@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.server.logging.logger;
 
+import java.util.Collection;
+import java.util.Date;
+
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
@@ -15,19 +18,24 @@ public class PatientVisitStateLogger extends BiobankObjectStateLogger {
             PatientVisit visit = (PatientVisit) obj;
             Log log = new Log();
             log.setPatientNumber(visit.getPatient().getPnumber());
-            String worksheet = "";
-            for (PvAttr pvAttr : visit.getPvAttrCollection()) {
-                if (pvAttr.getStudyPvAttr().getLabel().equals("Worksheet")) {
-                    worksheet = " - Worksheet: " + pvAttr.getValue();
+            String details = "";
+            Date dateProcesssed = visit.getDateProcessed();
+            if (dateProcesssed != null) {
+                details = "Date Processed: "
+                    + dateTimeFormatter.format(dateProcesssed);
+            }
+            Collection<PvAttr> pvAttrs = visit.getPvAttrCollection();
+            if (pvAttrs != null) {
+                for (PvAttr pvAttr : pvAttrs) {
+                    if (pvAttr.getStudyPvAttr().getLabel().equals("Worksheet")) {
+                        details += " - Worksheet: " + pvAttr.getValue();
+                    }
                 }
             }
-            log.setDetails("Date Processed: "
-                + dateTimeFormatter.format(visit.getDateProcessed())
-                + worksheet);
+            log.setDetails(details);
             log.setType("Visit");
             return log;
         }
         return null;
     }
-
 }

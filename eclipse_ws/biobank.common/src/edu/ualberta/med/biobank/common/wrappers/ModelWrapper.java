@@ -223,35 +223,39 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         for (int i = 0; i < fields.length; i++) {
             int maxLen = properties.getMaxSize(fields[i]);
             if (maxLen > 0) {
-                Method f;
+                Method method;
                 try {
-                    f = this.getClass().getMethod(
+                    method = this.getClass().getMethod(
                         "get" + Character.toUpperCase(fields[i].charAt(0))
                             + fields[i].substring(1));
-                    fieldValue = (String) f.invoke(this);
-                    if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
-                        throw new BiobankStringLengthException(
-                            "Field exceeds max length: field: " + fields[i]
-                                + ", value \"" + fieldValue + "\"");
+                    if (method.getReturnType().equals(String.class)) {
+                        fieldValue = (String) method.invoke(this);
+                        if ((fieldValue != null)
+                            && (fieldValue.length() > maxLen)) {
+                            throw new BiobankStringLengthException(
+                                "Field exceeds max length: field: " + fields[i]
+                                    + ", value \"" + fieldValue + "\"");
+                        }
                     }
                 } catch (SecurityException e) {
-                    throw new BiobankCheckException(
-                        "Cannot get max length for field " + fields[i], e);
+                    throwBiobankException(fields[i], e);
                 } catch (NoSuchMethodException e) {
-                    throw new BiobankCheckException(
-                        "Cannot get max length for field " + fields[i], e);
+                    throwBiobankException(fields[i], e);
                 } catch (IllegalArgumentException e) {
-                    throw new BiobankCheckException(
-                        "Cannot get max length for field " + fields[i], e);
+                    throwBiobankException(fields[i], e);
                 } catch (IllegalAccessException e) {
-                    throw new BiobankCheckException(
-                        "Cannot get max length for field " + fields[i], e);
+                    throwBiobankException(fields[i], e);
                 } catch (InvocationTargetException e) {
-                    throw new BiobankCheckException(
-                        "Cannot get max length for field " + fields[i], e);
+                    throwBiobankException(fields[i], e);
                 }
             }
         }
+    }
+
+    private void throwBiobankException(String field, Exception e)
+        throws BiobankCheckException {
+        throw new BiobankCheckException("Cannot get max length for field "
+            + field, e);
     }
 
     /**

@@ -132,6 +132,7 @@ public class ContainerWrapper extends
                 // the label need to be modified
                 String label = parent.getLabel() + getPositionString();
                 setLabel(label);
+                checkLabelUniqueForType();
             }
         }
         persistChildren(labelChanged);

@@ -75,7 +75,9 @@ public class TestDatabase {
                 && !Map.class.isAssignableFrom(method.getReturnType())
                 && !method.getReturnType().isArray()
                 && !method.getReturnType().getName().startsWith(
-                    "edu.ualberta.med.biobank.common")) {
+                    "edu.ualberta.med.biobank.common")
+                && !method.getReturnType().getName().startsWith(
+                    "edu.ualberta.med.biobank.util")) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);

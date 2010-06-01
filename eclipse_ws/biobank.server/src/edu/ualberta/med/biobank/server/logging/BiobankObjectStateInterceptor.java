@@ -34,7 +34,11 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
         BiobankObjectStateLogger logger = BiobankObjectStateLogger
             .getlogger(entity.getClass().getSimpleName());
         if (logger != null) {
-            logger.logMessage(entity, action);
+            try {
+                logger.logMessage(entity, action);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

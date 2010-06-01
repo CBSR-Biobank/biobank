@@ -2,8 +2,13 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
+import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -14,8 +19,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.springframework.remoting.RemoteAccessException;
+import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -224,18 +233,53 @@ public class ContainerEntryForm extends BiobankEntryForm {
             ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
                 .getSelection()).getFirstElement();
             container.setActivityStatus(activity);
-            callPersistWithProgressDialog();
-            if (newName) {
-                container.reload();
-                containerAdapter.rebuild();
-                containerAdapter.performExpand();
-            } else {
-                containerAdapter.getParent().addChild(containerAdapter);
-            }
-            containerAdapter.getParent().performExpand();
+            callPersistWithProgressDialog(newName);
         } else {
             setDirty(true);
         }
+    }
+
+    protected void callPersistWithProgressDialog(final boolean newName)
+        throws Exception {
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        context.run(true, false, new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) {
+                monitor.beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                try {
+                    adapter.getModelObject().persist();
+                    if (newName) {
+                        container.reload();
+                        containerAdapter.rebuild();
+                        containerAdapter.performExpand();
+                    } else {
+                        containerAdapter.getParent().addChild(containerAdapter);
+                    }
+                    containerAdapter.getParent().performExpand();
+                } catch (final RemoteConnectFailureException exp) {
+                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    setDirty(true);
+                    monitor.setCanceled(true);
+                } catch (final RemoteAccessException exp) {
+                    BioBankPlugin.openRemoteAccessErrorMessage();
+                    setDirty(true);
+                    monitor.setCanceled(true);
+                } catch (final AccessDeniedException ade) {
+                    BioBankPlugin.openAccessDeniedErrorMessage();
+                    setDirty(true);
+                    monitor.setCanceled(true);
+                } catch (BiobankCheckException bce) {
+                    setDirty(true);
+                    monitor.setCanceled(true);
+                    BioBankPlugin.openAsyncError("Save error", bce);
+                } catch (Exception e) {
+                    setDirty(true);
+                    throw new RuntimeException(e);
+                }
+                monitor.done();
+            }
+        });
     }
 
     @Override
