@@ -21,6 +21,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -29,6 +31,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
@@ -247,6 +250,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 @Override
                 public void textModified() {
                     viewerSampleTypes.setInput(null);
+                    positionTextModified = true;
+                    resultShownValue.setValue(Boolean.FALSE);
+                    hidePositions();
                 }
             });
 
@@ -262,7 +268,17 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             inventoryIDValidator);
         gd = (GridData) inventoryIdText.getLayoutData();
         gd.horizontalSpan = 2;
-        inventoryIdText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        inventoryIdText.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.character == SWT.CR && !afterKeyCancel
+                    && !afterInitialization) {
+                    ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
+                }
+                afterKeyCancel = false;
+                afterInitialization = false;
+            }
+        });
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -282,6 +298,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 inventoryIdModified = true;
+                positionTextModified = true;
+                resultShownValue.setValue(Boolean.FALSE);
+                hidePositions();
             }
         });
 
@@ -321,6 +340,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         gd = (GridData) oldCabinetPosition.getLayoutData();
         gd.horizontalSpan = 2;
         oldCabinetPosition.setEnabled(false);
+        oldCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         // for move mode: field to enter old position. Check needed to be sure
         // nothing is wrong with the aliquot
@@ -355,6 +375,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     "", String.class), oldCabinetPositionCheckValidator);
         gd = (GridData) oldCabinetPositionCheck.getLayoutData();
         gd.horizontalSpan = 2;
+        oldCabinetPositionCheck
+            .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         // for all modes: position to be assigned to the aliquot
         newCabinetPositionLabel = widgetCreator.createLabel(fieldsComposite,
@@ -385,6 +407,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                                 int typeListSize = setTypeCombosLists();
                                 if (typeListSize == 0) {
                                     newCabinetPosition.setFocus();
+                                } else {
+                                    viewerSampleTypes.getCombo().setFocus();
                                 }
                             }
                         });
@@ -399,8 +423,11 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 if (radioNew.getSelection()) {
                     viewerSampleTypes.setInput(null);
                 }
+                resultShownValue.setValue(Boolean.FALSE);
+                hidePositions();
             }
         });
+        newCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         displayOldCabinetFields(false);
     }
 
@@ -479,13 +506,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             enableAndShowSampleTypeCombo(!moveMode);
             canLaunchCheck.setValue(true);
             if (moveMode) {
-                setFirstControl(oldCabinetPositionCheck);
+                setFirstControl(inventoryIdText);
                 setFocus();
             } else {
                 linkFormPatientManagement.setFirstControl();
                 setFocus();
             }
-
             form.layout(true, true);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error setting move mode " + moveMode, //$NON-NLS-1$
@@ -676,8 +702,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 aliquot.setSampleType(null);
             }
         } else {
-            viewerSampleTypes.setSelection(new StructuredSelection(aliquot
-                .getSampleType()));
+            SampleTypeWrapper type = aliquot.getSampleType();
+            if (type != null) {
+                viewerSampleTypes.setSelection(new StructuredSelection(type));
+            }
             viewerSampleTypes.getCombo().setEnabled(false);
         }
         return studiesSampleTypes.size();

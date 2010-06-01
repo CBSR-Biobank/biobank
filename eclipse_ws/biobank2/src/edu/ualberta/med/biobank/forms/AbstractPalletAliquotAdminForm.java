@@ -48,7 +48,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private Button scanButton;
     private String scanButtonTitle;
 
-    private CancelConfirmWidget cancelConfirmWidget;
+    protected CancelConfirmWidget cancelConfirmWidget;
 
     private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
@@ -348,14 +348,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void resetPlateToScan() {
         plateToScanText.setText(""); //$NON-NLS-1$
         plateToScanValue.setValue(""); //$NON-NLS-1$
-    }
-
-    protected void focusOnCancelConfirmText() {
-        cancelConfirmWidget.setFocus();
-    }
-
-    protected CancelConfirmWidget getCancelConfirmWidget() {
-        return cancelConfirmWidget;
     }
 
     protected void setCanLaunchScan(boolean canLauch) {

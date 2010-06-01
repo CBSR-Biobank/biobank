@@ -35,6 +35,8 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     private static final SimpleDateFormat fileDateFormatter = new SimpleDateFormat(
         "yyyy-MM-dd_HHmmss");
 
+    protected boolean afterInitialization = true;
+
     @Override
     protected void init() throws Exception {
         if (activityLogger == null) {

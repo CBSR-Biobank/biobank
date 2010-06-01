@@ -150,6 +150,10 @@ public class SampleTypeSelectionWidget {
         }
     }
 
+    public boolean isComboEnabled() {
+        return combo.isEnabled();
+    }
+
     /**
      * return true if this selection need to be save, i.e. number > 0
      */
@@ -224,5 +228,9 @@ public class SampleTypeSelectionWidget {
 
     public void setTypes(List<SampleTypeWrapper> types) {
         cv.setInput(types);
+    }
+
+    public void setFocus() {
+        combo.setFocus();
     }
 }

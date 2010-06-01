@@ -165,4 +165,10 @@ public class BiobankText extends Composite {
     public void setEditable(boolean b) {
         text.setEditable(b);
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        text.setEnabled(enabled);
+        super.setEnabled(enabled);
+    }
 }
