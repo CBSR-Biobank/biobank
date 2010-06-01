@@ -46,7 +46,7 @@ public class DataModelExtractor {
                     .getElementsByTagName("UML:Classifier.feature");
                 Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
                 NodeList fstNm = fstNmElmnt.getChildNodes();
-                System.out.println("First Name : "
+                System.out.println("Attribute : "
                     + ((Node) fstNm.item(0)).getNodeValue());
                 NodeList lstNmElmntLst = fstElmnt
                     .getElementsByTagName("lastname");
