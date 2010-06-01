@@ -9,9 +9,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.biobank.util.LabelingScheme;
+import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ScanOneTubeDialog extends BiobankDialog {

@@ -53,7 +53,7 @@ public class CancelConfirmWidget extends BiobankWidget {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.keyCode == 13) {
-                    String text = ((BiobankText) e.widget).getText();
+                    String text = confirmCancelText.getText();
                     if (BioBankPlugin.getDefault().isConfirmBarcode(text)
                         && confirmButton.isEnabled()) {
                         form.confirm();

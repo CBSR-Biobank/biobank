@@ -859,8 +859,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetSampleCountForSite() throws Exception {
-        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+    public void testGetAliquotCountForSite() throws Exception {
+        String name = "testGetAliquotCountForSite" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");

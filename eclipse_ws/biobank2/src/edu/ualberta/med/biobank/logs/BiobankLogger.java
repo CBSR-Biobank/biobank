@@ -9,6 +9,9 @@ import org.eclipse.core.runtime.Status;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
+/**
+ * Log into Eclipse RCP logs (see Logs view) and .logs file
+ */
 public class BiobankLogger {
 
     private static Map<String, BiobankLogger> loggers = new HashMap<String, BiobankLogger>();

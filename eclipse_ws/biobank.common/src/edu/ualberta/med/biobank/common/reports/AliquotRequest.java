@@ -5,10 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -56,22 +54,17 @@ public class AliquotRequest extends QueryObject {
 
     @Override
     protected List<Object> postProcess(List<Object> results) {
-        AliquotPosition aliquotPosition;
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
-            aliquotPosition = a.getAliquotPosition();
             String pnumber = a.getPatientVisit().getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
             Date dateDrawn = a.getPatientVisit().getDateDrawn();
             String stName = a.getSampleType().getNameShort();
-            String containerLabel = aliquotPosition.getContainer().getLabel();
-            String aliquotLabel = LabelingScheme.getPositionString(
-                new RowColPos(aliquotPosition.getRow(), aliquotPosition
-                    .getCol()), aliquotPosition.getContainer()
-                    .getContainerType());
+            String aliquotLabel = new AliquotWrapper(null, a)
+                .getPositionString(true, false);
             modifiedResults.add(new Object[] { pnumber, inventoryId, dateDrawn,
-                stName, containerLabel + aliquotLabel });
+                stName, aliquotLabel });
         }
         return modifiedResults;
     }

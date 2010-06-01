@@ -1,14 +1,15 @@
 package edu.ualberta.med.biobank.server.logging.logger;
 
+import java.util.Collection;
+import java.util.Date;
+
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.PvAttr;
 
 public class PatientVisitStateLogger extends BiobankObjectStateLogger {
 
-    private static PatientVisitStateLogger instance = null;
-
-    private PatientVisitStateLogger() {
-
+    protected PatientVisitStateLogger() {
     }
 
     @Override
@@ -17,18 +18,24 @@ public class PatientVisitStateLogger extends BiobankObjectStateLogger {
             PatientVisit visit = (PatientVisit) obj;
             Log log = new Log();
             log.setPatientNumber(visit.getPatient().getPnumber());
-            // FIXME and worksheet ?
-            log.setDetails("Visit - "
-                + dateTimeFormatter.format(visit.getDateProcessed()));
+            String details = "";
+            Date dateProcesssed = visit.getDateProcessed();
+            if (dateProcesssed != null) {
+                details = "Date Processed: "
+                    + dateTimeFormatter.format(dateProcesssed);
+            }
+            Collection<PvAttr> pvAttrs = visit.getPvAttrCollection();
+            if (pvAttrs != null) {
+                for (PvAttr pvAttr : pvAttrs) {
+                    if (pvAttr.getStudyPvAttr().getLabel().equals("Worksheet")) {
+                        details += " - Worksheet: " + pvAttr.getValue();
+                    }
+                }
+            }
+            log.setDetails(details);
+            log.setType("Visit");
             return log;
         }
         return null;
-    }
-
-    public static PatientVisitStateLogger getInstance() {
-        if (instance == null) {
-            instance = new PatientVisitStateLogger();
-        }
-        return instance;
     }
 }

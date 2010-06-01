@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class LogWrapper extends ModelWrapper<Log> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "username", "date", "action", "patientNumber",
-            "inventoryId", "positionLabel", "details" };
+            "inventoryId", "positionLabel", "details", "type" };
     }
 
     @Override
@@ -118,14 +119,42 @@ public class LogWrapper extends ModelWrapper<Log> {
         propertyChangeSupport.firePropertyChange("details", old, details);
     }
 
+    public String getType() {
+        return wrappedObject.getType();
+    }
+
+    public void setType(String type) {
+        String old = getType();
+        wrappedObject.setType(type);
+        propertyChangeSupport.firePropertyChange("type", old, type);
+    }
+
     public static List<LogWrapper> getLogs(
         WritableApplicationService appService, String username, Date date,
         String action, String patientNumber, String inventoryId,
-        String locationLabel, String details) throws Exception {
+        String locationLabel, String details, String type) throws Exception {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, "username", username);
-        addParam(parametersString, parametersArgs, "date", date);
+        if (date != null) { // want the logs of this day, not matter the time
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            // the day before at midnight
+            cal.set(Calendar.AM_PM, Calendar.AM);
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            Date startDate = cal.getTime();
+            // this day at midnight
+            cal.add(Calendar.DATE, 1);
+            Date endDate = cal.getTime();
+            if (parametersString.length() > 0) {
+                parametersString.append(" and");
+            }
+            parametersString.append(" date >= ? and date <= ?");
+            parametersArgs.add(startDate);
+            parametersArgs.add(endDate);
+        }
         addParam(parametersString, parametersArgs, "action", action);
         addParam(parametersString, parametersArgs, "patientNumber",
             patientNumber);
@@ -133,11 +162,11 @@ public class LogWrapper extends ModelWrapper<Log> {
         addParam(parametersString, parametersArgs, "locationLabel",
             locationLabel);
         addParam(parametersString, parametersArgs, "details", details);
+        addParam(parametersString, parametersArgs, "type", type);
         String criteriaString = "from " + Log.class.getName();
         if (parametersString.length() > 0) {
             criteriaString += " where" + parametersString.toString();
         }
-        System.out.println(criteriaString);
         List<Log> logs = appService.query(new HQLCriteria(criteriaString,
             parametersArgs));
 
@@ -157,5 +186,31 @@ public class LogWrapper extends ModelWrapper<Log> {
             sb.append(" ").append(property).append("=?");
             parameters.add(value);
         }
+    }
+
+    public static List<String> getPossibleUsernames(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria(
+            "select distinct(username) from " + Log.class.getName()));
+    }
+
+    public static List<String> getPossibleActions(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria("select distinct(action) from "
+            + Log.class.getName()));
+    }
+
+    public static List<String> getPossibleTypes(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria("select distinct(type) from "
+            + Log.class.getName()));
+    }
+
+    @Override
+    public String toString() {
+        return getDate() + " -- action: " + getAction() + " / type: "
+            + getType() + " / patientNumber: " + getPatientNumber()
+            + " / inventoryId: " + getInventoryId() + " / locationLabel: "
+            + getLocationLabel() + " / details: " + getDetails();
     }
 }

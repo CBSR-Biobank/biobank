@@ -25,8 +25,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.ServiceConnection;
 import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
 import edu.ualberta.med.biobank.common.cbsr.CbsrContainerTypes;
@@ -55,6 +53,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -1258,8 +1257,8 @@ public class Importer {
         String aliquotLabel = String.format("%s%02d%s", parentContainer
             .getLabel(), containerNr, containerPos);
 
-        RowColPos pos = LabelingScheme.getRowColFromPositionString(
-            containerPos, container.getContainerType());
+        RowColPos pos = container.getContainerType()
+            .getRowColFromPositionString(containerPos);
         AliquotWrapper aliquot = container.getAliquot(pos.row, pos.col);
         if (aliquot != null) {
             logger.debug("container already contains aliquot at "

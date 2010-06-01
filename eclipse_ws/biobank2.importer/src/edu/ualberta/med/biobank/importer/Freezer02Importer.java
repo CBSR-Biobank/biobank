@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.util.LabelingScheme;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**

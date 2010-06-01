@@ -564,10 +564,19 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return getFormattedDateProcessed();
     }
 
-    public void logLookup() {
-        ((BiobankApplicationService) appService)
-            .logActivity("select", getPatient().getPnumber(), null, null,
-                "visit LOOKUP (date processed=" + getFormattedDateProcessed()
-                    + ")");
+    @Override
+    protected void log(String action, String details) {
+        String worksheet = "";
+        try {
+            String attr = getPvAttrValue("Worksheet");
+            if (attr != null) {
+                worksheet = " - Worksheet: " + attr;
+            }
+        } catch (Exception e) {
+        }
+        ((BiobankApplicationService) appService).logActivity(action,
+            getPatient().getPnumber(), null, null, "visit " + details
+                + " (Date Processed:" + getFormattedDateProcessed() + worksheet
+                + ")", "Visit");
     }
 }

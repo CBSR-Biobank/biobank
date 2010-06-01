@@ -8,8 +8,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.util.LabelingScheme;
+import edu.ualberta.med.biobank.util.RowColPos;
 
 public class TestLabelingScheme extends TestDatabase {
 

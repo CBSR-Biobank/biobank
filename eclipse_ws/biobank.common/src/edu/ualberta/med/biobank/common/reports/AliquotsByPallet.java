@@ -5,10 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class AliquotsByPallet extends QueryObject {
@@ -39,20 +37,17 @@ public class AliquotsByPallet extends QueryObject {
 
     @Override
     protected List<Object> postProcess(List<Object> results) {
-        AliquotPosition aliquotPosition;
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         // get the info
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
-            aliquotPosition = a.getAliquotPosition();
             String pnumber = a.getPatientVisit().getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
             String stName = a.getSampleType().getNameShort();
-            String containerLabel = aliquotPosition.getContainer().getLabel();
-            String aliquotLabel = LabelingScheme.getPositionString(
-                new RowColPos(aliquotPosition.getRow(), aliquotPosition
-                    .getCol()), aliquotPosition.getContainer()
-                    .getContainerType());
+            AliquotWrapper aliquotWrapper = new AliquotWrapper(null, a);
+            String aliquotLabel = aliquotWrapper
+                .getPositionString(false, false);
+            String containerLabel = aliquotWrapper.getParent().getLabel();
             modifiedResults.add(new Object[] { aliquotLabel, containerLabel,
                 inventoryId, pnumber, stName });
         }

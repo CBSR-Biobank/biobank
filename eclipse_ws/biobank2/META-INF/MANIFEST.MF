@@ -22,13 +22,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.databinding.beans;bundle-version="1.1.1",
  org.eclipse.jface.databinding;bundle-version="1.2.1",
  org.eclipse.ui.forms;bundle-version="3.3.101",
- scannerConfig;bundle-version="0.7.0",
+ scannerConfig;bundle-version="0.8.0",
  sampleProcessingRobot;bundle-version="0.0.1";resolution:=optional,
  org.eclipse.ui.console;bundle-version="3.4.0",
  org.eclipse.ui.views.log;bundle-version="1.0.100",
- biobank.common;bundle-version="1.1.0"
-Bundle-Version: 1.1.5.c
+ biobank.common
+Bundle-Version: 1.1.5.e
 Bundle-Vendor: AICML
-Import-Package: org.apache.log4j,
- org.apache.log4j.spi
-

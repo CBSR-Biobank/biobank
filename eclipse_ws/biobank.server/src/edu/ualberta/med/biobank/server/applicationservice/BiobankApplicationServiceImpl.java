@@ -208,11 +208,11 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public void logActivity(String action, String patientNumber,
-        String inventoryID, String locationLabel, String details) {
+        String inventoryID, String locationLabel, String details, String type) {
         Logger logger = Logger.getLogger("Biobank.Activity");
         logger.log(Level.toLevel("INFO"), MessageGenerator
             .generateStringMessage(action, patientNumber, inventoryID,
-                locationLabel, details));
+                locationLabel, details, type));
     }
 
 }

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common;
+package edu.ualberta.med.biobank.util;
 
 public class RowColPos implements Comparable<RowColPos> {
     public Integer row;

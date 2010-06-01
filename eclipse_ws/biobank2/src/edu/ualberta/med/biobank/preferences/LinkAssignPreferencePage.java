@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
@@ -28,7 +29,13 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CANCEL,
             "Cancel barcode:", getFieldEditorParent()));
         addField(new BooleanFieldEditor(
-            PreferenceConstants.LINK_ASSIGN_ASK_PRINT,
+            PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
+            "Save activity logs into a file", getFieldEditorParent()));
+        addField(new DirectoryFieldEditor(
+            PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+            "Path for activity logs files", getFieldEditorParent()));
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT,
             "Ask to print activity log", getFieldEditorParent()));
     }
 

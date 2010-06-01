@@ -16,8 +16,8 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.util.RowColPos;
 
 public class MultiSelectionManager {
 

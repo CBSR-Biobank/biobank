@@ -43,6 +43,12 @@ public enum LogProperty {
         public void setValue(Log log, String value) {
             log.setDetails(value);
         }
+    },
+    TYPE("type") {
+        @Override
+        public void setValue(Log log, String value) {
+            log.setType(value);
+        }
     };
 
     private String propertyName;

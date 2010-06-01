@@ -91,6 +91,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.views.ReportsView;
@@ -394,10 +395,13 @@ public class ReportsEditor extends BiobankFormBase {
                     }
                     bw.close();
                 }
-            } else
+            } else {
                 ReportingUtils.printReport(createDynamicReport(query.getName(),
                     params, columnInfo, listData));
-
+                ((BiobankApplicationService) SessionManager.getAppService())
+                    .logActivity("print", null, null, null, query.getName(),
+                        "report");
+            }
             return true;
         }
         return false;

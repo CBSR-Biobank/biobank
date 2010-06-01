@@ -19,8 +19,7 @@ public class PrintHandler extends AbstractHandler implements IHandler {
             .getActiveWorkbenchWindow().getShell(), "Print",
             "Do you want to print information ?");
         if (doPrint) {
-            if (form.print())
-                form.setPrinted(true);
+            form.print();
         }
 
         return null;
