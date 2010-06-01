@@ -64,6 +64,7 @@ public class CancelConfirmWidget extends BiobankWidget {
                     } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
                         try {
                             form.reset();
+                            form.setAfterKeyCancel();
                         } catch (Exception ex) {
                             logger.error(
                                 "Error while reseting pallet values", ex); //$NON-NLS-1$

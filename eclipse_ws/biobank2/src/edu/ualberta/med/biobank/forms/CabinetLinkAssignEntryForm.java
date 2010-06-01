@@ -676,8 +676,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 aliquot.setSampleType(null);
             }
         } else {
-            viewerSampleTypes.setSelection(new StructuredSelection(aliquot
-                .getSampleType()));
+            SampleTypeWrapper type = aliquot.getSampleType();
+            if (type != null) {
+                viewerSampleTypes.setSelection(new StructuredSelection(type));
+            }
             viewerSampleTypes.getCombo().setEnabled(false);
         }
         return studiesSampleTypes.size();
