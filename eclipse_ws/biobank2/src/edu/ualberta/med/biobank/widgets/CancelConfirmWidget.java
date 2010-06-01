@@ -52,7 +52,7 @@ public class CancelConfirmWidget extends BiobankWidget {
         confirmCancelText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.keyCode == 13) {
+                if (e.character == SWT.CR) {
                     String text = confirmCancelText.getText();
                     if (BioBankPlugin.getDefault().isConfirmBarcode(text)
                         && confirmButton.isEnabled()) {
@@ -117,6 +117,11 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     public void reset() {
         confirmCancelText.setText("");
+    }
+
+    @Override
+    public boolean setFocus() {
+        return confirmCancelText.setFocus();
     }
 
 }

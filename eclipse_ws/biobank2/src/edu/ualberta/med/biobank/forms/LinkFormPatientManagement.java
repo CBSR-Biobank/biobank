@@ -95,7 +95,7 @@ public class LinkFormPatientManagement {
         patientNumberText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13 && !aliquotAdminForm.afterKeyCancel
+                if (e.character == SWT.CR && !aliquotAdminForm.afterKeyCancel
                     && !aliquotAdminForm.afterInitialization) {
                     ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
                 }

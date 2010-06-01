@@ -78,7 +78,7 @@ public class SearchView extends ViewPart {
         searchText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (e.keyCode == 13) {
+                if (e.character == SWT.CR) {
                     search();
                 }
             }

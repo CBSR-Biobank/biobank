@@ -405,6 +405,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void run() {
                 typesSelectionPerRowComposite.setEnabled(everythingOk);
+                for (SampleTypeSelectionWidget typeWidget : sampleTypeWidgets) {
+                    if (typeWidget.isComboEnabled()) {
+                        typeWidget.setFocus();
+                        break;
+                    }
+                }
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
@@ -614,9 +620,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     public void reset() throws Exception {
         super.reset();
         setDirty(false);
-        reset(true);
         fieldsComposite.setEnabled(true);
         setScanValid(true);
+        reset(true);
     }
 
     public void reset(boolean resetAll) {

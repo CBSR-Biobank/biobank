@@ -247,6 +247,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 @Override
                 public void textModified() {
                     viewerSampleTypes.setInput(null);
+                    positionTextModified = true;
+                    resultShownValue.setValue(Boolean.FALSE);
+                    hidePositions();
                 }
             });
 
@@ -388,8 +391,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                                 int typeListSize = setTypeCombosLists();
                                 if (typeListSize == 0) {
                                     newCabinetPosition.setFocus();
-                                } else if (typeListSize == 1) {
-                                    checkButton.setFocus();
                                 } else {
                                     viewerSampleTypes.getCombo().setFocus();
                                 }
@@ -406,6 +407,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 if (radioNew.getSelection()) {
                     viewerSampleTypes.setInput(null);
                 }
+                resultShownValue.setValue(Boolean.FALSE);
+                hidePositions();
             }
         });
         newCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
