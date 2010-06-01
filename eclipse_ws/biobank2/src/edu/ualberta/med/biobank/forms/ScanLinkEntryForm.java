@@ -115,7 +115,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
         SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
             .get(sampleTypeWidgets.size() - 1);
-        lastWidget.setNextWidget(getCancelConfirmWidget());
+        lastWidget.setNextWidget(cancelConfirmWidget);
 
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             typesFilledValue, Messages
@@ -627,7 +627,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     public void reset(boolean resetAll) {
         linkFormPatientManagement.reset(resetAll);
-        getCancelConfirmWidget().reset();
+        cancelConfirmWidget.reset();
         removeRescanMode();
         setScanHasBeenLauched(false);
         setScanNotLauched();

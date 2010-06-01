@@ -498,11 +498,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                cancelConfirmWidget.setFocus();
                 displayPalletPositions();
                 palletWidget.setCells(cells);
                 setDirty(true);
                 setRescanMode();
-                focusOnCancelConfirmText();
                 containersComposite.layout(true, true);
             }
         });

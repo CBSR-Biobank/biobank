@@ -49,6 +49,7 @@ public class CancelConfirmWidget extends BiobankWidget {
         GridData gd = new GridData();
         gd.widthHint = 100;
         confirmCancelText.setLayoutData(gd);
+
         confirmCancelText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
