@@ -3,22 +3,19 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class LoggingInfoTable extends InfoTableWidget<Object> {
+public class LoggingInfoTable extends InfoTableWidget<Log> {
 
-    public LoggingInfoTable(Composite parent, List<Object> collection,
+    public LoggingInfoTable(Composite parent, List<Log> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, collection, headings, columnWidths, rowsPerPage);
     }
 
     class TableRowData {
-        PatientWrapper patient;
-        String pnumber;
-        String studyNameShort;
 
         @Override
         public String toString() {
@@ -57,28 +54,23 @@ public class LoggingInfoTable extends InfoTableWidget<Object> {
         return null;
     }
 
-    // XXX getCollectionModelObject
-    @Override
-    public Object getCollectionModelObject(Object o) throws Exception {
-        return null;
-    }
-
-    @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
-        return ((TableRowData) o).toString();
-    }
+    //
 
     // XXX getCollection
     @Override
-    public List<Object> getCollection() {
+    public List<Log> getCollection() {
         return null;
     }
 
     // XXX getSelection
     @Override
-    public Object getSelection() {
+    public Log getSelection() {
+        return null;
+    }
+
+    @Override
+    protected String getCollectionModelObjectToString(Object o) {
+        // TODO Auto-generated method stub
         return null;
     }
 }

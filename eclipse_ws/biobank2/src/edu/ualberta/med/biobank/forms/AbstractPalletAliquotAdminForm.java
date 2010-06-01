@@ -227,6 +227,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 currentPlateToScan);
             ScanCell[][] scanCells = null;
             if (isScanChoiceSimple) {
+                // ScannerConfigPlugin.scan appears to be stable
+                // (30+ consecutive scans turned up no problem)
                 scanCells = ScannerConfigPlugin.scan(plateNum);
             } else {
                 scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);

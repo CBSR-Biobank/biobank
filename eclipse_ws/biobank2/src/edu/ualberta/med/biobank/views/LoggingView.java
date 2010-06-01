@@ -18,6 +18,7 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 //DateTimeWidget
@@ -29,11 +30,14 @@ public class LoggingView extends ViewPart {
     public static LoggingView loggingView;
 
     private Composite top;
+
     private Label userLabel, formLabel, actionLabel, patientNumLabel,
         inventoryIdLabel, containerTypeLabel, containerLabelLabel,
         startDateLabel, stopDateLabel, detailsLabel;
+
     BiobankText patientNumTextInput, inventoryIdTextInput,
         containerLabelTextInput, detailsTextInput;
+
     Combo userCombo, formCombo, actionCombo, containerTypeCombo,
         startDateCombo, stopDateCombo;
 
@@ -233,7 +237,8 @@ public class LoggingView extends ViewPart {
         detailsTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         detailsTextInput.addTraverseListener(new TraverseListener() {
             public void keyTraversed(TraverseEvent e) {
-                switch (e.detail) { // Traverse to searchButton
+                // Traverse to searchButton from detailsTextInput
+                switch (e.detail) {
                 case SWT.TRAVERSE_TAB_NEXT:
                 case SWT.TRAVERSE_TAB_PREVIOUS: {
                     searchButton.setFocus();
@@ -293,11 +298,35 @@ public class LoggingView extends ViewPart {
                     System.out.println("Search Logs");
                     FormInput input = new FormInput(null, "Logging Form Input");
                     try {
+                        LogQuery.getInstance().setSearchQueryItem("user",
+                            userCombo.getText());
+                        LogQuery.getInstance().setSearchQueryItem("form",
+                            formCombo.getText());
+                        LogQuery.getInstance().setSearchQueryItem("action",
+                            actionCombo.getText());
+                        LogQuery.getInstance().setSearchQueryItem(
+                            "patientNumber", patientNumTextInput.getText());
+                        LogQuery.getInstance().setSearchQueryItem(
+                            "inventoryId", inventoryIdTextInput.getText());
+                        LogQuery.getInstance().setSearchQueryItem(
+                            "containerType", containerTypeCombo.getText());
+                        LogQuery.getInstance().setSearchQueryItem("details",
+                            detailsTextInput.getText());
+                        LogQuery.getInstance().setSearchQueryItem("startDate",
+                            startDateCombo.getText());
+                        LogQuery.getInstance().setSearchQueryItem("stopDate",
+                            stopDateCombo.getText());
+                        LogQuery.getInstance()
+                            .setSearchQueryItem("containerLabel",
+                                containerLabelTextInput.getText());
+
+                        /* creates logging view */
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().openEditor(input, LoggingForm.ID);
                     } catch (Exception ex) {
                         BioBankPlugin.openAsyncError("Error",
-                            "There was an error opening: Editor LoggingForm!");
+                            "There was an error opening: LoggingForm.\n"
+                                + ex.getLocalizedMessage());
                     }
                     break;
                 }
