@@ -1,6 +1,13 @@
 package edu.ualberta.med.biobank.views;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
@@ -16,10 +23,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 //DateTimeWidget
 //aicml-med.cs.ualberta.ca:8443
@@ -29,19 +39,51 @@ public class LoggingView extends ViewPart {
     public static final String ID = "edu.ualberta.med.biobank.forms.LoggingView";
     public static LoggingView loggingView;
 
+    private static enum ComboListType {
+        USER, TYPE, ACTION
+    }
+
     private Composite top;
 
-    private Label userLabel, formLabel, actionLabel, patientNumLabel,
-        inventoryIdLabel, containerTypeLabel, containerLabelLabel,
-        startDateLabel, stopDateLabel, detailsLabel;
+    private Label userLabel, typeLabel, actionLabel, patientNumLabel,
+        inventoryIdLabel, startDateLabel, stopDateLabel, detailsLabel,
+        locationLabel;
+    // containerTypeLabel, containerLabelLabel
 
-    BiobankText patientNumTextInput, inventoryIdTextInput,
-        containerLabelTextInput, detailsTextInput;
+    BiobankText patientNumTextInput, inventoryIdTextInput, detailsTextInput,
+        locationTextInput;
+    // containerLabelTextInput
 
-    Combo userCombo, formCombo, actionCombo, containerTypeCombo,
-        startDateCombo, stopDateCombo;
+    Combo userCombo, typeCombo, actionCombo, startDateCombo, stopDateCombo;
+    // containerTypeCombo
 
     Button clearButton, searchButton;
+
+    private final Listener alphaNumericListener = new Listener() {
+        public void handleEvent(Event e) {
+            String string = e.text;
+            for (int i = 0; i < string.length(); i++) {
+                // input must be alpha numeric
+                if (!(string.matches("\\p{Alnum}+"))) {
+                    e.doit = false;
+                    return;
+                }
+            }
+        }
+    };
+
+    private final KeyListener enterListener = new KeyListener() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.keyCode == SWT.CR) {
+                searchDatabase();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+    };
 
     public LoggingView() {
         loggingView = this;
@@ -78,23 +120,25 @@ public class LoggingView extends ViewPart {
         userLabel.setVisible(true);
 
         userCombo = new Combo(top, SWT.READ_ONLY);
-        userCombo.setItems(this.loadUserList()); // makes personal copy
+        userCombo.setItems(this.loadComboList(ComboListType.USER));
         userCombo.select(0);
         userCombo.setVisible(true);
         userCombo.setFocus();
         userCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        userCombo.addKeyListener(enterListener);
 
-        formLabel = new Label(top, SWT.NO_BACKGROUND);
-        formLabel.setText("Form:");
-        formLabel.setAlignment(SWT.LEFT);
-        formLabel.setBackground(colorWhite);
-        formLabel.setVisible(true);
+        typeLabel = new Label(top, SWT.NO_BACKGROUND);
+        typeLabel.setText("Type:");
+        typeLabel.setAlignment(SWT.LEFT);
+        typeLabel.setBackground(colorWhite);
+        typeLabel.setVisible(true);
 
-        formCombo = new Combo(top, SWT.READ_ONLY);
-        formCombo.setItems(this.loadFormList()); // makes personal copy
-        formCombo.select(0);
-        formCombo.setVisible(true);
-        formCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        typeCombo = new Combo(top, SWT.READ_ONLY);
+        typeCombo.setItems(this.loadComboList(ComboListType.TYPE));
+        typeCombo.select(0);
+        typeCombo.setVisible(true);
+        typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        typeCombo.addKeyListener(enterListener);
 
         actionLabel = new Label(top, SWT.NO_BACKGROUND);
         actionLabel.setText("Action:");
@@ -103,10 +147,11 @@ public class LoggingView extends ViewPart {
         actionLabel.setVisible(true);
 
         actionCombo = new Combo(top, SWT.READ_ONLY);
-        actionCombo.setItems(this.loadActionList());
+        actionCombo.setItems(this.loadComboList(ComboListType.ACTION));
         actionCombo.select(0);
         actionCombo.setVisible(true);
         actionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        actionCombo.addKeyListener(enterListener);
 
         new Label(top, SWT.NONE);
         new Label(top, SWT.NONE);
@@ -121,18 +166,8 @@ public class LoggingView extends ViewPart {
         patientNumTextInput.setVisible(true);
         patientNumTextInput
             .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        patientNumTextInput.addListener(SWT.Verify, new Listener() {
-            public void handleEvent(Event e) {
-                String string = e.text;
-                for (int i = 0; i < string.length(); i++) {
-                    // input must be alpha numeric
-                    if (!(string.matches("\\p{Alnum}+"))) {
-                        e.doit = false;
-                        return;
-                    }
-                }
-            }
-        });
+        patientNumTextInput.addListener(SWT.Verify, alphaNumericListener);
+        patientNumTextInput.addKeyListener(enterListener);
 
         inventoryIdLabel = new Label(top, SWT.NO_BACKGROUND);
         inventoryIdLabel.setText("Inventory ID:");
@@ -144,58 +179,52 @@ public class LoggingView extends ViewPart {
         inventoryIdTextInput.setVisible(true);
         inventoryIdTextInput.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL));
-        inventoryIdTextInput.addListener(SWT.Verify, new Listener() {
-            public void handleEvent(Event e) {
-                String string = e.text;
-                for (int i = 0; i < string.length(); i++) {
-                    // input must be alpha numeric
-                    if (!(string.matches("\\p{Alnum}+"))) {
-                        e.doit = false;
-                        return;
-                    }
-                }
-            }
-        });
+        inventoryIdTextInput.addListener(SWT.Verify, alphaNumericListener);
+        inventoryIdTextInput.addKeyListener(enterListener);
 
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
+        locationLabel = new Label(top, SWT.NO_BACKGROUND);
+        locationLabel.setText("Location:");
+        locationLabel.setAlignment(SWT.LEFT);
+        locationLabel.setBackground(colorWhite);
+        locationLabel.setVisible(true);
 
-        containerTypeLabel = new Label(top, SWT.NO_BACKGROUND);
-        containerTypeLabel.setText("Container Type:");
-        containerTypeLabel.setAlignment(SWT.LEFT);
-        containerTypeLabel.setBackground(colorWhite);
-        containerTypeLabel.setVisible(true);
+        locationTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
+        locationTextInput.setVisible(true);
+        locationTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        locationTextInput.addListener(SWT.Verify, alphaNumericListener);
+        locationTextInput.addKeyListener(enterListener);
 
-        containerTypeCombo = new Combo(top, SWT.READ_ONLY);
-        containerTypeCombo.setItems(this.loadContainerTypeList());
-        containerTypeCombo.select(0);
-        containerTypeCombo.setVisible(true);
-        containerTypeCombo
-            .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        containerLabelLabel = new Label(top, SWT.NO_BACKGROUND);
-        containerLabelLabel.setText("Container Label:");
-        containerLabelLabel.setAlignment(SWT.LEFT);
-        containerLabelLabel.setBackground(colorWhite);
-        containerLabelLabel.setVisible(true);
-
-        containerLabelTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
-        containerLabelTextInput.setVisible(true);
-        containerLabelTextInput.setLayoutData(new GridData(
-            GridData.FILL_HORIZONTAL));
-        containerLabelTextInput.addListener(SWT.Verify, new Listener() {
-            public void handleEvent(Event e) {
-                String string = e.text;
-                for (int i = 0; i < string.length(); i++) {
-                    // input must be alpha numeric
-                    if (!(string.matches("\\p{Alnum}+"))) {
-                        e.doit = false;
-                        return;
-                    }
-                }
-            }
-        });
-
+        /*
+         * new Label(top, SWT.NONE); new Label(top, SWT.NONE);
+         * 
+         * containerTypeLabel = new Label(top, SWT.NO_BACKGROUND);
+         * containerTypeLabel.setText("Container Type:");
+         * containerTypeLabel.setAlignment(SWT.LEFT);
+         * containerTypeLabel.setBackground(colorWhite);
+         * containerTypeLabel.setVisible(true);
+         * 
+         * containerTypeCombo = new Combo(top, SWT.READ_ONLY);
+         * containerTypeCombo.setItems(this.loadContainerTypeList());
+         * containerTypeCombo.select(0); containerTypeCombo.setVisible(true);
+         * containerTypeCombo .setLayoutData(new
+         * GridData(GridData.FILL_HORIZONTAL));
+         * 
+         * containerLabelLabel = new Label(top, SWT.NO_BACKGROUND);
+         * containerLabelLabel.setText("Container Label:");
+         * containerLabelLabel.setAlignment(SWT.LEFT);
+         * containerLabelLabel.setBackground(colorWhite);
+         * containerLabelLabel.setVisible(true);
+         * 
+         * containerLabelTextInput = new BiobankText(top, SWT.SINGLE |
+         * SWT.BORDER); containerLabelTextInput.setVisible(true);
+         * containerLabelTextInput.setLayoutData(new GridData(
+         * GridData.FILL_HORIZONTAL));
+         * containerLabelTextInput.addListener(SWT.Verify, new Listener() {
+         * public void handleEvent(Event e) { String string = e.text; for (int i
+         * = 0; i < string.length(); i++) { // input must be alpha numeric if
+         * (!(string.matches("\\p{Alnum}+"))) { e.doit = false; return; } } }
+         * });
+         */
         new Label(top, SWT.NONE);
         new Label(top, SWT.NONE);
 
@@ -205,11 +234,12 @@ public class LoggingView extends ViewPart {
         startDateLabel.setBackground(colorWhite);
         startDateLabel.setVisible(true);
 
-        startDateCombo = new Combo(top, SWT.READ_ONLY);
-        startDateCombo.setItems(this.loadStartDateList());
+        startDateCombo = new Combo(top, SWT.READ_ONLY | SWT.VERTICAL);
+        startDateCombo.setItems(this.loadStartDateList(1, 90));
         startDateCombo.select(0);
         startDateCombo.setVisible(true);
         startDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        startDateCombo.addKeyListener(enterListener);
 
         stopDateLabel = new Label(top, SWT.NO_BACKGROUND);
         stopDateLabel.setText("Stop Date:");
@@ -218,10 +248,11 @@ public class LoggingView extends ViewPart {
         stopDateLabel.setVisible(true);
 
         stopDateCombo = new Combo(top, SWT.READ_ONLY);
-        stopDateCombo.setItems(this.loadStopDateList());
+        stopDateCombo.setItems(this.loadStartDateList(0, 90));
         stopDateCombo.select(0);
         stopDateCombo.setVisible(true);
         stopDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        stopDateCombo.addKeyListener(enterListener);
 
         new Label(top, SWT.NONE);
         new Label(top, SWT.NONE);
@@ -235,18 +266,8 @@ public class LoggingView extends ViewPart {
         detailsTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
         detailsTextInput.setVisible(true);
         detailsTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        detailsTextInput.addTraverseListener(new TraverseListener() {
-            public void keyTraversed(TraverseEvent e) {
-                // Traverse to searchButton from detailsTextInput
-                switch (e.detail) {
-                case SWT.TRAVERSE_TAB_NEXT:
-                case SWT.TRAVERSE_TAB_PREVIOUS: {
-                    searchButton.setFocus();
-                    e.doit = false;
-                }
-                }
-            }
-        });
+        detailsTextInput.addListener(SWT.Verify, alphaNumericListener);
+        detailsTextInput.addKeyListener(enterListener);
 
         new Label(top, SWT.NONE);
         new Label(top, SWT.NONE);
@@ -274,12 +295,13 @@ public class LoggingView extends ViewPart {
                 switch (e.type) {
                 case SWT.Selection:
                     userCombo.select(0);
-                    formCombo.select(0);
+                    typeCombo.select(0);
                     actionCombo.select(0);
                     patientNumTextInput.setText("");
                     inventoryIdTextInput.setText("");
-                    containerTypeCombo.select(0);
-                    containerLabelTextInput.setText("");
+                    locationTextInput.setText("");
+                    // containerTypeCombo.select(0);
+                    // containerLabelTextInput.setText("");
                     startDateCombo.select(0);
                     stopDateCombo.select(0);
                     detailsTextInput.setText("");
@@ -291,43 +313,12 @@ public class LoggingView extends ViewPart {
         searchButton = new Button(buttonComposite, SWT.PUSH);
         searchButton.setText("Search Logs");
         searchButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        searchButton.addKeyListener(enterListener);
         searchButton.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event e) {
                 switch (e.type) {
                 case SWT.Selection:
-                    System.out.println("Search Logs");
-                    FormInput input = new FormInput(null, "Logging Form Input");
-                    try {
-                        LogQuery.getInstance().setSearchQueryItem("user",
-                            userCombo.getText());
-                        LogQuery.getInstance().setSearchQueryItem("form",
-                            formCombo.getText());
-                        LogQuery.getInstance().setSearchQueryItem("action",
-                            actionCombo.getText());
-                        LogQuery.getInstance().setSearchQueryItem(
-                            "patientNumber", patientNumTextInput.getText());
-                        LogQuery.getInstance().setSearchQueryItem(
-                            "inventoryId", inventoryIdTextInput.getText());
-                        LogQuery.getInstance().setSearchQueryItem(
-                            "containerType", containerTypeCombo.getText());
-                        LogQuery.getInstance().setSearchQueryItem("details",
-                            detailsTextInput.getText());
-                        LogQuery.getInstance().setSearchQueryItem("startDate",
-                            startDateCombo.getText());
-                        LogQuery.getInstance().setSearchQueryItem("stopDate",
-                            stopDateCombo.getText());
-                        LogQuery.getInstance()
-                            .setSearchQueryItem("containerLabel",
-                                containerLabelTextInput.getText());
-
-                        /* creates logging view */
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().openEditor(input, LoggingForm.ID);
-                    } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Error",
-                            "There was an error opening: LoggingForm.\n"
-                                + ex.getLocalizedMessage());
-                    }
+                    searchDatabase();
                     break;
                 }
             }
@@ -344,33 +335,107 @@ public class LoggingView extends ViewPart {
     public void setFocus() {
     }
 
-    private String[] loadUserList() {
-        String list[] = { "Bobby", "Margret", "James" };
-        return list;
+    private void searchDatabase() {
+        FormInput input = new FormInput(null, "Logging Form Input");
+        try {
+            LogQuery.getInstance().setSearchQueryItem("user",
+                userCombo.getText());
+            LogQuery.getInstance().setSearchQueryItem("type",
+                typeCombo.getText());
+            LogQuery.getInstance().setSearchQueryItem("action",
+                actionCombo.getText());
+            LogQuery.getInstance().setSearchQueryItem("patientNumber",
+                patientNumTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem("inventoryId",
+                inventoryIdTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem("location",
+                locationTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem("details",
+                detailsTextInput.getText());
+            LogQuery.getInstance().setSearchQueryItem("startDate",
+                startDateCombo.getText());
+            LogQuery.getInstance().setSearchQueryItem("stopDate",
+                stopDateCombo.getText());
+            /*
+             * LogQuery.getInstance().setSearchQueryItem( "containerType",
+             * containerTypeCombo.getText()); LogQuery.getInstance()
+             * .setSearchQueryItem("containerLabel",
+             * containerLabelTextInput.getText());
+             */
+
+            /* creates logging view */
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().openEditor(input, LoggingForm.ID);
+        } catch (Exception ex) {
+            BioBankPlugin.openAsyncError("Error",
+                "There was an error opening: LoggingForm.\n"
+                    + ex.getLocalizedMessage());
+        }
     }
 
-    private String[] loadFormList() {
-        String list[] = { "Item One", "Item Two", "Item Three", "Item Four" };
-        return list;
+    private static String[] arrayListStringToStringList(
+        List<String> listArrayString) {
+
+        if (listArrayString == null)
+            return null;
+
+        int listArraySize = listArrayString.size();
+
+        String listString[] = new String[listArraySize + 1];
+        listString[0] = "";
+        for (int i = 1; i <= listArraySize; i++) {
+            listString[i] = listArrayString.get(i - 1);
+        }
+        return listString;
     }
 
-    private String[] loadActionList() {
-        String list[] = { "Item One", "Item Two", "Item Three", "Item Four" };
-        return list;
+    private String[] loadComboList(ComboListType possibleList) {
+        try {
+            List<String> arrayList = null;
+
+            // XXX run this code later on? ensure this does
+            // not get called before logging in
+            if (!SessionManager.getInstance().isConnected()) {
+                return new String[] { "ERROR" };
+            }
+
+            switch (possibleList) {
+            case USER:
+                arrayList = LogWrapper.getPossibleUsernames(SessionManager
+                    .getAppService());
+                break;
+
+            case TYPE:
+                arrayList = LogWrapper.getPossibleTypes(SessionManager
+                    .getAppService());
+                break;
+
+            case ACTION:
+                arrayList = LogWrapper.getPossibleActions(SessionManager
+                    .getAppService());
+                break;
+            }
+            return arrayListStringToStringList(arrayList);
+
+        } catch (ApplicationException ex) {
+            BioBankPlugin.openAsyncError("Error", "There was an error: \n"
+                + ex.getLocalizedMessage());
+        }
+        return null;
     }
 
-    private String[] loadContainerTypeList() {
-        String list[] = { "Item One", "Item Two", "Item Three", "Item Four" };
-        return list;
-    }
+    private String[] loadStartDateList(long startOffset, long listLength) {
+        String list[] = new String[(int) listLength];
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+        Calendar nowCal = new GregorianCalendar();
+        Calendar beforeCal = new GregorianCalendar();
+        for (long i = startOffset; i < listLength + startOffset; i++) {
+            beforeCal.setTimeInMillis(nowCal.getTimeInMillis() - i * 1000 * 60
+                * 60 * 24);
+            list[(int) i - (int) startOffset] = dateFormat.format(beforeCal
+                .getTime());
+        }
 
-    private String[] loadStartDateList() {
-        String list[] = { "Item One", "Item Two", "Item Three", "Item Four" };
-        return list;
-    }
-
-    private String[] loadStopDateList() {
-        String list[] = { "Item One", "Item Two", "Item Three", "Item Four" };
         return list;
     }
 }

@@ -5,7 +5,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.logs.LogQuery;
@@ -19,15 +18,17 @@ public class LoggingForm extends BiobankViewForm {
     public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
 
     private BiobankText userLabel;
-    private BiobankText formLabel;
+    private BiobankText typeLabel;
     private BiobankText actionLabel;
     private BiobankText patientNumLabel;
     private BiobankText inventoryIDLabel;
+    private BiobankText locationLabel;
     private BiobankText detailsLabel;
-    private BiobankText containerTypeLabel;
-    private BiobankText containerLabelLabel;
     private BiobankText startDateLabel;
     private BiobankText stopDateLabel;
+
+    // private BiobankText containerTypeLabel;
+    // private BiobankText containerLabelLabel;
 
     @Override
     public void init() throws Exception {
@@ -47,53 +48,99 @@ public class LoggingForm extends BiobankViewForm {
             BioBankPlugin.IMG_STUDY));
 
         Composite client = toolkit.createComposite(form.getBody());
-        client.setLayout(new GridLayout(4, false));
+        client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        userLabel = createReadOnlyLabelledField(client, SWT.NONE, "User");
-        containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Container Type");
-        formLabel = createReadOnlyLabelledField(client, SWT.NONE, "Form");
-        containerLabelLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Container Label");
-        actionLabel = createReadOnlyLabelledField(client, SWT.NONE, "Action");
-        startDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Start Date");
-        patientNumLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        Composite leftClient = toolkit.createComposite(client);
+        leftClient.setLayout(new GridLayout(2, false));
+        leftClient.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
+            | GridData.VERTICAL_ALIGN_BEGINNING));
+        toolkit.paintBordersFor(leftClient);
+
+        Composite rightClient = toolkit.createComposite(client);
+        rightClient.setLayout(new GridLayout(2, false));
+        rightClient.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
+            | GridData.VERTICAL_ALIGN_BEGINNING));
+        toolkit.paintBordersFor(rightClient);
+
+        /* a grid might make this easier */
+        userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "User");
+        typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Type");
+        actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            "Action");
+        detailsLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            "Details");
+
+        patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Patient #");
-        stopDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Stop Date");
-        inventoryIDLabel = createReadOnlyLabelledField(client, SWT.NONE,
+        locationLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
+            "Location");
+        inventoryIDLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Inventory ID");
-        detailsLabel = createReadOnlyLabelledField(client, SWT.NONE, "Details");
 
-        /* Copy over the search query */
-        userLabel.setText(LogQuery.getInstance().getSearchQueryItem("user"));
-        containerTypeLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "containerType"));
-        formLabel.setText(LogQuery.getInstance().getSearchQueryItem("form"));
-        containerLabelLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "containerLabel"));
-        actionLabel
-            .setText(LogQuery.getInstance().getSearchQueryItem("action"));
-        startDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "startDate"));
-        stopDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "stopDate"));
-        patientNumLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "patientNumber"));
-        inventoryIDLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "inventoryId"));
-        detailsLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "details"));
+        startDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
+            "Start Date");
+        stopDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
+            "Stop Date");
 
-        Section section = createSection("Search Results");
+        getSearchRequestFields();
 
-        LoggingInfoTable loggingTable = new LoggingInfoTable(section, null,
-            new String[] { "Fat", "Cat", "Rat" }, new int[] { 5, 5, 5 }, 10);
+        generateSearchQueryTable();
+    }
+
+    private void generateSearchQueryTable() {
+
+        LogQuery.getInstance().queryDatabase();
+
+        Composite client = createSectionWithClient("Search Results");
+        LoggingInfoTable loggingTable = new LoggingInfoTable(client, LogQuery
+            .getInstance().getDatabaseResults());
         loggingTable.adaptToToolkit(toolkit, true);
+        loggingTable.setVisible(true);
+        loggingTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(loggingTable);
+    }
 
+    private void getSearchRequestFields() {
+        try {
+            userLabel
+                .setText(LogQuery.getInstance().getSearchQueryItem("user"));
+            actionLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "action"));
+            typeLabel
+                .setText(LogQuery.getInstance().getSearchQueryItem("type"));
+            startDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "startDate"));
+            stopDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "stopDate"));
+            patientNumLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "patientNumber"));
+            inventoryIDLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "inventoryId"));
+            locationLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "location"));
+
+            detailsLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+                "details"));
+            /*
+             * containerTypeLabel = createReadOnlyLabelledField(client,
+             * SWT.NONE, "Container Type"); containerLabelLabel
+             * =createReadOnlyLabelledField(client, SWT.NONE,
+             * "Container Label");
+             */
+            /*
+             * containerTypeLabel.setText(LogQuery.getInstance().getSearchQueryItem
+             * ( "containerType"));
+             * 
+             * containerLabelLabel
+             * .setText(LogQuery.getInstance().getSearchQueryItem(
+             * "containerLabel"));
+             */
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO pyrx generate a proper responce here
+        }
     }
 
     @Override
