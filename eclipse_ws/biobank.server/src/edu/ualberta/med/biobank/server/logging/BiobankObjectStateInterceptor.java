@@ -31,13 +31,16 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
     private void log(Object entity, Serializable id, Object[] state,
         Object[] previousState, String[] propertyNames, Type[] types,
         String action) {
+        String name = entity.getClass().getSimpleName();
         BiobankObjectStateLogger logger = BiobankObjectStateLogger
-            .getlogger(entity.getClass().getSimpleName());
+            .getlogger(name);
         if (logger != null) {
             try {
                 logger.logMessage(entity, action);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                ExceptionUtils.writeMsgToTmpFile(name
+                    + "_biobankstateinterceptor", ex);
             }
         }
     }

@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.test.wrappers.TestContact;
 import edu.ualberta.med.biobank.test.wrappers.TestContainer;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerLabelingScheme;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerType;
+import edu.ualberta.med.biobank.test.wrappers.TestPatient;
 import edu.ualberta.med.biobank.test.wrappers.TestPatientVisit;
 import edu.ualberta.med.biobank.test.wrappers.TestPvSourceVessel;
 import edu.ualberta.med.biobank.test.wrappers.TestSampleStorage;
@@ -27,8 +28,8 @@ import edu.ualberta.med.biobank.test.wrappers.TestStudy;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
-@SuiteClasses( { TestSite.class, /* TestPatient.class, */
-    TestPatientVisit.class, TestStudy.class, TestContainerLabelingScheme.class,
+@SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
+    TestStudy.class, TestContainerLabelingScheme.class,
     TestPvSourceVessel.class, TestActivityStatus.class, TestAliquot.class,
     TestClinic.class, TestSampleStorage.class, TestSourceVessel.class,
     TestSampleType.class, TestContainer.class, TestContainerType.class,
@@ -39,7 +40,7 @@ public class AllTests {
     @BeforeClass
     public static void setUp() throws Exception {
         appService = ServiceConnection.getAppService(System.getProperty(
-            "server", "http://localhost:8080")
+            "server", "https://localhost:8443")
             + "/biobank2", "testuser", "test");
         DbHelper.setAppService(appService);
     }

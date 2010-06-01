@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.server.logging;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -85,7 +81,7 @@ public class JDBCLogExecutor implements Runnable {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            writeMsgToTmpFile(ex);
+            ExceptionUtils.writeMsgToTmpFile("biobanklogappender", ex);
         }
     }
 
@@ -194,43 +190,6 @@ public class JDBCLogExecutor implements Runnable {
             return "";
         }
         return dateTimeFormatter.format(date);
-    }
-
-    /**
-     * Writes fatal errors to a log file on the system's current directory.
-     * 
-     * @param t
-     */
-    private static void writeMsgToTmpFile(Throwable t) {
-        FileWriter writer = null;
-        try {
-            File f = new File("biobanklogappender" + System.currentTimeMillis()
-                + ".log");
-            writer = new FileWriter(f);
-            writer.write(getErrorAndStack(t));
-            writer.flush();
-
-        } catch (Exception e) {
-        } finally {
-            try {
-                writer.close();
-            } catch (Exception e1) {
-            }
-        }
-    }
-
-    public static String getErrorAndStack(Throwable t) {
-        if (t == null) {
-            return null;
-        }
-        return t.getMessage() + System.getProperty("line.separator")
-            + getStackTrace(t).toString();
-    }
-
-    public static StringBuffer getStackTrace(Throwable t) {
-        StringWriter stringWriter = new java.io.StringWriter();
-        t.printStackTrace(new PrintWriter(stringWriter));
-        return stringWriter.getBuffer();
     }
 
 }
