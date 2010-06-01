@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.server.logging;
 
-import edu.ualberta.med.biobank.server.logging.user.BiobankThreadVariable;
-import edu.ualberta.med.biobank.server.logging.user.UserInfo;
 
 public class MessageGenerator {
 
@@ -9,9 +7,6 @@ public class MessageGenerator {
         String patientNumber, String inventoryID, String locationLabel,
         String details, String type) {
 
-        UserInfo userInfo = BiobankThreadVariable.get();
-        if (null == userInfo)
-            userInfo = new UserInfo();
         StringBuffer sb = new StringBuffer();
         append(sb, LogProperty.ACTION.getPropertyName(), action);
         append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(), patientNumber);

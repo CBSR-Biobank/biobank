@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.logging.logger;
 
+import java.util.Map;
+
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 
@@ -9,11 +11,10 @@ public class PatientStateLogger extends BiobankObjectStateLogger {
     }
 
     @Override
-    protected Log getLogObject(Object obj) {
+    protected Log getLogObject(Object obj, Map<String, Object> statesMap) {
         if (obj instanceof Patient) {
-            Patient patient = (Patient) obj;
             Log log = new Log();
-            log.setPatientNumber(patient.getPnumber());
+            log.setPatientNumber((String) statesMap.get("pNumber"));
             log.setType("Patient");
             return log;
         }

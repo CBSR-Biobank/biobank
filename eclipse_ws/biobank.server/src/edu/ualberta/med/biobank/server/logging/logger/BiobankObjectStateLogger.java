@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.server.logging.logger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,8 +42,9 @@ public abstract class BiobankObjectStateLogger {
      * @param action -- the name of the operation being performed
      * 
      */
-    public void logMessage(Object obj, String action) {
-        Log log = getLogObject(obj);
+    public void logMessage(Object obj, String action,
+        Map<String, Object> statesMap) {
+        Log log = getLogObject(obj, statesMap);
         if (log != null) {
             String message = MessageGenerator.generateStringMessage(action, log
                 .getPatientNumber(), log.getInventoryId(), log
@@ -76,7 +78,8 @@ public abstract class BiobankObjectStateLogger {
         BiobankThreadVariable.set(userInfo);
     }
 
-    protected abstract Log getLogObject(Object obj);
+    protected abstract Log getLogObject(Object obj,
+        Map<String, Object> statesMap);
 
     /**
      * This method logs the message

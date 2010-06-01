@@ -159,9 +159,8 @@ public class LogWrapper extends ModelWrapper<Log> {
         addParam(parametersString, parametersArgs, "patientNumber",
             patientNumber);
         addParam(parametersString, parametersArgs, "inventoryId", inventoryId);
-        addParam(parametersString, parametersArgs, "locationLabel",
-            locationLabel);
-        addParam(parametersString, parametersArgs, "details", details);
+        addLocationLabelParam(parametersString, parametersArgs, locationLabel);
+        addParam(parametersString, parametersArgs, "details", details, false);
         addParam(parametersString, parametersArgs, "type", type);
         String criteriaString = "from " + Log.class.getName();
         if (parametersString.length() > 0) {
@@ -179,12 +178,34 @@ public class LogWrapper extends ModelWrapper<Log> {
 
     private static void addParam(StringBuffer sb, List<Object> parameters,
         String property, Object value) {
+        addParam(sb, parameters, property, value, true);
+    }
+
+    private static void addParam(StringBuffer sb, List<Object> parameters,
+        String property, Object value, boolean strict) {
         if (value != null) {
             if (sb.length() > 0) {
                 sb.append(" and");
             }
-            sb.append(" ").append(property).append("=?");
-            parameters.add(value);
+            sb.append(" ").append(property);
+            if (strict) {
+                sb.append("=?");
+                parameters.add(value);
+            } else {
+                sb.append(" like ?");
+                parameters.add("%" + value + "%");
+            }
+        }
+    }
+
+    private static void addLocationLabelParam(StringBuffer sb,
+        List<Object> parameters, Object value) {
+        if (value != null) {
+            if (sb.length() > 0) {
+                sb.append(" and");
+            }
+            sb.append(" ").append("locationLabel").append(" like ?");
+            parameters.add(value + " (%");
         }
     }
 
