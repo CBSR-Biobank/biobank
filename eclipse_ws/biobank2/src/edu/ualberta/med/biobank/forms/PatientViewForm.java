@@ -41,6 +41,7 @@ public class PatientViewForm extends BiobankViewForm {
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getWrapper();
         retrievePatient();
+        patient.logLookup();
         setPartName("Patient " + patient.getPnumber());
     }
 

@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -147,11 +148,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
-            .getStudy().getStudyPvAttrCollection();
-        if (studyPvAttrCollection != null) {
-            for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
-                studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
+        if (getPatient() != null && getPatient().getStudy() != null) {
+            Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
+                .getStudy().getStudyPvAttrCollection();
+            if (studyPvAttrCollection != null) {
+                for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
+                    studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
+                }
             }
         }
         return studyPvAttrMap;
@@ -270,23 +273,25 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (value != null) {
             // validate the value
             value = value.trim();
-            String type = studyPvAttr.getPvAttrType().getName();
-            List<String> permissibleSplit = null;
+            if (value.length() > 0) {
+                String type = studyPvAttr.getPvAttrType().getName();
+                List<String> permissibleSplit = null;
 
-            if (type.equals("select_single") || type.equals("select_multiple")) {
-                String permissible = studyPvAttr.getPermissible();
-                if (permissible != null) {
-                    permissibleSplit = Arrays.asList(permissible.split(";"));
+                if (type.equals("select_single")
+                    || type.equals("select_multiple")) {
+                    String permissible = studyPvAttr.getPermissible();
+                    if (permissible != null) {
+                        permissibleSplit = Arrays
+                            .asList(permissible.split(";"));
+                    }
                 }
-            }
 
-            if (type.equals("select_single")) {
-                if (!permissibleSplit.contains(value)) {
-                    throw new Exception("value " + value
-                        + "is invalid for label \"" + label + "\"");
-                }
-            } else if (type.equals("select_multiple")) {
-                if (value.length() > 0) {
+                if (type.equals("select_single")) {
+                    if (!permissibleSplit.contains(value)) {
+                        throw new Exception("value " + value
+                            + "is invalid for label \"" + label + "\"");
+                    }
+                } else if (type.equals("select_multiple")) {
                     for (String singleVal : value.split(";")) {
                         if (!permissibleSplit.contains(singleVal)) {
                             throw new Exception("value " + singleVal + " ("
@@ -294,23 +299,25 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                                 + "\"");
                         }
                     }
+                } else if (type.equals("number")) {
+                    Double.parseDouble(value);
+                } else if (type.equals("date_time")) {
+                    DateFormatter.dateFormatter.parse(value);
+                } else if (type.equals("text")) {
+                    // do nothing
+                } else {
+                    throw new Exception("type \"" + type + "\" not tested");
                 }
-            } else if (type.equals("number")) {
-                Double.parseDouble(value);
-            } else if (type.equals("date_time")) {
-                DateFormatter.dateFormatter.parse(value);
-            } else if (type.equals("text")) {
-                // do nothing
-            } else {
-                throw new Exception("type \"" + type + "\" not tested");
             }
         }
 
-        pvAttr = new PvAttrWrapper(appService, new PvAttr());
-        pvAttr.setPatientVisit(this);
-        pvAttr.setStudyPvAttr(studyPvAttr);
+        if (pvAttr == null) {
+            pvAttr = new PvAttrWrapper(appService);
+            pvAttr.setPatientVisit(this);
+            pvAttr.setStudyPvAttr(studyPvAttr);
+            pvAttrMap.put(label, pvAttr);
+        }
         pvAttr.setValue(value);
-        pvAttrMap.put(label, pvAttr);
     }
 
     public void setDateProcessed(Date date) {
@@ -555,5 +562,21 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     public String toString() {
         return getFormattedDateProcessed();
+    }
+
+    @Override
+    protected void log(String action, String details) {
+        String worksheet = "";
+        try {
+            String attr = getPvAttrValue("Worksheet");
+            if (attr != null) {
+                worksheet = " - Worksheet: " + attr;
+            }
+        } catch (Exception e) {
+        }
+        ((BiobankApplicationService) appService).logActivity(action,
+            getPatient().getPnumber(), null, null, "visit " + details
+                + " (Date Processed:" + getFormattedDateProcessed() + worksheet
+                + ")", "Visit");
     }
 }

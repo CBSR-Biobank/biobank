@@ -9,6 +9,7 @@ eclipse_ws/biobank.common/bin
 eclipse_ws/biobank.common/conf/*.xml
 eclipse_ws/biobank.common/lib/*.jar
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/test
+eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.properties
 eclipse_ws/biobank.server/bin
 eclipse_ws/biobank.server/lib/*.jar
 eclipse_ws/biobank.server/output

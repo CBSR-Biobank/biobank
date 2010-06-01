@@ -1,0 +1,4 @@
+* recuperer les classes clm pour objectstate
+* voir comment utiliser pour inserer informations
+* voir la methode pour ajouter infos non specifiques à une instance
+* tests

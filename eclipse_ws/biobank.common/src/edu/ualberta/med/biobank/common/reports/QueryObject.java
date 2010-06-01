@@ -30,6 +30,7 @@ public abstract class QueryObject {
         aMap.put(PVsByStudy.NAME, PVsByStudy.class);
         aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
         aMap.put(PatientWBC.NAME, PatientWBC.class);
+        aMap.put(AliquotsByPallet.NAME, AliquotsByPallet.class);
         aMap.put(AliquotCount.NAME, AliquotCount.class);
         aMap.put(AliquotInvoiceByClinic.NAME, AliquotInvoiceByClinic.class);
         aMap.put(AliquotInvoiceByPatient.NAME, AliquotInvoiceByPatient.class);
@@ -121,7 +122,7 @@ public abstract class QueryObject {
     }
 
     public List<Object> generate(WritableApplicationService appService,
-        List<Object> params) throws Exception {
+        List<Object> params) throws ApplicationException, BiobankCheckException {
         return postProcess(executeQuery(appService, preProcess(params)));
     }
 

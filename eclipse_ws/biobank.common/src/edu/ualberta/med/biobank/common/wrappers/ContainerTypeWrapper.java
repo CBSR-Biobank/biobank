@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.util.LabelingScheme;
+import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -723,5 +725,16 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     protected void resetInternalField() {
         deletedChildTypes.clear();
         deletedSampleTypes.clear();
+    }
+
+    public String getPositionString(RowColPos position) {
+        return LabelingScheme.getPositionString(position,
+            getChildLabelingScheme(), getRowCapacity(), getColCapacity());
+    }
+
+    public RowColPos getRowColFromPositionString(String position)
+        throws Exception {
+        return LabelingScheme.getRowColFromPositionString(position,
+            getChildLabelingScheme(), getRowCapacity(), getColCapacity());
     }
 }

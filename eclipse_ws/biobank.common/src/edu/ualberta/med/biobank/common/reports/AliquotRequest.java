@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -15,14 +17,14 @@ public class AliquotRequest extends QueryObject {
 
     public AliquotRequest(String op, Integer siteId) {
         super(
-            "Given a CSV file detailing a request (Study, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
-            "select s.patientVisit.patient.study.nameShort, s.inventoryId, s.patientVisit.dateDrawn, s.sampleType.name, s.aliquotPosition.container.label from "
+            "Given a CSV file detailing a request (Patient Number, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
+            "select s from "
                 + Aliquot.class.getName()
                 + " s where s.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " and s.aliquotPosition.container.label not like 'SS%' and s.patientVisit.patient.study.nameShort like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.name like ? ORDER BY RAND()",
-            new String[] { "Study", "Inventory ID", "Date Drawn", "Type",
+                + " and s.aliquotPosition.container.label not like 'SS%' and s.patientVisit.patient.pnumber like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.nameShort like ? ORDER BY RAND()",
+            new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
     }
@@ -46,6 +48,23 @@ public class AliquotRequest extends QueryObject {
             throw new BiobankCheckException("Failed to parse CSV.");
         }
         return results;
+    }
+
+    @Override
+    protected List<Object> postProcess(List<Object> results) {
+        ArrayList<Object> modifiedResults = new ArrayList<Object>();
+        for (Object ob : results) {
+            Aliquot a = (Aliquot) ob;
+            String pnumber = a.getPatientVisit().getPatient().getPnumber();
+            String inventoryId = a.getInventoryId();
+            Date dateDrawn = a.getPatientVisit().getDateDrawn();
+            String stName = a.getSampleType().getNameShort();
+            String aliquotLabel = new AliquotWrapper(null, a)
+                .getPositionString(true, false);
+            modifiedResults.add(new Object[] { pnumber, inventoryId, dateDrawn,
+                stName, aliquotLabel });
+        }
+        return modifiedResults;
     }
 
     @Override

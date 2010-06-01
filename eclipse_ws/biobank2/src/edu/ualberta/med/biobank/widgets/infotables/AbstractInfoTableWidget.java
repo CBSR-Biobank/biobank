@@ -74,6 +74,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     protected boolean reloadData = false;
 
+    private int size;
+
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage,
         boolean fitToInputSize) {
@@ -89,7 +91,10 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         setLayout(gl);
         setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL | SWT.MULTI;
+        int style = SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL;
+
+        if (!isEditMode())
+            style = style | SWT.MULTI;
 
         tableViewer = new TableViewer(this, style);
 
@@ -135,6 +140,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         addClipboardCopySupport();
     }
 
+    protected abstract boolean isEditMode();
+
     protected abstract IBaseLabelProvider getLabelProvider();
 
     private void addClipboardCopySupport() {
@@ -155,23 +162,27 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
                     Object item = iterator.next();
                     String row = "";
                     for (int i = 0; i < numCols; i++) {
-                        row += lp.getColumnText(item, i);
+                        String text = lp.getColumnText(item, i);
+                        if (text != null)
+                            row += text;
                         if (i < numCols - 1)
                             row += ", ";
                     }
                     selectedRows.add(row);
                 }
-                StringBuilder sb = new StringBuilder();
-                for (Object row : selectedRows) {
-                    if (sb.length() != 0) {
-                        sb.append(System.getProperty("line.separator"));
+                if (selectedRows.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Object row : selectedRows) {
+                        if (sb.length() != 0) {
+                            sb.append(System.getProperty("line.separator"));
+                        }
+                        sb.append(row.toString());
                     }
-                    sb.append(row.toString());
+                    TextTransfer textTransfer = TextTransfer.getInstance();
+                    Clipboard cb = new Clipboard(Display.getDefault());
+                    cb.setContents(new Object[] { sb.toString() },
+                        new Transfer[] { textTransfer });
                 }
-                TextTransfer textTransfer = TextTransfer.getInstance();
-                Clipboard cb = new Clipboard(Display.getDefault());
-                cb.setContents(new Object[] { sb.toString() },
-                    new Transfer[] { textTransfer });
             }
         });
     }
@@ -204,13 +215,16 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     public void setCollection(final List<T> collection) {
         setCollection(collection, null);
+        if (collection != null) {
+            size = collection.size();
+        }
     }
 
     public void setCollection(final List<T> collection, final T selection) {
         if ((collection == null)
             || ((backgroundThread != null) && backgroundThread.isAlive())) {
             return;
-        } else if (this.collection != collection) {
+        } else if (this.collection != collection || size != collection.size()) {
             this.collection = collection;
             init(collection);
             setPaginationParams(collection);
@@ -222,7 +236,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             setPageLabelText();
             showPaginationWidget();
             enablePaginationWidget(false);
-        }
+        } else if (paginationWidget != null)
+            paginationWidget.setVisible(false);
 
         backgroundThread = new Thread() {
             @Override
@@ -232,6 +247,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         };
         backgroundThread.start();
+        this.getParent().getParent().layout(true, true);
     }
 
     protected abstract void init(List<T> collection);
@@ -254,8 +270,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         }
 
         gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
-        table.layout(true);
-        layout(true, true);
     }
 
     protected abstract void setPaginationParams(List<T> collection);
@@ -263,15 +277,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     @Override
     public void setEnabled(boolean enabled) {
         tableViewer.getTable().setEnabled(enabled);
-    }
-
-    protected BiobankCollectionModel getSelectionInternal() {
-        Assert.isTrue(!tableViewer.getTable().isDisposed(),
-            "widget is disposed");
-        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
-            .getSelection();
-
-        return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
     protected void addPaginationWidget() {

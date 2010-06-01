@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -95,8 +97,13 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<PatientVisitWrapper> getPatientVisitCollection() {
+        return getPatientVisitCollection(false, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort,
+        final boolean ascending) {
         List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
             .get("patientVisitCollection");
         if (patientVisitCollection == null) {
@@ -111,6 +118,21 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 propertiesMap.put("patientVisitCollection",
                     patientVisitCollection);
             }
+        }
+        if (sort) {
+            Collections.sort(patientVisitCollection,
+                new Comparator<PatientVisitWrapper>() {
+                    @Override
+                    public int compare(PatientVisitWrapper pv1,
+                        PatientVisitWrapper pv2) {
+                        int res = pv1.getDateProcessed().compareTo(
+                            pv2.getDateProcessed());
+                        if (ascending) {
+                            return res;
+                        }
+                        return -res;
+                    }
+                });
         }
         return patientVisitCollection;
     }
@@ -341,5 +363,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             visits.add(new PatientVisitWrapper(appService, v));
         }
         return visits;
+    }
+
+    @Override
+    protected void log(String action, String details) {
+        ((BiobankApplicationService) appService).logActivity(action,
+            getPnumber(), null, null, "patient " + details, "Patient");
     }
 }

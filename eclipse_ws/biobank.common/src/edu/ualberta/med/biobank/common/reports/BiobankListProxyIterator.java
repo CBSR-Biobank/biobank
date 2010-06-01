@@ -9,7 +9,7 @@ public class BiobankListProxyIterator implements Iterator<Object> {
 
     public BiobankListProxyIterator(BiobankListProxy proxy) {
         this.proxy = proxy;
-        this.index = 0;
+        this.index = -1;
     }
 
     @Override

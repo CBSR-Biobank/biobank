@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
@@ -178,6 +181,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     @SuppressWarnings("unchecked")
     public void persist() throws Exception {
+        checkFieldLimits();
         persistChecks();
         SDKQuery query;
         E origObject = null;
@@ -210,6 +214,49 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected abstract void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException;
+
+    protected void checkFieldLimits() throws BiobankCheckException,
+        BiobankStringLengthException {
+        String fieldValue = "";
+        VarCharLengths properties = VarCharLengths.getInstance();
+        String[] fields = getPropertyChangeNames();
+        for (int i = 0; i < fields.length; i++) {
+            int maxLen = properties.getMaxSize(fields[i]);
+            if (maxLen > 0) {
+                Method method;
+                try {
+                    method = this.getClass().getMethod(
+                        "get" + Character.toUpperCase(fields[i].charAt(0))
+                            + fields[i].substring(1));
+                    if (method.getReturnType().equals(String.class)) {
+                        fieldValue = (String) method.invoke(this);
+                        if ((fieldValue != null)
+                            && (fieldValue.length() > maxLen)) {
+                            throw new BiobankStringLengthException(
+                                "Field exceeds max length: field: " + fields[i]
+                                    + ", value \"" + fieldValue + "\"");
+                        }
+                    }
+                } catch (SecurityException e) {
+                    throwBiobankException(fields[i], e);
+                } catch (NoSuchMethodException e) {
+                    throwBiobankException(fields[i], e);
+                } catch (IllegalArgumentException e) {
+                    throwBiobankException(fields[i], e);
+                } catch (IllegalAccessException e) {
+                    throwBiobankException(fields[i], e);
+                } catch (InvocationTargetException e) {
+                    throwBiobankException(fields[i], e);
+                }
+            }
+        }
+    }
+
+    private void throwBiobankException(String field, Exception e)
+        throws BiobankCheckException {
+        throw new BiobankCheckException("Cannot get max length for field "
+            + field, e);
+    }
 
     /**
      * delete the object into the database
@@ -464,5 +511,20 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 "Cannot init internal object with a null wrapper");
         }
         setWrappedObject(otherWrapper.wrappedObject);
+    }
+
+    public void logLookup() {
+        log("select", "LOOKUP");
+    }
+
+    public void logEdit() {
+        if (!isNew()) {
+            log("edit", "EDIT");
+        }
+    }
+
+    protected void log(@SuppressWarnings("unused") String action,
+        @SuppressWarnings("unused") String details) {
+
     }
 }
