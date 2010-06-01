@@ -414,9 +414,14 @@
                      definitionId="biobank2.loggedIn">
                </reference>
                <not>
+               <or>
                 <reference
-                     definitionId="biobank2.reportsPerspectiveSelected">
-               </reference>
+                      definitionId="biobank2.reportsPerspectiveSelected">
+                </reference>
+                <reference
+                      definitionId="biobank2.sampleManagementPerspectiveSelected">
+                </reference>
+               </or>
                </not>
             </and>
          </enabledWhen>
@@ -449,9 +454,14 @@
          <enabledWhen>
          <and>
                   <not>
+                  <or>
                      <reference
                            definitionId="biobank2.mainPerspectiveSelected">
                      </reference>
+                     <reference
+                      definitionId="biobank2.sampleManagementPerspectiveSelected">
+                </reference>
+                </or>
                   </not>
                   <reference
                   definitionId="biobank2.loggedIn">
@@ -684,9 +694,14 @@
                      definitionId="biobank2.siteSelected">
                </reference>
                <not>
+               <or>
                 <reference
                      definitionId="biobank2.shipmentsPerspectiveSelected">
                </reference>
+               <reference
+                     definitionId="biobank2.sampleManagementPerspectiveSelected">
+               </reference>
+               </or>
                </not>
             </and>
          </enabledWhen>
@@ -986,6 +1001,12 @@
                style="push">
             </command>
             <command
+               commandId="edu.ualberta.med.biobank.commands.search"
+               icon="icons/search.png"
+               label="Search View"
+               style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
                   icon="icons/reportsPerspective.png"
                   label="Logging View"
@@ -1126,10 +1147,11 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.reports"
-                  icon="icons/reportsPerspective.png"
-                  label="Reports View"
-                  style="push">
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
             </command>
          </toolbar>
       </menuContribution>

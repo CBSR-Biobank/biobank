@@ -45,6 +45,7 @@
 			</manifest>
 			<include name="**/applicationservice/*.*" />
 			<include name="**/query/*.*" />
+			<include name="**/util/*.*" />
 			<exclude name="**/*Impl.*" />
 		</jar>
 	</target>

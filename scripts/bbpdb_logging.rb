@@ -20,7 +20,7 @@ BBPDB_QUERY_END
                'findex_nr', 'punches', 'details' ]
 
   def initialize
-    getDbConnection("bbpdb", 'aicml-med')
+    getDbConnection("bbpdb", 'localhost')
     res = @dbh.query(BBPDB_QUERY)
     f = File.new("bbpdb_logging.csv", "w")
     f.write CSV.generate_line(HEADINGS, ',') << "\n"

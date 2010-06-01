@@ -28,12 +28,12 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.LabelingScheme;
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.util.LabelingScheme;
+import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -76,7 +76,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private Label scanTubeAloneSwitch;
 
     @Override
-    protected void init() {
+    protected void init() throws Exception {
         super.init();
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();

@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -106,9 +107,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void setPaginationParams(List<T> collection) {
-        if (!isEditMode() && (pageInfo.rowsPerPage != 0)
+        if (pageInfo.rowsPerPage != 0
             && (collection.size() > pageInfo.rowsPerPage)) {
-            pageInfo.page = 0;
             Double size = new Double(collection.size());
             Double pageSize = new Double(pageInfo.rowsPerPage);
             pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
@@ -116,7 +116,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             paginationRequired = true;
             addPaginationWidget();
             getTableViewer().refresh();
-        }
+        } else
+            paginationRequired = false;
     }
 
     /**
@@ -125,8 +126,18 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      * 
      * @return true if editing is allowed.
      */
+    @Override
     protected boolean isEditMode() {
         return false;
+    }
+
+    protected BiobankCollectionModel getSelectionInternal() {
+        Assert.isTrue(!tableViewer.getTable().isDisposed(),
+            "widget is disposed");
+        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
+            .getSelection();
+
+        return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
     protected void initModel(List<T> collection) {
@@ -177,7 +188,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         tableViewer.refresh();
     }
 
-    protected abstract BiobankTableSorter getTableSorter();
+    protected BiobankTableSorter getTableSorter() {
+        return new BiobankTableSorter();
+    }
 
     @Override
     public boolean setFocus() {

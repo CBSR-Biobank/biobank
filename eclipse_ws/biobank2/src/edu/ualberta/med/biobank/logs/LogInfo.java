@@ -5,7 +5,8 @@ import edu.ualberta.med.biobank.forms.ScanAssignEntryForm;
 import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
 
 /**
- * Activity log information.
+ * Activity log information. Used for Activity logs of ScanLink, ScanAssign and
+ * CabinetLinkAssign.
  * 
  * @see ActivityLogAppender
  * @see ScanLinkEntryForm

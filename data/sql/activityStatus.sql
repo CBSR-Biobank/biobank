@@ -5,3 +5,4 @@ INSERT INTO `ACTIVITY_STATUS` (ID, NAME) VALUES
 ( 3, "Disabled"),
 ( 4, "Flagged");
 UNLOCK TABLES;
+

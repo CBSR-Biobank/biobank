@@ -413,9 +413,21 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return !value.isEmpty() && getPlateNumber(value) != -1;
     }
 
-    public static boolean isAskPrint() {
+    public static String getActivityLogPath() {
         IPreferenceStore store = getDefault().getPreferenceStore();
-        return store.getBoolean(PreferenceConstants.LINK_ASSIGN_ASK_PRINT);
+        boolean logToFile = store
+            .getBoolean(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE);
+        if (logToFile) {
+            return store
+                .getString(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH);
+        }
+        return null;
+    }
+
+    public static boolean isAskPrintActivityLog() {
+        IPreferenceStore store = getDefault().getPreferenceStore();
+        return store
+            .getBoolean(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT);
     }
 
     public static boolean isRealScanEnabled() {

@@ -74,6 +74,7 @@ public class DbHelper {
         for (PatientWrapper patient : patients) {
             deletePatientVisits(patient.getPatientVisitCollection());
             for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+                ship.reload();
                 ship.removePatients(Arrays.asList(patient));
                 if (ship.getPatientCollection().size() == 0) {
                     ship.delete();

@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
@@ -14,12 +16,11 @@ import gov.nih.nci.system.query.example.ExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
 import org.acegisecurity.context.SecurityContextHolder;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -141,13 +142,11 @@ public class BiobankApplicationServiceImpl extends
         SDKQueryResult res = super.executeQuery(query);
         if (query instanceof ExampleQuery) {
             Object queryObject = ((ExampleQuery) query).getExample();
-            if (queryObject != null
-                && SITE_CLASS_NAME.equals(queryObject.getClass().getName())) {
+            if (queryObject != null && queryObject instanceof Site) {
                 if (query instanceof InsertExampleQuery) {
-                    newSiteSecurity(res.getObjectResult()); // need the result
-                    // to get the object id
+                    newSiteSecurity((Site) res.getObjectResult());
                 } else if (query instanceof DeleteExampleQuery) {
-                    deleteSiteSecurity(queryObject);
+                    deleteSiteSecurity((Site) queryObject);
                 }
             }
         }
@@ -155,13 +154,12 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @SuppressWarnings("unchecked")
-    private void deleteSiteSecurity(Object siteObject)
-        throws ApplicationException {
+    private void deleteSiteSecurity(Site site) throws ApplicationException {
         Object id = null;
         String nameShort = null;
         try {
-            id = getSiteObjectId(siteObject);
-            nameShort = getSiteObjectNameShort(siteObject);
+            id = site.getId();
+            nameShort = site.getNameShort();
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             Set<ProtectionElement> siteAdminPEs = upm
@@ -180,12 +178,12 @@ public class BiobankApplicationServiceImpl extends
 
     }
 
-    private void newSiteSecurity(Object siteObject) throws ApplicationException {
+    private void newSiteSecurity(Site site) throws ApplicationException {
         Object id = null;
         String nameShort = null;
         try {
-            id = getSiteObjectId(siteObject);
-            nameShort = getSiteObjectNameShort(siteObject);
+            id = site.getId();
+            nameShort = site.getNameShort();
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             // Create protection element for the site
@@ -208,18 +206,13 @@ public class BiobankApplicationServiceImpl extends
         }
     }
 
-    private String getSiteObjectNameShort(Object siteObject)
-        throws SecurityException, NoSuchMethodException,
-        IllegalArgumentException, IllegalAccessException,
-        InvocationTargetException {
-        Method getNameMethod = siteObject.getClass().getMethod("getNameShort");
-        return (String) getNameMethod.invoke(siteObject);
+    @Override
+    public void logActivity(String action, String patientNumber,
+        String inventoryID, String locationLabel, String details, String type) {
+        Logger logger = Logger.getLogger("Biobank.Activity");
+        logger.log(Level.toLevel("INFO"), MessageGenerator
+            .generateStringMessage(action, patientNumber, inventoryID,
+                locationLabel, details, type));
     }
 
-    private Object getSiteObjectId(Object siteObject) throws SecurityException,
-        NoSuchMethodException, IllegalArgumentException,
-        IllegalAccessException, InvocationTargetException {
-        Method getIdMethod = siteObject.getClass().getMethod("getId");
-        return getIdMethod.invoke(siteObject);
-    }
 }

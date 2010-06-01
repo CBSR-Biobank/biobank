@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.common.cbsr;
 
-import edu.ualberta.med.biobank.common.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.util.RowColPos;
 
 public class CbsrContainers {
 
