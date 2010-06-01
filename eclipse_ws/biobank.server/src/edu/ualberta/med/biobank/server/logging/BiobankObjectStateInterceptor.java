@@ -37,17 +37,17 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
         BiobankObjectStateLogger logger = BiobankObjectStateLogger
             .getlogger(name);
         if (logger != null) {
-            // try {
-            Map<String, Object> statesMaps = new HashMap<String, Object>();
-            for (int i = 0; i < state.length; i++) {
-                statesMaps.put(propertyNames[i], state[i]);
+            try {
+                Map<String, Object> statesMaps = new HashMap<String, Object>();
+                for (int i = 0; i < state.length; i++) {
+                    statesMaps.put(propertyNames[i], state[i]);
+                }
+                logger.logMessage(entity, action, statesMaps);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                ExceptionUtils.writeMsgToTmpFile(name
+                    + "_biobankstateinterceptor", ex);
             }
-            logger.logMessage(entity, action, statesMaps);
-            // } catch (Exception ex) {
-            // ex.printStackTrace();
-            // ExceptionUtils.writeMsgToTmpFile(name
-            // + "_biobankstateinterceptor", ex);
-            // }
         }
     }
 
