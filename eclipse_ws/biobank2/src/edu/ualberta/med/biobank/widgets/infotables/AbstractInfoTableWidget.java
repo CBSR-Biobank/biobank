@@ -144,6 +144,10 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
     protected abstract IBaseLabelProvider getLabelProvider();
 
+    public List<T> getCollection() {
+        return collection;
+    }
+
     private void addClipboardCopySupport() {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);

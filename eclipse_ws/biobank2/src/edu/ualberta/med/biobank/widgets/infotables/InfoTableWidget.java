@@ -261,15 +261,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<T> getCollectionInternal() {
-        List<T> collection = new ArrayList<T>();
-        for (BiobankCollectionModel item : model) {
-            collection.add((T) item.o);
-        }
-        return collection;
-    }
-
-    @SuppressWarnings("unchecked")
     public T getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)

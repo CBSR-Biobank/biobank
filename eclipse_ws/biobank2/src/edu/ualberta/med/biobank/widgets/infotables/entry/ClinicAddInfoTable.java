@@ -40,18 +40,26 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     public void createClinicContact() {
-        SelectClinicContactDialog dlg = new SelectClinicContactDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            study);
-        if (dlg.open() == Dialog.OK) {
-            notifyListeners();
-            ContactWrapper contact = dlg.getSelection();
-            if (contact != null) {
-                List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
-                dummyList.add(contact);
-                study.addContacts(dummyList);
-                setCollection(study.getContactCollection(true));
+        SelectClinicContactDialog dlg;
+        try {
+            List<ContactWrapper> availableContacts = study
+                .getContactsNotAssoc();
+            availableContacts.removeAll(study.getContactCollection(true));
+            dlg = new SelectClinicContactDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), availableContacts);
+            if (dlg.open() == Dialog.OK) {
+                notifyListeners();
+                ContactWrapper contact = dlg.getSelection();
+                if (contact != null) {
+                    List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
+                    dummyList.add(contact);
+                    study.addContacts(dummyList);
+                    setCollection(study.getContactCollection(true));
+                }
             }
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError(
+                "Unable to retrieve available contacts", e);
         }
     }
 
