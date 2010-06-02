@@ -21,12 +21,12 @@ public class StrFields {
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
-    private static Pattern HBM_STRING_ATTR = Pattern
-        .compile("<.*type=\"string\".*column=\"([^\"]*)\"/");
+    private static Pattern HBM_STRING_ATTR = Pattern.compile(
+    // "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
+        "property", Pattern.CASE_INSENSITIVE);
 
-    private static Pattern HBM_STRING_LENGTH_ATTR = Pattern
-        .compile("length=\"(\\d+)\"");
-
+    private static Pattern HBM_STRING_LENGTH_ATTR = Pattern.compile(
+        "length=\"(\\d+)\"", Pattern.CASE_INSENSITIVE);
     private AppArgs appArgs;
 
     public StrFields(AppArgs appArgs) {
@@ -98,9 +98,10 @@ public class StrFields {
             String line = reader.readLine();
 
             while (line != null) {
+                System.out.println(hbmFileName + ": " + line);
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
-                if (stringAttrMatcher.matches()) {
-                    System.out.println(line);
+                if (stringAttrMatcher.find()) {
+                    System.out.println("**** found : " + line);
                 }
 
                 // writer.write(line);
