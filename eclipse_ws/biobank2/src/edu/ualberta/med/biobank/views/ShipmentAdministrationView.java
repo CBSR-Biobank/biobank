@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -21,8 +19,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -225,50 +221,6 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     public static ShipmentAdministrationView getCurrent() {
         return currentInstance;
-    }
-
-    public static class ShipmentListener extends WrapperListenerAdapter {
-        private ShipmentAdapter shipAdapter;
-
-        private boolean dateReceivedChanged = false;
-
-        public ShipmentListener(ShipmentAdapter ship) {
-            this.shipAdapter = ship;
-            shipAdapter.getWrapper().addPropertyChangeListener("dateReceived",
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        dateReceivedChanged = true;
-                    }
-                });
-        }
-
-        @Override
-        public void inserted(WrapperEvent event) {
-            if (shipAdapter.getWrapper().isReceivedToday()) {
-                shipAdapter.getParent().removeChild(shipAdapter, false);
-                displayTodayObjects();
-            }
-        }
-
-        @Override
-        public void updated(WrapperEvent event) {
-            if (dateReceivedChanged) {
-                shipAdapter.getParent().removeChild(shipAdapter, false);
-                displayTodayObjects();
-                if (!shipAdapter.getWrapper().isReceivedToday()) {
-                    ShipmentAdministrationView.showShipment(shipAdapter
-                        .getWrapper());
-                }
-            }
-        }
-
-        private void displayTodayObjects() {
-            ShipmentAdministrationView.getCurrent().reload();
-            if (PatientAdministrationView.getCurrent() != null) {
-                PatientAdministrationView.getCurrent().reload();
-            }
-        }
     }
 
     public static ShipmentAdapter getCurrentShipment() {
