@@ -225,13 +225,21 @@ public abstract class AbstractPalletAliquotAdminForm extends
         if (BioBankPlugin.isRealScanEnabled()) {
             int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                 currentPlateToScan);
-            ScanCell[][] scanCells = null;
-            if (isScanChoiceSimple) {
-                scanCells = ScannerConfigPlugin.scan(plateNum);
+            if (plateNum == -1) {
+                setScanNotLauched(true);
+                BioBankPlugin.openAsyncError("Scan error",
+                    "Plate with barcode " + currentPlateToScan
+                        + " is not enabled");
+                return;
             } else {
-                scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
+                ScanCell[][] scanCells = null;
+                if (isScanChoiceSimple) {
+                    scanCells = ScannerConfigPlugin.scan(plateNum);
+                } else {
+                    scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
+                }
+                cells = PalletCell.convertArray(scanCells);
             }
-            cells = PalletCell.convertArray(scanCells);
         } else {
             launchFakeScan();
         }

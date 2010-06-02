@@ -414,7 +414,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
-                // not needed on windows. This was if the textfield number go
+                // not needed on windows. This was if the textfield number
+                // go
                 // after 9, needed to resize on linux : need to check that
                 // again
                 // form.layout(true, true);
@@ -444,36 +445,40 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean processScanResult(IProgressMonitor monitor)
         throws ApplicationException {
         boolean everythingOk = true;
-        final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-        for (RowColPos rcp : cells.keySet()) {
-            monitor.subTask("Processing position "
-                + LabelingScheme.rowColToSbs(rcp));
-            Integer typesRowsCount = typesRows.get(rcp.row);
-            if (typesRowsCount == null) {
-                typesRowsCount = 0;
-                sampleTypeWidgets.get(rcp.row).resetValues(true, true);
+        if (cells != null) {
+            final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+            for (RowColPos rcp : cells.keySet()) {
+                monitor.subTask("Processing position "
+                    + LabelingScheme.rowColToSbs(rcp));
+                Integer typesRowsCount = typesRows.get(rcp.row);
+                if (typesRowsCount == null) {
+                    typesRowsCount = 0;
+                    sampleTypeWidgets.get(rcp.row).resetValues(true, true);
+                }
+                PalletCell cell = null;
+                cell = cells.get(rcp);
+                if (!isRescanMode()
+                    || (cell != null
+                        && cell.getStatus() != AliquotCellStatus.TYPE && cell
+                        .getStatus() != AliquotCellStatus.NO_TYPE)) {
+                    processCellStatus(cell);
+                }
+                everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
+                    && everythingOk;
+                if (PalletCell.hasValue(cell)) {
+                    typesRowsCount++;
+                    typesRows.put(rcp.row, typesRowsCount);
+                }
             }
-            PalletCell cell = null;
-            cell = cells.get(rcp);
-            if (!isRescanMode()
-                || (cell != null && cell.getStatus() != AliquotCellStatus.TYPE && cell
-                    .getStatus() != AliquotCellStatus.NO_TYPE)) {
-                processCellStatus(cell);
-            }
-            everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
-                && everythingOk;
-            if (PalletCell.hasValue(cell)) {
-                typesRowsCount++;
-                typesRows.put(rcp.row, typesRowsCount);
-            }
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    setTypeCombosLists(typesRows);
+                }
+            });
+            return everythingOk;
         }
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                setTypeCombosLists(typesRows);
-            }
-        });
-        return everythingOk;
+        return false;
     }
 
     /**
