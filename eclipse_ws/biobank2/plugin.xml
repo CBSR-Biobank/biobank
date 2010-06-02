@@ -1073,28 +1073,6 @@
             <control
                   class="edu.ualberta.med.biobank.rcp.SiteCombo">
             </control>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.search"
-                  icon="icons/search.png"
-                  label="Search"
-                  style="push"
-                  tooltip="Search">
-               <visibleWhen
-                     checkEnabled="false">
-                  <and>
-                     <not>
-                        <reference
-                              definitionId="biobank2.sampleManagementPerspectiveSelected">
-                        </reference>
-                     </not>
-                     <not>
-                        <reference
-                              definitionId="biobank2.reportsPerspectiveSelected">
-                        </reference>
-                     </not>
-                  </and>
-               </visibleWhen>
-            </command>
          </toolbar>
       </menuContribution>
       <menuContribution
@@ -1145,6 +1123,13 @@
                   icon="icons/shipmentPerspective.png"
                   label="Shipment View"
                   style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.reports"
+                  icon="icons/reportsPerspective.png"
+                  label="Reports"
+                  style="push"
+                  tooltip="Reports">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
@@ -1896,6 +1881,11 @@
             class="edu.ualberta.med.biobank.preferences.IssueTrackerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.gereral"
             name="Issue Tracker">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.ServerPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="Servers">
       </page>
    </extension>
    <extension

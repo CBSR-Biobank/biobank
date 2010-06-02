@@ -117,7 +117,8 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 @Override
                 public void editItem(InfoTableEvent event) {
                     SampleTypeWrapper type = getSelection();
-                    addOrEditSampleType(false, type, editMessage);
+                    if (type != null)
+                        addOrEditSampleType(false, type, editMessage);
                 }
             });
         }
@@ -127,35 +128,38 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     SampleTypeWrapper sampleType = getSelection();
+                    if (sampleType != null) {
+                        try {
+                            if (!sampleType.isNew()
+                                && sampleType.isUsedBySamples()) {
+                                BioBankPlugin.openError(
+                                    "Sample Type Delete Error",
+                                    "Cannot delete sample type \""
+                                        + sampleType.getName()
+                                        + "\" since there are samples of this "
+                                        + "type already in the database.");
+                                return;
+                            }
 
-                    try {
-                        if (!sampleType.isNew() && sampleType.isUsedBySamples()) {
-                            BioBankPlugin.openError("Sample Type Delete Error",
-                                "Cannot delete sample type \""
-                                    + sampleType.getName()
-                                    + "\" since there are samples of this "
-                                    + "type already in the database.");
-                            return;
+                            if (!MessageDialog.openConfirm(PlatformUI
+                                .getWorkbench().getActiveWorkbenchWindow()
+                                .getShell(), "Delete Sample Type",
+                                "Are you sure you want to delete sample type \""
+                                    + sampleType.getName() + "\"?")) {
+                                return;
+                            }
+
+                            selectedSampleTypes.remove(sampleType);
+
+                            setCollection(selectedSampleTypes);
+                            deletedSampleTypes.add(sampleType);
+                            notifyListeners();
+                        } catch (final RemoteConnectFailureException exp) {
+                            BioBankPlugin.openRemoteConnectErrorMessage();
+                        } catch (Exception e) {
+                            logger.error(
+                                "BioBankFormBase.createPartControl Error", e);
                         }
-
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Sample Type",
-                            "Are you sure you want to delete sample type \""
-                                + sampleType.getName() + "\"?")) {
-                            return;
-                        }
-
-                        selectedSampleTypes.remove(sampleType);
-
-                        setCollection(selectedSampleTypes);
-                        deletedSampleTypes.add(sampleType);
-                        notifyListeners();
-                    } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage();
-                    } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error",
-                            e);
                     }
                 }
             });
@@ -164,6 +168,18 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
     private boolean addEditOk(SampleTypeWrapper type) {
         try {
+            for (SampleTypeWrapper st : selectedSampleTypes)
+                if (st.getId() != type.getId()
+                    && (st.getName().equals(type.getName()) || st
+                        .getNameShort().equals(type.getNameShort())))
+                    throw new BiobankCheckException(
+                        "That sample type has already been added.");
+            for (SampleTypeWrapper st : addedOrModifiedSampleTypes)
+                if (st.getId() != type.getId()
+                    && (st.getName().equals(type.getName()) || st
+                        .getNameShort().equals(type.getNameShort())))
+                    throw new BiobankCheckException(
+                        "That sample type has already been added.");
             type.checkNameAndShortNameUniquesForSiteAndGlobal();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);

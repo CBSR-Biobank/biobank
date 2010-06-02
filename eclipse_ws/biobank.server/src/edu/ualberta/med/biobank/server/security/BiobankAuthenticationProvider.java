@@ -10,6 +10,7 @@ import org.acegisecurity.userdetails.UserDetails;
 
 public class BiobankAuthenticationProvider extends CSMAuthenticationProvider {
 
+    @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails,
         UsernamePasswordAuthenticationToken authentication)
         throws AuthenticationException {

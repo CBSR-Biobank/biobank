@@ -202,21 +202,25 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             @Override
             public void deleteItem(InfoTableEvent event) {
                 PatientWrapper patient = patientTable.getSelection();
-                if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), "Delete Patient",
-                    "Are you sure you want to remove patient \""
-                        + patient.getPnumber() + "\" for this shipment ?")) {
-                    return;
+                if (patient != null) {
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        "Delete Patient",
+                        "Are you sure you want to remove patient \""
+                            + patient.getPnumber() + "\" for this shipment ?")) {
+                        return;
+                    }
+                    try {
+                        shipment.checkCanRemovePatient(patient);
+                    } catch (Exception e) {
+                        BioBankPlugin
+                            .openAsyncError("Cannot remove patient", e);
+                        return;
+                    }
+                    shipment.removePatients(Arrays.asList(patient));
+                    updateList();
+                    notifyListeners();
                 }
-                try {
-                    shipment.checkCanRemovePatient(patient);
-                } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Cannot remove patient", e);
-                    return;
-                }
-                shipment.removePatients(Arrays.asList(patient));
-                updateList();
-                notifyListeners();
             }
         });
     }

@@ -121,7 +121,8 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
                 @Override
                 public void editItem(InfoTableEvent event) {
                     StudySourceVesselWrapper studySourceVessel = getSelection();
-                    addOrEditStudySourceVessel(false, studySourceVessel);
+                    if (studySourceVessel != null)
+                        addOrEditStudySourceVessel(false, studySourceVessel);
                 }
             });
         }
@@ -130,20 +131,22 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     StudySourceVesselWrapper studySourceVessel = getSelection();
+                    if (studySourceVessel != null) {
+                        if (!MessageDialog
+                            .openConfirm(PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getShell(),
+                                "Delete Study Source Vessel",
+                                "Are you sure you want to delete this source vessel ?")) {
+                            return;
+                        }
 
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Study Source Vessel",
-                        "Are you sure you want to delete this source vessel ?")) {
-                        return;
+                        selectedStudySourceVessels.remove(studySourceVessel);
+                        setCollection(selectedStudySourceVessels);
+                        deletedSourceVessels.add(studySourceVessel);
+                        availableSourceVessels.add(studySourceVessel
+                            .getSourceVessel());
+                        notifyListeners();
                     }
-
-                    selectedStudySourceVessels.remove(studySourceVessel);
-                    setCollection(selectedStudySourceVessels);
-                    deletedSourceVessels.add(studySourceVessel);
-                    availableSourceVessels.add(studySourceVessel
-                        .getSourceVessel());
-                    notifyListeners();
                 }
             });
         }
