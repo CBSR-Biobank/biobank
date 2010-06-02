@@ -1,12 +1,10 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -36,51 +34,6 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
             return StringUtils.join(new String[] { inventoryId, type, position,
                 linkDate, (quantity != null) ? quantity.toString() : "",
                 activityStatus, comment }, "\t");
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if (i1 == null) {
-                return -1;
-            } else if (i2 == null) {
-                return 1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(i1.inventoryId, i2.inventoryId);
-                break;
-            case 1:
-                rc = compare(i1.type, i2.type);
-                break;
-            case 2:
-                rc = compare(i1.position, i2.position);
-                break;
-            case 3:
-                rc = compare(i1.linkDate, i2.linkDate);
-                break;
-            case 4:
-                rc = compare(i1.quantity, i2.quantity);
-                break;
-            case 5:
-                rc = compare(i1.activityStatus, i2.activityStatus);
-                break;
-            case 6:
-                rc = compare(i1.comment, i2.comment);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -149,13 +102,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
-    public Object getCollectionModelObject(AliquotWrapper aliquot)
+    public TableRowData getCollectionModelObject(AliquotWrapper aliquot)
         throws Exception {
         TableRowData info = new TableRowData();
         info.aliquot = aliquot;
@@ -201,15 +148,6 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
     }
 
     @Override
-    public List<AliquotWrapper> getCollection() {
-        List<AliquotWrapper> result = new ArrayList<AliquotWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).aliquot);
-        }
-        return result;
-    }
-
-    @Override
     public AliquotWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -217,5 +155,10 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.aliquot;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 }

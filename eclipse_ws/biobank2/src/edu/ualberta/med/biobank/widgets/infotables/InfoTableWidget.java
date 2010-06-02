@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -18,7 +19,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
@@ -102,7 +102,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
             }
         });
-        setSorter();
     }
 
     @Override
@@ -146,53 +145,20 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         if ((collection == null) || (model.size() == collection.size()))
             return;
 
+        BiobankTableSorter comparator = getComparator();
+        if (comparator != null)
+            Collections.sort(collection, comparator);
+
         model.clear();
         for (int i = 0, n = collection.size(); i < n; ++i) {
             model.add(new BiobankCollectionModel(i));
         }
+
     }
+
+    protected abstract BiobankTableSorter getComparator();
 
     protected abstract String getCollectionModelObjectToString(Object o);
-
-    private void setSorter() {
-        final BiobankTableSorter tableSorter = getTableSorter();
-
-        if (tableSorter == null)
-            return;
-
-        tableViewer.setSorter(tableSorter);
-        final Table table = tableViewer.getTable();
-        for (int i = 0, n = table.getColumnCount(); i < n; ++i) {
-            final TableColumn col = table.getColumn(i);
-            final int index = i;
-            col.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    tableSorter.setColumn(index);
-                    int dir = table.getSortDirection();
-                    if (table.getSortColumn() == col) {
-                        dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
-                    } else {
-                        dir = SWT.DOWN;
-                    }
-                    table.setSortDirection(dir);
-                    table.setSortColumn(col);
-                    tableViewer.refresh();
-                }
-            });
-        }
-    }
-
-    protected void sortOnFirstColumn() {
-        Table table = tableViewer.getTable();
-        table.setSortDirection(SWT.DOWN);
-        table.setSortColumn(table.getColumn(0));
-        tableViewer.refresh();
-    }
-
-    protected BiobankTableSorter getTableSorter() {
-        return new BiobankTableSorter();
-    }
 
     @Override
     public boolean setFocus() {
@@ -303,9 +269,15 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         return collection;
     }
 
-    public abstract List<T> getCollection();
-
-    public abstract T getSelection();
+    @SuppressWarnings("unchecked")
+    public T getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        T type = (T) item.o;
+        Assert.isNotNull(type);
+        return type;
+    }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);

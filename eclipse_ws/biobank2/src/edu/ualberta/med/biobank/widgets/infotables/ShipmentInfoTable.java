@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -27,40 +25,6 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { dateReceived, waybill,
                 shippingCompany, numPatients.toString() }, "\t");
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData s1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData s2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((s1 == null) || (s2 == null)) {
-                return -1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = s2.dateReceived.compareTo(s1.dateReceived);
-                break;
-            case 1:
-                rc = s1.waybill.compareTo(s2.waybill);
-                break;
-            case 2:
-                rc = s1.shippingCompany.compareTo(s2.shippingCompany);
-                break;
-            case 3:
-                rc = s1.numPatients.compareTo(s2.numPatients);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -101,12 +65,6 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         };
     }
 
-    @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
     /**
      * Required since the shipping company object must be loaded for every
      * shipment.
@@ -141,15 +99,6 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     }
 
     @Override
-    public List<ShipmentWrapper> getCollection() {
-        List<ShipmentWrapper> result = new ArrayList<ShipmentWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).shipment);
-        }
-        return result;
-    }
-
-    @Override
     public ShipmentWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -157,5 +106,10 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.shipment;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 }
