@@ -167,7 +167,7 @@
       <srcfiles file="model/biobank2.uml" />
     </uptodate>
   </target>
-  <target name="sdk" depends="check-cacore-sdk-uptodate"
+  <target name="sdk" depends="check-cacore-sdk-uptodate, build-server-project-validator"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
@@ -424,6 +424,9 @@
       </fileset>
     </copy>
     <ant dir="${eclipse.proj.dir.server}" target="build-remote-lib" inheritRefs="false" />
+  </target>
+
+  <target name="build-server-project-validator">
     <ant dir="${eclipse.proj.dir.server}" target="build-validator-lib" inheritRefs="false" />
   </target>
 
@@ -492,6 +495,7 @@
           depends="tests-clean,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant target="clean-jars" />
+    <ant dir="${eclipse.proj.dir.server}" target="clean" inheritRefs="false" />
   </target>
 
   <target name="clean-caCore"
