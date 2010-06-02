@@ -25,10 +25,10 @@
 	</target>
 
 	<target name="clean">
-		<delete dir="bin" />
+		<delete dir="bin" />		
+		<delete dir="output" />	
 	</target>
 
-	<target name="cleanall" depends="clean" />
 
 	<target name="build" depends="init">
 		<echo message="${ant.project.name}: ${ant.file}" />
@@ -50,7 +50,14 @@
 		</jar>
 	</target>
 	
-	<target name="build-validator-lib">
+	<target name="build-validator-lib" depends="init">
+                <echo message="${ant.project.name}: ${ant.file}" />
+		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+			<src path="src"/>
+			<include name="**/validator/**"/>
+			<exclude name="**"/>
+			<classpath refid="biobank.server.classpath" />
+		</javac>
 		<jar destfile="output/biobank-validators.jar" basedir="bin">
 			<manifest>
 				<attribute name="Generated-By" value="AICML Ant build file" />
