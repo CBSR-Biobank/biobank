@@ -170,8 +170,9 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
 
     @Override
     public void reload() {
-        searchedNode.performExpand();
         todayNode.performExpand();
+        searchedNode.performExpand();
+        getTreeViewer().refresh(true);
         getTreeViewer().expandToLevel(3);
     }
 

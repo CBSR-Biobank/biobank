@@ -81,9 +81,11 @@ public abstract class AbstractTodayNode extends AdapterBase {
 
                 // remove elements that are not in today list
                 for (AdapterBase child : getChildren()) {
+                    child.getModelObject().reload();
                     List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
                         child.getChildren());
                     for (AdapterBase subChild : subChildren) {
+                        subChild.getModelObject().reload();
                         if (!todayElements.contains(subChild.getModelObject())) {
                             subChild.getParent().removeChild(subChild);
                         }
