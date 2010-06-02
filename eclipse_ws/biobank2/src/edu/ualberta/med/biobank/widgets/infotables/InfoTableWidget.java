@@ -114,6 +114,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             pageInfo.pageTotal = new Double(Math.ceil(size / pageSize))
                 .intValue();
             paginationRequired = true;
+            if (pageInfo.page == pageInfo.pageTotal)
+                pageInfo.page--;
             addPaginationWidget();
             getTableViewer().refresh();
         } else

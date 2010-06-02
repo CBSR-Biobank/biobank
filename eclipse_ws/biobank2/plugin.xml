@@ -1897,6 +1897,11 @@
             id="edu.ualberta.med.biobank.preferences.gereral"
             name="Issue Tracker">
       </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.ServerPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.gereral"
+            name="Servers">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.services">

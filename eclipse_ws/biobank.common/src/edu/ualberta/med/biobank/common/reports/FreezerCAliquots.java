@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class FreezerCAliquots extends QueryObject {
@@ -15,7 +16,9 @@ public class FreezerCAliquots extends QueryObject {
             "select aliquot.patientVisit.patient.study.nameShort, "
                 + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.aliquotPosition.container.label not like 'SS%' and aliquot.aliquotPosition.container.id "
+                + " as aliquot where aliquot.aliquotPosition not in (from "
+                + AliquotPosition.class.getName()
+                + " a where a.container.label like 'SS%') and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
                 + ContainerPath.class.getName()
                 + " as path1, "

@@ -166,7 +166,8 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
                 @Override
                 public void editItem(InfoTableEvent event) {
                     PvSourceVesselWrapper svss = getSelection();
-                    addOrEditPvSourceVessel(false, svss);
+                    if (svss != null)
+                        addOrEditPvSourceVessel(false, svss);
                 }
             });
         }
@@ -175,23 +176,24 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     PvSourceVesselWrapper svss = getSelection();
+                    if (svss != null) {
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Aliquot Storage",
+                            "Are you sure you want to delete source vessel \""
+                                + svss.getSourceVessel().getName() + "\"?")) {
+                            return;
+                        }
 
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Aliquot Storage",
-                        "Are you sure you want to delete source vessel \""
-                            + svss.getSourceVessel().getName() + "\"?")) {
-                        return;
+                        selectedPvSourceVessels.remove(svss);
+                        setCollection(selectedPvSourceVessels);
+                        if (selectedPvSourceVessels.size() == 0) {
+                            sourceVesselsAdded.setValue(false);
+                        }
+                        addedPvSourceVessels.remove(svss);
+                        removedPvSourceVessels.add(svss);
+                        notifyListeners();
                     }
-
-                    selectedPvSourceVessels.remove(svss);
-                    setCollection(selectedPvSourceVessels);
-                    if (selectedPvSourceVessels.size() == 0) {
-                        sourceVesselsAdded.setValue(false);
-                    }
-                    addedPvSourceVessels.remove(svss);
-                    removedPvSourceVessels.add(svss);
-                    notifyListeners();
                 }
             });
         }

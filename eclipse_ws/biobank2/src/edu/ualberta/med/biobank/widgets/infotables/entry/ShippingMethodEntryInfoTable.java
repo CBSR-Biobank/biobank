@@ -113,7 +113,8 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
             @Override
             public void editItem(InfoTableEvent event) {
                 ShippingMethodWrapper type = getSelection();
-                addOrEditShippingMethod(false, type, editMessage);
+                if (type != null)
+                    addOrEditShippingMethod(false, type, editMessage);
             }
         });
 
@@ -121,35 +122,39 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
             @Override
             public void deleteItem(InfoTableEvent event) {
                 ShippingMethodWrapper shippingMethod = getSelection();
+                if (shippingMethod != null) {
+                    try {
+                        if (!shippingMethod.isNew() && shippingMethod.isUsed()) {
+                            BioBankPlugin
+                                .openError(
+                                    "Shipping Method Delete Error",
+                                    "Cannot delete shipping method \""
+                                        + shippingMethod.getName()
+                                        + "\" since created shipments are using it.");
+                            return;
+                        }
 
-                try {
-                    if (!shippingMethod.isNew() && shippingMethod.isUsed()) {
-                        BioBankPlugin.openError("Shipping Method Delete Error",
-                            "Cannot delete shipping method \""
-                                + shippingMethod.getName()
-                                + "\" since created shipments are using it.");
-                        return;
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Shipping Method",
+                            "Are you sure you want to delete shipping method \""
+                                + shippingMethod.getName() + "\"?")) {
+                            return;
+                        }
+
+                        // equals method now compare toString() results if both
+                        // ids are null.
+                        selectedShippingMethods.remove(shippingMethod);
+
+                        setCollection(selectedShippingMethods);
+                        deletedShippingMethods.add(shippingMethod);
+                        notifyListeners();
+                    } catch (final RemoteConnectFailureException exp) {
+                        BioBankPlugin.openRemoteConnectErrorMessage();
+                    } catch (Exception e) {
+                        logger.error("BioBankFormBase.createPartControl Error",
+                            e);
                     }
-
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Shipping Method",
-                        "Are you sure you want to delete shipping method \""
-                            + shippingMethod.getName() + "\"?")) {
-                        return;
-                    }
-
-                    // equals method now compare toString() results if both
-                    // ids are null.
-                    selectedShippingMethods.remove(shippingMethod);
-
-                    setCollection(selectedShippingMethods);
-                    deletedShippingMethods.add(shippingMethod);
-                    notifyListeners();
-                } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
-                } catch (Exception e) {
-                    logger.error("BioBankFormBase.createPartControl Error", e);
                 }
             }
         });
@@ -157,6 +162,16 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
 
     private boolean addEditOk(ShippingMethodWrapper type) {
         try {
+            for (ShippingMethodWrapper sm : selectedShippingMethods)
+                if (sm.getId() != type.getId()
+                    && sm.getName().equals(type.getName()))
+                    throw new BiobankCheckException(
+                        "That shipping method has already been added.");
+            for (ShippingMethodWrapper sm : addedOrModifiedShippingMethods)
+                if (sm.getId() != type.getId()
+                    && sm.getName().equals(type.getName()))
+                    throw new BiobankCheckException(
+                        "That shipping method has already been added.");
             type.checkUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);

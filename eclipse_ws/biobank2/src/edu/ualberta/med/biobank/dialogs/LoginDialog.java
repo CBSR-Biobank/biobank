@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -20,6 +21,7 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,6 +44,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -59,10 +62,6 @@ public class LoginDialog extends TitleAreaDialog {
     private Combo userNameWidget;
 
     private Text passwordWidget;
-
-    private static final String SAVED_SERVERS = "savedServers";
-
-    private static final String SERVER = "server";
 
     private static final String LAST_SERVER = "lastServer";
 
@@ -96,17 +95,16 @@ public class LoginDialog extends TitleAreaDialog {
         userNames = new ArrayList<String>();
 
         pluginPrefs = new InstanceScope().getNode(Application.PLUGIN_ID);
-        Preferences prefsServers = pluginPrefs.node(SAVED_SERVERS);
         Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
 
-        try {
-            String[] serverNodeNames = prefsServers.childrenNames();
-            for (String serverNodeName : serverNodeNames) {
-                Preferences node = prefsServers.node(serverNodeName);
-                servers.add(node.get(SERVER, ""));
-            }
-        } catch (BackingStoreException e) {
-            logger.error("Could not get " + SERVER + " preference", e);
+        IPreferenceStore prefsStore = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+
+        String serverList = prefsStore
+            .getString(PreferenceConstants.SERVER_LIST);
+        StringTokenizer st = new StringTokenizer(serverList, "\n");
+        while (st.hasMoreTokens()) {
+            servers.add(st.nextToken());
         }
 
         try {
@@ -277,40 +275,6 @@ public class LoginDialog extends TitleAreaDialog {
     }
 
     @Override
-    protected void buttonPressed(int buttonId) {
-        if ((buttonId == IDialogConstants.OK_ID)
-            || (buttonId == IDialogConstants.CANCEL_ID)) {
-            pluginPrefs.put(LAST_SERVER, serverWidget.getText());
-            pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
-
-            if ((serverWidget.getText().length() > 0)
-                && (serverWidget.getSelectionIndex() == -1)
-                && !servers.contains(serverWidget.getText())) {
-                Preferences prefsServers = pluginPrefs.node(SAVED_SERVERS);
-                Preferences prefsServer = prefsServers.node(Integer
-                    .toString(servers.size()));
-                prefsServer.put(SERVER, serverWidget.getText().trim());
-            }
-
-            if ((userNameWidget.getText().length() > 0)
-                && (userNameWidget.getSelectionIndex() == -1)
-                && !userNames.contains(userNameWidget.getText())) {
-                Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
-                Preferences prefsUserName = prefsUserNames.node(Integer
-                    .toString(userNames.size()));
-                prefsUserName.put(USER_NAME, userNameWidget.getText().trim());
-            }
-
-            try {
-                pluginPrefs.flush();
-            } catch (BackingStoreException e) {
-                logger.error("Could not save loggin preferences", e);
-            }
-        }
-        super.buttonPressed(buttonId);
-    }
-
-    @Override
     protected void okPressed() {
         try {
             new URL("http://" + serverWidget.getText());
@@ -348,6 +312,38 @@ public class LoginDialog extends TitleAreaDialog {
 
         if (sites != null) {
             // login successful
+            pluginPrefs.put(LAST_SERVER, serverWidget.getText());
+            pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
+
+            if ((serverWidget.getText().length() > 0)
+                && (serverWidget.getSelectionIndex() == -1)
+                && !servers.contains(serverWidget.getText())) {
+                IPreferenceStore prefsStore = BioBankPlugin.getDefault()
+                    .getPreferenceStore();
+                StringBuilder serverList = new StringBuilder();
+                for (String server : servers) {
+                    serverList.append(server);
+                    serverList.append("\n");
+                }
+                prefsStore.putValue(PreferenceConstants.SERVER_LIST, serverList
+                    .append(serverWidget.getText().trim()).toString());
+            }
+
+            if ((userNameWidget.getText().length() > 0)
+                && (userNameWidget.getSelectionIndex() == -1)
+                && !userNames.contains(userNameWidget.getText())) {
+                Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
+                Preferences prefsUserName = prefsUserNames.node(Integer
+                    .toString(userNames.size()));
+                prefsUserName.put(USER_NAME, userNameWidget.getText().trim());
+            }
+
+            try {
+                pluginPrefs.flush();
+            } catch (BackingStoreException e) {
+                logger.error("Could not save loggin preferences", e);
+            }
+
             SessionManager.getInstance().addSession(
                 sessionHelper.getAppService(), serverWidget.getText(),
                 realUsername, sites);

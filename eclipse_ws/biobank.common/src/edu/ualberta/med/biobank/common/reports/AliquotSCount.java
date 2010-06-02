@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 
 public class AliquotSCount extends QueryObject {
 
@@ -11,7 +12,9 @@ public class AliquotSCount extends QueryObject {
             "Lists the total number of each aliquot sample type by study.",
             "Select Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name, count(*) from "
                 + Aliquot.class.getName()
-                + " as Alias where Alias.aliquotPosition.container.label not like 'SS%' and Alias.patientVisit.patient.study.site "
+                + " as Alias where Alias.aliquotPosition not in (from "
+                + AliquotPosition.class.getName()
+                + " a where a.container.label like 'SS%') and Alias.patientVisit.patient.study.site "
                 + op
                 + siteId
                 + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name",
