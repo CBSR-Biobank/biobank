@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -98,9 +98,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
         if (logQueryDate != null) {
             // 05/31/10 10:45 AM
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "dd/MM/yy KK:mm aa");
-            info.date = dateFormat.format(logQueryDate);
+            info.date = DateFormatter.formatAsDateTime(logQueryDate);
         } else {
 
             info.date = null;

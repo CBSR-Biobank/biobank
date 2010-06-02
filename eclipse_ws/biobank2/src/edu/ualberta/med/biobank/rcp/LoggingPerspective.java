@@ -9,8 +9,6 @@ public class LoggingPerspective implements IPerspectiveFactory {
 
     @Override
     public void createInitialLayout(IPageLayout layout) {
-        layout.setEditorAreaVisible(true);
-
     }
 
 }

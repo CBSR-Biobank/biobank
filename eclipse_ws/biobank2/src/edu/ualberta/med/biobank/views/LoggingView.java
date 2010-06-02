@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.views;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -19,16 +20,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.ISourceProvider;
+import org.eclipse.ui.ISourceProviderListener;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.LogQuery;
+import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 //DateTimeWidget
@@ -37,7 +45,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class LoggingView extends ViewPart {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.LoggingView";
-    public static LoggingView loggingView;
+
+    private ISourceProviderListener siteStateListener;
 
     private static enum ComboListType {
         USER, TYPE, ACTION
@@ -54,7 +63,10 @@ public class LoggingView extends ViewPart {
         locationTextInput;
     // containerLabelTextInput
 
-    Combo userCombo, typeCombo, actionCombo, startDateCombo, stopDateCombo;
+    Combo userCombo, typeCombo, actionCombo;
+
+    DateTimeWidget startDateWidget, stopDateWidget;
+
     // containerTypeCombo
 
     Button clearButton, searchButton;
@@ -86,12 +98,12 @@ public class LoggingView extends ViewPart {
     };
 
     public LoggingView() {
-        loggingView = this;
     }
 
     /* TODO implement Auto-fill text/combo box hybrid */
     @Override
     public void createPartControl(Composite parent) {
+
         GridLayout gridlayout = new GridLayout();
         gridlayout.makeColumnsEqualWidth = false;
         gridlayout.numColumns = 2;
@@ -120,8 +132,6 @@ public class LoggingView extends ViewPart {
         userLabel.setVisible(true);
 
         userCombo = new Combo(top, SWT.READ_ONLY);
-        userCombo.setItems(this.loadComboList(ComboListType.USER));
-        userCombo.select(0);
         userCombo.setVisible(true);
         userCombo.setFocus();
         userCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -134,8 +144,6 @@ public class LoggingView extends ViewPart {
         typeLabel.setVisible(true);
 
         typeCombo = new Combo(top, SWT.READ_ONLY);
-        typeCombo.setItems(this.loadComboList(ComboListType.TYPE));
-        typeCombo.select(0);
         typeCombo.setVisible(true);
         typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         typeCombo.addKeyListener(enterListener);
@@ -147,8 +155,6 @@ public class LoggingView extends ViewPart {
         actionLabel.setVisible(true);
 
         actionCombo = new Combo(top, SWT.READ_ONLY);
-        actionCombo.setItems(this.loadComboList(ComboListType.ACTION));
-        actionCombo.select(0);
         actionCombo.setVisible(true);
         actionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         actionCombo.addKeyListener(enterListener);
@@ -225,38 +231,6 @@ public class LoggingView extends ViewPart {
          * (!(string.matches("\\p{Alnum}+"))) { e.doit = false; return; } } }
          * });
          */
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
-
-        startDateLabel = new Label(top, SWT.NO_BACKGROUND);
-        startDateLabel.setText("Start Date:");
-        startDateLabel.setAlignment(SWT.LEFT);
-        startDateLabel.setBackground(colorWhite);
-        startDateLabel.setVisible(true);
-
-        startDateCombo = new Combo(top, SWT.READ_ONLY | SWT.VERTICAL);
-        startDateCombo.setItems(this.loadStartDateList(1, 90));
-        startDateCombo.select(0);
-        startDateCombo.setVisible(true);
-        startDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        startDateCombo.addKeyListener(enterListener);
-
-        stopDateLabel = new Label(top, SWT.NO_BACKGROUND);
-        stopDateLabel.setText("Stop Date:");
-        stopDateLabel.setAlignment(SWT.LEFT);
-        stopDateLabel.setBackground(colorWhite);
-        stopDateLabel.setVisible(true);
-
-        stopDateCombo = new Combo(top, SWT.READ_ONLY);
-        stopDateCombo.setItems(this.loadStartDateList(0, 90));
-        stopDateCombo.select(0);
-        stopDateCombo.setVisible(true);
-        stopDateCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        stopDateCombo.addKeyListener(enterListener);
-
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
-
         detailsLabel = new Label(top, SWT.NO_BACKGROUND);
         detailsLabel.setText("Details:");
         detailsLabel.setAlignment(SWT.LEFT);
@@ -268,6 +242,27 @@ public class LoggingView extends ViewPart {
         detailsTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         detailsTextInput.addListener(SWT.Verify, alphaNumericListener);
         detailsTextInput.addKeyListener(enterListener);
+
+        new Label(top, SWT.NONE);
+        new Label(top, SWT.NONE);
+
+        startDateLabel = new Label(top, SWT.NO_BACKGROUND);
+        startDateLabel.setText("Start Date:");
+        startDateLabel.setAlignment(SWT.LEFT);
+        startDateLabel.setBackground(colorWhite);
+        startDateLabel.setVisible(true);
+
+        startDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
+        startDateWidget.setBackground(colorWhite);
+
+        stopDateLabel = new Label(top, SWT.NO_BACKGROUND);
+        stopDateLabel.setText("Stop Date:");
+        stopDateLabel.setAlignment(SWT.LEFT);
+        stopDateLabel.setBackground(colorWhite);
+        stopDateLabel.setVisible(true);
+
+        stopDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
+        stopDateWidget.setBackground(colorWhite);
 
         new Label(top, SWT.NONE);
         new Label(top, SWT.NONE);
@@ -294,18 +289,7 @@ public class LoggingView extends ViewPart {
             public void handleEvent(Event e) {
                 switch (e.type) {
                 case SWT.Selection:
-                    userCombo.select(0);
-                    typeCombo.select(0);
-                    actionCombo.select(0);
-                    patientNumTextInput.setText("");
-                    inventoryIdTextInput.setText("");
-                    locationTextInput.setText("");
-                    // containerTypeCombo.select(0);
-                    // containerLabelTextInput.setText("");
-                    startDateCombo.select(0);
-                    stopDateCombo.select(0);
-                    detailsTextInput.setText("");
-                    break;
+                    clearFields();
                 }
             }
         });
@@ -329,13 +313,116 @@ public class LoggingView extends ViewPart {
                 e.doit = false;
             }
         });
+        setSiteManagement();
+        setEnableAllFields(false);
+        clearFields();
+    }
+
+    private void setSiteManagement() {
+        ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
+
+        siteStateListener = new ISourceProviderListener() {
+            @Override
+            public void sourceChanged(int sourcePriority, String sourceName,
+                Object sourceValue) {
+
+                if (sourceValue == null || (Integer) sourceValue < 0) {
+                    setEnableAllFields(false);
+                    return;
+                }
+
+                if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
+                    if (!SessionManager.getInstance().getCurrentSite()
+                        .getName().equals("All Sites")) {
+                        loadComboFields();
+                        setEnableAllFields(true);
+                    } else {
+                        setEnableAllFields(false);
+                    }
+                }
+            }
+
+            @Override
+            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
+            }
+        };
+
+        siteSelectionStateSourceProvider
+            .addSourceProviderListener(siteStateListener);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        if (siteStateListener != null) {
+            getSiteSelectionStateSourceProvider().removeSourceProviderListener(
+                siteStateListener);
+        }
+    }
+
+    private ISourceProvider getSiteSelectionStateSourceProvider() {
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        ISourceProvider siteSelectionStateSourceProvider = service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        return siteSelectionStateSourceProvider;
     }
 
     @Override
     public void setFocus() {
     }
 
+    private void setEnableAllFields(boolean enabled) {
+        userCombo.setEnabled(enabled);
+        typeCombo.setEnabled(enabled);
+        actionCombo.setEnabled(enabled);
+        patientNumTextInput.setEnabled(enabled);
+        inventoryIdTextInput.setEnabled(enabled);
+        locationTextInput.setEnabled(enabled);
+        detailsTextInput.setEnabled(enabled);
+        startDateWidget.setEnabled(enabled);
+        stopDateWidget.setEnabled(enabled);
+        clearButton.setEnabled(enabled);
+        searchButton.setEnabled(enabled);
+    }
+
+    private void loadComboFields() {
+        userCombo.setItems(this.loadComboList(ComboListType.USER));
+        userCombo.select(0);
+        typeCombo.setItems(this.loadComboList(ComboListType.TYPE));
+        typeCombo.select(0);
+        actionCombo.setItems(this.loadComboList(ComboListType.ACTION));
+        actionCombo.select(0);
+    }
+
+    private void clearFields() {
+        userCombo.select(0);
+        typeCombo.select(0);
+        actionCombo.select(0);
+        patientNumTextInput.setText("");
+        inventoryIdTextInput.setText("");
+        locationTextInput.setText("");
+        detailsTextInput.setText("");
+
+        Calendar now = new GregorianCalendar();
+        Calendar dayBefore = new GregorianCalendar();
+        dayBefore.setTimeInMillis(dayBefore.getTimeInMillis() - 1000 * 60 * 60
+            * 24);
+        startDateWidget.setDate(dayBefore.getTime());
+        stopDateWidget.setDate(now.getTime());
+
+    }
+
     private void searchDatabase() {
+
+        if (startDateWidget.getDate().after(stopDateWidget.getDate())) {
+            BioBankPlugin.openAsyncError("Error",
+                "Error: start date cannot be ahead stop date.");
+            return;
+        }
+
         FormInput input = new FormInput(null, "Logging Form Input");
         try {
             LogQuery.getInstance().setSearchQueryItem("user",
@@ -352,10 +439,13 @@ public class LoggingView extends ViewPart {
                 locationTextInput.getText());
             LogQuery.getInstance().setSearchQueryItem("details",
                 detailsTextInput.getText());
+            Date startDateDate = startDateWidget.getDate();
+            Date stopDateDate = stopDateWidget.getDate();
+
             LogQuery.getInstance().setSearchQueryItem("startDate",
-                startDateCombo.getText());
+                DateFormatter.formatAsDateTime(startDateDate));
             LogQuery.getInstance().setSearchQueryItem("stopDate",
-                stopDateCombo.getText());
+                DateFormatter.formatAsDateTime(stopDateDate));
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()
@@ -424,18 +514,4 @@ public class LoggingView extends ViewPart {
         return null;
     }
 
-    private String[] loadStartDateList(long startOffset, long listLength) {
-        String list[] = new String[(int) listLength];
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-        Calendar nowCal = new GregorianCalendar();
-        Calendar beforeCal = new GregorianCalendar();
-        for (long i = startOffset; i < listLength + startOffset; i++) {
-            beforeCal.setTimeInMillis(nowCal.getTimeInMillis() - i * 1000 * 60
-                * 60 * 24);
-            list[(int) i - (int) startOffset] = dateFormat.format(beforeCal
-                .getTime());
-        }
-
-        return list;
-    }
 }

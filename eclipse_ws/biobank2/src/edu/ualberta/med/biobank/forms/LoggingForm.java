@@ -40,7 +40,7 @@ public class LoggingForm extends BiobankViewForm {
 
         PlatformUI.getWorkbench().getViewRegistry().find(LoggingView.ID);
 
-        form.setText("Logging: Browse through logs.");
+        form.setText("Logging: Browse through your search results");
         GridLayout layout = new GridLayout(1, false);
         form.getBody().setLayout(layout);
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -69,8 +69,10 @@ public class LoggingForm extends BiobankViewForm {
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE, "Type");
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
             "Action");
-        detailsLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Details");
+        startDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            "Start Date");
+        stopDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            "Stop Date");
 
         patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Patient #");
@@ -78,11 +80,8 @@ public class LoggingForm extends BiobankViewForm {
             "Location");
         inventoryIDLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Inventory ID");
-
-        startDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Start Date");
-        stopDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Stop Date");
+        detailsLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
+            "Details");
 
         getSearchRequestFields();
 
