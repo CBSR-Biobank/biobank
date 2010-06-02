@@ -33,29 +33,25 @@ public class DataModelExtractor {
         doc.getDocumentElement().normalize();
         System.out.println("Root element "
             + doc.getDocumentElement().getNodeName());
-        NodeList nodeLst = doc.getElementsByTagName("UML:Class");
+        NodeList nodeLst = doc.getElementsByTagName("UML:Package");
 
         for (int s = 0; s < nodeLst.getLength(); s++) {
+            Element el = (Element) nodeLst.item(s);
+            if (!el.getAttribute("name").equals("Data Model"))
+                continue;
+            System.out.println("Package: " + el.getAttribute("name"));
+            NodeList dmNodeLst = el.getChildNodes();
 
-            Node fstNode = nodeLst.item(s);
+            for (int i = 0, n = dmNodeLst.getLength(); i < n; ++i) {
+                Node el1 = (Node) dmNodeLst.item(i);
+                if (!dmNodeLst.item(i).getNodeName().equals(
+                    "UML:Namespace.ownedElement"))
+                    continue;
 
-            if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+                System.out.println("node " + el1.getNodeName() + " "
+                    + el1.getNodeType());
 
-                Element fstElmnt = (Element) fstNode;
-                NodeList fstNmElmntLst = fstElmnt
-                    .getElementsByTagName("UML:Classifier.feature");
-                Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
-                NodeList fstNm = fstNmElmnt.getChildNodes();
-                System.out.println("Attribute : "
-                    + ((Node) fstNm.item(0)).getNodeValue());
-                NodeList lstNmElmntLst = fstElmnt
-                    .getElementsByTagName("lastname");
-                Element lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                NodeList lstNm = lstNmElmnt.getChildNodes();
-                System.out.println("Last Name : "
-                    + ((Node) lstNm.item(0)).getNodeValue());
             }
-
         }
 
     }
