@@ -14,13 +14,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends TitleAreaDialog {
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(SelectClinicContactDialog.class.getName());
 
     public static final int ADD_BTN_ID = 100;
 
