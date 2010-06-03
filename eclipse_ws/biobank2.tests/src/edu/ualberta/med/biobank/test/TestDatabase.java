@@ -181,7 +181,7 @@ public class TestDatabase {
                     continue;
 
                 try {
-                    // 512 length string
+                    // 512 char string
                     String longString = "12345678901234567890123456789012"
                         + "12345678901234567890123456789012"
                         + "12345678901234567890123456789012"
