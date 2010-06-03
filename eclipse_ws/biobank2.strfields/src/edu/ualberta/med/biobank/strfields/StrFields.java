@@ -11,29 +11,37 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.FileUtils;
 
 public class StrFields {
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR OUTPATH\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
-    private static String HBM_FILE_EXTENSION = ".hbm.xml";
+    private static StrFields instance = null;
 
-    private static Pattern HBM_STRING_ATTR = Pattern.compile(
-        "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
-        Pattern.CASE_INSENSITIVE);
+    private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
     private static Pattern VARCHAR_LEN = Pattern.compile("VARCHAR\\((\\d+)\\)");
 
-    private AppArgs appArgs;
+    private AppArgs appArgs = null;
 
-    public StrFields(AppArgs appArgs) {
+    private StrFields() {
+
+    }
+
+    public static StrFields getInstance() {
+        if (instance == null) {
+            instance = new StrFields();
+        }
+        return instance;
+    }
+
+    public void doWork(AppArgs appArgs) {
         this.appArgs = appArgs;
 
         try {
@@ -67,6 +75,13 @@ public class StrFields {
         }
     }
 
+    public boolean getVerbose() throws Exception {
+        if (appArgs == null) {
+            throw new Exception("invalid state");
+        }
+        return appArgs.verbose;
+    }
+
     /*
      * Returns all "*.hbm.xml" files found in directory hbmDir
      */
@@ -96,60 +111,26 @@ public class StrFields {
         String className = toTitleCase(hbmFileName.replace(HBM_FILE_EXTENSION,
             ""));
 
-        try {
-            Map<String, String> attrMap = DataModelExtractor.getInstance()
-                .getDmClassAttrMap(className);
+        Map<String, String> attrMap = DataModelExtractor.getInstance()
+            .getDmClassAttrMap(className);
+        Map<String, Integer> attrLengthMap = new HashMap<String, Integer>();
 
-            File outFile = File.createTempFile(className, HBM_FILE_EXTENSION);
+        for (String attrName : attrMap.keySet()) {
+            String attrType = attrMap.get(attrName);
 
-            BufferedReader reader = new BufferedReader(new FileReader(
-                hbmFilePath));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+            if (attrType.startsWith("VARCHAR")) {
+                Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
 
-            String line = reader.readLine();
-            while (line != null) {
-                Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
-                if (stringAttrMatcher.find() && !line.contains("length=\"")) {
-                    String attrName = stringAttrMatcher.group(1);
-                    String attrType = attrMap.get(attrName);
-
-                    if (attrType == null) {
-                        throw new Exception(
-                            "hbm file attribute not found: file " + hbmFileName
-                                + ", " + attrName);
-                    }
-
-                    if (attrType.startsWith("VARCHAR")) {
-                        Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
-
-                        if (varcharMatcher.find()) {
-                            line = line.replace("type=\"string\"",
-                                "type=\"string\" length=\""
-                                    + varcharMatcher.group(1) + "\"");
-                        }
-                    } else if (attrType.startsWith("TEXT")) {
-                        line = line.replace("type=\"string\"",
-                            "type=\"string\" length=\"500\"");
-                    }
+                if (varcharMatcher.find()) {
+                    attrLengthMap.put(attrName, Integer.valueOf(varcharMatcher
+                        .group(1)));
                 }
-
-                writer.write(line);
-                writer.newLine();
-                line = reader.readLine();
-            }
-
-            reader.close();
-            writer.flush();
-            writer.close();
-            FileUtils.copyFile(outFile, new File(hbmFilePath));
-            outFile.deleteOnExit();
-        } catch (Exception e) {
-            if (appArgs.verbose) {
-                System.out.println("class " + className
-                    + " does not have a corresponding HBM file");
+            } else if (attrType.startsWith("TEXT")) {
+                attrLengthMap.put(attrName, 500);
             }
         }
 
+        HbmModifier.getInstance().alterMapping(hbmFilePath, attrLengthMap);
     }
 
     private void createVarCharLengthProperties() throws Exception {
@@ -203,7 +184,7 @@ public class StrFields {
 
     public static void main(String argv[]) {
         try {
-            new StrFields(parseCommandLine(argv));
+            StrFields.getInstance().doWork(parseCommandLine(argv));
         } catch (Exception e) {
             e.printStackTrace();
         }

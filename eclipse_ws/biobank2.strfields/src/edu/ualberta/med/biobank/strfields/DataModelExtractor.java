@@ -15,8 +15,6 @@ import org.w3c.dom.NodeList;
 
 public class DataModelExtractor {
 
-    private Document doc;
-
     private class DataModelClass {
         @SuppressWarnings("unused")
         String name;
@@ -34,6 +32,8 @@ public class DataModelExtractor {
     private Map<String, String> modelDataTypeMap;
 
     private Map<String, DataModelClass> dataModelClassMap;
+
+    private Document doc;
 
     private DataModelExtractor() {
         modelDataTypeMap = new HashMap<String, String>();
