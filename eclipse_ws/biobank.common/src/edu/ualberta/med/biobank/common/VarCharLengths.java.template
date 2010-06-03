@@ -1,0 +1,19 @@
+package edu.ualberta.med.biobank.common;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+public class VarCharLengths {
+    
+    private static Map<String, Integer> attrMaxLen;
+    static {
+       Map<String, Integer>  aMap = new HashMap<String, Integer>();
+       {attrMapContents}
+       attrMaxLen = Collections.unmodifiableMap(aMap);
+    };
+
+    public static Integer getMaxSize(Class<?> klass, String attributeName) {
+        return attrMaxLen.get(klass.getName() + "." + attributeName);
+    }
+}

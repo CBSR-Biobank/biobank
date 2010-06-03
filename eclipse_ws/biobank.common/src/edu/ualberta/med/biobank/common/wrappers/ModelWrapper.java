@@ -218,36 +218,36 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkFieldLimits() throws BiobankCheckException,
         BiobankStringLengthException {
         String fieldValue = "";
-        VarCharLengths properties = VarCharLengths.getInstance();
         String[] fields = getPropertyChangeNames();
         for (int i = 0; i < fields.length; i++) {
-            int maxLen = properties.getMaxSize(fields[i]);
-            if (maxLen > 0) {
-                Method method;
-                try {
-                    method = this.getClass().getMethod(
-                        "get" + Character.toUpperCase(fields[i].charAt(0))
-                            + fields[i].substring(1));
-                    if (method.getReturnType().equals(String.class)) {
-                        fieldValue = (String) method.invoke(this);
-                        if ((fieldValue != null)
-                            && (fieldValue.length() > maxLen)) {
-                            throw new BiobankStringLengthException(
-                                "Field exceeds max length: field: " + fields[i]
-                                    + ", value \"" + fieldValue + "\"");
-                        }
+            Integer maxLen = VarCharLengths.getMaxSize(
+                wrappedObject.getClass(), fields[i]);
+            if (maxLen == null)
+                continue;
+
+            Method method;
+            try {
+                method = this.getClass().getMethod(
+                    "get" + Character.toUpperCase(fields[i].charAt(0))
+                        + fields[i].substring(1));
+                if (method.getReturnType().equals(String.class)) {
+                    fieldValue = (String) method.invoke(this);
+                    if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
+                        throw new BiobankStringLengthException(
+                            "Field exceeds max length: field: " + fields[i]
+                                + ", value \"" + fieldValue + "\"");
                     }
-                } catch (SecurityException e) {
-                    throwBiobankException(fields[i], e);
-                } catch (NoSuchMethodException e) {
-                    throwBiobankException(fields[i], e);
-                } catch (IllegalArgumentException e) {
-                    throwBiobankException(fields[i], e);
-                } catch (IllegalAccessException e) {
-                    throwBiobankException(fields[i], e);
-                } catch (InvocationTargetException e) {
-                    throwBiobankException(fields[i], e);
                 }
+            } catch (SecurityException e) {
+                throwBiobankException(fields[i], e);
+            } catch (NoSuchMethodException e) {
+                throwBiobankException(fields[i], e);
+            } catch (IllegalArgumentException e) {
+                throwBiobankException(fields[i], e);
+            } catch (IllegalAccessException e) {
+                throwBiobankException(fields[i], e);
+            } catch (InvocationTargetException e) {
+                throwBiobankException(fields[i], e);
             }
         }
     }

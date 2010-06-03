@@ -60,6 +60,8 @@ public class StrFields {
                 updateHbmFile(file);
             }
 
+            createVarCharLengthProperties();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -105,7 +107,6 @@ public class StrFields {
             BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
             String line = reader.readLine();
-
             while (line != null) {
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
                 if (stringAttrMatcher.find() && !line.contains("length=\"")) {
@@ -142,9 +143,6 @@ public class StrFields {
             writer.close();
             FileUtils.copyFile(outFile, new File(hbmFilePath));
             outFile.deleteOnExit();
-
-            System.out.println(hbmFilePath);
-
         } catch (Exception e) {
             if (appArgs.verbose) {
                 System.out.println("class " + className
@@ -152,6 +150,55 @@ public class StrFields {
             }
         }
 
+    }
+
+    private void createVarCharLengthProperties() throws Exception {
+        String newLine = System.getProperty("line.separator");
+        StringBuffer sb = new StringBuffer();
+
+        for (String className : DataModelExtractor.getInstance()
+            .getDmClassSet()) {
+            Map<String, String> attrMap = DataModelExtractor.getInstance()
+                .getDmClassAttrMap(className);
+            for (String attrName : attrMap.keySet()) {
+                String attrType = attrMap.get(attrName);
+                if (!attrType.startsWith("VARCHAR"))
+                    continue;
+
+                if (attrType.startsWith("VARCHAR")) {
+                    Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
+
+                    if (varcharMatcher.find()) {
+                        attrType = varcharMatcher.group(1);
+
+                        sb
+                            .append("\t\taMap.put(\"edu.ualberta.med.biobank.model."
+                                + toCamelCase(className + "." + attrName, true)
+                                + "\", " + attrType + ");");
+                        sb.append(newLine);
+                    }
+                }
+            }
+        }
+
+        String content = sb.toString();
+
+        BufferedReader reader = new BufferedReader(new FileReader(
+            appArgs.outDir + "/" + "VarCharLengths.java.template"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(
+            appArgs.outDir + "/" + "VarCharLengths.java"));
+
+        String line = reader.readLine();
+        while (line != null) {
+            line = line.replace("{attrMapContents}", content);
+            writer.write(line);
+            writer.newLine();
+            line = reader.readLine();
+        }
+
+        writer.flush();
+        writer.close();
+        reader.close();
     }
 
     public static void main(String argv[]) {
@@ -197,13 +244,12 @@ public class StrFields {
         return appArgs;
     }
 
-    @SuppressWarnings("unused")
-    private String convertToCamelCase(String str) {
+    private String toCamelCase(String str, boolean firstCharUpperCase) {
         StringBuffer sb = new StringBuffer();
         String[] splitStr = str.split("_");
         boolean firstTime = true;
         for (String temp : splitStr) {
-            if (firstTime) {
+            if (firstTime && !firstCharUpperCase) {
                 sb.append(temp.toLowerCase());
                 firstTime = false;
             } else {
