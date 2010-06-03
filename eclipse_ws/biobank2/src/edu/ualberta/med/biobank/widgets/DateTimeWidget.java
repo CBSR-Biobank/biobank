@@ -97,9 +97,11 @@ public class DateTimeWidget extends BiobankWidget {
                         .get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
                 }
                 new Label(dialog, SWT.BORDER);
+
                 calendar.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseDoubleClick(MouseEvent e) {
+
                         Calendar c = Calendar.getInstance();
                         if (dateEntry.getSelection() != null)
                             c.setTime(dateEntry.getSelection());
