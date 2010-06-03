@@ -96,14 +96,14 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     public void setNeedOriginalVolume(Boolean needOriginalVolume) {
-        Boolean oldNeedOriginalVolume = wrappedObject.getNeedRealVolume();
-        wrappedObject.setNeedRealVolume(needOriginalVolume);
+        Boolean oldNeedOriginalVolume = wrappedObject.getNeedOriginalVolume();
+        wrappedObject.setNeedOriginalVolume(needOriginalVolume);
         propertyChangeSupport.firePropertyChange("needOriginalVolume",
             oldNeedOriginalVolume, needOriginalVolume);
     }
 
     public Boolean getNeedOriginalVolume() {
-        return wrappedObject.getNeedRealVolume();
+        return wrappedObject.getNeedOriginalVolume();
     }
 
 }
