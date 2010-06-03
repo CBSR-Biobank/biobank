@@ -119,7 +119,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                     patientVisitCollection);
             }
         }
-        if (sort) {
+        if (sort && patientVisitCollection != null) {
             Collections.sort(patientVisitCollection,
                 new Comparator<PatientVisitWrapper>() {
                     @Override
