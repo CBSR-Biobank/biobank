@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -13,33 +10,6 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 10;
-
-    @SuppressWarnings("unused")
-    private class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            SampleTypeWrapper i1 = (SampleTypeWrapper) ((BiobankCollectionModel) e1).o;
-            SampleTypeWrapper i2 = (SampleTypeWrapper) ((BiobankCollectionModel) e2).o;
-            if (i1 == null) {
-                return -1;
-            } else if (i2 == null) {
-                return 1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(i1.getName(), i2.getName());
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
-        }
-    }
 
     private static final String[] HEADINGS = new String[] { "Sample Type",
         "Short Name" };
@@ -77,12 +47,6 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
     protected String getCollectionModelObjectToString(Object o) {
         if (o == null)
             return null;
@@ -91,21 +55,8 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
     }
 
     @Override
-    public List<SampleTypeWrapper> getCollection() {
-        List<SampleTypeWrapper> result = new ArrayList<SampleTypeWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add((SampleTypeWrapper) item.o);
-        }
-        return result;
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 
-    @Override
-    public SampleTypeWrapper getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
-        SampleTypeWrapper type = (SampleTypeWrapper) item.o;
-        Assert.isNotNull(type);
-        return type;
-    }
 }

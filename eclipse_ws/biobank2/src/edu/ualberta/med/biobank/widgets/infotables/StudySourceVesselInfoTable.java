@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
@@ -18,9 +16,9 @@ public class StudySourceVesselInfoTable extends
 
     protected class TableRowData {
         StudySourceVesselWrapper studySourceVessel;
-        String name;
-        Boolean needTimeDrawn;
-        Boolean needOriginalVolume;
+        public String name;
+        public Boolean needTimeDrawn;
+        public Boolean needOriginalVolume;
 
         @Override
         public String toString() {
@@ -29,39 +27,6 @@ public class StudySourceVesselInfoTable extends
                 (needTimeDrawn != null) ? needTimeDrawn.toString() : "",
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
                     : "" }, "\t");
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if (i1 == null) {
-                return -1;
-            } else if (i2 == null) {
-                return 1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(i1.name, i2.name);
-                break;
-            case 1:
-                rc = compare(i1.needTimeDrawn, i2.needTimeDrawn);
-                break;
-            case 2:
-                rc = compare(i1.needOriginalVolume, i2.needOriginalVolume);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -105,13 +70,7 @@ public class StudySourceVesselInfoTable extends
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
-    public Object getCollectionModelObject(
+    public TableRowData getCollectionModelObject(
         StudySourceVesselWrapper studySourceVessel) throws Exception {
         TableRowData info = new TableRowData();
         info.studySourceVessel = studySourceVessel;
@@ -131,15 +90,6 @@ public class StudySourceVesselInfoTable extends
     }
 
     @Override
-    public List<StudySourceVesselWrapper> getCollection() {
-        List<StudySourceVesselWrapper> result = new ArrayList<StudySourceVesselWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).studySourceVessel);
-        }
-        return result;
-    }
-
-    @Override
     public StudySourceVesselWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -147,6 +97,11 @@ public class StudySourceVesselInfoTable extends
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.studySourceVessel;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 
 }

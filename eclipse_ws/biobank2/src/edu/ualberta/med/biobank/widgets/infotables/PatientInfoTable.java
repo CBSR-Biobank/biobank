@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -16,44 +14,16 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
-    class TableRowData {
+    protected class TableRowData {
         PatientWrapper patient;
-        String pnumber;
-        String studyNameShort;
+        public String pnumber;
+        public String studyNameShort;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { pnumber, studyNameShort },
                 "\t");
         }
-    }
-
-    class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((c1 == null) || (c2 == null)) {
-                return -1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(c1.pnumber, c2.pnumber);
-                break;
-            case 1:
-                rc = compare(c1.studyNameShort, c2.studyNameShort);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
-        }
-
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
@@ -91,13 +61,7 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
-    public Object getCollectionModelObject(PatientWrapper patient)
+    public TableRowData getCollectionModelObject(PatientWrapper patient)
         throws Exception {
         TableRowData info = new TableRowData();
         info.patient = patient;
@@ -119,15 +83,6 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
     }
 
     @Override
-    public List<PatientWrapper> getCollection() {
-        List<PatientWrapper> result = new ArrayList<PatientWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).patient);
-        }
-        return result;
-    }
-
-    @Override
     public PatientWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -135,5 +90,10 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.patient;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 }
