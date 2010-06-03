@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.strfields;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -16,6 +16,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class HbmModifier {
 
@@ -40,7 +43,23 @@ public class HbmModifier {
         throws Exception {
         File file = new File(filename);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setValidating(false);
         DocumentBuilder db = dbf.newDocumentBuilder();
+
+        // dissable parsing of external DTD since this slows down the processing
+        db.setEntityResolver(new EntityResolver() {
+            public InputSource resolveEntity(java.lang.String publicId,
+                java.lang.String systemId) throws SAXException,
+                java.io.IOException {
+                if (systemId.endsWith(".dtd"))
+                    // this deactivates all DTDs by giving empty XML docs
+                    return new InputSource(new ByteArrayInputStream(
+                        "<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
+                else
+                    return null;
+            }
+        });
+
         doc = db.parse(file);
         doc.getDocumentElement().normalize();
 
@@ -81,10 +100,14 @@ public class HbmModifier {
         }
 
         if (documentChanged) {
-            Source source = new DOMSource(doc);
-            Result result = new StreamResult(new File(filename));
             Transformer t = TransformerFactory.newInstance().newTransformer();
-            t.transform(source, result);
+
+            t.setOutputProperty(OutputKeys.METHOD, "xml");
+            t
+                .setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,
+                    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd");
+            t.transform(new DOMSource(doc),
+                new StreamResult(new File(filename)));
 
             if (StrFields.getInstance().getVerbose()) {
                 System.out.println("HBM Modified: " + filename);

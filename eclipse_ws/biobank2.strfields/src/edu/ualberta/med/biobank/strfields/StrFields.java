@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class StrFields {
 
-    private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR OUTPATH\n\n"
+    private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
     private static StrFields instance = null;
@@ -44,6 +44,13 @@ public class StrFields {
     public void doWork(AppArgs appArgs) {
         this.appArgs = appArgs;
 
+        if (appArgs.verbose) {
+            System.out.println("  UML file: " + appArgs.modelFileName);
+            System.out.println("  HBM dir:  " + appArgs.hbmDir);
+            System.out.println("  Template: " + appArgs.template);
+            System.out.println();
+        }
+
         try {
             DataModelExtractor.getInstance().getModel(appArgs.modelFileName);
 
@@ -58,17 +65,18 @@ public class StrFields {
                             && !type.startsWith("TEXT"))
                             continue;
 
-                        System.out.println(className + "." + attrName + ": "
-                            + type);
+                        System.out.println("  " + className + "." + attrName
+                            + ": " + type);
                     }
                 }
+                System.out.println();
             }
 
             for (String file : getHbmFiles(appArgs.hbmDir)) {
                 updateHbmFile(file);
             }
 
-            createVarCharLengthProperties();
+            createVarCharLengthsSourceCode();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,7 +141,7 @@ public class StrFields {
         HbmModifier.getInstance().alterMapping(hbmFilePath, attrLengthMap);
     }
 
-    private void createVarCharLengthProperties() throws Exception {
+    private void createVarCharLengthsSourceCode() throws Exception {
         String newLine = System.getProperty("line.separator");
         StringBuffer sb = new StringBuffer();
 
@@ -165,9 +173,9 @@ public class StrFields {
         String content = sb.toString();
 
         BufferedReader reader = new BufferedReader(new FileReader(
-            appArgs.outDir + "/" + "VarCharLengths.java.template"));
+            appArgs.template));
         BufferedWriter writer = new BufferedWriter(new FileWriter(
-            appArgs.outDir + "/" + "VarCharLengths.java"));
+            appArgs.template.replace(".template", "")));
 
         String line = reader.readLine();
         while (line != null) {
@@ -220,7 +228,7 @@ public class StrFields {
 
         appArgs.modelFileName = args[0];
         appArgs.hbmDir = args[1];
-        appArgs.outDir = args[2];
+        appArgs.template = args[2];
 
         return appArgs;
     }
@@ -266,5 +274,5 @@ class AppArgs {
     boolean verbose = false;
     String modelFileName = null;
     String hbmDir = null;
-    String outDir = null;
+    String template = null;
 }
