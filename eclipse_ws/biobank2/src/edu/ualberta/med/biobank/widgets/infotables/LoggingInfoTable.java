@@ -78,11 +78,6 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        return null;
-    }
-
-    @Override
     public Object getCollectionModelObject(LogWrapper logQuery)
         throws Exception {
         TableRowData info = new TableRowData();
@@ -123,6 +118,11 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     // XXX getSelection
     @Override
     public LogWrapper getSelection() {
+        return null;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
         return null;
     }
 }
