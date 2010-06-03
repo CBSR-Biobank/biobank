@@ -48,7 +48,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private Button scanButton;
     private String scanButtonTitle;
 
-    private CancelConfirmWidget cancelConfirmWidget;
+    protected CancelConfirmWidget cancelConfirmWidget;
 
     private static IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
@@ -225,13 +225,21 @@ public abstract class AbstractPalletAliquotAdminForm extends
         if (BioBankPlugin.isRealScanEnabled()) {
             int plateNum = BioBankPlugin.getDefault().getPlateNumber(
                 currentPlateToScan);
-            ScanCell[][] scanCells = null;
-            if (isScanChoiceSimple) {
-                scanCells = ScannerConfigPlugin.scan(plateNum);
+            if (plateNum == -1) {
+                setScanNotLauched(true);
+                BioBankPlugin.openAsyncError("Scan error",
+                    "Plate with barcode " + currentPlateToScan
+                        + " is not enabled");
+                return;
             } else {
-                scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
+                ScanCell[][] scanCells = null;
+                if (isScanChoiceSimple) {
+                    scanCells = ScannerConfigPlugin.scan(plateNum);
+                } else {
+                    scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
+                }
+                cells = PalletCell.convertArray(scanCells);
             }
-            cells = PalletCell.convertArray(scanCells);
         } else {
             launchFakeScan();
         }
@@ -348,14 +356,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void resetPlateToScan() {
         plateToScanText.setText(""); //$NON-NLS-1$
         plateToScanValue.setValue(""); //$NON-NLS-1$
-    }
-
-    protected void focusOnCancelConfirmText() {
-        cancelConfirmWidget.setFocus();
-    }
-
-    protected CancelConfirmWidget getCancelConfirmWidget() {
-        return cancelConfirmWidget;
     }
 
     protected void setCanLaunchScan(boolean canLauch) {

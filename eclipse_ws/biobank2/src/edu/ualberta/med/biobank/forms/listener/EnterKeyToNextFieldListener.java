@@ -18,7 +18,7 @@ public class EnterKeyToNextFieldListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if (e.keyCode == 13) {
+        if (e.character == SWT.CR) {
             ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
         }
     }

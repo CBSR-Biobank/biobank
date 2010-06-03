@@ -26,7 +26,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -309,7 +308,7 @@ public class WidgetCreator {
         Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
         return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
-            input, selection, errorMessage, false);
+            input, selection, errorMessage, true);
     }
 
     public <T> ComboViewer createComboViewerWithNoSelectionValidator(
@@ -369,7 +368,6 @@ public class WidgetCreator {
         if (modifyListener != null) {
             combo.addModifyListener(modifyListener);
         }
-        comboViewer.setSorter(new ViewerSorter());
         return comboViewer;
     }
 

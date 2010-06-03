@@ -11,6 +11,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -25,8 +27,8 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView.ShipmentListener;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
@@ -57,8 +59,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ShipmentPatientsWidget shipmentPatientsWidget;
 
-    private ShipmentListener shipListener;
-
     private BiobankText waybillText;
 
     private Label waybillLabel;
@@ -66,6 +66,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private NonEmptyStringValidator waybillValidator;
 
     private static final String WAYBILL_BINDING = "shipment-waybill-binding";
+
+    private boolean dateReceivedModified;
 
     @Override
     protected void init() throws Exception {
@@ -89,14 +91,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             tabName = "Shipment " + shipmentWrapper.getFormattedDateReceived();
         }
         setPartName(tabName);
-        shipListener = new ShipmentListener(shipmentAdapter);
-        shipmentWrapper.addWrapperListener(shipListener);
-    }
-
-    @Override
-    public void dispose() {
-        shipmentWrapper.removeWrapperListener(shipListener);
-        super.dispose();
     }
 
     @Override
@@ -182,9 +176,16 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Box Number", null, BeansObservables.observeValue(shipmentWrapper,
                 "boxNumber"), null);
 
-        createDateTimeWidget(client, "Date Received", shipmentWrapper
-            .getDateReceived(), BeansObservables.observeValue(shipmentWrapper,
-            "dateReceived"), "Date received should be set");
+        DateTimeWidget dateReceivedWidget = createDateTimeWidget(client,
+            "Date Received", shipmentWrapper.getDateReceived(),
+            BeansObservables.observeValue(shipmentWrapper, "dateReceived"),
+            "Date received should be set");
+        dateReceivedWidget.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                dateReceivedModified = true;
+            }
+        });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
             | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
@@ -263,8 +264,26 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         shipmentWrapper.persist();
 
         if (newShipment) {
-            ShipmentAdministrationView.showShipment(shipmentWrapper);
+            if (shipmentAdapter.getWrapper().isReceivedToday()) {
+                shipmentAdapter.getParent().removeChild(shipmentAdapter, false);
+                ShipmentAdministrationView.getCurrent().reload();
+                if (PatientAdministrationView.getCurrent() != null) {
+                    PatientAdministrationView.getCurrent().reload();
+                }
+            } else {
+                ShipmentAdministrationView.showShipment(shipmentWrapper);
+            }
         } else {
+            if (dateReceivedModified) {
+                shipmentAdapter.getParent().removeChild(shipmentAdapter, false);
+                ShipmentAdministrationView.getCurrent().reload();
+                if (PatientAdministrationView.getCurrent() != null) {
+                    PatientAdministrationView.getCurrent().reload();
+                }
+                if (!shipmentWrapper.isReceivedToday()) {
+                    ShipmentAdministrationView.showShipment(shipmentWrapper);
+                }
+            }
             shipmentAdapter.getParent().performExpand();
         }
     }

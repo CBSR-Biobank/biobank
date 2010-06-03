@@ -104,7 +104,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), site.getActivityStatus(),
-            "Site must have an activity status", true);
+            "Site must have an activity status");
 
         BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,

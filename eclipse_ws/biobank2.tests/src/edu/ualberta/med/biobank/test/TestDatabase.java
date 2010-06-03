@@ -177,15 +177,28 @@ public class TestDatabase {
             // maxlength for varchar test
             if (returnType.equals(java.lang.String.class)) {
                 String attrName = getterInfo.getMethod.getName().substring(3);
-                if (VarCharLengths.getInstance().getMaxSize(attrName) < 0)
+                if (VarCharLengths.getMaxSize(w.getWrappedClass(), attrName) == null)
                     continue;
 
                 try {
-                    String longString = "ExcessivelyLongMassiveStringDesignedtoReachTheCharLimit."
-                        + "SomeVarCharsHaveVerySmallLimitsButThisOneWillBeTooLongForAllOfThem,"
-                        + "EvenThe255CharacterLimitFields."
-                        + "However,ThisFieldWillBeSavedCorrectlyForFieldsOfTypeTextInTheDatabase."
-                        + "AnExceptionShouldBeThrownByTheUnderlyingWrapperIfTheVarCharLimitIsViolated.";
+                    // 512 char string
+                    String longString = "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012"
+                        + "12345678901234567890123456789012";
+
                     getterInfo.setMethod.invoke(w, longString);
                     w.persist();
                     Assert.fail("VARCHAR limits not enforced on field: "

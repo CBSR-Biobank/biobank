@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.server.logging.logger;
 
+import java.util.Map;
+
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.util.LabelingScheme;
 import edu.ualberta.med.biobank.util.RowColPos;
 
@@ -16,14 +19,14 @@ public class AliquotStateLogger extends BiobankObjectStateLogger {
     }
 
     @Override
-    protected Log getLogObject(Object obj) {
+    protected Log getLogObject(Object obj, Map<String, Object> statesMap) {
         if (obj instanceof Aliquot) {
-            Aliquot aliquot = (Aliquot) obj;
             Log log = new Log();
-            log.setPatientNumber(aliquot.getPatientVisit().getPatient()
-                .getPnumber());
-            log.setInventoryId(aliquot.getInventoryId());
-            AliquotPosition pos = aliquot.getAliquotPosition();
+            PatientVisit visit = (PatientVisit) statesMap.get("patientVisit");
+            log.setPatientNumber(visit.getPatient().getPnumber());
+            log.setInventoryId((String) statesMap.get("inventoryId"));
+            AliquotPosition pos = (AliquotPosition) statesMap
+                .get("aliquotPosition");
             if (pos != null) {
                 Container parent = pos.getContainer();
                 if (parent != null) {
@@ -33,7 +36,8 @@ public class AliquotStateLogger extends BiobankObjectStateLogger {
                         + LabelingScheme.getPositionString(new RowColPos(pos
                             .getRow(), pos.getCol()), type
                             .getChildLabelingScheme().getId(), capacity
-                            .getRowCapacity(), capacity.getColCapacity()));
+                            .getRowCapacity(), capacity.getColCapacity())
+                        + " (" + type.getNameShort() + ")");
                 }
             }
             log.setType("Aliquot");

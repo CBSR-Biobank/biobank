@@ -95,6 +95,12 @@
             icon="icons/shipmentPerspective.png"
             name="Shipment View">
       </perspective>
+      <perspective
+            class="edu.ualberta.med.biobank.rcp.LoggingPerspective"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.perspective.logging"
+            name="Logging View">
+      </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -240,6 +246,10 @@
       <command
             id="edu.ualberta.med.biobank.commands.scanner.scanPlate"
             name="Scan Plate">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.logging"
+            name="Logging">
       </command>
    </extension>
    <extension
@@ -786,6 +796,22 @@
             </reference>
          </activeWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.LoggingHandler"
+            commandId="edu.ualberta.med.biobank.commands.logging">
+         <enabledWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <not>
+                  <reference
+                        definitionId="biobank2.loggingPerspectiveSelected">
+                  </reference>
+               </not>
+            </and>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -980,6 +1006,12 @@
                label="Search View"
                style="push">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.logging"
+                  icon="icons/reportsPerspective.png"
+                  label="Logging View"
+                  style="push">
+            </command>
          </menu>
          <menu
                id="edu.ualberta.med.biobank.menu.print"
@@ -1095,8 +1127,9 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
                   icon="icons/reportsPerspective.png"
-                  label="Reports View"
-                  style="push">
+                  label="Reports"
+                  style="push"
+                  tooltip="Reports">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
@@ -1490,6 +1523,21 @@
                visible="false">
          </view>
       </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.logging">
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.LoggingView"
+               minimized="false"
+               moveable="false"
+               ratio="0.3"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+      </perspectiveExtension>
       </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -1690,6 +1738,13 @@
             id="edu.ualberta.med.biobank.forms.ScanPlateForm"
             name="Scan Plate">
       </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.LoggingForm"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.forms.LoggingForm"
+            name="Logging Form">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -1791,6 +1846,11 @@
             id="biobank2.scheme"
             name="Scheme Biobank">
       </scheme>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.logging"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+K">
+      </key>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">
@@ -1889,6 +1949,14 @@
             icon="icons/search.png"
             id="edu.ualberta.med.biobank.views.SearchView"
             name="Search"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.LoggingView"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.views.LoggingView"
+            name="Logging"
             restorable="true">
       </view>
    </extension>
@@ -2011,6 +2079,15 @@
                </equals>
             </or>
                      </with>
+      </definition>
+      <definition
+            id="biobank2.loggingPerspectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <equals
+                  value="edu.ualberta.med.biobank.perspective.logging">
+            </equals>
+         </with>
       </definition>
    </extension>
    <extension

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -9,10 +11,17 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.springframework.remoting.RemoteAccessException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public abstract class AbstractSearchedNode extends AdapterBase {
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(AbstractSearchedNode.class.getName());
 
     public AbstractSearchedNode(AdapterBase parent, int id) {
         super(parent, id, "Searched", true, false);
@@ -28,6 +37,26 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 removeAll();
             }
         });
+    }
+
+    @Override
+    public void performExpand() {
+        if (!SessionManager.getInstance().isAllSitesSelected()) {
+            try {
+                for (AdapterBase child : getChildren()) {
+                    child.getModelObject().reload();
+                    List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
+                        child.getChildren());
+                    for (AdapterBase subChild : subChildren) {
+                        subChild.getModelObject().reload();
+                    }
+                }
+            } catch (final RemoteAccessException exp) {
+                BioBankPlugin.openRemoteAccessErrorMessage();
+            } catch (Exception e) {
+                logger.error("Error while refreshing searched elements", e);
+            }
+        }
     }
 
     @Override

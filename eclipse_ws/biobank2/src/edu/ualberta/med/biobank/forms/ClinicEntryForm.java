@@ -130,8 +130,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService),
-            clinic.getActivityStatus(), "Clinic must have an activity status",
-            true);
+            clinic.getActivityStatus(), "Clinic must have an activity status");
 
         BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
