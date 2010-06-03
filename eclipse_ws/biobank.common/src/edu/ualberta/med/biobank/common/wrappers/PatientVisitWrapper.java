@@ -422,7 +422,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public List<PvSourceVesselWrapper> getPvSourceVesselCollection() {
-        return getPvSourceVesselCollection(false);
+        return getPvSourceVesselCollection(true);
     }
 
     public void addPvSourceVessels(

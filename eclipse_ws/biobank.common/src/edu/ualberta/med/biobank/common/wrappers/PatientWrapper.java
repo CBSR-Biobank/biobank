@@ -98,7 +98,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
-        return getPatientVisitCollection(false, false);
+        return getPatientVisitCollection(true, false);
     }
 
     @SuppressWarnings("unchecked")

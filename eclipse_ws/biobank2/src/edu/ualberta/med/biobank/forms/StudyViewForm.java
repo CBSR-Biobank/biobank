@@ -160,7 +160,7 @@ public class StudyViewForm extends BiobankViewForm {
         Section section = createSection("Source Vessels");
 
         studySourceVesselsTable = new StudySourceVesselInfoTable(section, study
-            .getStudySourceVesselCollection());
+            .getStudySourceVesselCollection(true));
         section.setClient(studySourceVesselsTable);
         studySourceVesselsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studySourceVesselsTable);
