@@ -56,9 +56,9 @@ public class StrFields {
 
             if (appArgs.verbose) {
                 for (String className : DataModelExtractor.getInstance()
-                    .getDmClassSet()) {
+                    .getDmTableSet()) {
                     Map<String, String> attrMap = DataModelExtractor
-                        .getInstance().getDmClassAttrMap(className);
+                        .getInstance().getDmTableAttrMap(className);
                     for (String attrName : attrMap.keySet()) {
                         String type = attrMap.get(attrName);
                         if (!type.startsWith("VARCHAR")
@@ -116,11 +116,11 @@ public class StrFields {
      */
     private void updateHbmFile(String hbmFileName) throws Exception {
         String hbmFilePath = appArgs.hbmDir + "/" + hbmFileName;
-        String className = toTitleCase(hbmFileName.replace(HBM_FILE_EXTENSION,
-            ""));
+        String className = hbmFileName.replace(HBM_FILE_EXTENSION, "");
+        String tableName = toTitleCase(className);
 
         Map<String, String> attrMap = DataModelExtractor.getInstance()
-            .getDmClassAttrMap(className);
+            .getDmTableAttrMap(tableName);
         Map<String, Integer> attrLengthMap = new HashMap<String, Integer>();
 
         for (String attrName : attrMap.keySet()) {
@@ -138,7 +138,8 @@ public class StrFields {
             }
         }
 
-        HbmModifier.getInstance().alterMapping(hbmFilePath, attrLengthMap);
+        HbmModifier.getInstance().alterMapping(hbmFilePath, className,
+            tableName, attrLengthMap);
     }
 
     private void createVarCharLengthsSourceCode() throws Exception {
@@ -146,9 +147,9 @@ public class StrFields {
         StringBuffer sb = new StringBuffer();
 
         for (String className : DataModelExtractor.getInstance()
-            .getDmClassSet()) {
+            .getDmTableSet()) {
             Map<String, String> attrMap = DataModelExtractor.getInstance()
-                .getDmClassAttrMap(className);
+                .getDmTableAttrMap(className);
             for (String attrName : attrMap.keySet()) {
                 String attrType = attrMap.get(attrName);
                 if (!attrType.startsWith("VARCHAR"))

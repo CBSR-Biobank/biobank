@@ -1,30 +1,25 @@
 package edu.ualberta.med.biobank.strfields;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import org.apache.commons.io.FileUtils;
 
 public class HbmModifier {
 
-    private static HbmModifier instance = null;
+    private static Pattern HBM_STRING_ATTR = Pattern.compile(
+        "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
+        Pattern.CASE_INSENSITIVE);
 
-    private Document doc;
+    private static String HBM_FILE_EXTENSION = ".hbm.xml";
+
+    private static HbmModifier instance = null;
 
     private boolean documentChanged = false;
 
@@ -39,80 +34,57 @@ public class HbmModifier {
         return instance;
     }
 
-    public void alterMapping(String filename, Map<String, Integer> columnLenMap)
-        throws Exception {
-        File file = new File(filename);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setValidating(false);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-
-        // dissable parsing of external DTD since this slows down the processing
-        db.setEntityResolver(new EntityResolver() {
-            public InputSource resolveEntity(java.lang.String publicId,
-                java.lang.String systemId) throws SAXException,
-                java.io.IOException {
-                if (systemId.endsWith(".dtd"))
-                    // this deactivates all DTDs by giving empty XML docs
-                    return new InputSource(new ByteArrayInputStream(
-                        "<?xml version='1.0' encoding='UTF-8'?>".getBytes()));
-                else
-                    return null;
-            }
-        });
-
-        doc = db.parse(file);
-        doc.getDocumentElement().normalize();
-
-        NodeList nodeLst = doc.getElementsByTagName("property");
-        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
-            Node node = nodeLst.item(i);
-
-            Node parent = node.getParentNode();
-            if (parent == null) {
-                throw new Exception("property node does not have a parent");
-            }
-
-            String parentName = ((Element) parent).getAttribute("name");
-            if (!filename.contains(parentName)) {
-                throw new Exception("HBM mapping class does not match filename");
-            }
-
-            Element el = (Element) node;
-
-            String columnName = el.getAttribute("column");
-            String attrType = el.getAttribute("type");
-            if ((columnName == null) || (attrType == null)) {
-                throw new Exception("bad format for HBM mapping property ");
-            }
-
-            if (!attrType.equals("string")) {
-                // only looking for strings
-                continue;
-            }
-
-            String attrLength = el.getAttribute("length");
-            Integer newLength = columnLenMap.get(columnName);
-            if (((attrLength == null) || (attrLength.length() == 0))
-                && (newLength != null)) {
-                el.setAttribute("length", newLength.toString());
-                documentChanged = true;
-            }
+    public void alterMapping(String filename, String className,
+        String tableName, Map<String, Integer> columnLenMap) throws Exception {
+        if (!filename.contains(className)) {
+            throw new Exception(
+                "HBM file name does not contain class name: filename "
+                    + filename + ", classname " + className);
         }
 
-        if (documentChanged) {
-            Transformer t = TransformerFactory.newInstance().newTransformer();
+        try {
+            File outFile = File.createTempFile(className, HBM_FILE_EXTENSION);
 
-            t.setOutputProperty(OutputKeys.METHOD, "xml");
-            t
-                .setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,
-                    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd");
-            t.transform(new DOMSource(doc),
-                new StreamResult(new File(filename)));
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
-            if (StrFields.getInstance().getVerbose()) {
-                System.out.println("HBM Modified: " + filename);
+            String line = reader.readLine();
+            while (line != null) {
+                Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
+                if (stringAttrMatcher.find() && !line.contains("length=\"")) {
+                    String attrName = stringAttrMatcher.group(1);
+                    Integer attrLen = columnLenMap.get(attrName);
+
+                    if (attrLen == null) {
+                        // no length for this attribute
+                        continue;
+                    }
+
+                    line = line.replace("type=\"string\"",
+                        "type=\"string\" length=\"" + attrLen + "\"");
+                    documentChanged = true;
+                }
+
+                writer.write(line);
+                writer.newLine();
+                line = reader.readLine();
             }
+
+            reader.close();
+            writer.flush();
+            writer.close();
+
+            if (documentChanged) {
+                FileUtils.copyFile(outFile, new File(filename));
+                if (StrFields.getInstance().getVerbose()) {
+                    System.out.println("HBM Modified: " + filename);
+                }
+            }
+
+            outFile.deleteOnExit();
+        } catch (Exception e) {
+            System.out.println("class " + className
+                + " does not have a corresponding HBM file");
         }
     }
-
 }
