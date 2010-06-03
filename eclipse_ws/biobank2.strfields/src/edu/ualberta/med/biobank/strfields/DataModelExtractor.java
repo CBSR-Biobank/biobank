@@ -15,6 +15,8 @@ import org.w3c.dom.NodeList;
 
 public class DataModelExtractor {
 
+    private Document doc;
+
     private class DataModelClass {
         @SuppressWarnings("unused")
         String name;
@@ -49,26 +51,11 @@ public class DataModelExtractor {
         File file = new File(modelFileName);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(file);
+        doc = db.parse(file);
         doc.getDocumentElement().normalize();
 
-        NodeList nodeLst = doc.getElementsByTagName("UML:Model");
-        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
-            Node node = nodeLst.item(i);
-            if (!((Element) node).getAttribute("name").equals("Model"))
-                continue;
-
-            getModel(node);
-        }
-
-        nodeLst = doc.getElementsByTagName("UML:Package");
-        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
-            Node node = nodeLst.item(i);
-            if (!((Element) node).getAttribute("name").equals("Data Model"))
-                continue;
-
-            getDataModel(node);
-        }
+        getModelDataTypes();
+        getDataModel();
     }
 
     public Set<String> getDmClassSet() throws Exception {
@@ -91,72 +78,45 @@ public class DataModelExtractor {
         return dmClass.attrMap;
     }
 
-    private void getModel(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
-
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals(
-                "UML:Namespace.ownedElement"))
+    private void getModelDataTypes() throws Exception {
+        NodeList nodeLst = doc.getElementsByTagName("UML:DataType");
+        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
+            Node node = nodeLst.item(i);
+            Node grandParent = node.getParentNode().getParentNode();
+            if (grandParent == null) {
+                throw new Exception(
+                    "UML:DataType node does not have a grandparent");
+            }
+            if (!((Element) grandParent).getAttribute("name").equals("Model"))
                 continue;
 
-            getModelOwnedElement(childNode);
+            modelDataTypeMap.put(((Element) node).getAttribute("xmi.id"),
+                ((Element) node).getAttribute("name"));
         }
     }
 
-    private void getModelOwnedElement(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
-
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals("UML:DataType"))
+    private void getDataModel() throws Exception {
+        NodeList nodeLst = doc.getElementsByTagName("UML:Class");
+        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
+            Node node = nodeLst.item(i);
+            Node grandParent = node.getParentNode().getParentNode();
+            if (grandParent == null) {
+                throw new Exception(
+                    "UML:Class node does not have a grandparent");
+            }
+            if (!((Element) grandParent).getAttribute("name").equals(
+                "Data Model"))
                 continue;
 
-            getModelDataType(childNode);
-        }
-    }
+            NodeList childNodeLst = node.getChildNodes();
 
-    private void getModelDataType(Node node) {
-        modelDataTypeMap.put(((Element) node).getAttribute("xmi.id"),
-            ((Element) node).getAttribute("name"));
+            for (int i2 = 0, n2 = childNodeLst.getLength(); i2 < n2; ++i2) {
+                Node childNode = (Node) childNodeLst.item(i2);
+                if (!childNode.getNodeName().equals("UML:Classifier.feature"))
+                    continue;
 
-    }
-
-    private void getDataModel(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
-
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals(
-                "UML:Namespace.ownedElement"))
-                continue;
-
-            getDmOwnedElement(childNode);
-        }
-    }
-
-    private void getDmOwnedElement(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
-
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals("UML:Class"))
-                continue;
-
-            getDmClass(childNode);
-        }
-    }
-
-    private void getDmClass(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
-
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals(
-                "UML:Classifier.feature"))
-                continue;
-
-            getDmClassifierFeature(childNode);
+                getDmClassifierFeature(childNode);
+            }
         }
     }
 
