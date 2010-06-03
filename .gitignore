@@ -17,6 +17,7 @@ eclipse_ws/biobank.server/src/edu/ualberta/med/biobank/server/test
 eclipse_ws/biobank2.importer/bin
 eclipse_ws/biobank2.importer/conf
 eclipse_ws/biobank2.importer/lib/*
+eclipse_ws/biobank2.strfields/bin
 eclipse_ws/biobank2.tests/bin
 eclipse_ws/biobank2.tests/build
 eclipse_ws/biobank2.tests/conf

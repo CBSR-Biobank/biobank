@@ -5,14 +5,18 @@ import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.OptionException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
 
 public class StrFields {
 
@@ -22,11 +26,11 @@ public class StrFields {
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
     private static Pattern HBM_STRING_ATTR = Pattern.compile(
-    // "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
-        "property", Pattern.CASE_INSENSITIVE);
+        "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
+        Pattern.CASE_INSENSITIVE);
 
-    private static Pattern HBM_STRING_LENGTH_ATTR = Pattern.compile(
-        "length=\"(\\d+)\"", Pattern.CASE_INSENSITIVE);
+    private static Pattern VARCHAR_LEN = Pattern.compile("VARCHAR\\((\\d+)\\)");
+
     private AppArgs appArgs;
 
     public StrFields(AppArgs appArgs) {
@@ -42,7 +46,8 @@ public class StrFields {
                         .getInstance().getDmClassAttrMap(className);
                     for (String attrName : attrMap.keySet()) {
                         String type = attrMap.get(attrName);
-                        if (!type.startsWith("VARCHAR"))
+                        if (!type.startsWith("VARCHAR")
+                            && !type.startsWith("TEXT"))
                             continue;
 
                         System.out.println(className + "." + attrName + ": "
@@ -80,7 +85,12 @@ public class StrFields {
         return hbmFiles;
     }
 
+    /*
+     * Creates a new HBM file with lengths derived from UML file for all string
+     * fields
+     */
     private void updateHbmFile(String hbmFileName) throws Exception {
+        String hbmFilePath = appArgs.hbmDir + "/" + hbmFileName;
         String className = toTitleCase(hbmFileName.replace(HBM_FILE_EXTENSION,
             ""));
 
@@ -88,26 +98,52 @@ public class StrFields {
             Map<String, String> attrMap = DataModelExtractor.getInstance()
                 .getDmClassAttrMap(className);
 
-            File inFile = new File(appArgs.hbmDir + "/" + hbmFileName);
             File outFile = File.createTempFile(className, HBM_FILE_EXTENSION);
 
-            BufferedReader reader = new BufferedReader(new FileReader(inFile));
-            // BufferedWriter writer = new BufferedWriter(new
-            // FileWriter(outFile));
+            BufferedReader reader = new BufferedReader(new FileReader(
+                hbmFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
             String line = reader.readLine();
 
             while (line != null) {
-                System.out.println(hbmFileName + ": " + line);
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
-                if (stringAttrMatcher.find()) {
-                    System.out.println("**** found : " + line);
+                if (stringAttrMatcher.find() && !line.contains("length=\"")) {
+                    String attrName = stringAttrMatcher.group(1);
+                    String attrType = attrMap.get(attrName);
+
+                    if (attrType == null) {
+                        throw new Exception(
+                            "hbm file attribute not found: file " + hbmFileName
+                                + ", " + attrName);
+                    }
+
+                    if (attrType.startsWith("VARCHAR")) {
+                        Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
+
+                        if (varcharMatcher.find()) {
+                            line = line.replace("type=\"string\"",
+                                "type=\"string\" length=\""
+                                    + varcharMatcher.group(1) + "\"");
+                        }
+                    } else if (attrType.startsWith("TEXT")) {
+                        line = line.replace("type=\"string\"",
+                            "type=\"string\" length=\"500\"");
+                    }
                 }
 
-                // writer.write(line);
-                // writer.newLine();
+                writer.write(line);
+                writer.newLine();
                 line = reader.readLine();
             }
+
+            reader.close();
+            writer.flush();
+            writer.close();
+            FileUtils.copyFile(outFile, new File(hbmFilePath));
+            outFile.deleteOnExit();
+
+            System.out.println(hbmFilePath);
 
         } catch (Exception e) {
             if (appArgs.verbose) {
