@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSourceVesselDialog;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -209,16 +209,28 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
         removedPvSourceVessels = new ArrayList<PvSourceVesselWrapper>();
     }
 
-    public Collection<PvSourceVesselWrapper> getPvSourceVessels() {
-        return getCollection();
-    }
-
     public List<PvSourceVesselWrapper> getAddedPvSourceVessels() {
         return addedPvSourceVessels;
     }
 
     public List<PvSourceVesselWrapper> getRemovedPvSourceVessels() {
         return removedPvSourceVessels;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((PvSourceVesselWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((PvSourceVesselWrapper) e2);
+                    return super.compare(i1.name, i2.name);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
     }
 
 }

@@ -50,16 +50,6 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        return null;
-    }
-
-    @Override
-    public List<Object> getCollection() {
-        return super.getCollectionInternal();
-    }
-
-    @Override
     public Object getSelection() {
         return getSelectionInternal();
     }
@@ -77,5 +67,10 @@ public class SearchResultsInfoTable extends InfoTableWidget<Object> {
             ++count;
         }
         return sb.toString();
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 }

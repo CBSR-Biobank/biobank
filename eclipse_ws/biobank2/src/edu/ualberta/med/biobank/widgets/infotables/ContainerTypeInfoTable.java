@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -29,63 +27,6 @@ public class ContainerTypeInfoTable extends
                 (capacity != null) ? capacity.toString() : "", status,
                 (inUseCount != null) ? inUseCount.toString() : "",
                 (temperature != null) ? temperature.toString() : "" }, "\t");
-        }
-    }
-
-    class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData c1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData c2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((c1 == null) || (c2 == null)) {
-                return -1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = c1.name.compareTo(c2.name);
-                break;
-            case 1:
-                rc = c1.nameShort.compareTo(c2.nameShort);
-                break;
-            case 2:
-                if (c1.capacity == null) {
-                    rc = -1;
-                } else if (c2.capacity == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.capacity.compareTo(c2.capacity);
-                }
-                break;
-            case 3:
-                rc = c1.status.compareTo(c2.status);
-                break;
-            case 4:
-                if (c1.inUseCount == null) {
-                    rc = -1;
-                } else if (c2.inUseCount == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.inUseCount.compareTo(c2.inUseCount);
-                }
-                break;
-            case 5:
-                if (c1.temperature == null) {
-                    rc = -1;
-                } else if (c2.temperature == null) {
-                    rc = 1;
-                } else {
-                    rc = c1.temperature.compareTo(c2.temperature);
-                }
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -136,12 +77,6 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
     public Object getCollectionModelObject(ContainerTypeWrapper type)
         throws Exception {
         TableRowData info = new TableRowData();
@@ -168,15 +103,6 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    public List<ContainerTypeWrapper> getCollection() {
-        List<ContainerTypeWrapper> result = new ArrayList<ContainerTypeWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).containerType);
-        }
-        return result;
-    }
-
-    @Override
     public ContainerTypeWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -184,5 +110,10 @@ public class ContainerTypeInfoTable extends
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.containerType;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 }

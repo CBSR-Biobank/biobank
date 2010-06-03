@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.List;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -10,11 +12,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
 
@@ -31,11 +30,11 @@ public class SelectClinicContactDialog extends TitleAreaDialog {
 
     private ContactWrapper selectedContact;
 
-    private StudyWrapper study;
+    private List<ContactWrapper> contacts;
 
-    public SelectClinicContactDialog(Shell parent, StudyWrapper study) {
+    public SelectClinicContactDialog(Shell parent, List<ContactWrapper> contacts) {
         super(parent);
-        this.study = study;
+        this.contacts = contacts;
     }
 
     @Override
@@ -60,7 +59,6 @@ public class SelectClinicContactDialog extends TitleAreaDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         contactInfoTable = new StudyContactEntryInfoTable(contents, null);
-        contactInfoTable.setEnabled(false);
         contactInfoTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -69,15 +67,7 @@ public class SelectClinicContactDialog extends TitleAreaDialog {
                         IDialogConstants.OK_ID).setEnabled(true);
             }
         });
-
-        try {
-            contactInfoTable.setCollection(study.getContactsNotAssoc());
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
-        } catch (Exception e) {
-            logger.error("BioBankFormBase.createPartControl Error", e);
-        }
-
+        contactInfoTable.setCollection(contacts);
         contactInfoTable.setEnabled(true);
         return contents;
     }

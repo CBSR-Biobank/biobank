@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -138,5 +139,21 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
         reloadCollection(selectedContacts, null);
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    return super.compare(i1.name, i2.name);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
     }
 }

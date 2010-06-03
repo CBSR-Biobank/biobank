@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -31,51 +29,6 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
             return StringUtils.join(new String[] { clinicNameShort, name,
                 title, emailAddress, mobileNumber, pagerNumber, officeNumber },
                 "\t");
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if (i1 == null) {
-                return -1;
-            } else if (i2 == null) {
-                return 1;
-            }
-
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(i1.clinicNameShort, i2.clinicNameShort);
-                break;
-            case 1:
-                rc = compare(i1.name, i2.name);
-                break;
-            case 2:
-                rc = compare(i1.title, i2.title);
-            case 3:
-                rc = compare(i1.emailAddress, i2.emailAddress);
-                break;
-            case 4:
-                rc = compare(i1.mobileNumber, i2.mobileNumber);
-                break;
-            case 5:
-                rc = compare(i1.pagerNumber, i2.pagerNumber);
-                break;
-            case 6:
-                rc = compare(i1.officeNumber, i2.officeNumber);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -125,13 +78,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
-    public Object getCollectionModelObject(ContactWrapper contact)
+    public TableRowData getCollectionModelObject(ContactWrapper contact)
         throws Exception {
         if (contact == null)
             return null;
@@ -170,11 +117,19 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     }
 
     @Override
-    public List<ContactWrapper> getCollection() {
-        List<ContactWrapper> result = new ArrayList<ContactWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).contact);
-        }
-        return result;
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    return super
+                        .compare(i1.clinicNameShort, i2.clinicNameShort);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
     }
 }

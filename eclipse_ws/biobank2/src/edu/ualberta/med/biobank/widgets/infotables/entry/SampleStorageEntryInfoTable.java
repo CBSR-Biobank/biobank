@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -174,4 +175,21 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
         deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
     }
+
+    @Override
+    public BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((SampleStorageWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((SampleStorageWrapper) e2);
+                    return super.compare(i1.typeName, i2.typeName);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
+    }
+
 }

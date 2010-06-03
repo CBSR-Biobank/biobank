@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -27,45 +25,6 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
             return StringUtils.join(new String[] { label, typeNameShort,
                 status, barcode,
                 (temperature != null) ? temperature.toString() : "" }, "\t");
-        }
-    }
-
-    class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if (i1 == null) {
-                return -1;
-            } else if (i2 == null) {
-                return 1;
-            }
-
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(i1.label, i2.label);
-                break;
-            case 1:
-                rc = compare(i1.typeNameShort, i2.typeNameShort);
-                break;
-            case 2:
-                rc = compare(i1.status, i2.status);
-                break;
-            case 3:
-                rc = compare(i1.barcode, i2.barcode);
-                break;
-            case 4:
-                rc = compare(i1.temperature, i2.temperature);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -113,12 +72,6 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
     public Object getCollectionModelObject(ContainerWrapper container)
         throws Exception {
         TableRowData info = new TableRowData();
@@ -143,15 +96,6 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     }
 
     @Override
-    public List<ContainerWrapper> getCollection() {
-        List<ContainerWrapper> result = new ArrayList<ContainerWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).container);
-        }
-        return result;
-    }
-
-    @Override
     public ContainerWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -159,6 +103,11 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.container;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 
 }

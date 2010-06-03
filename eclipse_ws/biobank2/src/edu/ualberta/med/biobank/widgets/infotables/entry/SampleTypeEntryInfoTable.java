@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -54,7 +55,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     public SampleTypeEntryInfoTable(Composite parent,
         List<SampleTypeWrapper> sampleTypeCollection, String addMessage,
         String editMessage, SiteWrapper currentSite) {
-        super(parent, null);
+        super(parent, sampleTypeCollection);
         setLists(sampleTypeCollection);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
@@ -220,4 +221,16 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             setLists(currentSite.getSampleTypeCollection(true));
         }
     }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                return super.compare(((SampleTypeWrapper) e1).getName(),
+                    ((SampleTypeWrapper) e2).getName());
+            }
+        };
+    }
+
 }

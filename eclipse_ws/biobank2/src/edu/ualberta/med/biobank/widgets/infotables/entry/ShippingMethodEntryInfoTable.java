@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ShippingMethodDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -214,5 +215,16 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("AppService unavailable", e);
         }
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                return super.compare(((ShippingMethodWrapper) e1).getName(),
+                    ((ShippingMethodWrapper) e2).getName());
+            }
+        };
     }
 }

@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.StudySourceVesselDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -186,6 +187,22 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
         reloadCollection(selectedStudySourceVessels);
         addedOrModifiedSourceVessels = new ArrayList<StudySourceVesselWrapper>();
         deletedSourceVessels = new ArrayList<StudySourceVesselWrapper>();
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((StudySourceVesselWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((StudySourceVesselWrapper) e2);
+                    return super.compare(i1.name, i2.name);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
     }
 
 }
