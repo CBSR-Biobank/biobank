@@ -22,8 +22,11 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends ModelWrapper<Patient> {
 
+    private StudyWrapper study;
+
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
+        study = new StudyWrapper(appService, wrappedObject.getStudy());
     }
 
     public PatientWrapper(WritableApplicationService appService) {
@@ -41,18 +44,15 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public StudyWrapper getStudy() {
-        Study study = wrappedObject.getStudy();
-        if (study == null) {
-            return null;
-        }
-        return new StudyWrapper(appService, study);
+        return study;
     }
 
-    public void setStudy(StudyWrapper study) {
+    public void setStudy(StudyWrapper s) {
         Study oldStudy = wrappedObject.getStudy();
-        Study newStudy = study.wrappedObject;
+        Study newStudy = s.wrappedObject;
         wrappedObject.setStudy(newStudy);
         propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
+        this.study = new StudyWrapper(appService, newStudy);
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {
