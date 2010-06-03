@@ -150,6 +150,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText("Clinic: " + clinic.getName());
         setClinicValues();
         setAdressValues(clinic);
+        contactsTable.setCollection(clinic.getContactCollection(true));
+        shipmentsTable.setCollection(clinic.getShipmentCollection());
         studiesTable.setCollection(clinic.getStudyCollection());
     }
 
