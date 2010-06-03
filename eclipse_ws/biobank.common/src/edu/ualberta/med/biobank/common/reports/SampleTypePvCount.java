@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class SampleTypePvCount extends QueryObject {
@@ -12,7 +13,9 @@ public class SampleTypePvCount extends QueryObject {
             "Select pv.patient.pnumber, pv.dateProcessed, pv.dateDrawn,  Alias.sampleType.name, count(*) from "
                 + PatientVisit.class.getName()
                 + " as pv join pv.aliquotCollection as Alias where pv.patient.study.nameShort LIKE ? "
-                + " and Alias.aliquotPosition not in (from edu.ualberta.med.biobank.model.AliquotPosition a where a.container.label like '%SS%') and Alias.patientVisit.patient.study.site "
+                + " and Alias.aliquotPosition not in (from "
+                + AliquotPosition.class.getName()
+                + " a where a.container.label like 'SS%') and Alias.patientVisit.patient.study.site "
                 + op
                 + siteId
                 + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateProcessed",

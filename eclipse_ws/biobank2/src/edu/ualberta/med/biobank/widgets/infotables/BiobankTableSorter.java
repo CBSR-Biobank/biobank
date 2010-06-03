@@ -1,27 +1,16 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.Comparator;
+
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
  * Classes derived from InfoTableWidget should derive their table sorter from
  * this class.
  */
-public class BiobankTableSorter extends ViewerSorter {
-    protected int propertyIndex = 0;
+public class BiobankTableSorter implements Comparator<Object> {
 
-    protected int direction = 0;
-
-    public void setColumn(int colId) {
-        if (propertyIndex == colId) {
-            direction = 1 - direction;
-        } else {
-            propertyIndex = colId;
-            direction = 1 - direction;
-        }
-    }
-
-    protected int compare(Object o1, Object o2) {
+    public int compare(Object o1, Object o2) {
         if (o1 == null) {
             return -1;
         }
@@ -31,7 +20,7 @@ public class BiobankTableSorter extends ViewerSorter {
 
         if (o1 instanceof String) {
             Assert.isTrue(o2 instanceof String);
-            return ((String) o1).compareTo((String) o2);
+            return ((String) o1).compareToIgnoreCase((String) o2);
         } else if (o1 instanceof Integer) {
             Assert.isTrue(o2 instanceof Integer);
             return ((Integer) o1).compareTo((Integer) o2);
@@ -49,4 +38,5 @@ public class BiobankTableSorter extends ViewerSorter {
             .isTrue(false, "invalid class for o1: " + o1.getClass().getName());
         return 0;
     }
+
 }

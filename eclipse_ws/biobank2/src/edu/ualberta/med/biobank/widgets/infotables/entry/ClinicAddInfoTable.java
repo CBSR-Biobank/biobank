@@ -24,12 +24,6 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
  */
 public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
 
-    private List<ContactWrapper> selectedContacts;
-
-    private List<ContactWrapper> addedContacts;
-
-    private List<ContactWrapper> removedContacts;
-
     private StudyWrapper study;
 
     public ClinicAddInfoTable(Composite parent, StudyWrapper study) {
@@ -37,7 +31,6 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         this.study = study;
         SiteWrapper site = study.getSite();
         Assert.isNotNull(site, "site is null");
-        loadContacts(study);
         addDeleteSupport();
     }
 
@@ -47,20 +40,26 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     }
 
     public void createClinicContact() {
-        SelectClinicContactDialog dlg = new SelectClinicContactDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            study);
-        if (dlg.open() == Dialog.OK) {
-            notifyListeners();
-            ContactWrapper contact = dlg.getSelection();
-            if (contact != null) {
-                if (!selectedContacts.contains(contact)) {
-                    selectedContacts.add(contact);
-                    addedContacts.add(contact);
-                    removedContacts.remove(contact);
+        SelectClinicContactDialog dlg;
+        try {
+            List<ContactWrapper> availableContacts = study
+                .getContactsNotAssoc();
+            availableContacts.removeAll(study.getContactCollection(true));
+            dlg = new SelectClinicContactDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), availableContacts);
+            if (dlg.open() == Dialog.OK) {
+                notifyListeners();
+                ContactWrapper contact = dlg.getSelection();
+                if (contact != null) {
+                    List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
+                    dummyList.add(contact);
+                    study.addContacts(dummyList);
+                    setCollection(study.getContactCollection(true));
                 }
-                setCollection(selectedContacts);
             }
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError(
+                "Unable to retrieve available contacts", e);
         }
     }
 
@@ -76,49 +75,28 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             @Override
             public void deleteItem(InfoTableEvent event) {
                 ContactWrapper contact = getSelection();
-                if (!BioBankPlugin.openConfirm("Delete Contact",
-                    "Are you sure you want to delete contact \""
-                        + contact.getName() + "\"")) {
-                    return;
+                if (contact != null) {
+                    if (!BioBankPlugin.openConfirm("Delete Contact",
+                        "Are you sure you want to delete contact \""
+                            + contact.getName() + "\"")) {
+                        return;
+                    }
+                    List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
+                    dummyList.add(contact);
+                    study.removeContacts(dummyList);
+                    setCollection(study.getContactCollection(true));
+                    notifyListeners();
                 }
-                selectedContacts.remove(contact);
-                addedContacts.remove(contact);
-                removedContacts.add(contact);
-                setCollection(selectedContacts);
-                notifyListeners();
             }
         });
     }
 
-    public List<ContactWrapper> getAllSelectedContacts() {
-        return selectedContacts;
-    }
-
-    public List<ContactWrapper> getAddedContacts() {
-        return addedContacts;
-    }
-
-    public List<ContactWrapper> getRemovedContacts() {
-        return removedContacts;
-    }
-
     public void setContacts(List<ContactWrapper> contacts) {
-        this.selectedContacts = contacts;
-        setCollection(selectedContacts);
-    }
-
-    private void loadContacts(StudyWrapper studyWrapper) {
-        selectedContacts = studyWrapper.getContactCollection();
-        if (selectedContacts == null) {
-            selectedContacts = new ArrayList<ContactWrapper>();
-        }
-        addedContacts = new ArrayList<ContactWrapper>();
-        removedContacts = new ArrayList<ContactWrapper>();
+        setCollection(contacts);
     }
 
     public void reload() {
-        loadContacts(study);
-        setCollection(study.getContactCollection());
+        setCollection(study.getContactCollection(true));
     }
 
 }

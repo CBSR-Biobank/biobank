@@ -54,5 +54,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             "biobank2@gmail.com");
         store.setDefault(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PASSWORD, "catissue");
+
+        store
+            .setDefault(PreferenceConstants.SERVER_LIST,
+                "cbsr.med.ualberta.ca:8443\n10.8.31.50:8443\naicml-med.cs.ualberta.ca:8443");
     }
 }

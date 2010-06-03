@@ -117,6 +117,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     };
 
+    protected boolean afterKeyCancel = false;
+
     public BiobankEntryForm() {
         super();
         firstControl = null;
@@ -256,16 +258,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
         Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage, boolean useDefaultComparator) {
-        return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
-            fieldLabel, input, selection, errorMessage, useDefaultComparator);
-    }
-
-    protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<T> input, T selection,
         String errorMessage) {
-        return createComboViewerWithNoSelectionValidator(parent, fieldLabel,
-            input, selection, errorMessage, false);
+        return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
+            fieldLabel, input, selection, errorMessage);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
@@ -479,5 +474,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * performed and the current form closed
      */
     public abstract String getNextOpenedFormID();
+
+    public void setAfterKeyCancel() {
+        afterKeyCancel = true;
+    }
 
 }

@@ -38,4 +38,6 @@ public class PreferenceConstants {
 
     public static final String ISSUE_TRACKER_SMTP_SERVER_PASSWORD = "issue.tracker.smtp.server.password";
 
+    public static final String SERVER_LIST = "server.list";
+
 }

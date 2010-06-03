@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.ContactAddDialog;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -50,7 +51,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    addOrEditContact(false, getSelection());
+                    ContactWrapper contact = getSelection();
+                    if (contact != null)
+                        addOrEditContact(false, contact);
                 }
             });
         }
@@ -59,26 +62,28 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     ContactWrapper contact = getSelection();
-                    if (!contact.deleteAllowed()) {
-                        BioBankPlugin
-                            .openError(
-                                "Contact Delete Error",
-                                "Cannot delete contact \""
-                                    + contact.getName()
-                                    + "\" since it is associated with one or more studies");
-                        return;
-                    }
+                    if (contact != null) {
+                        if (!contact.deleteAllowed()) {
+                            BioBankPlugin
+                                .openError(
+                                    "Contact Delete Error",
+                                    "Cannot delete contact \""
+                                        + contact.getName()
+                                        + "\" since it is associated with one or more studies");
+                            return;
+                        }
 
-                    if (!BioBankPlugin.openConfirm("Delete Contact",
-                        "Are you sure you want to delete contact \""
-                            + contact.getName() + "\"")) {
-                        return;
-                    }
+                        if (!BioBankPlugin.openConfirm("Delete Contact",
+                            "Are you sure you want to delete contact \""
+                                + contact.getName() + "\"")) {
+                            return;
+                        }
 
-                    deletedContacts.add(contact);
-                    selectedContacts.remove(contact);
-                    setCollection(selectedContacts);
-                    notifyListeners();
+                        deletedContacts.add(contact);
+                        selectedContacts.remove(contact);
+                        setCollection(selectedContacts);
+                        notifyListeners();
+                    }
                 }
             });
         }
@@ -134,5 +139,21 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
         reloadCollection(selectedContacts, null);
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    return super.compare(i1.name, i2.name);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
     }
 }

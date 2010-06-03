@@ -125,7 +125,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status", ActivityStatusWrapper
                 .getAllActivityStatuses(appService), study.getActivityStatus(),
-            "Study must have an activity status", true);
+            "Study must have an activity status");
 
         BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
@@ -274,9 +274,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getAddedOrModifiedSampleStorages());
         study.removeSampleStorages(sampleStorageEntryTable
             .getDeletedSampleStorages());
-
-        study.addContacts(contactEntryTable.getAddedContacts());
-        study.removeContacts(contactEntryTable.getRemovedContacts());
 
         SiteAdapter siteAdapter = studyAdapter
             .getParentFromClass(SiteAdapter.class);

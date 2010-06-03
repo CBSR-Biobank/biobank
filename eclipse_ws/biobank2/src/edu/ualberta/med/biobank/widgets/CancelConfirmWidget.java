@@ -49,10 +49,11 @@ public class CancelConfirmWidget extends BiobankWidget {
         GridData gd = new GridData();
         gd.widthHint = 100;
         confirmCancelText.setLayoutData(gd);
+
         confirmCancelText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.keyCode == 13) {
+                if (e.character == SWT.CR) {
                     String text = confirmCancelText.getText();
                     if (BioBankPlugin.getDefault().isConfirmBarcode(text)
                         && confirmButton.isEnabled()) {
@@ -64,6 +65,7 @@ public class CancelConfirmWidget extends BiobankWidget {
                     } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
                         try {
                             form.reset();
+                            form.setAfterKeyCancel();
                         } catch (Exception ex) {
                             logger.error(
                                 "Error while reseting pallet values", ex); //$NON-NLS-1$
@@ -116,6 +118,11 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     public void reset() {
         confirmCancelText.setText("");
+    }
+
+    @Override
+    public boolean setFocus() {
+        return confirmCancelText.setFocus();
     }
 
 }

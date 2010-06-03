@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class QAFreezerAliquots extends QueryObject {
@@ -18,7 +19,9 @@ public class QAFreezerAliquots extends QueryObject {
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.aliquotPosition.container.label not like 'SS%' and aliquot.patientVisit.dateProcessed "
+                + " as aliquot where aliquot.aliquotPosition not in (from "
+                + AliquotPosition.class.getName()
+                + " a where a.container.label like 'SS%') and aliquot.patientVisit.dateProcessed "
                 + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"
                 + " and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "

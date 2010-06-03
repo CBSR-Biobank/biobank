@@ -115,7 +115,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
         SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
             .get(sampleTypeWidgets.size() - 1);
-        lastWidget.setNextWidget(getCancelConfirmWidget());
+        lastWidget.setNextWidget(cancelConfirmWidget);
 
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             typesFilledValue, Messages
@@ -405,10 +405,17 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void run() {
                 typesSelectionPerRowComposite.setEnabled(everythingOk);
+                for (SampleTypeSelectionWidget typeWidget : sampleTypeWidgets) {
+                    if (typeWidget.isComboEnabled()) {
+                        typeWidget.setFocus();
+                        break;
+                    }
+                }
                 // Show result in grid
                 spw.setCells(cells);
                 setRescanMode();
-                // not needed on windows. This was if the textfield number go
+                // not needed on windows. This was if the textfield number
+                // go
                 // after 9, needed to resize on linux : need to check that
                 // again
                 // form.layout(true, true);
@@ -438,36 +445,40 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean processScanResult(IProgressMonitor monitor)
         throws ApplicationException {
         boolean everythingOk = true;
-        final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-        for (RowColPos rcp : cells.keySet()) {
-            monitor.subTask("Processing position "
-                + LabelingScheme.rowColToSbs(rcp));
-            Integer typesRowsCount = typesRows.get(rcp.row);
-            if (typesRowsCount == null) {
-                typesRowsCount = 0;
-                sampleTypeWidgets.get(rcp.row).resetValues(true, true);
+        if (cells != null) {
+            final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+            for (RowColPos rcp : cells.keySet()) {
+                monitor.subTask("Processing position "
+                    + LabelingScheme.rowColToSbs(rcp));
+                Integer typesRowsCount = typesRows.get(rcp.row);
+                if (typesRowsCount == null) {
+                    typesRowsCount = 0;
+                    sampleTypeWidgets.get(rcp.row).resetValues(true, true);
+                }
+                PalletCell cell = null;
+                cell = cells.get(rcp);
+                if (!isRescanMode()
+                    || (cell != null
+                        && cell.getStatus() != AliquotCellStatus.TYPE && cell
+                        .getStatus() != AliquotCellStatus.NO_TYPE)) {
+                    processCellStatus(cell);
+                }
+                everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
+                    && everythingOk;
+                if (PalletCell.hasValue(cell)) {
+                    typesRowsCount++;
+                    typesRows.put(rcp.row, typesRowsCount);
+                }
             }
-            PalletCell cell = null;
-            cell = cells.get(rcp);
-            if (!isRescanMode()
-                || (cell != null && cell.getStatus() != AliquotCellStatus.TYPE && cell
-                    .getStatus() != AliquotCellStatus.NO_TYPE)) {
-                processCellStatus(cell);
-            }
-            everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
-                && everythingOk;
-            if (PalletCell.hasValue(cell)) {
-                typesRowsCount++;
-                typesRows.put(rcp.row, typesRowsCount);
-            }
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    setTypeCombosLists(typesRows);
+                }
+            });
+            return everythingOk;
         }
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                setTypeCombosLists(typesRows);
-            }
-        });
-        return everythingOk;
+        return false;
     }
 
     /**
@@ -614,14 +625,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     public void reset() throws Exception {
         super.reset();
         setDirty(false);
-        reset(true);
         fieldsComposite.setEnabled(true);
         setScanValid(true);
+        reset(true);
     }
 
     public void reset(boolean resetAll) {
         linkFormPatientManagement.reset(resetAll);
-        getCancelConfirmWidget().reset();
+        cancelConfirmWidget.reset();
         removeRescanMode();
         setScanHasBeenLauched(false);
         setScanNotLauched();

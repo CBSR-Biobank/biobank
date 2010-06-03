@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
@@ -15,7 +16,9 @@ public class PatientWBC extends QueryObject {
             "Select Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
                 + "Alias.patient.pnumber, Alias.dateProcessed, aliquot.sampleType.name, aliquot.inventoryId, aliquot.aliquotPosition.container.label  from "
                 + PatientVisit.class.getName()
-                + " as Alias left join Alias.aliquotCollection as aliquot where aliquot.aliquotPosition.container.label not like 'SS%' and Alias.patient.study.site "
+                + " as Alias left join Alias.aliquotCollection as aliquot where aliquot.aliquotPosition not in (from "
+                + AliquotPosition.class.getName()
+                + " a where a.container.label like 'SS%') and Alias.patient.study.site "
                 + op
                 + siteId
                 + " and aliquot.sampleType.name LIKE '%DNA%' and aliquot.aliquotPosition.container.id in (select path1.container.id from "

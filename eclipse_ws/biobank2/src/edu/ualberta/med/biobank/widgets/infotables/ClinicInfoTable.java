@@ -1,11 +1,9 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -30,45 +28,6 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 studyCount.toString(), (status != null) ? status : "",
                 (patientCount != null) ? patientCount.toString() : "",
                 (visitCount != null) ? visitCount.toString() : "" }, "\t");
-        }
-    }
-
-    class TableSorter extends BiobankTableSorter {
-        @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            TableRowData i1 = (TableRowData) ((BiobankCollectionModel) e1).o;
-            TableRowData i2 = (TableRowData) ((BiobankCollectionModel) e2).o;
-            if ((i1 == null) || (i2 == null)) {
-                return -1;
-            }
-            int rc = 0;
-            switch (propertyIndex) {
-            case 0:
-                rc = compare(i1.clinicName, i2.clinicName);
-                break;
-            case 1:
-                rc = compare(i1.clinicNameShort, i2.clinicNameShort);
-                break;
-            case 2:
-                rc = compare(i1.studyCount, i2.studyCount);
-                break;
-            case 3:
-                rc = compare(i1.status, i2.status);
-                break;
-            case 4:
-                rc = compare(i1.patientCount, i2.patientCount);
-                break;
-            case 5:
-                rc = compare(i1.visitCount, i2.visitCount);
-                break;
-            default:
-                rc = 0;
-            }
-            // If descending order, flip the direction
-            if (direction == 1) {
-                rc = -rc;
-            }
-            return rc;
         }
     }
 
@@ -115,12 +74,6 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     @Override
-    protected BiobankTableSorter getTableSorter() {
-        // return new TableSorter();
-        return null;
-    }
-
-    @Override
     public Object getCollectionModelObject(ClinicWrapper clinic)
         throws Exception {
         TableRowData info = new TableRowData();
@@ -152,15 +105,6 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     @Override
-    public List<ClinicWrapper> getCollection() {
-        List<ClinicWrapper> result = new ArrayList<ClinicWrapper>();
-        for (BiobankCollectionModel item : model) {
-            result.add(((TableRowData) item.o).clinic);
-        }
-        return result;
-    }
-
-    @Override
     public ClinicWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
@@ -168,6 +112,11 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.clinic;
+    }
+
+    @Override
+    protected BiobankTableSorter getComparator() {
+        return null;
     }
 
     /*

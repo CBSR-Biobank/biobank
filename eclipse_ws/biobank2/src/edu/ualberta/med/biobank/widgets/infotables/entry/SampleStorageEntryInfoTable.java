@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
@@ -116,7 +117,9 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 @Override
                 public void editItem(InfoTableEvent event) {
                     SampleStorageWrapper sampleStorage = getSelection();
-                    addOrEditSampleStorage(false, sampleStorage, allSampleTypes);
+                    if (sampleStorage != null)
+                        addOrEditSampleStorage(false, sampleStorage,
+                            allSampleTypes);
                 }
             });
         }
@@ -125,19 +128,21 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
                     SampleStorageWrapper sampleStorage = getSelection();
+                    if (sampleStorage != null) {
+                        if (!MessageDialog.openConfirm(PlatformUI
+                            .getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), "Delete Aliquot Storage",
+                            "Are you sure you want to delete sample storage \""
+                                + sampleStorage.getSampleType().getName()
+                                + "\"?")) {
+                            return;
+                        }
 
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                        "Delete Aliquot Storage",
-                        "Are you sure you want to delete sample storage \""
-                            + sampleStorage.getSampleType().getName() + "\"?")) {
-                        return;
+                        selectedSampleStorages.remove(sampleStorage);
+                        setCollection(selectedSampleStorages);
+                        deletedSampleStorages.add(sampleStorage);
+                        notifyListeners();
                     }
-
-                    selectedSampleStorages.remove(sampleStorage);
-                    setCollection(selectedSampleStorages);
-                    deletedSampleStorages.add(sampleStorage);
-                    notifyListeners();
                 }
             });
         }
@@ -170,4 +175,21 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
         deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
     }
+
+    @Override
+    public BiobankTableSorter getComparator() {
+        return new BiobankTableSorter() {
+            @Override
+            public int compare(Object e1, Object e2) {
+                try {
+                    TableRowData i1 = getCollectionModelObject((SampleStorageWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((SampleStorageWrapper) e2);
+                    return super.compare(i1.typeName, i2.typeName);
+                } catch (Exception e) {
+                    return 0;
+                }
+            }
+        };
+    }
+
 }

@@ -48,6 +48,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
+        checkUnique();
     }
 
     public String getName() {
