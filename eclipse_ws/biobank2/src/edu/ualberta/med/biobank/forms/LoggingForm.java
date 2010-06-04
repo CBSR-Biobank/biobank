@@ -101,45 +101,37 @@ public class LoggingForm extends BiobankViewForm {
         toolkit.paintBordersFor(loggingTable);
     }
 
-    private void getSearchRequestFields() {
-        try {
-            userLabel
-                .setText(LogQuery.getInstance().getSearchQueryItem("user"));
-            actionLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "action"));
-            typeLabel
-                .setText(LogQuery.getInstance().getSearchQueryItem("type"));
-            startDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "startDate"));
-            stopDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "stopDate"));
-            patientNumLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "patientNumber"));
-            inventoryIDLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "inventoryId"));
-            locationLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "location"));
+    private void getSearchRequestFields() throws Exception {
+        userLabel.setText(LogQuery.getInstance().getSearchQueryItem("user"));
+        actionLabel
+            .setText(LogQuery.getInstance().getSearchQueryItem("action"));
+        typeLabel.setText(LogQuery.getInstance().getSearchQueryItem("type"));
+        startDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "startDate"));
+        stopDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "stopDate"));
+        patientNumLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "patientNumber"));
+        inventoryIDLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "inventoryId"));
+        locationLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "location"));
 
-            detailsLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-                "details"));
-            /*
-             * containerTypeLabel = createReadOnlyLabelledField(client,
-             * SWT.NONE, "Container Type"); containerLabelLabel
-             * =createReadOnlyLabelledField(client, SWT.NONE,
-             * "Container Label");
-             */
-            /*
-             * containerTypeLabel.setText(LogQuery.getInstance().getSearchQueryItem
-             * ( "containerType"));
-             * 
-             * containerLabelLabel
-             * .setText(LogQuery.getInstance().getSearchQueryItem(
-             * "containerLabel"));
-             */
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO pyrx generate a proper responce here
-        }
+        detailsLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "details"));
+        /*
+         * containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
+         * "Container Type"); containerLabelLabel
+         * =createReadOnlyLabelledField(client, SWT.NONE, "Container Label");
+         */
+        /*
+         * containerTypeLabel.setText(LogQuery.getInstance().getSearchQueryItem
+         * ( "containerType"));
+         * 
+         * containerLabelLabel
+         * .setText(LogQuery.getInstance().getSearchQueryItem(
+         * "containerLabel"));
+         */
     }
 
     @Override
