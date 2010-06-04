@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -68,6 +69,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private static final String WAYBILL_BINDING = "shipment-waybill-binding";
 
     private boolean dateReceivedModified;
+
+    private DateTimeWidget dateShippedWidget;
+
+    private DateTimeWidget dateReceivedWidget;
 
     @Override
     protected void init() throws Exception {
@@ -160,10 +165,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             waybillValidator, WAYBILL_BINDING);
         activateWaybillField(false);
 
-        DateTimeWidget dateShippedWidget = createDateTimeWidget(client,
-            "Date Shipped", shipmentWrapper.getDateShipped(), BeansObservables
-                .observeValue(shipmentWrapper, "dateShipped"),
-            "Date shipped should be set");
+        Date shippedDate = shipmentWrapper.getDateShipped();
+        if (shippedDate == null)
+            shippedDate = new Date();
+
+        dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
+            shippedDate, BeansObservables.observeValue(shipmentWrapper,
+                "dateShipped"), "Date shipped should be set");
         setFirstControl(dateShippedWidget);
 
         ShippingMethodWrapper selectedShippingMethod = shipmentWrapper
@@ -176,10 +184,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Box Number", null, BeansObservables.observeValue(shipmentWrapper,
                 "boxNumber"), null);
 
-        DateTimeWidget dateReceivedWidget = createDateTimeWidget(client,
-            "Date Received", shipmentWrapper.getDateReceived(),
-            BeansObservables.observeValue(shipmentWrapper, "dateReceived"),
-            "Date received should be set");
+        Date recievedDate = shipmentWrapper.getDateReceived();
+        if (recievedDate == null)
+            recievedDate = new Date();
+
+        dateReceivedWidget = createDateTimeWidget(client, "Date Received",
+            recievedDate, BeansObservables.observeValue(shipmentWrapper,
+                "dateReceived"), "Date received should be set");
         dateReceivedWidget.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -306,6 +317,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
         }
+        dateShippedWidget.setDate(new Date());
+        dateReceivedWidget.setDate(new Date());
+
         shipmentPatientsWidget.updateList();
         ShippingMethodWrapper shipMethod = shipmentWrapper.getShippingMethod();
         if (shipMethod != null) {
@@ -314,6 +328,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
             shippingMethodComboViewer.getCombo().deselectAll();
         }
+
     }
 
 }

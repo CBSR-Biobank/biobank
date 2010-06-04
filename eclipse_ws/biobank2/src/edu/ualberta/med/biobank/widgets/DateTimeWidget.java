@@ -148,12 +148,8 @@ public class DateTimeWidget extends BiobankWidget {
     }
 
     public void setDate(Date date) {
-        if (date == null)
-            return;
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
         dateEntry.setSelection(date);
+        fireModifyListeners();
     }
 
     public void addModifyListener(ModifyListener modifyListener) {
