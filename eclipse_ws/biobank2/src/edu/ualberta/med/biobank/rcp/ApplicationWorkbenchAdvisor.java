@@ -37,7 +37,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        // XXX logging perspective case
+
         if (page.getPerspective().getId().equals(ReportsPerspective.ID)) {
             IPerspectiveDescriptor main = workbench.getPerspectiveRegistry()
                 .findPerspectiveWithId(MainPerspective.ID);

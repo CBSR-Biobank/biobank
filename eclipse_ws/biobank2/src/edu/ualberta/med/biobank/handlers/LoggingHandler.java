@@ -15,8 +15,10 @@ public class LoggingHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         try {
-            workbench.showPerspective(LoggingPerspective.ID, workbench
-                .getActiveWorkbenchWindow());
+            if (workbench.getActiveWorkbenchWindow().getActivePage()
+                .closeAllEditors(true))
+                workbench.showPerspective(LoggingPerspective.ID, workbench
+                    .getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(
                 "Error while opening logging perspective", e);

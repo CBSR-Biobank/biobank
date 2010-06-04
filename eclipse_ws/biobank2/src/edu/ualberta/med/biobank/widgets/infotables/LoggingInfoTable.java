@@ -109,13 +109,11 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
         return ((TableRowData) o).toString();
     }
 
-    // XXX getCollection
     @Override
     public List<LogWrapper> getCollection() {
         return null;
     }
 
-    // XXX getSelection
     @Override
     public LogWrapper getSelection() {
         return null;

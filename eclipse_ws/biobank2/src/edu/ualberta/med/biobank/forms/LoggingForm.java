@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
-//XXX based on studyviewform
 public class LoggingForm extends BiobankViewForm {
 
     public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
@@ -25,7 +24,7 @@ public class LoggingForm extends BiobankViewForm {
     private BiobankText locationLabel;
     private BiobankText detailsLabel;
     private BiobankText startDateLabel;
-    private BiobankText stopDateLabel;
+    private BiobankText endDateLabel;
 
     // private BiobankText containerTypeLabel;
     // private BiobankText containerLabelLabel;
@@ -71,8 +70,8 @@ public class LoggingForm extends BiobankViewForm {
             "Action");
         startDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
             "Start Date");
-        stopDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Stop Date");
+        endDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
+            "End Date");
 
         patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Patient #");
@@ -108,8 +107,8 @@ public class LoggingForm extends BiobankViewForm {
         typeLabel.setText(LogQuery.getInstance().getSearchQueryItem("type"));
         startDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
             "startDate"));
-        stopDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
-            "stopDate"));
+        endDateLabel.setText(LogQuery.getInstance().getSearchQueryItem(
+            "endDate"));
         patientNumLabel.setText(LogQuery.getInstance().getSearchQueryItem(
             "patientNumber"));
         inventoryIDLabel.setText(LogQuery.getInstance().getSearchQueryItem(
