@@ -211,7 +211,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         Composite client = createSectionWithClient("Patients");
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
-        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
         shipmentPatientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,

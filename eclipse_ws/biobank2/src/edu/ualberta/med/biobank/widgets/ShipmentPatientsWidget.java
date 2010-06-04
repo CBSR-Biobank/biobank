@@ -227,7 +227,10 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
     public void updateList() {
         List<PatientWrapper> patients = shipment.getPatientCollection();
-        patientTable.setCollection(patients);
+        if (patients != null)
+            patientTable.setCollection(patients);
+        else
+            patientTable.setCollection(new ArrayList<PatientWrapper>());
         patientsAdded.setValue(patients != null && patients.size() > 0);
     }
 

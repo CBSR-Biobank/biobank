@@ -150,7 +150,7 @@ public class StudyViewForm extends BiobankViewForm {
         Section section = createSection("Sample Storage");
 
         sampleStorageTable = new SampleStorageInfoTable(section, study
-            .getSampleStorageCollection());
+            .getSampleStorageCollection(true));
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
@@ -160,7 +160,7 @@ public class StudyViewForm extends BiobankViewForm {
         Section section = createSection("Source Vessels");
 
         studySourceVesselsTable = new StudySourceVesselInfoTable(section, study
-            .getStudySourceVesselCollection());
+            .getStudySourceVesselCollection(true));
         section.setClient(studySourceVesselsTable);
         studySourceVesselsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studySourceVesselsTable);
@@ -228,7 +228,11 @@ public class StudyViewForm extends BiobankViewForm {
         form.setText("Study: " + study.getName());
         setStudySectionValues();
         setPvDataSectionValues();
-        contactsTable.setCollection(study.getContactCollection());
+        sampleStorageTable
+            .setCollection(study.getSampleStorageCollection(true));
+        studySourceVesselsTable.setCollection(study
+            .getStudySourceVesselCollection(true));
+        contactsTable.setCollection(study.getContactCollection(true));
     }
 
 }

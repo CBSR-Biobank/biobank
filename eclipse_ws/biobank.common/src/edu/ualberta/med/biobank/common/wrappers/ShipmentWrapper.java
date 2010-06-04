@@ -364,7 +364,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     public List<PatientWrapper> getPatientCollection() {
-        return getPatientCollection(false);
+        return getPatientCollection(true);
     }
 
     private void setPatients(Collection<Patient> allPatientObjects,

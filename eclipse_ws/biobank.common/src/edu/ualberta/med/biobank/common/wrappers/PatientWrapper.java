@@ -98,7 +98,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
-        return getPatientVisitCollection(false, false);
+        return getPatientVisitCollection(true, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -119,7 +119,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                     patientVisitCollection);
             }
         }
-        if (sort) {
+        if (sort && patientVisitCollection != null) {
             Collections.sort(patientVisitCollection,
                 new Comparator<PatientVisitWrapper>() {
                     @Override
