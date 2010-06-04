@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -470,14 +469,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
         Collection<StudyPvAttr> studyPvAttrCollection = wrappedObject
             .getStudyPvAttrCollection();
         if (studyPvAttrCollection != null) {
-            Date before = new Date();
             for (StudyPvAttr studyPvAttr : studyPvAttrCollection) {
                 String label = studyPvAttr.getLabel();
                 studyPvAttrMap.put(label, new StudyPvAttrWrapper(appService,
                     studyPvAttr));
             }
-            Date after = new Date();
-            System.out.println("Delay:" + (after.getTime() - before.getTime()));
         }
         return studyPvAttrMap;
     }
