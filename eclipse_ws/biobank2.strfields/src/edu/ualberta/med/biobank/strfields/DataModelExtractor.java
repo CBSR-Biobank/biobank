@@ -58,24 +58,24 @@ public class DataModelExtractor {
         getDataModel();
     }
 
-    public Set<String> getDmClassSet() throws Exception {
+    public Set<String> getDmTableSet() throws Exception {
         if (dataModelClassMap.size() == 0) {
             throw new Exception("UML file not parsed yet");
         }
         return dataModelClassMap.keySet();
     }
 
-    public Map<String, String> getDmClassAttrMap(String className)
+    public Map<String, String> getDmTableAttrMap(String className)
         throws Exception {
         if (dataModelClassMap.size() == 0) {
             throw new Exception("UML file not parsed yet");
         }
 
-        DataModelClass dmClass = dataModelClassMap.get(className);
-        if (dmClass == null) {
+        DataModelClass dmTable = dataModelClassMap.get(className);
+        if (dmTable == null) {
             throw new Exception("invalid data model class name: " + className);
         }
-        return dmClass.attrMap;
+        return dmTable.attrMap;
     }
 
     private void getModelDataTypes() throws Exception {
@@ -128,11 +128,11 @@ public class DataModelExtractor {
             if (!childNodeLst.item(i).getNodeName().equals("UML:Attribute"))
                 continue;
 
-            getDmClassAttribute(childNode);
+            getDmTableAttribute(childNode);
         }
     }
 
-    private void getDmClassAttribute(Node node) throws Exception {
+    private void getDmTableAttribute(Node node) throws Exception {
         Node grandParent = node.getParentNode().getParentNode();
         if (grandParent == null) {
             throw new Exception(

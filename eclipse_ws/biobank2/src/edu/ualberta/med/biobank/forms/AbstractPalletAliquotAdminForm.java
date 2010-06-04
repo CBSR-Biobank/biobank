@@ -11,6 +11,8 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -75,6 +77,32 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private Label scanTubeAloneSwitch;
 
+    IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent event) {
+            int plateEnabledCount = 0;
+
+            for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED.length; ++i) {
+                if (!event
+                    .getProperty()
+                    .equals(
+                        edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED[i]))
+                    continue;
+
+                int plateId = i + 1;
+                if (ScannerConfigPlugin.getDefault().getPlateEnabled(plateId)) {
+                    ++plateEnabledCount;
+                }
+            }
+
+            // force an error check
+            String plateText = plateToScanText.getText();
+            plateToScanText.setText("");
+            plateToScanText.setText(plateText);
+        }
+    };
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -82,6 +110,16 @@ public abstract class AbstractPalletAliquotAdminForm extends
             .getPreferenceStore();
         palletNameContains = store
             .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
+
+        ScannerConfigPlugin.getDefault().getPreferenceStore()
+            .addPropertyChangeListener(propertyListener);
+    }
+
+    @Override
+    public void dispose() {
+        ScannerConfigPlugin.getDefault().getPreferenceStore()
+            .removePropertyChangeListener(propertyListener);
+        super.dispose();
     }
 
     @Override

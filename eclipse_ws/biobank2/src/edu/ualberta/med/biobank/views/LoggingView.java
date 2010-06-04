@@ -342,6 +342,7 @@ public class LoggingView extends ViewPart {
                 }
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
             }

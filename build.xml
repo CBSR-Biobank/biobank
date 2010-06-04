@@ -378,18 +378,10 @@
           depends="sdk">
     <java classpath="scripts/strfields.jar" classname="edu.ualberta.med.biobank.strfields.StrFields"
           failonerror="true" fork="true">
-      <arg value="-v" />
       <arg value="${model.proj.dir}/biobank2.uml" />
       <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />
     </java>
-    <!--exec executable="${perl}">
-      <env key="PATH" path="${scripts.proj.dir}" />
-      <arg value="${scripts.proj.dir}/hbmstringlength.pl" />
-      <arg value="${model.proj.dir}/biobank2.uml" />
-      <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
-      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/" />
-    </exec-->
   </target>
 
   <target name="package-codegen-orm"

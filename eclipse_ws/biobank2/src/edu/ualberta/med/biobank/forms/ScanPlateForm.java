@@ -5,6 +5,8 @@ import java.io.File;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -41,6 +43,29 @@ public class ScanPlateForm extends BiobankViewForm {
 
     Integer plateToScan;
 
+    IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent event) {
+            int plateEnabledCount = 0;
+
+            for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED.length; ++i) {
+                if (!event
+                    .getProperty()
+                    .equals(
+                        edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED[i]))
+                    continue;
+
+                int plateId = i + 1;
+                if (ScannerConfigPlugin.getDefault().getPlateEnabled(plateId)) {
+                    ++plateEnabledCount;
+                }
+            }
+
+            scanButton.setEnabled(plateEnabledCount > 0);
+        }
+    };
+
     @Override
     protected void init() throws Exception {
         img = null;
@@ -50,6 +75,12 @@ public class ScanPlateForm extends BiobankViewForm {
         }
 
         setPartName(Messages.getString("ScanPlate.tabTitle")); //$NON-NLS-1$
+    }
+
+    @Override
+    public void dispose() {
+        ScannerConfigPlugin.getDefault().getPreferenceStore()
+            .removePropertyChangeListener(propertyListener);
     }
 
     @Override
@@ -120,6 +151,9 @@ public class ScanPlateForm extends BiobankViewForm {
                 }
             }
         });
+
+        ScannerConfigPlugin.getDefault().getPreferenceStore()
+            .addPropertyChangeListener(propertyListener);
 
     }
 
