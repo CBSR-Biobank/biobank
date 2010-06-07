@@ -519,6 +519,11 @@
               </reference>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.shipmentsPerspectiveSelected">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ShipmentDeleteHandler"
@@ -1226,6 +1231,12 @@
                   icon="icons/patient_delete.png"
                   label="Delete Patient"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
