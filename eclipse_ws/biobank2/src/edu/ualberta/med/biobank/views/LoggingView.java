@@ -39,9 +39,6 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-//DateTimeWidget
-//aicml-med.cs.ualberta.ca:8443
-//XXX PYRX logging view -- orginally a clone of ReportsView
 public class LoggingView extends ViewPart {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.LoggingView";
@@ -55,7 +52,7 @@ public class LoggingView extends ViewPart {
     private Composite top;
 
     private Label userLabel, typeLabel, actionLabel, patientNumLabel,
-        inventoryIdLabel, startDateLabel, stopDateLabel, detailsLabel,
+        inventoryIdLabel, startDateLabel, endDateLabel, detailsLabel,
         locationLabel;
     // containerTypeLabel, containerLabelLabel
 
@@ -65,7 +62,7 @@ public class LoggingView extends ViewPart {
 
     Combo userCombo, typeCombo, actionCombo;
 
-    DateTimeWidget startDateWidget, stopDateWidget;
+    DateTimeWidget startDateWidget, endDateWidget;
 
     // containerTypeCombo
 
@@ -73,14 +70,9 @@ public class LoggingView extends ViewPart {
 
     private final Listener alphaNumericListener = new Listener() {
         public void handleEvent(Event e) {
-            String string = e.text;
-            for (int i = 0; i < string.length(); i++) {
-                // input must be alpha numeric
-                if (!(string.matches("\\p{Alnum}+"))) {
-                    e.doit = false;
-                    return;
-                }
-            }
+            /* The user can only enter in alphanumeric */
+            /* Applied to Patient#, Inventory ID, Location */
+            e.text = e.text.replaceAll("^(?:(?!\\p{Alnum}+).)*$", "");
         }
     };
 
@@ -240,7 +232,6 @@ public class LoggingView extends ViewPart {
         detailsTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
         detailsTextInput.setVisible(true);
         detailsTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        detailsTextInput.addListener(SWT.Verify, alphaNumericListener);
         detailsTextInput.addKeyListener(enterListener);
 
         new Label(top, SWT.NONE);
@@ -255,14 +246,14 @@ public class LoggingView extends ViewPart {
         startDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
         startDateWidget.setBackground(colorWhite);
 
-        stopDateLabel = new Label(top, SWT.NO_BACKGROUND);
-        stopDateLabel.setText("Stop Date:");
-        stopDateLabel.setAlignment(SWT.LEFT);
-        stopDateLabel.setBackground(colorWhite);
-        stopDateLabel.setVisible(true);
+        endDateLabel = new Label(top, SWT.NO_BACKGROUND);
+        endDateLabel.setText("End Date:");
+        endDateLabel.setAlignment(SWT.LEFT);
+        endDateLabel.setBackground(colorWhite);
+        endDateLabel.setVisible(true);
 
-        stopDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
-        stopDateWidget.setBackground(colorWhite);
+        endDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
+        endDateWidget.setBackground(colorWhite);
 
         new Label(top, SWT.NONE);
         new Label(top, SWT.NONE);
@@ -314,8 +305,15 @@ public class LoggingView extends ViewPart {
             }
         });
         setSiteManagement();
-        setEnableAllFields(false);
         clearFields();
+
+        if (SessionManager.getInstance().isConnected()
+            && SessionManager.getInstance().getCurrentSite() != null
+            && !SessionManager.getInstance().isAllSitesSelected())
+            setEnableAllFields(true);
+        else
+            setEnableAllFields(false);
+
     }
 
     private void setSiteManagement() {
@@ -332,12 +330,11 @@ public class LoggingView extends ViewPart {
                 }
 
                 if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
-                    if (!SessionManager.getInstance().getCurrentSite()
-                        .getName().equals("All Sites")) {
+                    if (SessionManager.getInstance().isAllSitesSelected()) {
+                        setEnableAllFields(false);
+                    } else {
                         loadComboFields();
                         setEnableAllFields(true);
-                    } else {
-                        setEnableAllFields(false);
                     }
                 }
             }
@@ -384,7 +381,7 @@ public class LoggingView extends ViewPart {
         locationTextInput.setEnabled(enabled);
         detailsTextInput.setEnabled(enabled);
         startDateWidget.setEnabled(enabled);
-        stopDateWidget.setEnabled(enabled);
+        endDateWidget.setEnabled(enabled);
         clearButton.setEnabled(enabled);
         searchButton.setEnabled(enabled);
     }
@@ -412,15 +409,15 @@ public class LoggingView extends ViewPart {
         dayBefore.setTimeInMillis(dayBefore.getTimeInMillis() - 1000 * 60 * 60
             * 24);
         startDateWidget.setDate(dayBefore.getTime());
-        stopDateWidget.setDate(now.getTime());
+        endDateWidget.setDate(now.getTime());
 
     }
 
     private void searchDatabase() {
 
-        if (startDateWidget.getDate().after(stopDateWidget.getDate())) {
+        if (startDateWidget.getDate().after(endDateWidget.getDate())) {
             BioBankPlugin.openAsyncError("Error",
-                "Error: start date cannot be ahead stop date.");
+                "Error: start date cannot be ahead end date.");
             return;
         }
 
@@ -441,12 +438,12 @@ public class LoggingView extends ViewPart {
             LogQuery.getInstance().setSearchQueryItem("details",
                 detailsTextInput.getText());
             Date startDateDate = startDateWidget.getDate();
-            Date stopDateDate = stopDateWidget.getDate();
+            Date endDateDate = endDateWidget.getDate();
 
             LogQuery.getInstance().setSearchQueryItem("startDate",
                 DateFormatter.formatAsDateTime(startDateDate));
-            LogQuery.getInstance().setSearchQueryItem("stopDate",
-                DateFormatter.formatAsDateTime(stopDateDate));
+            LogQuery.getInstance().setSearchQueryItem("endDate",
+                DateFormatter.formatAsDateTime(endDateDate));
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()
@@ -473,7 +470,7 @@ public class LoggingView extends ViewPart {
         int listArraySize = listArrayString.size();
 
         String listString[] = new String[listArraySize + 1];
-        listString[0] = "";
+        listString[0] = "ALL";
         for (int i = 1; i <= listArraySize; i++) {
             listString[i] = listArrayString.get(i - 1);
         }
@@ -484,8 +481,6 @@ public class LoggingView extends ViewPart {
         try {
             List<String> arrayList = null;
 
-            // XXX run this code later on? ensure this does
-            // not get called before logging in
             if (!SessionManager.getInstance().isConnected()) {
                 return new String[] { "ERROR" };
             }

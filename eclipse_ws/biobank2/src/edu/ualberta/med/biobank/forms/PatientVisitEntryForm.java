@@ -200,7 +200,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = patient.getStudy();
+        StudyWrapper study = patientVisit.getPatient().getStudy();
         String[] labels = study.getStudyPvAttrLabels();
         if (labels == null)
             return;
@@ -330,20 +330,20 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         PatientWrapper patient = patientVisit.getPatient();
-        super.reset();
-        // patient was set before the form is open, so keep it
+        patient.reload();
+        patientVisit.reload();
         patientVisit.setPatient(patient);
+        super.reset();
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }
         pvSourceVesseltable.reload();
-
         resetPvCustomInfo();
     }
 
     private void resetPvCustomInfo() throws Exception {
-        StudyWrapper study = patient.getStudy();
+        StudyWrapper study = patientVisit.getPatient().getStudy();
         String[] labels = study.getStudyPvAttrLabels();
         if (labels == null)
             return;

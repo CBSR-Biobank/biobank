@@ -97,7 +97,7 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.LoggingPerspective"
-            icon="icons/reportsPerspective.png"
+            icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.perspective.logging"
             name="Logging View">
       </perspective>
@@ -1000,14 +1000,14 @@
                   style="push">
             </command>
             <command
-               commandId="edu.ualberta.med.biobank.commands.reports"
-               icon="icons/reportsPerspective.png"
-               label="Reports View"
-               style="push">
+                  commandId="edu.ualberta.med.biobank.commands.reports"
+                  icon="icons/reportsPerspective.png"
+                  label="Reports View"
+                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
-                  icon="icons/reportsPerspective.png"
+                  icon="icons/table_row_delete.png"
                   label="Logging View"
                   style="push">
             </command>
@@ -1139,6 +1139,20 @@
                   label="Reports"
                   style="push"
                   tooltip="Reports">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.logging"
+                  icon="icons/table_row_delete.png"
+                  label="Logging"
+                  style="push"
+                  tooltip="Logging: search for specific information in stored logs">
             </command>
          </toolbar>
       </menuContribution>
@@ -1770,7 +1784,7 @@
       <editor
             class="edu.ualberta.med.biobank.forms.LoggingForm"
             default="false"
-            icon="icons/reportsPerspective.png"
+            icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.forms.LoggingForm"
             name="Logging Form">
       </editor>
@@ -1983,7 +1997,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.LoggingView"
-            icon="icons/reportsPerspective.png"
+            icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.views.LoggingView"
             name="Logging"
             restorable="true">

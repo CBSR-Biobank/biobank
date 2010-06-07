@@ -22,7 +22,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends ModelWrapper<Patient> {
 
-    private StudyWrapper study;
+    private StudyWrapper study = null;
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -44,15 +44,24 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public StudyWrapper getStudy() {
+        if (study != null)
+            return study;
+
+        Study studyRaw = wrappedObject.getStudy();
+        if (studyRaw == null) {
+            return null;
+        }
+        study = new StudyWrapper(appService, studyRaw);
         return study;
     }
 
-    public void setStudy(StudyWrapper s) {
-        Study oldStudy = wrappedObject.getStudy();
-        Study newStudy = s.wrappedObject;
-        wrappedObject.setStudy(newStudy);
-        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
-        this.study = new StudyWrapper(appService, newStudy);
+    public void setStudy(StudyWrapper study) {
+        this.study = study;
+        Study oldStudyRaw = wrappedObject.getStudy();
+        Study newStudyRaw = study.wrappedObject;
+        wrappedObject.setStudy(newStudyRaw);
+        propertyChangeSupport.firePropertyChange("study", oldStudyRaw,
+            newStudyRaw);
     }
 
     public boolean checkPatientNumberUnique() throws ApplicationException {
@@ -369,5 +378,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     protected void log(String action, String details) {
         ((BiobankApplicationService) appService).logActivity(action,
             getPnumber(), null, null, "patient " + details, "Patient");
+    }
+
+    @Override
+    public void reload() throws Exception {
+        study = null;
+        super.reload();
     }
 }
