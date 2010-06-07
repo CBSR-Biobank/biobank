@@ -31,12 +31,6 @@ public class AliquotWrapper extends
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
         super(appService, wrappedObject);
-        this.patientVisit = new PatientVisitWrapper(appService, wrappedObject
-            .getPatientVisit());
-        this.sampleType = new SampleTypeWrapper(appService, wrappedObject
-            .getSampleType());
-        this.activityStatus = new ActivityStatusWrapper(appService,
-            wrappedObject.getActivityStatus());
     }
 
     public AliquotWrapper(WritableApplicationService appService) {
@@ -57,7 +51,7 @@ public class AliquotWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (activityStatus == null) {
+        if (getActivityStatus() == null) {
             throw new BiobankCheckException(
                 "the aliquot does not have an activity status");
         }
@@ -68,7 +62,7 @@ public class AliquotWrapper extends
     }
 
     private void checkPatientVisitNotNull() throws BiobankCheckException {
-        if (patientVisit == null) {
+        if (getPatientVisit() == null) {
             throw new BiobankCheckException("patient visit should be set");
         }
     }
@@ -116,19 +110,19 @@ public class AliquotWrapper extends
             }
             List<SampleTypeWrapper> types = parentType
                 .getSampleTypeCollection();
-            if (types == null || !types.contains(sampleType)) {
+            if (types == null || !types.contains(getSampleType())) {
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()
                     + " does not allow inserts of sample type "
-                    + sampleType.getName() + ".");
+                    + getSampleType().getName() + ".");
             }
         }
     }
 
     @Override
     public SiteWrapper getSite() {
-        if (patientVisit != null) {
-            return patientVisit.getPatient().getStudy().getSite();
+        if (getPatientVisit() != null) {
+            return getPatientVisit().getPatient().getStudy().getSite();
         }
         return null;
     }
@@ -151,6 +145,9 @@ public class AliquotWrapper extends
     }
 
     public PatientVisitWrapper getPatientVisit() {
+        if (patientVisit == null)
+            this.patientVisit = new PatientVisitWrapper(appService,
+                wrappedObject.getPatientVisit());
         return patientVisit;
     }
 
@@ -206,6 +203,9 @@ public class AliquotWrapper extends
     }
 
     public SampleTypeWrapper getSampleType() {
+        if (sampleType == null)
+            this.sampleType = new SampleTypeWrapper(appService, wrappedObject
+                .getSampleType());
         return sampleType;
     }
 
@@ -235,6 +235,9 @@ public class AliquotWrapper extends
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        if (activityStatus == null)
+            this.activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
         return activityStatus;
     }
 
@@ -304,7 +307,7 @@ public class AliquotWrapper extends
             .getSampleStorageCollection();
         if (sampleStorageCollection != null) {
             for (SampleStorageWrapper ss : sampleStorageCollection) {
-                if (ss.getSampleType().getId().equals(sampleType.getId())) {
+                if (ss.getSampleType().getId().equals(getSampleType().getId())) {
                     volume = ss.getVolume();
                 }
             }
@@ -446,5 +449,13 @@ public class AliquotWrapper extends
         ((BiobankApplicationService) appService).logActivity(action,
             patientVisit.getPatient().getPnumber(), getInventoryId(),
             getPositionString(true, false), "aliquot " + details, "Aliquot");
+    }
+
+    @Override
+    public void reload() throws Exception {
+        patientVisit = null;
+        sampleType = null;
+        activityStatus = null;
+        super.reload();
     }
 }
