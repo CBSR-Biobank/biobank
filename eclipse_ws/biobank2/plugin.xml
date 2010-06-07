@@ -1141,13 +1141,6 @@
                   tooltip="Reports">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.search"
-                  icon="icons/search.png"
-                  label="Search"
-                  style="push"
-                  tooltip="Search">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
                   icon="icons/table_row_delete.png"
                   label="Logging"

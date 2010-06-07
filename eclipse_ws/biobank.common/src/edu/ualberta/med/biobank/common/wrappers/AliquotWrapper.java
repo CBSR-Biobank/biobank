@@ -24,9 +24,19 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class AliquotWrapper extends
     AbstractPositionHolder<Aliquot, AliquotPosition> {
 
+    private PatientVisitWrapper patientVisit;
+    private SampleTypeWrapper sampleType;
+    private ActivityStatusWrapper activityStatus;
+
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
         super(appService, wrappedObject);
+        this.patientVisit = new PatientVisitWrapper(appService, wrappedObject
+            .getPatientVisit());
+        this.sampleType = new SampleTypeWrapper(appService, wrappedObject
+            .getSampleType());
+        this.activityStatus = new ActivityStatusWrapper(appService,
+            wrappedObject.getActivityStatus());
     }
 
     public AliquotWrapper(WritableApplicationService appService) {
@@ -47,7 +57,7 @@ public class AliquotWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getActivityStatus() == null) {
+        if (activityStatus == null) {
             throw new BiobankCheckException(
                 "the aliquot does not have an activity status");
         }
@@ -58,7 +68,7 @@ public class AliquotWrapper extends
     }
 
     private void checkPatientVisitNotNull() throws BiobankCheckException {
-        if (getPatientVisit() == null) {
+        if (patientVisit == null) {
             throw new BiobankCheckException("patient visit should be set");
         }
     }
@@ -106,28 +116,30 @@ public class AliquotWrapper extends
             }
             List<SampleTypeWrapper> types = parentType
                 .getSampleTypeCollection();
-            if (types == null || !types.contains(getSampleType())) {
+            if (types == null || !types.contains(sampleType)) {
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()
                     + " does not allow inserts of sample type "
-                    + getSampleType().getName() + ".");
+                    + sampleType.getName() + ".");
             }
         }
     }
 
     @Override
     public SiteWrapper getSite() {
-        if (getPatientVisit() != null) {
-            return getPatientVisit().getPatient().getStudy().getSite();
+        if (patientVisit != null) {
+            return patientVisit.getPatient().getStudy().getSite();
         }
         return null;
     }
 
     protected void setPatientVisit(PatientVisit patientVisit) {
-        PatientVisit oldPV = patientVisit;
-        wrappedObject.setPatientVisit(patientVisit);
-        propertyChangeSupport.firePropertyChange("patientVisit", oldPV,
-            patientVisit);
+        this.patientVisit = new PatientVisitWrapper(appService, patientVisit);
+        PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
+        PatientVisit newPvRaw = patientVisit;
+        wrappedObject.setPatientVisit(newPvRaw);
+        propertyChangeSupport.firePropertyChange("patientVisit", oldPvRaw,
+            newPvRaw);
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
@@ -139,11 +151,7 @@ public class AliquotWrapper extends
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        PatientVisit pv = wrappedObject.getPatientVisit();
-        if (pv == null) {
-            return null;
-        }
-        return new PatientVisitWrapper(appService, pv);
+        return patientVisit;
     }
 
     public void setAliquotPositionFromString(String positionString,
@@ -181,9 +189,12 @@ public class AliquotWrapper extends
     }
 
     protected void setSampleType(SampleType type) {
-        SampleType oldType = wrappedObject.getSampleType();
+        this.sampleType = new SampleTypeWrapper(appService, type);
+        SampleType oldTypeRaw = wrappedObject.getSampleType();
+        SampleType newTypeRaw = type;
         wrappedObject.setSampleType(type);
-        propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
+        propertyChangeSupport.firePropertyChange("sampleType", oldTypeRaw,
+            newTypeRaw);
     }
 
     public void setSampleType(SampleTypeWrapper type) {
@@ -195,11 +206,7 @@ public class AliquotWrapper extends
     }
 
     public SampleTypeWrapper getSampleType() {
-        SampleType type = wrappedObject.getSampleType();
-        if (type == null) {
-            return null;
-        }
-        return new SampleTypeWrapper(appService, type);
+        return sampleType;
     }
 
     public void setLinkDate(Date date) {
@@ -228,13 +235,11 @@ public class AliquotWrapper extends
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
-        if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -293,13 +298,13 @@ public class AliquotWrapper extends
     }
 
     public void setQuantityFromType() {
-        StudyWrapper study = getPatientVisit().getPatient().getStudy();
+        StudyWrapper study = patientVisit.getPatient().getStudy();
         Double volume = null;
         Collection<SampleStorageWrapper> sampleStorageCollection = study
             .getSampleStorageCollection();
         if (sampleStorageCollection != null) {
             for (SampleStorageWrapper ss : sampleStorageCollection) {
-                if (ss.getSampleType().getId().equals(getSampleType().getId())) {
+                if (ss.getSampleType().getId().equals(sampleType.getId())) {
                     volume = ss.getVolume();
                 }
             }
@@ -439,7 +444,7 @@ public class AliquotWrapper extends
     @Override
     protected void log(String action, String details) {
         ((BiobankApplicationService) appService).logActivity(action,
-            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
+            patientVisit.getPatient().getPnumber(), getInventoryId(),
             getPositionString(true, false), "aliquot " + details, "Aliquot");
     }
 }
