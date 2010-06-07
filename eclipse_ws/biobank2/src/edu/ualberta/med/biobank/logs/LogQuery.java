@@ -52,13 +52,16 @@ public class LogQuery {
     public boolean queryDatabase() {
         try {
             String user = searchQuery.get("user");
-            user = user.equals("") || user.equals("ALL") ? null : user;
+            user = user.equals("NONE") ? "" : user;
+            user = user.equals("ALL") ? null : user;
 
             String action = searchQuery.get("action");
-            action = action.equals("") || action.equals("ALL") ? null : action;
+            action = action.equals("NONE") ? "" : action;
+            action = action.equals("ALL") ? null : action;
 
             String type = searchQuery.get("type");
-            type = type.equals("") || type.equals("ALL") ? null : type;
+            type = type.equals("NONE") ? "" : type;
+            type = type.equals("ALL") ? null : type;
 
             String patientNumber = searchQuery.get("patientNumber");
             patientNumber = patientNumber.equals("") ? null : patientNumber;
@@ -79,7 +82,7 @@ public class LogQuery {
             endDateText = endDateText.equals("") ? null : endDateText;
 
             SimpleDateFormat dateFormat = new SimpleDateFormat(
-                DateFormatter.DATE_TIME_FORMAT);
+                DateFormatter.DATE_FORMAT);
 
             Date startDate = null;
 

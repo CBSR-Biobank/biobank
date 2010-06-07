@@ -243,7 +243,7 @@ public class LoggingView extends ViewPart {
         startDateLabel.setBackground(colorWhite);
         startDateLabel.setVisible(true);
 
-        startDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
+        startDateWidget = new DateTimeWidget(top, SWT.DATE, null);
         startDateWidget.setBackground(colorWhite);
 
         endDateLabel = new Label(top, SWT.NO_BACKGROUND);
@@ -252,7 +252,7 @@ public class LoggingView extends ViewPart {
         endDateLabel.setBackground(colorWhite);
         endDateLabel.setVisible(true);
 
-        endDateWidget = new DateTimeWidget(top, SWT.DATE | SWT.TIME, null);
+        endDateWidget = new DateTimeWidget(top, SWT.DATE, null);
         endDateWidget.setBackground(colorWhite);
 
         new Label(top, SWT.NONE);
@@ -415,7 +415,9 @@ public class LoggingView extends ViewPart {
 
     private void searchDatabase() {
 
-        if (startDateWidget.getDate().after(endDateWidget.getDate())) {
+        if (startDateWidget.getDate() != null
+            && endDateWidget.getDate() != null
+            && startDateWidget.getDate().after(endDateWidget.getDate())) {
             BioBankPlugin.openAsyncError("Error",
                 "Error: start date cannot be ahead end date.");
             return;
@@ -441,9 +443,9 @@ public class LoggingView extends ViewPart {
             Date endDateDate = endDateWidget.getDate();
 
             LogQuery.getInstance().setSearchQueryItem("startDate",
-                DateFormatter.formatAsDateTime(startDateDate));
+                DateFormatter.formatAsDate(startDateDate));
             LogQuery.getInstance().setSearchQueryItem("endDate",
-                DateFormatter.formatAsDateTime(endDateDate));
+                DateFormatter.formatAsDate(endDateDate));
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()
@@ -473,6 +475,7 @@ public class LoggingView extends ViewPart {
         listString[0] = "ALL";
         for (int i = 1; i <= listArraySize; i++) {
             listString[i] = listArrayString.get(i - 1);
+            listString[i] = listString[i].equals("") ? "NONE" : listString[i];
         }
         return listString;
     }
