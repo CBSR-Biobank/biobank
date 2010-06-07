@@ -1,11 +1,15 @@
 package edu.ualberta.med.biobank.logs;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 
 public class LogQuery {
@@ -74,32 +78,34 @@ public class LogQuery {
             String endDateText = searchQuery.get("endDate");
             endDateText = endDateText.equals("") ? null : endDateText;
 
-            /*
-             * TODO: apply start and end date to query
-             * 
-             * SimpleDateFormat dateFormat = new SimpleDateFormat(
-             * DateFormatter.DATE_TIME_FORMAT);
-             * 
-             * Date startDate = null;
-             * 
-             * if (startDateText != null) { try { startDate =
-             * dateFormat.parse(startDateText); } catch (ParseException pe) {
-             * BioBankPlugin.openAsyncError("Error",
-             * "ERROR: Error parsing start date"); } }
-             * 
-             * Date endDate = null;
-             * 
-             * if (endDateText != null) { try { endDate =
-             * dateFormat.parse(endDateText); } catch (ParseException pe) {
-             * BioBankPlugin.openAsyncError("Error",
-             * "ERROR: Error parsing stop date"); } }
-             */
+            SimpleDateFormat dateFormat = new SimpleDateFormat(
+                DateFormatter.DATE_TIME_FORMAT);
 
-            Date date = null;
+            Date startDate = null;
+
+            if (startDateText != null) {
+                try {
+                    startDate = dateFormat.parse(startDateText);
+                } catch (ParseException pe) {
+                    BioBankPlugin.openAsyncError("Error",
+                        "ERROR: Error parsing start date");
+                }
+            }
+
+            Date endDate = null;
+
+            if (endDateText != null) {
+                try {
+                    endDate = dateFormat.parse(endDateText);
+                } catch (ParseException pe) {
+                    BioBankPlugin.openAsyncError("Error",
+                        "ERROR: Error parsing stop date");
+                }
+            }
 
             dbResults = LogWrapper.getLogs(SessionManager.getAppService(),
-                user, date, action, patientNumber, inventoryId, location,
-                details, type);
+                user, startDate, endDate, action, patientNumber, inventoryId,
+                location, details, type);
 
         } catch (Exception e) {
             e.printStackTrace();

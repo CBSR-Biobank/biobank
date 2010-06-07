@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -130,31 +129,33 @@ public class LogWrapper extends ModelWrapper<Log> {
     }
 
     public static List<LogWrapper> getLogs(
-        WritableApplicationService appService, String username, Date date,
-        String action, String patientNumber, String inventoryId,
+        WritableApplicationService appService, String username, Date startDate,
+        Date endDate, String action, String patientNumber, String inventoryId,
         String locationLabel, String details, String type) throws Exception {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, "username", username);
-        if (date != null) { // want the logs of this day, not matter the time
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            // the day before at midnight
-            cal.set(Calendar.AM_PM, Calendar.AM);
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            Date startDate = cal.getTime();
-            // this day at midnight
-            cal.add(Calendar.DATE, 1);
-            Date endDate = cal.getTime();
+
+        StringBuffer datePart = new StringBuffer();
+        if ((startDate != null) && (endDate != null)) {
+            datePart.append(" date >= ? and date <= ?");
+            parametersArgs.add(startDate);
+            parametersArgs.add(endDate);
+        } else if (startDate != null) {
+            datePart.append(" date >= ?");
+            parametersArgs.add(startDate);
+        } else if (endDate != null) {
+            datePart.append(" date <= ?");
+            parametersArgs.add(endDate);
+        }
+
+        if (datePart.length() > 0) {
             if (parametersString.length() > 0) {
                 parametersString.append(" and");
             }
-            parametersString.append(" date >= ? and date <= ?");
-            parametersArgs.add(startDate);
-            parametersArgs.add(endDate);
+            parametersString.append(" " + datePart);
         }
+
         addParam(parametersString, parametersArgs, "action", action);
         addParam(parametersString, parametersArgs, "patientNumber",
             patientNumber);
