@@ -466,13 +466,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        Collection<StudyPvAttr> studyPvAttrCollection = wrappedObject
-            .getStudyPvAttrCollection();
-        if (studyPvAttrCollection != null) {
-            for (StudyPvAttr studyPvAttr : studyPvAttrCollection) {
-                studyPvAttrMap.put(studyPvAttr.getLabel(),
-                    new StudyPvAttrWrapper(appService, studyPvAttr));
-            }
+        for (StudyPvAttrWrapper studyPvAttr : StudyPvAttrWrapper
+            .getStudyPvAttrCollection(this)) {
+            studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
         }
         return studyPvAttrMap;
     }

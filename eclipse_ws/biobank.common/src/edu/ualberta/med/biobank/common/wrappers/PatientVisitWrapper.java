@@ -34,6 +34,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private Set<PvSourceVesselWrapper> deletedPvSourceVessels = new HashSet<PvSourceVesselWrapper>();
 
+    private PatientWrapper patient = null;
+
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
@@ -73,19 +75,24 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public PatientWrapper getPatient() {
-        Patient patient = wrappedObject.getPatient();
-        if (patient == null) {
+        if (patient != null)
+            return patient;
+
+        Patient patientRaw = wrappedObject.getPatient();
+        if (patientRaw == null) {
             return null;
         }
-        return new PatientWrapper(appService, patient);
+        patient = new PatientWrapper(appService, patientRaw);
+        return patient;
     }
 
     public void setPatient(PatientWrapper patient) {
-        Patient oldPatient = wrappedObject.getPatient();
-        Patient newPatient = patient.getWrappedObject();
-        wrappedObject.setPatient(newPatient);
-        propertyChangeSupport.firePropertyChange("patient", oldPatient,
-            newPatient);
+        this.patient = patient;
+        Patient oldPatientRaw = wrappedObject.getPatient();
+        Patient newPatientRaw = patient.getWrappedObject();
+        wrappedObject.setPatient(newPatientRaw);
+        propertyChangeSupport.firePropertyChange("patient", oldPatientRaw,
+            newPatientRaw);
     }
 
     @SuppressWarnings("unchecked")
@@ -578,5 +585,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             getPatient().getPnumber(), null, null, "visit " + details
                 + " (Date Processed:" + getFormattedDateProcessed() + worksheet
                 + ")", "Visit");
+    }
+
+    @Override
+    public void reload() throws Exception {
+        patient = null;
+        super.reload();
     }
 }

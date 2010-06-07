@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
@@ -154,5 +156,20 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         return "" + getId() + ":\"" + getLabel() + "\":\"" + getPermissible()
             + "\":" + getActivityStatus() + ":" + getPvAttrType().getName()
             + ":" + getStudy();
+    }
+
+    public static List<StudyPvAttrWrapper> getStudyPvAttrCollection(
+        StudyWrapper study) {
+        List<StudyPvAttrWrapper> result = new ArrayList<StudyPvAttrWrapper>();
+        Collection<StudyPvAttr> studyPvAttrCollection = study
+            .getWrappedObject().getStudyPvAttrCollection();
+        if (studyPvAttrCollection != null) {
+            for (StudyPvAttr studyPvAttr : studyPvAttrCollection) {
+                result.add(new StudyPvAttrWrapper(study.getAppService(),
+                    studyPvAttr));
+            }
+        }
+        return result;
+
     }
 }
