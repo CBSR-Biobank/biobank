@@ -26,6 +26,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
+    private AddressWrapper address;
+    private ActivityStatusWrapper activityStatus;
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
@@ -45,14 +47,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     private AddressWrapper getAddress() {
-        Address address = wrappedObject.getAddress();
         if (address == null) {
-            return null;
+            address = new AddressWrapper(appService, wrappedObject.getAddress());
         }
-        return new AddressWrapper(appService, address);
+        return address;
     }
 
     private void setAddress(Address address) {
+        this.address = new AddressWrapper(appService, address);
         Address oldAddress = wrappedObject.getAddress();
         wrappedObject.setAddress(address);
         propertyChangeSupport
@@ -92,13 +94,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -551,6 +554,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     @Override
     protected void resetInternalField() {
         deletedContacts.clear();
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        address = null;
+        activityStatus = null;
     }
 
 }

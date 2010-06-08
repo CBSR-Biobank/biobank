@@ -35,6 +35,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
 
+    private ActivityStatusWrapper activityStatus;
+
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
         super(appService, wrappedObject);
@@ -278,13 +280,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -736,5 +739,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         throws Exception {
         return LabelingScheme.getRowColFromPositionString(position,
             getChildLabelingScheme(), getRowCapacity(), getColCapacity());
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        activityStatus = null;
     }
 }

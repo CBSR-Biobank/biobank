@@ -14,6 +14,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContactWrapper extends ModelWrapper<Contact> {
 
+    private ClinicWrapper clinic;
+
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
         super(appService, wrappedObject);
@@ -99,10 +101,13 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     public ClinicWrapper getClinic() {
-        return new ClinicWrapper(appService, wrappedObject.getClinic());
+        if (clinic == null)
+            clinic = new ClinicWrapper(appService, wrappedObject.getClinic());
+        return clinic;
     }
 
     public void setClinic(ClinicWrapper clinic) {
+        this.clinic = clinic;
         Clinic oldClinic = wrappedObject.getClinic();
         Clinic newClinic = clinic.getWrappedObject();
         wrappedObject.setClinic(newClinic);
@@ -184,4 +189,11 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     public String toString() {
         return getName() + " (" + getMobileNumber() + ")";
     }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        clinic = null;
+    }
+
 }
