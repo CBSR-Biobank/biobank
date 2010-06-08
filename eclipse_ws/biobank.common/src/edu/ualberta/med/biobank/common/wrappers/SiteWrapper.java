@@ -39,6 +39,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private Set<SitePvAttrWrapper> deletedSitePvAttr = new HashSet<SitePvAttrWrapper>();
 
+    private AddressWrapper address;
+
+    private ActivityStatusWrapper activityStatus;
+
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
         sitePvAttrMap = null;
@@ -82,13 +86,14 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            new ActivityStatusWrapper(appService, wrappedObject
+                .getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -111,14 +116,14 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     private AddressWrapper getAddress() {
-        Address address = wrappedObject.getAddress();
         if (address == null) {
-            return null;
+            address = new AddressWrapper(appService, wrappedObject.getAddress());
         }
-        return new AddressWrapper(appService, address);
+        return address;
     }
 
     private void setAddress(Address address) {
+        this.address = new AddressWrapper(appService, address);
         Address oldAddress = wrappedObject.getAddress();
         wrappedObject.setAddress(address);
         propertyChangeSupport
@@ -847,4 +852,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
             return false;
         }
     }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        activityStatus = null;
+        address = null;
+    }
+
 }

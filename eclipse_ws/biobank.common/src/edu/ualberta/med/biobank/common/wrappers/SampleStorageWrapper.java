@@ -10,6 +10,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
 
+    private StudyWrapper study;
+    private ActivityStatusWrapper activityStatus;
+    private SampleTypeWrapper type;
+
     public SampleStorageWrapper(WritableApplicationService appService,
         SampleStorage wrappedObject) {
         super(appService, wrappedObject);
@@ -20,14 +24,14 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     public StudyWrapper getStudy() {
-        Study study = wrappedObject.getStudy();
         if (study == null) {
-            return null;
+            study = new StudyWrapper(appService, wrappedObject.getStudy());
         }
-        return new StudyWrapper(appService, study);
+        return study;
     }
 
     public void setStudy(StudyWrapper study) {
+        this.study = study;
         Study oldStudy = wrappedObject.getStudy();
         Study newStudy = study.wrappedObject;
         wrappedObject.setStudy(newStudy);
@@ -35,14 +39,15 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     public SampleTypeWrapper getSampleType() {
-        SampleType type = wrappedObject.getSampleType();
         if (type == null) {
-            return null;
+            type = new SampleTypeWrapper(appService, wrappedObject
+                .getSampleType());
         }
-        return new SampleTypeWrapper(appService, type);
+        return type;
     }
 
     public void setSampleType(SampleTypeWrapper sampleType) {
+        this.type = sampleType;
         SampleType oldSampleType = wrappedObject.getSampleType();
         SampleType newSampleType = null;
         if (sampleType != null) {
@@ -75,13 +80,14 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -134,4 +140,13 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
         return getSampleType().getName() + "/" + getQuantity() + "/"
             + getActivityStatus();
     }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        activityStatus = null;
+        type = null;
+        study = null;
+    }
+
 }

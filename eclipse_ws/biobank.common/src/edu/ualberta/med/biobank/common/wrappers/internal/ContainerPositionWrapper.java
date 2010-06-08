@@ -16,6 +16,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerPositionWrapper extends
     AbstractPositionWrapper<ContainerPosition> {
 
+    private ContainerWrapper parent;
+    private ContainerWrapper container;
+
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
         super(appService, wrappedObject);
@@ -40,6 +43,7 @@ public class ContainerPositionWrapper extends
     }
 
     public void setParentContainer(Container parentContainer) {
+        this.parent = new ContainerWrapper(appService, parentContainer);
         Container oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
         propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
@@ -55,19 +59,19 @@ public class ContainerPositionWrapper extends
     }
 
     private ContainerWrapper getParentContainer() {
-        Container parent = wrappedObject.getParentContainer();
         if (parent == null) {
-            return null;
+            parent = new ContainerWrapper(appService, wrappedObject
+                .getParentContainer());
         }
-        return new ContainerWrapper(appService, parent);
+        return parent;
     }
 
     public ContainerWrapper getContainer() {
-        Container container = wrappedObject.getContainer();
         if (container == null) {
-            return null;
+            container = new ContainerWrapper(appService, wrappedObject
+                .getContainer());
         }
-        return new ContainerWrapper(appService, container);
+        return container;
     }
 
     public void setContainer(ContainerWrapper container) {
@@ -75,6 +79,7 @@ public class ContainerPositionWrapper extends
     }
 
     public void setContainer(Container container) {
+        this.container = new ContainerWrapper(appService, container);
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
@@ -137,5 +142,12 @@ public class ContainerPositionWrapper extends
                     + parent.getFullInfoLabel());
             }
         }
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        parent = null;
+        container = null;
     }
 }
