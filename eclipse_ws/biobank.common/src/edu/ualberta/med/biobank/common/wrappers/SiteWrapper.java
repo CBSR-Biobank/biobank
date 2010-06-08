@@ -858,6 +858,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         super.reload();
         activityStatus = null;
         address = null;
+
     }
 
 }

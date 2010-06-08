@@ -40,6 +40,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private ActivityStatusWrapper activityStatus;
 
+    private SiteWrapper site;
+
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -103,14 +105,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
         if (site == null) {
-            return null;
+            site = new SiteWrapper(appService, wrappedObject.getSite());
         }
-        return new SiteWrapper(appService, site);
+        return site;
     }
 
     public void setSite(SiteWrapper site) {
+        this.site = site;
         Site oldSite = wrappedObject.getSite();
         Site newSite = site.getWrappedObject();
         wrappedObject.setSite(newSite);
@@ -892,6 +894,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void reload() throws Exception {
         super.reload();
         activityStatus = null;
+        site = null;
     }
 
 }

@@ -26,7 +26,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
-        study = new StudyWrapper(appService, wrappedObject.getStudy());
     }
 
     public PatientWrapper(WritableApplicationService appService) {
@@ -44,14 +43,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public StudyWrapper getStudy() {
-        if (study != null)
-            return study;
-
-        Study studyRaw = wrappedObject.getStudy();
-        if (studyRaw == null) {
-            return null;
-        }
-        study = new StudyWrapper(appService, studyRaw);
+        if (study == null)
+            study = new StudyWrapper(appService, wrappedObject.getStudy());
         return study;
     }
 
