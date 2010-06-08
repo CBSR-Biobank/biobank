@@ -11,6 +11,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PvAttrWrapper extends ModelWrapper<PvAttr> {
 
+    private StudyPvAttrWrapper studyPvAttr;
+    private PatientVisitWrapper pv;
+
     public PvAttrWrapper(WritableApplicationService appService,
         PvAttr wrappedObject) {
         super(appService, wrappedObject);
@@ -41,14 +44,15 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     }
 
     public StudyPvAttrWrapper getStudyPvAttr() {
-        StudyPvAttr studyPvAttr = wrappedObject.getStudyPvAttr();
         if (studyPvAttr == null) {
-            return null;
+            studyPvAttr = new StudyPvAttrWrapper(appService, wrappedObject
+                .getStudyPvAttr());
         }
-        return new StudyPvAttrWrapper(appService, studyPvAttr);
+        return studyPvAttr;
     }
 
     public void setStudyPvAttr(StudyPvAttr studyPvAttr) {
+        this.studyPvAttr = new StudyPvAttrWrapper(appService, studyPvAttr);
         StudyPvAttr oldInfo = wrappedObject.getStudyPvAttr();
         wrappedObject.setStudyPvAttr(studyPvAttr);
         propertyChangeSupport.firePropertyChange("studyPvAttr", oldInfo,
@@ -70,14 +74,15 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        PatientVisit pv = wrappedObject.getPatientVisit();
         if (pv == null) {
-            return null;
+            pv = new PatientVisitWrapper(appService, wrappedObject
+                .getPatientVisit());
         }
-        return new PatientVisitWrapper(appService, pv);
+        return pv;
     }
 
     public void setPatientVisit(PatientVisit pv) {
+        this.pv = new PatientVisitWrapper(appService, pv);
         PatientVisit oldPv = wrappedObject.getPatientVisit();
         wrappedObject.setPatientVisit(pv);
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, pv);
@@ -91,4 +96,12 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     public int compareTo(ModelWrapper<PvAttr> o) {
         return 0;
     }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        pv = null;
+        studyPvAttr = null;
+    }
+
 }

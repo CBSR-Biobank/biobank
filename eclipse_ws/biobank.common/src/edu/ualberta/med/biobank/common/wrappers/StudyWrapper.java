@@ -38,6 +38,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
+    private ActivityStatusWrapper activityStatus;
+
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -71,13 +73,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -466,6 +469,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             return studyPvAttrMap;
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
+
         for (StudyPvAttrWrapper studyPvAttr : StudyPvAttrWrapper
             .getStudyPvAttrCollection(this)) {
             studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
@@ -882,6 +886,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        activityStatus = null;
     }
 
 }

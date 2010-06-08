@@ -24,6 +24,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class AliquotWrapper extends
     AbstractPositionHolder<Aliquot, AliquotPosition> {
 
+    private PatientVisitWrapper patientVisit;
+    private SampleTypeWrapper sampleType;
+    private ActivityStatusWrapper activityStatus;
+
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
         super(appService, wrappedObject);
@@ -124,10 +128,12 @@ public class AliquotWrapper extends
     }
 
     protected void setPatientVisit(PatientVisit patientVisit) {
-        PatientVisit oldPV = patientVisit;
-        wrappedObject.setPatientVisit(patientVisit);
-        propertyChangeSupport.firePropertyChange("patientVisit", oldPV,
-            patientVisit);
+        this.patientVisit = new PatientVisitWrapper(appService, patientVisit);
+        PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
+        PatientVisit newPvRaw = patientVisit;
+        wrappedObject.setPatientVisit(newPvRaw);
+        propertyChangeSupport.firePropertyChange("patientVisit", oldPvRaw,
+            newPvRaw);
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
@@ -139,11 +145,10 @@ public class AliquotWrapper extends
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        PatientVisit pv = wrappedObject.getPatientVisit();
-        if (pv == null) {
-            return null;
-        }
-        return new PatientVisitWrapper(appService, pv);
+        if (patientVisit == null)
+            this.patientVisit = new PatientVisitWrapper(appService,
+                wrappedObject.getPatientVisit());
+        return patientVisit;
     }
 
     public void setAliquotPositionFromString(String positionString,
@@ -181,9 +186,12 @@ public class AliquotWrapper extends
     }
 
     protected void setSampleType(SampleType type) {
-        SampleType oldType = wrappedObject.getSampleType();
+        this.sampleType = new SampleTypeWrapper(appService, type);
+        SampleType oldTypeRaw = wrappedObject.getSampleType();
+        SampleType newTypeRaw = type;
         wrappedObject.setSampleType(type);
-        propertyChangeSupport.firePropertyChange("sampleType", oldType, type);
+        propertyChangeSupport.firePropertyChange("sampleType", oldTypeRaw,
+            newTypeRaw);
     }
 
     public void setSampleType(SampleTypeWrapper type) {
@@ -195,11 +203,10 @@ public class AliquotWrapper extends
     }
 
     public SampleTypeWrapper getSampleType() {
-        SampleType type = wrappedObject.getSampleType();
-        if (type == null) {
-            return null;
-        }
-        return new SampleTypeWrapper(appService, type);
+        if (sampleType == null)
+            this.sampleType = new SampleTypeWrapper(appService, wrappedObject
+                .getSampleType());
+        return sampleType;
     }
 
     public void setLinkDate(Date date) {
@@ -228,13 +235,14 @@ public class AliquotWrapper extends
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            this.activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -293,7 +301,7 @@ public class AliquotWrapper extends
     }
 
     public void setQuantityFromType() {
-        StudyWrapper study = getPatientVisit().getPatient().getStudy();
+        StudyWrapper study = patientVisit.getPatient().getStudy();
         Double volume = null;
         Collection<SampleStorageWrapper> sampleStorageCollection = study
             .getSampleStorageCollection();
@@ -439,7 +447,15 @@ public class AliquotWrapper extends
     @Override
     protected void log(String action, String details) {
         ((BiobankApplicationService) appService).logActivity(action,
-            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
+            patientVisit.getPatient().getPnumber(), getInventoryId(),
             getPositionString(true, false), "aliquot " + details, "Aliquot");
+    }
+
+    @Override
+    public void reload() throws Exception {
+        patientVisit = null;
+        sampleType = null;
+        activityStatus = null;
+        super.reload();
     }
 }

@@ -13,6 +13,8 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     private RowColPos rowColPosition;
     private AbstractPositionWrapper<T> positionWrapper;
 
+    private ContainerWrapper parent;
+
     public AbstractPositionHolder(WritableApplicationService appService,
         E wrappedObject) {
         super(appService, wrappedObject);
@@ -81,14 +83,15 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     public ContainerWrapper getParent() {
-        AbstractPositionWrapper<T> pos = getPositionWrapper();
-        if (pos == null) {
-            return null;
+        if (parent == null) {
+            if (getPositionWrapper() != null)
+                parent = getPositionWrapper().getParent();
         }
-        return pos.getParent();
+        return parent;
     }
 
     public void setParent(ContainerWrapper container) {
+        this.parent = container;
         ContainerWrapper oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
         pos.setParent(container);
@@ -113,5 +116,11 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
 
     protected abstract AbstractPositionWrapper<T> getSpecificPositionWrapper(
         boolean initIfNoPosition);
+
+    @Override
+    public void reload() throws Exception {
+        parent = null;
+        super.reload();
+    }
 
 }

@@ -20,6 +20,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
 
+    private ActivityStatusWrapper activityStatus;
+    private StudyWrapper study;
+
     public StudyPvAttrWrapper(WritableApplicationService appService,
         StudyPvAttr wrappedObject) {
         super(appService, wrappedObject);
@@ -31,7 +34,7 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "label", "permissilbe", "activityStatus",
+        return new String[] { "label", "permissible", "activityStatus",
             "pvAttrType", "study" };
     }
 
@@ -93,13 +96,14 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -129,14 +133,14 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     public StudyWrapper getStudy() {
-        Study study = wrappedObject.getStudy();
         if (study == null) {
-            return null;
+            study = new StudyWrapper(appService, wrappedObject.getStudy());
         }
-        return new StudyWrapper(appService, study);
+        return study;
     }
 
     public void setStudy(Study study) {
+        this.study = new StudyWrapper(appService, study);
         Study oldStudy = wrappedObject.getStudy();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);
@@ -171,5 +175,12 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         }
         return result;
 
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        study = null;
+        activityStatus = null;
     }
 }

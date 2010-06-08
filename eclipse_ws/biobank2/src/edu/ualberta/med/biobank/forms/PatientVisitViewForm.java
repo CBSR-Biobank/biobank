@@ -50,6 +50,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private BiobankText dateDrawnLabel;
 
+    private PvSourceVesselInfoTable table;
+
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
     }
@@ -165,8 +167,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
-        PvSourceVesselInfoTable table = new PvSourceVesselInfoTable(client,
-            patientVisit.getPvSourceVesselCollection());
+        table = new PvSourceVesselInfoTable(client, patientVisit
+            .getPvSourceVesselCollection());
         table.adaptToToolkit(toolkit, true);
     }
 
@@ -186,6 +188,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
         setPatientVisitValues();
+        table.setCollection(patientVisit.getPvSourceVesselCollection());
+        aliquotWidget.setCollection(patientVisit.getAliquotCollection());
     }
 
     private void retrievePatientVisit() {

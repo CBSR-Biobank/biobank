@@ -19,6 +19,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
+    private SiteWrapper site;
+
     public SampleTypeWrapper(WritableApplicationService appService,
         SampleType wrappedObject) {
         super(appService, wrappedObject);
@@ -56,14 +58,14 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
         if (site == null) {
-            return null;
+            site = new SiteWrapper(appService, wrappedObject.getSite());
         }
-        return new SiteWrapper(appService, site);
+        return site;
     }
 
     protected void setSite(Site site) {
+        this.site = new SiteWrapper(appService, site);
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -278,6 +280,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
             throw new BiobankCheckException("Invalid size for HQL query result");
         }
         return results.get(0) > 0;
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        site = null;
     }
 
 }

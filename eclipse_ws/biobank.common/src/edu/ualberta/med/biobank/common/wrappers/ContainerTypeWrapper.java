@@ -35,6 +35,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
 
+    private ActivityStatusWrapper activityStatus;
+
+    private SiteWrapper site;
+
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
         super(appService, wrappedObject);
@@ -278,13 +282,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -446,6 +451,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setSite(SiteWrapper site) {
+        this.site = site;
         Site oldSite = wrappedObject.getSite();
         Site newSite = site.getWrappedObject();
         wrappedObject.setSite(newSite);
@@ -453,11 +459,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
         if (site == null) {
-            return null;
+            site = new SiteWrapper(appService, wrappedObject.getSite());
         }
-        return new SiteWrapper(appService, site);
+        return site;
     }
 
     private CapacityWrapper getCapacity() {
@@ -736,5 +741,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         throws Exception {
         return LabelingScheme.getRowColFromPositionString(position,
             getChildLabelingScheme(), getRowCapacity(), getColCapacity());
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        activityStatus = null;
+        site = null;
     }
 }

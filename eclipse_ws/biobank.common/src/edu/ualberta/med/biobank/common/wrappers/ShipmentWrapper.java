@@ -26,6 +26,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
     private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
+    private ClinicWrapper clinic;
 
     public ShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -217,14 +218,14 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     public ClinicWrapper getClinic() {
-        Clinic clinic = wrappedObject.getClinic();
         if (clinic == null) {
-            return null;
+            clinic = new ClinicWrapper(appService, wrappedObject.getClinic());
         }
-        return new ClinicWrapper(appService, clinic);
+        return clinic;
     }
 
     protected void setClinic(Clinic clinic) {
+        this.clinic = new ClinicWrapper(appService, clinic);
         Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
@@ -552,5 +553,11 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         ((BiobankApplicationService) appService).logActivity(action, null,
             null, null, fullDetails, "Shipment");
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        clinic = null;
     }
 }

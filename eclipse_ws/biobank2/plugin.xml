@@ -519,6 +519,11 @@
               </reference>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.shipmentsPerspectiveSelected">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ShipmentDeleteHandler"
@@ -1001,12 +1006,6 @@
                   style="push">
             </command>
             <command
-               commandId="edu.ualberta.med.biobank.commands.search"
-               icon="icons/search.png"
-               label="Search View"
-               style="push">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
                   icon="icons/table_row_delete.png"
                   label="Logging View"
@@ -1036,6 +1035,16 @@
                   commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate"
                   id="edu.ualberta.med.biobank.menu.scanner.decodePlate"
                   label="Decode Plate"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.search"
+               label="Search">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search View"
                   style="push">
             </command>
          </menu>
@@ -1132,13 +1141,6 @@
                   tooltip="Reports">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.search"
-                  icon="icons/search.png"
-                  label="Search"
-                  style="push"
-                  tooltip="Search">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
                   icon="icons/table_row_delete.png"
                   label="Logging"
@@ -1207,6 +1209,13 @@
                   tooltip="Delete Selected Item">
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.sessionReload"
                   icon="icons/reload.png"
                   label="Reload"
@@ -1233,6 +1242,12 @@
                   icon="icons/patient_delete.png"
                   label="Delete Patient"
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
@@ -1307,6 +1322,13 @@
                </parameter>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.todayNodeReload"
                   icon="icons/reload.png"
                   label="Reload"
@@ -1345,6 +1367,13 @@
                         definitionId="biobank2.shipmentsPerspectiveSelected">
                   </reference>
                </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.todayNodeReload"

@@ -12,6 +12,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
 
+    private PatientVisitWrapper pv;
+    private SourceVesselWrapper ss;
+
     public PvSourceVesselWrapper(WritableApplicationService appService,
         PvSourceVessel wrappedObject) {
         super(appService, wrappedObject);
@@ -54,14 +57,15 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        PatientVisit p = wrappedObject.getPatientVisit();
-        if (p == null) {
-            return null;
+        if (pv == null) {
+            pv = new PatientVisitWrapper(appService, wrappedObject
+                .getPatientVisit());
         }
-        return new PatientVisitWrapper(appService, p);
+        return pv;
     }
 
     public void setPatientVisit(PatientVisitWrapper visit) {
+        this.pv = visit;
         PatientVisit oldPv = wrappedObject.getPatientVisit();
         PatientVisit newPv = visit.wrappedObject;
         wrappedObject.setPatientVisit(newPv);
@@ -93,14 +97,15 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     public SourceVesselWrapper getSourceVessel() {
-        SourceVessel ss = wrappedObject.getSourceVessel();
         if (ss == null) {
-            return null;
+            ss = new SourceVesselWrapper(appService, wrappedObject
+                .getSourceVessel());
         }
-        return new SourceVesselWrapper(appService, ss);
+        return ss;
     }
 
     protected void setSourceVessel(SourceVessel ss) {
+        this.ss = new SourceVesselWrapper(appService, ss);
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         wrappedObject.setSourceVessel(ss);
         propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, ss);
@@ -121,5 +126,12 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
                 ((PvSourceVesselWrapper) o).getSourceVessel());
         }
         return 0;
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        ss = null;
+        pv = null;
     }
 }

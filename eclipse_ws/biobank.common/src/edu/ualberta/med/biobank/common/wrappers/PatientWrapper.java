@@ -26,6 +26,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
+        study = new StudyWrapper(appService, wrappedObject.getStudy());
     }
 
     public PatientWrapper(WritableApplicationService appService) {
