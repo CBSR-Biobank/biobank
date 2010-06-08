@@ -87,8 +87,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public ActivityStatusWrapper getActivityStatus() {
         if (activityStatus == null)
-            new ActivityStatusWrapper(appService, wrappedObject
-                .getActivityStatus());
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
         return activityStatus;
     }
 
