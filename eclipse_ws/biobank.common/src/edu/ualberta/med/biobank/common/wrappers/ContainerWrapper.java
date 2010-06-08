@@ -32,6 +32,12 @@ public class ContainerWrapper extends
 
     private List<AliquotWrapper> addedAliquots = new ArrayList<AliquotWrapper>();
 
+    private SiteWrapper site;
+
+    private ContainerTypeWrapper containerType;
+
+    private ActivityStatusWrapper activityStatus;
+
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -223,11 +229,10 @@ public class ContainerWrapper extends
 
     @Override
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
         if (site == null) {
-            return null;
+            site = new SiteWrapper(appService, wrappedObject.getSite());
         }
-        return new SiteWrapper(appService, site);
+        return site;
     }
 
     public String getLabel() {
@@ -376,6 +381,7 @@ public class ContainerWrapper extends
     }
 
     protected void setContainerType(ContainerType containerType) {
+        this.containerType = new ContainerTypeWrapper(appService, containerType);
         ContainerType oldType = wrappedObject.getContainerType();
         wrappedObject.setContainerType(containerType);
         propertyChangeSupport.firePropertyChange("containerType", oldType,
@@ -383,21 +389,22 @@ public class ContainerWrapper extends
     }
 
     public ContainerTypeWrapper getContainerType() {
-        ContainerType type = wrappedObject.getContainerType();
-        if (type == null) {
-            return null;
+        if (containerType == null) {
+            containerType = new ContainerTypeWrapper(appService, wrappedObject
+                .getContainerType());
         }
-        return new ContainerTypeWrapper(appService, type);
+        return containerType;
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatus activityStatus = wrappedObject.getActivityStatus();
         if (activityStatus == null)
-            return null;
-        return new ActivityStatusWrapper(appService, activityStatus);
+            activityStatus = new ActivityStatusWrapper(appService,
+                wrappedObject.getActivityStatus());
+        return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        this.activityStatus = activityStatus;
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -409,6 +416,7 @@ public class ContainerWrapper extends
     }
 
     protected void setSite(Site site) {
+        this.site = new SiteWrapper(appService, site);
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -980,6 +988,14 @@ public class ContainerWrapper extends
     public boolean canEdit() {
         return super.canEdit()
             && SecurityHelper.isContainerAdministrator(appService);
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        site = null;
+        containerType = null;
+        activityStatus = null;
     }
 
 }

@@ -36,6 +36,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private PatientWrapper patient = null;
 
+    private ShipmentWrapper shipment;
+
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
@@ -391,14 +393,15 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public ShipmentWrapper getShipment() {
-        Shipment s = wrappedObject.getShipment();
-        if (s == null) {
-            return null;
+        if (shipment == null) {
+            shipment = new ShipmentWrapper(appService, wrappedObject
+                .getShipment());
         }
-        return new ShipmentWrapper(appService, s);
+        return shipment;
     }
 
     public void setShipment(ShipmentWrapper s) {
+        this.shipment = s;
         Shipment oldShipment = wrappedObject.getShipment();
         Shipment newShipment = s.getWrappedObject();
         wrappedObject.setShipment(newShipment);
@@ -590,6 +593,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     public void reload() throws Exception {
         patient = null;
+        shipment = null;
         super.reload();
     }
 }
