@@ -48,7 +48,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     private AddressWrapper getAddress() {
         if (address == null) {
-            address = new AddressWrapper(appService, wrappedObject.getAddress());
+            Address a = wrappedObject.getAddress();
+            if (a == null)
+                return null;
+            address = new AddressWrapper(appService, a);
         }
         return address;
     }
@@ -94,9 +97,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null)
-            activityStatus = new ActivityStatusWrapper(appService,
-                wrappedObject.getActivityStatus());
+        if (activityStatus == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activityStatus = new ActivityStatusWrapper(appService, a);
+        }
         return activityStatus;
     }
 

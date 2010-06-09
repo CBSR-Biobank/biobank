@@ -145,9 +145,12 @@ public class AliquotWrapper extends
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        if (patientVisit == null)
-            this.patientVisit = new PatientVisitWrapper(appService,
-                wrappedObject.getPatientVisit());
+        if (patientVisit == null) {
+            PatientVisit pv = wrappedObject.getPatientVisit();
+            if (pv == null)
+                return null;
+            this.patientVisit = new PatientVisitWrapper(appService, pv);
+        }
         return patientVisit;
     }
 
@@ -203,9 +206,12 @@ public class AliquotWrapper extends
     }
 
     public SampleTypeWrapper getSampleType() {
-        if (sampleType == null)
-            this.sampleType = new SampleTypeWrapper(appService, wrappedObject
-                .getSampleType());
+        if (sampleType == null) {
+            SampleType s = wrappedObject.getSampleType();
+            if (s == null)
+                return null;
+            this.sampleType = new SampleTypeWrapper(appService, s);
+        }
         return sampleType;
     }
 
@@ -235,9 +241,12 @@ public class AliquotWrapper extends
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null)
-            this.activityStatus = new ActivityStatusWrapper(appService,
-                wrappedObject.getActivityStatus());
+        if (activityStatus == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            this.activityStatus = new ActivityStatusWrapper(appService, a);
+        }
         return activityStatus;
     }
 

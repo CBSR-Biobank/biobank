@@ -230,7 +230,10 @@ public class ContainerWrapper extends
     @Override
     public SiteWrapper getSite() {
         if (site == null) {
-            site = new SiteWrapper(appService, wrappedObject.getSite());
+            Site s = wrappedObject.getSite();
+            if (s == null)
+                return null;
+            site = new SiteWrapper(appService, s);
         }
         return site;
     }
@@ -390,16 +393,21 @@ public class ContainerWrapper extends
 
     public ContainerTypeWrapper getContainerType() {
         if (containerType == null) {
-            containerType = new ContainerTypeWrapper(appService, wrappedObject
-                .getContainerType());
+            ContainerType c = wrappedObject.getContainerType();
+            if (c == null)
+                return null;
+            containerType = new ContainerTypeWrapper(appService, c);
         }
         return containerType;
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null)
-            activityStatus = new ActivityStatusWrapper(appService,
-                wrappedObject.getActivityStatus());
+        if (activityStatus == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activityStatus = new ActivityStatusWrapper(appService, a);
+        }
         return activityStatus;
     }
 

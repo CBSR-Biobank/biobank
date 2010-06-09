@@ -45,8 +45,10 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
 
     public StudyPvAttrWrapper getStudyPvAttr() {
         if (studyPvAttr == null) {
-            studyPvAttr = new StudyPvAttrWrapper(appService, wrappedObject
-                .getStudyPvAttr());
+            StudyPvAttr s = wrappedObject.getStudyPvAttr();
+            if (s == null)
+                return null;
+            studyPvAttr = new StudyPvAttrWrapper(appService, s);
         }
         return studyPvAttr;
     }
@@ -75,8 +77,10 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
 
     public PatientVisitWrapper getPatientVisit() {
         if (pv == null) {
-            pv = new PatientVisitWrapper(appService, wrappedObject
-                .getPatientVisit());
+            PatientVisit p = wrappedObject.getPatientVisit();
+            if (p == null)
+                return null;
+            pv = new PatientVisitWrapper(appService, p);
         }
         return pv;
     }

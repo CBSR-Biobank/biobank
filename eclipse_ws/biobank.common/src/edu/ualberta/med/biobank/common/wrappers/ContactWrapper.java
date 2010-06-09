@@ -101,8 +101,12 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     public ClinicWrapper getClinic() {
-        if (clinic == null)
-            clinic = new ClinicWrapper(appService, wrappedObject.getClinic());
+        if (clinic == null) {
+            Clinic c = wrappedObject.getClinic();
+            if (c == null)
+                return null;
+            clinic = new ClinicWrapper(appService, c);
+        }
         return clinic;
     }
 

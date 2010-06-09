@@ -59,7 +59,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     public SiteWrapper getSite() {
         if (site == null) {
-            site = new SiteWrapper(appService, wrappedObject.getSite());
+            Site s = wrappedObject.getSite();
+            if (s == null)
+                return null;
+            site = new SiteWrapper(appService, s);
         }
         return site;
     }
