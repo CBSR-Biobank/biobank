@@ -253,7 +253,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         containerAdapter.rebuild();
                         containerAdapter.performExpand();
                     } else {
-                        containerAdapter.getParent().addChild(containerAdapter);
+                        Display.getDefault().asyncExec(new Runnable() {
+                            public void run() {
+                                containerAdapter.getParent().addChild(
+                                    containerAdapter);
+                            }
+                        });
                     }
                     containerAdapter.getParent().performExpand();
                 } catch (final RemoteConnectFailureException exp) {
