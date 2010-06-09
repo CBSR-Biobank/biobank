@@ -9,6 +9,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
 
+    private StudyWrapper study;
+    private SourceVesselWrapper ss;
+
     public StudySourceVesselWrapper(WritableApplicationService appService,
         StudySourceVessel wrappedObject) {
         super(appService, wrappedObject);
@@ -48,14 +51,17 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     public StudyWrapper getStudy() {
-        Study s = wrappedObject.getStudy();
-        if (s == null) {
-            return null;
+        if (study == null) {
+            Study s = wrappedObject.getStudy();
+            if (s == null)
+                return null;
+            study = new StudyWrapper(appService, s);
         }
-        return new StudyWrapper(appService, s);
+        return study;
     }
 
     public void setStudy(StudyWrapper study) {
+        this.study = study;
         Study oldStudy = wrappedObject.getStudy();
         Study newStudy = study.wrappedObject;
         wrappedObject.setStudy(newStudy);
@@ -63,14 +69,22 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     public SourceVesselWrapper getSourceVessel() {
-        SourceVessel ss = wrappedObject.getSourceVessel();
         if (ss == null) {
-            return null;
+            SourceVessel s = wrappedObject.getSourceVessel();
+            if (s == null) {
+                return null;
+            }
+            ss = new SourceVesselWrapper(appService, s);
         }
-        return new SourceVesselWrapper(appService, ss);
+
+        return ss;
     }
 
     protected void setSourceVessel(SourceVessel ss) {
+        if (ss == null)
+            this.ss = null;
+        else
+            this.ss = new SourceVesselWrapper(appService, ss);
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         wrappedObject.setSourceVessel(ss);
         propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, ss);

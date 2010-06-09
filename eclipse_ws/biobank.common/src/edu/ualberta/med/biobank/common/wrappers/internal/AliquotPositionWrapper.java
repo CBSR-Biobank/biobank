@@ -51,7 +51,10 @@ public class AliquotPositionWrapper extends
     }
 
     public void setAliquot(Aliquot aliquot) {
-        this.aliquot = new AliquotWrapper(appService, aliquot);
+        if (aliquot == null)
+            this.aliquot = null;
+        else
+            this.aliquot = new AliquotWrapper(appService, aliquot);
         Aliquot oldAliquot = wrappedObject.getAliquot();
         wrappedObject.setAliquot(aliquot);
         propertyChangeSupport
@@ -73,7 +76,10 @@ public class AliquotPositionWrapper extends
     }
 
     private void setContainer(Container container) {
-        this.container = new ContainerWrapper(appService, container);
+        if (container == null)
+            this.container = null;
+        else
+            this.container = new ContainerWrapper(appService, container);
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,

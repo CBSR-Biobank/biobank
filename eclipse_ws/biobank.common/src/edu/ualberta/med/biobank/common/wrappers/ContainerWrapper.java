@@ -384,7 +384,11 @@ public class ContainerWrapper extends
     }
 
     protected void setContainerType(ContainerType containerType) {
-        this.containerType = new ContainerTypeWrapper(appService, containerType);
+        if (containerType == null)
+            this.containerType = null;
+        else
+            this.containerType = new ContainerTypeWrapper(appService,
+                containerType);
         ContainerType oldType = wrappedObject.getContainerType();
         wrappedObject.setContainerType(containerType);
         propertyChangeSupport.firePropertyChange("containerType", oldType,
@@ -424,7 +428,10 @@ public class ContainerWrapper extends
     }
 
     protected void setSite(Site site) {
-        this.site = new SiteWrapper(appService, site);
+        if (site == null)
+            this.site = null;
+        else
+            this.site = new SiteWrapper(appService, site);
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);

@@ -184,9 +184,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
         List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap
             .get("contactCollection");
         if (contactCollection == null) {
+            contactCollection = new ArrayList<ContactWrapper>();
             Collection<Contact> children = wrappedObject.getContactCollection();
             if (children != null) {
-                contactCollection = new ArrayList<ContactWrapper>();
                 for (Contact type : children) {
                     contactCollection.add(new ContactWrapper(appService, type));
                 }

@@ -228,7 +228,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     protected void setClinic(Clinic clinic) {
-        this.clinic = new ClinicWrapper(appService, clinic);
+        if (clinic == null)
+            this.clinic = null;
+        else
+            this.clinic = new ClinicWrapper(appService, clinic);
         Clinic oldClinic = wrappedObject.getClinic();
         wrappedObject.setClinic(clinic);
         propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);

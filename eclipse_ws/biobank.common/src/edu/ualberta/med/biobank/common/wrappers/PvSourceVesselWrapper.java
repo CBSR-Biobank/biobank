@@ -109,7 +109,10 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     protected void setSourceVessel(SourceVessel ss) {
-        this.ss = new SourceVesselWrapper(appService, ss);
+        if (ss == null)
+            this.ss = null;
+        else
+            this.ss = new SourceVesselWrapper(appService, ss);
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         wrappedObject.setSourceVessel(ss);
         propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, ss);

@@ -128,7 +128,11 @@ public class AliquotWrapper extends
     }
 
     protected void setPatientVisit(PatientVisit patientVisit) {
-        this.patientVisit = new PatientVisitWrapper(appService, patientVisit);
+        if (patientVisit == null)
+            this.patientVisit = null;
+        else
+            this.patientVisit = new PatientVisitWrapper(appService,
+                patientVisit);
         PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
         PatientVisit newPvRaw = patientVisit;
         wrappedObject.setPatientVisit(newPvRaw);
@@ -189,7 +193,10 @@ public class AliquotWrapper extends
     }
 
     protected void setSampleType(SampleType type) {
-        this.sampleType = new SampleTypeWrapper(appService, type);
+        if (type == null)
+            this.sampleType = null;
+        else
+            this.sampleType = new SampleTypeWrapper(appService, type);
         SampleType oldTypeRaw = wrappedObject.getSampleType();
         SampleType newTypeRaw = type;
         wrappedObject.setSampleType(type);

@@ -66,7 +66,10 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
     }
 
     public void setPvAttrType(PvAttrType pvAttrType) {
-        this.pvAttrType = new PvAttrTypeWrapper(appService, pvAttrType);
+        if (pvAttrType == null)
+            this.pvAttrType = null;
+        else
+            this.pvAttrType = new PvAttrTypeWrapper(appService, pvAttrType);
         PvAttrType oldPvInfo = wrappedObject.getPvAttrType();
         wrappedObject.setPvAttrType(pvAttrType);
         propertyChangeSupport.firePropertyChange("pvAttrType", oldPvInfo,
@@ -89,7 +92,10 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
     }
 
     public void setSite(Site site) {
-        this.site = new SiteWrapper(appService, site);
+        if (site == null)
+            this.site = null;
+        else
+            this.site = new SiteWrapper(appService, site);
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);

@@ -146,7 +146,10 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     public void setStudy(Study study) {
-        this.study = new StudyWrapper(appService, study);
+        if (study == null)
+            this.study = null;
+        else
+            this.study = new StudyWrapper(appService, study);
         Study oldStudy = wrappedObject.getStudy();
         wrappedObject.setStudy(study);
         propertyChangeSupport.firePropertyChange("study", oldStudy, study);

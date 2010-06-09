@@ -54,7 +54,10 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     }
 
     public void setStudyPvAttr(StudyPvAttr studyPvAttr) {
-        this.studyPvAttr = new StudyPvAttrWrapper(appService, studyPvAttr);
+        if (studyPvAttr == null)
+            this.studyPvAttr = null;
+        else
+            this.studyPvAttr = new StudyPvAttrWrapper(appService, studyPvAttr);
         StudyPvAttr oldInfo = wrappedObject.getStudyPvAttr();
         wrappedObject.setStudyPvAttr(studyPvAttr);
         propertyChangeSupport.firePropertyChange("studyPvAttr", oldInfo,
@@ -86,7 +89,10 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     }
 
     public void setPatientVisit(PatientVisit pv) {
-        this.pv = new PatientVisitWrapper(appService, pv);
+        if (pv == null)
+            this.pv = null;
+        else
+            this.pv = new PatientVisitWrapper(appService, pv);
         PatientVisit oldPv = wrappedObject.getPatientVisit();
         wrappedObject.setPatientVisit(pv);
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, pv);

@@ -57,7 +57,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     private void setAddress(Address address) {
-        this.address = new AddressWrapper(appService, address);
+        if (address == null)
+            this.address = null;
+        else
+            this.address = new AddressWrapper(appService, address);
         Address oldAddress = wrappedObject.getAddress();
         wrappedObject.setAddress(address);
         propertyChangeSupport
