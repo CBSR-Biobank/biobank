@@ -6,8 +6,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,12 +25,10 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 
-public class DecodePlateForm extends BiobankViewForm {
+public class DecodePlateForm extends PlateForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
 
     private Button multipleScanButton;
-
-    private Button scanButton;
 
     private ScanPalletWidget spw;
 
@@ -43,29 +39,6 @@ public class DecodePlateForm extends BiobankViewForm {
     Integer plateToScan;
 
     boolean multipleScan;
-
-    IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
-
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-            int plateEnabledCount = 0;
-
-            for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED.length; ++i) {
-                if (!event
-                    .getProperty()
-                    .equals(
-                        edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED[i]))
-                    continue;
-
-                int plateId = i + 1;
-                if (ScannerConfigPlugin.getDefault().getPlateEnabled(plateId)) {
-                    ++plateEnabledCount;
-                }
-            }
-
-            scanButton.setEnabled(plateEnabledCount > 0);
-        }
-    };
 
     @Override
     protected void init() throws Exception {
