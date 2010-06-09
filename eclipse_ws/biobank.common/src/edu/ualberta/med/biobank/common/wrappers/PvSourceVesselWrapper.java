@@ -74,6 +74,12 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
     }
 
+    @Override
+    protected void resetInternalField() {
+        this.pv = null;
+        this.ss = null;
+    }
+
     public Date getTimeDrawn() {
         return wrappedObject.getTimeDrawn();
     }

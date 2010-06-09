@@ -46,6 +46,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private Map<String, StudySourceVesselWrapper> mapStudySourceVessel;
 
+    private BiobankText quantityText;
+
     private DateTimeWidget timeDrawnWidget;
 
     private Control volumeText;
@@ -177,8 +179,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
         });
         allSourceVesselCheckBox.setSelection(useStudyOnlySourceVessels);
 
-        BiobankText quantityText = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.BORDER, "Quantity", new String[0],
+        quantityText = (BiobankText) createBoundWidgetWithLabel(contents,
+            BiobankText.class, SWT.BORDER, "Quantity", new String[0],
             BeansObservables.observeValue(internalSourceVessel, "quantity"),
             new IntegerNumberValidator("quantity should be a whole number",
                 false));
@@ -245,8 +247,11 @@ public class PvSourceVesselDialog extends BiobankDialog {
     protected void setOkButtonEnabled(boolean enabled) {
         if (addMode) {
             Button nextButton = getButton(IDialogConstants.NEXT_ID);
-            if (nextButton != null && !nextButton.isDisposed()) {
+            Button finishButton = getButton(IDialogConstants.FINISH_ID);
+            if (nextButton != null && !nextButton.isDisposed()
+                && finishButton != null && !finishButton.isDisposed()) {
                 nextButton.setEnabled(enabled);
+                finishButton.setEnabled(enabled);
             } else {
                 okButtonEnabled = enabled;
             }
@@ -290,9 +295,11 @@ public class PvSourceVesselDialog extends BiobankDialog {
             newPvSourceVessel.initObjectWith(internalSourceVessel);
             newPvSourceVessel.setPatientVisit(patientVisit);
             infotable.addPvSourceVessel(newPvSourceVessel);
+            quantityText.setText("");
             internalSourceVessel.reset();
             sourceVesselsComboViewer.getCombo().deselectAll();
             sourceVesselsComboViewer.getCombo().setFocus();
+            updateWidgetVisibilityAndValues();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
