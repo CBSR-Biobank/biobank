@@ -216,6 +216,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                     IProgressMonitor.UNKNOWN);
                 try {
                     scanAndProcessResult(monitor);
+                    setScanValid(true);
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                     setScanValid(false);
