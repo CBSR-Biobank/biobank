@@ -64,8 +64,10 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     public ContainerWrapper getContainer() {
         if (container == null) {
-            container = new ContainerWrapper(appService, wrappedObject
-                .getContainer());
+            Container c = wrappedObject.getContainer();
+            if (c == null)
+                return null;
+            container = new ContainerWrapper(appService, c);
         }
         return container;
     }

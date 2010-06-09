@@ -58,8 +58,10 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
 
     public PatientVisitWrapper getPatientVisit() {
         if (pv == null) {
-            pv = new PatientVisitWrapper(appService, wrappedObject
-                .getPatientVisit());
+            PatientVisit p = wrappedObject.getPatientVisit();
+            if (p == null)
+                return null;
+            pv = new PatientVisitWrapper(appService, p);
         }
         return pv;
     }
@@ -98,8 +100,10 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
 
     public SourceVesselWrapper getSourceVessel() {
         if (ss == null) {
-            ss = new SourceVesselWrapper(appService, wrappedObject
-                .getSourceVessel());
+            SourceVessel s = wrappedObject.getSourceVessel();
+            if (s == null)
+                return null;
+            ss = new SourceVesselWrapper(appService, s);
         }
         return ss;
     }

@@ -11,6 +11,9 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
 
+    private PvAttrTypeWrapper pvAttrType;
+    private SiteWrapper site;
+
     public SitePvAttrWrapper(WritableApplicationService appService,
         SitePvAttr wrappedObject) {
         super(appService, wrappedObject);
@@ -52,14 +55,18 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
     }
 
     public PvAttrTypeWrapper getPvAttrType() {
-        PvAttrType pvAttrType = wrappedObject.getPvAttrType();
         if (pvAttrType == null) {
-            return null;
+            PvAttrType p = wrappedObject.getPvAttrType();
+            if (p == null) {
+                return null;
+            }
+            pvAttrType = new PvAttrTypeWrapper(appService, p);
         }
-        return new PvAttrTypeWrapper(appService, pvAttrType);
+        return pvAttrType;
     }
 
     public void setPvAttrType(PvAttrType pvAttrType) {
+        this.pvAttrType = new PvAttrTypeWrapper(appService, pvAttrType);
         PvAttrType oldPvInfo = wrappedObject.getPvAttrType();
         wrappedObject.setPvAttrType(pvAttrType);
         propertyChangeSupport.firePropertyChange("pvAttrType", oldPvInfo,
@@ -71,14 +78,18 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
     }
 
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
         if (site == null) {
-            return null;
+            Site s = wrappedObject.getSite();
+            if (s == null) {
+                return null;
+            }
+            site = new SiteWrapper(appService, s);
         }
-        return new SiteWrapper(appService, site);
+        return site;
     }
 
     public void setSite(Site site) {
+        this.site = new SiteWrapper(appService, site);
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
@@ -104,4 +115,12 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
             + getPvAttrType().getName() + ":"
             + ((site == null) ? "no site" : site);
     }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        pvAttrType = null;
+        site = null;
+    }
+
 }

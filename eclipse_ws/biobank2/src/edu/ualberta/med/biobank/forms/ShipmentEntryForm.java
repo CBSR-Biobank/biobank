@@ -165,13 +165,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             waybillValidator, WAYBILL_BINDING);
         activateWaybillField(false);
 
-        Date shippedDate = shipmentWrapper.getDateShipped();
-        if (shippedDate == null)
-            shippedDate = new Date();
+        if (shipmentWrapper.getDateShipped() == null)
+            shipmentWrapper.setDateShipped(new Date());
 
         dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
-            shippedDate, BeansObservables.observeValue(shipmentWrapper,
-                "dateShipped"), "Date shipped should be set");
+            shipmentWrapper.getDateShipped(), BeansObservables.observeValue(
+                shipmentWrapper, "dateShipped"), "Date shipped should be set");
         setFirstControl(dateShippedWidget);
 
         ShippingMethodWrapper selectedShippingMethod = shipmentWrapper
@@ -184,13 +183,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             "Box Number", null, BeansObservables.observeValue(shipmentWrapper,
                 "boxNumber"), null);
 
-        Date recievedDate = shipmentWrapper.getDateReceived();
-        if (recievedDate == null)
-            recievedDate = new Date();
+        if (shipmentWrapper.getDateReceived() == null)
+            shipmentWrapper.setDateReceived(new Date());
 
         dateReceivedWidget = createDateTimeWidget(client, "Date Received",
-            recievedDate, BeansObservables.observeValue(shipmentWrapper,
-                "dateReceived"), "Date received should be set");
+            shipmentWrapper.getDateReceived(), BeansObservables.observeValue(
+                shipmentWrapper, "dateReceived"), "Date received should be set");
         dateReceivedWidget.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {

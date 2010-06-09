@@ -60,16 +60,20 @@ public class ContainerPositionWrapper extends
 
     private ContainerWrapper getParentContainer() {
         if (parent == null) {
-            parent = new ContainerWrapper(appService, wrappedObject
-                .getParentContainer());
+            Container c = wrappedObject.getParentContainer();
+            if (c == null)
+                return null;
+            parent = new ContainerWrapper(appService, c);
         }
         return parent;
     }
 
     public ContainerWrapper getContainer() {
         if (container == null) {
-            container = new ContainerWrapper(appService, wrappedObject
-                .getContainer());
+            Container c = wrappedObject.getContainer();
+            if (c == null)
+                return null;
+            container = new ContainerWrapper(appService, c);
         }
         return container;
     }

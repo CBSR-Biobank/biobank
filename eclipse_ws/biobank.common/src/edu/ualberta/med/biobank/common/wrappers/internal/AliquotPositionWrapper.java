@@ -18,6 +18,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class AliquotPositionWrapper extends
     AbstractPositionWrapper<AliquotPosition> {
 
+    private AliquotWrapper aliquot;
+    private ContainerWrapper container;
+
     public AliquotPositionWrapper(WritableApplicationService appService,
         AliquotPosition wrappedObject) {
         super(appService, wrappedObject);
@@ -48,6 +51,7 @@ public class AliquotPositionWrapper extends
     }
 
     public void setAliquot(Aliquot aliquot) {
+        this.aliquot = new AliquotWrapper(appService, aliquot);
         Aliquot oldAliquot = wrappedObject.getAliquot();
         wrappedObject.setAliquot(aliquot);
         propertyChangeSupport
@@ -59,14 +63,17 @@ public class AliquotPositionWrapper extends
     }
 
     public AliquotWrapper getAliquot() {
-        Aliquot aliquot = wrappedObject.getAliquot();
         if (aliquot == null) {
-            return null;
+            Aliquot a = wrappedObject.getAliquot();
+            if (a == null)
+                return null;
+            aliquot = new AliquotWrapper(appService, a);
         }
-        return new AliquotWrapper(appService, aliquot);
+        return aliquot;
     }
 
     private void setContainer(Container container) {
+        this.container = new ContainerWrapper(appService, container);
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
@@ -82,11 +89,14 @@ public class AliquotPositionWrapper extends
     }
 
     private ContainerWrapper getContainer() {
-        Container container = wrappedObject.getContainer();
         if (container == null) {
-            return null;
+            Container c = wrappedObject.getContainer();
+            if (c == null) {
+                return null;
+            }
+            container = new ContainerWrapper(appService, c);
         }
-        return new ContainerWrapper(appService, container);
+        return container;
     }
 
     @Override
@@ -128,6 +138,13 @@ public class AliquotPositionWrapper extends
             }
         }
 
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        aliquot = null;
+        container = null;
     }
 
 }

@@ -394,8 +394,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public ShipmentWrapper getShipment() {
         if (shipment == null) {
-            shipment = new ShipmentWrapper(appService, wrappedObject
-                .getShipment());
+            Shipment s = wrappedObject.getShipment();
+            if (s == null)
+                return null;
+            shipment = new ShipmentWrapper(appService, s);
         }
         return shipment;
     }

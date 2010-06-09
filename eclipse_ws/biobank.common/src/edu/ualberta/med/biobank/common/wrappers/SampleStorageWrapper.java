@@ -25,7 +25,10 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
 
     public StudyWrapper getStudy() {
         if (study == null) {
-            study = new StudyWrapper(appService, wrappedObject.getStudy());
+            Study s = wrappedObject.getStudy();
+            if (s == null)
+                return null;
+            study = new StudyWrapper(appService, s);
         }
         return study;
     }
@@ -40,8 +43,10 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
 
     public SampleTypeWrapper getSampleType() {
         if (type == null) {
-            type = new SampleTypeWrapper(appService, wrappedObject
-                .getSampleType());
+            SampleType s = wrappedObject.getSampleType();
+            if (s == null)
+                return null;
+            type = new SampleTypeWrapper(appService, s);
         }
         return type;
     }
@@ -80,9 +85,12 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null)
-            activityStatus = new ActivityStatusWrapper(appService,
-                wrappedObject.getActivityStatus());
+        if (activityStatus == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activityStatus = new ActivityStatusWrapper(appService, a);
+        }
         return activityStatus;
     }
 

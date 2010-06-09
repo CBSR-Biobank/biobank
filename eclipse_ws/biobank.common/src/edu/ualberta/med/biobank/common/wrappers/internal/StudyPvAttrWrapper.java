@@ -96,9 +96,12 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null)
-            activityStatus = new ActivityStatusWrapper(appService,
-                wrappedObject.getActivityStatus());
+        if (activityStatus == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activityStatus = new ActivityStatusWrapper(appService, a);
+        }
         return activityStatus;
     }
 
@@ -134,7 +137,10 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
 
     public StudyWrapper getStudy() {
         if (study == null) {
-            study = new StudyWrapper(appService, wrappedObject.getStudy());
+            Study s = wrappedObject.getStudy();
+            if (s == null)
+                return null;
+            study = new StudyWrapper(appService, s);
         }
         return study;
     }

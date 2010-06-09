@@ -75,9 +75,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null)
-            activityStatus = new ActivityStatusWrapper(appService,
-                wrappedObject.getActivityStatus());
+        if (activityStatus == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activityStatus = new ActivityStatusWrapper(appService, a);
+        }
         return activityStatus;
     }
 
@@ -106,7 +109,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public SiteWrapper getSite() {
         if (site == null) {
-            site = new SiteWrapper(appService, wrappedObject.getSite());
+            Site s = wrappedObject.getSite();
+            if (s == null)
+                return null;
+            site = new SiteWrapper(appService, s);
         }
         return site;
     }

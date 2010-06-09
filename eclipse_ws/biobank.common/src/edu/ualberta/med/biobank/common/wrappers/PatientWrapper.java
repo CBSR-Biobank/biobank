@@ -43,8 +43,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public StudyWrapper getStudy() {
-        if (study == null)
-            study = new StudyWrapper(appService, wrappedObject.getStudy());
+        if (study == null) {
+            Study s = wrappedObject.getStudy();
+            if (s == null)
+                return null;
+            study = new StudyWrapper(appService, s);
+        }
         return study;
     }
 

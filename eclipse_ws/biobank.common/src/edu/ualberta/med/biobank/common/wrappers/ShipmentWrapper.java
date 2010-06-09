@@ -219,7 +219,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     public ClinicWrapper getClinic() {
         if (clinic == null) {
-            clinic = new ClinicWrapper(appService, wrappedObject.getClinic());
+            Clinic c = wrappedObject.getClinic();
+            if (c == null)
+                return null;
+            clinic = new ClinicWrapper(appService, c);
         }
         return clinic;
     }
