@@ -45,7 +45,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         }
 
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_EMAIL,
-            "biobank2@gmail.com");
+            "biobank@cs.ualberta.ca");
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER,
             "smtp.gmail.com");
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT,
