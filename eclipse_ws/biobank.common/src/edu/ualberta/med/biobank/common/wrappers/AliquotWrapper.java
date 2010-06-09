@@ -463,7 +463,7 @@ public class AliquotWrapper extends
     @Override
     protected void log(String action, String details) {
         ((BiobankApplicationService) appService).logActivity(action,
-            patientVisit.getPatient().getPnumber(), getInventoryId(),
+            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
             getPositionString(true, false), "aliquot " + details, "Aliquot");
     }
 
