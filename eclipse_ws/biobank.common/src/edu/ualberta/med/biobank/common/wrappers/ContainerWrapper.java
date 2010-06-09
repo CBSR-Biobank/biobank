@@ -897,6 +897,10 @@ public class ContainerWrapper extends
 
     private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
         throws Exception {
+        if (type == null) {
+            throw new Exception(
+                "Error initializing container. That is not a valid container type.");
+        }
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
             ContainerWrapper newContainer = new ContainerWrapper(appService);

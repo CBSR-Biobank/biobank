@@ -294,6 +294,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
+        if (!container.hasParent()) {
+            containerTypeComboViewer.setInput(ContainerTypeWrapper
+                .getTopContainerTypesInSite(appService, siteWrapper));
+        } else {
+            containerTypeComboViewer.setInput(container.getParent()
+                .getContainerType().getChildContainerTypeCollection());
+        }
         currentContainerType = container.getContainerType();
         if (currentContainerType != null) {
             containerTypeComboViewer.setSelection(new StructuredSelection(
@@ -309,5 +316,4 @@ public class ContainerEntryForm extends BiobankEntryForm {
             activityStatusComboViewer.getCombo().deselectAll();
         }
     }
-
 }
