@@ -153,8 +153,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public String getStreet1() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             return null;
         }
         return address.getStreet1();
@@ -162,17 +161,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public void setStreet1(String street1) {
         String old = getStreet1();
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             address = initAddress();
         }
-        address.setStreet1(street1);
+        wrappedObject.getAddress().setStreet1(street1);
         propertyChangeSupport.firePropertyChange("street1", old, street1);
     }
 
     public String getStreet2() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             return null;
         }
         return address.getStreet2();
@@ -180,17 +177,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public void setStreet2(String street2) {
         String old = getStreet2();
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             address = initAddress();
         }
-        address.setStreet2(street2);
+        wrappedObject.getAddress().setStreet2(street2);
         propertyChangeSupport.firePropertyChange("street2", old, street2);
     }
 
     public String getCity() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             return null;
         }
         return address.getCity();
@@ -198,17 +193,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public void setCity(String city) {
         String old = getCity();
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             address = initAddress();
         }
-        address.setCity(city);
+        wrappedObject.getAddress().setCity(city);
         propertyChangeSupport.firePropertyChange("city", old, city);
     }
 
     public String getProvince() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             return null;
         }
         return address.getProvince();
@@ -216,17 +209,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public void setProvince(String province) {
         String old = getProvince();
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             address = initAddress();
         }
-        address.setProvince(province);
+        wrappedObject.getAddress().setProvince(province);
         propertyChangeSupport.firePropertyChange("province", old, province);
     }
 
     public String getPostalCode() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             return null;
         }
         return address.getPostalCode();
@@ -234,11 +225,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public void setPostalCode(String postalCode) {
         String old = getPostalCode();
-        AddressWrapper address = getAddress();
-        if (address == null) {
+        if (getAddress() == null) {
             address = initAddress();
         }
-        address.setPostalCode(postalCode);
+        wrappedObject.getAddress().setPostalCode(postalCode);
         propertyChangeSupport.firePropertyChange("postalCode", old, postalCode);
     }
 
