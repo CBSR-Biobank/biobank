@@ -92,6 +92,10 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private boolean canDelete;
 
+    private ComboViewer initSelectionCv;
+
+    private ComboViewer deleteCv;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
@@ -261,9 +265,9 @@ public class ContainerViewForm extends BiobankViewForm {
 
             if (canCreate) {
                 // Initialisation action for selection
-                final ComboViewer initSelectionCv = createComboViewer(
-                    childrenActionSection, "Initialize selection to",
-                    containerTypes, containerTypes.get(0));
+                initSelectionCv = createComboViewer(childrenActionSection,
+                    "Initialize selection to", containerTypes, containerTypes
+                        .get(0));
                 Button initializeSelectionButton = toolkit.createButton(
                     childrenActionSection, "Initialize", SWT.PUSH);
                 initializeSelectionButton
@@ -282,8 +286,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 List<Object> deleteComboList = new ArrayList<Object>();
                 deleteComboList.add("All");
                 deleteComboList.addAll(containerTypes);
-                final ComboViewer deleteCv = createComboViewer(
-                    childrenActionSection,
+                deleteCv = createComboViewer(childrenActionSection,
                     "Delete selected containers of type", deleteComboList,
                     "All");
                 Button deleteButton = toolkit.createButton(
@@ -466,6 +469,17 @@ public class ContainerViewForm extends BiobankViewForm {
                 .size() > 0)
                 refreshVis();
             setContainerValues();
+            List<ContainerTypeWrapper> containerTypes = container
+                .getContainerType().getChildContainerTypeCollection();
+            List<Object> deleteComboList = new ArrayList<Object>();
+            deleteComboList.add("All");
+            deleteComboList.addAll(containerTypes);
+
+            initSelectionCv.setInput(containerTypes);
+            initSelectionCv.getCombo().select(0);
+            deleteCv.setInput(deleteComboList);
+            deleteCv.getCombo().select(0);
+
             if (aliquotsWidget != null) {
                 aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
                     container.getAliquots().values()));

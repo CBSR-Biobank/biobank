@@ -74,6 +74,12 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
     }
 
+    @Override
+    protected void resetInternalField() {
+        this.pv = null;
+        this.ss = null;
+    }
+
     public Date getTimeDrawn() {
         return wrappedObject.getTimeDrawn();
     }
@@ -109,7 +115,10 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     protected void setSourceVessel(SourceVessel ss) {
-        this.ss = new SourceVesselWrapper(appService, ss);
+        if (ss == null)
+            this.ss = null;
+        else
+            this.ss = new SourceVesselWrapper(appService, ss);
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         wrappedObject.setSourceVessel(ss);
         propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, ss);

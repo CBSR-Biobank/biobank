@@ -43,7 +43,10 @@ public class ContainerPositionWrapper extends
     }
 
     public void setParentContainer(Container parentContainer) {
-        this.parent = new ContainerWrapper(appService, parentContainer);
+        if (parentContainer == null)
+            this.parent = null;
+        else
+            this.parent = new ContainerWrapper(appService, parentContainer);
         Container oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
         propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
@@ -83,7 +86,10 @@ public class ContainerPositionWrapper extends
     }
 
     public void setContainer(Container container) {
-        this.container = new ContainerWrapper(appService, container);
+        if (container == null)
+            this.container = null;
+        else
+            this.container = new ContainerWrapper(appService, container);
         Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,

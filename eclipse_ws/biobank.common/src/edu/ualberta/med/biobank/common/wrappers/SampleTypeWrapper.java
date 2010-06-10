@@ -68,7 +68,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     protected void setSite(Site site) {
-        this.site = new SiteWrapper(appService, site);
+        if (site == null)
+            this.site = null;
+        else
+            this.site = new SiteWrapper(appService, site);
         Site oldSite = wrappedObject.getSite();
         wrappedObject.setSite(site);
         propertyChangeSupport.firePropertyChange("site", oldSite, site);
