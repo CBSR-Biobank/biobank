@@ -12,7 +12,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.AliquotListViewForm;
+import edu.ualberta.med.biobank.forms.PvListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -91,6 +93,33 @@ public enum SearchType {
                 return Arrays.asList(container);
             }
             return null;
+        }
+    },
+
+    WORKSHEET("Worksheet") {
+        @Override
+        public List<? extends ModelWrapper<?>> search(String searchString)
+            throws Exception {
+            List<PatientVisitWrapper> pvs = PatientVisitWrapper
+                .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
+                    searchString);
+            if (pvs == null)
+                return null;
+            return pvs;
+        }
+
+        @Override
+        public void processResults(List<? extends ModelWrapper<?>> res) {
+            Assert.isNotNull(res);
+            FormInput input = new FormInput(res, "Patient Visit List");
+            try {
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage()
+                    .openEditor(input, PvListViewForm.ID, false);
+            } catch (PartInitException e) {
+                logger.error("Can't open form with id "
+                    + AliquotListViewForm.ID, e);
+            }
         }
     };
 

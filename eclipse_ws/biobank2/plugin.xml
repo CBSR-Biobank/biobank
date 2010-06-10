@@ -1768,6 +1768,12 @@
             name="Aliquot List">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.forms.PvListViewForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.PvListViewForm"
+            name="Patient Visit List">
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.ScanPlateForm"
             default="false"
             icon="icons/scanLink.png"
