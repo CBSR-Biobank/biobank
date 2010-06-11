@@ -598,4 +598,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         shipment = null;
         super.reload();
     }
+
+    public static List<PatientVisitWrapper> getPatientVisitsWithWorksheet(
+        WritableApplicationService appService, String searchString)
+        throws Exception {
+        HQLCriteria c = new HQLCriteria("select pva.patientVisit from "
+            + PvAttr.class.getName()
+            + " pva where pva.studyPvAttr.label ='Worksheet' and pva.value ='"
+            + searchString + "'");
+        List<PatientVisit> pvs = appService.query(c);
+        List<PatientVisitWrapper> pvws = new ArrayList<PatientVisitWrapper>();
+        for (PatientVisit pv : pvs)
+            pvws.add(new PatientVisitWrapper(appService, pv));
+        if (pvws.size() == 0)
+            return null;
+        return pvws;
+    }
 }
