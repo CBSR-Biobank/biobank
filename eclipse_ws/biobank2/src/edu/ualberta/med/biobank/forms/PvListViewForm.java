@@ -9,12 +9,12 @@ import org.eclipse.swt.layout.GridLayout;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.PvListInfoTable;
 
 public class PvListViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PvListViewForm";
 
-    private PatientVisitInfoTable patientVisits;
+    private PvListInfoTable patientVisits;
 
     private List<PatientVisitWrapper> pvs;
 
@@ -35,7 +35,7 @@ public class PvListViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_BOX));
 
-        patientVisits = new PatientVisitInfoTable(form.getBody(), pvs);
+        patientVisits = new PvListInfoTable(form.getBody(), pvs);
         patientVisits.adaptToToolkit(toolkit, true);
         patientVisits.addDoubleClickListener(collectionDoubleClickListener);
     }
