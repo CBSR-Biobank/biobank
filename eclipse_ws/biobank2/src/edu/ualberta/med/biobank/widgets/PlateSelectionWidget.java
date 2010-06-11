@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -62,7 +64,8 @@ public class PlateSelectionWidget extends BiobankWidget {
         label.setText("Select plate:");
         plateButtons = new HashMap<Integer, Button>();
 
-        int numPlatesEnabled = 0;
+        List<Integer> enabledPlates = new ArrayList<Integer>();
+
         for (int i = 1, n = ScannerConfigPlugin.getPlatesMax(); i <= n; ++i) {
             Button b = new Button(this, SWT.RADIO);
             b.setText("Plate" + i);
@@ -75,13 +78,12 @@ public class PlateSelectionWidget extends BiobankWidget {
             plateButtons.put(i, b);
 
             if (visible) {
-                ++numPlatesEnabled;
+                enabledPlates.add(i);
             }
         }
 
-        if (numPlatesEnabled == 1) {
-            int plateId = plateButtons.keySet().iterator().next();
-            plateButtons.get(plateId).setSelection(true);
+        if (enabledPlates.size() == 1) {
+            plateButtons.get(enabledPlates.get(0)).setSelection(true);
         }
 
         ScannerConfigPlugin.getDefault().getPreferenceStore()

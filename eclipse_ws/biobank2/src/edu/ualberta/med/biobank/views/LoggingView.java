@@ -309,9 +309,10 @@ public class LoggingView extends ViewPart {
 
         if (SessionManager.getInstance().isConnected()
             && SessionManager.getInstance().getCurrentSite() != null
-            && !SessionManager.getInstance().isAllSitesSelected())
+            && !SessionManager.getInstance().isAllSitesSelected()) {
             setEnableAllFields(true);
-        else
+            loadComboFields();
+        } else
             setEnableAllFields(false);
 
     }
