@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.logs;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
@@ -81,29 +78,19 @@ public class LogQuery {
             String endDateText = searchQuery.get("endDate");
             endDateText = endDateText.equals("") ? null : endDateText;
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat(
-                DateFormatter.DATE_FORMAT);
-
             Date startDate = null;
 
             if (startDateText != null) {
-                try {
-                    startDate = dateFormat.parse(startDateText);
-                } catch (ParseException pe) {
-                    BioBankPlugin.openAsyncError("Error",
-                        "ERROR: Error parsing start date");
-                }
+                // set the time on end date to midnight (00:00 AM)
+                startDate = DateFormatter.parseToDateTime(startDateText
+                    + " 00:00");
             }
 
             Date endDate = null;
 
             if (endDateText != null) {
-                try {
-                    endDate = dateFormat.parse(endDateText);
-                } catch (ParseException pe) {
-                    BioBankPlugin.openAsyncError("Error",
-                        "ERROR: Error parsing stop date");
-                }
+                // set the time on end date to 11:59 PM
+                endDate = DateFormatter.parseToDateTime(endDateText + " 23:59");
             }
 
             dbResults = LogWrapper.getLogs(SessionManager.getAppService(),

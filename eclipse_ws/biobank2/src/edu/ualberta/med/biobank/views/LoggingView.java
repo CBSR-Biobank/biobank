@@ -409,8 +409,8 @@ public class LoggingView extends ViewPart {
         Calendar dayBefore = new GregorianCalendar();
         dayBefore.setTimeInMillis(dayBefore.getTimeInMillis() - 1000 * 60 * 60
             * 24);
-        startDateWidget.setDate(dayBefore.getTime());
-        endDateWidget.setDate(now.getTime());
+        startDateWidget.setDate(null);
+        endDateWidget.setDate(null);
 
     }
 
