@@ -91,11 +91,8 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
 
         Date logQueryDate = logQuery.getDate();
         if (logQueryDate != null) {
-            // 05/31/10 10:45 AM
-
-            info.date = DateFormatter.formatAsDateTime(logQueryDate);
+            info.date = DateFormatter.formatAsDate(logQueryDate);
         } else {
-
             info.date = null;
         }
 
