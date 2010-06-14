@@ -37,8 +37,9 @@ public class AliquotRequest extends QueryObject {
         List<Object> params) throws ApplicationException, BiobankCheckException {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;
+        int i = 0;
         try {
-            for (int i = 0; i + 4 <= params.size(); i += 4) {
+            for (; i + 4 <= params.size(); i += 4) {
                 c = new HQLCriteria(queryString);
                 c.setParameters(params.subList(i, i + 3));
                 // need to limit query size but not possible in hql
@@ -48,7 +49,8 @@ public class AliquotRequest extends QueryObject {
                     results.add(queried.get(j));
             }
         } catch (Exception e) {
-            throw new BiobankCheckException("Failed to parse CSV.");
+            throw new BiobankCheckException("Failed to parse CSV: Line "
+                + ((i / 4) + 1));
         }
         return results;
     }

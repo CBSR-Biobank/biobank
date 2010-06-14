@@ -333,21 +333,21 @@ public class ReportsEditor extends BiobankFormBase {
                 .getActiveWorkbenchWindow().getShell(), "Confirm",
                 "Print table contents?");
         if (doPrint) {
-            List<Object[]> params = new ArrayList<Object[]>();
-            List<Object> paramVals = getParams();
+            final List<Object[]> params = new ArrayList<Object[]>();
+            final List<Object> paramVals = getParams();
             List<Option> queryOptions = query.getOptions();
             int i = 0;
             for (Option option : queryOptions) {
                 params.add(new Object[] { option.getName(), paramVals.get(i) });
                 i++;
             }
-            List<String> columnInfo = new ArrayList<String>();
+            final List<String> columnInfo = new ArrayList<String>();
             String[] names = query.getColumnNames();
             for (int i1 = 0; i1 < names.length; i1++) {
                 columnInfo.add(names[i1]);
             }
 
-            List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
+            final List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
             for (Object object : reportData) {
                 Map<String, String> map = new HashMap<String, String>();
                 for (int j = 0; j < columnInfo.size(); j++) {
@@ -365,36 +365,52 @@ public class ReportsEditor extends BiobankFormBase {
                 fd.setFilterExtensions(filterExt);
                 fd.setFileName(query.getName().replaceAll(" ", "_") + "_"
                     + DateFormatter.formatAsDate(new Date()));
-                String path = fd.open();
+                final String path = fd.open();
                 if (path == null)
                     throw new Exception("Exporting canceled.");
-                if (path.endsWith(".pdf"))
-                    ReportingUtils.saveReport(createDynamicReport(query
-                        .getName(), params, columnInfo, listData), path);
-                else {
-                    // csv
-                    PrintWriter bw = new PrintWriter(new FileWriter(path));
-                    // write title
-                    bw.println("#" + query.getName());
-                    // write params
-                    for (Object[] ob : params)
-                        bw.println("#" + ob[0] + ":" + ob[1]);
-                    // write columnnames
-                    bw.println("#");
-                    bw.print("#" + columnInfo.get(0));
-                    for (int j = 1; j < columnInfo.size(); j++) {
-                        bw.write("," + columnInfo.get(j));
-                    }
-                    bw.println();
-                    for (Map<String, String> ob : listData) {
-                        bw.write("\"" + ob.get(columnInfo.get(0)) + "\"");
-                        for (int j = 1; j < columnInfo.size(); j++) {
-                            bw.write(",\"" + ob.get(columnInfo.get(j)) + "\"");
+                IRunnableContext context = new ProgressMonitorDialog(Display
+                    .getDefault().getActiveShell());
+                context.run(true, true, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        try {
+                            if (path.endsWith(".pdf"))
+                                ReportingUtils.saveReport(createDynamicReport(
+                                    query.getName(), params, columnInfo,
+                                    listData), path);
+                            else {
+                                // csv
+                                PrintWriter bw = new PrintWriter(
+                                    new FileWriter(path));
+                                // write title
+                                bw.println("#" + query.getName());
+                                // write params
+                                for (Object[] ob : params)
+                                    bw.println("#" + ob[0] + ":" + ob[1]);
+                                // write columnnames
+                                bw.println("#");
+                                bw.print("#" + columnInfo.get(0));
+                                for (int j = 1; j < columnInfo.size(); j++) {
+                                    bw.write("," + columnInfo.get(j));
+                                }
+                                bw.println();
+                                for (Map<String, String> ob : listData) {
+                                    bw.write("\"" + ob.get(columnInfo.get(0))
+                                        + "\"");
+                                    for (int j = 1; j < columnInfo.size(); j++) {
+                                        bw.write(",\""
+                                            + ob.get(columnInfo.get(j)) + "\"");
+                                    }
+                                    bw.println();
+                                }
+                                bw.close();
+                            }
+                        } catch (Exception e) {
+                            BioBankPlugin.openAsyncError(
+                                "Error exporting results", e);
                         }
-                        bw.println();
                     }
-                    bw.close();
-                }
+                });
             } else {
                 ReportingUtils.printReport(createDynamicReport(query.getName(),
                     params, columnInfo, listData));
