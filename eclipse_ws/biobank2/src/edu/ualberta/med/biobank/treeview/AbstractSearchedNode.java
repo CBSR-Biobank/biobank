@@ -44,7 +44,9 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             try {
                 for (AdapterBase child : getChildren()) {
-                    child.getModelObject().reload();
+                    if (child.getModelObject() != null) {
+                        child.getModelObject().reload();
+                    }
                     List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
                         child.getChildren());
                     for (AdapterBase subChild : subChildren) {
