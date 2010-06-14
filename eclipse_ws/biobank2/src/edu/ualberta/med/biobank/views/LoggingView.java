@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -404,11 +402,6 @@ public class LoggingView extends ViewPart {
         inventoryIdTextInput.setText("");
         locationTextInput.setText("");
         detailsTextInput.setText("");
-
-        Calendar now = new GregorianCalendar();
-        Calendar dayBefore = new GregorianCalendar();
-        dayBefore.setTimeInMillis(dayBefore.getTimeInMillis() - 1000 * 60 * 60
-            * 24);
         startDateWidget.setDate(null);
         endDateWidget.setDate(null);
 

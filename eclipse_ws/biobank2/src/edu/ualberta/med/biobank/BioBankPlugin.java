@@ -410,7 +410,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public boolean isValidPlateBarcode(String value) {
-        return !value.isEmpty() && getPlateNumber(value) != -1;
+        return (!value.isEmpty() && (getPlateNumber(value) != -1));
     }
 
     public static String getActivityLogPath() {
