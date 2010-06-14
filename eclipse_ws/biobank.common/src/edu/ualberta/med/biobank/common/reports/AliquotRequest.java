@@ -7,7 +7,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -24,9 +23,7 @@ public class AliquotRequest extends QueryObject {
                 + " s where s.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " and s.aliquotPosition not in (from "
-                + AliquotPosition.class.getName()
-                + " a where a.container.label like 'SS%') and s.patientVisit.patient.pnumber like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.nameShort like ? ORDER BY RAND()",
+                + " and s.patientVisit.patient.pnumber like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.nameShort like ? ORDER BY RAND()",
             new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
@@ -37,8 +34,9 @@ public class AliquotRequest extends QueryObject {
         List<Object> params) throws ApplicationException, BiobankCheckException {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;
+        int i = 0;
         try {
-            for (int i = 0; i + 4 <= params.size(); i += 4) {
+            for (; i + 4 <= params.size(); i += 4) {
                 c = new HQLCriteria(queryString);
                 c.setParameters(params.subList(i, i + 3));
                 // need to limit query size but not possible in hql
@@ -48,7 +46,8 @@ public class AliquotRequest extends QueryObject {
                     results.add(queried.get(j));
             }
         } catch (Exception e) {
-            throw new BiobankCheckException("Failed to parse CSV.");
+            throw new BiobankCheckException("Failed to parse CSV: Line "
+                + ((i / 4) + 1));
         }
         return results;
     }
