@@ -346,16 +346,29 @@ public class ReportsEditor extends BiobankFormBase {
             for (int i1 = 0; i1 < names.length; i1++) {
                 columnInfo.add(names[i1]);
             }
-
             final List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
-            for (Object object : reportData) {
-                Map<String, String> map = new HashMap<String, String>();
-                for (int j = 0; j < columnInfo.size(); j++) {
-                    map.put(columnInfo.get(j), (((Object[]) object)[j])
-                        .toString());
+            IRunnableContext context = new ProgressMonitorDialog(Display
+                .getDefault().getActiveShell());
+            context.run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    monitor.beginTask("Exporting Report...",
+                        IProgressMonitor.UNKNOWN);
+                    try {
+                        for (Object object : reportData) {
+                            Map<String, String> map = new HashMap<String, String>();
+                            for (int j = 0; j < columnInfo.size(); j++) {
+                                map.put(columnInfo.get(j),
+                                    (((Object[]) object)[j]).toString());
+                            }
+                            listData.add(map);
+                        }
+                    } catch (Exception e) {
+                        BioBankPlugin.openAsyncError("Error exporting results",
+                            e);
+                    }
                 }
-                listData.add(map);
-            }
+            });
             if (export) {
                 FileDialog fd = new FileDialog(exportButton.getShell(),
                     SWT.SAVE);
@@ -368,49 +381,34 @@ public class ReportsEditor extends BiobankFormBase {
                 final String path = fd.open();
                 if (path == null)
                     throw new Exception("Exporting canceled.");
-                IRunnableContext context = new ProgressMonitorDialog(Display
-                    .getDefault().getActiveShell());
-                context.run(true, true, new IRunnableWithProgress() {
-                    @Override
-                    public void run(final IProgressMonitor monitor) {
-                        try {
-                            if (path.endsWith(".pdf"))
-                                ReportingUtils.saveReport(createDynamicReport(
-                                    query.getName(), params, columnInfo,
-                                    listData), path);
-                            else {
-                                // csv
-                                PrintWriter bw = new PrintWriter(
-                                    new FileWriter(path));
-                                // write title
-                                bw.println("#" + query.getName());
-                                // write params
-                                for (Object[] ob : params)
-                                    bw.println("#" + ob[0] + ":" + ob[1]);
-                                // write columnnames
-                                bw.println("#");
-                                bw.print("#" + columnInfo.get(0));
-                                for (int j = 1; j < columnInfo.size(); j++) {
-                                    bw.write("," + columnInfo.get(j));
-                                }
-                                bw.println();
-                                for (Map<String, String> ob : listData) {
-                                    bw.write("\"" + ob.get(columnInfo.get(0))
-                                        + "\"");
-                                    for (int j = 1; j < columnInfo.size(); j++) {
-                                        bw.write(",\""
-                                            + ob.get(columnInfo.get(j)) + "\"");
-                                    }
-                                    bw.println();
-                                }
-                                bw.close();
-                            }
-                        } catch (Exception e) {
-                            BioBankPlugin.openAsyncError(
-                                "Error exporting results", e);
-                        }
+
+                if (path.endsWith(".pdf"))
+                    ReportingUtils.saveReport(createDynamicReport(query
+                        .getName(), params, columnInfo, listData), path);
+                else {
+                    // csv
+                    PrintWriter bw = new PrintWriter(new FileWriter(path));
+                    // write title
+                    bw.println("#" + query.getName());
+                    // write params
+                    for (Object[] ob : params)
+                        bw.println("#" + ob[0] + ":" + ob[1]);
+                    // write columnnames
+                    bw.println("#");
+                    bw.print("#" + columnInfo.get(0));
+                    for (int j = 1; j < columnInfo.size(); j++) {
+                        bw.write("," + columnInfo.get(j));
                     }
-                });
+                    bw.println();
+                    for (Map<String, String> ob : listData) {
+                        bw.write("\"" + ob.get(columnInfo.get(0)) + "\"");
+                        for (int j = 1; j < columnInfo.size(); j++) {
+                            bw.write(",\"" + ob.get(columnInfo.get(j)) + "\"");
+                        }
+                        bw.println();
+                    }
+                    bw.close();
+                }
             } else {
                 ReportingUtils.printReport(createDynamicReport(query.getName(),
                     params, columnInfo, listData));
@@ -611,7 +609,7 @@ public class ReportsEditor extends BiobankFormBase {
 
                         @Override
                         public void keyReleased(KeyEvent e) {
-                            if (e.keyCode == SWT.CR)
+                            if (e.keyCode == SWT.CR || e.keyCode == SWT.TAB)
                                 populateTopCombos(((BiobankText) widget)
                                     .getText());
                         }
