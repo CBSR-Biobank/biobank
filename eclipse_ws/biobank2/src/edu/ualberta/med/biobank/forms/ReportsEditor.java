@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.awt.Color;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
@@ -322,7 +323,7 @@ public class ReportsEditor extends BiobankFormBase {
         return params;
     }
 
-    public boolean printTable(Boolean export) throws Exception {
+    public void printTable(final Boolean export) throws Exception {
         boolean doPrint;
         if (export)
             doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
@@ -352,10 +353,13 @@ public class ReportsEditor extends BiobankFormBase {
             context.run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Exporting Report...",
+                    monitor.beginTask("Preparing Report...",
                         IProgressMonitor.UNKNOWN);
                     try {
                         for (Object object : reportData) {
+                            if (monitor.isCanceled()) {
+                                throw new Exception("Exporting canceled.");
+                            }
                             Map<String, String> map = new HashMap<String, String>();
                             for (int j = 0; j < columnInfo.size(); j++) {
                                 map.put(columnInfo.get(j),
@@ -366,59 +370,96 @@ public class ReportsEditor extends BiobankFormBase {
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error exporting results",
                             e);
+                        return;
                     }
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            monitor.done();
+                            if (export) {
+                                FileDialog fd = new FileDialog(exportButton
+                                    .getShell(), SWT.SAVE);
+                                fd.setOverwrite(true);
+                                fd.setText("Export as");
+                                String[] filterExt = { "*.csv", "*.pdf" };
+                                fd.setFilterExtensions(filterExt);
+                                fd.setFileName(query.getName().replaceAll(" ",
+                                    "_")
+                                    + "_"
+                                    + DateFormatter.formatAsDate(new Date()));
+                                final String path = fd.open();
+                                if (path == null) {
+                                    BioBankPlugin.openAsyncError(
+                                        "Exporting canceled.",
+                                        "Select a valid path and try again.");
+                                    return;
+                                }
+                                if (path.endsWith(".pdf"))
+                                    try {
+                                        ReportingUtils.saveReport(
+                                            createDynamicReport(
+                                                query.getName(), params,
+                                                columnInfo, listData), path);
+                                    } catch (Exception e) {
+                                        BioBankPlugin.openAsyncError(
+                                            "Error saving to PDF", e);
+                                        return;
+                                    }
+                                else {
+                                    // csv
+                                    PrintWriter bw = null;
+                                    try {
+                                        bw = new PrintWriter(new FileWriter(
+                                            path));
+                                    } catch (IOException e) {
+                                        BioBankPlugin.openAsyncError(
+                                            "Error writing to file.", e);
+                                        return;
+                                    }
+                                    // write title
+                                    bw.println("#" + query.getName());
+                                    // write params
+                                    for (Object[] ob : params)
+                                        bw.println("#" + ob[0] + ":" + ob[1]);
+                                    // write columnnames
+                                    bw.println("#");
+                                    bw.print("#" + columnInfo.get(0));
+                                    for (int j = 1; j < columnInfo.size(); j++) {
+                                        bw.write("," + columnInfo.get(j));
+                                    }
+                                    bw.println();
+                                    for (Map<String, String> ob : listData) {
+                                        bw.write("\""
+                                            + ob.get(columnInfo.get(0)) + "\"");
+                                        for (int j = 1; j < columnInfo.size(); j++) {
+                                            bw.write(",\""
+                                                + ob.get(columnInfo.get(j))
+                                                + "\"");
+                                        }
+                                        bw.println();
+                                    }
+                                    bw.close();
+                                }
+                            } else {
+                                try {
+                                    ReportingUtils
+                                        .printReport(createDynamicReport(query
+                                            .getName(), params, columnInfo,
+                                            listData));
+                                } catch (Exception e) {
+                                    BioBankPlugin.openAsyncError(
+                                        "Printer Error", e);
+                                    return;
+                                }
+                                ((BiobankApplicationService) SessionManager
+                                    .getAppService())
+                                    .logActivity("print", null, null, null,
+                                        query.getName(), "report");
+                            }
+                        }
+                    });
                 }
             });
-            if (export) {
-                FileDialog fd = new FileDialog(exportButton.getShell(),
-                    SWT.SAVE);
-                fd.setOverwrite(true);
-                fd.setText("Export as");
-                String[] filterExt = { "*.csv", "*.pdf" };
-                fd.setFilterExtensions(filterExt);
-                fd.setFileName(query.getName().replaceAll(" ", "_") + "_"
-                    + DateFormatter.formatAsDate(new Date()));
-                final String path = fd.open();
-                if (path == null)
-                    throw new Exception("Exporting canceled.");
-
-                if (path.endsWith(".pdf"))
-                    ReportingUtils.saveReport(createDynamicReport(query
-                        .getName(), params, columnInfo, listData), path);
-                else {
-                    // csv
-                    PrintWriter bw = new PrintWriter(new FileWriter(path));
-                    // write title
-                    bw.println("#" + query.getName());
-                    // write params
-                    for (Object[] ob : params)
-                        bw.println("#" + ob[0] + ":" + ob[1]);
-                    // write columnnames
-                    bw.println("#");
-                    bw.print("#" + columnInfo.get(0));
-                    for (int j = 1; j < columnInfo.size(); j++) {
-                        bw.write("," + columnInfo.get(j));
-                    }
-                    bw.println();
-                    for (Map<String, String> ob : listData) {
-                        bw.write("\"" + ob.get(columnInfo.get(0)) + "\"");
-                        for (int j = 1; j < columnInfo.size(); j++) {
-                            bw.write(",\"" + ob.get(columnInfo.get(j)) + "\"");
-                        }
-                        bw.println();
-                    }
-                    bw.close();
-                }
-            } else {
-                ReportingUtils.printReport(createDynamicReport(query.getName(),
-                    params, columnInfo, listData));
-                ((BiobankApplicationService) SessionManager.getAppService())
-                    .logActivity("print", null, null, null, query.getName(),
-                        "report");
-            }
-            return true;
         }
-        return false;
     }
 
     public JasperPrint createDynamicReport(String reportName,
