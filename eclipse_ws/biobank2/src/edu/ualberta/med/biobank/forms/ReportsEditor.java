@@ -37,6 +37,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -650,11 +652,20 @@ public class ReportsEditor extends BiobankFormBase {
 
                         @Override
                         public void keyReleased(KeyEvent e) {
-                            if (e.keyCode == SWT.CR || e.keyCode == SWT.TAB)
+                            if (e.keyCode == SWT.CR)
                                 populateTopCombos(((BiobankText) widget)
                                     .getText());
                         }
                     });
+                    ((BiobankText) widget)
+                        .addTraverseListener(new TraverseListener() {
+                            @Override
+                            public void keyTraversed(TraverseEvent e) {
+                                populateTopCombos(((BiobankText) widget)
+                                    .getText());
+                            }
+
+                        });
                     ((BiobankText) widget)
                         .addModifyListener(new ModifyListener() {
                             @Override
@@ -748,7 +759,8 @@ public class ReportsEditor extends BiobankFormBase {
             for (ContainerWrapper c : containers) {
                 for (int i = 0; i < (label.length() / 2) - 1; i++)
                     c = c.getParent();
-                topContainerTypes.add(c.getContainerType().getNameShort());
+                if (c.getContainerType().getNameShort().startsWith("F"))
+                    topContainerTypes.add(c.getContainerType().getNameShort());
             }
         } catch (Exception e) {
             enable = false;
