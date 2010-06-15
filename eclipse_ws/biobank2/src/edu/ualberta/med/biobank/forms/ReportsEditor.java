@@ -308,7 +308,7 @@ public class ReportsEditor extends BiobankFormBase {
                     int lines = 0;
                     while (stnewline.hasMoreTokens()) {
                         StringTokenizer stseparator = new StringTokenizer(
-                            stnewline.nextToken(), ", ");
+                            stnewline.nextToken(), ",\" ");
                         lines++;
                         if (stseparator.countTokens() != 4)
                             throw new Exception("Failed to parse CSV: Line "

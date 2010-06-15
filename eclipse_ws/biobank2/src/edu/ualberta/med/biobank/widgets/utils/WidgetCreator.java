@@ -245,7 +245,7 @@ public class WidgetCreator {
         }
 
         if ((widgetOptions & SWT.MULTI) != 0) {
-            widgetOptions = widgetOptions | SWT.V_SCROLL;
+            widgetOptions = widgetOptions | SWT.V_SCROLL | SWT.H_SCROLL;
         }
 
         BiobankText text = null;
