@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.AliquotListViewForm;
 import edu.ualberta.med.biobank.forms.PvListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -100,16 +101,14 @@ public enum SearchType {
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
 
-            // TODO FIXME broken code
-            // List<PatientVisitWrapper> pvs = PatientVisitWrapper
-            // .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
-            // searchString);
-            //            
-            // if (pvs == null)
-            // return null;
-            // return pvs;
+            List<PatientVisitWrapper> pvs = PatientVisitWrapper
+                .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
+                    searchString);
 
-            return null;
+            if (pvs == null)
+                return null;
+            return pvs;
+
         }
 
         @Override
