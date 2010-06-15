@@ -87,6 +87,7 @@ public class DateTimeWidget extends BiobankWidget {
         dateButton = new Button(this, SWT.NONE);
         dateButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CALENDAR));
+
         dateButton.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -104,6 +105,7 @@ public class DateTimeWidget extends BiobankWidget {
                 dialog.setText("Calendar -- pick a date with me");
                 dialog.setActive();
                 dialog.setFocus();
+
                 dialog.addShellListener(new ShellListener() {
 
                     public void shellActivated(ShellEvent event) {
