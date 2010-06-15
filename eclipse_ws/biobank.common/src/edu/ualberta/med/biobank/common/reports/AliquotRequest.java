@@ -1,10 +1,12 @@
 package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
@@ -36,21 +38,55 @@ public class AliquotRequest extends QueryObject {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;
         int i = 0;
-        try {
-            for (; i + 4 <= params.size(); i += 4) {
-                c = new HQLCriteria(queryString);
-                c.setParameters(params.subList(i, i + 3));
-                // need to limit query size but not possible in hql
-                Integer maxResults = (Integer) params.get(i + 3);
-                List<Object> queried = appService.query(c);
-                for (int j = 0; j < queried.size() && j < maxResults; j++)
-                    results.add(queried.get(j));
+        for (; i + 4 <= params.size(); i += 4) {
+            String pnumber = null;
+            Date dateDrawn = null;
+            String typeName = null;
+
+            c = new HQLCriteria(queryString);
+            try {
+                pnumber = (String) params.get(i);
+            } catch (ClassCastException e) {
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 1 \nInvalid Patient Number: "
+                    + params.get(i));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BiobankCheckException("Failed to parse CSV: Line "
-                + ((i / 4) + 1));
+            dateDrawn = DateFormatter.parseToDate((String) params.get(i + 1));
+            if (dateDrawn == null)
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 2 \nInvalid Date: "
+                    + params.get(i + 1));
+            try {
+                typeName = (String) params.get(i + 2);
+            } catch (ClassCastException e) {
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 3 \nInvalid Sample Type: "
+                    + params.get(i + 2));
+            }
+            c.setParameters(Arrays.asList(new Object[] { pnumber, dateDrawn,
+                typeName }));
+            // need to limit query size but not possible in hql
+            Integer maxResults = 0;
+            try {
+                maxResults = Integer.parseInt((String) params.get(i + 3));
+            } catch (Exception e) {
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 4 \nInvalid Integer: "
+                    + params.get(i + 3));
+            }
+            if (maxResults <= 0)
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1)
+                    + ", Column 4 \n Value must be greater than zero.");
+            if (maxResults >= 1000)
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1)
+                    + ", Column 4 \n Value must be less than 1000.");
+            List<Object> queried = appService.query(c);
+            for (int j = 0; j < queried.size() && j < maxResults; j++)
+                results.add(queried.get(j));
         }
+
         return results;
     }
 

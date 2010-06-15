@@ -130,6 +130,8 @@ public class ReportsEditor extends BiobankFormBase {
     private IObservableValue comboStatus = new WritableValue(Boolean.FALSE,
         Boolean.class);
 
+    private ArrayList<Object> params;
+
     private static Map<Class<?>, int[]> columnWidths;
 
     static {
@@ -170,7 +172,12 @@ public class ReportsEditor extends BiobankFormBase {
 
     private void generate() {
 
-        final ArrayList<Object> params = getParams();
+        try {
+            params = getParams();
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Input Error", e1);
+            return;
+        }
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -264,7 +271,7 @@ public class ReportsEditor extends BiobankFormBase {
         exportButton.setEnabled(false);
     }
 
-    private ArrayList<Object> getParams() {
+    private ArrayList<Object> getParams() throws Exception {
         ArrayList<Object> params = new ArrayList<Object>();
         List<Option> queryOptions = query.getOptions();
         for (int i = 0; i < widgetFields.size(); i++) {
@@ -297,19 +304,19 @@ public class ReportsEditor extends BiobankFormBase {
             else if (widgetFields.get(i) instanceof FileBrowser) {
                 String csv = ((FileBrowser) widgetFields.get(i)).getText();
                 if (csv != null) {
-                    StringTokenizer st = new StringTokenizer(csv, ",\" \n");
-                    while (st.hasMoreTokens()) {
-                        String token = st.nextToken();
-                        if (DateFormatter.parseToDate(token) == null)
-                            try {
-                                params.add(Integer.parseInt(token));
-                            } catch (NumberFormatException e) {
-                                params.add("%" + token + "%");
-                            }
+                    StringTokenizer stnewline = new StringTokenizer(csv, "\n");
+                    int lines = 0;
+                    while (stnewline.hasMoreTokens()) {
+                        StringTokenizer stseparator = new StringTokenizer(
+                            stnewline.nextToken(), ",\" ");
+                        lines++;
+                        if (stseparator.countTokens() != 4)
+                            throw new Exception("Failed to parse CSV: Line "
+                                + lines + " \n4 Columns Required: "
+                                + stseparator.countTokens() + " found.");
                         else {
-                            // Calendar c = Calendar.getInstance();
-                            // c.setTime();
-                            params.add(DateFormatter.parseToDate(token));
+                            while (stseparator.hasMoreTokens())
+                                params.add(stseparator.nextToken());
                         }
                     }
                 }
