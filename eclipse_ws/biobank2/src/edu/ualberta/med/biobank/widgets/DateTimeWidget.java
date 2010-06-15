@@ -16,6 +16,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -97,11 +99,32 @@ public class DateTimeWidget extends BiobankWidget {
 
                 final Shell dialog = new Shell(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM
-                    | SWT.MODELESS);
+                    | SWT.MODELESS | SWT.TITLE);
                 dialog.setLayout(dialogGridLayout);
                 dialog.setText("Calendar -- pick a date with me");
                 dialog.setActive();
                 dialog.setFocus();
+                dialog.addShellListener(new ShellListener() {
+
+                    public void shellActivated(ShellEvent event) {
+
+                    }
+
+                    public void shellClosed(ShellEvent arg0) {
+                        calendarOpen = false;
+                    }
+
+                    public void shellDeactivated(ShellEvent arg0) {
+                        calendarOpen = false;
+                        dialog.close();
+                    }
+
+                    public void shellDeiconified(ShellEvent arg0) {
+                    }
+
+                    public void shellIconified(ShellEvent arg0) {
+                    }
+                });
                 calendarOpen = true;
 
                 final DateTime calendar = new CustomDateTime(dialog,
