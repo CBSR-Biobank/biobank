@@ -6,6 +6,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QAFreezerAliquots extends QueryObject {
 
@@ -58,7 +59,8 @@ public class QAFreezerAliquots extends QueryObject {
     }
 
     @Override
-    public List<Object> postProcess(List<Object> results) {
+    public List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         return results.subList(0, numResults);
     }
 

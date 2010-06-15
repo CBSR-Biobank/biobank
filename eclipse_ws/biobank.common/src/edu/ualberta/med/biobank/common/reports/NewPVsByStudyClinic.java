@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.PatientVisit;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class NewPVsByStudyClinic extends QueryObject {
 
@@ -42,7 +43,8 @@ public class NewPVsByStudyClinic extends QueryObject {
     }
 
     @Override
-    public List<Object> postProcess(List<Object> results) {
+    public List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         List<Object> compressedDates = new ArrayList<Object>();
         if (columnNames[2].compareTo("Year") == 0) {
             for (Object ob : results) {
