@@ -123,7 +123,8 @@ public abstract class QueryObject {
 
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) throws ApplicationException, BiobankCheckException {
-        return postProcess(executeQuery(appService, preProcess(params)));
+        return postProcess(appService, executeQuery(appService,
+            preProcess(params)));
     }
 
     @SuppressWarnings("unused")
@@ -138,7 +139,9 @@ public abstract class QueryObject {
         return params;
     }
 
-    protected List<Object> postProcess(List<Object> results) {
+    @SuppressWarnings("unused")
+    protected List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         return results;
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientVisitSummary extends QueryObject {
 
@@ -67,7 +68,8 @@ public class PatientVisitSummary extends QueryObject {
     }
 
     @Override
-    public List<Object> postProcess(List<Object> results) {
+    public List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         if (results.get(0) == null)
             return results;
         List<Object> totalledResults = new ArrayList<Object>();

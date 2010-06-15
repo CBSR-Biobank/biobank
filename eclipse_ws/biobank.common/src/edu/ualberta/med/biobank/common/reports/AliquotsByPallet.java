@@ -8,6 +8,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AliquotsByPallet extends QueryObject {
 
@@ -36,7 +37,8 @@ public class AliquotsByPallet extends QueryObject {
     }
 
     @Override
-    protected List<Object> postProcess(List<Object> results) {
+    protected List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         // get the info
         for (Object ob : results) {

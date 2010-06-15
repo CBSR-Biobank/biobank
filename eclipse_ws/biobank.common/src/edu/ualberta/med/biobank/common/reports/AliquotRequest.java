@@ -1,12 +1,15 @@
 package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -18,12 +21,12 @@ public class AliquotRequest extends QueryObject {
     public AliquotRequest(String op, Integer siteId) {
         super(
             "Given a CSV file detailing a request (Patient Number, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
-            "select s from "
-                + Aliquot.class.getName()
-                + " s where s.patientVisit.patient.study.site "
+            "select p.aliquot from "
+                + AliquotPosition.class.getName()
+                + " p where p.aliquot.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " and s.patientVisit.patient.pnumber like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.nameShort like ? ORDER BY RAND()",
+                + " and p.aliquot.patientVisit.patient.pnumber like ? and datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and p.aliquot.sampleType.nameShort like ? ORDER BY RAND()",
             new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
@@ -35,25 +38,61 @@ public class AliquotRequest extends QueryObject {
         List<Object> results = new ArrayList<Object>();
         HQLCriteria c;
         int i = 0;
-        try {
-            for (; i + 4 <= params.size(); i += 4) {
-                c = new HQLCriteria(queryString);
-                c.setParameters(params.subList(i, i + 3));
-                // need to limit query size but not possible in hql
-                Integer maxResults = (Integer) params.get(i + 3);
-                List<Object> queried = appService.query(c);
-                for (int j = 0; j < queried.size() && j < maxResults; j++)
-                    results.add(queried.get(j));
+        for (; i + 4 <= params.size(); i += 4) {
+            String pnumber = null;
+            Date dateDrawn = null;
+            String typeName = null;
+
+            c = new HQLCriteria(queryString);
+            try {
+                pnumber = (String) params.get(i);
+            } catch (ClassCastException e) {
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 1 \nInvalid Patient Number: "
+                    + params.get(i));
             }
-        } catch (Exception e) {
-            throw new BiobankCheckException("Failed to parse CSV: Line "
-                + ((i / 4) + 1));
+            dateDrawn = DateFormatter.parseToDate((String) params.get(i + 1));
+            if (dateDrawn == null)
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 2 \nInvalid Date: "
+                    + params.get(i + 1));
+            try {
+                typeName = (String) params.get(i + 2);
+            } catch (ClassCastException e) {
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 3 \nInvalid Sample Type: "
+                    + params.get(i + 2));
+            }
+            c.setParameters(Arrays.asList(new Object[] { pnumber, dateDrawn,
+                typeName }));
+            // need to limit query size but not possible in hql
+            Integer maxResults = 0;
+            try {
+                maxResults = Integer.parseInt((String) params.get(i + 3));
+            } catch (Exception e) {
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1) + ", Column 4 \nInvalid Integer: "
+                    + params.get(i + 3));
+            }
+            if (maxResults <= 0)
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1)
+                    + ", Column 4 \n Value must be greater than zero.");
+            if (maxResults >= 1000)
+                throw new ApplicationException("Failed to parse CSV: Line "
+                    + ((i / 4) + 1)
+                    + ", Column 4 \n Value must be less than 1000.");
+            List<Object> queried = appService.query(c);
+            for (int j = 0; j < queried.size() && j < maxResults; j++)
+                results.add(queried.get(j));
         }
+
         return results;
     }
 
     @Override
-    protected List<Object> postProcess(List<Object> results) {
+    protected List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
@@ -61,7 +100,7 @@ public class AliquotRequest extends QueryObject {
             String inventoryId = a.getInventoryId();
             Date dateDrawn = a.getPatientVisit().getDateDrawn();
             String stName = a.getSampleType().getNameShort();
-            String aliquotLabel = new AliquotWrapper(null, a)
+            String aliquotLabel = new AliquotWrapper(appService, a)
                 .getPositionString(true, false);
             modifiedResults.add(new Object[] { pnumber, inventoryId, dateDrawn,
                 stName, aliquotLabel });
