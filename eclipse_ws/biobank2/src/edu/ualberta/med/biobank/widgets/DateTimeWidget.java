@@ -15,14 +15,15 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.CustomDateTime;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
@@ -46,6 +47,8 @@ public class DateTimeWidget extends BiobankWidget {
     private Button dateButton;
 
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
+
+    private boolean calendarOpen;
 
     /*
      * Allow date to be null. it typeShown == SWT.DATE, show only date; if
@@ -77,6 +80,8 @@ public class DateTimeWidget extends BiobankWidget {
         gd.heightHint = size.y;
         dateEntry.setLayoutData(gd);
 
+        calendarOpen = false;
+
         dateButton = new Button(this, SWT.NONE);
         dateButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CALENDAR));
@@ -84,24 +89,32 @@ public class DateTimeWidget extends BiobankWidget {
 
             @Override
             public void mouseUp(MouseEvent e) {
-                final Shell dialog = new Shell(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM);
-                dialog.setLayout(new GridLayout(3, false));
+                if (calendarOpen)
+                    return;
+                GridLayout dialogGridLayout = new GridLayout(1, false);
+                dialogGridLayout.horizontalSpacing = 2;
+                dialogGridLayout.verticalSpacing = 2;
 
-                final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
-                    | SWT.BORDER);
+                final Shell dialog = new Shell(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM
+                    | SWT.MODELESS);
+                dialog.setLayout(dialogGridLayout);
+                dialog.setText("Calendar -- pick a date with me");
+                dialog.setActive();
+                dialog.setFocus();
+                calendarOpen = true;
+
+                final DateTime calendar = new CustomDateTime(dialog,
+                    SWT.CALENDAR | SWT.BORDER);
                 if (dateEntry.getSelection() != null) {
                     Calendar c = Calendar.getInstance();
                     c.setTime(dateEntry.getSelection());
                     calendar.setDate(c.get(Calendar.YEAR), c
                         .get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
                 }
-                new Label(dialog, SWT.BORDER);
-
-                calendar.addMouseListener(new MouseAdapter() {
+                calendar.addSelectionListener(new SelectionListener() {
                     @Override
-                    public void mouseDoubleClick(MouseEvent e) {
-
+                    public void widgetDefaultSelected(SelectionEvent e) {
                         Calendar c = Calendar.getInstance();
                         if (dateEntry.getSelection() != null)
                             c.setTime(dateEntry.getSelection());
@@ -110,12 +123,16 @@ public class DateTimeWidget extends BiobankWidget {
                         c.set(Calendar.YEAR, calendar.getYear());
                         dateEntry.setSelection(c.getTime());
                         fireModifyListeners();
+                        calendarOpen = false;
                         dialog.close();
+                    }
+
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
                     }
                 });
                 dialog.pack();
                 dialog.open();
-
             }
 
         });
