@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CustomDateTime;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -105,6 +106,10 @@ public class DateTimeWidget extends BiobankWidget {
                 dialog.setText("Calendar -- pick a date with me");
                 dialog.setActive();
                 dialog.setFocus();
+                Point cursorPt = Display.getCurrent().getCursorLocation();
+                cursorPt.x -= 90;
+                cursorPt.y -= 100;
+                dialog.setLocation(cursorPt);
 
                 dialog.addShellListener(new ShellListener() {
 
