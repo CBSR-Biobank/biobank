@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QACabinetAliquots extends QueryObject {
 
@@ -50,7 +51,8 @@ public class QACabinetAliquots extends QueryObject {
     }
 
     @Override
-    public List<Object> postProcess(List<Object> results) {
+    public List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         return results.subList(0, numResults);
     }
 

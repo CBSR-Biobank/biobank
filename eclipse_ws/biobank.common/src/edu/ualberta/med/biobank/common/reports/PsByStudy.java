@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 public class PsByStudy extends QueryObject {
 
     protected static final String NAME = "Patients per Study by Date";
@@ -34,7 +36,8 @@ public class PsByStudy extends QueryObject {
     }
 
     @Override
-    public List<Object> postProcess(List<Object> results) {
+    public List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         List<Object> compressedDates = new ArrayList<Object>();
         if (columnNames[1].compareTo("Year") == 0) {
             for (Object ob : results) {

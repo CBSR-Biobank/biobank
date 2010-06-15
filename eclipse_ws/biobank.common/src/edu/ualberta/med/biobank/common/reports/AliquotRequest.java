@@ -7,6 +7,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -18,12 +19,12 @@ public class AliquotRequest extends QueryObject {
     public AliquotRequest(String op, Integer siteId) {
         super(
             "Given a CSV file detailing a request (Patient Number, Date Drawn, Sample Type, # Requested), generate a list of aliquot locations.",
-            "select s from "
-                + Aliquot.class.getName()
-                + " s where s.patientVisit.patient.study.site "
+            "select p.aliquot from "
+                + AliquotPosition.class.getName()
+                + " p where p.aliquot.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " and s.patientVisit.patient.pnumber like ? and datediff(s.patientVisit.dateDrawn, ?) between 0 and 1  and s.sampleType.nameShort like ? ORDER BY RAND()",
+                + " and p.aliquot.patientVisit.patient.pnumber like ? and datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and p.aliquot.sampleType.nameShort like ? ORDER BY RAND()",
             new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
@@ -46,6 +47,7 @@ public class AliquotRequest extends QueryObject {
                     results.add(queried.get(j));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BiobankCheckException("Failed to parse CSV: Line "
                 + ((i / 4) + 1));
         }
@@ -53,7 +55,8 @@ public class AliquotRequest extends QueryObject {
     }
 
     @Override
-    protected List<Object> postProcess(List<Object> results) {
+    protected List<Object> postProcess(WritableApplicationService appService,
+        List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
@@ -61,7 +64,7 @@ public class AliquotRequest extends QueryObject {
             String inventoryId = a.getInventoryId();
             Date dateDrawn = a.getPatientVisit().getDateDrawn();
             String stName = a.getSampleType().getNameShort();
-            String aliquotLabel = new AliquotWrapper(null, a)
+            String aliquotLabel = new AliquotWrapper(appService, a)
                 .getPositionString(true, false);
             modifiedResults.add(new Object[] { pnumber, inventoryId, dateDrawn,
                 stName, aliquotLabel });
