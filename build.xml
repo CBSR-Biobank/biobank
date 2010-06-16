@@ -63,7 +63,7 @@
             casesensitive="true" trim="true" />
   </condition>
   <condition property="isHostCbsr">
-    <equals arg1="${host.name}" arg2="cbsr.biochem.ualberta.ca"
+    <equals arg1="${host.name}" arg2="cbsr.med.ualberta.ca"
             casesensitive="true" trim="true" />
   </condition>
   <condition property="isHostLocal">
