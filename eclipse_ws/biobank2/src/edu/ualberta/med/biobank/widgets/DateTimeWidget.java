@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.eclipse.nebula.widgets.cdatetime.CDT;
-import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -23,7 +21,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.CustomDateTime;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -31,6 +28,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.widgets.nebula.CDT;
+import edu.ualberta.med.biobank.widgets.nebula.CDateTime;
 
 /**
  * Wrapper around Nebula's CDateTime widget.
@@ -134,8 +133,8 @@ public class DateTimeWidget extends BiobankWidget {
                 });
                 calendarOpen = true;
 
-                final DateTime calendar = new CustomDateTime(dialog,
-                    SWT.CALENDAR | SWT.BORDER);
+                final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
+                    | SWT.BORDER);
                 if (dateEntry.getSelection() != null) {
                     Calendar c = Calendar.getInstance();
                     c.setTime(dateEntry.getSelection());
