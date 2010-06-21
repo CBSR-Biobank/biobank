@@ -178,6 +178,7 @@ public class VGridLayout extends VLayout {
         return size;
     }
 
+    @SuppressWarnings("cast")
     private void doLayout(VPanel parent, VControl[] children) {
         Point size = parent.getClientSize();
         int border = 0; // TODO

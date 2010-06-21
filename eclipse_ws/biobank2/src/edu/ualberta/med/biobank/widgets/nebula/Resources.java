@@ -99,6 +99,7 @@ class Resources {
         return getString(key, Locale.getDefault());
     }
 
+    @SuppressWarnings("cast")
     public static String getString(String key, Locale locale) {
         ResourceBundle bundle = (ResourceBundle) bundles.get(locale);
         if (bundle == null) {

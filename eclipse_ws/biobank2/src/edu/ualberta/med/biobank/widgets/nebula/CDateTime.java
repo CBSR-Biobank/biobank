@@ -106,6 +106,7 @@ public class CDateTime extends BaseCombo {
             count = 0;
         }
 
+        @Override
         public String toString() {
             if (buffer.length() < digits) {
                 char[] ca = new char[digits - buffer.length()];
@@ -832,6 +833,7 @@ public class CDateTime extends BaseCombo {
         return calendar.getTimeInMillis();
     }
 
+    @Override
     public boolean getEditable() {
         return !panel.hasStyle(SWT.READ_ONLY);
     }
@@ -897,10 +899,12 @@ public class CDateTime extends BaseCombo {
         return hasSelection() ? selection[0] : null;
     }
 
+    @Override
     public int getStyle() {
         return style;
     }
 
+    @Override
     public String getText() {
         return checkText() ? text.getText() : null;
     }
@@ -1222,6 +1226,7 @@ public class CDateTime extends BaseCombo {
      * 
      * graphics.Image)
      */
+    @Override
     public void setButtonImage(Image image) {
         super.setButtonImage(image);
     }
@@ -1240,6 +1245,7 @@ public class CDateTime extends BaseCombo {
     /*
      * (non-Javadoc)
      */
+    @Override
     public void setEditable(boolean editable) {
         super.setEditable(editable);
         if (checkPicker()) {
@@ -1326,6 +1332,7 @@ public class CDateTime extends BaseCombo {
         }
     }
 
+    @Override
     protected void setModifyEventProperties(Event e) {
         e.data = calendar.getTime();
     }
@@ -1343,10 +1350,12 @@ public class CDateTime extends BaseCombo {
         updateText();
     }
 
+    @Override
     public void setOpen(boolean open) {
         setOpen(open, null);
     }
 
+    @Override
     public void setOpen(boolean open, Runnable callback) {
         if (open) {
             cancelDate = getSelection();
@@ -1647,7 +1656,6 @@ public class CDateTime extends BaseCombo {
      *            (for changes to text selection)
      */
     private void updateText(boolean async) {
-        // TODO: save previous state and only update on changes...?
 
         String buffer = hasSelection() ? df.format(getSelection())
             : getNullText();

@@ -87,6 +87,7 @@ public class VNative<T extends Control> extends VControl {
         }
     }
 
+    @Override
     public T getControl() {
         return control;
     }
@@ -172,6 +173,7 @@ public class VNative<T extends Control> extends VControl {
         control.setVisible(visible);
     }
 
+    @Override
     public String toString() {
         return getClass().getName()
             + "@" + Integer.toHexString(hashCode()) + " {" + control.toString() + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

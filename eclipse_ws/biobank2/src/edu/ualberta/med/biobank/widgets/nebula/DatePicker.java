@@ -260,6 +260,7 @@ class DatePicker extends VPanel {
 
         todayMenuItem = new MenuItem(bodyMenu, SWT.NONE);
         todayMenuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 cdt.setSelection(new Date());
             }
@@ -267,6 +268,7 @@ class DatePicker extends VPanel {
 
         showSelMenuItem = new MenuItem(bodyMenu, SWT.NONE);
         showSelMenuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 cdt.showSelection();
             }
@@ -503,6 +505,7 @@ class DatePicker extends VPanel {
                             "Month", new Integer(tmpcal.get(Calendar.MONTH))); //$NON-NLS-1$
                         monthItems[i]
                             .addSelectionListener(new SelectionAdapter() {
+                                @Override
                                 public void widgetSelected(SelectionEvent e) {
                                     MenuItem item = (MenuItem) e.widget;
                                     Calendar tmpcal = cdt.getCalendarInstance();
@@ -606,6 +609,7 @@ class DatePicker extends VPanel {
                         yearItems[i].setData("Year", new Integer(i)); //$NON-NLS-1$
                         yearItems[i]
                             .addSelectionListener(new SelectionAdapter() {
+                                @Override
                                 public void widgetSelected(SelectionEvent e) {
                                     MenuItem item = (MenuItem) e.widget;
                                     Calendar tmpcal = cdt.getCalendarInstance();
@@ -730,8 +734,9 @@ class DatePicker extends VPanel {
         }
     }
 
-    private void createTime(Body b) {
-        VPanel bodyPanel = bodyPanels[bodyPanels.length - 1];
+    private void createTime(@SuppressWarnings("unused") Body b) {
+        System.err
+            .println("WARNING: unpredictable createTime event was called.");
     }
 
     private void createYears(Body b) {
@@ -958,6 +963,7 @@ class DatePicker extends VPanel {
         }
     }
 
+    @Override
     public boolean setFocus() {
         return setFocusToSelection();
     }

@@ -495,7 +495,7 @@ public class CDateTimePainter implements IControlPainter {
     public final void update(VControl control) {
         switch ((CDT.PickerPart) control.getData(CDT.PickerPart)) {
         case ClearButton:
-            updateClearButton(control);
+            updateClearButton();
             break;
         case DateNow:
             updateDateNow(control);
@@ -504,7 +504,7 @@ public class CDateTimePainter implements IControlPainter {
             updateDayButton(control);
             break;
         case DayOfWeekLabel:
-            updateDayOfWeekLabel(control);
+            updateDayOfWeekLabel();
             break;
         case DayOfWeekPanel:
             updateDayOfWeekPanel(control);
@@ -513,16 +513,16 @@ public class CDateTimePainter implements IControlPainter {
             updateDayPanel(control);
             break;
         case TodayButton:
-            updateFooterButton(control);
+            updateFooterButton();
             break;
         case FooterPanel:
-            updateFooterPanel(control);
+            updateFooterPanel();
             break;
         case HeaderPanel:
-            updateHeaderPanel(control);
+            updateHeaderPanel();
             break;
         case MonthLabel:
-            updateMonthLabel(control);
+            updateMonthLabel();
             break;
         case MonthNext:
             updateMonthNext(control);
@@ -531,7 +531,7 @@ public class CDateTimePainter implements IControlPainter {
             updateMonthPrev(control);
             break;
         case YearLabel:
-            updateYearLabel(control);
+            updateYearLabel();
             break;
         case YearNext:
             updateYearNext(control);
@@ -542,7 +542,7 @@ public class CDateTimePainter implements IControlPainter {
         }
     }
 
-    protected void updateClearButton(VControl control) {
+    protected void updateClearButton() {
     }
 
     protected void updateDateNow(VControl control) {
@@ -562,7 +562,7 @@ public class CDateTimePainter implements IControlPainter {
         }
     }
 
-    protected void updateDayOfWeekLabel(VControl control) {
+    protected void updateDayOfWeekLabel() {
     }
 
     protected void updateDayOfWeekPanel(VControl control) {
@@ -575,16 +575,16 @@ public class CDateTimePainter implements IControlPainter {
             SWT.COLOR_WHITE));
     }
 
-    protected void updateFooterButton(VControl control) {
+    protected void updateFooterButton() {
     }
 
-    protected void updateFooterPanel(VControl control) {
+    protected void updateFooterPanel() {
     }
 
-    protected void updateHeaderPanel(VControl control) {
+    protected void updateHeaderPanel() {
     }
 
-    protected void updateMonthLabel(VControl control) {
+    protected void updateMonthLabel() {
     }
 
     protected void updateMonthNext(VControl control) {
@@ -595,7 +595,7 @@ public class CDateTimePainter implements IControlPainter {
         control.setFill(control.getDisplay().getSystemColor(SWT.COLOR_GRAY));
     }
 
-    protected void updateYearLabel(VControl control) {
+    protected void updateYearLabel() {
     }
 
     protected void updateYearNext(VControl control) {

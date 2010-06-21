@@ -277,6 +277,7 @@ class DiscreteTimePicker extends VPanel {
         updateLabels();
     }
 
+    @Override
     public boolean setFocus() {
         return true;
     }

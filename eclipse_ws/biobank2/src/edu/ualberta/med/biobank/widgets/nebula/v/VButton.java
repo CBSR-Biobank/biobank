@@ -47,6 +47,7 @@ public class VButton extends VControl {
         return VControl.Type.Button;
     }
 
+    @Override
     protected void filterEvent(Event event) {
         if (hasState(STATE_ACTIVE)) {
             switch (event.type) {

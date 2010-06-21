@@ -275,7 +275,8 @@ public abstract class VControl {
         return computeSize(wHint, hHint, true);
     }
 
-    public Point computeSize(int wHint, int hHint, boolean changed) {
+    public Point computeSize(int wHint, int hHint,
+        @SuppressWarnings("unused") boolean changed) {
         if (wHint != SWT.DEFAULT && wHint < 0) {
             wHint = 0;
         }
@@ -433,7 +434,7 @@ public abstract class VControl {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getData(String name, Class<T> clazz) {
+    public <T> T getData(String name, @SuppressWarnings("unused") Class<T> clazz) {
         if (dataMap != null) {
             return (T) dataMap.get(name);
         }
@@ -522,7 +523,7 @@ public abstract class VControl {
         return getParent().getWidget();
     }
 
-    protected void filterEvent(Event event) {
+    protected void filterEvent(@SuppressWarnings("unused") Event event) {
         // subclasses to implement if necessary
     }
 
@@ -582,11 +583,11 @@ public abstract class VControl {
         return getVisible() && composite.isVisible();
     }
 
-    public void moveAbove(VControl control) {
+    public void moveAbove(@SuppressWarnings("unused") VControl control) {
         parent.move(this, null);
     }
 
-    public void moveBelow(VControl control) {
+    public void moveBelow(@SuppressWarnings("unused") VControl control) {
         parent.move(null, this);
     }
 
@@ -594,6 +595,7 @@ public abstract class VControl {
         notifyListeners(eventType, null);
     }
 
+    @SuppressWarnings("unchecked")
     public void notifyListeners(int eventType, Event event) {
         if (listeners.containsKey(eventType)) {
             if (event == null) {
@@ -712,10 +714,12 @@ public abstract class VControl {
         yAlign = y;
     }
 
+    @SuppressWarnings("cast")
     public void setAlpha(GC gc) {
         gc.setAlpha((int) (2.55 * (double) visibility));
     }
 
+    @SuppressWarnings("cast")
     public void setAlpha(GC gc, int alpha) {
         gc
             .setAlpha((int) ((double) alpha * (double) visibility * (double) 0.01));
@@ -777,6 +781,7 @@ public abstract class VControl {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void setEnabled(boolean enabled) {
         if (setState(STATE_ENABLED, enabled)) {
             if (this instanceof VNative) {
@@ -814,7 +819,7 @@ public abstract class VControl {
         return false;
     }
 
-    public void setFont(Font font) {
+    public void setFont(@SuppressWarnings("unused") Font font) {
         // TODO setFont
     }
 
