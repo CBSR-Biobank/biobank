@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 import edu.ualberta.med.biobank.widgets.nebula.IControlPainter;
-import edu.ualberta.med.biobank.widgets.nebula.svg.SvgDocument;
 
 /**
  * A VControl is a class wich wraps an SWT Button to create a widget that acts
@@ -113,7 +112,6 @@ public abstract class VControl {
     private int style;
     Menu menu;
     Image image;
-    SvgDocument svg;
     String text;
     String tooltipText;
     int[] points;
@@ -826,11 +824,6 @@ public abstract class VControl {
 
     public void setImage(Image image) {
         this.image = image;
-        redraw();
-    }
-
-    public void setImage(SvgDocument svg) {
-        this.svg = svg;
         redraw();
     }
 

@@ -216,14 +216,7 @@ public class VControlPainter implements IControlPainter {
         if (!control.isEnabled()) {
             control.setAlpha(e.gc, 170);
         }
-        if (control.svg != null) {
-            if (control.text != null) {
-                paintImageAndText(control, e);
-            } else {
-                control.svg.apply(e.gc, control.getClientArea());
-            }
-        } else if (control.image != null
-            && !control.image.getDevice().isDisposed()) {
+        if (control.image != null && !control.image.getDevice().isDisposed()) {
             if (control.text != null) {
                 paintImageAndText(control, e);
             } else {

@@ -215,7 +215,7 @@ public class CDT {
 
     /**
      * Style constant indicating that the CDateTime should created with a
-     * spinner (value is 1&lt;&lt;26).
+     * spinner (value is 1&lt;&lt;26). WARNING: THIS HAS BEEN REMOVED.
      */
     public static final int SPINNER = 1 << 26;
 

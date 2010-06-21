@@ -89,8 +89,6 @@ class DatePicker extends VPanel {
 
     VButton[] yearButtons;
 
-    AnalogTimePicker timePanel;
-
     private CDateTime cdt;
     private int fields = 0;
     private SimpleDateFormat sdf;
@@ -734,15 +732,6 @@ class DatePicker extends VPanel {
 
     private void createTime(Body b) {
         VPanel bodyPanel = bodyPanels[bodyPanels.length - 1];
-
-        timePanel = new AnalogTimePicker(cdt, this);
-        timePanel.setParent(bodyPanel);
-
-        bodyPanel.getLayout(VStackLayout.class).setDefault(timePanel, false);
-
-        if (timeButton != null) {
-            timeButton.setData(Key.Panel, timePanel);
-        }
     }
 
     private void createYears(Body b) {
@@ -942,9 +931,6 @@ class DatePicker extends VPanel {
         if (dayPanel != null) {
             dayPanel.setActivatable(false);
         }
-        if (timePanel != null) {
-            timePanel.setActivatable(false);
-        }
     }
 
     public void setFields(int[] calendarFields) {
@@ -969,10 +955,6 @@ class DatePicker extends VPanel {
                     }
                 }
             });
-        }
-
-        if (timePanel != null) {
-            timePanel.setFields(calendarFields);
         }
     }
 
@@ -1405,9 +1387,6 @@ class DatePicker extends VPanel {
         }
         updateMonths();
         updateYears();
-        if (timePanel != null) {
-            timePanel.updateView();
-        }
         updateFooter();
     }
 

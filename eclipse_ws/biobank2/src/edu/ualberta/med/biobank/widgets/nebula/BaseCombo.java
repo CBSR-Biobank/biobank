@@ -1020,9 +1020,8 @@ public abstract class BaseCombo extends Canvas {
                     }
                 };
 
-                AnimationRunner runner = new AnimationRunner();
-                runner.runEffect(new Resize(contentShell, start, end, 200,
-                    new LinearInOut(), runnable, runnable));
+                System.err
+                    .println("ERROR BaseCombo: Animation Runner Unsupported.");
 
                 if (checkText()) {
                     text.setFocus();
@@ -1080,9 +1079,8 @@ public abstract class BaseCombo extends Canvas {
             };
 
             contentShell.setVisible(true);
-            AnimationRunner runner = new AnimationRunner();
-            runner.runEffect(new Resize(contentShell, start, end, 200,
-                new LinearInOut(), runnable, runnable));
+            System.err
+                .println("ERROR BaseCombo: Animation Runner Unsupported.");
             contentShell.setRedraw(true);
         }
         if (BUTTON_AUTO == buttonVisibility) {

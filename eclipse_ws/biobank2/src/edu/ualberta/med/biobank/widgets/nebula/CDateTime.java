@@ -24,16 +24,10 @@ import java.util.TimeZone;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -50,7 +44,6 @@ import edu.ualberta.med.biobank.widgets.nebula.v.VButton;
 import edu.ualberta.med.biobank.widgets.nebula.v.VCanvas;
 import edu.ualberta.med.biobank.widgets.nebula.v.VGridLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VLabel;
-import edu.ualberta.med.biobank.widgets.nebula.v.VLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VNative;
 import edu.ualberta.med.biobank.widgets.nebula.v.VPanel;
 import edu.ualberta.med.biobank.widgets.nebula.v.VTracker;
@@ -128,50 +121,6 @@ public class CDateTime extends BaseCombo {
      * SIMPLE or DROP_DOWN - with style of SPINNER.<br>
      * Note that there is a spinner, but no button for this style.
      */
-    class SpinnerLayout extends VLayout {
-
-        protected Point computeSize(VPanel panel, int wHint, int hHint,
-            boolean flushCache) {
-            Point size = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
-            int sWidth = sRect.x + sRect.width
-                - (2 * spinner.getControl().getBorderWidth()) + 1;
-
-            size.x += sWidth;
-            size.x++;
-            size.y += textMarginHeight;
-
-            if (wHint != SWT.DEFAULT) {
-                size.x = Math.min(size.x, wHint);
-            }
-            if (hHint != SWT.DEFAULT) {
-                size.y = Math.min(size.y, hHint);
-            }
-            return size;
-        }
-
-        protected void layout(VPanel panel, boolean flushCache) {
-            Rectangle cRect = panel.getClientArea();
-            if (cRect.isEmpty())
-                return;
-
-            Point tSize = text.getControl().computeSize(SWT.DEFAULT,
-                SWT.DEFAULT);
-            tSize.y += textMarginHeight;
-
-            spinner.setBounds(cRect.x, cRect.y, cRect.width, tSize.y);
-
-            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
-            int sWidth = sRect.x + sRect.width
-                - (2 * spinner.getControl().getBorderWidth()) + 1;
-
-            tSize.x = cRect.width - sWidth;
-
-            text.setBounds(cRect.x, cRect.y + getBorderWidth(), tSize.x,
-                tSize.y);
-        }
-    }
 
     private static final int FIELD_NONE = -1;
 
@@ -455,10 +404,8 @@ public class CDateTime extends BaseCombo {
                 dtp.updateView();
                 picker = dtp;
             } else {
-                AnalogTimePicker atp = new AnalogTimePicker(this);
-                atp.setFields(calendarFields);
-                atp.updateView();
-                picker = atp;
+                System.err
+                    .println("ERROR CDateTime: Analog Clock unsupported.");
             }
         }
 
@@ -1136,49 +1083,7 @@ public class CDateTime extends BaseCombo {
             } else {
                 setButtonVisibility(BaseCombo.BUTTON_NEVER);
                 if ((style & CDT.SPINNER) != 0) {
-                    int sStyle = SWT.VERTICAL;
-                    if (gtk && ((style & CDT.BORDER) != 0)) {
-                        sStyle |= SWT.BORDER;
-                    }
-                    spinner = VNative.create(Spinner.class, panel, sStyle);
-                    if (win32) {
-                        spinner
-                            .setBackground(text.getControl().getBackground());
-                    }
-                    spinner.getControl().setMinimum(0);
-                    spinner.getControl().setMaximum(50);
-                    spinner.getControl().setDigits(1);
-                    spinner.getControl().setIncrement(1);
-                    spinner.getControl().setPageIncrement(1);
-                    spinner.getControl().setSelection(25);
-                    spinner.getControl().addFocusListener(new FocusAdapter() {
-                        public void focusGained(FocusEvent e) {
-                            internalFocusShift = true;
-                            setFocus();
-                            internalFocusShift = false;
-                        }
-                    });
-                    spinner.getControl().addMouseListener(new MouseAdapter() {
-                        public void mouseDown(MouseEvent e) {
-                            if (e.button == 2) {
-                                fieldNext();
-                            }
-                        }
-                    });
-                    spinner.getControl().addSelectionListener(
-                        new SelectionAdapter() {
-                            public void widgetSelected(SelectionEvent e) {
-                                if (VTracker.getMouseDownButton() != 2) {
-                                    if (spinner.getControl().getSelection() > 25) {
-                                        fieldAdjust(1);
-                                    } else {
-                                        fieldAdjust(-1);
-                                    }
-                                    spinner.getControl().setSelection(25);
-                                }
-                            }
-                        });
-                    panel.setLayout(new SpinnerLayout());
+                    System.err.println("ERROR CDateTime: Spinner unsupported.");
                 }
             }
 
@@ -1718,10 +1623,6 @@ public class CDateTime extends BaseCombo {
         if (picker != null) {
             if (picker instanceof DatePicker) {
                 ((DatePicker) picker).updateView();
-            } else if (picker instanceof AnalogTimePicker) {
-                ((AnalogTimePicker) picker).updateView();
-            } else if (picker instanceof DiscreteTimePicker) {
-                ((DiscreteTimePicker) picker).updateView();
             }
         }
     }
