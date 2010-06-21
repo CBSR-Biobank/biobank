@@ -1,0 +1,59 @@
+#!/bin/bash
+
+if [ -z "$JBOSS_HOME" ]; then
+   echo "JBOSS_HOME is not defined"
+   exit
+fi
+
+COMMAND_RE="[j]ava.*jboss"
+
+start () {
+    if [ -e $JBOSS_HOME/nohup.out ]; then
+        rm $JBOSS_HOME/nohup.out
+    fi
+    cd $JBOSS_HOME && nohup bin/run.sh -b 0.0.0.0 2> /dev/null &
+    echo "jboss started"
+}
+
+stop () {
+    OUT=`ps -eaf | grep "$COMMAND_RE"`
+    if [ -n "$OUT" ]; then
+        cd $JBOSS_HOME && bin/shutdown.sh -S
+    fi
+    while [ -n "$OUT" ]
+    do
+	OUT=`ps -eaf | grep "$COMMAND_RE"`
+        echo "waiting for shutdown..."
+        sleep 1
+    done
+}
+
+status() {
+    OUT=`ps -eaf | grep "$COMMAND_RE"`
+    if [ -n "$OUT" ]; then
+        echo "jboss is running"
+    else
+        echo "jboss is stopped"
+    fi
+}
+
+case $1 in
+        start)
+          start
+        ;;
+        stop|kill)
+          stop
+        ;;
+        restart|reload)
+          stop
+          sleep 3
+          start
+        ;;
+        status)
+          status
+        ;;
+        *)
+          echo $"Invalid option. Usage: $0 [start|stop|kill|restart|reload]."
+        ;;
+esac
+

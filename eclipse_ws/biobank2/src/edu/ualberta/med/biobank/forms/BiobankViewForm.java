@@ -1,0 +1,154 @@
+package edu.ualberta.med.biobank.forms;
+
+import java.util.Map;
+
+import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.springframework.remoting.RemoteConnectFailureException;
+
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
+import edu.ualberta.med.biobank.widgets.BiobankText;
+
+/**
+ * The base class for all BioBank2 Java Client view forms. The forms are usually
+ * created when the user selects a node in the <code>SessionView</code> tree
+ * view.
+ */
+public abstract class BiobankViewForm extends BiobankFormBase {
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(BiobankViewForm.class.getName());
+
+    protected String sessionName;
+
+    private static ImageDescriptor reloadActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RELOAD_FORM));
+
+    private static ImageDescriptor editActionImage = ImageDescriptor
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_EDIT_FORM));
+
+    private AdapterChangedListener adapterChangedListener;
+
+    @Override
+    public void init(IEditorSite editorSite, IEditorInput input)
+        throws PartInitException {
+        super.init(editorSite, input);
+
+        if (adapter != null) {
+            adapterChangedListener = new AdapterChangedListener() {
+                @Override
+                public void changed(AdapterChangedEvent event) {
+                    try {
+                        reload();
+                    } catch (Exception e) {
+                        logger.error("Error sending event", e);
+                    }
+                }
+            };
+            adapter.addChangedListener(adapterChangedListener);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        if (adapter != null) {
+            Assert.isNotNull(adapterChangedListener);
+            adapter.removeChangedListener(adapterChangedListener);
+        }
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        addToolbarButtons();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return false;
+    }
+
+    @Override
+    public boolean isSaveAsAllowed() {
+        return false;
+    }
+
+    protected void setWidgetValues(Map<String, FieldInfo> fieldsMap, Object bean) {
+        for (String label : fieldsMap.keySet()) {
+            FieldInfo fi = fieldsMap.get(label);
+            IObservableValue ov = BeansObservables.observeValue(bean, label);
+            Object value = ov.getValue();
+            if (value != null) {
+                Control widget = getWidget(label);
+                if ((fi.widgetClass == Combo.class)
+                    || (fi.widgetClass == BiobankText.class)
+                    || (fi.widgetClass == Label.class)) {
+                    ((BiobankText) widget).setText((String) value);
+                }
+            }
+        }
+    }
+
+    protected void addToolbarButtons() {
+        Action reloadAction = new Action("Reload") {
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    public void run() {
+                        try {
+                            reload();
+                        } catch (final RemoteConnectFailureException exp) {
+                            BioBankPlugin.openRemoteConnectErrorMessage();
+                        } catch (Exception e) {
+                            logger.error(
+                                "BioBankFormBase.createPartControl Error", e);
+                        }
+                    }
+                });
+            }
+        };
+        reloadAction.setImageDescriptor(reloadActionImage);
+        form.getToolBarManager().add(reloadAction);
+
+        if ((adapter != null) && adapter.isEditable()
+            && adapter.getEntryFormId() != null) {
+            Action edit = new Action("Edit") {
+                @Override
+                public void run() {
+                    BusyIndicator.showWhile(Display.getDefault(),
+                        new Runnable() {
+                            public void run() {
+                                getSite().getPage().closeEditor(
+                                    BiobankViewForm.this, false);
+                                adapter.openEntryForm();
+                            }
+                        });
+                }
+            };
+            edit.setImageDescriptor(editActionImage);
+            form.getToolBarManager().add(edit);
+        }
+
+        form.updateToolBar();
+    }
+
+    protected abstract void reload() throws Exception;
+
+}

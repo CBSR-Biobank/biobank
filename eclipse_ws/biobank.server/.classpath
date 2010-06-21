@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="lib/csmapi-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CSM/CSM_API_4_1_Source/src"/>
+	<classpathentry kind="lib" path="lib/sdk-writable-core.jar"/>
+	<classpathentry kind="lib" path="lib/sdk-core.jar"/>
+	<classpathentry kind="lib" path="lib/sdk-client-framework.jar"/>
+	<classpathentry kind="lib" path="lib/sdk-writable-client-framework.jar"/>
+	<classpathentry kind="lib" path="lib/spring.jar" sourcepath="/home/delphine/projects/sources/spring-framework/2.0.3/src"/>
+	<classpathentry kind="lib" path="lib/hibernate3.jar" sourcepath="/home/delphine/projects/sources/hibernate/hibernate-3.2/src"/>
+	<classpathentry kind="lib" path="lib/caGrid-CQL-cql.1.0-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-validator.jar"/>
+	<classpathentry kind="lib" path="lib/sdk-security.jar"/>
+	<classpathentry kind="lib" path="lib/acegi-security-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar" sourcepath="/home/delphine/projects/sources/log4j-1.2.14-src/src"/>
+	<classpathentry kind="lib" path="lib/biobank2-beans.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

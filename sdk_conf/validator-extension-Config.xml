@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-dependency-check="none" default-autowire="no">
+
+  <bean name="ValidatorModelExtension" class="gov.nih.nci.codegen.validator.ValidatorModel">
+    <constructor-arg>
+      <map>
+        <entry key="edu.ualberta.med.biobank.model.Study">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.Study" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="name">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="name" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Name of study should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of study should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+        <entry key="edu.ualberta.med.biobank.model.Site">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.Site" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="name">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="name" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Name of site should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of site should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+        <entry key="edu.ualberta.med.biobank.model.SampleType">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.SampleType" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="name">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="name" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Name of sample type should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of sample type should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+        <entry key="edu.ualberta.med.biobank.model.Patient">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.Patient" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="pnumber">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="pnumber" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Pnumber of patient should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+        <entry key="edu.ualberta.med.biobank.model.ContainerType">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.ContainerType" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="name">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="name" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Name of container type should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of container type should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+        <entry key="edu.ualberta.med.biobank.model.Clinic">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.Clinic" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="name">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="name" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Name of clinic should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="nameShort">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="nameShort" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotEmpty" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Short name of clinic should not be null or empty"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+        <entry key="edu.ualberta.med.biobank.model.Capacity">
+          <bean class="gov.nih.nci.codegen.validator.ValidatorClass">
+            <constructor-arg value="edu.ualberta.med.biobank.model.Capacity" />
+            <constructor-arg index="1">
+              <map>
+                <entry key="rowCapacity">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="rowCapacity" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotNull" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Row of capacity should not be null"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.Min" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="value" value="0" />
+                              <entry key="message">
+                                <value>"Row of capacity must be greater than or equal to 0"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+                <entry key="colCapacity">
+                  <bean class="gov.nih.nci.codegen.validator.ValidatorAttribute">
+                    <constructor-arg value="colCapacity" />
+                    <constructor-arg index="1">
+                      <list>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.NotNull" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="message">
+                                <value>"Col of capacity should not be null"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                        <bean class="gov.nih.nci.codegen.validator.ValidatorConstraint">
+                          <constructor-arg value="org.hibernate.validator.Min" />
+                          <constructor-arg index="1">
+                            <map>
+                              <entry key="value" value="0" />
+                              <entry key="message">
+                                <value>"Col of capacity must be greater than or equal to 0"</value>
+                              </entry>
+                            </map>
+                          </constructor-arg>
+                        </bean>
+                      </list>
+                    </constructor-arg>
+                  </bean>
+                </entry>
+              </map>
+            </constructor-arg>
+            <constructor-arg index="2">
+              <list />
+            </constructor-arg>
+          </bean>
+        </entry>
+      </map>
+    </constructor-arg>
+  </bean>
+</beans>
