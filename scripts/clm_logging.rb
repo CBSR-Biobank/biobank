@@ -11,12 +11,17 @@ Usage: {script_name} HOST
 
 USAGE_END
 
+  # divide created_on by 1000 to ignore the milliseconds
   QUERY = <<QUERY_END
-select *
+select *,FROM_UNIXTIME(created_on/1000) as created_on_date
 from log_message
 join objectattributes on objectattributes.log_id=log_message.log_id
 join object_attribute on object_attribute.object_attribute_id=objectattributes.object_attribute_id
+join aliquot on aliquot.inventory_id=current_value
+join patient_visit on patient_visit.id=aliquot.patient_visit_id
+join patient on patient.id=patient_visit.patient_id
 where attribute='inventoryId'
+and FROM_UNIXTIME(created_on/1000) >= "2010-05-17"
 QUERY_END
 
 
@@ -30,10 +35,18 @@ QUERY_END
     getDbConnection("biobank2", host)
     res = @dbh.query(QUERY)
     res.each_hash do |row|
-      print row['USERNAME'], ", ", row['CURRENT_VALUE'], ", ", Time.at(row['CREATED_ON'].to_f / 1000.0), " - (", row['CREATED_ON'], "), ", row['OPERATION'], "\n"
+      print row['USERNAME'], ", ", Time.at(row['CREATED_ON'].to_f / 1000.0), ", ", row['OPERATION'],
+      ", ", row['PNUMBER'], ", ", row['CURRENT_VALUE'], "\n"
     end
   end
 
 end
+
+# columns for logging are:
+# User Date Action Type Patient# Inventory ID Location Details
+#
+#   Actions is "insert" for all clm imported inventory ids
+#   Location is null
+#   Details is null
 
 ClmLogging.new
