@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -15,8 +15,8 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     private static final String[] HEADINGS = new String[] { "User", "Date",
         "Action", "Type", "Patient #", "Inventory ID", "Location", "Details" };
 
-    private static final int[] BOUNDS = new int[] { 102, 110, 80, 100, 102,
-        102, 120, 200 };
+    private static final int[] BOUNDS = new int[] { 90, 120, 75, 80, 80, 102,
+        120, 200 };
 
     private static final int PAGE_SIZE_ROWS = 20;
 
@@ -91,7 +91,9 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
 
         Date logQueryDate = logQuery.getDate();
         if (logQueryDate != null) {
-            info.date = DateFormatter.formatAsDateTime(logQueryDate);
+            SimpleDateFormat dateTimeSecond = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss");
+            info.date = dateTimeSecond.format(logQueryDate);
         } else {
             info.date = null;
         }
