@@ -296,6 +296,7 @@
                   definitionId="biobank2.confirmEnabled">
             </reference>
          </activeWhen>
+         <enabledWhen></enabledWhen>
       </handler>   
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
