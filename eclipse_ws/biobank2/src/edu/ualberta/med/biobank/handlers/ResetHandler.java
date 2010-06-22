@@ -1,0 +1,30 @@
+package edu.ualberta.med.biobank.handlers;
+
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
+
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.forms.BiobankEntryForm;
+
+public class ResetHandler extends AbstractHandler implements IHandler {
+
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            public void run() {
+                try {
+                    ((BiobankEntryForm) PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage()
+                        .getActiveEditor()).reset();
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Error on reset", ex);
+                }
+            }
+        });
+        return null;
+    }
+}
