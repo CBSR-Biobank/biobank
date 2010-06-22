@@ -8,18 +8,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class CbsrSite extends ConfigSite {
 
-    public static void createConfiguration(WritableApplicationService appServ)
-        throws Exception {
-        appService = appServ;
-        addSite(appService);
-        CbsrClinics.createClinics(site);
-        CbsrStudies.createStudies(site);
-        CbsrContainerTypes configCT = new CbsrContainerTypes();
-        configCT.createContainerTypes(site);
-        CbsrContainers configContainers = new CbsrContainers();
-        configContainers.createContainers(site, configCT);
-    }
-
     public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
         getSampleTypeMap(appService);

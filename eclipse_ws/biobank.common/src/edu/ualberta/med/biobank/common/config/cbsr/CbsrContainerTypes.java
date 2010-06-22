@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class CbsrContainerTypes extends ConfigContainerTypes {
 
-    public void createContainerTypes(SiteWrapper site) throws Exception {
+    public CbsrContainerTypes(SiteWrapper site) throws Exception {
         createFreezerTypes(site);
         createCabinetTypes(site);
         createDewarTypes(site);

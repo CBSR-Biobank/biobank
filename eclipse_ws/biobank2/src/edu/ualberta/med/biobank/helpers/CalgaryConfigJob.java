@@ -42,6 +42,8 @@ public class CalgaryConfigJob {
 
     protected SiteWrapper calgarySite;
 
+    protected CalgaryClinics configClinics;
+
     protected Random r = new Random();
 
     protected List<SampleTypeWrapper> sampleTypesList;
@@ -154,14 +156,13 @@ public class CalgaryConfigJob {
             calgarySite = CalgarySite.addSite(appService);
             break;
         case 2:
-            CalgaryClinics.createClinics(calgarySite);
+            configClinics = new CalgaryClinics(calgarySite);
             break;
         case 3:
-            CalgaryStudies.createStudies(calgarySite);
+            new CalgaryStudies(calgarySite, configClinics);
             break;
         case 4:
-            CalgaryContainerTypes configCT = new CalgaryContainerTypes();
-            configCT.createContainerTypes(calgarySite);
+            new CalgaryContainerTypes(calgarySite);
             break;
         default:
             throw new Exception("sub task number " + subTaskNumber

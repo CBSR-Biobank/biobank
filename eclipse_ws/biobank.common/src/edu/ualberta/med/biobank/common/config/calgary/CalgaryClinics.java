@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class CalgaryClinics extends ConfigClinics {
 
-    public static void createClinics(SiteWrapper site) throws Exception {
+    public CalgaryClinics(SiteWrapper site) throws Exception {
         clinicsMap = new HashMap<String, ClinicWrapper>();
         contactsMap = new HashMap<String, ContactWrapper>();
 

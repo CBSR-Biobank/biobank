@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.config.cbsr;
 
 import java.util.HashMap;
 
+import edu.ualberta.med.biobank.common.config.ConfigClinics;
 import edu.ualberta.med.biobank.common.config.ConfigStudies;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -35,7 +36,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
  */
 public class CbsrStudies extends ConfigStudies {
 
-    public static void createStudies(SiteWrapper site) throws Exception {
+    public CbsrStudies(SiteWrapper site, ConfigClinics configClinics)
+        throws Exception {
+        super(configClinics);
+        this.configClinics = configClinics;
         studiesMap = new HashMap<String, StudyWrapper>();
 
         sourceVesselMap = new HashMap<String, SourceVesselWrapper>();

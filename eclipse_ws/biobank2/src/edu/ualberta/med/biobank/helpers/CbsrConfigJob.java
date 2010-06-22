@@ -43,6 +43,10 @@ public class CbsrConfigJob {
 
     protected SiteWrapper cbsrSite;
 
+    protected CbsrClinics configClinics;
+
+    protected CbsrStudies configStudies;
+
     protected Random r = new Random();
 
     protected List<SampleTypeWrapper> sampleTypesList;
@@ -158,18 +162,16 @@ public class CbsrConfigJob {
             cbsrSite = CbsrSite.addSite(appService);
             break;
         case 2:
-            CbsrClinics.createClinics(cbsrSite);
+            configClinics = new CbsrClinics(cbsrSite);
             break;
         case 3:
-            CbsrStudies.createStudies(cbsrSite);
+            configStudies = new CbsrStudies(cbsrSite, configClinics);
             break;
         case 4:
-            containerTypes = new CbsrContainerTypes();
-            containerTypes.createContainerTypes(cbsrSite);
+            containerTypes = new CbsrContainerTypes(cbsrSite);
             break;
         case 5:
-            CbsrContainers containers = new CbsrContainers();
-            containers.createContainers(cbsrSite, containerTypes);
+            new CbsrContainers(cbsrSite, containerTypes);
             break;
         default:
             throw new Exception("sub task number " + subTaskNumber

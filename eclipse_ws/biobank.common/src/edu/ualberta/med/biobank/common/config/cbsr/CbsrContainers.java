@@ -9,10 +9,9 @@ import edu.ualberta.med.biobank.util.RowColPos;
 
 public class CbsrContainers extends ConfigContainers {
 
-    public void createContainers(SiteWrapper site,
-        ConfigContainerTypes containerTypes) throws Exception {
-        this.containerTypes = containerTypes;
-
+    public CbsrContainers(SiteWrapper site, ConfigContainerTypes containerTypes)
+        throws Exception {
+        super(containerTypes);
         createFreezer01(site);
         createFreezer02(site);
         createFreezer03(site);

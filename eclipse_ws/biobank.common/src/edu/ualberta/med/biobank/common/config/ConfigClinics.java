@@ -12,11 +12,11 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class ConfigClinics {
 
-    protected static Map<String, ClinicWrapper> clinicsMap = null;
+    protected Map<String, ClinicWrapper> clinicsMap = null;
 
-    protected static Map<String, ContactWrapper> contactsMap = null;
+    protected Map<String, ContactWrapper> contactsMap = null;
 
-    protected static ClinicWrapper addClinic(SiteWrapper site, String name,
+    protected ClinicWrapper addClinic(SiteWrapper site, String name,
         String nameShort, boolean sendsShipments, String activityStatusName,
         String comment, String street1, String street2, String city,
         String province, String postalCode) throws Exception {
@@ -39,7 +39,7 @@ public class ConfigClinics {
         return clinic;
     }
 
-    public static ClinicWrapper getClinic(String name) throws Exception {
+    public ClinicWrapper getClinic(String name) throws Exception {
         ClinicWrapper clinic = clinicsMap.get(name);
         if (clinic == null) {
             throw new Exception("clinic with name \"" + name
@@ -48,7 +48,7 @@ public class ConfigClinics {
         return clinic;
     }
 
-    public static List<String> getClinicNames() throws Exception {
+    public List<String> getClinicNames() throws Exception {
         if (clinicsMap == null) {
             throw new Exception("clinics have not been added");
         }
@@ -56,9 +56,9 @@ public class ConfigClinics {
             .keySet()));
     }
 
-    protected static ContactWrapper addContact(String clinicNameShort,
-        String name, String title, String officeNumber, String faxNumber,
-        String emailAddress) throws Exception {
+    protected ContactWrapper addContact(String clinicNameShort, String name,
+        String title, String officeNumber, String faxNumber, String emailAddress)
+        throws Exception {
         ClinicWrapper clinic = clinicsMap.get(clinicNameShort);
 
         if (clinic == null) {
@@ -79,7 +79,7 @@ public class ConfigClinics {
         return contact;
     }
 
-    public static ContactWrapper getContact(String name) throws Exception {
+    public ContactWrapper getContact(String name) throws Exception {
         ContactWrapper contact = contactsMap.get(name);
         if (contact == null) {
             throw new Exception("contact with name \"" + name
@@ -88,7 +88,7 @@ public class ConfigClinics {
         return contact;
     }
 
-    public static List<String> getContactNames() throws Exception {
+    public List<String> getContactNames() throws Exception {
         if (contactsMap == null) {
             throw new Exception("contacts have not been added");
         }

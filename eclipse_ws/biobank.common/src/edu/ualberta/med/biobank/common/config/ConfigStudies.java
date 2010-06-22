@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.config.calgary.CalgaryClinics;
 import edu.ualberta.med.biobank.common.config.calgary.CalgarySite;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -17,11 +16,20 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ConfigStudies {
 
-    protected static Map<String, StudyWrapper> studiesMap = null;
+    protected Map<String, StudyWrapper> studiesMap = null;
 
-    protected static Map<String, SourceVesselWrapper> sourceVesselMap = null;
+    protected Map<String, SourceVesselWrapper> sourceVesselMap = null;
 
-    protected static StudyWrapper addStudy(SiteWrapper site, String name,
+    protected ConfigClinics configClinics;
+
+    protected ConfigStudies(ConfigClinics configClinics) throws Exception {
+        if (configClinics == null) {
+            throw new Exception("configClinics is null");
+        }
+        this.configClinics = configClinics;
+    }
+
+    protected StudyWrapper addStudy(SiteWrapper site, String name,
         String nameShort, String activityStatusName, String comment)
         throws Exception {
         StudyWrapper study = new StudyWrapper(site.getAppService());
@@ -37,7 +45,7 @@ public class ConfigStudies {
         return study;
     }
 
-    public static StudyWrapper getStudy(String name) throws Exception {
+    public StudyWrapper getStudy(String name) throws Exception {
         StudyWrapper study = studiesMap.get(name);
         if (study == null) {
             throw new Exception("study with name \"" + name
@@ -46,15 +54,15 @@ public class ConfigStudies {
         return study;
     }
 
-    public static List<String> getStudyNames() throws Exception {
+    public List<String> getStudyNames() throws Exception {
         if (studiesMap == null) {
             throw new Exception("contacts have not been added");
         }
         return new ArrayList<String>(studiesMap.keySet());
     }
 
-    protected static void addStudySourceVessel(String studyNameShort,
-        String name) throws Exception {
+    protected void addStudySourceVessel(String studyNameShort, String name)
+        throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
         SourceVesselWrapper ss = sourceVesselMap.get(name);
         if (ss == null) {
@@ -69,7 +77,7 @@ public class ConfigStudies {
         study.reload();
     }
 
-    protected static void addSampleStorage(String studyNameShort,
+    protected void addSampleStorage(String studyNameShort,
         String sampleTypeName, String quantity, String volume,
         String activityStatusName) throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
@@ -97,7 +105,7 @@ public class ConfigStudies {
 
     }
 
-    protected static void addPvAttr(SiteWrapper site, String studyNameShort,
+    protected void addPvAttr(SiteWrapper site, String studyNameShort,
         String label, String type, String permissible) throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
         if ((permissible != null) && (permissible.length() > 0)) {
@@ -121,14 +129,17 @@ public class ConfigStudies {
         }
     }
 
-    protected static void addPvAttr(SiteWrapper site, String studyNameShort,
+    protected void addPvAttr(SiteWrapper site, String studyNameShort,
         String label, String type) throws Exception {
         addPvAttr(site, studyNameShort, label, type, null);
     }
 
-    protected static void addContact(String studyNameShort, String contactName,
+    protected void addContact(String studyNameShort, String contactName,
         String clinicNameShort) throws Exception {
-        ContactWrapper contact = CalgaryClinics.getClinic(clinicNameShort)
+        if (configClinics == null) {
+            throw new Exception("configClinics is null");
+        }
+        ContactWrapper contact = configClinics.getClinic(clinicNameShort)
             .getContact(contactName);
         if (contact == null) {
             throw new Exception("clinic " + clinicNameShort
