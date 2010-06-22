@@ -131,6 +131,7 @@ public class CbsrClinics extends ConfigClinics {
             "403-816-1501 work cell",
             "sharon.gulewich@albertahealthservices.ca");
         addContact("CL2-Children Hosp", "unknown", null, null, null, null);
+
         addContact("ED1-UofA", "Bonny Granfield", null, "780-719-6279", null,
             "bgranfield@biosample.ca");
         addContact("ED1-UofA", "Candace Dando", "Research Nurse",
@@ -154,19 +155,18 @@ public class CbsrClinics extends ConfigClinics {
         addContact("ED1-UofA", "Kathy Littlewood", "Research Coordinator",
             "780-407-7448", "780-407-3324",
             "kathy.littlewood@albertahealthservices.ca");
-        addContact("ED1-UofA", "Erin Rezanoff", "Study Coordinator",
-            "780-407-7448", "780-407-3324",
-            "erin.rezanoff@albertahealthservices.ca");
         addContact("ED1-UofA", "Marleen Irwin", "Research Nurse",
             "780-221-1503", "780-431-3031 (pager)", "mirwin@ualberta.ca");
         addContact("ED1-UofA", "Melanie Peters", null, "780-407-6588", null,
             "melaniepeters@cha.ab.ca");
-        addContact("ED1-UofA", "Kathy Littlewood", "Research Coordinator",
-            "780-407-7448", "780-407-3324",
-            "kathy.littlewood@albertahealthservices.ca");
+        addContact("ED1-UofA", "Rae Foshaug", "Technician", "780-492-2925",
+            null, "raef@ualberta.ca");
         addContact("ED1-UofA", "Sheri Cholin", "Research Coordinator",
             "780-407-7448", "780-407-3324",
             "sheri.cholin@albertahealtherives.ca");
+        addContact("ED1-UofA", "Wanda MacDonald", "Research Coordinator",
+            "780-248-1037", "", "wmacdona@ualberta.ca");
+
         addContact("ED1-UofA", "Sue Szigety", null, "780-407-7868", null,
             "sszigety@ualberta.ca");
         addContact("ED1-UofA", "Wanda MacDonald", "Research Coordinator",
