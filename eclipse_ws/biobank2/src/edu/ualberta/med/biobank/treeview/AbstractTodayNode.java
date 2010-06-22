@@ -86,7 +86,9 @@ public abstract class AbstractTodayNode extends AdapterBase {
                         child.getChildren());
                     for (AdapterBase subChild : subChildren) {
                         subChild.getModelObject().reload();
-                        if (!todayElements.contains(subChild.getModelObject())) {
+                        ModelWrapper<?> modelObject = subChild.getModelObject();
+                        if (!todayElements.contains(modelObject)
+                            || !isParentTo(child.getModelObject(), modelObject)) {
                             subChild.getParent().removeChild(subChild);
                         }
                     }
@@ -120,6 +122,9 @@ public abstract class AbstractTodayNode extends AdapterBase {
             }
         }
     }
+
+    protected abstract boolean isParentTo(ModelWrapper<?> parent,
+        ModelWrapper<?> child);
 
     protected abstract List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException;

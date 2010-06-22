@@ -36,4 +36,12 @@ public class ShipmentTodayNode extends AbstractTodayNode {
                 .getCurrentSite());
 
     }
+
+    @Override
+    protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
+        if (child instanceof ShipmentWrapper) {
+            return parent.equals(((ShipmentWrapper) child).getClinic());
+        }
+        return false;
+    }
 }
