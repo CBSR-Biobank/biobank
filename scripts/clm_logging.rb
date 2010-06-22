@@ -55,7 +55,7 @@ LOG_QUERY_END
 
       @dbh.query("insert into log (username,date,action,patient_number,inventory_id) values ('#{username}','#{date}','insert','#{pnumber}','#{inventory_id}')");
       count = count +1
-      #print "  added insert for #{inventory_id}\n"
+      print "  added insert for #{inventory_id}\n"
 
     end
 
