@@ -22,6 +22,8 @@ join patient_visit on patient_visit.id=aliquot.patient_visit_id
 join patient on patient.id=patient_visit.patient_id
 where attribute='inventoryId'
 and FROM_UNIXTIME(created_on/1000) >= "2010-05-17"
+and aliquot.inventory_id like binary current_value
+and operation='INSERT'
 CLM_QUERY_END
 
   LOG_QUERY = <<LOG_QUERY_END
