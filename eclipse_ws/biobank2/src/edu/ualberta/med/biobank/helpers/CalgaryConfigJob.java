@@ -18,11 +18,10 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainers;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.common.config.calgary.CalgaryClinics;
+import edu.ualberta.med.biobank.common.config.calgary.CalgaryContainerTypes;
+import edu.ualberta.med.biobank.common.config.calgary.CalgarySite;
+import edu.ualberta.med.biobank.common.config.calgary.CalgaryStudies;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -31,25 +30,23 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
  * Accessed via the "**Debug**" main menu item. Invoked by the
- * CbsrConfigurationHandler to populate the database with CBSR configuration and
- * sample objects.
+ * CalgaryConfigurationHandler to populate the database with Calgary
+ * configuration and sample objects.
  */
-public class CbsrConfigJob {
+public class CalgaryConfigJob {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(CbsrConfigJob.class.getName());
+        .getLogger(CalgaryConfigJob.class.getName());
 
     protected WritableApplicationService appService;
 
-    protected SiteWrapper cbsrSite;
+    protected SiteWrapper calgarySite;
 
     protected Random r = new Random();
 
     protected List<SampleTypeWrapper> sampleTypesList;
 
     protected List<ShippingMethodWrapper> shippingCompaniesList;
-
-    protected CbsrContainerTypes containerTypes = null;
 
     // methods that add objects to database, plus a message to display in job
     // dialog
@@ -58,23 +55,22 @@ public class CbsrConfigJob {
         Set<String> aSet = new LinkedHashSet<String>();
 
         // insert methods are listed here and order is important
-        aSet.add("Removing previous CBSR configuration");
+        aSet.add("Removing previous Calgary configuration");
         aSet.add("Adding sites");
         aSet.add("Adding clinics");
         aSet.add("Adding studies");
         aSet.add("Adding container types");
-        aSet.add("Adding containers");
         defaultSubTasks = Collections.unmodifiableSet(aSet);
     };
 
-    public CbsrConfigJob() {
+    public CalgaryConfigJob() {
         this(defaultSubTasks);
     }
 
     /*
      * Sub classes can invoke this method with their now methodMap.
      */
-    protected CbsrConfigJob(final Set<String> subTasks) {
+    protected CalgaryConfigJob(final Set<String> subTasks) {
         appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
@@ -88,7 +84,7 @@ public class CbsrConfigJob {
             return;
         }
 
-        Job job = new Job("CBSR Configuration") {
+        Job job = new Job("Calgary Configuration") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
@@ -152,24 +148,20 @@ public class CbsrConfigJob {
     protected void performSubTask(int subTaskNumber) throws Exception {
         switch (subTaskNumber) {
         case 0:
-            CbsrSite.deleteConfiguration(appService);
+            CalgarySite.deleteConfiguration(appService);
             break;
         case 1:
-            cbsrSite = CbsrSite.addSite(appService);
+            calgarySite = CalgarySite.addSite(appService);
             break;
         case 2:
-            CbsrClinics.createClinics(cbsrSite);
+            CalgaryClinics.createClinics(calgarySite);
             break;
         case 3:
-            CbsrStudies.createStudies(cbsrSite);
+            CalgaryStudies.createStudies(calgarySite);
             break;
         case 4:
-            containerTypes = new CbsrContainerTypes();
-            containerTypes.createContainerTypes(cbsrSite);
-            break;
-        case 5:
-            CbsrContainers containers = new CbsrContainers();
-            containers.createContainers(cbsrSite, containerTypes);
+            CalgaryContainerTypes configCT = new CalgaryContainerTypes();
+            configCT.createContainerTypes(calgarySite);
             break;
         default:
             throw new Exception("sub task number " + subTaskNumber

@@ -26,11 +26,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.ualberta.med.biobank.common.ServiceConnection;
-import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
-import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrClinics;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainerTypes;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainers;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -292,10 +292,12 @@ public class Importer {
         CbsrStudies.createStudies(cbsrSite);
 
         logger.info("creating container types...");
-        CbsrContainerTypes.createContainerTypes(cbsrSite);
+        CbsrContainerTypes configCT = new CbsrContainerTypes();
+        configCT.createContainerTypes(cbsrSite);
 
         logger.info("creating containers...");
-        CbsrContainers.createContainers(cbsrSite);
+        CbsrContainers configContainers = new CbsrContainers();
+        configContainers.createContainers(cbsrSite, configCT);
     }
 
     private static void doImport() throws Exception {

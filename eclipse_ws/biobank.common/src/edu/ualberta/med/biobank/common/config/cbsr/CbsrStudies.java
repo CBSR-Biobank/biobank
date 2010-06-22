@@ -1,17 +1,11 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config.cbsr;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import edu.ualberta.med.biobank.common.config.ConfigStudies;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 /**
@@ -39,11 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
  * clinic.id=contact.clinic_id left join study_contact on contact.id=contact_id
  * join study on study.id=study_contact.study_id order by study.name_short
  */
-public class CbsrStudies {
-
-    private static Map<String, StudyWrapper> studiesMap = null;
-
-    private static Map<String, SourceVesselWrapper> sourceVesselMap = null;
+public class CbsrStudies extends ConfigStudies {
 
     public static void createStudies(SiteWrapper site) throws Exception {
         studiesMap = new HashMap<String, StudyWrapper>();
@@ -398,125 +388,6 @@ public class CbsrStudies {
         addContact("TCKS", "Sharon Gulewich", "CL1-Sunridge");
         addContact("TCKS", "Sue Szigety", "ED1-UofA");
         addContact("VAS", "Dawn Opgenorth", "ED1-UofA");
-    }
-
-    private static StudyWrapper addStudy(SiteWrapper site, String name,
-        String nameShort, String activityStatusName, String comment)
-        throws Exception {
-        StudyWrapper study = new StudyWrapper(site.getAppService());
-        study.setSite(site);
-        study.setName(name);
-        study.setNameShort(nameShort);
-        study.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
-        study.setComment(comment);
-        study.persist();
-        study.reload();
-        studiesMap.put(nameShort, study);
-        return study;
-    }
-
-    public static StudyWrapper getStudy(String name) throws Exception {
-        StudyWrapper study = studiesMap.get(name);
-        if (study == null) {
-            throw new Exception("study with name \"" + name
-                + "\" does not exist");
-        }
-        return study;
-    }
-
-    public static List<String> getStudyNames() throws Exception {
-        if (studiesMap == null) {
-            throw new Exception("contacts have not been added");
-        }
-        return new ArrayList<String>(studiesMap.keySet());
-    }
-
-    private static void addStudySourceVessel(String studyNameShort, String name)
-        throws Exception {
-        StudyWrapper study = getStudy(studyNameShort);
-        SourceVesselWrapper ss = sourceVesselMap.get(name);
-        if (ss == null) {
-            throw new Exception("invalid source vessel name: " + name);
-        }
-        StudySourceVesselWrapper studySourceVessel = new StudySourceVesselWrapper(
-            ss.getAppService());
-        studySourceVessel.setStudy(study);
-        studySourceVessel.setSourceVessel(ss);
-        study.addStudySourceVessels(Arrays.asList(studySourceVessel));
-        study.persist();
-        study.reload();
-    }
-
-    private static void addSampleStorage(String studyNameShort,
-        String sampleTypeName, String quantity, String volume,
-        String activityStatusName) throws Exception {
-        StudyWrapper study = getStudy(studyNameShort);
-
-        SampleStorageWrapper ss = new SampleStorageWrapper(study
-            .getAppService());
-        ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
-        if (quantity != null) {
-            ss.setQuantity(Integer.valueOf(quantity));
-        } else {
-            ss.setQuantity(null);
-        }
-
-        if (volume != null) {
-            ss.setVolume(Double.valueOf(volume));
-        } else {
-            ss.setVolume(null);
-        }
-
-        ss.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
-
-        study.addSampleStorage(Arrays.asList(ss));
-        study.persist();
-        study.reload();
-
-    }
-
-    private static void addPvAttr(SiteWrapper site, String studyNameShort,
-        String label, String type, String permissible) throws Exception {
-        StudyWrapper study = getStudy(studyNameShort);
-        if ((permissible != null) && (permissible.length() > 0)) {
-            study.setStudyPvAttr(label, type, permissible.split(";"));
-        } else {
-            study.setStudyPvAttr(label, type);
-        }
-        study.setStudyPvAttrActivityStatus(label, ActivityStatusWrapper
-            .getActivityStatus(study.getAppService(),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING));
-        study.persist();
-        study.reload();
-
-        List<String> sitePvAttrs = SiteWrapper.getPvAttrTypeNames(site
-            .getAppService());
-        if (!sitePvAttrs.contains(label)) {
-            // add this pv attr to the site
-            site.setSitePvAttr(label, type);
-            site.persist();
-            site.reload();
-        }
-    }
-
-    private static void addPvAttr(SiteWrapper site, String studyNameShort,
-        String label, String type) throws Exception {
-        addPvAttr(site, studyNameShort, label, type, null);
-    }
-
-    private static void addContact(String studyNameShort, String contactName,
-        String clinicNameShort) throws Exception {
-        ContactWrapper contact = CbsrClinics.getClinic(clinicNameShort)
-            .getContact(contactName);
-        if (contact == null) {
-            throw new Exception("clinic " + clinicNameShort
-                + " does not have a contact with name " + contactName);
-        }
-        StudyWrapper study = getStudy(studyNameShort);
-
-        study.addContacts(Arrays.asList(contact));
-        study.persist();
-        study.reload();
     }
 
 }

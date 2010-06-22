@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -21,43 +21,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CbsrSite {
+public class ConfigSite {
 
     public static WritableApplicationService appService;
 
-    public static SiteWrapper cbsrSite = null;
+    public static SiteWrapper site = null;
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
-
-    public static void createConfiguration(WritableApplicationService appServ)
-        throws Exception {
-        appService = appServ;
-        addSite(appService);
-        CbsrClinics.createClinics(cbsrSite);
-        CbsrStudies.createStudies(cbsrSite);
-        CbsrContainerTypes.createContainerTypes(cbsrSite);
-        CbsrContainers.createContainers(cbsrSite);
-    }
 
     public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
         getSampleTypeMap(appService);
-        cbsrSite = new SiteWrapper(appService);
-        cbsrSite.setName("Canadian BioSample Repository");
-        cbsrSite.setNameShort("CBSR");
-        cbsrSite.setActivityStatus(getActiveActivityStatus());
-        cbsrSite.setStreet1("471 Medical Sciences Building");
-        cbsrSite.setStreet2("University of Alberta");
-        cbsrSite.setCity("Edmonton");
-        cbsrSite.setProvince("Alberta");
-        cbsrSite.setPostalCode("T6G2H7");
-        cbsrSite.persist();
-        cbsrSite.reload();
-        return cbsrSite;
+        site = new SiteWrapper(appService);
+        site.setName("Canadian BioSample Repository");
+        site.setNameShort("CBSR");
+        site.setActivityStatus(getActiveActivityStatus());
+        site.setStreet1("471 Medical Sciences Building");
+        site.setStreet2("University of Alberta");
+        site.setCity("Edmonton");
+        site.setProvince("Alberta");
+        site.setPostalCode("T6G2H7");
+        site.persist();
+        site.reload();
+        return site;
     }
 
     public static SiteWrapper getSite() {
-        return cbsrSite;
+        return site;
     }
 
     public static void getSampleTypeMap(WritableApplicationService appService)

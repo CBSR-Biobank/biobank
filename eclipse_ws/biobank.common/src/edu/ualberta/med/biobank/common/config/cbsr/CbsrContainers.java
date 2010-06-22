@@ -1,13 +1,18 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config.cbsr;
 
+import edu.ualberta.med.biobank.common.config.ConfigContainerTypes;
+import edu.ualberta.med.biobank.common.config.ConfigContainers;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.util.RowColPos;
 
-public class CbsrContainers {
+public class CbsrContainers extends ConfigContainers {
 
-    public static void createContainers(SiteWrapper site) throws Exception {
+    public void createContainers(SiteWrapper site,
+        ConfigContainerTypes containerTypes) throws Exception {
+        this.containerTypes = containerTypes;
+
         createFreezer01(site);
         createFreezer02(site);
         createFreezer03(site);
@@ -17,14 +22,14 @@ public class CbsrContainers {
         createCabinet02(site);
     }
 
-    private static void createFreezer01(SiteWrapper site) throws Exception {
+    private void createFreezer01(SiteWrapper site) throws Exception {
         ContainerWrapper freezer01 = addTopLevelContainer(site, "01",
-            CbsrContainerTypes.getContainerType("Freezer 3x10"));
+            containerTypes.getContainerType("Freezer 3x10"));
 
         ContainerWrapper hotel;
-        ContainerTypeWrapper hotelType = CbsrContainerTypes
+        ContainerTypeWrapper hotelType = containerTypes
             .getContainerType("Hotel 17");
-        ContainerTypeWrapper palletType = CbsrContainerTypes
+        ContainerTypeWrapper palletType = containerTypes
             .getContainerType("Box 81");
 
         for (int row = 0; row < 3; ++row) {
@@ -38,14 +43,14 @@ public class CbsrContainers {
         }
     }
 
-    private static void createFreezer02(SiteWrapper site) throws Exception {
+    private void createFreezer02(SiteWrapper site) throws Exception {
         ContainerWrapper freezer02 = addTopLevelContainer(site, "02",
-            CbsrContainerTypes.getContainerType("Freezer 4x12"));
+            containerTypes.getContainerType("Freezer 4x12"));
 
         ContainerWrapper hotel;
-        ContainerTypeWrapper hotelType = CbsrContainerTypes
+        ContainerTypeWrapper hotelType = containerTypes
             .getContainerType("Hotel 18");
-        ContainerTypeWrapper palletType = CbsrContainerTypes
+        ContainerTypeWrapper palletType = containerTypes
             .getContainerType("Box 81");
 
         for (int row = 0; row < 4; ++row) {
@@ -59,15 +64,15 @@ public class CbsrContainers {
         }
     }
 
-    private static void createFreezer03(SiteWrapper site) throws Exception {
+    private void createFreezer03(SiteWrapper site) throws Exception {
         ContainerWrapper hotel;
         ContainerWrapper freezer03 = addTopLevelContainer(site, "03",
-            CbsrContainerTypes.getContainerType("Freezer 5x9"));
-        ContainerTypeWrapper hotel13Type = CbsrContainerTypes
+            containerTypes.getContainerType("Freezer 5x9"));
+        ContainerTypeWrapper hotel13Type = containerTypes
             .getContainerType("Hotel 13");
-        ContainerTypeWrapper hotel19Type = CbsrContainerTypes
+        ContainerTypeWrapper hotel19Type = containerTypes
             .getContainerType("Hotel 19");
-        ContainerTypeWrapper palletType = CbsrContainerTypes
+        ContainerTypeWrapper palletType = containerTypes
             .getContainerType("Pallet 96");
 
         ContainerTypeWrapper[] hotelTypes = new ContainerTypeWrapper[] {
@@ -95,15 +100,15 @@ public class CbsrContainers {
         }
     }
 
-    private static void createFreezer05(SiteWrapper site) throws Exception {
+    private void createFreezer05(SiteWrapper site) throws Exception {
         ContainerWrapper hotel;
         ContainerWrapper freezer05 = addTopLevelContainer(site, "05",
-            CbsrContainerTypes.getContainerType("Freezer 4x17"));
-        ContainerTypeWrapper h13Type = CbsrContainerTypes
+            containerTypes.getContainerType("Freezer 4x17"));
+        ContainerTypeWrapper h13Type = containerTypes
             .getContainerType("Hotel 13");
-        ContainerTypeWrapper h19Type = CbsrContainerTypes
+        ContainerTypeWrapper h19Type = containerTypes
             .getContainerType("Hotel 19");
-        ContainerTypeWrapper palletType = CbsrContainerTypes
+        ContainerTypeWrapper palletType = containerTypes
             .getContainerType("Pallet 96");
 
         ContainerTypeWrapper[] hotelTypes = new ContainerTypeWrapper[] {
@@ -162,20 +167,19 @@ public class CbsrContainers {
         }
     }
 
-    private static void createSentSamplesFreezer(SiteWrapper site)
-        throws Exception {
+    private void createSentSamplesFreezer(SiteWrapper site) throws Exception {
         ContainerWrapper hotel;
         ContainerWrapper freezerSS = addTopLevelContainer(site, "SS",
-            CbsrContainerTypes.getContainerType("Freezer 4x6"));
+            containerTypes.getContainerType("Freezer 4x6"));
         freezerSS
             .setComment("This freezer holds samples that have been sent out.");
         freezerSS.persist();
         freezerSS.reload();
-        ContainerTypeWrapper h13Type = CbsrContainerTypes
+        ContainerTypeWrapper h13Type = containerTypes
             .getContainerType("Hotel 13");
-        ContainerTypeWrapper h19Type = CbsrContainerTypes
+        ContainerTypeWrapper h19Type = containerTypes
             .getContainerType("Hotel 19");
-        ContainerTypeWrapper palletType = CbsrContainerTypes
+        ContainerTypeWrapper palletType = containerTypes
             .getContainerType("Pallet 96");
 
         ContainerTypeWrapper[] hotelTypes = new ContainerTypeWrapper[] {
@@ -195,14 +199,14 @@ public class CbsrContainers {
         }
     }
 
-    private static void createCabinet01(SiteWrapper site) throws Exception {
-        ContainerTypeWrapper ftaBinType = CbsrContainerTypes
+    private void createCabinet01(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper ftaBinType = containerTypes
             .getContainerType("FTA Bin");
-        ContainerTypeWrapper hairBinType = CbsrContainerTypes
+        ContainerTypeWrapper hairBinType = containerTypes
             .getContainerType("Hair Bin");
-        ContainerTypeWrapper drawerType = CbsrContainerTypes
+        ContainerTypeWrapper drawerType = containerTypes
             .getContainerType("Drawer 36");
-        ContainerTypeWrapper cabinetType = CbsrContainerTypes
+        ContainerTypeWrapper cabinetType = containerTypes
             .getContainerType("Cabinet 4 drawer");
         ContainerWrapper cabinet = addTopLevelContainer(site, "01", cabinetType);
 
@@ -283,14 +287,14 @@ public class CbsrContainers {
         }
     }
 
-    private static void createCabinet02(SiteWrapper site) throws Exception {
-        ContainerTypeWrapper ftaBinLoerschType = CbsrContainerTypes
+    private void createCabinet02(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper ftaBinLoerschType = containerTypes
             .getContainerType("FTA Bin Loersch");
-        ContainerTypeWrapper hairBinType = CbsrContainerTypes
+        ContainerTypeWrapper hairBinType = containerTypes
             .getContainerType("Hair Bin");
-        ContainerTypeWrapper drawerType = CbsrContainerTypes
+        ContainerTypeWrapper drawerType = containerTypes
             .getContainerType("Drawer 36");
-        ContainerTypeWrapper cabinetType = CbsrContainerTypes
+        ContainerTypeWrapper cabinetType = containerTypes
             .getContainerType("Cabinet 4 drawer");
         ContainerWrapper cabinet = addTopLevelContainer(site, "02", cabinetType);
 
