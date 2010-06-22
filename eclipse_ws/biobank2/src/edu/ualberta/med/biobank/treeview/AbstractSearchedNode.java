@@ -16,12 +16,18 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
+import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 
 public abstract class AbstractSearchedNode extends AdapterBase {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractSearchedNode.class.getName());
+
+    private List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
 
     public AbstractSearchedNode(AdapterBase parent, int id) {
         super(parent, id, "Searched", true, false);
@@ -34,6 +40,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                searchedObjects.clear();
                 removeAll();
             }
         });
@@ -44,13 +51,40 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             try {
                 for (AdapterBase child : getChildren()) {
-                    if (child.getModelObject() != null) {
-                        child.getModelObject().reload();
-                    }
+                    ModelWrapper<?> childWrapper = child.getModelObject();
+                    childWrapper.reload();
                     List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
                         child.getChildren());
                     for (AdapterBase subChild : subChildren) {
-                        subChild.getModelObject().reload();
+                        ModelWrapper<?> subChildWrapper = subChild
+                            .getModelObject();
+                        subChildWrapper.reload();
+                        if (!searchedObjects.contains(subChildWrapper)
+                            || !isParentTo(childWrapper, subChildWrapper)) {
+                            subChild.getParent().removeChild(subChild);
+                        }
+                    }
+                }
+
+                // add searched objects is not yet there
+                for (ModelWrapper<?> wrapper : searchedObjects) {
+                    assert wrapper instanceof PatientWrapper
+                        || wrapper instanceof ShipmentWrapper;
+                    if (wrapper instanceof PatientWrapper) {
+                        PatientAdministrationView.getCurrent().addToNode(this,
+                            wrapper);
+                    } else if (wrapper instanceof ShipmentWrapper) {
+                        ShipmentAdministrationView.getCurrent().addToNode(this,
+                            wrapper);
+                    }
+                }
+
+                // remove sub children without any children
+                List<AdapterBase> children = new ArrayList<AdapterBase>(
+                    getChildren());
+                for (AdapterBase child : children) {
+                    if (child.getChildren().size() == 0) {
+                        removeChild(child);
                     }
                 }
             } catch (final RemoteAccessException exp) {
@@ -101,5 +135,12 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     public AdapterBase accept(NodeSearchVisitor visitor) {
         return visitor.visit(this);
     }
+
+    public void addSearchObject(ModelWrapper<?> searchedObject) {
+        searchedObjects.add(searchedObject);
+    }
+
+    protected abstract boolean isParentTo(ModelWrapper<?> parent,
+        ModelWrapper<?> child);
 
 }

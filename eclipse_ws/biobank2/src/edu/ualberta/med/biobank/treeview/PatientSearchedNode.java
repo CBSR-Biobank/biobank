@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class PatientSearchedNode extends AbstractSearchedNode {
@@ -22,4 +23,11 @@ public class PatientSearchedNode extends AbstractSearchedNode {
         return new SiteAdapter(this, null);
     }
 
+    @Override
+    protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
+        if (child instanceof PatientWrapper) {
+            return parent.equals(((PatientWrapper) child).getStudy());
+        }
+        return false;
+    }
 }
