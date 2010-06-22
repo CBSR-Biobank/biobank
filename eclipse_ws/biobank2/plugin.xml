@@ -291,11 +291,11 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
             commandId="edu.ualberta.med.biobank.commands.confirm">
-         <enabledWhen>
+         <activeWhen>
             <reference
                   definitionId="biobank2.confirmEnabled">
             </reference>
-         </enabledWhen>
+         </activeWhen>
       </handler>   
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
