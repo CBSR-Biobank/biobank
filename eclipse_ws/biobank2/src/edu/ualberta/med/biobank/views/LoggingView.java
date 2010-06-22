@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -457,23 +458,6 @@ public class LoggingView extends ViewPart {
         }
     }
 
-    private static String[] arrayListStringToStringList(
-        List<String> listArrayString) {
-
-        if (listArrayString == null)
-            return null;
-
-        int listArraySize = listArrayString.size();
-
-        String listString[] = new String[listArraySize + 1];
-        listString[0] = "ALL";
-        for (int i = 1; i <= listArraySize; i++) {
-            listString[i] = listArrayString.get(i - 1);
-            listString[i] = listString[i].equals("") ? "NONE" : listString[i];
-        }
-        return listString;
-    }
-
     private String[] loadComboList(ComboListType possibleList) {
         try {
             List<String> arrayList = null;
@@ -498,7 +482,15 @@ public class LoggingView extends ViewPart {
                     .getAppService());
                 break;
             }
-            return arrayListStringToStringList(arrayList);
+            arrayList.remove(null);
+            List<String> result = new ArrayList<String>();
+            result.add("ALL");
+            result.add("NONE");
+            for (String item : arrayList) {
+                if (item != null)
+                    result.add(item);
+            }
+            return result.toArray(new String[0]);
 
         } catch (ApplicationException ex) {
             BioBankPlugin.openAsyncError("Error", "There was an error: \n"
