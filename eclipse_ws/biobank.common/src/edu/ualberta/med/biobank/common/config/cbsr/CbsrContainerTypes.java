@@ -12,6 +12,7 @@ public class CbsrContainerTypes extends ConfigContainerTypes {
     public void createContainerTypes(SiteWrapper site) throws Exception {
         createFreezerTypes(site);
         createCabinetTypes(site);
+        createDewarTypes(site);
     }
 
     private void createFreezerTypes(SiteWrapper site) throws Exception {
@@ -92,5 +93,25 @@ public class CbsrContainerTypes extends ConfigContainerTypes {
         addContainerType(site, "Cabinet 4 drawer", "Cabinet 4", null,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 4, 1, Arrays
                 .asList(new ContainerTypeWrapper[] { drawer36 }));
+    }
+
+    private void createDewarTypes(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper dewarAA = addContainerType(site,
+            "Dewar Lab 40 AA", "DW40 AA", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 9, null);
+        ContainerTypeWrapper dewarBB = addContainerType(site,
+            "Dewar Lab 40 BB", "DW40 BB", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
+        ContainerTypeWrapper dewarCC = addContainerType(site,
+            "Dewar Lab 40 CC", "DW40 CC", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
+        ContainerTypeWrapper dewarDD = addContainerType(site,
+            "Dewar Lab 40 DD", "DW40 DD", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
+
+        addContainerType(site, "Dewar Lab 40", "DW40", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 4, 2, 2, Arrays
+                .asList(new ContainerTypeWrapper[] { dewarAA, dewarBB, dewarCC,
+                    dewarDD }));
     }
 }

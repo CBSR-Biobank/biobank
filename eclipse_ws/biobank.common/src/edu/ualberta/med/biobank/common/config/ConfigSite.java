@@ -29,23 +29,6 @@ public class ConfigSite {
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
-    public static SiteWrapper addSite(WritableApplicationService appService)
-        throws Exception {
-        getSampleTypeMap(appService);
-        site = new SiteWrapper(appService);
-        site.setName("Canadian BioSample Repository");
-        site.setNameShort("CBSR");
-        site.setActivityStatus(getActiveActivityStatus());
-        site.setStreet1("471 Medical Sciences Building");
-        site.setStreet2("University of Alberta");
-        site.setCity("Edmonton");
-        site.setProvince("Alberta");
-        site.setPostalCode("T6G2H7");
-        site.persist();
-        site.reload();
-        return site;
-    }
-
     public static SiteWrapper getSite() {
         return site;
     }
@@ -87,21 +70,8 @@ public class ConfigSite {
         return ActivityStatusWrapper.getActivityStatus(appService, "Active");
     }
 
-    public static void deleteConfiguration(WritableApplicationService appServ)
+    protected static void siteDeleteSubObjects(SiteWrapper site)
         throws Exception {
-        appService = appServ;
-
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-        if (sites == null)
-            return;
-        for (SiteWrapper site : sites) {
-            if (site.getName().equals("Canadian BioSample Repository")) {
-                siteDeleteSubObjects(site);
-            }
-        }
-    }
-
-    private static void siteDeleteSubObjects(SiteWrapper site) throws Exception {
         List<StudyWrapper> studies = site.getStudyCollection(false);
         if (studies != null) {
             for (StudyWrapper study : studies) {

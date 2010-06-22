@@ -50,7 +50,7 @@ public class ConfigContainerTypes {
 
         "LH PFP 200", "UrineC900", "PlasmaE800", "P100 500", "PlasmaL500",
         "LH PFP 500", "PlasmaE200", "DNA L 1000", "SerumG500", "PlasmaL200",
-        "DNA E 1000", "PlasmaE500", "UrineSA900"
+        "DNA E 1000", "PlasmaE500", "UrineSA900", "PlasmaE250", "UrineSA700"
 
     };
 

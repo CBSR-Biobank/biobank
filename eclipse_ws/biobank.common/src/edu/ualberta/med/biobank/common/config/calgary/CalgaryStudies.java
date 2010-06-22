@@ -47,6 +47,14 @@ public class CalgaryStudies extends ConfigStudies {
         addStudy(site, "Heart failure Etiology and Analysis Research Team",
             "HEART", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
 
+        addStudySourceVessel("HEART", "10ml green top Lithium Heparin tube");
+        addStudySourceVessel("HEART", "10mL lavender top EDTA tube");
+        addStudySourceVessel("HEART", "10ml orange top PAXgene tube");
+        addStudySourceVessel("HEART", "5mL gold top serum tube");
+        addStudySourceVessel("HEART", "6mL lavender top EDTA tube");
+        addStudySourceVessel("HEART", "8.5ml P100 orange top tube");
+        addStudySourceVessel("HEART", "urine cup");
+
         addSampleStorage("HEART", "DNA E 1000", "5", "1", "Active");
         addSampleStorage("HEART", "DNA L 1000", "5", "1", "Active");
         addSampleStorage("HEART", "LH PFP 200", "10", "0.2", "Active");
@@ -61,7 +69,7 @@ public class CalgaryStudies extends ConfigStudies {
         addSampleStorage("HEART", "UrineC900", "6", "0.9", "Active");
         addSampleStorage("HEART", "UrineSA900", "12", "0.9", "Active");
 
-        addContact("HEART", "Marleen Irwin", "ED1-UofA");
+        addContact("HEART", "Morna Brown", "CL1-Foothills");
     }
 
 }
