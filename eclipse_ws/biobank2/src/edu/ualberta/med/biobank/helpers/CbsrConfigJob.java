@@ -165,13 +165,13 @@ public class CbsrConfigJob {
             configClinics = new CbsrClinics(cbsrSite);
             break;
         case 3:
-            configStudies = new CbsrStudies(cbsrSite, configClinics);
+            configStudies = new CbsrStudies(cbsrSite);
             break;
         case 4:
             containerTypes = new CbsrContainerTypes(cbsrSite);
             break;
         case 5:
-            new CbsrContainers(cbsrSite, containerTypes);
+            new CbsrContainers(cbsrSite);
             break;
         default:
             throw new Exception("sub task number " + subTaskNumber

@@ -12,14 +12,20 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class ConfigClinics {
 
+    protected SiteWrapper site;
+
     protected Map<String, ClinicWrapper> clinicsMap = null;
 
     protected Map<String, ContactWrapper> contactsMap = null;
 
-    protected ClinicWrapper addClinic(SiteWrapper site, String name,
-        String nameShort, boolean sendsShipments, String activityStatusName,
-        String comment, String street1, String street2, String city,
-        String province, String postalCode) throws Exception {
+    protected ConfigClinics(SiteWrapper site) {
+        this.site = site;
+    }
+
+    protected ClinicWrapper addClinic(String name, String nameShort,
+        boolean sendsShipments, String activityStatusName, String comment,
+        String street1, String street2, String city, String province,
+        String postalCode) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(site.getAppService());
         clinic.setSite(site);
         clinic.setName(name);

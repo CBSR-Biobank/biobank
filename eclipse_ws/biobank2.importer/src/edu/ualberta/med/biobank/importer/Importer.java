@@ -286,16 +286,16 @@ public class Importer {
         cbsrSite = CbsrSite.addSite(appService);
 
         logger.info("creating clinics...");
-        CbsrClinics configClinics = new CbsrClinics(cbsrSite);
+        new CbsrClinics(cbsrSite);
 
         logger.info("creating studies... ");
-        new CbsrStudies(cbsrSite, configClinics);
+        new CbsrStudies(cbsrSite);
 
         logger.info("creating container types...");
-        CbsrContainerTypes configCT = new CbsrContainerTypes(cbsrSite);
+        new CbsrContainerTypes(cbsrSite);
 
         logger.info("creating containers...");
-        new CbsrContainers(cbsrSite, configCT);
+        new CbsrContainers(cbsrSite);
     }
 
     private static void doImport() throws Exception {

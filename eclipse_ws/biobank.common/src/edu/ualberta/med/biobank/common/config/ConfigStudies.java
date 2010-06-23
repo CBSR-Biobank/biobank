@@ -2,11 +2,13 @@ package edu.ualberta.med.biobank.common.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.config.calgary.CalgarySite;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -16,17 +18,28 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ConfigStudies {
 
+    protected SiteWrapper site;
+
     protected Map<String, StudyWrapper> studiesMap = null;
 
     protected Map<String, SourceVesselWrapper> sourceVesselMap = null;
 
-    protected ConfigClinics configClinics;
+    protected Map<String, ClinicWrapper> clinicsMap;
 
-    protected ConfigStudies(ConfigClinics configClinics) throws Exception {
-        if (configClinics == null) {
-            throw new Exception("configClinics is null");
+    protected ConfigStudies(SiteWrapper site) throws Exception {
+        if (site == null) {
+            throw new Exception("site is null");
         }
-        this.configClinics = configClinics;
+        this.site = site;
+        clinicsMap = new HashMap<String, ClinicWrapper>();
+        for (ClinicWrapper clinic : ClinicWrapper.getAllClinics(site
+            .getAppService())) {
+            clinicsMap.put(clinic.getNameShort(), clinic);
+        }
+        if (clinicsMap.size() < 1) {
+            throw new Exception("no clinics present in site "
+                + site.getNameShort());
+        }
     }
 
     protected StudyWrapper addStudy(SiteWrapper site, String name,
@@ -136,11 +149,8 @@ public class ConfigStudies {
 
     protected void addContact(String studyNameShort, String contactName,
         String clinicNameShort) throws Exception {
-        if (configClinics == null) {
-            throw new Exception("configClinics is null");
-        }
-        ContactWrapper contact = configClinics.getClinic(clinicNameShort)
-            .getContact(contactName);
+        ContactWrapper contact = getClinic(clinicNameShort).getContact(
+            contactName);
         if (contact == null) {
             throw new Exception("clinic " + clinicNameShort
                 + " does not have a contact with name " + contactName);
@@ -150,6 +160,15 @@ public class ConfigStudies {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         study.reload();
+    }
+
+    protected ClinicWrapper getClinic(String nameShort) throws Exception {
+        ClinicWrapper clinic = clinicsMap.get(nameShort);
+        if (clinic == null) {
+            throw new Exception("clinic with name \"" + nameShort
+                + "\" does not exist");
+        }
+        return clinic;
     }
 
 }

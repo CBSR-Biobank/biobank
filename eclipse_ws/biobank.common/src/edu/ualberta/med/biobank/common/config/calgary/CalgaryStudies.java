@@ -35,9 +35,8 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
  */
 public class CalgaryStudies extends ConfigStudies {
 
-    public CalgaryStudies(SiteWrapper site, CalgaryClinics configClinics)
-        throws Exception {
-        super(configClinics);
+    public CalgaryStudies(SiteWrapper site) throws Exception {
+        super(site);
         studiesMap = new HashMap<String, StudyWrapper>();
 
         sourceVesselMap = new HashMap<String, SourceVesselWrapper>();

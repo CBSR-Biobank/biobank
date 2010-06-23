@@ -159,7 +159,7 @@ public class CalgaryConfigJob {
             configClinics = new CalgaryClinics(calgarySite);
             break;
         case 3:
-            new CalgaryStudies(calgarySite, configClinics);
+            new CalgaryStudies(calgarySite);
             break;
         case 4:
             new CalgaryContainerTypes(calgarySite);

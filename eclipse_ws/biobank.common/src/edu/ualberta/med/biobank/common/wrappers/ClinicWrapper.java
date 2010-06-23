@@ -550,6 +550,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return result.get(0);
     }
 
+    public static List<ClinicWrapper> getAllClinics(
+        WritableApplicationService appService) throws ApplicationException {
+        List<Clinic> clinics = new ArrayList<Clinic>();
+        List<ClinicWrapper> wrappers = new ArrayList<ClinicWrapper>();
+        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName());
+        clinics = appService.query(c);
+        for (Clinic clinic : clinics)
+            wrappers.add(new ClinicWrapper(appService, clinic));
+        return wrappers;
+    }
+
     @Override
     protected void resetInternalField() {
         deletedContacts.clear();
