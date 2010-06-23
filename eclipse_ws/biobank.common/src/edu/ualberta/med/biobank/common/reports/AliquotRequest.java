@@ -83,8 +83,12 @@ public class AliquotRequest extends QueryObject {
                     + ((i / 4) + 1)
                     + ", Column 4 \n Value must be less than 1000.");
             List<Object> queried = appService.query(c);
-            for (int j = 0; j < queried.size() && j < maxResults; j++)
+            results.add(null);
+            results.add("Requested: " + maxResults + "  Found: "
+                + queried.size());
+            for (int j = 0; j < maxResults; j++) {
                 results.add(queried.get(j));
+            }
         }
 
         return results;
@@ -95,15 +99,21 @@ public class AliquotRequest extends QueryObject {
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
-            Aliquot a = (Aliquot) ob;
-            String pnumber = a.getPatientVisit().getPatient().getPnumber();
-            String inventoryId = a.getInventoryId();
-            Date dateDrawn = a.getPatientVisit().getDateDrawn();
-            String stName = a.getSampleType().getNameShort();
-            String aliquotLabel = new AliquotWrapper(appService, a)
-                .getPositionString(true, false);
-            modifiedResults.add(new Object[] { pnumber, inventoryId, dateDrawn,
-                stName, aliquotLabel });
+            if (ob == null) {
+                modifiedResults.add(ob);
+            } else if (ob instanceof String) {
+                modifiedResults.add(new Object[] { ob });
+            } else {
+                Aliquot a = (Aliquot) ob;
+                String pnumber = a.getPatientVisit().getPatient().getPnumber();
+                String inventoryId = a.getInventoryId();
+                Date dateDrawn = a.getPatientVisit().getDateDrawn();
+                String stName = a.getSampleType().getNameShort();
+                String aliquotLabel = new AliquotWrapper(appService, a)
+                    .getPositionString(true, false);
+                modifiedResults.add(new Object[] { pnumber, inventoryId,
+                    dateDrawn, stName, aliquotLabel });
+            }
         }
         return modifiedResults;
     }
