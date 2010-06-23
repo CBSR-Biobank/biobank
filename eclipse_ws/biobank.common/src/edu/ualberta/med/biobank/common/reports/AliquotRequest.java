@@ -83,12 +83,14 @@ public class AliquotRequest extends QueryObject {
                     + ((i / 4) + 1)
                     + ", Column 4 \n Value must be less than 1000.");
             List<Object> queried = appService.query(c);
-            results.add(null);
-            results.add("Requested: " + maxResults + "  Found: "
-                + queried.size());
             for (int j = 0; j < maxResults; j++) {
-                results.add(queried.get(j));
+                if (j < queried.size())
+                    results.add(queried.get(j));
+                else
+                    results.add(new Object[] { pnumber, "", dateDrawn,
+                        typeName, "NOT FOUND" });
             }
+
         }
 
         return results;
@@ -99,10 +101,8 @@ public class AliquotRequest extends QueryObject {
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
-            if (ob == null) {
+            if (ob instanceof Object[]) {
                 modifiedResults.add(ob);
-            } else if (ob instanceof String) {
-                modifiedResults.add(new Object[] { ob });
             } else {
                 Aliquot a = (Aliquot) ob;
                 String pnumber = a.getPatientVisit().getPatient().getPnumber();
