@@ -71,6 +71,10 @@ public class CbsrContainerTypes extends ConfigContainerTypes {
         addContainerType(site, "Freezer 4x6", "F4x6", -80.0,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 4, 6, Arrays
                 .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
+
+        addContainerType(site, "Freezer 6x12", "F6x12", -80.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 6, 12, Arrays
+                .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
     }
 
     private void createCabinetTypes(SiteWrapper site) throws Exception {
@@ -105,7 +109,7 @@ public class CbsrContainerTypes extends ConfigContainerTypes {
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
         ContainerTypeWrapper dewarCC = addContainerType(site,
             "Dewar Lab 40 CC", "DW40 CC", -196.0,
-            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 10, null);
         ContainerTypeWrapper dewarDD = addContainerType(site,
             "Dewar Lab 40 DD", "DW40 DD", -196.0,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);

@@ -261,6 +261,7 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("CEGIIR", "R-Jejunum", "1", "0.2", "Active");
         addSampleStorage("CEGIIR", "R-StomachA", "1", "0.2", "Active");
         addSampleStorage("CEGIIR", "R-StomachB", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "Jejunum", "2", "0", "Active");
 
         addSampleStorage("CHILD", "CBMC", null, null, "Active");
         addSampleStorage("CHILD", "CBMC RNA", null, null, "Active");

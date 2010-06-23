@@ -161,8 +161,6 @@ public class CbsrClinics extends ConfigClinics {
         addContact("ED1-UofA", "Sheri Cholin", "Research Coordinator",
             "780-407-7448", "780-407-3324",
             "sheri.cholin@albertahealtherives.ca");
-        addContact("ED1-UofA", "Wanda MacDonald", "Research Coordinator",
-            "780-248-1037", "", "wmacdona@ualberta.ca");
 
         addContact("ED1-UofA", "Sue Szigety", null, "780-407-7868", null,
             "sszigety@ualberta.ca");
