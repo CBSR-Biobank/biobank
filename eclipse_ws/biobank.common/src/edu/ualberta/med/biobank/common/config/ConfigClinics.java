@@ -18,8 +18,12 @@ public class ConfigClinics {
 
     protected Map<String, ContactWrapper> contactsMap = null;
 
-    protected ConfigClinics(SiteWrapper site) {
+    protected ConfigClinics(SiteWrapper site) throws Exception {
+        if (site == null) {
+            throw new Exception("site is null");
+        }
         this.site = site;
+        site.reload();
     }
 
     protected ClinicWrapper addClinic(String name, String nameShort,

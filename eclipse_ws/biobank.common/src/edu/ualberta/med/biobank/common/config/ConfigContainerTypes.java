@@ -50,9 +50,14 @@ public class ConfigContainerTypes {
 
         "LH PFP 200", "UrineC900", "PlasmaE800", "P100 500", "PlasmaL500",
         "LH PFP 500", "PlasmaE200", "DNA L 1000", "SerumG500", "PlasmaL200",
-        "DNA E 1000", "PlasmaE500", "UrineSA900", "PlasmaE250", "UrineSA700"
+        "DNA E 1000", "PlasmaE500", "UrineSA900", "PlasmaE250", "UrineSA700" };
 
-    };
+    protected ConfigContainerTypes(SiteWrapper site) throws Exception {
+        if (site == null) {
+            throw new Exception("site is null");
+        }
+        site.reload();
+    }
 
     public ContainerTypeWrapper getContainerType(String name) throws Exception {
         ContainerTypeWrapper type = containerTypeMap.get(name);

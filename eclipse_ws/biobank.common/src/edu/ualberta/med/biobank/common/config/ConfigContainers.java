@@ -12,6 +12,10 @@ public class ConfigContainers {
     protected Map<String, ContainerTypeWrapper> containerTypeMap;
 
     protected ConfigContainers(SiteWrapper site) throws Exception {
+        if (site == null) {
+            throw new Exception("site is null");
+        }
+        site.reload();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
         List<ContainerTypeWrapper> siteContainerTypes = site
             .getContainerTypeCollection();

@@ -31,6 +31,7 @@ public class ConfigStudies {
             throw new Exception("site is null");
         }
         this.site = site;
+        site.reload();
         clinicsMap = new HashMap<String, ClinicWrapper>();
         for (ClinicWrapper clinic : ClinicWrapper.getAllClinics(site
             .getAppService())) {
