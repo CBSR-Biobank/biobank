@@ -1,17 +1,11 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config.cbsr;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import edu.ualberta.med.biobank.common.config.ConfigStudies;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 /**
@@ -39,13 +33,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
  * clinic.id=contact.clinic_id left join study_contact on contact.id=contact_id
  * join study on study.id=study_contact.study_id order by study.name_short
  */
-public class CbsrStudies {
+public class CbsrStudies extends ConfigStudies {
 
-    private static Map<String, StudyWrapper> studiesMap = null;
-
-    private static Map<String, SourceVesselWrapper> sourceVesselMap = null;
-
-    public static void createStudies(SiteWrapper site) throws Exception {
+    public CbsrStudies(SiteWrapper site) throws Exception {
+        super(site);
         studiesMap = new HashMap<String, StudyWrapper>();
 
         sourceVesselMap = new HashMap<String, SourceVesselWrapper>();
@@ -70,11 +61,18 @@ public class CbsrStudies {
             "Centre of Excellence for Gastrointestinal Inflammation and Immunity Research",
             "CEGIIR", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Critical Care Cohort Study", "CCCS", "Closed", null);
+
+        addStudy(
+            site,
+            "Enzyme replacement therapy in patients with Fabry disease: differential impact on Heart Remodeling and Vascular Function",
+            "FABRY", ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            "Study starts with BA for Edmonton, BB for Calgary");
+
         addStudy(site,
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
             "ERCIN", "Disabled", "Precath visit - only urine is collected");
-        addStudy(site, "Fedorak Iron Deficieny Study", "FIDS",
+        addStudy(site, "Fedorak Iron Deficiency Study", "FIDS",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Heart failure Etiology and Analysis Research Team",
             "HEART", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
@@ -110,6 +108,9 @@ public class CbsrStudies {
         addStudySourceVessel("BBPSP", "10ml orange top PAXgene tube");
         addStudySourceVessel("BBPSP", "3mL lavender top EDTA tube");
         addStudySourceVessel("BBPSP", "4ml lavender top EDTA tube");
+        addStudySourceVessel("BBPSP", "6mL lavender top EDTA tube");
+        addStudySourceVessel("BBPSP", "9ml CPDA yellow top tube");
+
         addStudySourceVessel("BBPSP", "urine cup");
         addStudySourceVessel("CCCS", "6mL beige top tube");
         addStudySourceVessel("CCCS", "6mL lavender top EDTA tube");
@@ -118,6 +119,10 @@ public class CbsrStudies {
         addStudySourceVessel("CEGIIR",
             "15ml centrifuge tube (sodium azide urine)");
         addStudySourceVessel("CEGIIR", "6mL beige top tube");
+        addStudySourceVessel("CEGIIR", "Colonoscopy Kit");
+        addStudySourceVessel("CEGIIR", "Enteroscopy Kit");
+        addStudySourceVessel("CEGIIR", "Gastroscopy Kit");
+
         addStudySourceVessel("CHILD", "10ml green top sodium heparin tube");
         addStudySourceVessel("CHILD", "6mL beige top tube");
         addStudySourceVessel("CHILD", "Breast milk");
@@ -127,6 +132,22 @@ public class CbsrStudies {
         addStudySourceVessel("CHILD", "urine cup");
         addStudySourceVessel("ERCIN", "ERCIN Serum processing pallet");
         addStudySourceVessel("ERCIN", "ERCIN Urine processing pallet");
+
+        addStudySourceVessel("FABRY", "10ml green top Lithium Heparin tube");
+        addStudySourceVessel("FABRY", "10mL lavender top EDTA tube");
+        addStudySourceVessel("FABRY", "10ml orange top PAXgene tube");
+        addStudySourceVessel("FABRY", "5mL gold top serum tube");
+        addStudySourceVessel("FABRY", "8.5ml P100 orange top tube");
+        addStudySourceVessel("FIDS", "4ml lavender top EDTA tube");
+
+        addStudySourceVessel("HEART", "10ml green top Lithium Heparin tube");
+        addStudySourceVessel("HEART", "10mL lavender top EDTA tube");
+        addStudySourceVessel("HEART", "10ml orange top PAXgene tube");
+        addStudySourceVessel("HEART", "5mL gold top serum tube");
+        addStudySourceVessel("HEART", "6mL lavender top EDTA tube");
+        addStudySourceVessel("HEART", "8.5ml P100 orange top tube");
+        addStudySourceVessel("HEART", "urine cup");
+
         addStudySourceVessel("KDCS", "10mL lavender top EDTA tube");
         addStudySourceVessel("KDCS", "10ml orange top PAXgene tube");
         addStudySourceVessel("KDCS",
@@ -139,7 +160,9 @@ public class CbsrStudies {
         addStudySourceVessel("KDCS", "fingernail tube");
         addStudySourceVessel("KDCS", "hair bagette");
         addStudySourceVessel("KDCS", "toenail tube");
+
         addStudySourceVessel("KMS", "EDTA cryovial");
+
         addStudySourceVessel("LCS", "10mL lavender top EDTA tube");
         addStudySourceVessel("LCS", "10ml green top sodium heparin tube");
         addStudySourceVessel("LCS", "10ml orange top PAXgene tube");
@@ -169,15 +192,22 @@ public class CbsrStudies {
         addStudySourceVessel("LCS", "hair bagette");
         addStudySourceVessel("LCS", "toenail tube");
         addStudySourceVessel("LCS", "urine cup");
+
         addStudySourceVessel("MPS", "2.7mL blue top Sodium citrate tube");
+
         addStudySourceVessel("NHS", "4ml lavender top EDTA tube");
         addStudySourceVessel("NHS", "5mL gold top serum tube");
+        addStudySourceVessel("NHS", "Biopsy, RNA later");
+
         addStudySourceVessel("RVS", "10mL lavender top EDTA tube");
         addStudySourceVessel("RVS", "10ml orange top PAXgene tube");
         addStudySourceVessel("RVS", "15ml centrifuge tube (sodium azide urine)");
         addStudySourceVessel("RVS", "5mL gold top serum tube");
+        addStudySourceVessel("RVS", "Biopsy, RNA later");
+
         addStudySourceVessel("SPARK", "4ml lavender top EDTA tube");
         addStudySourceVessel("SPARK", "urine cup");
+
         addStudySourceVessel("TCKS", "10mL lavender top EDTA tube");
         addStudySourceVessel("TCKS", "10ml orange top PAXgene tube");
         addStudySourceVessel("TCKS",
@@ -186,9 +216,9 @@ public class CbsrStudies {
         addStudySourceVessel("TCKS", "fingernail tube");
         addStudySourceVessel("TCKS", "hair bagette");
         addStudySourceVessel("TCKS", "toenail tube");
+
         addStudySourceVessel("VAS", "10mL lavender top EDTA tube");
         addStudySourceVessel("VAS", "10ml orange top PAXgene tube");
-        addStudySourceVessel("VAS", "5mL gold top serum tube");
         addStudySourceVessel("VAS", "6mL beige top tube");
 
         addSampleStorage("AHFEM", "Lith Hep Plasma", "25", "0.2", "Active");
@@ -215,21 +245,24 @@ public class CbsrStudies {
         addSampleStorage("CEGIIR", "DNA(Blood)", "2", "0.4", "Active");
         addSampleStorage("CEGIIR", "Duodenum", "2", "0", "Active");
         addSampleStorage("CEGIIR", "Ileum", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "Jejunum", "2", "0", "Active");
         addSampleStorage("CEGIIR", "Plasma", "5", "0.4", "Active");
-        addSampleStorage("CEGIIR", "R-ColonA", "1", "0", "Active");
-        addSampleStorage("CEGIIR", "R-ColonD", "1", "0", "Active");
-        addSampleStorage("CEGIIR", "R-ColonT", "1", "0", "Active");
-        addSampleStorage("CEGIIR", "R-Duodenum", "1", "0", "Active");
-        addSampleStorage("CEGIIR", "R-Ilieum", "1", "0", "Active");
-        addSampleStorage("CEGIIR", "R-StomachA", "1", "0", "Active");
-        addSampleStorage("CEGIIR", "R-StomachB", "1", "0", "Active");
         addSampleStorage("CEGIIR", "Serum B", "6", "0.8", "Active");
         addSampleStorage("CEGIIR", "Stomach, A", "2", "0", "Active");
         addSampleStorage("CEGIIR", "Stomach, B", "2", "0", "Active");
         addSampleStorage("CEGIIR", "WB DMSO", "2", "0.8", "Active");
         addSampleStorage("CEGIIR", "WBE", "2", "0.8", "Disabled");
         addSampleStorage("CEGIIR", "Z Urine", "6", "0.9", "Active");
+
+        addSampleStorage("CEGIIR", "R-ColonA", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-ColonD", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-ColonT", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-Duodenum", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-Ilieum", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-Jejunum", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-StomachA", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "R-StomachB", "1", "0.2", "Active");
+        addSampleStorage("CEGIIR", "Jejunum", "2", "0", "Active");
+
         addSampleStorage("CHILD", "CBMC", null, null, "Active");
         addSampleStorage("CHILD", "CBMC RNA", null, null, "Active");
         addSampleStorage("CHILD", "Cells", null, null, "Active");
@@ -247,9 +280,16 @@ public class CbsrStudies {
         addSampleStorage("ERCIN", "Serum B", "12", "0.4", "Disabled");
         addSampleStorage("ERCIN", "Z Urine", "12", "0.9", "Active");
 
+        addSampleStorage("FABRY", "LH PFP 200", "10", "0.2", "Active");
+        addSampleStorage("FABRY", "LH PFP 500", "5", "0.5", "Active");
+        addSampleStorage("FABRY", "P100 500", "8", "0.5", "Active");
+        addSampleStorage("FABRY", "PlasmaE200", "10", "0.2", "Active");
+        addSampleStorage("FABRY", "PlasmaE500", "5", "0.5", "Active");
+        addSampleStorage("FABRY", "SerumG500", "5", "0.5", "Active");
+
         addSampleStorage("FIDS", "PlasmaE250", "1", "0.25", "Active");
         addSampleStorage("FIDS", "PlasmaE500", "1", "0.5", "Active");
-        addSampleStorage("FIDS", "UrineSA700", "3", "0.7", "Active");
+        addSampleStorage("FIDS", "UrineSA700", "3", "0.7", "Disabled");
 
         addSampleStorage("HEART", "DNA E 1000", "5", "1", "Active");
         addSampleStorage("HEART", "DNA L 1000", "5", "1", "Active");
@@ -272,7 +312,7 @@ public class CbsrStudies {
         addSampleStorage("KDCS", "Paxgene", "11", "0.8", "Active");
         addSampleStorage("KDCS", "Plasma", "12", "0.4", "Active");
         addSampleStorage("KDCS", "S Water", "3", "0.9", "Active");
-        addSampleStorage("KDCS", "Serum", null, null, "Active");
+        addSampleStorage("KDCS", "Serum", "8", "0.4", "Disabled");
         addSampleStorage("KDCS", "Serum B", "8", "0.4", "Active");
         addSampleStorage("KDCS", "T Nails", null, null, "Active");
         addSampleStorage("KDCS", "T Water", "3", "0.9", "Active");
@@ -280,6 +320,10 @@ public class CbsrStudies {
         addSampleStorage("KDCS", "WBE", "4", "0.8", "Active");
         addSampleStorage("KDCS", "Z Urine", "3", "0.4", "Active");
         addSampleStorage("KMS", "Plasma", "20", "0.1", "Active");
+
+        addSampleStorage("LCS", "BC", "5", "0.4", "Active");
+        addSampleStorage("LCS", "Colon, T", "20", "0.5", "Active");
+
         addSampleStorage("MPS", "Plasma", "3", "1", "Active");
         addSampleStorage("NHS", "Cells", "10", "0.5", "Active");
         addSampleStorage("NHS", "Plasma", "12", "0.4", "Active");
@@ -310,7 +354,7 @@ public class CbsrStudies {
         addSampleStorage("VAS", "Hair", null, null, "Active");
         addSampleStorage("VAS", "Paxgene", "11", "0.8", "Active");
         addSampleStorage("VAS", "Plasma", "12", "0.4", "Active");
-        addSampleStorage("VAS", "Serum", null, null, "Active");
+        addSampleStorage("VAS", "Serum", "8", "0.4", "Disabled");
         addSampleStorage("VAS", "Serum B", "8", "0.4", "Active");
         addSampleStorage("VAS", "T Nails", null, null, "Active");
         addSampleStorage("VAS", "WBE", "4", "0.8", "Active");
@@ -383,140 +427,36 @@ public class CbsrStudies {
         addContact("CHILD", "Dellanee Kahlke", "ED1-UofA");
         addContact("ERCIN", "Candace Dando", "ED1-UofA");
         addContact("ERCIN", "Daisy Gibbons", "SF1-Health NFLD");
-        addContact("FIDS", "Elizabeth Taylor", "ED1-UofA");
+
+        addContact("FABRY", "Marleen Irwin", "ED1-UofA");
+        addContact("FIDS", "Dr. Thomas Lee", "ED1-UofA");
+        addContact("FIDS", "Rae Foshaug", "ED1-UofA");
+
         addContact("HEART", "Marleen Irwin", "ED1-UofA");
+
         addContact("KDCS", "Ann Chala", "VN1-St Paul");
         addContact("KDCS", "Dawn Opgenorth", "ED1-UofA");
         addContact("KDCS", "Sharon Gulewich", "CL1-Sunridge");
+        addContact("KDCS", "Cathy Lent", "WL1-Westlock Hosp");
+        addContact("KDCS", "Gwen Winter", "RD1-Red Deer Hosp");
+        addContact("KDCS", "Janilee Dow", "LM1-Lloyd Hosp");
+        addContact("KDCS", "Jodie Hingst", "OL1-Hingst");
+        addContact("KDCS", "Phillo King", "FM1-King");
+        addContact("KDCS", "Sharon Mollins", "GP1-QE Hosp");
+        addContact("KDCS", "Stacey Culp", "SP1-St Therese Hosp");
+
         addContact("KMS", "Bonny Granfield", "KN1-Cancer Ctr");
         addContact("LCS", "Elizabeth Taylor", "ED1-UofA");
         addContact("MPS", "Bonny Granfield", "ED1-UofA");
         addContact("NHS", "Dr. Andrew Mason", "ED1-UofA");
         addContact("NHS", "Shirley Cole", "CL1-Heritage");
         addContact("RVS", "Dr. Andrew Mason", "ED1-UofA");
-        addContact("SPARK", "Erin Rezanoff", "ED1-UofA");
+
+        addContact("SPARK", "Kathy Littlewood", "ED1-UofA");
+        addContact("SPARK", "Sheri Cholin", "ED1-UofA");
+
         addContact("TCKS", "Sharon Gulewich", "CL1-Sunridge");
         addContact("TCKS", "Sue Szigety", "ED1-UofA");
         addContact("VAS", "Dawn Opgenorth", "ED1-UofA");
     }
-
-    private static StudyWrapper addStudy(SiteWrapper site, String name,
-        String nameShort, String activityStatusName, String comment)
-        throws Exception {
-        StudyWrapper study = new StudyWrapper(site.getAppService());
-        study.setSite(site);
-        study.setName(name);
-        study.setNameShort(nameShort);
-        study.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
-        study.setComment(comment);
-        study.persist();
-        study.reload();
-        studiesMap.put(nameShort, study);
-        return study;
-    }
-
-    public static StudyWrapper getStudy(String name) throws Exception {
-        StudyWrapper study = studiesMap.get(name);
-        if (study == null) {
-            throw new Exception("study with name \"" + name
-                + "\" does not exist");
-        }
-        return study;
-    }
-
-    public static List<String> getStudyNames() throws Exception {
-        if (studiesMap == null) {
-            throw new Exception("contacts have not been added");
-        }
-        return new ArrayList<String>(studiesMap.keySet());
-    }
-
-    private static void addStudySourceVessel(String studyNameShort, String name)
-        throws Exception {
-        StudyWrapper study = getStudy(studyNameShort);
-        SourceVesselWrapper ss = sourceVesselMap.get(name);
-        if (ss == null) {
-            throw new Exception("invalid source vessel name: " + name);
-        }
-        StudySourceVesselWrapper studySourceVessel = new StudySourceVesselWrapper(
-            ss.getAppService());
-        studySourceVessel.setStudy(study);
-        studySourceVessel.setSourceVessel(ss);
-        study.addStudySourceVessels(Arrays.asList(studySourceVessel));
-        study.persist();
-        study.reload();
-    }
-
-    private static void addSampleStorage(String studyNameShort,
-        String sampleTypeName, String quantity, String volume,
-        String activityStatusName) throws Exception {
-        StudyWrapper study = getStudy(studyNameShort);
-
-        SampleStorageWrapper ss = new SampleStorageWrapper(study
-            .getAppService());
-        ss.setSampleType(CbsrSite.getSampleType(sampleTypeName));
-        if (quantity != null) {
-            ss.setQuantity(Integer.valueOf(quantity));
-        } else {
-            ss.setQuantity(null);
-        }
-
-        if (volume != null) {
-            ss.setVolume(Double.valueOf(volume));
-        } else {
-            ss.setVolume(null);
-        }
-
-        ss.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
-
-        study.addSampleStorage(Arrays.asList(ss));
-        study.persist();
-        study.reload();
-
-    }
-
-    private static void addPvAttr(SiteWrapper site, String studyNameShort,
-        String label, String type, String permissible) throws Exception {
-        StudyWrapper study = getStudy(studyNameShort);
-        if ((permissible != null) && (permissible.length() > 0)) {
-            study.setStudyPvAttr(label, type, permissible.split(";"));
-        } else {
-            study.setStudyPvAttr(label, type);
-        }
-        study.setStudyPvAttrActivityStatus(label, ActivityStatusWrapper
-            .getActivityStatus(study.getAppService(),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING));
-        study.persist();
-        study.reload();
-
-        List<String> sitePvAttrs = SiteWrapper.getPvAttrTypeNames(site
-            .getAppService());
-        if (!sitePvAttrs.contains(label)) {
-            // add this pv attr to the site
-            site.setSitePvAttr(label, type);
-            site.persist();
-            site.reload();
-        }
-    }
-
-    private static void addPvAttr(SiteWrapper site, String studyNameShort,
-        String label, String type) throws Exception {
-        addPvAttr(site, studyNameShort, label, type, null);
-    }
-
-    private static void addContact(String studyNameShort, String contactName,
-        String clinicNameShort) throws Exception {
-        ContactWrapper contact = CbsrClinics.getClinic(clinicNameShort)
-            .getContact(contactName);
-        if (contact == null) {
-            throw new Exception("clinic " + clinicNameShort
-                + " does not have a contact with name " + contactName);
-        }
-        StudyWrapper study = getStudy(studyNameShort);
-
-        study.addContacts(Arrays.asList(contact));
-        study.persist();
-        study.reload();
-    }
-
 }

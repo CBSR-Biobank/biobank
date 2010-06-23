@@ -34,6 +34,9 @@ INSERT INTO `SOURCE_VESSEL` (ID, NAME) VALUES
 (32, "AHFEM processing pallet"),
 (33, "8.5ml P100 orange top tube"),
 (34, "9ml CPDA yellow top tube"),
-(35, "10ml green top Lithium Heparin tube");
+(35, "10ml green top Lithium Heparin tube"),
+(36,"Biopsy, RNA later"),
+(37,"Colonoscopy Kit"),
+(38,"Gastroscopy Kit"),
+(39,"Enteroscopy Kit");
 UNLOCK TABLES;
-

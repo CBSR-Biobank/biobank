@@ -1,74 +1,22 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config.cbsr;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import edu.ualberta.med.biobank.common.config.ConfigContainerTypes;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
-public class CbsrContainerTypes {
+public class CbsrContainerTypes extends ConfigContainerTypes {
 
-    private static Map<String, ContainerTypeWrapper> containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
-
-    private static String[] biopsyPallet96SampleTypes = new String[] {
-        "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
-        "Colon, A", "Colon, T", };
-
-    private static String[] box81SampleTypes = new String[] { "BC", "C Urine",
-        "CBMC RNA", "CBMC", "CDPA Plasma", "Cells", "Dialysate", "Effluent",
-        "F Nails", "F Urine", "HB", "Lith Hep Plasma", "Meconium", "PF Plasma",
-        "Paxgene", "Plasma SH", "Plasma", "RNA Biopsy", "S Water", "Serum B",
-        "Serum Pel", "Serum", "T Nails", "T Water", "Urine", "WB DMSO",
-        "WB Plasma", "WB RNA", "WB Serum", "WBE", "WBlood", "Z Urine" };
-
-    private static String[] cellPallet96SampleTypes = new String[] { "Cells" };
-
-    private static String[] ftaBinSampleTypes = new String[] { "DNA(Blood)",
-        "DNA (WBC)" };
-
-    private static String[] hairBinSampleTypes = new String[] { "Hair" };
-
-    private static String[] pallet96SampleTypes = new String[] { "BC",
-        "C Urine", "CBMC RNA", "CBMC", "CDPA Plasma", "Cells", "Colon, A",
-        "Colon, D", "Colon, T", "Dialysate", "Duodenum", "Effluent", "F Nails",
-        "F Urine", "HB", "Ileum", "Jejunum", "Lith Hep Plasma", "Meconium",
-        "PF Plasma", "Paxgene", "Plasma SH", "Plasma", "R-ColonA", "R-ColonA",
-        "R-ColonD", "R-ColonD", "R-ColonT", "R-ColonT", "R-Duodenum",
-        "R-Duodenum", "R-Ilieum", "R-Ilieum", "R-Jejunum", "R-StomachA",
-        "R-StomachA", "R-StomachB", "R-StomachB", "RNA Biopsy", "RNA Biopsy",
-        "S Water", "Serum B", "Serum Pel", "Serum", "Stomach, A", "Stomach, B",
-        "T Nails", "T Water", "Urine", "WB DMSO", "WB Plasma", "WB RNA",
-        "WB Serum", "WBE", "WBlood", "Z Urine",
-
-        "Colon, D", "Stomach, B", "Stomach, A", "Duodenum", "Jejunum", "Ileum",
-        "Colon, A", "Colon, T",
-
-        "LH PFP 200", "UrineC900", "PlasmaE800", "P100 500", "PlasmaL500",
-        "LH PFP 500", "PlasmaE200", "DNA L 1000", "SerumG500", "PlasmaL200",
-        "DNA E 1000", "PlasmaE500", "UrineSA900"
-
-    };
-
-    public static ContainerTypeWrapper getContainerType(String name)
-        throws Exception {
-        ContainerTypeWrapper type = containerTypeMap.get(name);
-        if (type == null) {
-            throw new Exception("container type " + name + " not in database");
-        }
-        return type;
-    }
-
-    public static void createContainerTypes(SiteWrapper site) throws Exception {
+    public CbsrContainerTypes(SiteWrapper site) throws Exception {
+        super(site);
         createFreezerTypes(site);
         createCabinetTypes(site);
+        createDewarTypes(site);
     }
 
-    private static void createFreezerTypes(SiteWrapper site) throws Exception {
+    private void createFreezerTypes(SiteWrapper site) throws Exception {
         ContainerTypeWrapper biopsyPallet96 = addContainerType(site,
             "Biopsy Pallet 96", "BP96", null,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 8, 12, null,
@@ -123,9 +71,13 @@ public class CbsrContainerTypes {
         addContainerType(site, "Freezer 4x6", "F4x6", -80.0,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 4, 6, Arrays
                 .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
+
+        addContainerType(site, "Freezer 6x12", "F6x12", -80.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 2, 6, 12, Arrays
+                .asList(new ContainerTypeWrapper[] { hotel13, hotel19 }));
     }
 
-    private static void createCabinetTypes(SiteWrapper site) throws Exception {
+    private void createCabinetTypes(SiteWrapper site) throws Exception {
         ContainerTypeWrapper ftaBin = addContainerType(site, "FTA Bin", "FBin",
             null, ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 2, 120, 1,
             null, ftaBinSampleTypes);
@@ -148,36 +100,23 @@ public class CbsrContainerTypes {
                 .asList(new ContainerTypeWrapper[] { drawer36 }));
     }
 
-    private static ContainerTypeWrapper addContainerType(SiteWrapper site,
-        String name, String nameShort, Double temperature,
-        String activityStatusName, boolean topLevel, int childLabelingScheme,
-        int rows, int cols, List<ContainerTypeWrapper> children,
-        String... sampleTypeNames) throws Exception {
-        ContainerTypeWrapper ct = new ContainerTypeWrapper(site.getAppService());
-        ct.setName(name);
-        ct.setNameShort(nameShort);
-        ct.setDefaultTemperature(temperature);
-        ct.setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
-        ct.setTopLevel(topLevel);
-        ct.setSite(site);
-        ct.setRowCapacity(rows);
-        ct.setColCapacity(cols);
-        ct.setChildLabelingScheme(childLabelingScheme);
+    private void createDewarTypes(SiteWrapper site) throws Exception {
+        ContainerTypeWrapper dewarAA = addContainerType(site,
+            "Dewar Lab 40 AA", "DW40 AA", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 9, null);
+        ContainerTypeWrapper dewarBB = addContainerType(site,
+            "Dewar Lab 40 BB", "DW40 BB", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
+        ContainerTypeWrapper dewarCC = addContainerType(site,
+            "Dewar Lab 40 CC", "DW40 CC", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 10, null);
+        ContainerTypeWrapper dewarDD = addContainerType(site,
+            "Dewar Lab 40 DD", "DW40 DD", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, false, 1, 1, 11, null);
 
-        if (children != null) {
-            ct.addChildContainerTypes(children);
-        }
-
-        List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
-        for (String sampleTypeName : sampleTypeNames) {
-            SampleTypeWrapper sampleType = CbsrSite
-                .getSampleType(sampleTypeName);
-            list.add(sampleType);
-        }
-        ct.addSampleTypes(list);
-        ct.persist();
-        ct.reload();
-        containerTypeMap.put(name, ct);
-        return ct;
+        addContainerType(site, "Dewar Lab 40", "DW40", -196.0,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, true, 4, 2, 2, Arrays
+                .asList(new ContainerTypeWrapper[] { dewarAA, dewarBB, dewarCC,
+                    dewarDD }));
     }
 }
