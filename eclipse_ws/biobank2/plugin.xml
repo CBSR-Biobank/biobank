@@ -287,19 +287,43 @@
 		<handler
             class="edu.ualberta.med.biobank.handlers.CancelHandler"
             commandId="edu.ualberta.med.biobank.commands.cancel">
+     <activeWhen>
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+           </instanceof>
+        </with>
+     </activeWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
             commandId="edu.ualberta.med.biobank.commands.confirm">
          <activeWhen>
-            <reference
-                  definitionId="biobank2.confirmEnabled">
-            </reference>
+            <and>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+                  </instanceof>
+               </with>
+               <reference
+                     definitionId="biobank2.confirmEnabled">
+               </reference>
+            </and>
          </activeWhen>
       </handler>   
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
             commandId="edu.ualberta.med.biobank.commands.reset">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+               </instanceof>
+            </with>
+         </activeWhen>
       </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
@@ -1902,9 +1926,10 @@
       		schemeId="biobank2.scheme"
       		sequence="M1+R"/>
       <key
-      		commandId="edu.ualberta.med.biobank.commands.confirm"
-      		schemeId="biobank2.scheme"
-      		sequence="M1+S"/>
+            commandId="edu.ualberta.med.biobank.commands.confirm"
+            schemeId="biobank2.scheme"
+            sequence="M1+S">
+      </key>
       <key
       		commandId="edu.ualberta.med.biobank.commands.cancel"
       		schemeId="biobank2.scheme"
