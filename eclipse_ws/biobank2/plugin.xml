@@ -291,6 +291,11 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
             commandId="edu.ualberta.med.biobank.commands.confirm">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.confirmEnabled">
+            </reference>
+         </activeWhen>
       </handler>   
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
@@ -1989,6 +1994,13 @@
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.ConfirmState">
+         <variable
+               name="edu.ualberta.med.biobank.sourceprovider.confirmState"
+               priorityLevel="activeEditorId">
+         </variable>
+      </sourceProvider>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -2176,6 +2188,15 @@
                   property="dirty"
                   value="true">
             </test>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.confirmEnabled">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
+            <equals
+                  value="confirmEnabled">
+            </equals>
          </with>
       </definition>
    </extension>
