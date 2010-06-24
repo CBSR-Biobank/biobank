@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.acegisecurity.AccessDeniedException;
+import org.eclipse.core.commands.Command;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -40,8 +41,10 @@ import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
+import org.eclipse.ui.services.IEvaluationService;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -316,7 +319,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void setConfirmEnabled(boolean enabled) {
-        confirmAction.getCommand().getCommand().setEnabled(enabled);
+        ICommandService cmdService = (ICommandService) PlatformUI
+            .getWorkbench().getService(ICommandService.class);
+        Command cmd = cmdService.getCommand("plugin.commands.openView");
+        IEvaluationService evalService = (IEvaluationService) PlatformUI
+            .getWorkbench().getService(IEvaluationService.class);
+        IEvaluationContext currentState = evalService.getCurrentState();
+        confirmAction.getCommand().getCommand()
+            .setEnabled(this.getEditorSite());
         form.getToolBarManager().update(true);
     }
 
