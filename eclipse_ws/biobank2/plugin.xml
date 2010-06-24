@@ -291,11 +291,6 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
             commandId="edu.ualberta.med.biobank.commands.confirm">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.confirmEnabled">
-            </reference>
-         </activeWhen>
       </handler>   
       <handler
             class="edu.ualberta.med.biobank.handlers.ResetHandler"
@@ -2179,17 +2174,6 @@
             <test
                   forcePluginActivation="true"
                   property="dirty"
-                  value="true">
-            </test>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.confirmEnabled">
-         <with
-               variable="activeEditorId">
-            <test
-                  forcePluginActivation="true"
-                  property="confirmEnabled"
                   value="true">
             </test>
          </with>

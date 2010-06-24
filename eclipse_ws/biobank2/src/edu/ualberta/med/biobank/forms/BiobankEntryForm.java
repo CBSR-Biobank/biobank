@@ -78,7 +78,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     // The widget that is to get the focus when the form is created
     private Control firstControl;
 
-    private Boolean confirmEnabled;
+    public CommandContributionItem confirmAction;
 
     private static ImageDescriptor printActionImage = ImageDescriptor
         .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
@@ -133,7 +133,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
-        if (!confirmEnabled) {
+        if (!confirmAction.isVisible()) {
             monitor.setCanceled(true);
             setDirty(true);
             BioBankPlugin.openAsyncError("Form state",
@@ -316,7 +316,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void setConfirmEnabled(boolean enabled) {
-        confirmEnabled = enabled;
+        confirmAction.getCommand().getCommand().setEnabled(enabled);
+        form.getToolBarManager().update(true);
     }
 
     public void setFormHeaderErrorMessage(String message, int type) {
@@ -350,7 +351,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addConfirmAction() {
-        CommandContributionItem confirmAction = new CommandContributionItem(
+        confirmAction = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(), "Confirm",
                 "edu.ualberta.med.biobank.commands.confirm", null,
