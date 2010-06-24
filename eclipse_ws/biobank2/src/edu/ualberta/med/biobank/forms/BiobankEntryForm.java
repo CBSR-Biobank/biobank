@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
-import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -48,12 +47,10 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -363,6 +360,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void addConfirmAction() {
         confirmAction = new Action() {
+            @Override
+            public void run() {
+                confirm();
+            }
         };
         confirmAction
             .setActionDefinitionId("edu.ualberta.med.biobank.commands.confirm");
