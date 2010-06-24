@@ -135,15 +135,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
-                        setClinicFromSelection();
-                        try {
-                            shipmentWrapper.checkPatientsStudy();
-                            activateWaybillField(Boolean.TRUE
-                                .equals(shipmentWrapper.getClinic()
-                                    .getSendsShipments()));
-                        } catch (Exception e) {
-                            BioBankPlugin.openAsyncError("Patients check", e);
-                        }
+                        clinicSelection();
                     }
                 });
         } else {
@@ -199,6 +191,23 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
             | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
             shipmentWrapper, "comment"), null);
+
+        if (clinicsComboViewer != null) {
+            clinicSelection();
+        }
+    }
+
+    private void clinicSelection() {
+        setClinicFromSelection();
+        if (shipmentWrapper.getClinic() != null) {
+            try {
+                shipmentWrapper.checkPatientsStudy();
+                activateWaybillField(Boolean.TRUE.equals(shipmentWrapper
+                    .getClinic().getSendsShipments()));
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Patients check", e);
+            }
+        }
     }
 
     private void activateWaybillField(boolean activate) {
@@ -251,9 +260,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (clinicsComboViewer != null) {
-            setClinicFromSelection();
-        }
+        setClinicFromSelection();
         if (!Boolean.TRUE.equals(shipmentWrapper.getClinic()
             .getSendsShipments())) {
             shipmentWrapper.setWaybill(null);
@@ -298,13 +305,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     private void setClinicFromSelection() {
-        IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
-            .getSelection();
-        if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
-            shipmentWrapper.setClinic((ClinicWrapper) clinicSelection
-                .getFirstElement());
-        } else {
-            shipmentWrapper.setClinic((ClinicWrapper) null);
+        if (clinicsComboViewer != null) {
+            IStructuredSelection clinicSelection = (IStructuredSelection) clinicsComboViewer
+                .getSelection();
+            if ((clinicSelection != null) && (clinicSelection.size() > 0)) {
+                shipmentWrapper.setClinic((ClinicWrapper) clinicSelection
+                    .getFirstElement());
+            } else {
+                shipmentWrapper.setClinic((ClinicWrapper) null);
+            }
         }
     }
 
