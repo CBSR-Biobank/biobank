@@ -150,8 +150,8 @@ public class ContainerViewForm extends BiobankViewForm {
             "Product Bar Code");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentsLabel = createReadOnlyLabelledField(client, SWT.MULTI
-            | SWT.WRAP, "Comments");
+        commentsLabel = createReadOnlyLabelledField(client, SWT.MULTI,
+            "Comments");
         containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Container Type");
         temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE,

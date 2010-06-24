@@ -116,8 +116,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             "Child Labeling Scheme");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client,
-            SWT.MULTI | SWT.WRAP, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
+            "Comments");
 
         setContainerTypeValues();
     }

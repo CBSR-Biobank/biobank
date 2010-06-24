@@ -118,8 +118,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             "Total Samples");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client,
-            SWT.MULTI | SWT.WRAP, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
+            "Comments");
         setSiteSectionValues();
     }
 

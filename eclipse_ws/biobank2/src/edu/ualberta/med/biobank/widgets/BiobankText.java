@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class BiobankText extends Composite {
+public class BiobankText extends BiobankWidget {
 
     private Text text;
     private boolean alreadyFocused;
