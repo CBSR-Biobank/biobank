@@ -127,12 +127,9 @@ public class StudyEntryForm extends BiobankEntryForm {
                 .getAllActivityStatuses(appService), study.getActivityStatus(),
             "Study must have an activity status");
 
-        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
-            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
-            BeansObservables.observeValue(study, "comment"), null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null, BeansObservables.observeValue(study, "comment"),
+            null);
 
         createClinicSection();
         createSampleStorageSection();

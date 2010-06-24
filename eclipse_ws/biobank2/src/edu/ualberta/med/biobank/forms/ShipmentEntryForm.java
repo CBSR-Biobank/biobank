@@ -188,9 +188,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
-            | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
-            shipmentWrapper, "comment"), null);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null, BeansObservables.observeValue(shipmentWrapper,
+                "comment"), null);
 
         if (clinicsComboViewer != null) {
             clinicSelection();
