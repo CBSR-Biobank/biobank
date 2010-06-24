@@ -104,8 +104,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
         createPvDataSection(client);
 
-        commentLabel = createReadOnlyLabelledField(client,
-            SWT.MULTI | SWT.WRAP, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
+            "Comments");
 
         setPatientVisitValues();
     }

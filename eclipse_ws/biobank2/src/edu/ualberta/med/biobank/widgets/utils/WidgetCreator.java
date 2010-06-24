@@ -245,7 +245,8 @@ public class WidgetCreator {
         }
 
         if ((widgetOptions & SWT.MULTI) != 0) {
-            widgetOptions = widgetOptions | SWT.V_SCROLL | SWT.H_SCROLL;
+            widgetOptions = widgetOptions | SWT.V_SCROLL | SWT.H_SCROLL
+                | SWT.WRAP;
         }
 
         BiobankText text = null;
@@ -256,7 +257,7 @@ public class WidgetCreator {
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         if ((widgetOptions & SWT.MULTI) != 0) {
-            gd.heightHint = 90;
+            gd.heightHint = 50;
             text.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyPressed(KeyEvent e) {

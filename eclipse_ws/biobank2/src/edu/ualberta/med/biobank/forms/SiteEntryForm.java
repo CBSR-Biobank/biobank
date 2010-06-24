@@ -106,12 +106,9 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 .getAllActivityStatuses(appService), site.getActivityStatus(),
             "Site must have an activity status");
 
-        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
-            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
-            BeansObservables.observeValue(site, "comment"), null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null, BeansObservables.observeValue(site, "comment"),
+            null);
     }
 
     @Override
