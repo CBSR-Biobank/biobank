@@ -26,7 +26,7 @@ public class AliquotRequest extends QueryObject {
                 + " p where p.aliquot.patientVisit.patient.study.site "
                 + op
                 + siteId
-                + " and p.aliquot.patientVisit.patient.pnumber like ? and datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and p.aliquot.sampleType.nameShort like ? ORDER BY RAND()",
+                + " and p.container.label not like '%SS' and p.aliquot.patientVisit.patient.pnumber like ? and datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and p.aliquot.sampleType.nameShort like ? ORDER BY RAND()",
             new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
                 "Location" });
         addOption("CSV File", String.class, "");
@@ -83,8 +83,14 @@ public class AliquotRequest extends QueryObject {
                     + ((i / 4) + 1)
                     + ", Column 4 \n Value must be less than 1000.");
             List<Object> queried = appService.query(c);
-            for (int j = 0; j < queried.size() && j < maxResults; j++)
-                results.add(queried.get(j));
+            for (int j = 0; j < maxResults; j++) {
+                if (j < queried.size())
+                    results.add(queried.get(j));
+                else
+                    results.add(new Object[] { pnumber, "", dateDrawn,
+                        typeName, "NOT FOUND" });
+            }
+
         }
 
         return results;
@@ -95,15 +101,19 @@ public class AliquotRequest extends QueryObject {
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
-            Aliquot a = (Aliquot) ob;
-            String pnumber = a.getPatientVisit().getPatient().getPnumber();
-            String inventoryId = a.getInventoryId();
-            Date dateDrawn = a.getPatientVisit().getDateDrawn();
-            String stName = a.getSampleType().getNameShort();
-            String aliquotLabel = new AliquotWrapper(appService, a)
-                .getPositionString(true, false);
-            modifiedResults.add(new Object[] { pnumber, inventoryId, dateDrawn,
-                stName, aliquotLabel });
+            if (ob instanceof Object[]) {
+                modifiedResults.add(ob);
+            } else {
+                Aliquot a = (Aliquot) ob;
+                String pnumber = a.getPatientVisit().getPatient().getPnumber();
+                String inventoryId = a.getInventoryId();
+                Date dateDrawn = a.getPatientVisit().getDateDrawn();
+                String stName = a.getSampleType().getNameShort();
+                String aliquotLabel = new AliquotWrapper(appService, a)
+                    .getPositionString(true, false);
+                modifiedResults.add(new Object[] { pnumber, inventoryId,
+                    dateDrawn, stName, aliquotLabel });
+            }
         }
         return modifiedResults;
     }
