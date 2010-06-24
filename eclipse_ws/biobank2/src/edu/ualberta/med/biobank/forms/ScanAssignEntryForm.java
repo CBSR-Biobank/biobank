@@ -120,6 +120,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private IObservableValue validationMade = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
+    protected boolean useNewProductBarcode;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -921,6 +923,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (!beforeScan) {
             setDirty(false);
             setFocus();
+            useNewProductBarcode = false;
         }
     }
 
@@ -1040,12 +1043,28 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             if ((barcode != null && !barcode.isEmpty())
                 || containerAtPosition.hasAliquots()) {
                 // Position already physically used
-                openDialogPositionUsed(barcode == null ? "[none]" : barcode);
-                return false;
+                boolean ok = openDialogPositionUsed(barcode);
+                if (!ok) {
+                    appendLogNLS(
+                        "ScanAssign.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
+                        currentPalletWrapper.getLabel()); //$NON-NLS-1$
+                    return false;
+                }
             }
-            appendLogNLS("ScanAssign.activitylog.pallet.positionInitialized",
-                palletLabel, containerAtPosition.getContainerType().getName());
-            // Position initialised but not physically used
+            if (useNewProductBarcode) {
+                // Position exists but no product barcode set before
+                appendLogNLS(
+                    "ScanAssign.activitylog.pallet.positionUsedWithNoProductBarcode",
+                    palletLabel, containerAtPosition.getContainerType()
+                        .getName(), currentPalletWrapper.getProductBarcode());
+            } else {
+                // Position initialised but not physically used
+                appendLogNLS(
+                    "ScanAssign.activitylog.pallet.positionInitialized",
+                    palletLabel, containerAtPosition.getContainerType()
+                        .getName());
+            }
+
             palletTypes = Arrays.asList(containerAtPosition.getContainerType());
             typeFixed = containerAtPosition.getContainerType();
             if (palletFoundWithProductBarcode != null) {
@@ -1056,7 +1075,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 currentPalletWrapper.setPosition(containerAtPosition
                     .getPosition());
             } else {
-                // new pallet. Can use the initialised one
+                // new pallet or only new product barcode. Can use the
+                // initialised one
                 String productBarcode = currentPalletWrapper
                     .getProductBarcode();
                 currentPalletWrapper.initObjectWith(containerAtPosition);
@@ -1085,13 +1105,28 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         return true;
     }
 
-    private void openDialogPositionUsed(String barcode) {
-        BioBankPlugin.openAsyncError(Messages
-            .getString("ScanAssign.dialog.positionUsed.title"), //$NON-NLS-1$
-            Messages.getFormattedString(
-                "ScanAssign.dialog.positionUsed.msg", barcode)); //$NON-NLS-1$
-        appendLogNLS("ScanAssign.activitylog.pallet.positionUsedMsg", barcode, //$NON-NLS-1$
-            currentPalletWrapper.getLabel()); //$NON-NLS-1$
+    private boolean openDialogPositionUsed(String barcode) {
+        if (barcode == null || barcode.isEmpty()) {
+            // Position already use but the barcode was not set.
+            if (!useNewProductBarcode) {
+                useNewProductBarcode = MessageDialog
+                    .openQuestion(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(),
+                        Messages
+                            .getString("ScanAssign.dialog.positionUsed.noBarcode.title"),
+                        Messages
+                            .getString("ScanAssign.dialog.positionUsed.noBarcode.question"));
+            }
+            return useNewProductBarcode;
+        } else {
+            // Position already use with a different barcode
+            BioBankPlugin.openAsyncError(Messages
+                .getString("ScanAssign.dialog.positionUsed.error.title"), //$NON-NLS-1$
+                Messages.getFormattedString(
+                    "ScanAssign.dialog.positionUsed.error.msg", barcode)); //$NON-NLS-1$
+            return false;
+        }
     }
 
     @Override
