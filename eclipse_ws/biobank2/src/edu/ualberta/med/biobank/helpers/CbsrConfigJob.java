@@ -126,6 +126,7 @@ public class CbsrConfigJob {
             @Override
             public void done(final IJobChangeEvent event) {
                 Display.getDefault().asyncExec(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             SessionManager.getInstance().updateSites();

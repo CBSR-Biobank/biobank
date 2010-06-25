@@ -54,6 +54,7 @@ public class JDBCLogExecutor implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         try {
             Connection conn = null;

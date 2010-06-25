@@ -17,6 +17,7 @@ public class BiobankLogProxy implements MethodInterceptor {
     private static Logger log = Logger.getLogger(BiobankLogProxy.class
         .getName());
 
+    @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
 
         String userName = null;
@@ -24,8 +25,7 @@ public class BiobankLogProxy implements MethodInterceptor {
             userName = SecurityContextHolder.getContext().getAuthentication()
                 .getName();
         } catch (NullPointerException e) {
-            log
-                .error("Error:  Unable to retrieve userName from SecurityContext; setting userName to 'dummy'");
+            log.error("Error:  Unable to retrieve userName from SecurityContext; setting userName to 'dummy'");
             userName = "dummy";
         }
 

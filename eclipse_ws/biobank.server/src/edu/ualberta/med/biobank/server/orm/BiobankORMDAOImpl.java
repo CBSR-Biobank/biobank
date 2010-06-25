@@ -62,6 +62,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     protected HibernateCallback getExecuteSQLQueryHibernateCallback(
         final String sql, final int firstResult, final int maxResult) {
         HibernateCallback callBack = new HibernateCallback() {
+            @Override
             public Object doInHibernate(Session session)
                 throws HibernateException, SQLException {
                 Query query = session.createSQLQuery(sql);

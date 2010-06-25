@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.rcp.LoggingPerspective;
 
 public class LoggingHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         try {

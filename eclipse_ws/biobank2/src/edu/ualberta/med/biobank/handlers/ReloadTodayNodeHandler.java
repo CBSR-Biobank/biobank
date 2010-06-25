@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.views.AbstractViewWithTree;
 
 public class ReloadTodayNodeHandler extends AbstractHandler implements IHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AbstractViewWithTree view = SessionManager.getCurrentViewWithTree();
         if (view instanceof AbstractAdministrationView) {
