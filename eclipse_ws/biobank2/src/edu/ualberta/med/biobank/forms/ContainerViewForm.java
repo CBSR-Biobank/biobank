@@ -344,8 +344,15 @@ public class ContainerViewForm extends BiobankViewForm {
                     }
                     refresh(initDone, false);
                     monitor.done();
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            containerWidget.getMultiSelectionManager()
+                                .clearMultiSelection();
+                        }
+                    });
                 }
             });
+
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error while creating children", e);
             refresh(false, false);
@@ -373,6 +380,12 @@ public class ContainerViewForm extends BiobankViewForm {
                     }
                     refresh(deleteDones, true);
                     monitor.done();
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            containerWidget.getMultiSelectionManager()
+                                .clearMultiSelection();
+                        }
+                    });
                 }
             });
         } catch (Exception e) {
