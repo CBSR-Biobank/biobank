@@ -92,26 +92,20 @@ public class ReportingUtils {
                     service = ps;
                 }
             }
-            if (service == null) {
+            if (service == null && data.printToFile == true) {
                 // corresponding PrintService not found
-                if (data.printToFile == true) {
-                    // if printToFile asked, can print to a pdf file only
-                    String fileName = data.fileName;
-                    if (fileName.endsWith(".pdf")) {
-                        String prefix = "file://";
-                        if (fileName.startsWith(prefix)) {
-                            fileName = fileName.substring(prefix.length());
-                        }
-                        JasperExportManager.exportReportToPdfFile(jasperPrint,
-                            fileName);
-                    } else {
-                        throw new Exception("Can't save to file type "
-                            + data.fileName);
+                // if printToFile asked, can print to a pdf file only
+                String fileName = data.fileName;
+                if (fileName.endsWith(".pdf")) {
+                    String prefix = "file://";
+                    if (fileName.startsWith(prefix)) {
+                        fileName = fileName.substring(prefix.length());
                     }
+                    JasperExportManager.exportReportToPdfFile(jasperPrint,
+                        fileName);
                 } else {
-                    throw new Exception(
-                        "Error with printer - No Print Service found with name "
-                            + data.name);
+                    throw new Exception("Can't save to file type "
+                        + data.fileName);
                 }
             } else {
                 JRExporter exporter = new JRPrintServiceExporter();

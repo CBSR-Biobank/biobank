@@ -119,8 +119,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             // with waybill, should find only one corresponding shipment, or
             // mutliple shipments from different clinics
             List<ShipmentWrapper> shipments = ShipmentWrapper
-                .getShipmentsInSite(SessionManager.getAppService(), text,
-                    SessionManager.getInstance().getCurrentSite());
+                .getShipmentsInSite(SessionManager.getAppService(),
+                    text.trim(), SessionManager.getInstance().getCurrentSite());
             if (shipments.size() > 1) {
                 SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
