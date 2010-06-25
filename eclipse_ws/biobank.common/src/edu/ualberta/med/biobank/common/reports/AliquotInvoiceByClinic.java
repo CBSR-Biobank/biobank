@@ -11,7 +11,7 @@ public class AliquotInvoiceByClinic extends QueryObject {
 
     protected static final String NAME = "Aliquots per Clinic by Date";
 
-    private static String QUERY_STRING = "Select Alias.patientVisit.shipment.clinic.name, "
+    private static String QUERY_STRING = "Select Alias.inventoryId, Alias.patientVisit.shipment.clinic.name, "
         + "Alias.patientVisit.patient.pnumber, "
         + "Alias.linkDate, Alias.sampleType.name  from "
         + Aliquot.class.getName()
@@ -25,7 +25,8 @@ public class AliquotInvoiceByClinic extends QueryObject {
         super(
             "Lists all aliquots linked in a particular date range, ordered by clinic.",
             MessageFormat.format(QUERY_STRING, siteId, op), new String[] {
-                "Clinic", "Patient Number", "Link Date", "Sample Type" });
+                "Inventory ID", "Clinic", "Patient Number", "Link Date",
+                "Sample Type" });
         addOption("Start Date (Linked)", Date.class, new Date(0));
         addOption("End Date (Linked)", Date.class, new Date());
     }
