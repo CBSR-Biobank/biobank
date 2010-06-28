@@ -558,7 +558,9 @@ public class WidgetCreator {
         Assert.isNotNull(dbc);
         Binding binding = bindings.get(bindingKey);
         Assert.isNotNull(binding);
-        dbc.addBinding(binding);
+        if (!dbc.getBindings().contains(binding)) {
+            dbc.addBinding(binding);
+        }
     }
 
     public <T> ComboViewer createComboViewer(Composite parent,
