@@ -100,12 +100,15 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
+
             List<PatientVisitWrapper> pvs = PatientVisitWrapper
                 .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
                     searchString);
+
             if (pvs == null)
                 return null;
             return pvs;
+
         }
 
         @Override

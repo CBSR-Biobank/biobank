@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.eclipse.nebula.widgets.cdatetime.CDT;
-import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -15,18 +13,23 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.widgets.nebula.CDT;
+import edu.ualberta.med.biobank.widgets.nebula.CDateTime;
 
 /**
  * Wrapper around Nebula's CDateTime widget.
@@ -46,6 +49,8 @@ public class DateTimeWidget extends BiobankWidget {
     private Button dateButton;
 
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
+
+    private boolean calendarOpen;
 
     /*
      * Allow date to be null. it typeShown == SWT.DATE, show only date; if
@@ -77,16 +82,56 @@ public class DateTimeWidget extends BiobankWidget {
         gd.heightHint = size.y;
         dateEntry.setLayoutData(gd);
 
+        calendarOpen = false;
+
         dateButton = new Button(this, SWT.NONE);
         dateButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CALENDAR));
+
         dateButton.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseUp(MouseEvent e) {
+                if (calendarOpen)
+                    return;
+                GridLayout dialogGridLayout = new GridLayout(1, false);
+                dialogGridLayout.horizontalSpacing = 2;
+                dialogGridLayout.verticalSpacing = 2;
+
                 final Shell dialog = new Shell(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM);
-                dialog.setLayout(new GridLayout(3, false));
+                    .getActiveWorkbenchWindow().getShell(), SWT.DIALOG_TRIM
+                    | SWT.MODELESS | SWT.TITLE);
+                dialog.setLayout(dialogGridLayout);
+                dialog.setText("Calendar -- pick a date with me");
+                dialog.setActive();
+                dialog.setFocus();
+                Point cursorPt = Display.getCurrent().getCursorLocation();
+                cursorPt.x -= 90;
+                cursorPt.y -= 100;
+                dialog.setLocation(cursorPt);
+
+                dialog.addShellListener(new ShellListener() {
+
+                    public void shellActivated(ShellEvent event) {
+
+                    }
+
+                    public void shellClosed(ShellEvent arg0) {
+                        calendarOpen = false;
+                    }
+
+                    public void shellDeactivated(ShellEvent arg0) {
+                        calendarOpen = false;
+                        dialog.close();
+                    }
+
+                    public void shellDeiconified(ShellEvent arg0) {
+                    }
+
+                    public void shellIconified(ShellEvent arg0) {
+                    }
+                });
+                calendarOpen = true;
 
                 final DateTime calendar = new DateTime(dialog, SWT.CALENDAR
                     | SWT.BORDER);
@@ -96,12 +141,9 @@ public class DateTimeWidget extends BiobankWidget {
                     calendar.setDate(c.get(Calendar.YEAR), c
                         .get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
                 }
-                new Label(dialog, SWT.BORDER);
-
-                calendar.addMouseListener(new MouseAdapter() {
+                calendar.addSelectionListener(new SelectionListener() {
                     @Override
-                    public void mouseDoubleClick(MouseEvent e) {
-
+                    public void widgetDefaultSelected(SelectionEvent e) {
                         Calendar c = Calendar.getInstance();
                         if (dateEntry.getSelection() != null)
                             c.setTime(dateEntry.getSelection());
@@ -110,12 +152,16 @@ public class DateTimeWidget extends BiobankWidget {
                         c.set(Calendar.YEAR, calendar.getYear());
                         dateEntry.setSelection(c.getTime());
                         fireModifyListeners();
+                        calendarOpen = false;
                         dialog.close();
+                    }
+
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
                     }
                 });
                 dialog.pack();
                 dialog.open();
-
             }
 
         });
