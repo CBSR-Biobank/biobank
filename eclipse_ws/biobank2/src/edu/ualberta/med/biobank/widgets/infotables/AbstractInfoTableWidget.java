@@ -237,7 +237,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         resizeTable();
 
         if (paginationRequired) {
-            setPageLabelText();
             showPaginationWidget();
             enablePaginationWidget(false);
         } else if (paginationWidget != null)
@@ -247,11 +246,14 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             @Override
             public void run() {
                 tableLoader(collection, selection);
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                    }
+                });
             }
 
         };
         backgroundThread.start();
-        this.getShell().layout(true, true);
     }
 
     protected abstract void init(List<T> collection);

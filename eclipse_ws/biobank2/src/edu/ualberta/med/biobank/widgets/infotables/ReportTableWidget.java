@@ -101,6 +101,8 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         display.syncExec(new Runnable() {
             public void run() {
                 if (!table.isDisposed()) {
+                    setPageLabelText();
+                    ReportTableWidget.this.getShell().layout(true, true);
                     tableViewer.setInput(collSubList);
                 }
             }
