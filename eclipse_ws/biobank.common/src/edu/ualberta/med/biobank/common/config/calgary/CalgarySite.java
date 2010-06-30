@@ -22,6 +22,13 @@ public class CalgarySite extends ConfigSite {
         site.setPostalCode("");
         site.persist();
         site.reload();
+
+        site.setSitePvAttr("Consent", "select_multiple");
+        site.setSitePvAttr("PBMC Count (x10^6)", "number");
+        site.setSitePvAttr("Phlebotomist", "text");
+        site.setSitePvAttr("Worksheet", "text");
+        site.setSitePvAttr("Biopsy Length", "number");
+
         return site;
     }
 
