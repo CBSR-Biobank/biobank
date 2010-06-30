@@ -34,7 +34,7 @@ public class DateTimeWidget extends BiobankWidget {
         setLayout(layout);
         dateEntry = new CDateTime(this, CDT.BORDER | CDT.COMPACT
             | CDT.DROP_DOWN | CDT.DATE_SHORT | CDT.TIME_SHORT
-            | CDT.CLOCK_24_HOUR | CDT.BORDER | CDT.CLOCK_DISCRETE | style);
+            | CDT.CLOCK_24_HOUR | CDT.BORDER | style);
         if ((style & SWT.TIME) != 0 && (style & SWT.DATE) != 0)
             dateEntry.setPattern(DateFormatter.DATE_TIME_FORMAT);
         else if ((style & SWT.TIME) != 0)

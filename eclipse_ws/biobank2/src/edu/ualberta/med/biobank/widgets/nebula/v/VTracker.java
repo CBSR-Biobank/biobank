@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.forms.widgets.Form;
 
 public class VTracker implements DisposeListener {
 
@@ -165,7 +166,7 @@ public class VTracker implements DisposeListener {
         if (comp != null) {
             Composite parent = comp.getParent();
             Control[] controls = parent.getTabList();
-            if (parent instanceof Shell) {
+            if ((parent instanceof Shell) || (parent instanceof Form)) {
                 for (int i = 0; i < controls.length; i++) {
                     if (controls[i] == comp) {
                         for (int j = 0; j < controls.length; j++) {

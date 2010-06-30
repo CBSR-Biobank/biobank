@@ -25,11 +25,6 @@ import java.util.TimeZone;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -1123,51 +1118,7 @@ public class CDateTime extends BaseCombo {
                 }
             } else {
                 setButtonVisibility(BaseCombo.BUTTON_NEVER);
-                if ((style & CDT.SPINNER) != 0) {
-                    int sStyle = SWT.VERTICAL;
-                    if (gtk && ((style & CDT.BORDER) != 0)) {
-                        sStyle |= SWT.BORDER;
-                    }
-                    spinner = VNative.create(Spinner.class, panel, sStyle);
-                    if (win32) {
-                        spinner
-                            .setBackground(text.getControl().getBackground());
-                    }
-                    spinner.getControl().setMinimum(0);
-                    spinner.getControl().setMaximum(50);
-                    spinner.getControl().setDigits(1);
-                    spinner.getControl().setIncrement(1);
-                    spinner.getControl().setPageIncrement(1);
-                    spinner.getControl().setSelection(25);
-                    spinner.getControl().addFocusListener(new FocusAdapter() {
-                        public void focusGained(FocusEvent e) {
-                            internalFocusShift = true;
-                            setFocus();
-                            internalFocusShift = false;
-                        }
-                    });
-                    spinner.getControl().addMouseListener(new MouseAdapter() {
-                        public void mouseDown(MouseEvent e) {
-                            if (e.button == 2) {
-                                fieldNext();
-                            }
-                        }
-                    });
-                    spinner.getControl().addSelectionListener(
-                        new SelectionAdapter() {
-                            public void widgetSelected(SelectionEvent e) {
-                                if (VTracker.getMouseDownButton() != 2) {
-                                    if (spinner.getControl().getSelection() > 25) {
-                                        fieldAdjust(1);
-                                    } else {
-                                        fieldAdjust(-1);
-                                    }
-                                    spinner.getControl().setSelection(25);
-                                }
-                            }
-                        });
-                    panel.setLayout(new SpinnerLayout());
-                }
+
             }
 
             updateText();
