@@ -13,7 +13,6 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -134,16 +133,6 @@ public class BiobankText extends BiobankWidget {
     @Override
     public void removeKeyListener(KeyListener listener) {
         text.removeKeyListener(listener);
-    }
-
-    @Override
-    public void addListener(int eventType, Listener listener) {
-        text.addListener(eventType, listener);
-    }
-
-    @Override
-    public void removeListener(int eventType, Listener listener) {
-        text.removeListener(eventType, listener);
     }
 
     public void addModifyListener(ModifyListener modifyListener) {
