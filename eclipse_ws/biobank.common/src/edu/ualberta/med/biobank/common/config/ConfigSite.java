@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -21,43 +21,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CbsrSite {
+public class ConfigSite {
 
     public static WritableApplicationService appService;
 
-    public static SiteWrapper cbsrSite = null;
+    public static SiteWrapper site = null;
 
     private static Map<String, SampleTypeWrapper> sampleTypeMap;
 
-    public static void createConfiguration(WritableApplicationService appServ)
-        throws Exception {
-        appService = appServ;
-        addSite(appService);
-        CbsrClinics.createClinics(cbsrSite);
-        CbsrStudies.createStudies(cbsrSite);
-        CbsrContainerTypes.createContainerTypes(cbsrSite);
-        CbsrContainers.createContainers(cbsrSite);
-    }
-
-    public static SiteWrapper addSite(WritableApplicationService appService)
-        throws Exception {
-        getSampleTypeMap(appService);
-        cbsrSite = new SiteWrapper(appService);
-        cbsrSite.setName("Canadian BioSample Repository");
-        cbsrSite.setNameShort("CBSR");
-        cbsrSite.setActivityStatus(getActiveActivityStatus());
-        cbsrSite.setStreet1("471 Medical Sciences Building");
-        cbsrSite.setStreet2("University of Alberta");
-        cbsrSite.setCity("Edmonton");
-        cbsrSite.setProvince("Alberta");
-        cbsrSite.setPostalCode("T6G2H7");
-        cbsrSite.persist();
-        cbsrSite.reload();
-        return cbsrSite;
-    }
-
     public static SiteWrapper getSite() {
-        return cbsrSite;
+        return site;
     }
 
     public static void getSampleTypeMap(WritableApplicationService appService)
@@ -97,21 +70,8 @@ public class CbsrSite {
         return ActivityStatusWrapper.getActivityStatus(appService, "Active");
     }
 
-    public static void deleteConfiguration(WritableApplicationService appServ)
+    protected static void siteDeleteSubObjects(SiteWrapper site)
         throws Exception {
-        appService = appServ;
-
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-        if (sites == null)
-            return;
-        for (SiteWrapper site : sites) {
-            if (site.getName().equals("Canadian BioSample Repository")) {
-                siteDeleteSubObjects(site);
-            }
-        }
-    }
-
-    private static void siteDeleteSubObjects(SiteWrapper site) throws Exception {
         List<StudyWrapper> studies = site.getStudyCollection(false);
         if (studies != null) {
             for (StudyWrapper study : studies) {

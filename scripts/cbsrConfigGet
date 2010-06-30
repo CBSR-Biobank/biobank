@@ -35,7 +35,7 @@ join activity_status on activity_status.id=clinic.activity_status_id
 order by clinic.name"
 
 QUERIES[1]="select clinic.name_short, contact.name, contact.title,
-contact.phone_number, contact.fax_number, contact.email_address from clinic
+contact.office_number, contact.fax_number, contact.email_address from clinic
 join contact on contact.clinic_id=clinic.id order by clinic.name, contact.name"
 
 QUERIES[2]="select container.label, container.product_barcode,
@@ -46,7 +46,7 @@ join abstract_position on abstract_position.id=container.position_id
 join activity_status on activity_status.id=container.activity_status_id
 order by label"
 
-QUERIES[3]="select container_type.name_short, container_type.name, top_level,
+QUERIES[3]="select container_type.name,  container_type.name_short, top_level,
 default_temperature, comment, activity_status.name, row_capacity, col_capacity,
 container_labeling_scheme.name from container_type
 join capacity on capacity.id=container_type.capacity_id

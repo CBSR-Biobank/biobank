@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -106,7 +105,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
              * studies.get(r.nextInt(studies.size()));
              */
 
-            study = CbsrStudies.getStudy("BBPSP");
+            study = configStudies.getStudy("BBPSP");
             study.reload();
             clinic = study.getContactCollection().get(0).getClinic();
 

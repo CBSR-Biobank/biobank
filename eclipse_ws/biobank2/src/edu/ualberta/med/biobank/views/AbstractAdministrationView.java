@@ -43,6 +43,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
         searchListener = new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 internalSearch();
             }
@@ -98,7 +99,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
             if (searchedObject == null || searchedObject.size() == 0) {
                 notFound(text);
             } else {
-                showSearchedObjectsInTree(searchedObject);
+                showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
@@ -108,19 +109,23 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     }
 
     protected void showSearchedObjectsInTree(
-        List<? extends ModelWrapper<?>> searchedObjects) {
+        List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             NodeSearchVisitor visitor = getVisitor(searchedObject);
             AdapterBase node = todayNode.accept(visitor);
             if (node == null) {
                 node = searchedNode.accept(visitor);
                 if (node == null) {
-                    node = addToNode(searchedNode, searchedObject);
+                    searchedNode.addSearchObject(searchedObject);
+                    searchedNode.performExpand();
+                    node = searchedNode.accept(visitor);
                 }
             }
             if (node != null) {
                 setSelectedNode(node);
-                node.performDoubleClick();
+                if (doubleClick) {
+                    node.performDoubleClick();
+                }
             }
         }
     }
@@ -158,9 +163,9 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
                 }
             }
 
-            @SuppressWarnings("unchecked")
             @Override
-            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
+            public void sourceChanged(int sourcePriority,
+                @SuppressWarnings("rawtypes") Map sourceValuesByName) {
             }
         };
 

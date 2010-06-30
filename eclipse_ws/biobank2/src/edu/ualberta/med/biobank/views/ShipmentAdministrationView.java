@@ -215,7 +215,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     public static void showShipment(ShipmentWrapper shipment) {
         if (currentInstance != null) {
-            currentInstance.showSearchedObjectsInTree(Arrays.asList(shipment));
+            currentInstance.showSearchedObjectsInTree(Arrays.asList(shipment),
+                false);
         }
     }
 
@@ -229,6 +230,11 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             return (ShipmentAdapter) selectedNode;
         }
         return null;
+    }
+
+    @Override
+    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
+        return rootNode.accept(new ShipmentViewNodeSearchVisitor(wrapper));
     }
 
 }

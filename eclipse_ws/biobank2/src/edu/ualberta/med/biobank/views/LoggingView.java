@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ public class LoggingView extends ViewPart {
     Button clearButton, searchButton;
 
     private final Listener alphaNumericListener = new Listener() {
+        @Override
         public void handleEvent(Event e) {
             /* The user can only enter in alphanumeric */
             /* Applied to Patient#, Inventory ID, Location */
@@ -275,6 +277,7 @@ public class LoggingView extends ViewPart {
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         clearButton.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 switch (e.type) {
                 case SWT.Selection:
@@ -288,6 +291,7 @@ public class LoggingView extends ViewPart {
         searchButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         searchButton.addKeyListener(enterListener);
         searchButton.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 switch (e.type) {
                 case SWT.Selection:
@@ -297,6 +301,7 @@ public class LoggingView extends ViewPart {
             }
         });
         searchButton.addTraverseListener(new TraverseListener() {
+            @Override
             public void keyTraversed(TraverseEvent e) {
                 userCombo.setFocus();
                 e.doit = false;
@@ -338,7 +343,7 @@ public class LoggingView extends ViewPart {
                 }
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("rawtypes")
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
             }
@@ -451,27 +456,11 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Error",
+            BioBankPlugin.openAsyncError(
+                "Error",
                 "There was an error opening: LoggingForm.\n"
                     + ex.getLocalizedMessage());
         }
-    }
-
-    private static String[] arrayListStringToStringList(
-        List<String> listArrayString) {
-
-        if (listArrayString == null)
-            return null;
-
-        int listArraySize = listArrayString.size();
-
-        String listString[] = new String[listArraySize + 1];
-        listString[0] = "ALL";
-        for (int i = 1; i <= listArraySize; i++) {
-            listString[i] = listArrayString.get(i - 1);
-            listString[i] = listString[i].equals("") ? "NONE" : listString[i];
-        }
-        return listString;
     }
 
     private String[] loadComboList(ComboListType possibleList) {
@@ -498,11 +487,19 @@ public class LoggingView extends ViewPart {
                     .getAppService());
                 break;
             }
-            return arrayListStringToStringList(arrayList);
+            arrayList.remove(null);
+            List<String> result = new ArrayList<String>();
+            result.add("ALL");
+            result.add("NONE");
+            for (String item : arrayList) {
+                if (item != null)
+                    result.add(item);
+            }
+            return result.toArray(new String[0]);
 
         } catch (ApplicationException ex) {
-            BioBankPlugin.openAsyncError("Error", "There was an error: \n"
-                + ex.getLocalizedMessage());
+            BioBankPlugin.openAsyncError("Error",
+                "There was an error: \n" + ex.getLocalizedMessage());
         }
         return null;
     }

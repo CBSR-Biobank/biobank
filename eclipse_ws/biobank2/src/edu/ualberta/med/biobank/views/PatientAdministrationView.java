@@ -87,7 +87,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         patient.addWrapperListener(new WrapperListenerAdapter() {
             @Override
             public void inserted(WrapperEvent event) {
-                showSearchedObjectsInTree(Arrays.asList(patient));
+                showSearchedObjectsInTree(Arrays.asList(patient), true);
             }
         });
         PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
@@ -112,13 +112,12 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         return null;
     }
 
-    public static void showPatient(PatientWrapper patient) {
-        if (currentInstance != null) {
-            currentInstance.showSearchedObjectsInTree(Arrays.asList(patient));
-        }
-    }
-
     public static PatientAdministrationView getCurrent() {
         return currentInstance;
+    }
+
+    @Override
+    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
+        return rootNode.accept(new PatientViewNodeSearchVisitor(wrapper));
     }
 }

@@ -6,9 +6,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public class AdapterFactory {
 
-    @SuppressWarnings("unchecked")
     public static AdapterBase getAdapter(ModelWrapper<?> wrapper) {
-        Class wrapperClass = wrapper.getClass();
+        Class<?> wrapperClass = wrapper.getClass();
         String wrapperClassName = wrapperClass.getName();
         String adapterClassName = new String(wrapperClassName);
         adapterClassName = "edu.ualberta.med.biobank.treeview."
@@ -16,8 +15,8 @@ public class AdapterFactory {
         adapterClassName = adapterClassName.replace("Wrapper", "Adapter");
 
         try {
-            Class klass = Class.forName(adapterClassName);
-            Constructor constructor = klass.getConstructor(new Class[] {
+            Class<?> klass = Class.forName(adapterClassName);
+            Constructor<?> constructor = klass.getConstructor(new Class[] {
                 AdapterBase.class, wrapperClass });
             return (AdapterBase) constructor.newInstance(new Object[] { null,
                 wrapper });

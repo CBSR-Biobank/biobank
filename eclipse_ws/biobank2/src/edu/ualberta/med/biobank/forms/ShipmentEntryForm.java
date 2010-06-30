@@ -188,9 +188,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             }
         });
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
-            | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
-            shipmentWrapper, "comment"), null);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null, BeansObservables.observeValue(shipmentWrapper,
+                "comment"), null);
 
         if (clinicsComboViewer != null) {
             clinicSelection();
@@ -202,11 +202,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         if (shipmentWrapper.getClinic() != null) {
             try {
                 shipmentWrapper.checkPatientsStudy();
-                activateWaybillField(Boolean.TRUE.equals(shipmentWrapper
-                    .getClinic().getSendsShipments()));
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Patients check", e);
             }
+            activateWaybillField(Boolean.TRUE.equals(shipmentWrapper
+                .getClinic().getSendsShipments()));
         }
     }
 

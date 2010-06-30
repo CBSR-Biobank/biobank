@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SampleProcessingRobot
+Bundle-SymbolicName: sampleProcessingRobot; singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Activator: edu.ualberta.med.sampleProcessingRobot.SampleProcessingRobotPlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime;bundle-version="3.4.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ClassPath: ., libs/RXTXcomm.jar, libs/
+Bundle-Vendor: AICML

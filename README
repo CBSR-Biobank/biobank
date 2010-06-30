@@ -103,3 +103,9 @@ located within the /output/<<project name>>/src/ sub-folders.
 BBPDB EXPORT
 - use Bullzip Access to Mysql to export data to MySQL
 
+cf config for MANIFEST ?
+Bundle-NativeCode: libs/rxtxSerial.dll;selection-filter="(&(osgi.arch=x86)(osg
+ i.os=win32))",*
+ 
+ and build.propertoies : 
+ Bundle-NativeCode: /libs/rxtxSerial.dll

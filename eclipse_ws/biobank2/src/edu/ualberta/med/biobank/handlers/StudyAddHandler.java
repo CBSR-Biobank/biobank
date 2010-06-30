@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.treeview.StudyAdapter;
 public class StudyAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addStudy";
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchNode(site);

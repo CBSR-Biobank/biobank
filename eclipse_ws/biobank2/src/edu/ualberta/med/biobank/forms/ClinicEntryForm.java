@@ -132,12 +132,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
                 .getAllActivityStatuses(appService),
             clinic.getActivityStatus(), "Clinic must have an activity status");
 
-        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
-            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
-            BeansObservables.observeValue(clinic, "comment"), null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null, BeansObservables.observeValue(clinic, "comment"),
+            null);
     }
 
     private void createContactSection() {

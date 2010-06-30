@@ -44,8 +44,6 @@ public class LogQuery {
         return dbResults;
     }
 
-    // XXX LogQuery.queryDatabase() ignores date field
-    // StartDate and EndDate need to be implemented in the model
     public boolean queryDatabase() {
         try {
             String user = searchQuery.get("user");

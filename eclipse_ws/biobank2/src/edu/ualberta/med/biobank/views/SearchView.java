@@ -106,7 +106,7 @@ public class SearchView extends ViewPart {
                 }
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
             }
@@ -147,6 +147,7 @@ public class SearchView extends ViewPart {
 
     private void search() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
             public void run() {
                 String searchString = searchText.getText().trim();
                 SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo

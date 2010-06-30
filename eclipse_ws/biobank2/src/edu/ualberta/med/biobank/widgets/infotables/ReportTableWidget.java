@@ -99,6 +99,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         init(collection);
 
         display.syncExec(new Runnable() {
+            @Override
             public void run() {
                 if (!table.isDisposed()) {
                     setPageLabelText();
@@ -120,6 +121,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                     break;
                 }
                 display.syncExec(new Runnable() {
+                    @Override
                     public void run() {
                         if (!table.isDisposed()) {
                             viewer.refresh(item, false);
@@ -134,6 +136,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
             final Object selectedItem = selItem;
             display.syncExec(new Runnable() {
+                @Override
                 public void run() {
                     if (!table.isDisposed()) {
                         if (paginationRequired) {

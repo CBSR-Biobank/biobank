@@ -81,12 +81,16 @@ public abstract class AbstractTodayNode extends AdapterBase {
 
                 // remove elements that are not in today list
                 for (AdapterBase child : getChildren()) {
-                    child.getModelObject().reload();
+                    ModelWrapper<?> childWrapper = child.getModelObject();
+                    childWrapper.reload();
                     List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
                         child.getChildren());
                     for (AdapterBase subChild : subChildren) {
-                        subChild.getModelObject().reload();
-                        if (!todayElements.contains(subChild.getModelObject())) {
+                        ModelWrapper<?> subChildWrapper = subChild
+                            .getModelObject();
+                        subChildWrapper.reload();
+                        if (!todayElements.contains(subChildWrapper)
+                            || !isParentTo(childWrapper, subChildWrapper)) {
                             subChild.getParent().removeChild(subChild);
                         }
                     }
@@ -120,6 +124,9 @@ public abstract class AbstractTodayNode extends AdapterBase {
             }
         }
     }
+
+    protected abstract boolean isParentTo(ModelWrapper<?> parent,
+        ModelWrapper<?> child);
 
     protected abstract List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException;

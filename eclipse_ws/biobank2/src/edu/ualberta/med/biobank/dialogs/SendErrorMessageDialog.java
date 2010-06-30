@@ -1,11 +1,15 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -24,11 +28,17 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -37,16 +47,20 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class SendErrorMessageDialog extends BiobankDialog {
 
     private EMailDescriptor email;
+
+    private List<AttachmentComposite> attachments;
 
     // private int compositeHeight;
 
     public SendErrorMessageDialog(Shell parentShell) {
         super(parentShell);
         initEmailDescriptor();
+        attachments = new ArrayList<AttachmentComposite>();
     }
 
     @Override
@@ -63,7 +77,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) {
-        Composite contents = new Composite(parent, SWT.NONE);
+        final Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -81,59 +95,86 @@ public class SendErrorMessageDialog extends BiobankDialog {
         gd.heightHint = 200;
         descText.setLayoutData(gd);
 
-        // ExpandBar bar = new ExpandBar(contents, SWT.NONE);
-        // bar.setLayoutData(new GridData(GridData.FILL_BOTH));
-        // final Composite compositeWithBar = new Composite(bar, SWT.NONE);
-        // compositeWithBar.setLayout(new GridLayout(2, false));
-        // GridData compData = new GridData(GridData.FILL_BOTH);
-        // compositeWithBar.setLayoutData(compData);
-        //
-        // createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
-        // "Smtp server", new String[0], PojoObservables.observeValue(email,
-        // "smtpServer"), new NonEmptyStringValidator(
-        // "Please enter the smtp server name"));
-        //
-        // createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
-        // "Port", new String[0], PojoObservables.observeValue(email,
-        // "serverPort"), new NonEmptyStringValidator(
-        // "Please enter the server port"));
-        //
-        // createBoundWidgetWithLabel(compositeWithBar, Text.class, SWT.NONE,
-        // "Username", new String[0], PojoObservables.observeValue(email,
-        // "serverUsername"), new NonEmptyStringValidator(
-        // "Please enter the server username"));
-        //
-        // createBoundWidgetWithLabel(compositeWithBar, Text.class,
-        // SWT.PASSWORD,
-        // "Password", new String[0], PojoObservables.observeValue(email,
-        // "serverPassword"), new NonEmptyStringValidator(
-        // "Please enter the server password"));
+        Label attLabel = widgetCreator.createLabel(contents, "Attachments");
+        attLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-        // ExpandItem item = new ExpandItem(bar, SWT.NONE, 0);
-        // item.setText("Email configuration");
-        // compositeHeight = compositeWithBar
-        // .computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-        // item.setHeight(compositeHeight);
-        // item.setControl(compositeWithBar);
-        // item.setExpanded(true);
-        //
-        // bar.addExpandListener(new ExpandAdapter() {
-        // @Override
-        // public void itemCollapsed(ExpandEvent e) {
-        // compositeWithBar.layout(true, true);
-        // Point shellSize = getShell().getSize();
-        // getShell().setSize(shellSize.x, shellSize.y - compositeHeight);
-        // }
-        //
-        // @Override
-        // public void itemExpanded(ExpandEvent e) {
-        // compositeWithBar.layout(true, true);
-        // compositeWithBar.setVisible(true);
-        // Point shellSize = getShell().getSize();
-        // getShell().setSize(shellSize.x, shellSize.y + compositeHeight);
-        // }
-        // });
+        final Composite attachmentsComposite = new Composite(contents, SWT.NONE);
+        GridLayout layout = new GridLayout(1, false);
+        layout.horizontalSpacing = 0;
+        layout.marginWidth = 0;
+        layout.verticalSpacing = 0;
+        attachmentsComposite.setLayout(layout);
+        gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        attachmentsComposite.setLayoutData(gd);
+
+        Button addButton = new Button(contents, SWT.PUSH);
+        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_ADD));
+        addButton.setToolTipText("Add attachment");
+        addButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AttachmentComposite attachmentComposite = new AttachmentComposite(
+                    attachmentsComposite, contents);
+                contents.layout(true, true);
+                Point shellSize = getShell().getSize();
+                getShell().setSize(shellSize.x,
+                    shellSize.y + attachmentComposite.getHeight());
+                attachments.add(attachmentComposite);
+            }
+        });
     }
+
+    // private int createAttachmentChooser(Composite parent,
+    // final Composite globalComposite) {
+    // final Composite attachmentLine = new Composite(parent, SWT.NONE);
+    // GridLayout layout = new GridLayout(3, false);
+    // layout.horizontalSpacing = 0;
+    // layout.marginWidth = 0;
+    // layout.verticalSpacing = 0;
+    // attachmentLine.setLayout(layout);
+    // GridData gd = new GridData();
+    // gd.horizontalAlignment = SWT.FILL;
+    // gd.grabExcessHorizontalSpace = true;
+    // attachmentLine.setLayoutData(gd);
+    //
+    // final BiobankText attachmentText = (BiobankText) widgetCreator
+    // .createWidget(attachmentLine, BiobankText.class, SWT.READ_ONLY,
+    // null);
+    // final Button button = new Button(attachmentLine, SWT.PUSH);
+    // button.setText("Browse");
+    // button.addSelectionListener(new SelectionAdapter() {
+    // @Override
+    // public void widgetSelected(SelectionEvent e) {
+    // FileDialog fd = new FileDialog(button.getShell(), SWT.OPEN);
+    // fd.setText("Select attachment");
+    // String selected = fd.open();
+    // if (selected != null) {
+    // attachments.add(selected);
+    // attachmentText.setText(selected);
+    // }
+    // }
+    // });
+    // Button removeButton = new Button(attachmentLine, SWT.PUSH);
+    // removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+    // .get(BioBankPlugin.IMG_DELETE));
+    // removeButton.setToolTipText("Remove this attachment");
+    // removeButton.addSelectionListener(new SelectionAdapter() {
+    // @Override
+    // public void widgetSelected(SelectionEvent e) {
+    // int height = attachmentLine.computeSize(SWT.DEFAULT,
+    // SWT.DEFAULT).y;
+    // attachments.remove(attachmentText.getText());
+    // attachmentText.setText("");
+    // attachmentLine.dispose();
+    // globalComposite.layout(true, true);
+    // Point shellSize = getShell().getSize();
+    // getShell().setSize(shellSize.x, shellSize.y - height);
+    // }
+    // });
+    // return attachmentLine.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+    // }
 
     @Override
     protected void okPressed() {
@@ -210,13 +251,14 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     mbp1.setText(text);
                     mp.addBodyPart(mbp1);
 
-                    // create the second message part
-                    MimeBodyPart mbp2 = new MimeBodyPart();
-                    // attach the file to the message
-                    // attach log file
+                    // add log file
                     File logFile = Platform.getLogFileLocation().toFile();
-                    mbp2.attachFile(logFile.getPath());
-                    mp.addBodyPart(mbp2);
+                    addAttachment(mp, logFile.getPath());
+
+                    // add user attachments
+                    for (AttachmentComposite attachment : attachments) {
+                        addAttachment(mp, attachment.getFile());
+                    }
 
                     // add the Multipart to the message
                     message.setContent(mp);
@@ -238,6 +280,88 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     return;
                 }
             }
+
+            private void addAttachment(Multipart mp, String file)
+                throws IOException, MessagingException {
+                if (file != null && !file.isEmpty()) {
+                    // create the second message part
+                    MimeBodyPart mbp2 = new MimeBodyPart();
+                    // attach the file to the message
+                    mbp2.attachFile(file);
+                    mp.addBodyPart(mbp2);
+                }
+            }
         });
+    }
+
+    private class AttachmentComposite extends BiobankWidget {
+
+        private BiobankText attachmentText;
+
+        private Button browseButton;
+
+        private Button removeButton;
+
+        private String file;
+
+        public AttachmentComposite(Composite parent,
+            final Composite globalComposite) {
+            super(parent, SWT.NONE);
+            GridLayout layout = new GridLayout(3, false);
+            layout.horizontalSpacing = 0;
+            layout.marginWidth = 0;
+            layout.verticalSpacing = 0;
+            setLayout(layout);
+            GridData gd = new GridData();
+            gd.horizontalAlignment = SWT.FILL;
+            gd.grabExcessHorizontalSpace = true;
+            setLayoutData(gd);
+
+            attachmentText = (BiobankText) widgetCreator.createWidget(this,
+                BiobankText.class, SWT.READ_ONLY, null);
+            browseButton = new Button(this, SWT.PUSH);
+            browseButton.setText("Browse");
+            browseButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    FileDialog fd = new FileDialog(browseButton.getShell(),
+                        SWT.OPEN);
+                    fd.setText("Select attachment");
+                    file = fd.open();
+                    if (file != null) {
+                        attachmentText.setText(file);
+                    }
+                }
+            });
+            removeButton = new Button(this, SWT.PUSH);
+            removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+                .get(BioBankPlugin.IMG_DELETE));
+            removeButton.setToolTipText("Remove this attachment");
+            removeButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    int height = AttachmentComposite.this.computeSize(
+                        SWT.DEFAULT, SWT.DEFAULT).y;
+                    attachmentText.setText("");
+                    AttachmentComposite.this.setVisible(false);
+                    GridData gd = (GridData) AttachmentComposite.this
+                        .getLayoutData();
+                    gd.exclude = true;
+                    attachments.remove(AttachmentComposite.this);
+                    globalComposite.layout(true, true);
+                    Point shellSize = getShell().getSize();
+                    getShell().setSize(shellSize.x, shellSize.y - height);
+                    AttachmentComposite.this.dispose();
+                }
+            });
+        }
+
+        public String getFile() {
+            return file;
+        }
+
+        public int getHeight() {
+            return computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+        }
     }
 }

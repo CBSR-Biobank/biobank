@@ -329,6 +329,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static void openAsyncInformation(final String title,
         final String message) {
         Display.getDefault().asyncExec(new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openInformation(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), title, message);
@@ -341,6 +342,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
      */
     public static void openAsyncError(final String title, final String message) {
         Display.getDefault().asyncExec(new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openError(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), title, message);

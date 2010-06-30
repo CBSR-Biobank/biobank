@@ -199,6 +199,10 @@
             id="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
             name="CBSR Configuration with data">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
+            name="Calgary Configuration">
+      </command>
        <command
             id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
             name="Add shipment">
@@ -553,6 +557,15 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.CbsrConfigWithDataHandler"
             commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData">
+         <activeWhen>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.CalgaryConfigHandler"
+            commandId="edu.ualberta.med.biobank.commands.debug.calgaryConfig">
          <activeWhen>
             <reference
                   definitionId="biobank2.loggedIn">
@@ -1124,6 +1137,12 @@
                   commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
                   id="edu.ualberta.med.biobank.menu.debug.cbsrConfigWithData"
                   label="Create CBSR Configuration with data"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
+                  id="edu.ualberta.med.biobank.menu.debug.calgaryConfig"
+                  label="Create Calgary Configuration"
                   style="push">
             </command>
          </menu>

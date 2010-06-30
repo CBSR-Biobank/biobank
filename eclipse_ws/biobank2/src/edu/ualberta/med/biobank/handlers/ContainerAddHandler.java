@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class ContainerAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerAdd";
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
             Collection<ContainerTypeWrapper> top = ContainerTypeWrapper

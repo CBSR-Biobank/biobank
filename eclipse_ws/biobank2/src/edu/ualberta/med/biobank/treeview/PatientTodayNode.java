@@ -47,4 +47,12 @@ public class PatientTodayNode extends AbstractTodayNode {
             .getAppService(), SessionManager.getInstance().getCurrentSite());
     }
 
+    @Override
+    protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
+        if (child instanceof PatientWrapper) {
+            return parent.equals(((PatientWrapper) child).getStudy());
+        }
+        return false;
+    }
+
 }

@@ -83,20 +83,20 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     public Action confirmAction;
 
     private static ImageDescriptor printActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PRINTER));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PRINTER));
 
     private static ImageDescriptor resetActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RESET_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RESET_FORM));
 
     private static ImageDescriptor cancelActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CANCEL_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CANCEL_FORM));
 
     private static ImageDescriptor confirmActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CONFIRM_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CONFIRM_FORM));
 
     protected KeyListener keyListener = new KeyAdapter() {
         @Override
@@ -147,6 +147,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void doSaveInternal(final IProgressMonitor monitor) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
             public void run() {
                 try {
                     saveForm();
@@ -289,6 +290,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void bindChangeListener() {
         final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
+            @Override
             public void handleChange(ChangeEvent event) {
                 IObservableValue validationStatus = (IObservableValue) event
                     .getSource();
@@ -319,8 +321,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void setConfirmEnabled(boolean enabled) {
         ISourceProviderService service = (ISourceProviderService) PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getService(
-                ISourceProviderService.class);
+            .getWorkbench().getActiveWorkbenchWindow()
+            .getService(ISourceProviderService.class);
         ConfirmState confirmSourceProvider = (ConfirmState) service
             .getSourceProvider(ConfirmState.SESSION_STATE);
         confirmSourceProvider.setState(enabled);
@@ -387,6 +389,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             BiobankEntryForm.this.print();

@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.helpers.CbsrConfigWithDataJob;
 
 public class CbsrConfigWithDataHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         new CbsrConfigWithDataJob();
         return null;

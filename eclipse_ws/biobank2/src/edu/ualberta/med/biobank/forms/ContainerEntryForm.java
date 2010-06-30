@@ -139,12 +139,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .getAllActivityStatuses(appService), container
                 .getActivityStatus(), "Container must have an activity status");
 
-        BiobankText comment = (BiobankText) createBoundWidgetWithLabel(client,
-            BiobankText.class, SWT.MULTI | SWT.WRAP, "Comments", null,
-            BeansObservables.observeValue(container, "comment"), null);
-        GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        gd.heightHint = 40;
-        comment.setLayoutData(gd);
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null, BeansObservables.observeValue(container,
+                "comment"), null);
 
         createContainerTypesSection(client);
     }
@@ -254,6 +251,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         containerAdapter.performExpand();
                     } else {
                         Display.getDefault().asyncExec(new Runnable() {
+                            @Override
                             public void run() {
                                 containerAdapter.getParent().addChild(
                                     containerAdapter);

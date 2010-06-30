@@ -77,6 +77,7 @@ public abstract class BiobankFormBase extends EditorPart {
     public List<BiobankFormBase> linkedForms;
 
     protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
+        @Override
         public void doubleClick(DoubleClickEvent event) {
             Object selection = event.getSelection();
             if (selection instanceof StructuredSelection) {
@@ -192,6 +193,7 @@ public abstract class BiobankFormBase extends EditorPart {
         // start a new runnable so that database objects are populated in a
         // separate thread.
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+            @Override
             public void run() {
                 try {
                     createFormContent();
