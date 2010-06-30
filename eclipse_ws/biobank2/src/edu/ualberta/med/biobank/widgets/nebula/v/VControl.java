@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.util.ArrayList;
@@ -145,7 +146,6 @@ public abstract class VControl {
     private Set<Integer> eventTypes = new HashSet<Integer>();
 
     private Listener listener = new Listener() {
-        @Override
         public void handleEvent(Event event) {
             if (event.type == SWT.FocusIn) {
                 if (VControl.this == VTracker.getFocusControl()) {
@@ -158,12 +158,6 @@ public abstract class VControl {
 
     private boolean activatable = true;
 
-    /**
-     * Javadoc out of date // TODO: update javadoc
-     * 
-     * @param panel
-     * @param style
-     */
     public VControl(VPanel panel, int style) {
         setParent(panel);
 
@@ -276,8 +270,7 @@ public abstract class VControl {
         return computeSize(wHint, hHint, true);
     }
 
-    public Point computeSize(int wHint, int hHint,
-        @SuppressWarnings("unused") boolean changed) {
+    public Point computeSize(int wHint, int hHint, boolean changed) {
         if (wHint != SWT.DEFAULT && wHint < 0) {
             wHint = 0;
         }
@@ -332,7 +325,6 @@ public abstract class VControl {
     public Menu createMenu() {
         menu = new Menu(composite);
         addListener(SWT.MouseDown, new Listener() {
-            @Override
             public void handleEvent(Event event) {
                 if (SWT.MouseDown == event.type && event.button == 3) {
                     menu.setVisible(true);
@@ -436,7 +428,7 @@ public abstract class VControl {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getData(String name, @SuppressWarnings("unused") Class<T> clazz) {
+    public <T> T getData(String name, Class<T> clazz) {
         if (dataMap != null) {
             return (T) dataMap.get(name);
         }
@@ -525,7 +517,7 @@ public abstract class VControl {
         return getParent().getWidget();
     }
 
-    protected void filterEvent(@SuppressWarnings("unused") Event event) {
+    protected void filterEvent(Event event) {
         // subclasses to implement if necessary
     }
 
@@ -585,11 +577,11 @@ public abstract class VControl {
         return getVisible() && composite.isVisible();
     }
 
-    public void moveAbove(@SuppressWarnings("unused") VControl control) {
+    public void moveAbove(VControl control) {
         parent.move(this, null);
     }
 
-    public void moveBelow(@SuppressWarnings("unused") VControl control) {
+    public void moveBelow(VControl control) {
         parent.move(null, this);
     }
 
@@ -715,14 +707,13 @@ public abstract class VControl {
         yAlign = y;
     }
 
-    @SuppressWarnings("cast")
     public void setAlpha(GC gc) {
         gc.setAlpha((int) (2.55 * (double) visibility));
     }
 
-    @SuppressWarnings("cast")
     public void setAlpha(GC gc, int alpha) {
-        gc.setAlpha((int) ((double) alpha * (double) visibility * (double) 0.01));
+        gc
+            .setAlpha((int) ((double) alpha * (double) visibility * (double) 0.01));
     }
 
     public void setBackground(Color color) {
@@ -818,7 +809,7 @@ public abstract class VControl {
         return false;
     }
 
-    public void setFont(@SuppressWarnings("unused") Font font) {
+    public void setFont(Font font) {
         // TODO setFont
     }
 
@@ -1014,7 +1005,6 @@ public abstract class VControl {
                 public void run() {
                     do {
                         Display.getDefault().syncExec(new Runnable() {
-                            @Override
                             public void run() {
                                 if (!disposed) {
                                     setVisibility(visibility
@@ -1033,7 +1023,6 @@ public abstract class VControl {
                     } while (!disposed && visibility > 0 && visibility < 100);
                     if (!disposed && visibility != 0 && visibility != 100) {
                         Display.getDefault().syncExec(new Runnable() {
-                            @Override
                             public void run() {
                                 if (!disposed) {
                                     setVisible(visible);

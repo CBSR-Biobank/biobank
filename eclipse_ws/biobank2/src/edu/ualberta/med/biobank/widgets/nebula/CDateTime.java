@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula;
 
 import java.text.AttributedCharacterIterator;
@@ -24,10 +25,16 @@ import java.util.TimeZone;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -44,6 +51,7 @@ import edu.ualberta.med.biobank.widgets.nebula.v.VButton;
 import edu.ualberta.med.biobank.widgets.nebula.v.VCanvas;
 import edu.ualberta.med.biobank.widgets.nebula.v.VGridLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VLabel;
+import edu.ualberta.med.biobank.widgets.nebula.v.VLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VNative;
 import edu.ualberta.med.biobank.widgets.nebula.v.VPanel;
 import edu.ualberta.med.biobank.widgets.nebula.v.VTracker;
@@ -68,6 +76,7 @@ public class CDateTime extends BaseCombo {
     /**
      * A simple class used for editing a field numerically.
      */
+
     private class EditField {
 
         private String buffer;
@@ -106,7 +115,6 @@ public class CDateTime extends BaseCombo {
             count = 0;
         }
 
-        @Override
         public String toString() {
             if (buffer.length() < digits) {
                 char[] ca = new char[digits - buffer.length()];
@@ -122,6 +130,50 @@ public class CDateTime extends BaseCombo {
      * SIMPLE or DROP_DOWN - with style of SPINNER.<br>
      * Note that there is a spinner, but no button for this style.
      */
+    class SpinnerLayout extends VLayout {
+
+        protected Point computeSize(VPanel panel, int wHint, int hHint,
+            boolean flushCache) {
+            Point size = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
+            int sWidth = sRect.x + sRect.width
+                - (2 * spinner.getControl().getBorderWidth()) + 1;
+
+            size.x += sWidth;
+            size.x++;
+            size.y += textMarginHeight;
+
+            if (wHint != SWT.DEFAULT) {
+                size.x = Math.min(size.x, wHint);
+            }
+            if (hHint != SWT.DEFAULT) {
+                size.y = Math.min(size.y, hHint);
+            }
+            return size;
+        }
+
+        protected void layout(VPanel panel, boolean flushCache) {
+            Rectangle cRect = panel.getClientArea();
+            if (cRect.isEmpty())
+                return;
+
+            Point tSize = text.getControl().computeSize(SWT.DEFAULT,
+                SWT.DEFAULT);
+            tSize.y += textMarginHeight;
+
+            spinner.setBounds(cRect.x, cRect.y, cRect.width, tSize.y);
+
+            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
+            int sWidth = sRect.x + sRect.width
+                - (2 * spinner.getControl().getBorderWidth()) + 1;
+
+            tSize.x = cRect.width - sWidth;
+
+            text.setBounds(cRect.x, cRect.y + getBorderWidth(), tSize.x,
+                tSize.y);
+        }
+    }
 
     private static final int FIELD_NONE = -1;
 
@@ -177,11 +229,20 @@ public class CDateTime extends BaseCombo {
 
     private CDateTimePainter painter;
 
+    Listener doubleClickListener = new Listener() {
+        public void handleEvent(Event event) {
+            if (event.type == SWT.MouseDoubleClick) {
+                event.doit = false;
+
+                setOpen(false);
+            }
+        }
+    };
+
     /**
      * Delegates events to their appropriate handler
      */
     Listener textListener = new Listener() {
-        @Override
         public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.FocusIn:
@@ -377,7 +438,6 @@ public class CDateTime extends BaseCombo {
             setContent(pickerPanel.getComposite());
 
             canvas.addListener(SWT.KeyDown, new Listener() {
-                @Override
                 public void handleEvent(Event event) {
                     if (SWT.ESC == event.keyCode) {
                         event.doit = false;
@@ -399,17 +459,9 @@ public class CDateTime extends BaseCombo {
             dp.setScrollable(scrollable);
             dp.setFields(calendarFields);
             dp.updateView();
+            dp.addDoubleClickListenerToDays(doubleClickListener);
             picker = dp;
-        } else if (isTime) {
-            if ((style & CDT.CLOCK_DISCRETE) != 0) {
-                DiscreteTimePicker dtp = new DiscreteTimePicker(this);
-                dtp.setFields(calendarFields);
-                dtp.updateView();
-                picker = dtp;
-            } else {
-                System.err
-                    .println("ERROR CDateTime: Analog Clock unsupported.");
-            }
+
         }
 
         if (isDropDown()) {
@@ -433,7 +485,6 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("accept.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
-            @Override
             public void handleEvent(Event event) {
                 setOpen(false);
             }
@@ -444,7 +495,6 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("cancel.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
-            @Override
             public void handleEvent(Event event) {
                 setSelection(cancelDate);
                 setOpen(false);
@@ -457,7 +507,6 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
-            @Override
             public void handleEvent(Event event) {
                 setOpen(false);
                 setSelection(null);
@@ -469,25 +518,11 @@ public class CDateTime extends BaseCombo {
         sep.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
     }
 
-    // void deselect(Date date) {
-    // if(date != null && isSelected(date)) {
-    // Date[] tmp = new Date[selection.length - 1];
-    // for(int i = 0, j = 0; i < selection.length; i++) {
-    // if(!selection[i].equals(date)) {
-    // tmp[j++] = selection[i];
-    // }
-    // }
-    // setSelection(tmp);
-    // }
-    // }
-    //  
-    // void deselectAll() {
-    // setSelectedDates((Date[]) null);
-    // }
-
     private void disposePicker() {
         if (content != null) {
             if (picker != null) {
+                picker
+                    .removeListener(SWT.MouseDoubleClick, doubleClickListener);
                 picker.dispose();
                 picker = null;
             }
@@ -497,7 +532,6 @@ public class CDateTime extends BaseCombo {
                 c.dispose();
                 if (contentShell != null) {
                     Display.getDefault().asyncExec(new Runnable() {
-                        @Override
                         public void run() {
                             if (contentShell != null
                                 && !contentShell.isDisposed()) {
@@ -839,7 +873,6 @@ public class CDateTime extends BaseCombo {
         return calendar.getTimeInMillis();
     }
 
-    @Override
     public boolean getEditable() {
         return !panel.hasStyle(SWT.READ_ONLY);
     }
@@ -905,12 +938,10 @@ public class CDateTime extends BaseCombo {
         return hasSelection() ? selection[0] : null;
     }
 
-    @Override
     public int getStyle() {
         return style;
     }
 
-    @Override
     public String getText() {
         return checkText() ? text.getText() : null;
     }
@@ -1093,7 +1124,49 @@ public class CDateTime extends BaseCombo {
             } else {
                 setButtonVisibility(BaseCombo.BUTTON_NEVER);
                 if ((style & CDT.SPINNER) != 0) {
-                    System.err.println("ERROR CDateTime: Spinner unsupported.");
+                    int sStyle = SWT.VERTICAL;
+                    if (gtk && ((style & CDT.BORDER) != 0)) {
+                        sStyle |= SWT.BORDER;
+                    }
+                    spinner = VNative.create(Spinner.class, panel, sStyle);
+                    if (win32) {
+                        spinner
+                            .setBackground(text.getControl().getBackground());
+                    }
+                    spinner.getControl().setMinimum(0);
+                    spinner.getControl().setMaximum(50);
+                    spinner.getControl().setDigits(1);
+                    spinner.getControl().setIncrement(1);
+                    spinner.getControl().setPageIncrement(1);
+                    spinner.getControl().setSelection(25);
+                    spinner.getControl().addFocusListener(new FocusAdapter() {
+                        public void focusGained(FocusEvent e) {
+                            internalFocusShift = true;
+                            setFocus();
+                            internalFocusShift = false;
+                        }
+                    });
+                    spinner.getControl().addMouseListener(new MouseAdapter() {
+                        public void mouseDown(MouseEvent e) {
+                            if (e.button == 2) {
+                                fieldNext();
+                            }
+                        }
+                    });
+                    spinner.getControl().addSelectionListener(
+                        new SelectionAdapter() {
+                            public void widgetSelected(SelectionEvent e) {
+                                if (VTracker.getMouseDownButton() != 2) {
+                                    if (spinner.getControl().getSelection() > 25) {
+                                        fieldAdjust(1);
+                                    } else {
+                                        fieldAdjust(-1);
+                                    }
+                                    spinner.getControl().setSelection(25);
+                                }
+                            }
+                        });
+                    panel.setLayout(new SpinnerLayout());
                 }
             }
 
@@ -1131,13 +1204,12 @@ public class CDateTime extends BaseCombo {
      * 
      * @param listener the listener which should no longer be notified
      * @exception IllegalArgumentException <ul>
-     *                <li>ERROR_NULL_ARGUMENT - if the listener is null</li>
+     *                <li>_NULL_ARGUMENT - if the listener is null</li>
      *                </ul>
      * @exception SWTException <ul>
-     *                <li>ERROR_WIDGET_DISPOSED - if the receiver has been
-     *                disposed</li>
-     *                <li>ERROR_THREAD_INVALID_ACCESS - if not called from the
-     *                thread that created the receiver</li>
+     *                <li>_WIDGET_DISPOSED - if the receiver has been disposed</li>
+     *                <li>_THREAD_INVALID_ACCESS - if not called from the thread
+     *                that created the receiver</li>
      *                </ul>
      * @see SelectionListener
      * @see #addSelectionListener
@@ -1172,7 +1244,7 @@ public class CDateTime extends BaseCombo {
     // setSelectedDates(tmp);
     // }
     // }
-    //  
+    //	
     // void select(Date date1, Date date2, int field, int increment) {
     // if(date1 != null && date2 != null) {
     // Date start = date1.before(date2) ? date1 : date2;
@@ -1229,10 +1301,9 @@ public class CDateTime extends BaseCombo {
      * (non-Javadoc)
      * 
      * @see
-     * 
+     * org.eclipse.nebula.cwt.base.BaseCombo#setButtonImage(org.eclipse.swt.
      * graphics.Image)
      */
-    @Override
     public void setButtonImage(Image image) {
         super.setButtonImage(image);
     }
@@ -1250,8 +1321,9 @@ public class CDateTime extends BaseCombo {
 
     /*
      * (non-Javadoc)
+     * 
+     * @see org.eclipse.nebula.cwt.base.BaseCombo#setEditable(boolean)
      */
-    @Override
     public void setEditable(boolean editable) {
         super.setEditable(editable);
         if (checkPicker()) {
@@ -1338,7 +1410,6 @@ public class CDateTime extends BaseCombo {
         }
     }
 
-    @Override
     protected void setModifyEventProperties(Event e) {
         e.data = calendar.getTime();
     }
@@ -1356,12 +1427,10 @@ public class CDateTime extends BaseCombo {
         updateText();
     }
 
-    @Override
     public void setOpen(boolean open) {
         setOpen(open, null);
     }
 
-    @Override
     public void setOpen(boolean open, Runnable callback) {
         if (open) {
             cancelDate = getSelection();
@@ -1452,10 +1521,9 @@ public class CDateTime extends BaseCombo {
             }
             if (checkButton() && ((isDate != wasDate) || (isTime != wasTime))) {
                 if (defaultButtonImage) {
+                    // TODO fix image resources
                     if (isDate) {
                         doSetButtonImage(Resources.getIconCalendar());
-                    } else {
-                        doSetButtonImage(Resources.getIconClock());
                     }
                 }
                 updateNullText();
@@ -1704,7 +1772,6 @@ public class CDateTime extends BaseCombo {
         final int selEnd = s1;
 
         Runnable runnable = new Runnable() {
-            @Override
             public void run() {
                 if ((text != null) && (!text.isDisposed())) {
                     if (!string.equals(text.getText())) {

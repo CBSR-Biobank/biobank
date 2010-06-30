@@ -250,7 +250,6 @@ class DatePicker extends VPanel {
         bodyPanel.getLayout(VStackLayout.class).setDefault(dayPanel, false);
 
         addListener(SWT.MouseWheel, new Listener() {
-            @Override
             public void handleEvent(Event event) {
                 scrollCalendar((event.count > 0) ? SWT.ARROW_UP
                     : SWT.ARROW_DOWN);
@@ -261,7 +260,6 @@ class DatePicker extends VPanel {
 
         todayMenuItem = new MenuItem(bodyMenu, SWT.NONE);
         todayMenuItem.addSelectionListener(new SelectionAdapter() {
-            @Override
             public void widgetSelected(SelectionEvent e) {
                 cdt.setSelection(new Date());
             }
@@ -269,14 +267,12 @@ class DatePicker extends VPanel {
 
         showSelMenuItem = new MenuItem(bodyMenu, SWT.NONE);
         showSelMenuItem.addSelectionListener(new SelectionAdapter() {
-            @Override
             public void widgetSelected(SelectionEvent e) {
                 cdt.showSelection();
             }
         });
 
         dayListener = new Listener() {
-            @Override
             public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.KeyDown:
@@ -299,10 +295,11 @@ class DatePicker extends VPanel {
                         dayPanel.getMenu().setVisible(true);
                     }
                     break;
+
+                /* DOES NOT WORK */
                 case SWT.MouseWheel:
-                    scrollCalendar((event.count > 0) ? SWT.ARROW_UP
-                        : SWT.ARROW_DOWN);
                     break;
+
                 case SWT.Selection:
                     if (event.widget == null) {
                         VButton button = (VButton) event.data;
@@ -363,6 +360,19 @@ class DatePicker extends VPanel {
         }
     }
 
+    public void addDoubleClickListenerToDays(Listener doubleClick) {
+        if (dayButtons != null)
+            for (int day = 0; day < dayButtons.length; day++)
+                dayButtons[day].addListener(SWT.MouseDoubleClick, doubleClick);
+    }
+
+    public void removeDoubleClickListenerToDays(Listener doubleClick) {
+        if (dayButtons != null)
+            for (int day = 0; day < dayButtons.length; day++)
+                dayButtons[day].removeListener(SWT.MouseDoubleClick,
+                    doubleClick);
+    }
+
     /**
      * create the footer (footerButton) for the Calendar part of this CDateTime<br/>
      * there is currently no footer for the Clock part - should there be? or
@@ -396,7 +406,6 @@ class DatePicker extends VPanel {
                 clear.setLayoutData(new GridData(f.alignment, SWT.FILL, f.grab,
                     false));
                 clear.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         cdt.setSelection(null);
                         if (event.widget == null) {
@@ -414,7 +423,6 @@ class DatePicker extends VPanel {
                 today.setLayoutData(new GridData(f.alignment, SWT.FILL, f.grab,
                     false));
                 today.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         cdt.setSelection(new Date());
                         if (event.widget == null) {
@@ -463,7 +471,6 @@ class DatePicker extends VPanel {
                 dateNow.setPolygon(new int[] { 7, 7 });
                 dateNow.setLayoutData(data);
                 dateNow.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         cdt.setSelection(new Date());
                         if (event.widget == null) {
@@ -484,7 +491,6 @@ class DatePicker extends VPanel {
                 } else {
                     if (CDT.gtk) {
                         monthButton.addListener(SWT.MouseWheel, new Listener() {
-                            @Override
                             public void handleEvent(Event event) {
                                 if (SWT.MouseWheel == event.type) {
                                     Calendar tmpcal = cdt.getCalendarInstance();
@@ -496,7 +502,6 @@ class DatePicker extends VPanel {
                         });
                     }
                     monthButton.addListener(SWT.Selection, new Listener() {
-                        @Override
                         public void handleEvent(Event event) {
                             handleHeaderSelection((VButton) event.data);
                         }
@@ -512,7 +517,6 @@ class DatePicker extends VPanel {
                             "Month", new Integer(tmpcal.get(Calendar.MONTH))); //$NON-NLS-1$
                         monthItems[i]
                             .addSelectionListener(new SelectionAdapter() {
-                                @Override
                                 public void widgetSelected(SelectionEvent e) {
                                     MenuItem item = (MenuItem) e.widget;
                                     Calendar tmpcal = cdt.getCalendarInstance();
@@ -533,7 +537,6 @@ class DatePicker extends VPanel {
                 monthNext.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false,
                     false));
                 monthNext.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         Calendar tmpcal = cdt.getCalendarInstance();
                         if (yearNext == null && yearButton != null
@@ -555,7 +558,6 @@ class DatePicker extends VPanel {
                 monthPrev.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false,
                     false));
                 monthPrev.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         Calendar tmpcal = cdt.getCalendarInstance();
                         if (yearPrev == null && yearButton != null
@@ -565,22 +567,6 @@ class DatePicker extends VPanel {
                             tmpcal.add(Calendar.MONTH, -1);
                         }
                         cdt.setSelection(tmpcal.getTime());
-                    }
-                });
-                break;
-            case Header.TIME:
-                timeButton = new VButton(header, SWT.TOGGLE | SWT.NO_FOCUS);
-                timeButton.setMargins(3, 5);
-                timeButton.setImage(Resources.getIconClock());
-                timeButton.setData(CDT.PickerPart, PickerPart.MonthPrev);
-                timeButton.setPainter(cdt.getPainter());
-                cdt.getPainter().update(timeButton);
-                timeButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-                    false, false));
-                timeButton.addListener(SWT.Selection, new Listener() {
-                    @Override
-                    public void handleEvent(Event event) {
-                        handleHeaderSelection((VButton) event.data);
                     }
                 });
                 break;
@@ -596,7 +582,6 @@ class DatePicker extends VPanel {
                 } else {
                     if (CDT.gtk) {
                         yearButton.addListener(SWT.MouseWheel, new Listener() {
-                            @Override
                             public void handleEvent(Event event) {
                                 if (SWT.MouseWheel == event.type) {
                                     Calendar tmpcal = cdt.getCalendarInstance();
@@ -608,7 +593,6 @@ class DatePicker extends VPanel {
                         });
                     }
                     yearButton.addListener(SWT.Selection, new Listener() {
-                        @Override
                         public void handleEvent(Event event) {
                             handleHeaderSelection((VButton) event.data);
                         }
@@ -621,7 +605,6 @@ class DatePicker extends VPanel {
                         yearItems[i].setData("Year", new Integer(i)); //$NON-NLS-1$
                         yearItems[i]
                             .addSelectionListener(new SelectionAdapter() {
-                                @Override
                                 public void widgetSelected(SelectionEvent e) {
                                     MenuItem item = (MenuItem) e.widget;
                                     Calendar tmpcal = cdt.getCalendarInstance();
@@ -641,7 +624,6 @@ class DatePicker extends VPanel {
                 cdt.getPainter().update(yearNext);
                 yearNext.setLayoutData(data);
                 yearNext.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         Calendar tmpcal = cdt.getCalendarInstance();
                         if (yearButton != null && yearButton.getSelection()) {
@@ -664,7 +646,6 @@ class DatePicker extends VPanel {
                 cdt.getPainter().update(yearPrev);
                 yearPrev.setLayoutData(data);
                 yearPrev.addListener(SWT.Selection, new Listener() {
-                    @Override
                     public void handleEvent(Event event) {
                         Calendar tmpcal = cdt.getCalendarInstance();
                         if (yearButton != null && yearButton.getSelection()) {
@@ -714,7 +695,6 @@ class DatePicker extends VPanel {
             monthButtons[month].setLayoutData(new GridData(SWT.FILL, SWT.FILL,
                 true, true));
             monthButtons[month].addListener(SWT.Selection, new Listener() {
-                @Override
                 public void handleEvent(Event event) {
                     if (event.widget == null) {
                         VButton button = (VButton) event.data;
@@ -749,9 +729,7 @@ class DatePicker extends VPanel {
         }
     }
 
-    private void createTime(@SuppressWarnings("unused") Body b) {
-        System.err
-            .println("WARNING: unpredictable createTime event was called.");
+    private void createTime(Body b) {
     }
 
     private void createYears(Body b) {
@@ -783,7 +761,6 @@ class DatePicker extends VPanel {
             yearButtons[year].setLayoutData(new GridData(SWT.FILL, SWT.FILL,
                 true, true));
             yearButtons[year].addListener(SWT.Selection, new Listener() {
-                @Override
                 public void handleEvent(Event event) {
                     if (event.widget == null) {
                         VButton button = (VButton) event.data;
@@ -970,7 +947,6 @@ class DatePicker extends VPanel {
 
         if (monthButton != null) {
             monthButton.addListener(SWT.Resize, new Listener() {
-                @Override
                 public void handleEvent(Event event) {
                     if (SWT.Resize == event.type) {
                         setMonthLabelText();
@@ -980,7 +956,6 @@ class DatePicker extends VPanel {
         }
     }
 
-    @Override
     public boolean setFocus() {
         return setFocusToSelection();
     }

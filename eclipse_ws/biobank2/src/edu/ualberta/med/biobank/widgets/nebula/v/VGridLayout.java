@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.util.ArrayList;
@@ -178,10 +179,9 @@ public class VGridLayout extends VLayout {
         return size;
     }
 
-    @SuppressWarnings("cast")
     private void doLayout(VPanel parent, VControl[] children) {
         Point size = parent.getClientSize();
-        int border = 0; // TODO
+        int border = 0;
 
         if (size.x == 0 || size.y == 0) {
             return;

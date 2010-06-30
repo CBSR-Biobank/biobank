@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.util.HashMap;
@@ -211,7 +212,6 @@ public class VTracker implements DisposeListener {
     private VControl activeControl = null;
 
     private Listener filter = new Listener() {
-        @Override
         public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.Traverse:
@@ -414,7 +414,6 @@ public class VTracker implements DisposeListener {
         }
     }
 
-    @Override
     public void widgetDisposed(DisposeEvent e) {
         VTracker tracker = instance();
         if (tracker.panels != null && tracker.panels.containsKey(e.widget)) {
