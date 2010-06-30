@@ -40,6 +40,7 @@ class VButtonImageBak {
             this.b = b;
         }
 
+        @Override
         public void handleEvent(Event e) {
             GC gc = new GC(b);
             Image image = new Image(b.getDisplay(), e.width, e.height);
@@ -58,6 +59,7 @@ class VButtonImageBak {
                 requests.remove(key);
             }
             Display.getDefault().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     if (!b.isDisposed()
                         && b == b.getDisplay().getFocusControl()) {

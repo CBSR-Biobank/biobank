@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Listener;
 class Resources {
 
     private static Listener disposeListener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             List<String> invalids = new ArrayList<String>();
             for (Entry<String, Image> entry : images.entrySet()) {

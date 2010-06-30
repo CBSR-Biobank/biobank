@@ -40,6 +40,7 @@ public class VPanel extends VControl {
         composite = parent;
 
         topLevelListener = new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Dispose:
@@ -294,7 +295,6 @@ public class VPanel extends VControl {
         super.setVisibility(visibility);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
@@ -308,6 +308,7 @@ public class VPanel extends VControl {
     public void setWidget(Composite widget) {
         this.widget = widget;
         this.widget.addListener(SWT.KeyDown, new Listener() {
+            @Override
             public void handleEvent(Event event) {
             }
         });

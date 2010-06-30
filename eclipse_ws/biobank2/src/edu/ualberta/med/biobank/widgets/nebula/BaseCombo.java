@@ -289,6 +289,7 @@ public abstract class BaseCombo extends Canvas {
     private Listener textListener;
     private Listener shellListener;
     private Listener comboListener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.Move:
@@ -307,6 +308,7 @@ public abstract class BaseCombo extends Canvas {
     };
 
     private Listener disposeListener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             if (!isDisposed()) {
                 getShell().removeListener(SWT.Deactivate, comboListener);
@@ -411,6 +413,7 @@ public abstract class BaseCombo extends Canvas {
             button.setMargins(0, 0);
         }
         button.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setOpen(!isOpen());
             }
@@ -443,6 +446,7 @@ public abstract class BaseCombo extends Canvas {
 
     private void createText(int style) {
         textListener = new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.KeyDown:
@@ -585,6 +589,7 @@ public abstract class BaseCombo extends Canvas {
             }
 
             shellListener = new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     switch (event.type) {
                     case SWT.Close:
@@ -793,6 +798,7 @@ public abstract class BaseCombo extends Canvas {
         setButtonVisible(false);
         if (buttonVisibility == BUTTON_AUTO) {
             buttonVisibilityListener = new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     switch (event.type) {
                     case SWT.FocusIn:

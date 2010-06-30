@@ -86,6 +86,7 @@ class DiscreteTimePicker extends VPanel {
             hours[i]
                 .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             hours[i].addListener(SWT.Selection, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     for (VButton button : hours) {
                         if (button != event.data) {
@@ -107,6 +108,7 @@ class DiscreteTimePicker extends VPanel {
                 am_pm[0].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
                     true));
                 am_pm[0].addListener(SWT.Selection, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         for (VButton button : am_pm) {
                             if (button != event.data) {
@@ -139,6 +141,7 @@ class DiscreteTimePicker extends VPanel {
             minutes[i].setBackground(getDisplay().getSystemColor(
                 SWT.COLOR_WHITE));
             minutes[i].addListener(SWT.Selection, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     for (VButton button : minutes) {
                         if (button != event.data) {
@@ -156,6 +159,7 @@ class DiscreteTimePicker extends VPanel {
             am_pm[1]
                 .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             am_pm[1].addListener(SWT.Selection, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     for (VButton button : am_pm) {
                         if (button != event.data) {
@@ -175,6 +179,7 @@ class DiscreteTimePicker extends VPanel {
             hours[i]
                 .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             hours[i].addListener(SWT.Selection, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     for (VButton button : hours) {
                         if (button != event.data) {
@@ -192,6 +197,7 @@ class DiscreteTimePicker extends VPanel {
                 hours[j].setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
                     true));
                 hours[j].addListener(SWT.Selection, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         for (VButton button : hours) {
                             if (button != event.data) {
@@ -217,6 +223,7 @@ class DiscreteTimePicker extends VPanel {
             minutes[i].setBackground(getDisplay().getSystemColor(
                 SWT.COLOR_WHITE));
             minutes[i].addListener(SWT.Selection, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     for (VButton button : minutes) {
                         if (button != event.data) {
@@ -241,6 +248,7 @@ class DiscreteTimePicker extends VPanel {
             am_pm[i]
                 .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
             am_pm[i].addListener(SWT.Selection, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     for (VButton button : am_pm) {
                         if (button != event.data) {

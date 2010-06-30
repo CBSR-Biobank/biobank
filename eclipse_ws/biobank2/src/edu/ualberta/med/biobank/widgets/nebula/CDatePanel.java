@@ -113,6 +113,7 @@ public class CDatePanel extends Composite {
         body.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         body.addListener(SWT.Resize, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 handleResize();
             }
@@ -150,6 +151,7 @@ public class CDatePanel extends Composite {
         b.setFill(getDisplay().getSystemColor(SWT.COLOR_GRAY));
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 calendar.add(Calendar.MONTH, -1);
                 updateMonths();
@@ -160,6 +162,7 @@ public class CDatePanel extends Composite {
         b.setText("Today");
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 calendar.setTimeInMillis(System.currentTimeMillis());
                 updateMonths();
@@ -170,6 +173,7 @@ public class CDatePanel extends Composite {
         b.setFill(getDisplay().getSystemColor(SWT.COLOR_GRAY));
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 calendar.add(Calendar.MONTH, 1);
                 updateMonths();

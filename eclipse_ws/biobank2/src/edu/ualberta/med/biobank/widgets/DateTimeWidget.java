@@ -112,22 +112,27 @@ public class DateTimeWidget extends BiobankWidget {
 
                 dialog.addShellListener(new ShellListener() {
 
+                    @Override
                     public void shellActivated(ShellEvent event) {
 
                     }
 
+                    @Override
                     public void shellClosed(ShellEvent arg0) {
                         calendarOpen = false;
                     }
 
+                    @Override
                     public void shellDeactivated(ShellEvent arg0) {
                         calendarOpen = false;
                         dialog.close();
                     }
 
+                    @Override
                     public void shellDeiconified(ShellEvent arg0) {
                     }
 
+                    @Override
                     public void shellIconified(ShellEvent arg0) {
                     }
                 });

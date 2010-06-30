@@ -181,6 +181,7 @@ public class CDateTime extends BaseCombo {
      * Delegates events to their appropriate handler
      */
     Listener textListener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.FocusIn:
@@ -376,6 +377,7 @@ public class CDateTime extends BaseCombo {
             setContent(pickerPanel.getComposite());
 
             canvas.addListener(SWT.KeyDown, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     if (SWT.ESC == event.keyCode) {
                         event.doit = false;
@@ -431,6 +433,7 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("accept.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setOpen(false);
             }
@@ -441,6 +444,7 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("cancel.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setSelection(cancelDate);
                 setOpen(false);
@@ -453,6 +457,7 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setOpen(false);
                 setSelection(null);
@@ -492,6 +497,7 @@ public class CDateTime extends BaseCombo {
                 c.dispose();
                 if (contentShell != null) {
                     Display.getDefault().asyncExec(new Runnable() {
+                        @Override
                         public void run() {
                             if (contentShell != null
                                 && !contentShell.isDisposed()) {
@@ -1698,6 +1704,7 @@ public class CDateTime extends BaseCombo {
         final int selEnd = s1;
 
         Runnable runnable = new Runnable() {
+            @Override
             public void run() {
                 if ((text != null) && (!text.isDisposed())) {
                     if (!string.equals(text.getText())) {

@@ -178,14 +178,16 @@ public class VControlPainter implements IControlPainter {
         }
 
         Point size = e.gc.textExtent(control.text);
-        e.gc.drawText(control.text, (int) getX(control, size.x), (int) getY(
-            control, size.y), true);
+        e.gc.drawText(control.text, (int) getX(control, size.x),
+            (int) getY(control, size.y), true);
     }
 
+    @Override
     public void dispose() {
         // nothing to do
     }
 
+    @Override
     public void paintBackground(VControl control, Event e) {
         int alpha = e.gc.getAlpha();
         if (!control.isEnabled()) {
@@ -198,6 +200,7 @@ public class VControlPainter implements IControlPainter {
         e.gc.setAlpha(alpha);
     }
 
+    @Override
     public void paintBorders(VControl control, Event e) {
         int alpha = e.gc.getAlpha();
         if (!control.isEnabled()) {
@@ -211,6 +214,7 @@ public class VControlPainter implements IControlPainter {
         e.gc.setAlpha(alpha);
     }
 
+    @Override
     public void paintContent(VControl control, Event e) {
         int alpha = e.gc.getAlpha();
         if (!control.isEnabled()) {

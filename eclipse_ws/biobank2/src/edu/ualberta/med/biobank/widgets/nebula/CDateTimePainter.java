@@ -81,6 +81,7 @@ public class CDateTimePainter implements IControlPainter {
         }
     }
 
+    @Override
     public void dispose() {
         buttonPainter.dispose();
         labelPainter.dispose();
@@ -115,6 +116,7 @@ public class CDateTimePainter implements IControlPainter {
         return false;
     }
 
+    @Override
     public final void paintBackground(VControl control, Event e) {
         switch ((CDT.PickerPart) control.getData(CDT.PickerPart)) {
         case ClearButton:
@@ -168,6 +170,7 @@ public class CDateTimePainter implements IControlPainter {
         }
     }
 
+    @Override
     public final void paintBorders(VControl control, Event e) {
         switch ((CDT.PickerPart) control.getData(CDT.PickerPart)) {
         case ClearButton:
@@ -233,6 +236,7 @@ public class CDateTimePainter implements IControlPainter {
         defaultPaintContent(control, e);
     }
 
+    @Override
     public final void paintContent(VControl control, Event e) {
         switch ((CDT.PickerPart) control.getData(CDT.PickerPart)) {
         case ClearButton:

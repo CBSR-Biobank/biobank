@@ -145,6 +145,7 @@ public abstract class VControl {
     private Set<Integer> eventTypes = new HashSet<Integer>();
 
     private Listener listener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             if (event.type == SWT.FocusIn) {
                 if (VControl.this == VTracker.getFocusControl()) {
@@ -331,6 +332,7 @@ public abstract class VControl {
     public Menu createMenu() {
         menu = new Menu(composite);
         addListener(SWT.MouseDown, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 if (SWT.MouseDown == event.type && event.button == 3) {
                     menu.setVisible(true);
@@ -595,7 +597,6 @@ public abstract class VControl {
         notifyListeners(eventType, null);
     }
 
-    @SuppressWarnings("unchecked")
     public void notifyListeners(int eventType, Event event) {
         if (listeners.containsKey(eventType)) {
             if (event == null) {
@@ -721,8 +722,7 @@ public abstract class VControl {
 
     @SuppressWarnings("cast")
     public void setAlpha(GC gc, int alpha) {
-        gc
-            .setAlpha((int) ((double) alpha * (double) visibility * (double) 0.01));
+        gc.setAlpha((int) ((double) alpha * (double) visibility * (double) 0.01));
     }
 
     public void setBackground(Color color) {
@@ -781,7 +781,6 @@ public abstract class VControl {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void setEnabled(boolean enabled) {
         if (setState(STATE_ENABLED, enabled)) {
             if (this instanceof VNative) {
@@ -1015,6 +1014,7 @@ public abstract class VControl {
                 public void run() {
                     do {
                         Display.getDefault().syncExec(new Runnable() {
+                            @Override
                             public void run() {
                                 if (!disposed) {
                                     setVisibility(visibility
@@ -1033,6 +1033,7 @@ public abstract class VControl {
                     } while (!disposed && visibility > 0 && visibility < 100);
                     if (!disposed && visibility != 0 && visibility != 100) {
                         Display.getDefault().syncExec(new Runnable() {
+                            @Override
                             public void run() {
                                 if (!disposed) {
                                     setVisible(visible);

@@ -44,6 +44,7 @@ public class VNative<T extends Control> extends VControl {
     private VNative(VPanel panel, int style) {
         super(panel, style);
         disposeListener = new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 dispose();
             }
