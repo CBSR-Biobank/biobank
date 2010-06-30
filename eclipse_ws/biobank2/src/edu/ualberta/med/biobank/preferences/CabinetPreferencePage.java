@@ -28,6 +28,7 @@ public class CabinetPreferencePage extends FieldEditorPreferencePage implements
             getFieldEditorParent()));
     }
 
+    @Override
     public void init(IWorkbench workbench) {
     }
 }

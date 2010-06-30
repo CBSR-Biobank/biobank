@@ -53,6 +53,7 @@ public class AdapterTreeWidget extends Composite {
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
         treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
 
@@ -77,6 +78,7 @@ public class AdapterTreeWidget extends Composite {
         });
         treeViewer.setUseHashlookup(true);
         treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 // TODO don't work well. Something prevent the status to be well
                 // printed all the time - see #123
@@ -110,15 +112,15 @@ public class AdapterTreeWidget extends Composite {
                 Object element = ((StructuredSelection) treeViewer
                     .getSelection()).getFirstElement();
                 if (element != null) {
-                    ((AdapterBase) element).popupMenu(treeViewer, treeViewer
-                        .getTree(), menu);
+                    ((AdapterBase) element).popupMenu(treeViewer,
+                        treeViewer.getTree(), menu);
                 }
             }
         });
         treeViewer.getTree().setMenu(menu);
 
         treeViewer.setComparator(new ViewerComparator() {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "unchecked", "rawtypes" })
             @Override
             public int compare(Viewer viewer, Object e1, Object e2) {
                 if (e1 instanceof AdapterBase && e2 instanceof AdapterBase) {

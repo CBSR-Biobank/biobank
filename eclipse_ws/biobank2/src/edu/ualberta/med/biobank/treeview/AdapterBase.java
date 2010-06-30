@@ -326,6 +326,7 @@ public abstract class AdapterBase {
 
     public void performExpand() {
         Display.getDefault().asyncExec(new Runnable() {
+            @Override
             public void run() {
                 loadChildren(true);
                 try {
@@ -428,6 +429,7 @@ public abstract class AdapterBase {
                                 node.setModelObject(child);
                                 final AdapterBase nodeToUpdate = node;
                                 Display.getDefault().asyncExec(new Runnable() {
+                                    @Override
                                     public void run() {
                                         SessionManager
                                             .refreshTreeNode(nodeToUpdate);
@@ -435,6 +437,7 @@ public abstract class AdapterBase {
                                 });
                             }
                             Display.getDefault().asyncExec(new Runnable() {
+                                @Override
                                 public void run() {
                                     SessionManager
                                         .refreshTreeNode(AdapterBase.this);

@@ -382,6 +382,7 @@ public class ReportsEditor extends BiobankFormBase {
                         return;
                     }
                     Display.getDefault().syncExec(new Runnable() {
+                        @Override
                         public void run() {
                             monitor.done();
                             if (export) {
@@ -731,6 +732,7 @@ public class ReportsEditor extends BiobankFormBase {
 
         statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
+            @Override
             public void handleChange(ChangeEvent event) {
                 IObservableValue validationStatus = (IObservableValue) event
                     .getSource();

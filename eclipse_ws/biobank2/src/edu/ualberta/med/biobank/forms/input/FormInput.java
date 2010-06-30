@@ -76,7 +76,7 @@ public class FormInput implements IEditorInput {
         return getName();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes" })
     @Override
     public Object getAdapter(Class adapter) {
         if (obj == null)

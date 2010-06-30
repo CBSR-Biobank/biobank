@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.helpers.CalgaryConfigJob;
 
 public class CalgaryConfigHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         new CalgaryConfigJob();
         return null;

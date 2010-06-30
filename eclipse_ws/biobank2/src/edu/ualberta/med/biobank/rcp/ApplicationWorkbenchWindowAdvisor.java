@@ -65,8 +65,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        if (page.getPerspective().getId().equals(
-            AliquotManagementPerspective.ID)) {
+        if (page.getPerspective().getId()
+            .equals(AliquotManagementPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
                 workbench.showPerspective(PatientsAdministrationPerspective.ID,
@@ -89,17 +89,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null
                         && sourceValue.equals(SessionState.LOGGED_IN)) {
-                        updatedTitle(SessionManager.getServer(), SessionManager
-                            .getUser());
+                        updatedTitle(SessionManager.getServer(),
+                            SessionManager.getUser());
                     } else {
                         resetTitle();
                     }
                 }
 
-                @SuppressWarnings("unchecked")
                 @Override
                 public void sourceChanged(int sourcePriority,
-                    Map sourceValuesByName) {
+                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
                 }
             });
     }

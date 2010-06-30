@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 
 public class PrintHandler extends AbstractHandler implements IHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AbstractAliquotAdminForm form = (AbstractAliquotAdminForm) HandlerUtil
             .getActiveEditor(event);

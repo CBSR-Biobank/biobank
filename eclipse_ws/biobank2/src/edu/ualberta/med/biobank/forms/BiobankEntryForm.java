@@ -143,6 +143,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void doSaveInternal(final IProgressMonitor monitor) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
             public void run() {
                 try {
                     saveForm();
@@ -285,6 +286,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected void bindChangeListener() {
         final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
+            @Override
             public void handleChange(ChangeEvent event) {
                 IObservableValue validationStatus = (IObservableValue) event
                     .getSource();
@@ -354,6 +356,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    @Override
                     public void run() {
                         confirm();
                     }
@@ -369,6 +372,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    @Override
                     public void run() {
                         cancel();
                     }
@@ -384,6 +388,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             BiobankEntryForm.this.print();
@@ -408,6 +413,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             reset();

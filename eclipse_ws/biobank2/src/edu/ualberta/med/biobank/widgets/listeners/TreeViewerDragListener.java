@@ -26,10 +26,12 @@ public class TreeViewerDragListener implements DragSourceListener {
             new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
     }
 
+    @Override
     public void dragStart(DragSourceEvent event) {
         event.doit = !viewer.getSelection().isEmpty();
     }
 
+    @Override
     public void dragSetData(DragSourceEvent event) {
         Object[] selections = ((IStructuredSelection) viewer.getSelection())
             .toArray();
@@ -45,6 +47,7 @@ public class TreeViewerDragListener implements DragSourceListener {
         dragFinished(event);
     }
 
+    @Override
     public void dragFinished(DragSourceEvent event) {
         if (!event.doit || dragData == null)
             return;

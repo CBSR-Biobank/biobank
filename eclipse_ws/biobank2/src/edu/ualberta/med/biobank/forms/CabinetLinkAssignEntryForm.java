@@ -587,6 +587,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected void checkPositionAndAliquot() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
             public void run() {
                 try {
                     appendLog("----"); //$NON-NLS-1$

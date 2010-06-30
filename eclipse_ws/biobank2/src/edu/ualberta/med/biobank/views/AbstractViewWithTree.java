@@ -18,6 +18,7 @@ public abstract class AbstractViewWithTree extends ViewPart implements
 
     protected RootNode rootNode;
 
+    @Override
     public TreeViewer getTreeViewer() {
         return adaptersTree.getTreeViewer();
     }

@@ -57,6 +57,7 @@ public class BiobankStartup implements IStartup {
 
             final IWorkbench workbench = PlatformUI.getWorkbench();
             workbench.getDisplay().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     IWorkbenchWindow window = workbench
                         .getActiveWorkbenchWindow();

@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.views.AbstractViewWithTree;
 
 public class SessionReloadHandler extends AbstractHandler implements IHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AbstractViewWithTree view = SessionManager.getCurrentViewWithTree();
         view.reload();

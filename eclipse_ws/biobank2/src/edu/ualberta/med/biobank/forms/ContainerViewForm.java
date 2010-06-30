@@ -384,6 +384,7 @@ public class ContainerViewForm extends BiobankViewForm {
     private void refresh(boolean initDone, final boolean rebuild) {
         if (initDone) {
             PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         reload();
