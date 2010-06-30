@@ -13,7 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.ualberta.med.biobank.common.ServiceConnection;
+import edu.ualberta.med.biobank.client.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 

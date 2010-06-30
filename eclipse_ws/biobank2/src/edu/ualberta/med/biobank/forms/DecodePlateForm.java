@@ -17,9 +17,9 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;

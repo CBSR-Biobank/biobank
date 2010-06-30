@@ -37,6 +37,8 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -46,8 +48,6 @@ import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletLabelValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -171,12 +171,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
         productBarcodeValidator = new NonEmptyStringValidator( //$NON-NLS-1$
             Messages.getString("ScanAssign.productBarcode.validationMsg"));
-        palletLabelValidator = new PalletLabelValidator(Messages
-            .getString("ScanAssign.palletLabel.validationMsg"));
+        palletLabelValidator = new PalletLabelValidator(
+            Messages.getString("ScanAssign.palletLabel.validationMsg"));
 
         palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE, Messages
-                .getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
+            fieldsComposite, BiobankText.class, SWT.NONE,
+            Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
             null, BeansObservables.observeValue(currentPalletWrapper,
                 "productBarcode"), productBarcodeValidator); //$NON-NLS-1$
         palletproductBarcodeText.addKeyListener(new KeyAdapter() {
@@ -217,8 +217,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         });
 
         palletPositionText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE, Messages
-                .getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
+            fieldsComposite, BiobankText.class, SWT.NONE,
+            Messages.getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
             BeansObservables.observeValue(currentPalletWrapper, "label"), //$NON-NLS-1$
             palletLabelValidator); //$NON-NLS-1$
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -291,10 +291,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void createPalletTypesViewer(Composite parent) throws Exception {
         palletContainerTypes = getPalletContainerTypes();
-        palletTypesViewer = createComboViewerWithNoSelectionValidator(parent,
+        palletTypesViewer = createComboViewerWithNoSelectionValidator(
+            parent,
             Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
-            palletContainerTypes, null, Messages
-                .getString("ScanAssign.palletType.validationMsg")); //$NON-NLS-1$
+            palletContainerTypes, null,
+            Messages.getString("ScanAssign.palletType.validationMsg")); //$NON-NLS-1$
         palletTypesViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -854,8 +855,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean saveEvenIfAliquotsMissing() {
         if (currentScanState == AliquotCellStatus.MISSING
             && movedAndMissingAliquotsFromPallet.size() > 0) {
-            boolean save = BioBankPlugin.openConfirm(Messages
-                .getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
+            boolean save = BioBankPlugin.openConfirm(
+                Messages.getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
                 Messages.getString("ScanAssign.dialog.saveWithMissing.msg")); //$NON-NLS-1$
             if (save) {
                 return true;
@@ -960,8 +961,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             // database.
             appendLogNLS(
                 "ScanAssign.activitylog.pallet.checkLabelForProductBarcode", //$NON-NLS-1$
-                currentPalletWrapper.getLabel(), palletFoundWithProductBarcode
-                    .getProductBarcode());
+                currentPalletWrapper.getLabel(),
+                palletFoundWithProductBarcode.getProductBarcode());
             // need to compare with this value, in case the container has
             // been copied to the current pallet
             if (palletFoundWithProductBarcodeLabel.equals(currentPalletWrapper
@@ -1009,8 +1010,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             .getActiveWorkbenchWindow().getShell(), "Pallet product barcode", //$NON-NLS-1$
             Messages.getFormattedString(
                 "ScanAssign.dialog.checkPallet.otherPosition", //$NON-NLS-1$
-                palletFoundWithProductBarcode.getLabel(), currentPalletWrapper
-                    .getLabel()));
+                palletFoundWithProductBarcode.getLabel(),
+                currentPalletWrapper.getLabel()));
     }
 
     /**

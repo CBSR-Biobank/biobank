@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.common.ResourceResolver;
-import edu.ualberta.med.biobank.common.ServiceConnection;
+import edu.ualberta.med.biobank.client.ResourceResolver;
+import edu.ualberta.med.biobank.client.ServiceConnection;
 
 /**
  * This class controls all aspects of the application's execution

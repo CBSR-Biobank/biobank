@@ -6,8 +6,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -16,7 +17,6 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -180,8 +180,8 @@ public class AliquotWrapper extends
             HQLCriteria criteria = new HQLCriteria("from "
                 + Aliquot.class.getName()
                 + " where aliquotPosition.row=? and aliquotPosition.col=?"
-                + " and aliquotPosition.container=?", Arrays
-                .asList(new Object[] { position.row, position.col,
+                + " and aliquotPosition.container=?",
+                Arrays.asList(new Object[] { position.row, position.col,
                     parentContainer.getWrappedObject() }));
 
             List<Aliquot> samples = appService.query(criteria);
@@ -387,14 +387,14 @@ public class AliquotWrapper extends
         BiobankCheckException {
         // assume that the aliquot label position is 2 or 3 letters
         // will search with both possible positions
-        String lastContainerLabel = positionString.substring(0, positionString
-            .length() - 2);
+        String lastContainerLabel = positionString.substring(0,
+            positionString.length() - 2);
         String aliquotPositionLabel = positionString.replace(
             lastContainerLabel, "");
         List<AliquotWrapper> aliquots = getAliquotsInSiteWithPositionLabel(
             appService, site, lastContainerLabel, aliquotPositionLabel);
-        lastContainerLabel = positionString.substring(0, positionString
-            .length() - 3);
+        lastContainerLabel = positionString.substring(0,
+            positionString.length() - 3);
         aliquotPositionLabel = positionString.replace(lastContainerLabel, "");
         aliquots.addAll(getAliquotsInSiteWithPositionLabel(appService, site,
             lastContainerLabel, aliquotPositionLabel));

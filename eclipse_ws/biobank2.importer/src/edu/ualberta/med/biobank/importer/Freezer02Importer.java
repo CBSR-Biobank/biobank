@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.importer;
 
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
  * Freezer 02 in BBPDB is a 4x12 freezer, but due to timing and space problems

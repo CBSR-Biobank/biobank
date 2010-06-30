@@ -10,8 +10,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -39,7 +40,6 @@ import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import edu.ualberta.med.biobank.util.RowColPos;
 
 public class TestAliquot extends TestDatabase {
 
@@ -75,8 +75,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 0, 0);
 
-        StudyWrapper study = StudyHelper.addStudy(site, "studyname"
-            + r.nextInt());
+        StudyWrapper study = StudyHelper.addStudy(site,
+            "studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
@@ -100,8 +100,8 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testPersistFailActivityStatusNull() throws Exception {
-        AliquotWrapper pAliquot = AliquotHelper.newAliquot(aliquot
-            .getSampleType(), null);
+        AliquotWrapper pAliquot = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), null);
         pAliquot.setPatientVisit(aliquot.getPatientVisit());
 
         try {
@@ -120,9 +120,9 @@ public class TestAliquot extends TestDatabase {
         throws BiobankCheckException, Exception {
         aliquot.persist();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(aliquot
-            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
-            2, 2);
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
         duplicate.setInventoryId(aliquot.getInventoryId());
 
         try {
@@ -150,9 +150,9 @@ public class TestAliquot extends TestDatabase {
         Exception {
         aliquot.persist();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(aliquot
-            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
-            3, 3);
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 3, 3);
 
         try {
             duplicate.persist();
@@ -173,8 +173,8 @@ public class TestAliquot extends TestDatabase {
         throws BiobankCheckException, Exception {
         SampleTypeWrapper oldSampleType = aliquot.getSampleType();
 
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(oldSampleType
-            .getSite(), "sampletype_2");
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(
+            oldSampleType.getSite(), "sampletype_2");
         aliquot.setSampleType(type2);
         try {
             aliquot.persist();
@@ -238,8 +238,8 @@ public class TestAliquot extends TestDatabase {
     public void testDelete() throws Exception {
         aliquot.persist();
         SampleTypeWrapper type1 = aliquot.getSampleType();
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(aliquot
-            .getSite(), "sampletype_2");
+        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(
+            aliquot.getSite(), "sampletype_2");
         SampleTypeHelper.removeFromCreated(type2);
         type2.delete();
 
@@ -349,8 +349,8 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = aliquot.getSampleType();
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(aliquot
-            .getSite(), "newStw");
+        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(
+            aliquot.getSite(), "newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newType.getId());
         aliquot.setSampleType(newType);
@@ -390,8 +390,8 @@ public class TestAliquot extends TestDatabase {
         ss3.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         ss3.persist();
-        aliquot.getPatientVisit().getPatient().getStudy().addSampleStorage(
-            Arrays.asList(ss1, ss2, ss3));
+        aliquot.getPatientVisit().getPatient().getStudy()
+            .addSampleStorage(Arrays.asList(ss1, ss2, ss3));
         // should be 3
         aliquot.setQuantityFromType();
         Assert.assertTrue(aliquot.getQuantity().equals(3.0));
@@ -411,9 +411,9 @@ public class TestAliquot extends TestDatabase {
     public void testCompareTo() throws BiobankCheckException, Exception {
         aliquot.setInventoryId("defgh");
         aliquot.persist();
-        AliquotWrapper sample2 = AliquotHelper.newAliquot(aliquot
-            .getSampleType(), aliquot.getParent(), aliquot.getPatientVisit(),
-            2, 3);
+        AliquotWrapper sample2 = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
         Assert.assertTrue(aliquot.compareTo(sample2) > 0);
@@ -430,8 +430,8 @@ public class TestAliquot extends TestDatabase {
         SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
             name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        PatientWrapper patient = PatientHelper.addPatient(Utils
-            .getRandomNumericString(5), study);
+        PatientWrapper patient = PatientHelper.addPatient(
+            Utils.getRandomNumericString(5), study);
         ContactHelper.addContactsToStudy(study, name);
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
@@ -465,8 +465,8 @@ public class TestAliquot extends TestDatabase {
         SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
             name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        PatientWrapper patient = PatientHelper.addPatient(Utils
-            .getRandomNumericString(5), study);
+        PatientWrapper patient = PatientHelper.addPatient(
+            Utils.getRandomNumericString(5), study);
         ContactHelper.addContactsToStudy(study, name);
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
@@ -488,8 +488,8 @@ public class TestAliquot extends TestDatabase {
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
 
         List<AliquotWrapper> aliquots = AliquotWrapper
-            .getAliquotsInSiteWithPositionLabel(appService, site, aliquot
-                .getPositionString(true, false));
+            .getAliquotsInSiteWithPositionLabel(appService, site,
+                aliquot.getPositionString(true, false));
         Assert.assertEquals(1, aliquots.size());
         Assert.assertEquals(aliquots.get(0), aliquot);
     }
@@ -530,8 +530,8 @@ public class TestAliquot extends TestDatabase {
         SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
             name);
         StudyWrapper study = StudyHelper.addStudy(site, name);
-        PatientWrapper patient = PatientHelper.addPatient(Utils
-            .getRandomNumericString(5), study);
+        PatientWrapper patient = PatientHelper.addPatient(
+            Utils.getRandomNumericString(5), study);
         ContactHelper.addContactsToStudy(study, name);
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study

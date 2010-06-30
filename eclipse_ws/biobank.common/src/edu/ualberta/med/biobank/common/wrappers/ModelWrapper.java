@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.VarCharLengths;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;

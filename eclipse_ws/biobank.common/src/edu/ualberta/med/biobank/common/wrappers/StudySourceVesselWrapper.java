@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudySourceVessel;

@@ -1,5 +1,38 @@
 package edu.ualberta.med.biobank.importer;
 
+import edu.ualberta.med.biobank.client.ServiceConnection;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrClinics;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainerTypes;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainers;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Shipment;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -24,39 +57,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import edu.ualberta.med.biobank.common.ServiceConnection;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainers;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrStudies;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.util.RowColPos;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /*
  * a call to get a column from a result set can only be made once, otherwise the
@@ -251,9 +251,9 @@ public class Importer {
                     decodePatientNumbers();
                 }
 
-                appService = ServiceConnection.getAppService("http://"
-                    + System.getProperty("server", "localhost:8080")
-                    + "/biobank2", "testuser", "test");
+                appService = ServiceConnection.getAppService(
+                    "http://" + System.getProperty("server", "localhost:8080")
+                        + "/biobank2", "testuser", "test");
 
                 cbsrSite = getCbsrSite();
 
@@ -515,8 +515,10 @@ public class Importer {
             int cabinetNr = rs.getInt(1);
             String drawerNr = rs.getString(2);
             int binNr = rs.getInt(3);
-            String label = String.format("%02d%s%02d", new Object[] {
-                Integer.valueOf(cabinetNr), drawerNr, Integer.valueOf(binNr) });
+            String label = String.format(
+                "%02d%s%02d",
+                new Object[] { Integer.valueOf(cabinetNr), drawerNr,
+                    Integer.valueOf(binNr) });
             List<ContainerWrapper> binList = ContainerWrapper
                 .getContainersInSite(appService, cbsrSite, label);
             if (binList.size() == 0) {
@@ -564,9 +566,9 @@ public class Importer {
                     label = String.format("SS%s%02d", new Object[] { hotelNr,
                         Integer.valueOf(palletNr) });
                 else
-                    label = String.format("%02d%s%02d", new Object[] {
-                        Integer.valueOf(freezerNr), hotelNr,
-                        Integer.valueOf(palletNr) });
+                    label = String.format("%02d%s%02d",
+                        new Object[] { Integer.valueOf(freezerNr), hotelNr,
+                            Integer.valueOf(palletNr) });
                 List<ContainerWrapper> palletList = ContainerWrapper
                     .getContainersInSite(appService, cbsrSite, label);
                 if (palletList.size() == 0) {
@@ -577,8 +579,8 @@ public class Importer {
                     boolean palletFound = false;
                     for (ContainerWrapper bin : palletList) {
                         if (bin.getContainerType().getName().contains("Box")
-                            || bin.getContainerType().getName().contains(
-                                "Pallet")) {
+                            || bin.getContainerType().getName()
+                                .contains("Pallet")) {
                             palletFound = true;
                         }
                     }
@@ -891,8 +893,8 @@ public class Importer {
                 shipment.setClinic(clinic);
 
                 if (clinic.getSendsShipments()) {
-                    shipment.setWaybill(String.format("W-CBSR-%s-%s", clinic
-                        .getNameShort(), getWaybillDate(dateReceived)));
+                    shipment.setWaybill(String.format("W-CBSR-%s-%s",
+                        clinic.getNameShort(), getWaybillDate(dateReceived)));
                 }
                 shipment.setDateReceived(dateReceived);
                 shipment.setDateShipped(defaultDateShipped);
@@ -1254,8 +1256,8 @@ public class Importer {
             return;
         }
 
-        String aliquotLabel = String.format("%s%02d%s", parentContainer
-            .getLabel(), containerNr, containerPos);
+        String aliquotLabel = String.format("%s%02d%s",
+            parentContainer.getLabel(), containerNr, containerPos);
 
         RowColPos pos = container.getContainerType()
             .getRowColFromPositionString(containerPos);

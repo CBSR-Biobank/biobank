@@ -18,11 +18,11 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainers;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.common.config.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrClinics;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainerTypes;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainers;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
