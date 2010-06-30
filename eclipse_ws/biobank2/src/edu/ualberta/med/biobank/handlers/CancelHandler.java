@@ -12,8 +12,10 @@ import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 
 public class CancelHandler extends AbstractHandler implements IHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
             public void run() {
                 ((BiobankEntryForm) PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage()

@@ -266,8 +266,8 @@ public class ContainerViewForm extends BiobankViewForm {
             if (canCreate) {
                 // Initialisation action for selection
                 initSelectionCv = createComboViewer(childrenActionSection,
-                    "Initialize selection to", containerTypes, containerTypes
-                        .get(0));
+                    "Initialize selection to", containerTypes,
+                    containerTypes.get(0));
                 Button initializeSelectionButton = toolkit.createButton(
                     childrenActionSection, "Initialize", SWT.PUSH);
                 initializeSelectionButton
@@ -345,6 +345,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     refresh(initDone, false);
                     monitor.done();
                     Display.getDefault().syncExec(new Runnable() {
+                        @Override
                         public void run() {
                             containerWidget.getMultiSelectionManager()
                                 .clearMultiSelection();
@@ -381,6 +382,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     refresh(deleteDones, true);
                     monitor.done();
                     Display.getDefault().syncExec(new Runnable() {
+                        @Override
                         public void run() {
                             containerWidget.getMultiSelectionManager()
                                 .clearMultiSelection();

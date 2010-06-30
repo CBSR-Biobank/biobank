@@ -247,10 +247,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             @Override
             public void run() {
                 tableLoader(collection, selection);
-                Display.getDefault().syncExec(new Runnable() {
-                    public void run() {
-                    }
-                });
             }
 
         };
