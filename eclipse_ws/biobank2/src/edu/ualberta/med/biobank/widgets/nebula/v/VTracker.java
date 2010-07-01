@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.forms.widgets.Form;
 
 public class VTracker implements DisposeListener {
 
@@ -164,7 +166,7 @@ public class VTracker implements DisposeListener {
         if (comp != null) {
             Composite parent = comp.getParent();
             Control[] controls = parent.getTabList();
-            if (parent instanceof Shell) {
+            if ((parent instanceof Shell) || (parent instanceof Form)) {
                 for (int i = 0; i < controls.length; i++) {
                     if (controls[i] == comp) {
                         for (int j = 0; j < controls.length; j++) {
@@ -211,7 +213,6 @@ public class VTracker implements DisposeListener {
     private VControl activeControl = null;
 
     private Listener filter = new Listener() {
-        @Override
         public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.Traverse:
@@ -414,7 +415,6 @@ public class VTracker implements DisposeListener {
         }
     }
 
-    @Override
     public void widgetDisposed(DisposeEvent e) {
         VTracker tracker = instance();
         if (tracker.panels != null && tracker.panels.containsKey(e.widget)) {

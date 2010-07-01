@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.lang.reflect.Constructor;
@@ -44,7 +45,6 @@ public class VNative<T extends Control> extends VControl {
     private VNative(VPanel panel, int style) {
         super(panel, style);
         disposeListener = new DisposeListener() {
-            @Override
             public void widgetDisposed(DisposeEvent e) {
                 dispose();
             }
@@ -88,7 +88,6 @@ public class VNative<T extends Control> extends VControl {
         }
     }
 
-    @Override
     public T getControl() {
         return control;
     }
@@ -174,7 +173,6 @@ public class VNative<T extends Control> extends VControl {
         control.setVisible(visible);
     }
 
-    @Override
     public String toString() {
         return getClass().getName()
             + "@" + Integer.toHexString(hashCode()) + " {" + control.toString() + "}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

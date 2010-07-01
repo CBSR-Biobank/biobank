@@ -13,7 +13,6 @@ package edu.ualberta.med.biobank.widgets.nebula;
 
 import org.eclipse.swt.SWT;
 
-
 /**
  * This class provides access to the the public constants provided by the
  * CDateTime widget. This class is analogous to the SWT class of the Standard
@@ -213,22 +212,6 @@ public class CDT {
      */
     public static final int TAB_FIELDS = 1 << 25;
 
-    /**
-     * Style constant indicating that the CDateTime should created with a
-     * spinner (value is 1&lt;&lt;26). WARNING: THIS HAS BEEN REMOVED.
-     */
-    public static final int SPINNER = 1 << 26;
-
-    /**
-     * Style constant indicating that the CDateTime should created with a
-     * discrete clock, rather than an analog clock (value is 1&lt;&lt;27).
-     */
-    public static final int CLOCK_DISCRETE = 1 << 27;
-
-    /**
-     * Style constant to force the use of a 12 hour clock (value is
-     * 1&lt;&lt;28).
-     */
     public static final int CLOCK_12_HOUR = 1 << 28;
 
     /**
