@@ -18,10 +18,12 @@ import edu.ualberta.med.biobank.widgets.nebula.IControlPainter;
 
 public class VPanelPainter implements IControlPainter {
 
+    @Override
     public void dispose() {
         // nothing to do
     }
 
+    @Override
     public void paintBackground(VControl control, Event e) {
         if (control.background != null && !control.background.isDisposed()) {
             e.gc.setBackground(control.background);
@@ -29,6 +31,7 @@ public class VPanelPainter implements IControlPainter {
         }
     }
 
+    @Override
     public void paintBorders(VControl control, Event e) {
         if (control.hasStyle(SWT.BORDER)) {
             if (control.foreground != null) {
@@ -42,6 +45,7 @@ public class VPanelPainter implements IControlPainter {
         }
     }
 
+    @Override
     public void paintContent(VControl control, Event e) {
         for (VControl child : ((VPanel) control).getChildren()) {
             child.paintControl(e);

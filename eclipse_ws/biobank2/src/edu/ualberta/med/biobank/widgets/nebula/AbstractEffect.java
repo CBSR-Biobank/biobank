@@ -63,6 +63,7 @@ public abstract class AbstractEffect implements IEffect {
      * 
      * @see org.eclipse.nebula.animation.effects.IEffect#cancel()
      */
+    @Override
     public void cancel() {
         done = true;
         doCancel();
@@ -89,6 +90,7 @@ public abstract class AbstractEffect implements IEffect {
      * 
      * @see org.eclipse.nebula.animation.effects.IEffect#doEffect(long)
      */
+    @Override
     public void doEffect(long time) {
         long currentTime = time;
         if (currentTime > length) {
@@ -111,6 +113,7 @@ public abstract class AbstractEffect implements IEffect {
      * 
      * @see org.eclipse.nebula.animation.effects.IEffect#getLength()
      */
+    @Override
     public long getLength() {
         return length;
     }
@@ -120,6 +123,7 @@ public abstract class AbstractEffect implements IEffect {
      * 
      * @see org.eclipse.nebula.animation.effects.IEffect#isDone()
      */
+    @Override
     public boolean isDone() {
         return done;
     }

@@ -179,6 +179,7 @@ public class VGridLayout extends VLayout {
         return size;
     }
 
+    @SuppressWarnings("cast")
     private void doLayout(VPanel parent, VControl[] children) {
         Point size = parent.getClientSize();
         int border = 0;
@@ -209,8 +210,7 @@ public class VGridLayout extends VLayout {
                     widths[col] = -1;
                 } else {
                     int w = ((data.widthHint != SWT.DEFAULT) ? data.widthHint
-                        : p.x)
-                        + data.horizontalIndent;
+                        : p.x) + data.horizontalIndent;
                     widths[col] = Math.max(widths[col], w);
                 }
             }
@@ -219,8 +219,7 @@ public class VGridLayout extends VLayout {
                     heights[row] = -1;
                 } else {
                     int h = ((data.heightHint != SWT.DEFAULT) ? data.heightHint
-                        : p.y)
-                        + data.verticalIndent;
+                        : p.y) + data.verticalIndent;
                     heights[row] = Math.max(heights[row], h);
                 }
             }
