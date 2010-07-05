@@ -83,11 +83,11 @@ import edu.ualberta.med.biobank.common.reports.PsByStudy;
 import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
 import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
+import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.SampleTypePvCount;
 import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
-import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
-import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -164,8 +164,7 @@ public class ReportsEditor extends BiobankFormBase {
             new int[] { 100, 100, 150, 100 });
         aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(AliquotSCount.class, new int[] { 100, 150, 100 });
-        aMap
-            .put(SampleTypePvCount.class, new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(SampleTypePvCount.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(SampleTypeSUsage.class, new int[] { 150, 100 });
         columnWidths = Collections.unmodifiableMap(aMap);
     }
@@ -198,8 +197,8 @@ public class ReportsEditor extends BiobankFormBase {
                                     .getQuery()).getConstructor(String.class,
                                     Integer.class).newInstance(
                                     new Object[] { op, site.getId() });
-                                reportData = query.generate(SessionManager
-                                    .getAppService(), params);
+                                reportData = query.generate(
+                                    SessionManager.getAppService(), params);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
@@ -452,18 +451,17 @@ public class ReportsEditor extends BiobankFormBase {
                             } else {
                                 try {
                                     ReportingUtils
-                                        .printReport(createDynamicReport(query
-                                            .getName(), params, columnInfo,
-                                            listData));
+                                        .printReport(createDynamicReport(
+                                            query.getName(), params,
+                                            columnInfo, listData));
                                 } catch (Exception e) {
                                     BioBankPlugin.openAsyncError(
                                         "Printer Error", e);
                                     return;
                                 }
                                 ((BiobankApplicationService) SessionManager
-                                    .getAppService())
-                                    .logActivity("print", null, null, null,
-                                        query.getName(), "report");
+                                    .getAppService()).logActivity("print",
+                                    null, null, null, query.getName(), "report");
                             }
                         }
                     });
@@ -497,8 +495,8 @@ public class ReportsEditor extends BiobankFormBase {
         drb.setTemplateFile(reportURL.getFile());
         drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
-        drb.addAutoText("Printed on "
-            + DateFormatter.formatAsDateTime(new Date()),
+        drb.addAutoText(
+            "Printed on " + DateFormatter.formatAsDateTime(new Date()),
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
 
         Style headerStyle = new Style();
@@ -580,8 +578,8 @@ public class ReportsEditor extends BiobankFormBase {
         });
 
         printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
-        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PRINTER));
+        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -611,9 +609,8 @@ public class ReportsEditor extends BiobankFormBase {
 
         for (int i = 0; i < queryOptions.size(); i++) {
             Option option = queryOptions.get(i);
-            Label fieldLabel = toolkit.createLabel(parameterSection, option
-                .getName()
-                + ":", SWT.NONE);
+            Label fieldLabel = toolkit.createLabel(parameterSection,
+                option.getName() + ":", SWT.NONE);
             textLabels.add(fieldLabel);
             final Widget widget;
             GridData widgetData = new GridData();
@@ -669,8 +666,9 @@ public class ReportsEditor extends BiobankFormBase {
                         .addTraverseListener(new TraverseListener() {
                             @Override
                             public void keyTraversed(TraverseEvent e) {
-                                populateTopCombos(((BiobankText) widget)
-                                    .getText());
+                                if (e.keyCode == SWT.TAB)
+                                    populateTopCombos(((BiobankText) widget)
+                                        .getText());
                             }
 
                         });

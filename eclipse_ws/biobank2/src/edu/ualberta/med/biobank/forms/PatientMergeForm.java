@@ -128,7 +128,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         pnumber2.addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {
-                populateFields(pnumber2.getText());
+                if (e.keyCode == SWT.TAB)
+                    populateFields(pnumber2.getText());
             }
 
         });
