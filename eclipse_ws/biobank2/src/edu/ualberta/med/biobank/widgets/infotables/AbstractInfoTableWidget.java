@@ -251,6 +251,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         };
         backgroundThread.start();
+        this.getShell().layout(true, true);
     }
 
     protected abstract void init(List<T> collection);
