@@ -1,12 +1,11 @@
-package edu.ualberta.med.biobank.common.reports2;
+package edu.ualberta.med.biobank.client.reports;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractReport implements Serializable {
+import edu.ualberta.med.biobank.common.reports2.ReportOption;
 
-    private static final long serialVersionUID = 1L;
+public abstract class AbstractReport {
 
     /**
      * Description of this query object
@@ -18,13 +17,11 @@ public abstract class AbstractReport implements Serializable {
      */
     private String[] columnNames;
 
-    private List<Option> queryOptions;
-
-    private Object[] parameters;
+    private List<ReportOption> queryOptions;
 
     public AbstractReport(String description, String[] columnNames) {
         this.description = description;
-        queryOptions = new ArrayList<Option>();
+        queryOptions = new ArrayList<ReportOption>();
         this.columnNames = columnNames;
     }
 
@@ -46,15 +43,15 @@ public abstract class AbstractReport implements Serializable {
         this.columnNames = columnNames;
     }
 
-    public List<Option> getOptions() {
+    public List<ReportOption> getOptions() {
         return queryOptions;
     }
 
     public void addOption(String name, Class<?> type, Object defaultValue) {
-        queryOptions.add(new Option(name, type, defaultValue));
+        queryOptions.add(new ReportOption(name, type, defaultValue));
     }
 
-    public void setOptions(List<Option> queryOptions) {
+    public void setOptions(List<ReportOption> queryOptions) {
         this.queryOptions = queryOptions;
     }
 
@@ -63,11 +60,4 @@ public abstract class AbstractReport implements Serializable {
         return this.getClass().getSimpleName();
     }
 
-    public void setParameters(Object[] parameters) {
-        this.parameters = parameters;
-    }
-
-    public Object[] getParameters() {
-        return parameters;
-    }
 }

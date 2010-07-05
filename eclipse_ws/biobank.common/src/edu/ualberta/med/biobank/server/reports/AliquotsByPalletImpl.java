@@ -1,39 +1,34 @@
-package edu.ualberta.med.biobank.common.reports;
+package edu.ualberta.med.biobank.server.reports;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.reports2.ReportOption;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class AliquotsByPallet extends QueryObject {
+public class AliquotsByPalletImpl extends AbstractReport {
 
     protected static final String NAME = "Aliquots by Pallet";
 
-    public AliquotsByPallet(String op, Integer siteId) {
-        super("Given a pallet label, generate a list of aliquots.",
-            "select s from " + Aliquot.class.getName()
-                + " s where s.patientVisit.patient.study.site " + op + siteId
-                + " and s.aliquotPosition.container.id "
-                + "in (select path1.container.id from "
-                + ContainerPath.class.getName() + " as path1, "
-                + ContainerPath.class.getName()
-                + " as path2 where locate(path2.path, path1.path) > 0 "
-                + "and path2.container.containerType.nameShort like ?) "
-                + "and s.aliquotPosition.container.label = ?", new String[] {
-                "Location", "Inventory ID", "Patient", "Type" });
-        addOption("Pallet Label", String.class, "");
-        addOption("Top Container Type", String.class, "");
-    }
+    private static final String QUERY = "select s from "
+        + Aliquot.class.getName()
+        + " s where s.patientVisit.patient.study.site " + siteOperatorString
+        + siteIdString + " and s.aliquotPosition.container.id "
+        + "in (select path1.container.id from " + ContainerPath.class.getName()
+        + " as path1, " + ContainerPath.class.getName()
+        + " as path2 where locate(path2.path, path1.path) > 0 "
+        + "and path2.container.containerType.nameShort like ?) "
+        + "and s.aliquotPosition.container.label = ?";
 
-    @Override
-    protected List<Object> preProcess(List<Object> params) {
-        params.add(params.remove(0));
-        return params;
+    public AliquotsByPalletImpl(List<Object> parameters,
+        List<ReportOption> options) {
+        super(QUERY, parameters, options);
+        parameters.add(parameters.remove(0));
     }
 
     @Override
@@ -79,8 +74,4 @@ public class AliquotsByPallet extends QueryObject {
         return finalResults;
     }
 
-    @Override
-    public String getName() {
-        return NAME;
-    }
 }

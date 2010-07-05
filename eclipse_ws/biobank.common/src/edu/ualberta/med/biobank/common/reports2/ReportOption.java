@@ -2,13 +2,13 @@ package edu.ualberta.med.biobank.common.reports2;
 
 import java.io.Serializable;
 
-public class Option implements Serializable {
+public class ReportOption implements Serializable {
     private static final long serialVersionUID = 1L;
     protected String name;
     protected Class<?> type;
     private Object defaultValue;
 
-    public Option(String name, Class<?> type, Object defaultValue) {
+    public ReportOption(String name, Class<?> type, Object defaultValue) {
         this.name = name;
         this.type = type;
         this.setDefaultValue(defaultValue);

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.reports2;
+package edu.ualberta.med.biobank.client.reports;
 
 public class AliquotCount extends AbstractReport {
 

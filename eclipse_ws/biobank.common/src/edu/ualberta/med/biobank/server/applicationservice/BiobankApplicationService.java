@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.common.reports2.ReportOption;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -44,4 +45,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void logActivity(String action, String patientNumber,
         String inventoryID, String locationLabel, String details, String type);
+
+    public List<Object> launchReport(String reportClassName,
+        List<Object> parameters, List<ReportOption> options,
+        String siteOperator, Integer siteId) throws ApplicationException;
 }
