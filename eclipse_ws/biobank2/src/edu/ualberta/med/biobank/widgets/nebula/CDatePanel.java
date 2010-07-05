@@ -67,7 +67,7 @@ public class CDatePanel extends Composite {
 
         panel = new VPanel(this, SWT.NONE);
 
-        locale = Locale.getDefault();
+        locale = Locale.US;
         try {
             timezone = TimeZone.getDefault();
         } catch (Exception e) {
