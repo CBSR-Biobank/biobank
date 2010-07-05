@@ -49,18 +49,19 @@ public class AliquotWrapper extends
     }
 
     @Override
-    protected void persistDependencies(Aliquot origObject) throws Exception {
-        if (origObject != null) {
-            // check if position was deleted
-            if (getPosition() == null) {
-                AliquotPosition rawPos = origObject.getAliquotPosition();
-                if (rawPos != null) {
-                    AliquotPositionWrapper pos = new AliquotPositionWrapper(
-                        appService, rawPos);
-                    pos.delete();
-                }
+    public void persist() throws Exception {
+        // check if position was deleted
+        if (getPosition() == null) {
+            // get original position
+            AliquotPosition rawPos = wrappedObject.getAliquotPosition();
+            if (rawPos != null) {
+                AbstractPositionWrapper<AliquotPosition> pos = new AliquotPositionWrapper(
+                    appService, rawPos);
+                pos.delete();
             }
+            wrappedObject.setAliquotPosition(null);
         }
+        super.persist();
     }
 
     @Override
@@ -457,15 +458,31 @@ public class AliquotWrapper extends
     @Override
     protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        AliquotPosition pos = wrappedObject.getAliquotPosition();
-        if (pos != null) {
-            return new AliquotPositionWrapper(appService, pos);
-        } else if (initIfNoPosition) {
-            AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                appService);
-            posWrapper.setAliquot(this);
-            wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-            return posWrapper;
+        if (newPositionSet) {
+            if (rowColPosition != null) {
+                AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                    appService);
+                posWrapper.setRow(rowColPosition.row);
+                posWrapper.setCol(rowColPosition.col);
+                posWrapper.setAliquot(this);
+                positionWrapper = posWrapper;
+                wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
+                System.out.println("created new position wrapper");
+                return posWrapper;
+            }
+        } else {
+            AliquotPosition pos = wrappedObject.getAliquotPosition();
+            if (pos != null) {
+                return new AliquotPositionWrapper(appService, pos);
+            } else if (initIfNoPosition) {
+                AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                    appService);
+                posWrapper.setAliquot(this);
+                positionWrapper = posWrapper;
+                wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
+                System.out.println("reverting position wrapper");
+                return posWrapper;
+            }
         }
         return null;
     }

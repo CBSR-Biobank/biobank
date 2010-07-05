@@ -10,14 +10,18 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     extends ModelWrapper<E> {
 
-    private RowColPos rowColPosition;
-    private AbstractPositionWrapper<T> positionWrapper;
+    protected RowColPos rowColPosition;
+    protected AbstractPositionWrapper<T> positionWrapper;
+
+    // used to allow position to be assigned to null
+    protected boolean newPositionSet;
 
     private ContainerWrapper parent;
 
     public AbstractPositionHolder(WritableApplicationService appService,
         E wrappedObject) {
         super(appService, wrappedObject);
+        newPositionSet = false;
     }
 
     public AbstractPositionHolder(WritableApplicationService appService) {
@@ -26,9 +30,9 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
 
     @Override
     public void persist() throws Exception {
-        boolean positionSet = (rowColPosition != null);
+        boolean positionSet = (!newPositionSet && rowColPosition != null);
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(positionSet);
-        if (posWrapper != null && positionSet) {
+        if ((posWrapper != null) && positionSet) {
             posWrapper.setRow(rowColPosition.row);
             posWrapper.setCol(rowColPosition.col);
         }
@@ -38,7 +42,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        boolean positionSet = rowColPosition != null;
+        boolean positionSet = (!newPositionSet && rowColPosition != null);
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(positionSet);
         if (posWrapper != null) {
             posWrapper.persistChecks();
@@ -62,7 +66,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     }
 
     public RowColPos getPosition() {
-        if (rowColPosition == null) {
+        if (!newPositionSet && (rowColPosition == null)) {
             AbstractPositionWrapper<T> pos = getPositionWrapper();
             if (pos != null) {
                 rowColPosition = new RowColPos(pos.getRow(), pos.getCol());
@@ -76,6 +80,11 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         this.rowColPosition = position;
         propertyChangeSupport.firePropertyChange("position", oldPosition,
             position);
+        if (position == null) {
+            positionWrapper = null;
+            System.out.println("setting position wrapper to null");
+        }
+        newPositionSet = true;
     }
 
     public void setPosition(Integer row, Integer col) {
@@ -120,6 +129,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     @Override
     public void reload() throws Exception {
         parent = null;
+        newPositionSet = false;
         super.reload();
     }
 

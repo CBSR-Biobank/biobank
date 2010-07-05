@@ -69,6 +69,9 @@ public class SentAliquots {
             }
         }
 
+        ActivityStatusWrapper closedStatus = ActivityStatusWrapper
+            .getActivityStatus(appService, "Closed");
+
         // now process the file contents
         for (String[] cols : content) {
             String patientNo = cols[0];
@@ -102,9 +105,11 @@ public class SentAliquots {
 
             System.out.println(" old position " + aliquot.getPositionString());
             aliquot.setComment(closeComment);
+            if (aliquot.getPosition() != null) {
+                System.out.println("need to assign position to null");
+            }
             aliquot.setPosition(null);
-            aliquot.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-                appService, "Closed"));
+            aliquot.setActivityStatus(closedStatus);
             aliquot.persist();
         }
     }
