@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.util.ArrayList;
@@ -166,9 +167,8 @@ public class VPanel extends VControl {
         return layout;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends VLayout> T getLayout(
-        @SuppressWarnings("unused") Class<T> clazz) {
+    @SuppressWarnings({ "unchecked", "unused" })
+    public <T extends VLayout> T getLayout(Class<T> clazz) {
         return (T) layout;
     }
 

@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.util.ArrayList;
@@ -158,12 +159,6 @@ public abstract class VControl {
 
     private boolean activatable = true;
 
-    /**
-     * Javadoc out of date // TODO: update javadoc
-     * 
-     * @param panel
-     * @param style
-     */
     public VControl(VPanel panel, int style) {
         setParent(panel);
 
@@ -276,8 +271,8 @@ public abstract class VControl {
         return computeSize(wHint, hHint, true);
     }
 
-    public Point computeSize(int wHint, int hHint,
-        @SuppressWarnings("unused") boolean changed) {
+    @SuppressWarnings("unused")
+    public Point computeSize(int wHint, int hHint, boolean changed) {
         if (wHint != SWT.DEFAULT && wHint < 0) {
             wHint = 0;
         }
@@ -435,8 +430,8 @@ public abstract class VControl {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getData(String name, @SuppressWarnings("unused") Class<T> clazz) {
+    @SuppressWarnings({ "unchecked", "unused" })
+    public <T> T getData(String name, Class<T> clazz) {
         if (dataMap != null) {
             return (T) dataMap.get(name);
         }
@@ -525,7 +520,8 @@ public abstract class VControl {
         return getParent().getWidget();
     }
 
-    protected void filterEvent(@SuppressWarnings("unused") Event event) {
+    @SuppressWarnings("unused")
+    protected void filterEvent(Event event) {
         // subclasses to implement if necessary
     }
 
@@ -585,11 +581,13 @@ public abstract class VControl {
         return getVisible() && composite.isVisible();
     }
 
-    public void moveAbove(@SuppressWarnings("unused") VControl control) {
+    @SuppressWarnings("unused")
+    public void moveAbove(VControl control) {
         parent.move(this, null);
     }
 
-    public void moveBelow(@SuppressWarnings("unused") VControl control) {
+    @SuppressWarnings("unused")
+    public void moveBelow(VControl control) {
         parent.move(null, this);
     }
 
@@ -715,14 +713,12 @@ public abstract class VControl {
         yAlign = y;
     }
 
-    @SuppressWarnings("cast")
     public void setAlpha(GC gc) {
-        gc.setAlpha((int) (2.55 * (double) visibility));
+        gc.setAlpha((int) (2.55 * visibility));
     }
 
-    @SuppressWarnings("cast")
     public void setAlpha(GC gc, int alpha) {
-        gc.setAlpha((int) ((double) alpha * (double) visibility * (double) 0.01));
+        gc.setAlpha((int) ((double) alpha * (double) visibility * 0.01));
     }
 
     public void setBackground(Color color) {
@@ -818,7 +814,8 @@ public abstract class VControl {
         return false;
     }
 
-    public void setFont(@SuppressWarnings("unused") Font font) {
+    @SuppressWarnings("unused")
+    public void setFont(Font font) {
         // TODO setFont
     }
 

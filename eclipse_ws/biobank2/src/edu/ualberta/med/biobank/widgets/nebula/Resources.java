@@ -11,7 +11,6 @@
 
 package edu.ualberta.med.biobank.widgets.nebula;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +25,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+
+import edu.ualberta.med.biobank.BioBankPlugin;
 
 class Resources {
 
@@ -48,9 +49,8 @@ class Resources {
         }
     };
 
-    public static final String ICON_CALENDAR = "calendar.png";
-    public static final String ICON_CLOCK = "clock.png";
-    public static final String ICON_BULLET = "bullet.png";
+    public static final String ICON_CALENDAR = "calendar";
+    public static final String ICON_BULLET = "bullet";
 
     private static final String BUNDLE_NAME = Resources.class.getPackage()
         .getName()
@@ -80,17 +80,12 @@ class Resources {
         return getImage(ICON_CALENDAR);
     }
 
-    public static Image getIconClock() {
-        return getImage(ICON_CLOCK);
-    }
-
     private static Image getImage(String name) {
         Image img = images.get(name);
         if (img == null || img.isDisposed()) {
             Display display = Display.getDefault();
             display.addListener(SWT.Dispose, disposeListener);
-            InputStream inputStream = Resources.class.getResourceAsStream(name);
-            img = new Image(display, inputStream);
+            img = BioBankPlugin.getDefault().getImageRegistry().get(name);
             images.put(name, img);
         }
         return img;
