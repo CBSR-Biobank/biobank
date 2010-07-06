@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.reports;
+package edu.ualberta.med.biobank.common.util;
 
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;

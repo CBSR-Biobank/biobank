@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class CabinetDAliquots extends QueryObject {
 
     protected static final String NAME = "Cabinet Aliquots per Study per Clinic by Date";

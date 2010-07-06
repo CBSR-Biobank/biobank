@@ -15,7 +15,7 @@ public class NewPsByStudyClinicImpl extends AbstractReport {
         + " where pv.dateProcessed=(select min(pvCollection.dateProcessed)"
         + " from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection"
         + " as pvCollection where p=pv.patient) and pv.patient.study.site "
-        + siteOperatorString + siteIdString
+        + SITE_OPERATOR + SITE_ID
         + " group by pv.patient.study.nameShort, pv.shipment.clinic.name,"
         + " year(pv.dateProcessed), {0}(pv.dateProcessed)";
 

@@ -14,6 +14,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class AliquotRequest extends QueryObject {
 
     protected static final String NAME = "Aliquot Request by CSV file";

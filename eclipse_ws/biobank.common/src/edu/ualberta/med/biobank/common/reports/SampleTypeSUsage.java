@@ -11,6 +11,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.proxy.ListProxy;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class SampleTypeSUsage extends QueryObject {
 
     public final static String NAME = "Sample Type Usage by Study";

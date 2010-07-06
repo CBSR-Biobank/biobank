@@ -1,16 +1,18 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
+@Deprecated
 public abstract class QueryObject {
 
     private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
@@ -123,8 +125,8 @@ public abstract class QueryObject {
 
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) throws ApplicationException, BiobankCheckException {
-        return postProcess(appService, executeQuery(appService,
-            preProcess(params)));
+        return postProcess(appService,
+            executeQuery(appService, preProcess(params)));
     }
 
     @SuppressWarnings("unused")

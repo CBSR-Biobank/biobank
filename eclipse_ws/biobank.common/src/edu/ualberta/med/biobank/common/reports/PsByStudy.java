@@ -1,11 +1,12 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
+@Deprecated
 public class PsByStudy extends QueryObject {
 
     protected static final String NAME = "Patients per Study by Date";

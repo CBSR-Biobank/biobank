@@ -60,35 +60,35 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.client.reports.AbstractReport;
+import edu.ualberta.med.biobank.client.reports.AliquotCount;
+import edu.ualberta.med.biobank.client.reports.AliquotInvoiceByClinic;
+import edu.ualberta.med.biobank.client.reports.AliquotInvoiceByPatient;
+import edu.ualberta.med.biobank.client.reports.AliquotRequest;
+import edu.ualberta.med.biobank.client.reports.AliquotSCount;
+import edu.ualberta.med.biobank.client.reports.AliquotsByPallet;
+import edu.ualberta.med.biobank.client.reports.CabinetCAliquots;
+import edu.ualberta.med.biobank.client.reports.CabinetDAliquots;
+import edu.ualberta.med.biobank.client.reports.CabinetSAliquots;
+import edu.ualberta.med.biobank.client.reports.FreezerCAliquots;
+import edu.ualberta.med.biobank.client.reports.FreezerDAliquots;
+import edu.ualberta.med.biobank.client.reports.FreezerSAliquots;
+import edu.ualberta.med.biobank.client.reports.FvLPatientVisits;
+import edu.ualberta.med.biobank.client.reports.NewPVsByStudyClinic;
+import edu.ualberta.med.biobank.client.reports.NewPsByStudyClinic;
+import edu.ualberta.med.biobank.client.reports.PVsByStudy;
+import edu.ualberta.med.biobank.client.reports.PatientVisitSummary;
+import edu.ualberta.med.biobank.client.reports.PatientWBC;
+import edu.ualberta.med.biobank.client.reports.PsByStudy;
+import edu.ualberta.med.biobank.client.reports.QACabinetAliquots;
+import edu.ualberta.med.biobank.client.reports.QAFreezerAliquots;
+import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.client.reports.SampleTypePvCount;
+import edu.ualberta.med.biobank.client.reports.SampleTypeSUsage;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.AliquotCount;
-import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic;
-import edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient;
-import edu.ualberta.med.biobank.common.reports.AliquotRequest;
-import edu.ualberta.med.biobank.common.reports.AliquotSCount;
-import edu.ualberta.med.biobank.common.reports.AliquotsByPallet;
-import edu.ualberta.med.biobank.common.reports.BiobankListProxy;
-import edu.ualberta.med.biobank.common.reports.CabinetCAliquots;
-import edu.ualberta.med.biobank.common.reports.CabinetDAliquots;
-import edu.ualberta.med.biobank.common.reports.CabinetSAliquots;
-import edu.ualberta.med.biobank.common.reports.FreezerCAliquots;
-import edu.ualberta.med.biobank.common.reports.FreezerDAliquots;
-import edu.ualberta.med.biobank.common.reports.FreezerSAliquots;
-import edu.ualberta.med.biobank.common.reports.FvLPatientVisits;
-import edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic;
-import edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic;
-import edu.ualberta.med.biobank.common.reports.PVsByStudy;
-import edu.ualberta.med.biobank.common.reports.PatientVisitSummary;
-import edu.ualberta.med.biobank.common.reports.PatientWBC;
-import edu.ualberta.med.biobank.common.reports.PsByStudy;
-import edu.ualberta.med.biobank.common.reports.QACabinetAliquots;
-import edu.ualberta.med.biobank.common.reports.QAFreezerAliquots;
-import edu.ualberta.med.biobank.common.reports.QueryObject;
-import edu.ualberta.med.biobank.common.reports.QueryObject.DateGroup;
-import edu.ualberta.med.biobank.common.reports.QueryObject.Option;
-import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.SampleTypePvCount;
-import edu.ualberta.med.biobank.common.reports.SampleTypeSUsage;
+import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.DateGroup;
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -124,7 +124,7 @@ public class ReportsEditor extends BiobankFormBase {
     private Button exportCSVButton;
     private String path;
 
-    private QueryObject query;
+    private AbstractReport report;
 
     private ReportTreeNode node;
 
@@ -196,12 +196,12 @@ public class ReportsEditor extends BiobankFormBase {
                                 String op = "=";
                                 if (site.getName().compareTo("All Sites") == 0)
                                     op = "!=";
-                                query = (QueryObject) ((Class<?>) node
-                                    .getQuery()).getConstructor(String.class,
-                                    Integer.class).newInstance(
-                                    new Object[] { op, site.getId() });
-                                reportData = query.generate(
-                                    SessionManager.getAppService(), params);
+                                report = (AbstractReport) ((Class<?>) node
+                                    .getQuery()).getConstructor().newInstance(
+                                    new Object[] {});
+                                reportData = report.generate(
+                                    SessionManager.getAppService(), params, op,
+                                    site.getId());
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
@@ -256,8 +256,9 @@ public class ReportsEditor extends BiobankFormBase {
                                 exportPDFButton.setToolTipText("Export PDF");
                             }
                             reportTable = new ReportTableWidget<Object>(form
-                                .getBody(), reportData, query.getColumnNames(),
-                                columnWidths.get(query.getClass()), 24);
+                                .getBody(), reportData,
+                                report.getColumnNames(), columnWidths
+                                    .get(report.getClass()), 24);
                             reportTable.adaptToToolkit(toolkit, true);
                             form.reflow(true);
                         }
@@ -292,14 +293,14 @@ public class ReportsEditor extends BiobankFormBase {
 
     private ArrayList<Object> getParams() throws Exception {
         ArrayList<Object> params = new ArrayList<Object>();
-        List<Option> queryOptions = query.getOptions();
+        List<ReportOption> queryOptions = report.getOptions();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof BiobankText) {
                 if (queryOptions.get(i).getName().compareTo("Pallet Label") == 0) {
                     params.add(((BiobankText) widgetFields.get(i)).getText());
                 } else if (((BiobankText) widgetFields.get(i)).getText()
                     .compareTo("") == 0)
-                    params.add(query.getOptions().get(i).getDefaultValue());
+                    params.add(report.getOptions().get(i).getDefaultValue());
                 else
                     try {
                         params.add(Integer.parseInt(((BiobankText) widgetFields
@@ -308,7 +309,8 @@ public class ReportsEditor extends BiobankFormBase {
                         BioBankPlugin
                             .openAsyncError("Invalid Number Format",
                                 "Please enter a valid number. Searching with default value...");
-                        params.add(query.getOptions().get(i).getDefaultValue());
+                        params
+                            .add(report.getOptions().get(i).getDefaultValue());
                     }
             } else if (widgetFields.get(i) instanceof Combo) {
                 Combo tempCombo = (Combo) widgetFields.get(i);
@@ -343,7 +345,7 @@ public class ReportsEditor extends BiobankFormBase {
         }
 
         for (int i = 0; i < queryOptions.size() && i < params.size(); i++) {
-            Option option = queryOptions.get(i);
+            ReportOption option = queryOptions.get(i);
             if (params.get(i) == null)
                 params.set(i, option.getDefaultValue());
         }
@@ -362,7 +364,7 @@ public class ReportsEditor extends BiobankFormBase {
             return;
         }
         // write title
-        bw.println("#" + query.getName());
+        bw.println("#" + report.getName());
         // write params
         for (Object[] ob : params)
             bw.println("#" + ob[0] + ":" + ob[1]);
@@ -410,21 +412,21 @@ public class ReportsEditor extends BiobankFormBase {
         if (doPrint) {
             final List<Object[]> printParams = new ArrayList<Object[]>();
             final List<Object> paramVals = getParams();
-            List<Option> queryOptions = query.getOptions();
+            List<ReportOption> queryOptions = report.getOptions();
             int i = 0;
-            for (Option option : queryOptions) {
+            for (ReportOption option : queryOptions) {
                 params.add(new Object[] { option.getName(), paramVals.get(i) });
                 i++;
             }
             final List<String> columnInfo = new ArrayList<String>();
-            String[] names = query.getColumnNames();
+            String[] names = report.getColumnNames();
             for (int i1 = 0; i1 < names.length; i1++) {
                 columnInfo.add(names[i1]);
             }
 
             if (exportCSV) {
                 String[] filterExt = { "*.csv" };
-                path = runExportDialog(query.getName().replaceAll(" ", "_")
+                path = runExportDialog(report.getName().replaceAll(" ", "_")
                     + "_" + DateFormatter.formatAsDate(new Date()), filterExt);
                 if (path == null) {
                     BioBankPlugin.openAsyncError("Exporting canceled.",
@@ -434,7 +436,7 @@ public class ReportsEditor extends BiobankFormBase {
                 }
             } else if (exportPDF) {
                 String[] filterExt = new String[] { ".pdf" };
-                path = runExportDialog(query.getName().replaceAll(" ", "_")
+                path = runExportDialog(report.getName().replaceAll(" ", "_")
                     + "_" + DateFormatter.formatAsDate(new Date()), filterExt);
 
             }
@@ -451,7 +453,7 @@ public class ReportsEditor extends BiobankFormBase {
                             exportCSV(columnInfo, printParams, path, monitor);
                             ((BiobankApplicationService) SessionManager
                                 .getAppService()).logActivity("exportCSV",
-                                null, null, null, query.getName(), "report");
+                                null, null, null, report.getName(), "report");
                         } else {
                             for (Object object : reportData) {
                                 if (monitor.isCanceled()) {
@@ -484,25 +486,25 @@ public class ReportsEditor extends BiobankFormBase {
         if (exportPDF) {
             try {
                 ReportingUtils.saveReport(
-                    createDynamicReport(query.getName(), params, columnInfo,
+                    createDynamicReport(report.getName(), params, columnInfo,
                         listData), path);
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Error saving to PDF", e);
                 return;
             }
             ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("exportPDF", null, null, null, query.getName(),
+                .logActivity("exportPDF", null, null, null, report.getName(),
                     "report");
         } else {
             try {
-                ReportingUtils.printReport(createDynamicReport(query.getName(),
-                    params, columnInfo, listData));
+                ReportingUtils.printReport(createDynamicReport(
+                    report.getName(), params, columnInfo, listData));
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Printer Error", e);
                 return;
             }
             ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("print", null, null, null, query.getName(),
+                .logActivity("print", null, null, null, report.getName(),
                     "report");
         }
     }
@@ -582,10 +584,10 @@ public class ReportsEditor extends BiobankFormBase {
         formLayout.marginWidth = 0;
         form.getBody().setLayout(formLayout);
 
-        form.setText(query.getDescription());
+        form.setText(report.getDescription());
 
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
-        List<Option> queryOptions = query.getOptions();
+        List<ReportOption> queryOptions = report.getOptions();
         textLabels = new ArrayList<Label>();
         widgetFields = new ArrayList<Widget>();
 
@@ -661,7 +663,7 @@ public class ReportsEditor extends BiobankFormBase {
         });
 
         for (int i = 0; i < queryOptions.size(); i++) {
-            Option option = queryOptions.get(i);
+            ReportOption option = queryOptions.get(i);
             Label fieldLabel = toolkit.createLabel(parameterSection,
                 option.getName() + ":", SWT.NONE);
             textLabels.add(fieldLabel);
@@ -854,18 +856,13 @@ public class ReportsEditor extends BiobankFormBase {
 
         reportData = new ArrayList<Object>();
         node = ((ReportInput) getEditorInput()).getNode();
-        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
-        String op = "=";
-        if (siteWrap.getName().compareTo("All Sites") == 0)
-            op = "!=";
         try {
-            query = (QueryObject) ((Class<?>) node.getQuery()).getConstructor(
-                String.class, Integer.class).newInstance(
-                new Object[] { op, siteWrap.getId() });
+            report = (AbstractReport) ((Class<?>) node.getQuery())
+                .getConstructor().newInstance(new Object[] {});
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        this.setPartName(query.getName());
+        this.setPartName(report.getName());
     }
 }

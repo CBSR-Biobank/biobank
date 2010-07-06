@@ -7,6 +7,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 
+@Deprecated
 public class AliquotInvoiceByClinic extends QueryObject {
 
     protected static final String NAME = "Aliquots per Clinic by Date";

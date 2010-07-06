@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class AliquotsByPallet extends QueryObject {
 
     protected static final String NAME = "Aliquots by Pallet";

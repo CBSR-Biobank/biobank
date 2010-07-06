@@ -45,12 +45,12 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.CustomQueryObject;
+import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.common.reports.QueryObject;
-import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.CustomQueryObject;
-import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
-import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -104,8 +104,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         top.setLayout(layout);
         top.setLayoutData(gdfill);
 
-        tree = new QueryTree(top, SWT.BORDER, ((QueryTreeNode) node.getQuery())
-            .clone());
+        tree = new QueryTree(top, SWT.BORDER,
+            ((QueryTreeNode) node.getQuery()).clone());
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -187,8 +187,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         });
 
         printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
-        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PRINTER));
+        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -305,15 +305,15 @@ public class AdvancedReportsEditor extends BiobankFormBase {
 
         widgetFields.add(widget);
         Button plusButton = new Button(parameterSection, SWT.NONE);
-        plusButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_ADD));
+        plusButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_ADD));
         plusButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 saveFields();
                 HQLField addedField = new HQLField(field);
-                selectedNode.insertField(selectedNode.getFieldData().indexOf(
-                    field), addedField);
+                selectedNode.insertField(
+                    selectedNode.getFieldData().indexOf(field), addedField);
                 displayFields(selectedNode);
             }
         });
@@ -343,8 +343,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                             try {
                                 QueryObject tempQuery = new CustomQueryObject(
                                     null, tree.compileQuery(), new String[] {});
-                                reportData = tempQuery.generate(SessionManager
-                                    .getAppService(), null);
+                                reportData = tempQuery.generate(
+                                    SessionManager.getAppService(), null);
                             } catch (Exception e) {
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);

@@ -12,6 +12,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FreezerDAliquotsImpl extends AbstractReport {
 
+    private static final String TYPE_NAME = "%Freezer%";
+
     private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort,"
         + " aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate),"
         + " {0}(aliquot.linkDate), count(aliquot.linkDate) from "
@@ -26,10 +28,11 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         + " as path1, "
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.containerType.name like ?) and"
-        + " aliquot.patientVisit.patient.study.site "
-        + siteOperatorString
-        + siteIdString
+        + " path2.container.containerType.name like '"
+        + TYPE_NAME
+        + "') and aliquot.patientVisit.patient.study.site "
+        + SITE_OPERATOR
+        + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"
         + " aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate),"
         + " {0}(aliquot.linkDate)";
@@ -50,7 +53,6 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         // columnNames[2] = (String) params.get(0);
         String groupBy = (String) parameters.get(0);
         queryString = MessageFormat.format(queryString, groupBy);
-        parameters.set(0, "%Freezer%");
         groupByYear = groupBy.equals("Year");
     }
 

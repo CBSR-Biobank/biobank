@@ -9,6 +9,8 @@ import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class FreezerCAliquotsImpl extends AbstractReport {
 
+    private static final String TYPE_NAME = "%Freezer%";
+
     private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, "
         + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
         + Aliquot.class.getName()
@@ -21,15 +23,16 @@ public class FreezerCAliquotsImpl extends AbstractReport {
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site"
-        + siteOperatorString
-        + siteIdString
+        + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like '"
+        + TYPE_NAME
+        + "') and aliquot.patientVisit.patient.study.site"
+        + SITE_OPERATOR
+        + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name";
 
     public FreezerCAliquotsImpl(List<Object> parameters,
         List<ReportOption> options) {
         super(QUERY, parameters, options);
-        parameters.add("%Freezer%");
     }
 
 }

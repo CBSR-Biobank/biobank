@@ -1,21 +1,18 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.client.reports;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.client.reports.AbstractReport;
-
 public class ReportTreeNode extends Object {
     private ReportTreeNode parent;
     private List<ReportTreeNode> children;
-    private Class<? extends AbstractReport> reportClass;
+    private Object report;
     private String name;
 
-    public ReportTreeNode(String name,
-        Class<? extends AbstractReport> reportClass) {
+    public ReportTreeNode(String name, Object query) {
         this.name = name;
-        this.reportClass = reportClass;
+        this.report = query;
         this.children = new ArrayList<ReportTreeNode>();
     }
 
@@ -25,10 +22,11 @@ public class ReportTreeNode extends Object {
 
     public String getToolTipText() {
         try {
-            if (AbstractReport.class.isAssignableFrom(reportClass)) {
-                Constructor<?> c = ((Class<?>) reportClass).getConstructor();
-                AbstractReport report = (AbstractReport) c.newInstance();
-                return report.getDescription();
+            if (AbstractReport.class.isAssignableFrom((Class<?>) report)) {
+                Constructor<?> c = ((Class<?>) report).getConstructor(
+                    String.class, Integer.class);
+                AbstractReport obj = (AbstractReport) c.newInstance();
+                return obj.getDescription();
 
             }
         } catch (Exception e) {
@@ -36,8 +34,8 @@ public class ReportTreeNode extends Object {
         return "";
     }
 
-    public Class<? extends AbstractReport> getReportClass() {
-        return reportClass;
+    public Object getQuery() {
+        return report;
     }
 
     public ReportTreeNode getParent() {

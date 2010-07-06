@@ -5,6 +5,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
+@Deprecated
 public class CabinetCAliquots extends QueryObject {
 
     public static final String NAME = "Cabinet Aliquots per Study per Clinic";

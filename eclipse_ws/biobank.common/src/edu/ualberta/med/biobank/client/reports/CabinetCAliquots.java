@@ -6,7 +6,8 @@ public class CabinetCAliquots extends AbstractReport {
 
     public CabinetCAliquots() {
         super(
-            "Displays the total number of cabinet aliquots per study per clinic. Note: the top container's name must contain \"Cabinet\".",
+            "Displays the total number of cabinet aliquots per study per clinic."
+                + " Note: the top container's name must contain \"Cabinet\".",
             new String[] { "Study", "Clinic", "Total" });
     }
 

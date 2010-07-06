@@ -15,8 +15,8 @@ public class NewPVsByStudyClinicImpl extends AbstractReport {
         + "{0}(Alias.dateProcessed), count(*) from "
         + PatientVisit.class.getName()
         + " as Alias where Alias.patient.study.site "
-        + siteOperatorString
-        + siteIdString
+        + SITE_OPERATOR
+        + SITE_ID
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
         + "Year(Alias.dateProcessed), {0}(Alias.dateProcessed)";
 

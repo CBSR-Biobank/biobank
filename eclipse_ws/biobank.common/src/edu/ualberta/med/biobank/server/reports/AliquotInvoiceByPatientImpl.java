@@ -15,8 +15,8 @@ public class AliquotInvoiceByPatientImpl extends AbstractReport {
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "') and Alias.linkDate > ? and Alias.linkDate < ? and Alias.patientVisit.patient.study.site "
-        + siteOperatorString
-        + siteIdString
+        + SITE_OPERATOR
+        + SITE_ID
         + " ORDER BY Alias.patientVisit.patient.pnumber";
 
     public AliquotInvoiceByPatientImpl(List<Object> parameters,

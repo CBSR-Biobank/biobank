@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
+@Deprecated
 public class PatientWBC extends QueryObject {
 
     protected static final String NAME = "Patient WBC Aliquots";

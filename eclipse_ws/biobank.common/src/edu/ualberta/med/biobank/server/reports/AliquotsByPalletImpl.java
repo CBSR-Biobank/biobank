@@ -15,8 +15,8 @@ public class AliquotsByPalletImpl extends AbstractReport {
 
     private static final String QUERY = "select s from "
         + Aliquot.class.getName()
-        + " s where s.patientVisit.patient.study.site " + siteOperatorString
-        + siteIdString + " and s.aliquotPosition.container.id "
+        + " s where s.patientVisit.patient.study.site " + SITE_OPERATOR
+        + SITE_ID + " and s.aliquotPosition.container.id "
         + "in (select path1.container.id from " + ContainerPath.class.getName()
         + " as path1, " + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 "

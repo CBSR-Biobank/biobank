@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.reports;
+package edu.ualberta.med.biobank.common.util;
 
 import java.util.Iterator;
 

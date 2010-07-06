@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.reports;
 
 import edu.ualberta.med.biobank.model.PatientVisit;
 
+@Deprecated
 public class FvLPatientVisits extends QueryObject {
 
     protected static final String NAME = "Clinic Activity by Study";

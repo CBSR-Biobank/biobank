@@ -36,11 +36,11 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.reports.QueryObject;
-import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
-import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.client.reports.AbstractReport;
+import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.ReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
@@ -90,13 +90,17 @@ public class ReportsView extends AbstractViewWithTree {
                 try {
                     if (node.getQuery() != null) {
                         if (node.getQuery() instanceof QueryTreeNode)
-                            PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
+                            PlatformUI
+                                .getWorkbench()
+                                .getActiveWorkbenchWindow()
+                                .getActivePage()
                                 .openEditor(new ReportInput(node),
                                     AdvancedReportsEditor.ID);
                         else
-                            PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
+                            PlatformUI
+                                .getWorkbench()
+                                .getActiveWorkbenchWindow()
+                                .getActivePage()
                                 .openEditor(new ReportInput(node),
                                     ReportsEditor.ID);
                     }
@@ -314,11 +318,11 @@ public class ReportsView extends AbstractViewWithTree {
         patients.setParent(standard);
         misc.setParent(standard);
 
-        String[] names = QueryObject.getQueryObjectNames();
+        String[] names = AbstractReport.getReportNames();
         for (int i = 0; i < names.length; i++)
             try {
-                ReportTreeNode child = new ReportTreeNode(names[i], QueryObject
-                    .getQueryObjectByName(names[i]));
+                ReportTreeNode child = new ReportTreeNode(names[i],
+                    AbstractReport.getReportByName(names[i]));
                 if (names[i].contains("Aliquot")) {
                     aliquots.addChild(child);
                     child.setParent(aliquots);

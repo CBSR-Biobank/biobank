@@ -17,14 +17,14 @@ public class AbstractReport {
 
     protected List<ReportOption> options;
 
-    protected static final String siteOperatorString = "$$siteOperator$$";
+    protected static final String SITE_OPERATOR = "$$siteOperator$$";
 
-    protected static final String siteOperatorSearchString = siteOperatorString
+    protected static final String SITE_OPERATOR_SEARCH_STRING = SITE_OPERATOR
         .replaceAll("\\$", "\\\\\\$");
 
-    protected static final String siteIdString = "$$siteId$$";
+    protected static final String SITE_ID = "$$siteId$$";
 
-    protected static final String siteIdSearchString = siteIdString.replaceAll(
+    protected static final String SITE_ID_SEARCH_STRING = SITE_ID.replaceAll(
         "\\$", "\\\\\\$");
 
     protected AbstractReport(String queryString, List<Object> parameters,
@@ -48,9 +48,9 @@ public class AbstractReport {
 
     public List<Object> executeQuery(WritableApplicationService appService,
         String siteOperator, Integer siteId) throws ApplicationException {
-        queryString = queryString.replaceAll(siteOperatorSearchString,
+        queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
             siteOperator);
-        queryString = queryString.replaceAll(siteIdSearchString,
+        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING,
             siteId.toString());
         HQLCriteria criteria = new HQLCriteria(queryString, parameters);
         List<Object> results = appService.query(criteria);

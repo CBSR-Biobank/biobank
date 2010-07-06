@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.reports.advanced;
+package edu.ualberta.med.biobank.client.reports.advanced;
 
 public class HQLField {
     private String fname;

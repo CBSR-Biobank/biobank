@@ -10,6 +10,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QAFreezerAliquotsImpl extends AbstractReport {
 
+    private static final String CONTAINER_TYPE_NAME = "%Freezer%";
+
     private static final String QUERY = "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
         + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
         + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
@@ -26,8 +28,11 @@ public class QAFreezerAliquotsImpl extends AbstractReport {
         + " as path1, "
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site "
-        + siteOperatorString + siteIdString + " ORDER BY RAND()";
+        + " path2.container.containerType.name like '"
+        + CONTAINER_TYPE_NAME
+        + "') and aliquot.patientVisit.patient.study.site "
+        + SITE_OPERATOR
+        + SITE_ID + " ORDER BY RAND()";
 
     private int numResults;
 
@@ -42,7 +47,6 @@ public class QAFreezerAliquotsImpl extends AbstractReport {
                 parameters.set(i, "%" + parameters.get(i) + "%");
         }
         numResults = (Integer) parameters.remove(parameters.size() - 1);
-        parameters.add("%Freezer%");
     }
 
     @Override

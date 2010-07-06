@@ -4,7 +4,7 @@ public class AliquotCount extends AbstractReport {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String NAME = "Sample Type Totals";
+    protected static final String NAME = "Sample Type Totals";
 
     public AliquotCount() {
         super("Lists the total number of aliquots per sample type.",

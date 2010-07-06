@@ -13,8 +13,8 @@ public class PsByStudyImpl extends AbstractReport {
         + " year(pv.dateProcessed), {0}(pv.dateProcessed), "
         + "count(distinct pv.patient) from edu.ualberta.med.biobank.model.PatientVisit pv"
         + " where pv.patient.study.site "
-        + siteOperatorString
-        + siteIdString
+        + SITE_OPERATOR
+        + SITE_ID
         + " group by pv.patient.study.nameShort, year(pv.dateProcessed), {0}(pv.dateProcessed)";
 
     private boolean groupByYear;

@@ -39,7 +39,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + " patients.patient.study=s and patients.dateProcessed between ? and ?)"
         + " from " + Study.class.getName()
         + " as s inner join s.contactCollection as c where s.site.id "
-        + siteOperatorString + siteIdString + " ORDER BY s.nameShort";
+        + SITE_OPERATOR + SITE_ID + " ORDER BY s.nameShort";
 
     public PatientVisitSummaryImpl(List<Object> parameters,
         List<ReportOption> options) {

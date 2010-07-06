@@ -12,8 +12,8 @@ public class FvLPatientVisitsImpl extends AbstractReport {
         + " MAX(Alias.shipment.dateReceived) from "
         + PatientVisit.class.getName()
         + " as Alias where Alias.patient.study.site "
-        + siteOperatorString
-        + siteIdString
+        + SITE_OPERATOR
+        + SITE_ID
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.nameShort";
 
     public FvLPatientVisitsImpl(List<Object> parameters, List<ReportOption> options) {

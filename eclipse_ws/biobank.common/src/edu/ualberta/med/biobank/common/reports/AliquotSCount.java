@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.reports;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 
+@Deprecated
 public class AliquotSCount extends QueryObject {
 
     protected static final String NAME = "Sample Types by Study";

@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class FreezerDAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";

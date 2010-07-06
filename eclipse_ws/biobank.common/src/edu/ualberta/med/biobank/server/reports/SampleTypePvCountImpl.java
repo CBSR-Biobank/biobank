@@ -20,8 +20,8 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "') and Alias.patientVisit.patient.study.site "
-        + siteOperatorString
-        + siteIdString
+        + SITE_OPERATOR
+        + SITE_ID
         + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateProcessed";
 
     public SampleTypePvCountImpl(List<Object> parameters,

@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class PatientVisitSummary extends QueryObject {
 
     protected static final String NAME = "Patient Visit Statistics by Study and Clinic";

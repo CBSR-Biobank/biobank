@@ -7,6 +7,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class NewPVsByStudyClinic extends QueryObject {
 
     protected static final String NAME = "New Patient Visits per Study per Clinic by Date";

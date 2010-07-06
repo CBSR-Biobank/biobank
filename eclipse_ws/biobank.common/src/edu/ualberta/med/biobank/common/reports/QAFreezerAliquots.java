@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class QAFreezerAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquot QA";

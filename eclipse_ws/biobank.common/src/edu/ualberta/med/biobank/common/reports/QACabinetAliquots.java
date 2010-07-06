@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class QACabinetAliquots extends QueryObject {
 
     protected static final String NAME = "Cabinet Aliquot QA";
