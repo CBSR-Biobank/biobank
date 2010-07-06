@@ -30,7 +30,6 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.forms.widgets.ScrolledPageBook;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -66,8 +65,6 @@ public abstract class BiobankFormBase extends EditorPart {
     protected ManagedForm mform;
 
     protected FormToolkit toolkit;
-
-    protected ScrolledPageBook book;
 
     protected ScrolledForm form;
 
@@ -189,7 +186,6 @@ public abstract class BiobankFormBase extends EditorPart {
     public void createPartControl(Composite parent) {
         mform = new ManagedForm(parent);
         toolkit = mform.getToolkit();
-        book = toolkit.createPageBook(mform.getForm().getBody(), SWT.NONE);
         widgetCreator.setToolkit(toolkit);
         form = mform.getForm();
         toolkit.decorateFormHeading(form.getForm());
@@ -262,8 +258,8 @@ public abstract class BiobankFormBase extends EditorPart {
             }
 
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
-            titem.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_ADD));
+            titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+                BioBankPlugin.IMG_ADD));
             titem.setToolTipText(tooltip);
             titem.addSelectionListener(listener);
         }
