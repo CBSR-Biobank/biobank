@@ -9,7 +9,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class NewPsByStudyClinicImpl extends AbstractReport {
 
-    protected static final String QUERY = "select pv.patient.study.nameShort,"
+    private static final String QUERY = "select pv.patient.study.nameShort,"
         + " pv.shipment.clinic.name, year(pv.dateProcessed), {0}(pv.dateProcessed),"
         + " count(*) from edu.ualberta.med.biobank.model.PatientVisit pv"
         + " where pv.dateProcessed=(select min(pvCollection.dateProcessed)"

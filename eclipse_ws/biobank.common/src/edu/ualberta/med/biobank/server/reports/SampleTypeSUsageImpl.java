@@ -13,18 +13,19 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleTypeSUsageImpl extends AbstractReport {
 
-    private String query1 = "select ss.sampleType.nameShort, "
+    private final static String QUERY1 = "select ss.sampleType.nameShort, "
         + "ss.study.nameShort from " + SampleStorage.class.getName() + " ss "
         + "where ss.study.site = " + siteIdString + " OR " + siteIdString
         + "=-9999 ORDER BY ss.sampleType.nameShort";
 
-    private String query2 = "select st.nameShort from "
+    private final static String QUERY2 = "select st.nameShort from "
         + SampleType.class.getName()
         + " st where st not in (select ss.sampleType from "
         + SampleStorage.class.getName() + " ss) and st.site = " + siteIdString
         + " OR " + siteIdString + "=-9999";
 
-    public SampleTypeSUsageImpl(List<Object> parameters, List<ReportOption> options) {
+    public SampleTypeSUsageImpl(List<Object> parameters,
+        List<ReportOption> options) {
         super("", parameters, options);
     }
 
@@ -33,10 +34,10 @@ public class SampleTypeSUsageImpl extends AbstractReport {
     public List<Object> executeQuery(WritableApplicationService appService,
         String siteOperator, Integer siteId) throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
-        HQLCriteria c1 = new HQLCriteria(query1.replaceAll(siteIdSearchString,
+        HQLCriteria c1 = new HQLCriteria(QUERY1.replaceAll(siteIdSearchString,
             siteId.toString()), parameters);
         results = ((ListProxy) appService.query(c1)).getListChunk();
-        HQLCriteria c2 = new HQLCriteria(query2.replaceAll(siteIdSearchString,
+        HQLCriteria c2 = new HQLCriteria(QUERY2.replaceAll(siteIdSearchString,
             siteId.toString()), parameters);
         results.addAll(specialPostProcess(appService.query(c2)));
         return results;

@@ -10,7 +10,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PVsByStudyImpl extends AbstractReport {
 
-    protected static final String QUERY = "Select Alias.patient.study.nameShort, "
+    private static final String QUERY = "Select Alias.patient.study.nameShort, "
         + " Year(Alias.dateProcessed), "
         + "{0}(Alias.dateProcessed), count(*) from "
         + PatientVisit.class.getName()

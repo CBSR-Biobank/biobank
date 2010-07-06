@@ -12,7 +12,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FreezerDAliquotsImpl extends AbstractReport {
 
-    protected static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort,"
+    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort,"
         + " aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate),"
         + " {0}(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()

@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class PatientWBCImpl extends AbstractReport {
 
-    protected static final String QUERY = "Select Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
+    private static final String QUERY = "Select Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
         + "Alias.patient.pnumber, Alias.dateProcessed, aliquot.sampleType.name, aliquot.inventoryId, aliquot.aliquotPosition.container.label  from "
         + PatientVisit.class.getName()
         + " as Alias left join Alias.aliquotCollection as aliquot where aliquot.aliquotPosition not in (from "

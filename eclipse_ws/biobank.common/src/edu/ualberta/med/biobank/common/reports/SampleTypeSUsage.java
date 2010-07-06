@@ -13,7 +13,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleTypeSUsage extends QueryObject {
 
-    public static String NAME = "Sample Type Usage by Study";
+    public final static String NAME = "Sample Type Usage by Study";
 
     private String query1 = "select ss.sampleType.nameShort, "
         + "ss.study.nameShort from "

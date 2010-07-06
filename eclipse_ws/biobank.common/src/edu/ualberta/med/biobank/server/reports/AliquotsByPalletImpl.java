@@ -13,8 +13,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AliquotsByPalletImpl extends AbstractReport {
 
-    protected static final String NAME = "Aliquots by Pallet";
-
     private static final String QUERY = "select s from "
         + Aliquot.class.getName()
         + " s where s.patientVisit.patient.study.site " + siteOperatorString

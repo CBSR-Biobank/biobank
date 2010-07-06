@@ -9,7 +9,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QACabinetAliquotsImpl extends AbstractReport {
 
-    protected static final String QUERY = "select aliquot.aliquotPosition.container.label,"
+    private static final String QUERY = "select aliquot.aliquotPosition.container.label,"
         + " aliquot.inventoryId, aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
         + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
         + Aliquot.class.getName()
@@ -23,9 +23,11 @@ public class QACabinetAliquotsImpl extends AbstractReport {
         + " as path2 where locate(path2.path, path1.path) > 0 and"
         + " path2.container.containerType.name like ?) and aliquot.patientVisit.patient.study.site "
         + siteOperatorString + siteIdString + " ORDER BY RAND()";
-    int numResults;
 
-    public QACabinetAliquotsImpl(List<Object> parameters, List<ReportOption> options) {
+    private int numResults;
+
+    public QACabinetAliquotsImpl(List<Object> parameters,
+        List<ReportOption> options) {
         super(QUERY, parameters, options);
         for (int i = 0; i < options.size() - 1; i++) {
             ReportOption option = options.get(i);
@@ -41,6 +43,7 @@ public class QACabinetAliquotsImpl extends AbstractReport {
     @Override
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
+        // FIXME need BiobankListProxy
         return results.subList(0, numResults);
     }
 }

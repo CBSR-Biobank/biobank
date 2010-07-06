@@ -6,9 +6,12 @@ import edu.ualberta.med.biobank.common.reports2.ReportOption;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
+/**
+ * needs one parameters = study.nameShort
+ */
 public class SampleTypePvCountImpl extends AbstractReport {
 
-    protected static final String QUERY = "Select pv.patient.pnumber, pv.dateProcessed,"
+    private static final String QUERY = "Select pv.patient.pnumber, pv.dateProcessed,"
         + " pv.dateDrawn,  Alias.sampleType.name, count(*) from "
         + PatientVisit.class.getName()
         + " as pv join pv.aliquotCollection as Alias where pv.patient.study.nameShort LIKE ? "
@@ -19,7 +22,8 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + siteIdString
         + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateProcessed";
 
-    public SampleTypePvCountImpl(List<Object> parameters, List<ReportOption> options) {
+    public SampleTypePvCountImpl(List<Object> parameters,
+        List<ReportOption> options) {
         super(QUERY, parameters, options);
     }
 

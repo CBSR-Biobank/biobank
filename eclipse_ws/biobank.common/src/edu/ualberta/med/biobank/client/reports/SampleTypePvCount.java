@@ -4,6 +4,7 @@ public class SampleTypePvCount extends AbstractReport {
 
     protected static final String NAME = "Sample Type Totals by Patient Visit and Study";
 
+    // FIXME need BiobankListProxy
     public SampleTypePvCount() {
         super(
             "Lists the total number of each sample type per patient visit for a specified study.",

@@ -9,13 +9,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PsByStudyImpl extends AbstractReport {
 
-    protected static final String QUERY = "select pv.patient.study.nameShort,"
+    private static final String QUERY = "select pv.patient.study.nameShort,"
         + " year(pv.dateProcessed), {0}(pv.dateProcessed), "
         + "count(distinct pv.patient) from edu.ualberta.med.biobank.model.PatientVisit pv"
         + " where pv.patient.study.site "
         + siteOperatorString
         + siteIdString
         + " group by pv.patient.study.nameShort, year(pv.dateProcessed), {0}(pv.dateProcessed)";
+
     private boolean groupByYear;
 
     public PsByStudyImpl(List<Object> parameters, List<ReportOption> options) {

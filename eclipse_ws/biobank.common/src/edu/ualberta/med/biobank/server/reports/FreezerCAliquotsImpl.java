@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class FreezerCAliquotsImpl extends AbstractReport {
 
-    protected static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, "
+    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, "
         + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "
@@ -24,7 +24,8 @@ public class FreezerCAliquotsImpl extends AbstractReport {
         + siteIdString
         + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name";
 
-    public FreezerCAliquotsImpl(List<Object> parameters, List<ReportOption> options) {
+    public FreezerCAliquotsImpl(List<Object> parameters,
+        List<ReportOption> options) {
         super(QUERY, parameters, options);
         parameters.add("%Freezer%");
     }
