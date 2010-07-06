@@ -25,13 +25,11 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
         super(parent, collection, headings, columnWidths, 40, false);
-        pageInfo.pageTotal = -1;
     }
 
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, collection, headings, columnWidths, rowsPerPage, false);
-        pageInfo.pageTotal = -1;
     }
 
     @Override
@@ -45,6 +43,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
             && (collection.size() == -1 || collection.size() > pageInfo.rowsPerPage)) {
             if (collection.get(pageInfo.rowsPerPage) != null) {
                 paginationRequired = true;
+                init(collection);
                 addPaginationWidget();
             }
         } else
@@ -102,8 +101,10 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
             @Override
             public void run() {
                 if (!table.isDisposed()) {
-                    setPageLabelText();
-                    ReportTableWidget.this.getShell().layout(true, true);
+                    if (paginationRequired) {
+                        setPageLabelText();
+                        ReportTableWidget.this.getShell().layout(true, true);
+                    }
                     tableViewer.setInput(collSubList);
                 }
             }
@@ -170,7 +171,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
             nextButton.setEnabled(false);
             lastButton.setEnabled(false);
         } else {
-            if (pageInfo.pageTotal == -1) {
+            if (pageInfo.pageTotal == 0) {
                 nextButton.setEnabled(true);
             } else if (pageInfo.page < pageInfo.pageTotal - 1) {
                 lastButton.setEnabled(true);
@@ -213,7 +214,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     @Override
     protected void init(List<T> collection) {
-        if (pageInfo.pageTotal < 0) {
+        if (pageInfo.pageTotal == 0) {
             if (collection instanceof BiobankListProxy) {
                 int realSize = ((BiobankListProxy) collection).getRealSize();
                 if (realSize != -1)

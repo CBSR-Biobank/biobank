@@ -158,6 +158,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             }
             // new
             for (PatientVisitWrapper visit : newPatientVisits) {
+                visit.setPatient(this);
                 allPvObjects.add(visit.getWrappedObject());
                 allPvWrappers.add(visit);
             }
@@ -195,8 +196,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         SiteWrapper siteWrapper) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Patient.class.getName()
-            + " where study.site.id = ? and pnumber = ?", Arrays
-            .asList(new Object[] { siteWrapper.getId(), patientNumber }));
+            + " where study.site.id = ? and pnumber = ?",
+            Arrays.asList(new Object[] { siteWrapper.getId(), patientNumber }));
         List<Patient> patients = appService.query(criteria);
         if (patients.size() == 1) {
             return new PatientWrapper(appService, patients.get(0));
@@ -381,5 +382,16 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public void reload() throws Exception {
         study = null;
         super.reload();
+    }
+
+    public void setPatientVisitCollection(List<PatientVisitWrapper> pvws) {
+        List<PatientVisit> pvs = new ArrayList<PatientVisit>();
+        for (PatientVisitWrapper pvw : pvws)
+            pvs.add(pvw.getWrappedObject());
+        List<PatientVisitWrapper> oldCollection = getPatientVisitCollection();
+        wrappedObject.setPatientVisitCollection(pvs);
+        propertiesMap.put("patientVisitCollection", pvs);
+        propertyChangeSupport.firePropertyChange("patientVisitCollection",
+            oldCollection, pvs);
     }
 }

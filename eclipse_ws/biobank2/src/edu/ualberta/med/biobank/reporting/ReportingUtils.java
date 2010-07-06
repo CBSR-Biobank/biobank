@@ -27,6 +27,7 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 import ar.com.fdvs.dj.domain.constants.Font;
@@ -36,6 +37,8 @@ public class ReportingUtils {
     public static Font sansSerif = new Font(Font.MEDIUM, "SansSerif", false);
 
     public static Font sansSerifBold = new Font(Font.MEDIUM, "SansSerif", true);
+
+    public static PrinterData data;
 
     public static JasperPrint createStandardReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {
@@ -77,9 +80,15 @@ public class ReportingUtils {
     public static void printReport(JasperPrint jasperPrint) throws Exception {
         // Use SWT PrintDialog instead of the JasperReport method that use java
         // swing gui.
-        PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        PrinterData data = dialog.open();
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                PrintDialog dialog = new PrintDialog(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+                data = dialog.open();
+            }
+        });
         if (data != null) {
             // use the standard java method to retrieve print services
             PrintService[] services = PrintServiceLookup.lookupPrintServices(

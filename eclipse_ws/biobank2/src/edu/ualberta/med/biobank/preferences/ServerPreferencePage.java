@@ -67,8 +67,8 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
             GridData data = new GridData(GridData.FILL_HORIZONTAL);
             int widthHint = convertHorizontalDLUsToPixels(button,
                 IDialogConstants.BUTTON_WIDTH);
-            data.widthHint = Math.max(widthHint, button.computeSize(
-                SWT.DEFAULT, SWT.DEFAULT, true).x);
+            data.widthHint = Math.max(widthHint,
+                button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
             button.setLayoutData(data);
             return button;
         }
@@ -112,6 +112,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
                     }
                 });
                 buttonBoxControl.addDisposeListener(new DisposeListener() {
+                    @Override
                     public void widgetDisposed(DisposeEvent event) {
                         editButton = null;
                     }

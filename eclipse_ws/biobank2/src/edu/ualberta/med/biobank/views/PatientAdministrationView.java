@@ -76,8 +76,8 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         boolean create = BioBankPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
-            PatientWrapper patient = new PatientWrapper(SessionManager
-                .getAppService());
+            PatientWrapper patient = new PatientWrapper(
+                SessionManager.getAppService());
             patient.setPnumber(text);
             openNewPatientForm(patient);
         }
