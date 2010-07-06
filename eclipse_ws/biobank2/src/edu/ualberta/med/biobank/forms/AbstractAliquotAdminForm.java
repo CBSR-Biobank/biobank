@@ -69,7 +69,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
                 if (BioBankPlugin.isAskPrintActivityLog()) {
                     boolean doPrint = MessageDialog.openQuestion(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        "Print", "Do you want to print information ?");
+                        "Print", "Do you want to print information ??");
                     if (doPrint) {
                         print();
                     }
@@ -100,6 +100,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
             JasperPrint jp = ReportingUtils.createStandardReport(
                 "ActivityReportForm", map, logsList);
+
             ReportingUtils.printReport(jp);
             printed = true;
             String printName = getClass().getSimpleName();
