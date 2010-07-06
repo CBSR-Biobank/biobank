@@ -65,6 +65,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.client.config,
  edu.ualberta.med.biobank.client.config.calgary,
  edu.ualberta.med.biobank.client.config.cbsr,
+ edu.ualberta.med.biobank.client.reports,
  edu.ualberta.med.biobank.common;
   uses:="edu.ualberta.med.biobank.model,
    edu.ualberta.med.biobank.server.applicationservice,
