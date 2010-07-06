@@ -149,7 +149,7 @@ public class SearchView extends ViewPart {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                String searchString = searchText.getText();
+                String searchString = searchText.getText().trim();
                 SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
                     .getSelection()).getFirstElement();
                 try {

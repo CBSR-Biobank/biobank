@@ -15,7 +15,8 @@ public class ShipmentDeleteHandler extends AbstractHandler {
         ShipmentAdapter shipAdapter = ShipmentAdministrationView
             .getCurrentShipment();
         try {
-            shipAdapter.delete();
+            shipAdapter
+                .delete("Are you sure you want to delete this shipment?");
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Delete Failed", e);
         }

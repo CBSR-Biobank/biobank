@@ -52,7 +52,9 @@ public abstract class AbstractSearchedNode extends AdapterBase {
             try {
                 for (AdapterBase child : getChildren()) {
                     ModelWrapper<?> childWrapper = child.getModelObject();
-                    childWrapper.reload();
+                    if (childWrapper != null) {
+                        childWrapper.reload();
+                    }
                     List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
                         child.getChildren());
                     for (AdapterBase subChild : subChildren) {

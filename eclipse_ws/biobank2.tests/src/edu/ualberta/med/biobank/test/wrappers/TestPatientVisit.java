@@ -537,13 +537,16 @@ public class TestPatientVisit extends TestDatabase {
         // change the worksheet value
         visit.setPvAttrValue("Worksheet", "jklmnopqr");
         visit.persist();
+        visit.reload();
 
         // make sure only one value in database
-        HQLCriteria c = new HQLCriteria("select pvattr from "
-            + PatientVisit.class.getName() + " as pv "
-            + "join pv.pvAttrCollection as pvattr "
-            + "join pvattr.studyPvAttr as spvattr where spvattr.label= ?",
-            Arrays.asList(new Object[] { "Worksheet" }));
+        HQLCriteria c = new HQLCriteria(
+            "select pvattr from "
+                + PatientVisit.class.getName()
+                + " as pv "
+                + "join pv.pvAttrCollection as pvattr "
+                + "join pvattr.studyPvAttr as spvattr where pv.id = ? and spvattr.label= ?",
+            Arrays.asList(new Object[] { visit.getId(), "Worksheet" }));
         List<PvAttr> results = appService.query(c);
         Assert.assertEquals(1, results.size());
     }

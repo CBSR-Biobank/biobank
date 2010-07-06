@@ -111,8 +111,10 @@ public class AliquotRequest extends QueryObject {
                 String stName = a.getSampleType().getNameShort();
                 String aliquotLabel = new AliquotWrapper(appService, a)
                     .getPositionString(true, false);
-                modifiedResults.add(new Object[] { pnumber, inventoryId,
-                    dateDrawn, stName, aliquotLabel });
+                modifiedResults
+                    .add(new Object[] { pnumber, inventoryId,
+                        DateFormatter.formatAsDate(dateDrawn), stName,
+                        aliquotLabel });
             }
         }
         return modifiedResults;
