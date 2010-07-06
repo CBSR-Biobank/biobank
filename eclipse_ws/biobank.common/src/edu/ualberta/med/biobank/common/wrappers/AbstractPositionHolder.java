@@ -82,7 +82,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
             position);
         if (position == null) {
             positionWrapper = null;
-            System.out.println("setting position wrapper to null");
         }
         newPositionSet = true;
     }

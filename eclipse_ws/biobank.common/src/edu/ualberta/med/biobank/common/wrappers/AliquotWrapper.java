@@ -467,7 +467,6 @@ public class AliquotWrapper extends
                 posWrapper.setAliquot(this);
                 positionWrapper = posWrapper;
                 wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-                System.out.println("created new position wrapper");
                 return posWrapper;
             }
         } else {
@@ -480,7 +479,6 @@ public class AliquotWrapper extends
                 posWrapper.setAliquot(this);
                 positionWrapper = posWrapper;
                 wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-                System.out.println("reverting position wrapper");
                 return posWrapper;
             }
         }
