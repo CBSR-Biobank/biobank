@@ -16,7 +16,8 @@ public class PatientVisitDeleteHandler extends AbstractHandler {
             .getSelectedNode();
         if (pvAdapter instanceof PatientVisitAdapter) {
             try {
-                ((PatientVisitAdapter) pvAdapter).delete();
+                ((PatientVisitAdapter) pvAdapter)
+                    .delete("Are you sure you want to delete this patient visit?");
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Delete Failed", e);
             }

@@ -15,7 +15,7 @@ public class PatientDeleteHandler extends AbstractHandler {
         PatientAdapter patAdapter = PatientAdministrationView
             .getCurrentPatient();
         try {
-            patAdapter.delete();
+            patAdapter.delete("Are you sure you want to delete this patient?");
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Delete Failed", e);
         }

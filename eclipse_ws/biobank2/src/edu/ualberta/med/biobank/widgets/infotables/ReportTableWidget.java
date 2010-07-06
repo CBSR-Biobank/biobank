@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -12,6 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.BiobankListProxy;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -23,11 +25,13 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
         super(parent, collection, headings, columnWidths, 40, false);
+        pageInfo.pageTotal = -1;
     }
 
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
         super(parent, collection, headings, columnWidths, rowsPerPage, false);
+        pageInfo.pageTotal = -1;
     }
 
     @Override
@@ -92,10 +96,14 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         }
         collSubList = collection.subList(start, end);
 
+        init(collection);
+
         display.syncExec(new Runnable() {
             @Override
             public void run() {
                 if (!table.isDisposed()) {
+                    setPageLabelText();
+                    ReportTableWidget.this.getShell().layout(true, true);
                     tableViewer.setInput(collSubList);
                 }
             }
@@ -103,10 +111,11 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
         try {
             Object selItem = null;
-            for (int i = start; i < end; ++i) {
+            Iterator<T> it = collSubList.iterator();
+            for (int i = start; i < end && it.hasNext(); ++i) {
                 if (table.isDisposed())
                     return;
-                final Object item = collection.get(i);
+                final Object item = it.next();
                 if (item == null) {
                     end = i;
                     break;
@@ -144,6 +153,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         } catch (Exception e) {
             logger.error("setCollection error", e);
         }
+
     }
 
     @Override
@@ -156,23 +166,23 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
             prevButton.setEnabled(false);
         }
 
-        if (!enable
-            || getTableViewer().getTable().getItemCount() < pageInfo.rowsPerPage) {
+        if (!enable) {
             nextButton.setEnabled(false);
             lastButton.setEnabled(false);
         } else {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(true);
+            if (pageInfo.pageTotal == -1) {
+                nextButton.setEnabled(true);
+            } else if (pageInfo.page < pageInfo.pageTotal - 1) {
+                lastButton.setEnabled(true);
+                nextButton.setEnabled(true);
+            }
         }
+
     }
 
     @Override
     protected void firstPage() {
         pageInfo.page = 0;
-        firstButton.setEnabled(false);
-        prevButton.setEnabled(false);
-        lastButton.setEnabled(true);
-        nextButton.setEnabled(true);
     }
 
     @Override
@@ -180,33 +190,38 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         if (pageInfo.page == 0)
             return;
         pageInfo.page--;
-        if (pageInfo.page == 0) {
-            firstButton.setEnabled(false);
-            prevButton.setEnabled(false);
-        }
     }
 
     @Override
     protected void nextPage() {
         pageInfo.page++;
-        if (pageInfo.page == 1) {
-            firstButton.setEnabled(true);
-            prevButton.setEnabled(true);
-        }
     }
 
     @Override
     protected void lastPage() {
+        pageInfo.page = pageInfo.pageTotal - 1;
     }
 
     @Override
     protected void setPageLabelText() {
-        pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
+        if (pageInfo.pageTotal > 0)
+            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of "
+                + pageInfo.pageTotal);
+        else
+            pageLabel.setText("Page: " + (pageInfo.page + 1) + " of " + "?");
     }
 
     @Override
     protected void init(List<T> collection) {
-
+        if (pageInfo.pageTotal < 0) {
+            if (collection instanceof BiobankListProxy) {
+                int realSize = ((BiobankListProxy) collection).getRealSize();
+                if (realSize != -1)
+                    pageInfo.pageTotal = realSize / pageInfo.rowsPerPage + 1;
+            } else
+                pageInfo.pageTotal = collection.size() / pageInfo.rowsPerPage
+                    + 1;
+        }
     }
 
     @Override

@@ -158,8 +158,8 @@ public class ReportsEditor extends BiobankFormBase {
             100 });
         aMap.put(AliquotsByPallet.class, new int[] { 100, 100, 100, 100 });
         aMap.put(AliquotCount.class, new int[] { 100, 100 });
-        aMap
-            .put(AliquotInvoiceByClinic.class, new int[] { 100, 100, 150, 100 });
+        aMap.put(AliquotInvoiceByClinic.class, new int[] { 100, 100, 100, 150,
+            100 });
         aMap.put(AliquotInvoiceByPatient.class,
             new int[] { 100, 100, 150, 100 });
         aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });

@@ -118,6 +118,18 @@
             name="Quit">
       </command>
       <command
+            id="edu.ualberta.med.biobank.commands.reset"
+            name="Reset">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.cancel"
+            name="Cancel">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.confirm"
+            name="Confirm">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.siteAdd"
             name="Add Repository Site">
       </command>
@@ -276,6 +288,47 @@
             </reference>
          </activeWhen>
       </handler>
+		<handler
+            class="edu.ualberta.med.biobank.handlers.CancelHandler"
+            commandId="edu.ualberta.med.biobank.commands.cancel">
+     <activeWhen>
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+           </instanceof>
+        </with>
+     </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
+            commandId="edu.ualberta.med.biobank.commands.confirm">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+                  </instanceof>
+               </with>
+               <reference
+                     definitionId="biobank2.confirmEnabled">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>   
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ResetHandler"
+            commandId="edu.ualberta.med.biobank.commands.reset">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
             commandId="edu.ualberta.med.biobank.commands.print">
@@ -1888,6 +1941,19 @@
          </parameter>
       </key>
       <key
+      		commandId="edu.ualberta.med.biobank.commands.reset"
+      		schemeId="biobank2.scheme"
+      		sequence="M1+R"/>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.confirm"
+            schemeId="biobank2.scheme"
+            sequence="M1+S">
+      </key>
+      <key
+      		commandId="edu.ualberta.med.biobank.commands.cancel"
+      		schemeId="biobank2.scheme"
+      		sequence="M1+E"/>
+      <key
             commandId="org.eclipse.ui.file.close"
             sequence="M1+W"
             schemeId="biobank2.scheme" />
@@ -1970,6 +2036,13 @@
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.siteSelectionId"
                priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.ConfirmState">
+         <variable
+               name="edu.ualberta.med.biobank.sourceprovider.confirmState"
+               priorityLevel="activeEditorId">
          </variable>
       </sourceProvider>
    </extension>
@@ -2147,6 +2220,26 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.logging">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.editorDirty">
+         <with
+               variable="activeEditorId">
+            <test
+                  forcePluginActivation="true"
+                  property="dirty"
+                  value="true">
+            </test>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.confirmEnabled">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
+            <equals
+                  value="confirmEnabled">
             </equals>
          </with>
       </definition>
