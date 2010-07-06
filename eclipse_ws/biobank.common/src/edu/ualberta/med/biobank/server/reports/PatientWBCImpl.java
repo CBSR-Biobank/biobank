@@ -14,7 +14,9 @@ public class PatientWBCImpl extends AbstractReport {
         + PatientVisit.class.getName()
         + " as Alias left join Alias.aliquotCollection as aliquot where aliquot.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
-        + " a where a.container.label like 'SS%') and Alias.patient.study.site "
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "') and Alias.patient.study.site "
         + siteOperatorString
         + siteIdString
         + " and aliquot.sampleType.name LIKE '%DNA%' and aliquot.aliquotPosition.container.id in (select path1.container.id from "

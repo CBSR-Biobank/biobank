@@ -16,7 +16,9 @@ public class QAFreezerAliquotsImpl extends AbstractReport {
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
-        + " a where a.container.label like 'SS%') and aliquot.patientVisit.dateProcessed "
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "') and aliquot.patientVisit.dateProcessed "
         + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"
         + " and aliquot.aliquotPosition.container.id "
         + "in (select path1.container.id from "

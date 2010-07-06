@@ -12,7 +12,9 @@ public class AliquotInvoiceByPatientImpl extends AbstractReport {
         + Aliquot.class.getName()
         + " as Alias where Alias.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
-        + " a where a.container.label like 'SS%') and Alias.linkDate > ? and Alias.linkDate < ? and Alias.patientVisit.patient.study.site "
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "') and Alias.linkDate > ? and Alias.linkDate < ? and Alias.patientVisit.patient.study.site "
         + siteOperatorString
         + siteIdString
         + " ORDER BY Alias.patientVisit.patient.pnumber";

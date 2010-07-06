@@ -14,7 +14,9 @@ public class AliquotInvoiceByClinicImpl extends AbstractReport {
         + Aliquot.class.getName()
         + " as Alias where Alias.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
-        + " a where a.container.label like ?) and Alias.linkDate > ? and Alias.linkDate < ? and "
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "') and Alias.linkDate > ? and Alias.linkDate < ? and "
         + "Alias.patientVisit.patient.study.site.id "
         + siteOperatorString
         + siteIdString
@@ -23,7 +25,6 @@ public class AliquotInvoiceByClinicImpl extends AbstractReport {
     public AliquotInvoiceByClinicImpl(List<Object> parameters,
         List<ReportOption> options) {
         super(QUERY_STRING, parameters, options);
-        parameters.add(0, "SS%");
     }
 
 }

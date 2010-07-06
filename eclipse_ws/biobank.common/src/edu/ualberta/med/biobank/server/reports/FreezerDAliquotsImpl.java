@@ -18,7 +18,9 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
-        + " a where a.container.label like ?) and aliquot.aliquotPosition.container.id"
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "') and aliquot.aliquotPosition.container.id"
         + " in (select path1.container.id from "
         + ContainerPath.class.getName()
         + " as path1, "
@@ -48,8 +50,7 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         // columnNames[2] = (String) params.get(0);
         String groupBy = (String) parameters.get(0);
         queryString = MessageFormat.format(queryString, groupBy);
-        parameters.set(0, "SS%");
-        parameters.add("%Freezer%");
+        parameters.set(0, "%Freezer%");
         groupByYear = groupBy.equals("Year");
     }
 

@@ -9,6 +9,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AbstractReport {
 
+    protected static final String SENT_SAMPLES_FREEZER_NAME = "SS%";
+
     protected String queryString;
 
     protected List<Object> parameters;

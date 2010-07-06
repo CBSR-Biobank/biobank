@@ -14,7 +14,9 @@ public class FreezerSAliquotsImpl extends AbstractReport {
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
-        + " a where a.container.label like 'SS%') and aliquot.aliquotPosition.container.id "
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "') and aliquot.aliquotPosition.container.id "
         + "in (select path1.container.id from "
         + ContainerPath.class.getName()
         + " as path1, "
@@ -25,7 +27,8 @@ public class FreezerSAliquotsImpl extends AbstractReport {
         + siteIdString
         + " group by aliquot.patientVisit.patient.study.nameShort";
 
-    public FreezerSAliquotsImpl(List<Object> parameters, List<ReportOption> options) {
+    public FreezerSAliquotsImpl(List<Object> parameters,
+        List<ReportOption> options) {
         super(QUERY, parameters, options);
         parameters.add("%Freezer%");
     }
