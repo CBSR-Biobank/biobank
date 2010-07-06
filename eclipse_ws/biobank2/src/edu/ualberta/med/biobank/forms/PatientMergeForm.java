@@ -218,10 +218,11 @@ public class PatientMergeForm extends BiobankEntryForm {
             SessionManager.getCurrentViewWithTree().getTreeViewer().refresh();
 
             patient2Wrapper.delete();
+            this.closeEntryOpenView(false, true);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Merge failed.", e);
         }
-        this.closeEntryOpenView(false, true);
+
     }
 
     @Override
