@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.reports2.ReportOption;
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 

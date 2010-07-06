@@ -9,8 +9,8 @@ public class AliquotInvoiceByClinic extends AbstractReport {
     public AliquotInvoiceByClinic() {
         super(
             "Lists all aliquots linked in a particular date range, ordered by clinic.",
-            new String[] { "Clinic", "Patient Number", "Link Date",
-                "Sample Type" });
+            new String[] { "Inventory ID", "Clinic", "Patient Number",
+                "Link Date", "Sample Type" });
         addOption("Start Date (Linked)", Date.class, new Date(0));
         addOption("End Date (Linked)", Date.class, new Date());
     }

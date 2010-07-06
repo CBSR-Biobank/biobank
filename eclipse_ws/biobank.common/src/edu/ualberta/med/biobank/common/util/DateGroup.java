@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.reports2;
+package edu.ualberta.med.biobank.common.util;
 
 public enum DateGroup {
     Week, Month, Quarter, Year

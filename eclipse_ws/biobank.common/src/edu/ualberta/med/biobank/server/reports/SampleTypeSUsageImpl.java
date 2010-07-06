@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.server.reports;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.reports2.ReportOption;
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;

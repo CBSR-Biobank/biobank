@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.client.reports;
 
-import edu.ualberta.med.biobank.common.reports2.DateGroup;
+import edu.ualberta.med.biobank.common.util.DateGroup;
 
 public class FreezerDAliquots extends AbstractReport {
 

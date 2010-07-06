@@ -18,13 +18,11 @@ public class AliquotRequestImpl extends AbstractReport {
     private static final String QUERY = "select p.aliquot from "
         + AliquotPosition.class.getName()
         + " p where p.aliquot.patientVisit.patient.study.site "
-        + siteOperatorString
-        + siteIdString
-        + " and p.container.label not like '"
-        + SENT_SAMPLES_FREEZER_NAME
-        + "' and p.aliquot.patientVisit.patient.pnumber"
-        + " like ? and datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1"
-        + "  and p.aliquot.sampleType.nameShort like ? ORDER BY RAND()";
+        + siteOperatorString + siteIdString
+        + " and p.container.label not like '" + SENT_SAMPLES_FREEZER_NAME
+        + "' and p.aliquot.patientVisit.patient.pnumber like ? and"
+        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and"
+        + " p.aliquot.sampleType.nameShort like ? ORDER BY RAND()";
 
     public AliquotRequestImpl() {
         super(QUERY, null, null);

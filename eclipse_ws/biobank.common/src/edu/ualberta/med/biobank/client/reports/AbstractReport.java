@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.client.reports;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.reports2.ReportOption;
+import edu.ualberta.med.biobank.common.util.ReportOption;
 
 public abstract class AbstractReport {
 
