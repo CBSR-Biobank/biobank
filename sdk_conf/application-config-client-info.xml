@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="@PROJECT_NAME@ServiceInfo" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="APPLICATION_SERVICE_BEAN" value-ref="@PROJECT_NAME@ApplicationService"/>
+				<entry key="AUTHENTICATION_SERVICE_BEAN" value-ref="@PROJECT_NAME@AuthenticationManager"/>
+				<entry key="APPLICATION_SERVICE_CONFIG"  value-ref="@PROJECT_NAME@ApplicationServiceConfig"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="@PROJECT_NAME@Interceptor" class="gov.nih.nci.system.client.proxy.ApplicationServiceProxy" singleton="true">
+		<property name="proxyFactory">
+			<bean class="edu.ualberta.med.biobank.client.BiobankProxyHelperImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="@PROJECT_NAME@ApplicationService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+				<property name="serviceUrl" value="@SERVER_URL@/http/applicationService"/>
+				<property name="serviceInterface" value="@SERVICE_INTERFACE@"/>
+				<property name="httpInvokerRequestExecutor">
+				<bean class="gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor"/>
+				</property>
+			</bean>
+		</property>
+		<property name="interceptorNames" value="@PROJECT_NAME@Interceptor"/>
+		<property name="interfaces" value="@SERVICE_INTERFACE@"/>
+	</bean>	
+	
+	<bean id="@PROJECT_NAME@AuthenticationManager" class="org.acegisecurity.providers.ProviderManager">
+		<property name="providers">
+			<list>
+				<bean class="org.acegisecurity.providers.rcp.RemoteAuthenticationProvider">
+					<property name="remoteAuthenticationManager">
+						<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+						    <property name="serviceUrl" value="@SERVER_URL@/http/remoteAuthenticationManager"/>
+						    <property name="serviceInterface" value="org.acegisecurity.providers.rcp.RemoteAuthenticationManager"/>
+						</bean>
+					</property>
+				</bean>
+				<bean class="gov.nih.nci.system.security.acegi.authentication.NullGroupNameAuthenticationProvider"/>
+				<bean class="gov.nih.nci.system.security.acegi.authentication.NullX509AuthenticationProvider"/>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<!-- Dont touch this unless you know what you are doing -->
+	<bean id="@PROJECT_NAME@ApplicationServiceConfig" class="java.lang.String">
+		<constructor-arg>
+			<value>
+				&lt;bean id=&quot;@PROJECT_NAME@ServiceInfo&quot; class=&quot;java.util.HashMap&quot;&gt;
+					&lt;constructor-arg&gt;
+						&lt;map&gt;
+							&lt;entry key=&quot;APPLICATION_SERVICE_BEAN&quot; value-ref=&quot;@PROJECT_NAME@ApplicationService&quot;/&gt;
+							&lt;entry key=&quot;AUTHENTICATION_SERVICE_BEAN&quot; value-ref=&quot;@PROJECT_NAME@AuthenticationManager&quot;/&gt;
+						&lt;/map&gt;
+					&lt;/constructor-arg&gt;
+				&lt;/bean&gt;
+			
+				&lt;bean id=&quot;@PROJECT_NAME@Interceptor&quot; class=&quot;gov.nih.nci.system.client.proxy.ApplicationServiceProxy&quot; singleton=&quot;true&quot;&gt;
+					&lt;property name=&quot;proxyFactory&quot;&gt;
+						&lt;bean class=&quot;edu.ualberta.med.biobank.client.BiobankProxyHelperImpl&quot;/&gt;
+					&lt;/property&gt;
+				&lt;/bean&gt;
+				
+				&lt;bean id=&quot;@PROJECT_NAME@ApplicationService&quot; class=&quot;org.springframework.aop.framework.ProxyFactoryBean&quot;&gt;
+					&lt;property name=&quot;target&quot;&gt;
+						&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
+							&lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/applicationService&quot;/&gt;
+							&lt;property name=&quot;serviceInterface&quot; value=&quot;@SERVICE_INTERFACE@&quot;/&gt;
+							&lt;property name=&quot;httpInvokerRequestExecutor&quot;&gt;
+							&lt;bean class=&quot;gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor&quot;/&gt;
+							&lt;/property&gt;
+						&lt;/bean&gt;
+					&lt;/property&gt;
+					&lt;property name=&quot;interceptorNames&quot; value=&quot;@PROJECT_NAME@Interceptor&quot;/&gt;
+					&lt;property name=&quot;interfaces&quot; value=&quot;@SERVICE_INTERFACE@&quot;/&gt;
+				&lt;/bean&gt;	
+				
+				&lt;bean id=&quot;@PROJECT_NAME@AuthenticationManager&quot; class=&quot;org.acegisecurity.providers.ProviderManager&quot;&gt;
+					&lt;property name=&quot;providers&quot;&gt;
+						&lt;list&gt;
+							&lt;bean class=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationProvider&quot;&gt;
+								&lt;property name=&quot;remoteAuthenticationManager&quot;&gt;
+									&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
+									    &lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/remoteAuthenticationManager&quot;/&gt;
+									    &lt;property name=&quot;serviceInterface&quot; value=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationManager&quot;/&gt;
+									&lt;/bean&gt;
+								&lt;/property&gt;
+							&lt;/bean&gt;
+							&lt;bean class=&quot;gov.nih.nci.system.security.acegi.authentication.NullGroupNameAuthenticationProvider&quot;/&gt;
+							&lt;bean class=&quot;gov.nih.nci.system.security.acegi.authentication.NullX509AuthenticationProvider&quot;/&gt;
+						&lt;/list&gt;
+					&lt;/property&gt;
+				&lt;/bean&gt;
+				
+				&lt;alias alias="ServiceInfo" name="@PROJECT_NAME@ServiceInfo"/&gt;
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

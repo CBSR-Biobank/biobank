@@ -5,6 +5,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -17,13 +18,15 @@ import org.springframework.util.Assert;
 //Read only
 //Non-searchable
 //Non-iterable
-public class BiobankListProxy implements List<Object> {
+public class BiobankListProxy implements List<Object>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private List<Object> listChunk;
     private int pageSize;
     private int offset;
     private int realSize;
-    private ApplicationService appService;
+    private transient ApplicationService appService;
     private HQLCriteria criteria;
 
     public BiobankListProxy(ApplicationService appService, HQLCriteria criteria) {
@@ -82,12 +85,12 @@ public class BiobankListProxy implements List<Object> {
         if (index - offset >= pageSize || index < offset) {
             offset = (index / pageSize) * pageSize;
             try {
-                listChunk = appService.query(criteria, offset, Site.class
-                    .getName());
+                listChunk = appService.query(criteria, offset,
+                    Site.class.getName());
                 if (listChunk.size() != 1000 && realSize == -1)
                     realSize = offset + listChunk.size();
             } catch (ApplicationException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
@@ -162,8 +165,8 @@ public class BiobankListProxy implements List<Object> {
         Assert.isTrue(fromIndex <= toIndex);
         updateListChunk(fromIndex);
         List<Object> subList = new ArrayList<Object>();
-        subList.addAll(listChunk.subList(fromIndex - offset, Math.min(listChunk
-            .size(), toIndex - offset)));
+        subList.addAll(listChunk.subList(fromIndex - offset,
+            Math.min(listChunk.size(), toIndex - offset)));
         if (offset + pageSize < toIndex && listChunk.size() == pageSize) {
             subList.addAll(subList(offset + pageSize, toIndex));
         }
@@ -180,4 +183,21 @@ public class BiobankListProxy implements List<Object> {
         return null;
     }
 
+    public void setAppService(ApplicationService as) {
+        this.appService = as;
+    }
+
+    /**
+     * Used in BiobankProxyHelperImpl
+     */
+    public List<Object> getListChunk() {
+        return listChunk;
+    }
+
+    /**
+     * Used in BiobankProxyHelperImpl
+     */
+    public void setListChunk(List<Object> listChunk) {
+        this.listChunk = listChunk;
+    }
 }

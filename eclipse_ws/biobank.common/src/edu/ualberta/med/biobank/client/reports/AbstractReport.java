@@ -100,7 +100,7 @@ public abstract class AbstractReport implements IReport {
     }
 
     public List<Object> generate(WritableApplicationService appService,
-        ArrayList<Object> parameters, String siteOperator, Integer siteId)
+        List<Object> parameters, String siteOperator, Integer siteId)
         throws ApplicationException {
         if (appService instanceof BiobankApplicationService) {
             doColumnModification(parameters);

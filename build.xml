@@ -178,6 +178,7 @@
     <copy file="sdk_conf/validator-extension-Config.xml" tofile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
     <copy file="sdk_conf/application-config.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
     <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
+  	<copy file="sdk_conf/application-config-client-info.xml" tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
     <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
     <copy file="security-logs/log4j.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
