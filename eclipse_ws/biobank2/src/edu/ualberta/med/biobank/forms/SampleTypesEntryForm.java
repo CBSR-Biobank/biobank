@@ -55,7 +55,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Sample Types");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
 
         createGlobalSampleTypeSection();
 
@@ -139,9 +139,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             currentSite.removeSampleTypes(siteWidget.getDeletedSampleTypes());
             currentSite.persist();
         }
-        SampleTypeWrapper.persistGlobalSampleTypes(globalSampleWidget
-            .getAddedOrModifiedSampleTypes(), globalSampleWidget
-            .getDeletedSampleTypes());
+        SampleTypeWrapper.persistGlobalSampleTypes(
+            globalSampleWidget.getAddedOrModifiedSampleTypes(),
+            globalSampleWidget.getDeletedSampleTypes());
     }
 
     @Override

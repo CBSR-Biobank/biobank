@@ -74,14 +74,14 @@ public class PatientMergeForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Patient Information");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_PATIENT));
         createPatientSection();
     }
 
     private void createPatientSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout toplayout = new GridLayout(2, true);
         toplayout.horizontalSpacing = 10;
         client.setLayout(toplayout);

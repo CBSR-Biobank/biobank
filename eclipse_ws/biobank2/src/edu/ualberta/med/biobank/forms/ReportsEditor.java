@@ -259,7 +259,7 @@ public class ReportsEditor extends BiobankFormBase {
                                 .getBody(), reportData, query.getColumnNames(),
                                 columnWidths.get(query.getClass()), 24);
                             reportTable.adaptToToolkit(toolkit, true);
-                            form.reflow(true);
+                            // form.reflow(true);
                         }
                     });
 
@@ -274,7 +274,7 @@ public class ReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget<Object>(form.getBody(), null,
+        reportTable = new ReportTableWidget<Object>(page, null,
             new String[] { " " }, new int[] { 500 });
         reportTable.adaptToToolkit(toolkit, true);
         form.layout(true, true);
@@ -466,7 +466,7 @@ public class ReportsEditor extends BiobankFormBase {
                             }
                             monitor.done();
                             exportPDFOrPrint(listData, columnInfo, printParams,
-                                path, monitor, exportPDF);
+                                path, exportPDF);
                         }
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error exporting results",
@@ -479,8 +479,7 @@ public class ReportsEditor extends BiobankFormBase {
     }
 
     public void exportPDFOrPrint(List<?> listData, List<String> columnInfo,
-        List<Object[]> params, String path, IProgressMonitor monitor,
-        Boolean exportPDF) {
+        List<Object[]> params, String path, Boolean exportPDF) {
         if (exportPDF) {
             try {
                 ReportingUtils.saveReport(
@@ -580,7 +579,7 @@ public class ReportsEditor extends BiobankFormBase {
     protected void createFormContent() throws Exception {
         GridLayout formLayout = new GridLayout();
         formLayout.marginWidth = 0;
-        form.getBody().setLayout(formLayout);
+        page.setLayout(formLayout);
 
         form.setText(query.getDescription());
 
@@ -592,14 +591,14 @@ public class ReportsEditor extends BiobankFormBase {
         if (parameterSection != null)
             parameterSection.dispose();
 
-        parameterSection = toolkit.createComposite(form.getBody(), SWT.NONE);
+        parameterSection = toolkit.createComposite(page, SWT.NONE);
         GridData pgd = new GridData();
         GridLayout pgl = new GridLayout(2, false);
         pgd.grabExcessHorizontalSpace = true;
         parameterSection.setLayout(pgl);
         parameterSection.setLayoutData(pgd);
 
-        buttonSection = toolkit.createComposite(form.getBody(), SWT.NONE);
+        buttonSection = toolkit.createComposite(page, SWT.NONE);
         GridLayout gl = new GridLayout();
         gl.numColumns = 4;
         buttonSection.setLayout(gl);

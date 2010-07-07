@@ -59,27 +59,24 @@ public class ScanPlateForm extends PlateForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("ScanPlate.tabTitle"));
         GridLayout layout = new GridLayout(2, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(
-            new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        Label label = toolkit.createLabel(form.getBody(),
+        Label label = toolkit.createLabel(page,
             "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         label.setLayoutData(gd);
 
-        plateSelectionWidget = new PlateSelectionWidget(form.getBody(),
-            SWT.NONE);
+        plateSelectionWidget = new PlateSelectionWidget(page, SWT.NONE);
         plateSelectionWidget.adaptToToolkit(toolkit, true);
         gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
-        scanButton = toolkit.createButton(form.getBody(), "Scan Plate",
-            SWT.PUSH);
+        scanButton = toolkit.createButton(page, "Scan Plate", SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -89,9 +86,9 @@ public class ScanPlateForm extends PlateForm {
             }
         });
 
-        imageCanvas = new Canvas(form.getBody(), SWT.BORDER);
+        imageCanvas = new Canvas(page, SWT.BORDER);
         imageCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        form.getBody().layout(true);
+        page.layout(true);
 
         imageCanvas.addPaintListener(new PaintListener() {
             @Override
@@ -157,8 +154,8 @@ public class ScanPlateForm extends PlateForm {
                 } catch (RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError(Messages
-                        .getString("ScanPlate.dialog.scanError.title"), //$NON-NLS-1$
+                    BioBankPlugin.openAsyncError(
+                        Messages.getString("ScanPlate.dialog.scanError.title"), //$NON-NLS-1$
                         e);
                 }
                 monitor.done();

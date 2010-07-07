@@ -41,12 +41,12 @@ public class LoggingForm extends BiobankViewForm {
 
         form.setText("Logging: Browse through your search results");
         GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_STUDY));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_STUDY));
 
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);

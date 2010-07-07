@@ -72,12 +72,12 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_STUDY));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_STUDY));
 
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
@@ -149,8 +149,8 @@ public class StudyViewForm extends BiobankViewForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
 
-        sampleStorageTable = new SampleStorageInfoTable(section, study
-            .getSampleStorageCollection(true));
+        sampleStorageTable = new SampleStorageInfoTable(section,
+            study.getSampleStorageCollection(true));
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
@@ -159,8 +159,8 @@ public class StudyViewForm extends BiobankViewForm {
     private void createSourceVesselSection() {
         Section section = createSection("Source Vessels");
 
-        studySourceVesselsTable = new StudySourceVesselInfoTable(section, study
-            .getStudySourceVesselCollection(true));
+        studySourceVesselsTable = new StudySourceVesselInfoTable(section,
+            study.getStudySourceVesselCollection(true));
         section.setClient(studySourceVesselsTable);
         studySourceVesselsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studySourceVesselsTable);
@@ -216,8 +216,8 @@ public class StudyViewForm extends BiobankViewForm {
                 // skip this attribute since its already part of PatientVisit
                 continue;
             }
-            setTextValue(pvCustomInfo.wiget, StringUtils.join(study
-                .getStudyPvAttrPermissible(label), "; "));
+            setTextValue(pvCustomInfo.wiget,
+                StringUtils.join(study.getStudyPvAttrPermissible(label), "; "));
         }
     }
 

@@ -31,11 +31,11 @@ public class AliquotListViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Non Active Aliquots");
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_BOX));
+        page.setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_BOX));
 
-        samplesWidget = new AliquotListInfoTable(form.getBody(), aliquots,
+        samplesWidget = new AliquotListInfoTable(page, aliquots,
             AliquotListInfoTable.ColumnsShown.PNUMBER);
         samplesWidget.adaptToToolkit(toolkit, true);
         samplesWidget.addDoubleClickListener(collectionDoubleClickListener);

@@ -52,10 +52,10 @@ public class PatientViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Patient: " + patient.getPnumber());
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT));
+        page.setLayout(new GridLayout(1, false));
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
         createPatientVisitSection();
@@ -63,7 +63,7 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void createPatientSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -81,8 +81,8 @@ public class PatientViewForm extends BiobankViewForm {
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable = new PatientVisitInfoTable(section, patient
-            .getPatientVisitCollection());
+        visitsTable = new PatientVisitInfoTable(section,
+            patient.getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);

@@ -31,11 +31,11 @@ public class PvListViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Patient Visits");
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_BOX));
+        page.setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_BOX));
 
-        patientVisits = new PvListInfoTable(form.getBody(), pvs);
+        patientVisits = new PvListInfoTable(page, pvs);
         patientVisits.adaptToToolkit(toolkit, true);
         patientVisits.addDoubleClickListener(collectionDoubleClickListener);
     }

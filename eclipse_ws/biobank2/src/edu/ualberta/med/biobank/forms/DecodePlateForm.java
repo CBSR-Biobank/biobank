@@ -55,27 +55,25 @@ public class DecodePlateForm extends PlateForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("DecodePlate.tabTitle"));
         GridLayout layout = new GridLayout(2, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(
-            new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        plateSelectionWidget = new PlateSelectionWidget(form.getBody(),
-            SWT.NONE);
+        plateSelectionWidget = new PlateSelectionWidget(page, SWT.NONE);
         plateSelectionWidget.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
-        multipleScanButton = new Button(form.getBody(), SWT.CHECK);
+        multipleScanButton = new Button(page, SWT.CHECK);
         multipleScanButton.setText("Multiple Scan");
         gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         multipleScanButton.setLayoutData(gd);
 
-        scanButton = toolkit.createButton(form.getBody(),
-            "Scan && Decode Plate", SWT.PUSH);
+        scanButton = toolkit.createButton(page, "Scan && Decode Plate",
+            SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -85,7 +83,7 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        spw = new ScanPalletWidget(form.getBody(), false);
+        spw = new ScanPalletWidget(page, false);
         spw.setVisible(true);
         toolkit.adapt(spw);
 
