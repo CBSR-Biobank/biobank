@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.client.reports;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.reports.QueryObject;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryObject;
 
 public class ReportTreeNode extends Object {
     private ReportTreeNode parent;

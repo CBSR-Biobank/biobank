@@ -29,7 +29,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -86,9 +85,9 @@ import edu.ualberta.med.biobank.client.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.SampleTypePvCount;
 import edu.ualberta.med.biobank.client.reports.SampleTypeSUsage;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryObject;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
 import edu.ualberta.med.biobank.common.util.DateGroup;
 import edu.ualberta.med.biobank.common.util.ReportOption;
@@ -145,100 +144,34 @@ public class ReportsEditor extends BiobankFormBase {
         Map<Class<?>, int[]> aMap = new HashMap<Class<?>, int[]>();
         aMap = new HashMap<Class<?>, int[]>();
         aMap.put(CabinetCAliquots.class, new int[] { 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.CabinetCAliquots.class,
-            new int[] { 100, 100, 100 });
         aMap.put(CabinetDAliquots.class, new int[] { 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.CabinetDAliquots.class,
-            new int[] { 100, 100, 100, 100 });
         aMap.put(CabinetSAliquots.class, new int[] { 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.CabinetSAliquots.class,
-            new int[] { 100, 100 });
         aMap.put(FreezerCAliquots.class, new int[] { 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.FreezerCAliquots.class,
-            new int[] { 100, 100, 100 });
         aMap.put(FreezerDAliquots.class, new int[] { 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.FreezerDAliquots.class,
-            new int[] { 100, 100, 100, 100 });
         aMap.put(FreezerSAliquots.class, new int[] { 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.FreezerSAliquots.class,
-            new int[] { 100, 100 });
         aMap.put(FvLPatientVisits.class, new int[] { 100, 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.FvLPatientVisits.class,
-            new int[] { 100, 100, 100, 100, 100 });
         aMap.put(NewPsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.NewPsByStudyClinic.class,
-            new int[] { 100, 100, 100, 100 });
         aMap.put(NewPVsByStudyClinic.class, new int[] { 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.NewPVsByStudyClinic.class,
-            new int[] { 100, 100, 100, 100 });
         aMap.put(PsByStudy.class, new int[] { 100, 100, 100 });
-        aMap.put(edu.ualberta.med.biobank.common.reports.PsByStudy.class,
-            new int[] { 100, 100, 100 });
         aMap.put(PVsByStudy.class, new int[] { 100, 100, 100 });
-        aMap.put(edu.ualberta.med.biobank.common.reports.PVsByStudy.class,
-            new int[] { 100, 100, 100 });
         aMap.put(PatientVisitSummary.class, new int[] { 100, 100, 100, 100,
             100, 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.PatientVisitSummary.class,
-            new int[] { 100, 100, 100, 100, 100, 100, 100, 100, 100 });
         aMap.put(PatientWBC.class, new int[] { 100, 100, 100, 100, 100, 100,
             100 });
-        aMap.put(edu.ualberta.med.biobank.common.reports.PatientWBC.class,
-            new int[] { 100, 100, 100, 100, 100, 100, 100 });
         aMap.put(QACabinetAliquots.class, new int[] { 100, 100, 100, 100, 100,
             100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.QACabinetAliquots.class,
-            new int[] { 100, 100, 100, 100, 100, 100 });
         aMap.put(QAFreezerAliquots.class, new int[] { 100, 100, 100, 100, 100,
             100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.QAFreezerAliquots.class,
-            new int[] { 100, 100, 100, 100, 100, 100 });
         aMap.put(AliquotsByPallet.class, new int[] { 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.AliquotsByPallet.class,
-            new int[] { 100, 100, 100, 100 });
         aMap.put(AliquotCount.class, new int[] { 100, 100 });
-        aMap.put(edu.ualberta.med.biobank.common.reports.AliquotCount.class,
-            new int[] { 100, 100 });
         aMap.put(AliquotInvoiceByClinic.class, new int[] { 100, 100, 100, 150,
             100 });
-        aMap
-            .put(
-                edu.ualberta.med.biobank.common.reports.AliquotInvoiceByClinic.class,
-                new int[] { 100, 100, 100, 150, 100 });
         aMap.put(AliquotInvoiceByPatient.class,
             new int[] { 100, 100, 150, 100 });
-        aMap
-            .put(
-                edu.ualberta.med.biobank.common.reports.AliquotInvoiceByPatient.class,
-                new int[] { 100, 100, 150, 100 });
         aMap.put(AliquotRequest.class, new int[] { 100, 100, 100, 100, 100 });
-        aMap.put(edu.ualberta.med.biobank.common.reports.AliquotRequest.class,
-            new int[] { 100, 100, 100, 100, 100 });
         aMap.put(AliquotSCount.class, new int[] { 100, 150, 100 });
-        aMap.put(edu.ualberta.med.biobank.common.reports.AliquotSCount.class,
-            new int[] { 100, 150, 100 });
-        aMap
-            .put(SampleTypePvCount.class, new int[] { 100, 100, 100, 100, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.SampleTypePvCount.class,
-            new int[] { 100, 100, 100, 100, 100 });
+        aMap.put(SampleTypePvCount.class, new int[] { 100, 100, 100, 100, 100 });
         aMap.put(SampleTypeSUsage.class, new int[] { 150, 100 });
-        aMap.put(
-            edu.ualberta.med.biobank.common.reports.SampleTypeSUsage.class,
-            new int[] { 150, 100 });
         columnWidths = Collections.unmodifiableMap(aMap);
     }
 
@@ -377,12 +310,17 @@ public class ReportsEditor extends BiobankFormBase {
         List<ReportOption> queryOptions = report.getOptions();
         for (int i = 0; i < widgetFields.size(); i++) {
             if (widgetFields.get(i) instanceof BiobankText) {
-                if (queryOptions.get(i).getName().compareTo("Pallet Label") == 0) {
+                // TODO why do we need a specific test for 'Pallet Label': if
+                // the default value is set to "", then this is exactly the same
+                if (queryOptions.get(i).getName().equals("Pallet Label")) {
                     params.add(((BiobankText) widgetFields.get(i)).getText());
                 } else if (((BiobankText) widgetFields.get(i)).getText()
-                    .compareTo("") == 0)
+                    .equals(""))
                     params.add(report.getOptions().get(i).getDefaultValue());
                 else
+                    // TODO test on the option type would be fine before that.
+                    // If we add this check before in a validator, we won't need
+                    // this anymore
                     try {
                         params.add(Integer.parseInt(((BiobankText) widgetFields
                             .get(i)).getText()));
@@ -566,8 +504,9 @@ public class ReportsEditor extends BiobankFormBase {
         Boolean exportPDF) {
         if (exportPDF) {
             try {
-                ReportingUtils.saveReport(createDynamicReport(report.getName(),
-                    params, columnInfo, listData), path);
+                ReportingUtils.saveReport(
+                    createDynamicReport(report.getName(), params, columnInfo,
+                        listData), path);
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Error saving to PDF", e);
                 return;
@@ -614,8 +553,8 @@ public class ReportsEditor extends BiobankFormBase {
         drb.setTemplateFile(reportURL.getFile());
         drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
-        drb.addAutoText("Printed on "
-            + DateFormatter.formatAsDateTime(new Date()),
+        drb.addAutoText(
+            "Printed on " + DateFormatter.formatAsDateTime(new Date()),
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
 
         Style headerStyle = new Style();
@@ -655,7 +594,7 @@ public class ReportsEditor extends BiobankFormBase {
 
     @Override
     public void setFocus() {
-        ReportsView.getTree().setSelection(new StructuredSelection(node));
+        ReportsView.currentInstance.setSelectedNode(node);
     }
 
     @Override
@@ -697,8 +636,8 @@ public class ReportsEditor extends BiobankFormBase {
         });
 
         printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
-        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PRINTER));
+        printButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -744,9 +683,8 @@ public class ReportsEditor extends BiobankFormBase {
 
         for (int i = 0; i < queryOptions.size(); i++) {
             ReportOption option = queryOptions.get(i);
-            Label fieldLabel = toolkit.createLabel(parameterSection, option
-                .getName()
-                + ":", SWT.NONE);
+            Label fieldLabel = toolkit.createLabel(parameterSection,
+                option.getName() + ":", SWT.NONE);
             textLabels.add(fieldLabel);
             final Widget widget;
             GridData widgetData = new GridData();

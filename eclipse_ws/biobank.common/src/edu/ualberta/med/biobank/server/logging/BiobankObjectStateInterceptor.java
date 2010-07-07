@@ -30,6 +30,7 @@ public class BiobankObjectStateInterceptor extends EmptyInterceptor {
 
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
     private void log(Object entity, Serializable id, Object[] state,
         Object[] previousState, String[] propertyNames, Type[] types,
         String action) {

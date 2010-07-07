@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.views.AbstractViewWithTree;
+import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -50,12 +50,12 @@ public class SessionManager {
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
      * perspective is set
      */
-    public Map<String, AbstractViewWithTree> possibleViewMap;
+    public Map<String, AbstractViewWithAdapterTree> possibleViewMap;
 
     private SessionManager() {
         super();
         rootNode = new RootNode();
-        possibleViewMap = new HashMap<String, AbstractViewWithTree>();
+        possibleViewMap = new HashMap<String, AbstractViewWithAdapterTree>();
         siteManager = new SiteManager();
     }
 
@@ -142,29 +142,29 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public static void updateTreeNode(AdapterBase node) {
-        AbstractViewWithTree view = getCurrentViewWithTree();
+    public static void updateAdapterTreeNode(AdapterBase node) {
+        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             view.getTreeViewer().update(node, null);
         }
     }
 
     public static void refreshTreeNode(AdapterBase node) {
-        AbstractViewWithTree view = getCurrentViewWithTree();
+        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             view.getTreeViewer().refresh(node, true);
         }
     }
 
     public static void setSelectedNode(AdapterBase node) {
-        AbstractViewWithTree view = getCurrentViewWithTree();
+        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null && node != null) {
             view.setSelectedNode(node);
         }
     }
 
     public static AdapterBase getSelectedNode() {
-        AbstractViewWithTree view = getCurrentViewWithTree();
+        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             AdapterBase selectedNode = view.getSelectedNode();
             return selectedNode;
@@ -187,7 +187,7 @@ public class SessionManager {
         }
     }
 
-    public static AbstractViewWithTree getCurrentViewWithTree() {
+    public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
             .getActivePage();
@@ -196,7 +196,7 @@ public class SessionManager {
     }
 
     public static AdapterBase searchNode(ModelWrapper<?> wrapper) {
-        AbstractViewWithTree view = getCurrentViewWithTree();
+        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             return view.searchNode(wrapper);
         }
@@ -244,7 +244,8 @@ public class SessionManager {
         siteManager.updateSites();
     }
 
-    public static void addView(String perspectiveId, AbstractViewWithTree view) {
+    public static void addView(String perspectiveId,
+        AbstractViewWithAdapterTree view) {
         getInstance().possibleViewMap.put(perspectiveId, view);
     }
 

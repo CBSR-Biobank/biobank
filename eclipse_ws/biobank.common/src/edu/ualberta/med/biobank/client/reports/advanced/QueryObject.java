@@ -1,10 +1,7 @@
-package edu.ualberta.med.biobank.common.reports;
+package edu.ualberta.med.biobank.client.reports.advanced;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.client.reports.IReport;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -14,38 +11,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-@Deprecated
 public abstract class QueryObject implements IReport {
-
-    private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
-
-    static {
-        Map<String, Class<? extends QueryObject>> aMap = new TreeMap<String, Class<? extends QueryObject>>();
-        aMap.put(CabinetCAliquots.NAME, CabinetCAliquots.class);
-        aMap.put(CabinetDAliquots.NAME, CabinetDAliquots.class);
-        aMap.put(CabinetSAliquots.NAME, CabinetSAliquots.class);
-        aMap.put(FreezerCAliquots.NAME, FreezerCAliquots.class);
-        aMap.put(FreezerDAliquots.NAME, FreezerDAliquots.class);
-        aMap.put(FreezerSAliquots.NAME, FreezerSAliquots.class);
-        aMap.put(FvLPatientVisits.NAME, FvLPatientVisits.class);
-        aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
-        aMap.put(NewPsByStudyClinic.NAME, NewPsByStudyClinic.class);
-        aMap.put(PsByStudy.NAME, PsByStudy.class);
-        aMap.put(PVsByStudy.NAME, PVsByStudy.class);
-        aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
-        aMap.put(PatientWBC.NAME, PatientWBC.class);
-        aMap.put(AliquotsByPallet.NAME, AliquotsByPallet.class);
-        aMap.put(AliquotCount.NAME, AliquotCount.class);
-        aMap.put(AliquotInvoiceByClinic.NAME, AliquotInvoiceByClinic.class);
-        aMap.put(AliquotInvoiceByPatient.NAME, AliquotInvoiceByPatient.class);
-        aMap.put(AliquotRequest.NAME, AliquotRequest.class);
-        aMap.put(AliquotSCount.NAME, AliquotSCount.class);
-        aMap.put(SampleTypePvCount.NAME, SampleTypePvCount.class);
-        aMap.put(SampleTypeSUsage.NAME, SampleTypeSUsage.class);
-        aMap.put(QACabinetAliquots.NAME, QACabinetAliquots.class);
-        aMap.put(QAFreezerAliquots.NAME, QAFreezerAliquots.class);
-        QUERIES = Collections.unmodifiableMap(aMap);
-    };
 
     /**
      * Description of this query object
@@ -74,19 +40,6 @@ public abstract class QueryObject implements IReport {
 
     public void addOption(String name, Class<?> type, Object defaultValue) {
         queryOptions.add(new ReportOption(name, type, defaultValue));
-    }
-
-    public static String[] getQueryObjectNames() {
-        return QUERIES.keySet().toArray(new String[] {});
-    }
-
-    public static Class<? extends QueryObject> getQueryObjectByName(String name)
-        throws Exception {
-        Class<? extends QueryObject> queryObject = QUERIES.get(name);
-        if (queryObject == null) {
-            throw new Exception("Query object \"" + name + "\" does not exist");
-        }
-        return queryObject;
     }
 
     @Override
@@ -132,7 +85,5 @@ public abstract class QueryObject implements IReport {
     public String toString() {
         return this.getClass().getSimpleName();
     }
-
-    public abstract String getName();
 
 }

@@ -28,7 +28,6 @@ public class PatientWBCImpl extends AbstractReport {
         + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like '"
         + TYPE_NAME + "')";
 
-    // FIXME need BiobankListProxy
     public PatientWBCImpl(List<Object> parameters, List<ReportOption> options) {
         super(QUERY, parameters, options);
     }

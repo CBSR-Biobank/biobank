@@ -66,7 +66,6 @@ public class FreezerDAliquotsImpl extends AbstractReport {
                     castOb[3], castOb[4] });
             }
         } else {
-            // FIXME needs BiobankListProxy
             for (Object ob : results) {
                 Object[] castOb = (Object[]) ob;
                 compressedDates.add(new Object[] { castOb[0], castOb[1],

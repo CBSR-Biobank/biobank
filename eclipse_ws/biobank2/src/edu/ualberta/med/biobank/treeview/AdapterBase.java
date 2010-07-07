@@ -370,7 +370,7 @@ public abstract class AdapterBase {
                         addChild(node);
                     }
                     if (updateNode) {
-                        SessionManager.updateTreeNode(node);
+                        SessionManager.updateAdapterTreeNode(node);
                     }
                 }
                 notifyListeners();
@@ -405,7 +405,7 @@ public abstract class AdapterBase {
                 addChild(node);
                 newNodes.add(node);
                 if (updateNode) {
-                    SessionManager.updateTreeNode(node);
+                    SessionManager.updateAdapterTreeNode(node);
                 }
             }
 

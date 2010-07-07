@@ -82,8 +82,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     protected void createFormContent() throws ApplicationException {
         form.setText("Clinic Information");
         form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CLINIC));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CLINIC));
 
         toolkit
             .createLabel(
@@ -95,9 +95,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         createContactSection();
         createButtonsSection();
 
-        // TODO: When adding help uncomment line below
-        // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
-        // IJavaHelpContextIds.XXXXX);
     }
 
     private void createClinicInfoSection() throws ApplicationException {
@@ -112,24 +109,26 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             .getSite().getName());
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, BeansObservables.observeValue(clinic,
-                "name"), new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
+            SWT.NONE, "Name", null,
+            BeansObservables.observeValue(clinic, "name"),
+            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, BeansObservables.observeValue(clinic,
-                "nameShort"), new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
+            "Short Name", null,
+            BeansObservables.observeValue(clinic, "nameShort"),
+            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
         if (clinic.getSendsShipments() == null) {
             clinic.setSendsShipments(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Sends Shipments", null, BeansObservables.observeValue(clinic,
-                "sendsShipments"), null);
+            "Sends Shipments", null,
+            BeansObservables.observeValue(clinic, "sendsShipments"), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService),
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
             clinic.getActivityStatus(), "Clinic must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,

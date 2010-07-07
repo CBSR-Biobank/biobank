@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.client.reports.advanced;
 
-import edu.ualberta.med.biobank.common.reports.QueryObject;
 
 public class CustomQueryObject extends QueryObject {
 

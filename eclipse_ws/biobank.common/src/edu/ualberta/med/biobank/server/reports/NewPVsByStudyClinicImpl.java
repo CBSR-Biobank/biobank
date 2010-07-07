@@ -48,7 +48,6 @@ public class NewPVsByStudyClinicImpl extends AbstractReport {
                     castOb[3], castOb[4] });
             }
         } else {
-            // FIXME need BiobankListProxy
             for (Object ob : results) {
                 Object[] castOb = (Object[]) ob;
                 compressedDates.add(new Object[] { castOb[0], castOb[1],

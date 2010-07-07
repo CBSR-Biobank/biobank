@@ -47,7 +47,6 @@ public class QACabinetAliquotsImpl extends AbstractReport {
     @Override
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
-        // FIXME need BiobankListProxy
         return results.subList(0, numResults);
     }
 }

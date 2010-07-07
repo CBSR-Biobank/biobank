@@ -215,7 +215,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             PatientAdapter p = (PatientAdapter) SessionManager
                 .searchNode(patient2Wrapper);
             p.getParent().removeChild(p);
-            SessionManager.getCurrentViewWithTree().getTreeViewer().refresh();
+            SessionManager.getCurrentAdapterViewWithTree().getTreeViewer().refresh();
 
             patient2Wrapper.delete();
             this.closeEntryOpenView(false, true);

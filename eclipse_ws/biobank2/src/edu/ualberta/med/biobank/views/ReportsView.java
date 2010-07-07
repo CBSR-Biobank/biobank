@@ -4,76 +4,44 @@ import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.reports.AbstractReport;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
-import edu.ualberta.med.biobank.common.reports.QueryObject;
-import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
-import edu.ualberta.med.biobank.forms.ReportsEditor;
-import edu.ualberta.med.biobank.forms.input.ReportInput;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.ReportsPerspective;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.QueryTree;
+import edu.ualberta.med.biobank.widgets.ReportTreeWidget;
 
-public class ReportsView extends AbstractViewWithTree {
+public class ReportsView extends AbstractViewWithTree<ReportTreeNode> {
 
     public static BiobankLogger logger = BiobankLogger
         .getLogger(ReportsView.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.views.ReportsView";
-    public static ReportsView reportsView;
+
+    public static ReportsView currentInstance;
 
     private Composite top;
 
-    private TreeViewer querySelect;
+    private ReportTreeWidget reportTree;
+
+    public ReportsView() {
+        currentInstance = this;
+    }
 
     @Override
     public TreeViewer getTreeViewer() {
-        return getTree();
-    }
-
-    public ReportsView() {
-        SessionManager.addView(ReportsPerspective.ID, this);
-        reportsView = this;
-    }
-
-    public static TreeViewer getTree() {
-        // retrieves the report tree
-        return reportsView.querySelect;
+        return reportTree.getTreeViewer();
     }
 
     @Override
@@ -82,220 +50,14 @@ public class ReportsView extends AbstractViewWithTree {
         top.setLayout(new GridLayout());
         top.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        querySelect = new TreeViewer(top, SWT.BORDER);
-        querySelect.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
-                    .getSelection()).getFirstElement();
-                try {
-                    if (node.getQuery() != null) {
-                        if (node.getQuery() instanceof QueryTreeNode)
-                            PlatformUI
-                                .getWorkbench()
-                                .getActiveWorkbenchWindow()
-                                .getActivePage()
-                                .openEditor(new ReportInput(node),
-                                    AdvancedReportsEditor.ID);
-                        else
-                            PlatformUI
-                                .getWorkbench()
-                                .getActiveWorkbenchWindow()
-                                .getActivePage()
-                                .openEditor(new ReportInput(node),
-                                    ReportsEditor.ID);
-                    }
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Error",
-                        "There was an error while building page.");
-                }
-            }
-        });
+        reportTree = new ReportTreeWidget(top);
 
-        querySelect.setContentProvider(new ITreeContentProvider() {
-
-            @Override
-            public void inputChanged(Viewer viewer, Object oldInput,
-                Object newInput) {
-
-            }
-
-            @Override
-            public void dispose() {
-            }
-
-            @Override
-            public Object[] getElements(Object inputElement) {
-                return ((ReportTreeNode) inputElement).getChildren().toArray();
-            }
-
-            @Override
-            public boolean hasChildren(Object element) {
-                return !((ReportTreeNode) element).isLeaf();
-            }
-
-            @Override
-            public Object getParent(Object element) {
-                return ((ReportTreeNode) element).getParent();
-            }
-
-            @Override
-            public Object[] getChildren(Object parentElement) {
-                return ((ReportTreeNode) parentElement).getChildren().toArray();
-            }
-        });
-        querySelect.setLabelProvider(new ILabelProvider() {
-            @Override
-            public Image getImage(Object element) {
-                return null;
-            }
-
-            @Override
-            public String getText(Object element) {
-                return ((ReportTreeNode) element).getLabel();
-            }
-
-            @Override
-            public void addListener(ILabelProviderListener listener) {
-
-            }
-
-            @Override
-            public void dispose() {
-            }
-
-            @Override
-            public boolean isLabelProperty(Object element, String property) {
-                return false;
-            }
-
-            @Override
-            public void removeListener(ILabelProviderListener listener) {
-            }
-        });
-
-        // lengthy tooltip faking code here
-        final Tree tree = querySelect.getTree();
-        final Display display = tree.getDisplay();
-        final Shell shell = new Shell(display);
-        shell.setLayout(new FillLayout());
-        // Disable native tooltip
-        tree.setToolTipText("");
-
-        // Implement a "fake" tooltip
-        final Listener labelListener = new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                Label label = (Label) event.widget;
-                Shell shell = label.getShell();
-                switch (event.type) {
-                case SWT.MouseDown:
-                    Event e = new Event();
-                    e.item = (TreeItem) label.getData("_TREEITEM");
-                    // Assuming table is single select, set the selection as if
-                    // the mouse down event went through to the table
-                    tree.setSelection(new TreeItem[] { (TreeItem) e.item });
-                    tree.notifyListeners(SWT.Selection, e);
-                    shell.dispose();
-                    tree.setFocus();
-                    break;
-                case SWT.MouseExit:
-                    shell.dispose();
-                    break;
-                }
-            }
-        };
-
-        Listener tableListener = new Listener() {
-            Shell tip = null;
-            Label label = null;
-
-            @Override
-            public void handleEvent(Event event) {
-                switch (event.type) {
-                case SWT.Dispose:
-                case SWT.KeyDown:
-                case SWT.MouseMove: {
-                    if (tip == null)
-                        break;
-                    tip.dispose();
-                    tip = null;
-                    label = null;
-                    break;
-                }
-                case SWT.MouseHover: {
-                    TreeItem item = tree.getItem(new Point(event.x, event.y));
-                    if (item != null) {
-                        if (tip != null && !tip.isDisposed())
-                            tip.dispose();
-                        tip = new Shell(shell, SWT.ON_TOP | SWT.NO_FOCUS
-                            | SWT.TOOL);
-                        tip.setBackground(display
-                            .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                        FillLayout layout = new FillLayout();
-                        layout.marginWidth = 2;
-                        tip.setLayout(layout);
-                        label = new Label(tip, SWT.NONE);
-                        label.setForeground(display
-                            .getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-                        label.setBackground(display
-                            .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                        label.setData("_TREEITEM", item);
-                        String text = ((ReportTreeNode) item.getData())
-                            .getToolTipText();
-                        if (text.equalsIgnoreCase(""))
-                            return;
-                        else
-                            label.setText(text);
-                        label.addListener(SWT.MouseExit, labelListener);
-                        label.addListener(SWT.MouseDown, labelListener);
-                        Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-                        Rectangle rect = item.getBounds(0);
-                        Point pt = tree.toDisplay(rect.x, rect.y);
-                        tip.setBounds(pt.x, pt.y, size.x, size.y);
-                        tip.setVisible(true);
-                    }
-                }
-                }
-            }
-        };
-        tree.addListener(SWT.Dispose, tableListener);
-        tree.addListener(SWT.KeyDown, tableListener);
-        tree.addListener(SWT.MouseMove, tableListener);
-        tree.addListener(SWT.MouseHover, tableListener);
-
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        menu.addListener(SWT.Show, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                Menu menu = querySelect.getTree().getMenu();
-                for (MenuItem menuItem : menu.getItems()) {
-                    menuItem.dispose();
-                }
-
-                Object element = ((StructuredSelection) querySelect
-                    .getSelection()).getFirstElement();
-                final ReportTreeNode node = (ReportTreeNode) element;
-                if (node != null
-                    && node.getParent().getLabel().compareTo("Custom") == 0) {
-                    MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText("Delete");
-                    mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-                        public void widgetSelected(SelectionEvent event) {
-                            File file = new File(Platform.getInstanceLocation()
-                                .getURL().getPath()
-                                + "/saved_reports/" + node.getLabel() + ".xml");
-                            file.delete();
-                            node.getParent().removeChild(node);
-                            querySelect.refresh();
-                        }
-                    });
-                }
-            }
-        });
-        querySelect.getTree().setMenu(menu);
+        GridData gd = new GridData();
+        gd.verticalAlignment = SWT.FILL;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
+        reportTree.setLayoutData(gd);
 
         ReportTreeNode root = new ReportTreeNode("", null);
         ReportTreeNode standard = new ReportTreeNode("Standard", null);
@@ -320,7 +82,6 @@ public class ReportsView extends AbstractViewWithTree {
         misc.setParent(standard);
 
         initializeNewReports(aliquots, clinics, patientVisits, patients, misc);
-        initializeOldReports(aliquots, clinics, patientVisits, patients, misc);
         List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs();
         for (Class<?> obj : advancedObjs) {
             ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
@@ -356,15 +117,8 @@ public class ReportsView extends AbstractViewWithTree {
         standard.setParent(root);
         root.addChild(advanced);
         advanced.setParent(root);
-        querySelect.setInput(root);
-        querySelect.expandAll();
-
-        GridData qgd = new GridData();
-        qgd.verticalAlignment = SWT.FILL;
-        qgd.horizontalAlignment = SWT.FILL;
-        qgd.grabExcessHorizontalSpace = true;
-        qgd.grabExcessVerticalSpace = true;
-        querySelect.getTree().setLayoutData(qgd);
+        getTreeViewer().setInput(root);
+        getTreeViewer().expandAll();
     }
 
     private void initializeNewReports(ReportTreeNode aliquots,
@@ -375,22 +129,6 @@ public class ReportsView extends AbstractViewWithTree {
             try {
                 ReportTreeNode child = new ReportTreeNode(names[i],
                     AbstractReport.getReportByName(names[i]));
-                addInTree(aliquots, clinics, patientVisits, patients, misc,
-                    names, i, child);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void initializeOldReports(ReportTreeNode aliquots,
-        ReportTreeNode clinics, ReportTreeNode patientVisits,
-        ReportTreeNode patients, ReportTreeNode misc) {
-        String[] names = QueryObject.getQueryObjectNames();
-        for (int i = 0; i < names.length; i++) {
-            try {
-                ReportTreeNode child = new ReportTreeNode(names[i],
-                    QueryObject.getQueryObjectByName(names[i]));
                 addInTree(aliquots, clinics, patientVisits, patients, misc,
                     names, i, child);
             } catch (Exception e) {
@@ -428,6 +166,8 @@ public class ReportsView extends AbstractViewWithTree {
     }
 
     @Override
-    public void reload() {
+    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
+        return null;
     }
+
 }

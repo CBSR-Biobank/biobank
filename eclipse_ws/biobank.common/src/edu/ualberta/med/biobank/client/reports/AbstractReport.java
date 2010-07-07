@@ -61,6 +61,7 @@ public abstract class AbstractReport implements IReport {
         this.columnNames = columnNames;
     }
 
+    @Override
     public abstract String getName();
 
     @Override
@@ -73,6 +74,7 @@ public abstract class AbstractReport implements IReport {
         return columnNames;
     }
 
+    @Override
     public List<ReportOption> getOptions() {
         return queryOptions;
     }

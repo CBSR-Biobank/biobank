@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
  * This view contains a tree view that represents the link to the server and the
  * ORM model objects in the database.
  */
-public class SessionsView extends AbstractViewWithTree {
+public class SessionsView extends AbstractViewWithAdapterTree {
 
     public static final String ID = "edu.ualberta.med.biobank.views.SessionsView";
 
