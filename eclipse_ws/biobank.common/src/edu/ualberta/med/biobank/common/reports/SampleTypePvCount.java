@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 @Deprecated
 public class SampleTypePvCount extends QueryObject {
 
-    protected static final String NAME = "Sample Type Totals by Patient Visit and Study";
+    protected static final String NAME = "Sample Type Totals by Patient Visit and Study Old";
 
     public SampleTypePvCount(String op, Integer siteId) {
         super(

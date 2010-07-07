@@ -41,6 +41,7 @@ import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.ReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
@@ -318,32 +319,8 @@ public class ReportsView extends AbstractViewWithTree {
         patients.setParent(standard);
         misc.setParent(standard);
 
-        String[] names = AbstractReport.getReportNames();
-        for (int i = 0; i < names.length; i++)
-            try {
-                ReportTreeNode child = new ReportTreeNode(names[i],
-                    AbstractReport.getReportByName(names[i]));
-                if (names[i].contains("Aliquot")) {
-                    aliquots.addChild(child);
-                    child.setParent(aliquots);
-                } else if (names[i].contains("Sample Type")) {
-                    misc.addChild(child);
-                    child.setParent(misc);
-                } else if (names[i].contains("Patient Visit")) {
-                    patientVisits.addChild(child);
-                    child.setParent(patientVisits);
-                } else if (names[i].contains("Patient")) {
-                    patients.addChild(child);
-                    child.setParent(patients);
-                } else if (names[i].contains("Clinic")) {
-                    clinics.addChild(child);
-                    child.setParent(clinics);
-                } else
-                    throw new Exception("Unable to place report node.");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+        initializeNewReports(aliquots, clinics, patientVisits, patients, misc);
+        initializeOldReports(aliquots, clinics, patientVisits, patients, misc);
         List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs();
         for (Class<?> obj : advancedObjs) {
             ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
@@ -388,6 +365,61 @@ public class ReportsView extends AbstractViewWithTree {
         qgd.grabExcessHorizontalSpace = true;
         qgd.grabExcessVerticalSpace = true;
         querySelect.getTree().setLayoutData(qgd);
+    }
+
+    private void initializeNewReports(ReportTreeNode aliquots,
+        ReportTreeNode clinics, ReportTreeNode patientVisits,
+        ReportTreeNode patients, ReportTreeNode misc) {
+        String[] names = AbstractReport.getReportNames();
+        for (int i = 0; i < names.length; i++) {
+            try {
+                ReportTreeNode child = new ReportTreeNode(names[i],
+                    AbstractReport.getReportByName(names[i]));
+                addInTree(aliquots, clinics, patientVisits, patients, misc,
+                    names, i, child);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void initializeOldReports(ReportTreeNode aliquots,
+        ReportTreeNode clinics, ReportTreeNode patientVisits,
+        ReportTreeNode patients, ReportTreeNode misc) {
+        String[] names = QueryObject.getQueryObjectNames();
+        for (int i = 0; i < names.length; i++) {
+            try {
+                ReportTreeNode child = new ReportTreeNode(names[i],
+                    QueryObject.getQueryObjectByName(names[i]));
+                addInTree(aliquots, clinics, patientVisits, patients, misc,
+                    names, i, child);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void addInTree(ReportTreeNode aliquots, ReportTreeNode clinics,
+        ReportTreeNode patientVisits, ReportTreeNode patients,
+        ReportTreeNode misc, String[] names, int i, ReportTreeNode child)
+        throws Exception {
+        if (names[i].contains("Aliquot")) {
+            aliquots.addChild(child);
+            child.setParent(aliquots);
+        } else if (names[i].contains("Sample Type")) {
+            misc.addChild(child);
+            child.setParent(misc);
+        } else if (names[i].contains("Patient Visit")) {
+            patientVisits.addChild(child);
+            child.setParent(patientVisits);
+        } else if (names[i].contains("Patient")) {
+            patients.addChild(child);
+            child.setParent(patients);
+        } else if (names[i].contains("Clinic")) {
+            clinics.addChild(child);
+            child.setParent(clinics);
+        } else
+            throw new Exception("Unable to place report node.");
     }
 
     @Override

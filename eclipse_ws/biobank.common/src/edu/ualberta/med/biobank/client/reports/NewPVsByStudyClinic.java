@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.client.reports;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.util.DateGroup;
 
 public class NewPVsByStudyClinic extends AbstractReport {
@@ -17,6 +19,11 @@ public class NewPVsByStudyClinic extends AbstractReport {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    protected void doColumnModification(List<Object> parameters) {
+        columnNames[2] = (String) parameters.get(0);
     }
 
 }

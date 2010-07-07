@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 @Deprecated
 public class AliquotInvoiceByClinic extends QueryObject {
 
-    protected static final String NAME = "Aliquots per Clinic by Date";
+    protected static final String NAME = "Aliquots per Clinic by Date Old";
 
     private static String QUERY_STRING = "Select Alias.inventoryId, Alias.patientVisit.shipment.clinic.name, "
         + "Alias.patientVisit.patient.pnumber, "

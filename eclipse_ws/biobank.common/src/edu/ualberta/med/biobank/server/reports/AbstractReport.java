@@ -19,13 +19,15 @@ public class AbstractReport {
 
     protected static final String SITE_OPERATOR = "$$siteOperator$$";
 
-    protected static final String SITE_OPERATOR_SEARCH_STRING = SITE_OPERATOR
-        .replaceAll("\\$", "\\\\\\$");
+    protected static final String SITE_OPERATOR_SEARCH_STRING = replacePatternString(SITE_OPERATOR);
 
     protected static final String SITE_ID = "$$siteId$$";
 
-    protected static final String SITE_ID_SEARCH_STRING = SITE_ID.replaceAll(
-        "\\$", "\\\\\\$");
+    protected static final String SITE_ID_SEARCH_STRING = replacePatternString(SITE_ID);
+
+    protected static final String GROUPBY_DATE = "$$groupBy$$";
+
+    protected static final String GROUPBY_DATE_SEARCH_STRING = replacePatternString(GROUPBY_DATE);
 
     protected AbstractReport(String queryString, List<Object> parameters,
         List<ReportOption> options) {
@@ -55,6 +57,10 @@ public class AbstractReport {
         HQLCriteria criteria = new HQLCriteria(queryString, parameters);
         List<Object> results = appService.query(criteria);
         return results;
+    }
+
+    private static String replacePatternString(String pattern) {
+        return pattern.replaceAll("\\$", "\\\\\\$");
     }
 
 }

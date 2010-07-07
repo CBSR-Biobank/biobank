@@ -28,7 +28,6 @@ public class PsByStudyImpl extends AbstractReport {
             if (option.getType().equals(String.class))
                 parameters.set(i, "%" + parameters.get(i) + "%");
         }
-        // FIXME modify column in client side
         String groupBy = (String) parameters.remove(0);
         queryString = MessageFormat.format(queryString, groupBy);
         groupByYear = groupBy.equals("Year");

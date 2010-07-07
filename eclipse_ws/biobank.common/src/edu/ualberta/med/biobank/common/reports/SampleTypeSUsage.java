@@ -14,7 +14,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 @Deprecated
 public class SampleTypeSUsage extends QueryObject {
 
-    public final static String NAME = "Sample Type Usage by Study";
+    public final static String NAME = "Sample Type Usage by Study Old";
 
     private String query1 = "select ss.sampleType.nameShort, "
         + "ss.study.nameShort from "

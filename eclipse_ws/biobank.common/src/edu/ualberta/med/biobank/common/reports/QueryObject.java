@@ -1,19 +1,21 @@
 package edu.ualberta.med.biobank.common.reports;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import edu.ualberta.med.biobank.client.reports.IReport;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.ReportOption;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
 @Deprecated
-public abstract class QueryObject {
+public abstract class QueryObject implements IReport {
 
     private static Map<String, Class<? extends QueryObject>> QUERIES = new TreeMap<String, Class<? extends QueryObject>>();
 
@@ -45,10 +47,6 @@ public abstract class QueryObject {
         QUERIES = Collections.unmodifiableMap(aMap);
     };
 
-    public enum DateGroup {
-        Week, Month, Quarter, Year
-    }
-
     /**
      * Description of this query object
      */
@@ -64,46 +62,18 @@ public abstract class QueryObject {
      */
     protected String[] columnNames;
 
-    protected List<Option> queryOptions;
-
-    public class Option {
-        protected String name;
-        protected Class<?> type;
-        private Object defaultValue;
-
-        public Option(String name, Class<?> type, Object defaultValue) {
-            this.name = name;
-            this.type = type;
-            this.setDefaultValue(defaultValue);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Class<?> getType() {
-            return type;
-        }
-
-        public void setDefaultValue(Object defaultValue) {
-            this.defaultValue = defaultValue;
-        }
-
-        public Object getDefaultValue() {
-            return defaultValue;
-        }
-    }
+    protected List<ReportOption> queryOptions;
 
     public QueryObject(String description, String queryString,
         String[] columnNames) {
         this.description = description;
         this.queryString = queryString;
-        queryOptions = new ArrayList<Option>();
+        queryOptions = new ArrayList<ReportOption>();
         this.columnNames = columnNames;
     }
 
     public void addOption(String name, Class<?> type, Object defaultValue) {
-        queryOptions.add(new Option(name, type, defaultValue));
+        queryOptions.add(new ReportOption(name, type, defaultValue));
     }
 
     public static String[] getQueryObjectNames() {
@@ -119,6 +89,7 @@ public abstract class QueryObject {
         return queryObject;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
@@ -147,11 +118,13 @@ public abstract class QueryObject {
         return results;
     }
 
+    @Override
     public String[] getColumnNames() {
         return columnNames;
     }
 
-    public List<Option> getOptions() {
+    @Override
+    public List<ReportOption> getOptions() {
         return queryOptions;
     }
 

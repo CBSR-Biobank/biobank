@@ -17,7 +17,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 @Deprecated
 public class AliquotRequest extends QueryObject {
 
-    protected static final String NAME = "Aliquot Request by CSV file";
+    protected static final String NAME = "Aliquot Request by CSV file Old";
 
     public AliquotRequest(String op, Integer siteId) {
         super(

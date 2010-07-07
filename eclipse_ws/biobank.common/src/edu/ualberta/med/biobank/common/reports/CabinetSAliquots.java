@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.model.ContainerPath;
 @Deprecated
 public class CabinetSAliquots extends QueryObject {
 
-    protected static final String NAME = "Cabinet Aliquots per Study";
+    protected static final String NAME = "Cabinet Aliquots per Study Old";
 
     public CabinetSAliquots(String op, Integer siteId) {
         super(

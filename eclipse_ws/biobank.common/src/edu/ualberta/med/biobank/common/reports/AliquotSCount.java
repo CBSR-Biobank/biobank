@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 @Deprecated
 public class AliquotSCount extends QueryObject {
 
-    protected static final String NAME = "Sample Types by Study";
+    protected static final String NAME = "Sample Types by Study Old";
 
     public AliquotSCount(String op, Integer siteId) {
         super(

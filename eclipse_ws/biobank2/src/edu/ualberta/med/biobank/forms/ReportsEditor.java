@@ -74,6 +74,7 @@ import edu.ualberta.med.biobank.client.reports.FreezerCAliquots;
 import edu.ualberta.med.biobank.client.reports.FreezerDAliquots;
 import edu.ualberta.med.biobank.client.reports.FreezerSAliquots;
 import edu.ualberta.med.biobank.client.reports.FvLPatientVisits;
+import edu.ualberta.med.biobank.client.reports.IReport;
 import edu.ualberta.med.biobank.client.reports.NewPVsByStudyClinic;
 import edu.ualberta.med.biobank.client.reports.NewPsByStudyClinic;
 import edu.ualberta.med.biobank.client.reports.PVsByStudy;
@@ -85,7 +86,9 @@ import edu.ualberta.med.biobank.client.reports.QAFreezerAliquots;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.SampleTypePvCount;
 import edu.ualberta.med.biobank.client.reports.SampleTypeSUsage;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.QueryObject;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
 import edu.ualberta.med.biobank.common.util.DateGroup;
 import edu.ualberta.med.biobank.common.util.ReportOption;
@@ -103,6 +106,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportsEditor extends BiobankFormBase {
 
@@ -124,7 +128,7 @@ public class ReportsEditor extends BiobankFormBase {
     private Button exportCSVButton;
     private String path;
 
-    private AbstractReport report;
+    private IReport report;
 
     private ReportTreeNode node;
 
@@ -196,17 +200,28 @@ public class ReportsEditor extends BiobankFormBase {
                                 String op = "=";
                                 if (site.getName().compareTo("All Sites") == 0)
                                     op = "!=";
-                                report = (AbstractReport) ((Class<?>) node
-                                    .getQuery()).getConstructor().newInstance(
-                                    new Object[] {});
-                                reportData = report.generate(
-                                    SessionManager.getAppService(), params, op,
-                                    site.getId());
+                                report = node.getNewInstance(op, site.getId());
+                                reportData = generateReport(op, site.getId());
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
                                     "Error while querying for results", e);
                             }
+                        }
+
+                        private List<Object> generateReport(String op,
+                            Integer siteId) throws ApplicationException,
+                            BiobankCheckException {
+                            if (report instanceof AbstractReport) {
+                                return ((AbstractReport) report).generate(
+                                    SessionManager.getAppService(), params, op,
+                                    siteId);
+                            }
+                            if (report instanceof QueryObject) {
+                                return ((QueryObject) report).generate(
+                                    SessionManager.getAppService(), params);
+                            }
+                            return null;
                         }
                     };
                     monitor.beginTask("Generating Report...",
@@ -856,9 +871,12 @@ public class ReportsEditor extends BiobankFormBase {
 
         reportData = new ArrayList<Object>();
         node = ((ReportInput) getEditorInput()).getNode();
+        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
+        String op = "=";
+        if (siteWrap.getName().compareTo("All Sites") == 0)
+            op = "!=";
         try {
-            report = (AbstractReport) ((Class<?>) node.getQuery())
-                .getConstructor().newInstance(new Object[] {});
+            report = node.getNewInstance(op, siteWrap.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -4,13 +4,15 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.DateGroup;
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @Deprecated
 public class PVsByStudy extends QueryObject {
 
-    protected static final String NAME = "Patient Visits per Study by Date";
+    protected static final String NAME = "Patient Visits per Study by Date Old";
 
     protected static final String query = "Select Alias.patient.study.nameShort, "
         + " Year(Alias.dateProcessed), "
@@ -32,10 +34,10 @@ public class PVsByStudy extends QueryObject {
     @Override
     public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size(); i++) {
-            Option option = queryOptions.get(i);
+            ReportOption option = queryOptions.get(i);
             if (params.get(i) == null)
                 params.set(i, option.getDefaultValue());
-            if (option.type.equals(String.class))
+            if (option.getType().equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
         columnNames[1] = (String) params.remove(0);

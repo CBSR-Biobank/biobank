@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
@@ -11,7 +12,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 @Deprecated
 public class QAFreezerAliquots extends QueryObject {
 
-    protected static final String NAME = "Freezer Aliquot QA";
+    protected static final String NAME = "Freezer Aliquot QA Old";
     int numResults;
 
     public QAFreezerAliquots(String op, Integer siteId) {
@@ -43,10 +44,10 @@ public class QAFreezerAliquots extends QueryObject {
     @Override
     public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size() - 1; i++) {
-            Option option = queryOptions.get(i);
+            ReportOption option = queryOptions.get(i);
             if (params.get(i) == null)
                 params.set(i, option.getDefaultValue());
-            if (option.type.equals(String.class))
+            if (option.getType().equals(String.class))
                 params.set(i, "%" + params.get(i) + "%");
         }
         numResults = (Integer) params.remove(params.size() - 1);

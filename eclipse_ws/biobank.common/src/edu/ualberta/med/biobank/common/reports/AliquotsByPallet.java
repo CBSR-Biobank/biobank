@@ -13,7 +13,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 @Deprecated
 public class AliquotsByPallet extends QueryObject {
 
-    protected static final String NAME = "Aliquots by Pallet";
+    protected static final String NAME = "Aliquots by Pallet Old";
 
     public AliquotsByPallet(String op, Integer siteId) {
         super("Given a pallet label, generate a list of aliquots.",

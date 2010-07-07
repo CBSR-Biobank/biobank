@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
@@ -13,7 +14,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 @Deprecated
 public class PatientVisitSummary extends QueryObject {
 
-    protected static final String NAME = "Patient Visit Statistics by Study and Clinic";
+    protected static final String NAME = "Patient Visit Statistics by Study and Clinic Old";
 
     private static String PVCOUNT_STRING = "(select count(p.id) from "
         + Patient.class.getName()
@@ -55,7 +56,7 @@ public class PatientVisitSummary extends QueryObject {
     @Override
     public List<Object> preProcess(List<Object> params) {
         for (int i = 0; i < queryOptions.size(); i++) {
-            Option option = queryOptions.get(i);
+            ReportOption option = queryOptions.get(i);
             if (params.get(i) == null)
                 params.set(i, option.getDefaultValue());
         }

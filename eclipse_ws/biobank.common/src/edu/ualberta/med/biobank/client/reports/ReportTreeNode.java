@@ -1,8 +1,9 @@
 package edu.ualberta.med.biobank.client.reports;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.ualberta.med.biobank.common.reports.QueryObject;
 
 public class ReportTreeNode extends Object {
     private ReportTreeNode parent;
@@ -22,13 +23,7 @@ public class ReportTreeNode extends Object {
 
     public String getToolTipText() {
         try {
-            if (AbstractReport.class.isAssignableFrom((Class<?>) report)) {
-                Constructor<?> c = ((Class<?>) report).getConstructor(
-                    String.class, Integer.class);
-                AbstractReport obj = (AbstractReport) c.newInstance();
-                return obj.getDescription();
-
-            }
+            return getNewInstance(null, null).getDescription();
         } catch (Exception e) {
         }
         return "";
@@ -66,4 +61,16 @@ public class ReportTreeNode extends Object {
         parent = n;
     }
 
+    public IReport getNewInstance(String op, Integer id) throws Exception {
+        if (AbstractReport.class.isAssignableFrom((Class<?>) report)) {
+            return (AbstractReport) ((Class<?>) getQuery()).getConstructor()
+                .newInstance(new Object[] {});
+        }
+        if (QueryObject.class.isAssignableFrom((Class<?>) report)) {
+            return (QueryObject) ((Class<?>) getQuery()).getConstructor(
+                String.class, Integer.class).newInstance(
+                new Object[] { op, id });
+        }
+        return null;
+    }
 }

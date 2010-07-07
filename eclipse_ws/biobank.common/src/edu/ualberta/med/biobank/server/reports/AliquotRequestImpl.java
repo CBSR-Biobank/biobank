@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
@@ -24,14 +25,19 @@ public class AliquotRequestImpl extends AbstractReport {
         + " datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and"
         + " p.aliquot.sampleType.nameShort like ? ORDER BY RAND()";
 
-    public AliquotRequestImpl() {
-        super(QUERY, null, null);
+    public AliquotRequestImpl(List<Object> parameters,
+        List<ReportOption> options) {
+        super(QUERY, parameters, options);
     }
 
     @Override
     public List<Object> generate(WritableApplicationService appService,
         String siteOperator, Integer siteId) throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
+        queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
+            siteOperator);
+        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING,
+            siteId.toString());
         HQLCriteria c;
         int i = 0;
         for (; i + 4 <= parameters.size(); i += 4) {

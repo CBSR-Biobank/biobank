@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 @Deprecated
 public class PatientWBC extends QueryObject {
 
-    protected static final String NAME = "Patient WBC Aliquots";
+    protected static final String NAME = "Patient WBC Aliquots Old";
 
     public PatientWBC(String op, Integer siteId) {
         super(

@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 @Deprecated
 public class AliquotInvoiceByPatient extends QueryObject {
 
-    protected static final String NAME = "Aliquots per Patient by Date";
+    protected static final String NAME = "Aliquots per Patient by Date Old";
 
     public AliquotInvoiceByPatient(String op, Integer siteId) {
         super(

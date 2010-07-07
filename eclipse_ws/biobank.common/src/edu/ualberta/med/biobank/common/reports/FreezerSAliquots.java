@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.model.ContainerPath;
 @Deprecated
 public class FreezerSAliquots extends QueryObject {
 
-    protected static final String NAME = "Freezer Aliquots per Study";
+    protected static final String NAME = "Freezer Aliquots per Study Old";
 
     public FreezerSAliquots(String op, Integer siteId) {
         super(

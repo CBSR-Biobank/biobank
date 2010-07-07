@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 @Deprecated
 public class FvLPatientVisits extends QueryObject {
 
-    protected static final String NAME = "Clinic Activity by Study";
+    protected static final String NAME = "Clinic Activity by Study Old";
 
     public FvLPatientVisits(String op, Integer siteId) {
         super(

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public abstract class AbstractReport {
+public abstract class AbstractReport implements IReport {
 
     private static Map<String, Class<? extends AbstractReport>> REPORTS = new TreeMap<String, Class<? extends AbstractReport>>();
 
@@ -51,7 +51,7 @@ public abstract class AbstractReport {
     /**
      * Column names for the result
      */
-    private String[] columnNames;
+    protected String[] columnNames;
 
     private List<ReportOption> queryOptions;
 
@@ -63,20 +63,14 @@ public abstract class AbstractReport {
 
     public abstract String getName();
 
+    @Override
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    @Override
     public String[] getColumnNames() {
         return columnNames;
-    }
-
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
     }
 
     public List<ReportOption> getOptions() {
@@ -85,10 +79,6 @@ public abstract class AbstractReport {
 
     public void addOption(String name, Class<?> type, Object defaultValue) {
         queryOptions.add(new ReportOption(name, type, defaultValue));
-    }
-
-    public void setOptions(List<ReportOption> queryOptions) {
-        this.queryOptions = queryOptions;
     }
 
     @Override
@@ -113,10 +103,15 @@ public abstract class AbstractReport {
         ArrayList<Object> parameters, String siteOperator, Integer siteId)
         throws ApplicationException {
         if (appService instanceof BiobankApplicationService) {
+            doColumnModification(parameters);
             return ((BiobankApplicationService) appService).launchReport(
                 getClass().getName(), parameters, getOptions(), siteOperator,
                 siteId);
         }
         return null;
+    }
+
+    protected void doColumnModification(
+        @SuppressWarnings("unused") List<Object> parameters) {
     }
 }

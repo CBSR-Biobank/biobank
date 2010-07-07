@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +14,9 @@ public class FreezerDAliquotsImpl extends AbstractReport {
     private static final String TYPE_NAME = "%Freezer%";
 
     private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort,"
-        + " aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate),"
-        + " {0}(aliquot.linkDate), count(aliquot.linkDate) from "
+        + " aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate), "
+        + GROUPBY_DATE
+        + "(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
@@ -34,8 +34,8 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         + SITE_OPERATOR
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"
-        + " aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate),"
-        + " {0}(aliquot.linkDate)";
+        + " aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate), "
+        + GROUPBY_DATE + "(aliquot.linkDate)";
 
     private boolean groupByYear;
 
@@ -49,10 +49,9 @@ public class FreezerDAliquotsImpl extends AbstractReport {
             if (option.getType().equals(String.class))
                 parameters.set(i, "%" + parameters.get(i) + "%");
         }
-        // FIXME should do on client side
-        // columnNames[2] = (String) params.get(0);
-        String groupBy = (String) parameters.get(0);
-        queryString = MessageFormat.format(queryString, groupBy);
+        String groupBy = (String) parameters.remove(0);
+        queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
+            groupBy);
         groupByYear = groupBy.equals("Year");
     }
 
