@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.client;
+package edu.ualberta.med.biobank.client.util;
 
 import java.net.URL;
 

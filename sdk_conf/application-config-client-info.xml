@@ -14,7 +14,7 @@
 
 	<bean id="@PROJECT_NAME@Interceptor" class="gov.nih.nci.system.client.proxy.ApplicationServiceProxy" singleton="true">
 		<property name="proxyFactory">
-			<bean class="edu.ualberta.med.biobank.client.BiobankProxyHelperImpl"/>
+			<bean class="edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl"/>
 		</property>
 	</bean>
 	
@@ -65,7 +65,7 @@
 			
 				&lt;bean id=&quot;@PROJECT_NAME@Interceptor&quot; class=&quot;gov.nih.nci.system.client.proxy.ApplicationServiceProxy&quot; singleton=&quot;true&quot;&gt;
 					&lt;property name=&quot;proxyFactory&quot;&gt;
-						&lt;bean class=&quot;edu.ualberta.med.biobank.client.BiobankProxyHelperImpl&quot;/&gt;
+						&lt;bean class=&quot;edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl&quot;/&gt;
 					&lt;/property&gt;
 				&lt;/bean&gt;
 				

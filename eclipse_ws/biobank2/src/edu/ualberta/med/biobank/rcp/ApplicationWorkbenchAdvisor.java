@@ -12,7 +12,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.ServiceConnection;
+import edu.ualberta.med.biobank.client.util.ServiceConnection;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 

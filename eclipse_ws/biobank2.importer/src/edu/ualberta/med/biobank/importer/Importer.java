@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.client.ServiceConnection;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrClinics;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainerTypes;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;

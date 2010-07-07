@@ -31,7 +31,7 @@ public class AliquotRequestImpl extends AbstractReport {
     }
 
     @Override
-    public List<Object> generate(WritableApplicationService appService,
+    public List<Object> executeQuery(WritableApplicationService appService,
         String siteOperator, Integer siteId) throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
         queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,

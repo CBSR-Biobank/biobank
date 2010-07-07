@@ -14,10 +14,14 @@ import java.util.ListIterator;
 
 import org.springframework.util.Assert;
 
-//ListProxy with transparent paging
-//Read only
-//Non-searchable
-//Non-iterable
+/**
+ * ListProxy with transparent paging: <br>
+ * <ul>
+ * <li>Read only</li><br>
+ * <li>Non-searchable</li><br>
+ * <li>Non-iterable</li>
+ * </ul>
+ */
 public class BiobankListProxy implements List<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;

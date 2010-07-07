@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.client;
+package edu.ualberta.med.biobank.client.util;
 
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
 import gov.nih.nci.system.applicationservice.ApplicationService;

@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import edu.ualberta.med.biobank.client.ServiceConnection;
+import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
 import edu.ualberta.med.biobank.test.wrappers.TestAliquot;
