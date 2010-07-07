@@ -8,12 +8,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
@@ -88,7 +86,7 @@ public class PatientViewForm extends BiobankViewForm {
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void setValues() throws ApplicationException, BiobankCheckException {
+    private void setValues() {
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel, patient.getPatientVisitCollection()

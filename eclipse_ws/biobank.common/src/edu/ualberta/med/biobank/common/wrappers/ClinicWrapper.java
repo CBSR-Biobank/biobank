@@ -346,15 +346,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     /**
      * Search for a contact in the clinic with the given name
      */
-    public ContactWrapper getContact(String contactName)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Contact.class.getName() + " where clinic.id = ? and name = ?",
-            Arrays.asList(new Object[] { getId(), contactName }));
-        List<Contact> contacts = appService.query(criteria);
-        if (contacts.size() == 1) {
-            return new ContactWrapper(appService, contacts.get(0));
-        }
+    public ContactWrapper getContact(String contactName) {
+        List<ContactWrapper> contacts = getContactCollection();
+        for (ContactWrapper contact : contacts)
+            if (contact.getName().equals(contactName))
+                return contact;
         return null;
     }
 
@@ -411,18 +407,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return shipmentCollection;
     }
 
-    public long getShipmentCount() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(shipment) from "
-                + Clinic.class.getName()
-                + " as clinic inner join clinic.shipmentCollection as shipment where clinic.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return result.get(0);
+    public long getShipmentCount() {
+        return getShipmentCollection().size();
     }
 
     public void addShipments(Collection<ShipmentWrapper> newShipments) {
@@ -453,16 +439,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     /**
      * Search for a shipment in the clinic with the given date received
      */
-    public ShipmentWrapper getShipment(Date dateReceived)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName()
-            + " where clinic.id = ? and dateReceived = ?", Arrays
-            .asList(new Object[] { getId(), dateReceived }));
-        List<Shipment> shipments = appService.query(criteria);
-        if (shipments.size() == 1) {
-            return new ShipmentWrapper(appService, shipments.get(0));
-        }
+    public ShipmentWrapper getShipment(Date dateReceived) {
+        List<ShipmentWrapper> shipments = getShipmentCollection();
+        for (ShipmentWrapper ship : shipments)
+            if (ship.getDateReceived().equals(dateReceived))
+                return ship;
         return null;
     }
 
@@ -470,18 +451,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * Search for a shipment in the clinic with the given date received and
      * patient number.
      */
-    public ShipmentWrapper getShipment(Date dateReceived, String patientNumber)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select shipment from "
-            + Shipment.class.getName()
-            + " as shipment join shipment.patientCollection as patients"
-            + " where shipment.clinic.id = ? and shipment.dateReceived = ? "
-            + "and patients.pnumber = ?", Arrays.asList(new Object[] { getId(),
-            dateReceived, patientNumber }));
-        List<Shipment> shipments = appService.query(criteria);
-        if (shipments.size() > 0) {
-            return new ShipmentWrapper(appService, shipments.get(0));
-        }
+    public ShipmentWrapper getShipment(Date dateReceived, String patientNumber) {
+        List<ShipmentWrapper> shipments = getShipmentCollection();
+        for (ShipmentWrapper ship : shipments)
+            if (ship.getDateReceived().equals(dateReceived)) {
+                List<PatientWrapper> patients = ship.getPatientCollection();
+                for (PatientWrapper p : patients)
+                    if (p.getPnumber().equals(patientNumber))
+                        return ship;
+            }
         return null;
     }
 
@@ -501,19 +479,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getName();
     }
 
-    public long getPatientCount() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
-            + Clinic.class.getName() + " as clinic"
-            + " join clinic.shipmentCollection as shipments"
-            + " join shipments.patientCollection as patients"
-            + " where clinic.id=?", Arrays.asList(new Object[] { getId() }));
-
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return result.get(0);
+    public long getPatientCount() throws ApplicationException {
+        HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
+        List<PatientVisitWrapper> patientVisits = getPatientVisitCollection();
+        for (PatientVisitWrapper pv : patientVisits)
+            uniquePatients.add(pv.getPatient());
+        return uniquePatients.size();
     }
 
     @SuppressWarnings("unchecked")
@@ -526,8 +497,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             pvCollection = new ArrayList<PatientVisitWrapper>();
             HQLCriteria c = new HQLCriteria("select distinct pv from "
                 + PatientVisit.class.getName()
-                + " as pv where shipment.clinic.id = ?", Arrays
-                .asList(new Object[] { getId() }));
+                + " as pv where shipment.clinic.id = ?",
+                Arrays.asList(new Object[] { getId() }));
             List<PatientVisit> collection = appService.query(c);
             for (PatientVisit pv : collection) {
                 pvCollection.add(new PatientVisitWrapper(appService, pv));
@@ -537,17 +508,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return pvCollection;
     }
 
-    public long getPatientVisitCount() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct pv) from "
-            + PatientVisit.class.getName()
-            + " as pv where shipment.clinic.id = ?", Arrays
-            .asList(new Object[] { getId() }));
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return result.get(0);
+    public long getPatientVisitCount() throws ApplicationException {
+        return getPatientVisitCollection().size();
     }
 
     public static List<ClinicWrapper> getAllClinics(

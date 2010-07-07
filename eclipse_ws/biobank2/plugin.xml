@@ -1450,7 +1450,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/patient_add.png"
+                  icon="icons/merge.png"
                   label="Merge Patient"
                   style="push">
             </command>

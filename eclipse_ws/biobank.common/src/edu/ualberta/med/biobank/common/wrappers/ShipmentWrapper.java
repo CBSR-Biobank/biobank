@@ -94,8 +94,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         checkDateReceivedNotNull();
     }
 
-    private void checkRemovedPatients() throws BiobankCheckException,
-        ApplicationException {
+    private void checkRemovedPatients() throws BiobankCheckException {
         if (!isNew()) {
             for (PatientWrapper patient : patientsRemoved) {
                 checkCanRemovePatient(patient);
@@ -110,7 +109,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     public void checkCanRemovePatient(PatientWrapper patient)
-        throws ApplicationException, BiobankCheckException {
+        throws BiobankCheckException {
         if (hasVisitForPatient(patient)) {
             throw new BiobankCheckException("Cannot remove patient "
                 + patient.getPnumber()
@@ -121,18 +120,12 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
     }
 
-    public boolean hasVisitForPatient(PatientWrapper patient)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + PatientVisit.class.getName()
-            + " where patient.id=? and shipment.id= ?", Arrays
-            .asList(new Object[] { patient.getId(), getId() }));
-
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return result.get(0) > 0;
+    public boolean hasVisitForPatient(PatientWrapper patient) {
+        List<PatientVisitWrapper> pvs = patient.getPatientVisitCollection();
+        for (PatientVisitWrapper pv : pvs)
+            if (pv.getShipment().equals(this))
+                return true;
+        return false;
     }
 
     public void checkAlLeastOnePatient() throws BiobankCheckException {
@@ -153,8 +146,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         if (!patientsInError.isEmpty()) {
             // remove last ", "
-            patientsInError = patientsInError.substring(0, patientsInError
-                .length() - 2);
+            patientsInError = patientsInError.substring(0,
+                patientsInError.length() - 2);
             throw new BiobankCheckException("Patient(s) " + patientsInError
                 + " are not part of a study that has contact with clinic "
                 + getClinic().getName());
@@ -443,8 +436,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Shipment.class.getName()
-            + " where clinic.site.id = ? and waybill = ?", Arrays
-            .asList(new Object[] { site.getId(), waybill }));
+            + " where clinic.site.id = ? and waybill = ?",
+            Arrays.asList(new Object[] { site.getId(), waybill }));
         List<Shipment> shipments = appService.query(criteria);
         List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
         for (Shipment s : shipments) {
@@ -486,18 +479,12 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     /**
      */
-    public boolean hasPatient(String patientNumber) throws Exception {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(distinct patients.id) from "
-                + Shipment.class.getName()
-                + " as shipment inner join shipment.patientCollection as patients"
-                + " where shipment.id = ? and patients.pnumber = ?", Arrays
-                .asList(new Object[] { getId(), patientNumber }));
-        List<Long> results = appService.query(criteria);
-        if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return results.get(0) > 0;
+    public boolean hasPatient(String patientNumber) {
+        List<PatientWrapper> ps = getPatientCollection();
+        for (PatientWrapper p : ps)
+            if (p.getPnumber().equals(patientNumber))
+                return true;
+        return false;
     }
 
     @Override

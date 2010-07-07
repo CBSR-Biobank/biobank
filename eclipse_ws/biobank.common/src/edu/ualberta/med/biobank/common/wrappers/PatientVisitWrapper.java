@@ -532,23 +532,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public long getAliquotsCount() throws ApplicationException,
-        BiobankCheckException {
-        String queryString = "select count(aliquots) from "
-            + PatientVisit.class.getName() + " as pv"
-            + " left join pv.aliquotCollection as aliquots"
-            + " where pv.id = ?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return results.get(0);
+    public long getAliquotsCount() {
+        return getAliquotCollection().size();
     }
 
-    public boolean hasAliquots() throws ApplicationException,
-        BiobankCheckException {
+    public boolean hasAliquots() {
         return getAliquotsCount() > 0;
     }
 

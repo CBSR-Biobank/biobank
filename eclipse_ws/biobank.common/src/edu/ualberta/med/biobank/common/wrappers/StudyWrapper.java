@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SampleStorage;
@@ -634,30 +633,21 @@ public class StudyWrapper extends ModelWrapper<Study> {
         deletedStudyPvAttr.add(studyPvAttr);
     }
 
-    public List<ClinicWrapper> getClinicCollection()
-        throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct clinics from "
-            + Contact.class.getName() + " as contacts"
-            + " inner join contacts.clinic as clinics"
-            + " where contacts.studyCollection.id = ?", Arrays
-            .asList(new Object[] { getId() }));
-        List<Clinic> clinics = appService.query(c);
+    public List<ClinicWrapper> getClinicCollection() {
+        List<ContactWrapper> contacts = getContactCollection();
         List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
-        for (Clinic clinic : clinics) {
-            clinicWrappers.add(new ClinicWrapper(appService, clinic));
+        for (ContactWrapper contact : contacts) {
+            clinicWrappers.add(contact.getClinic());
         }
         return clinicWrappers;
     }
 
-    public boolean hasClinic(String clinicNameShort) throws Exception {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(*) from "
-                + Study.class.getName()
-                + " as study join study.contactCollection as contacts"
-                + " join contacts.clinic as clinics where study = ? and clinics.nameShort = ?",
-            Arrays.asList(new Object[] { getWrappedObject(), clinicNameShort }));
-        List<Long> result = appService.query(criteria);
-        return (result.get(0) > 0);
+    public boolean hasClinic(String clinicNameShort) {
+        List<ClinicWrapper> clinics = getClinicCollection();
+        for (ClinicWrapper c : clinics)
+            if (c.getNameShort().equals(clinicNameShort))
+                return true;
+        return false;
     }
 
     @SuppressWarnings("unchecked")
