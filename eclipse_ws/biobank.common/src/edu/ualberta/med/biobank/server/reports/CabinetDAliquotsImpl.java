@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.DateRangePostProcess;
+import edu.ualberta.med.biobank.common.util.PostProcess;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class CabinetDAliquotsImpl extends AbstractReport {
 
@@ -31,7 +31,7 @@ public class CabinetDAliquotsImpl extends AbstractReport {
         + " group by aliquot.patientVisit.patient.study.nameShort,"
         + " aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate), {0}(aliquot.linkDate)";
 
-    private boolean groupByYear = false;
+    private DateRangePostProcess dateRangePostProcess;
 
     public CabinetDAliquotsImpl(List<Object> parameters,
         List<ReportOption> options) {
@@ -45,26 +45,31 @@ public class CabinetDAliquotsImpl extends AbstractReport {
         }
         String groupBy = (String) parameters.remove(0);
         queryString = MessageFormat.format(queryString, groupBy);
-        groupByYear = groupBy.equals("Year");
+        dateRangePostProcess = new DateRangePostProcess(groupBy.equals("Year"));
     }
 
+    // @Override
+    // public List<Object> postProcess(WritableApplicationService appService,
+    // List<Object> results) {
+    // List<Object> compressedDates = new ArrayList<Object>();
+    // if (groupByYear) {
+    // for (Object ob : results) {
+    // Object[] castOb = (Object[]) ob;
+    // compressedDates.add(new Object[] { castOb[0], castOb[1],
+    // castOb[3], castOb[4] });
+    // }
+    // } else {
+    // for (Object ob : results) {
+    // Object[] castOb = (Object[]) ob;
+    // compressedDates.add(new Object[] { castOb[0], castOb[1],
+    // castOb[3] + "-" + castOb[2], castOb[4] });
+    // }
+    // }
+    // return compressedDates;
+    // }
+
     @Override
-    public List<Object> postProcess(WritableApplicationService appService,
-        List<Object> results) {
-        List<Object> compressedDates = new ArrayList<Object>();
-        if (groupByYear) {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3], castOb[4] });
-            }
-        } else {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3] + "-" + castOb[2], castOb[4] });
-            }
-        }
-        return compressedDates;
+    protected PostProcess getPostProcess() {
+        return dateRangePostProcess;
     }
 }

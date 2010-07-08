@@ -26,12 +26,12 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private List<Object> listChunk;
-    private int pageSize;
-    private int offset;
-    private int realSize;
-    private transient ApplicationService appService;
-    private HQLCriteria criteria;
+    protected List<Object> listChunk;
+    protected int pageSize;
+    protected int offset;
+    protected int realSize;
+    protected transient ApplicationService appService;
+    protected HQLCriteria criteria;
 
     public BiobankListProxy(ApplicationService appService, HQLCriteria criteria) {
         this.appService = appService;
@@ -80,7 +80,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
         Assert.isTrue(index >= 0);
         updateListChunk(index);
         if (listChunk.size() > 0 && listChunk.size() > index - offset)
-            return listChunk.get(index - offset);
+            return getRowObject(listChunk.get(index - offset));
         else
             return null;
     }
@@ -169,12 +169,18 @@ public class BiobankListProxy implements List<Object>, Serializable {
         Assert.isTrue(fromIndex <= toIndex);
         updateListChunk(fromIndex);
         List<Object> subList = new ArrayList<Object>();
-        subList.addAll(listChunk.subList(fromIndex - offset,
-            Math.min(listChunk.size(), toIndex - offset)));
+        for (Object o : listChunk.subList(fromIndex - offset,
+            Math.min(listChunk.size(), toIndex - offset))) {
+            subList.add(getRowObject(o));
+        }
         if (offset + pageSize < toIndex && listChunk.size() == pageSize) {
             subList.addAll(subList(offset + pageSize, toIndex));
         }
         return subList;
+    }
+
+    protected Object getRowObject(Object object) {
+        return object;
     }
 
     @Override

@@ -2,7 +2,8 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.PostProcess;
+import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -39,8 +40,8 @@ public class AbstractReport {
 
     public List<Object> generate(WritableApplicationService appService,
         String siteOperator, Integer siteId) throws ApplicationException {
-        return postProcess(appService, executeQuery(appService, siteOperator,
-            siteId));
+        return postProcess(appService,
+            executeQuery(appService, siteOperator, siteId));
     }
 
     protected List<Object> postProcess(
@@ -54,10 +55,14 @@ public class AbstractReport {
         String siteOperator, Integer siteId) throws ApplicationException {
         queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
             siteOperator);
-        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING, siteId
-            .toString());
+        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING,
+            siteId.toString());
         HQLCriteria criteria = new HQLCriteria(queryString, parameters);
-        return new BiobankListProxy(appService, criteria);
+        return new ReportListProxy(appService, criteria, getPostProcess());
+    }
+
+    protected PostProcess getPostProcess() {
+        return null;
     }
 
     private static String replacePatternString(String pattern) {
