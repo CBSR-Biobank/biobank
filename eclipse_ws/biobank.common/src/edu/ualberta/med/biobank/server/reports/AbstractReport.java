@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.PostProcess;
+import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -44,6 +44,9 @@ public class AbstractReport {
             executeQuery(appService, siteOperator, siteId));
     }
 
+    /**
+     * Post process the whole collection after its retrieval
+     */
     protected List<Object> postProcess(
         @SuppressWarnings("unused") WritableApplicationService appService,
         List<Object> results) {
@@ -58,10 +61,14 @@ public class AbstractReport {
         queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING,
             siteId.toString());
         HQLCriteria criteria = new HQLCriteria(queryString, parameters);
-        return new ReportListProxy(appService, criteria, getPostProcess());
+        return new ReportListProxy(appService, criteria, getRowPostProcess());
     }
 
-    protected PostProcess getPostProcess() {
+    /**
+     * Will process line by line on the client side (if is called from the
+     * client side)
+     */
+    protected AbstractRowPostProcess getRowPostProcess() {
         return null;
     }
 

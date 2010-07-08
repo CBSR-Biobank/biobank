@@ -7,9 +7,7 @@ import gov.nih.nci.system.client.proxy.ProxyHelperImpl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -26,11 +24,13 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     private Object convertListProxyToProxy(ApplicationService as,
         BiobankListProxy proxy) {
         proxy.setAppService(as);
-        List<Object> chunk = proxy.getListChunk();
-        @SuppressWarnings("unchecked")
-        List<Object> modifiedChunk = new ArrayList<Object>(
-            (Collection<Object>) convertToProxy(as, chunk));
-        proxy.setListChunk(modifiedChunk);
+        // We don't convert the chunk: it is suppose to contain only simple
+        // object, no model objects
+        // List<Object> chunk = proxy.getListChunk();
+        // @SuppressWarnings("unchecked")
+        // List<Object> modifiedChunk = new ArrayList<Object>(
+        // (Collection<Object>) convertToProxy(as, chunk));
+        // proxy.setListChunk(modifiedChunk);
         return proxy;
     }
 

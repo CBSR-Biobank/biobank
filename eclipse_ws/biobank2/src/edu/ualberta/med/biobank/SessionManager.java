@@ -250,7 +250,10 @@ public class SessionManager {
     }
 
     public void rebuildSession() {
-        SessionManager.getInstance().getSession().rebuild();
+        SessionAdapter session = SessionManager.getInstance().getSession();
+        if (session != null) {
+            session.rebuild();
+        }
         if (view != null) {
             view.getTreeViewer().expandToLevel(3);
         }

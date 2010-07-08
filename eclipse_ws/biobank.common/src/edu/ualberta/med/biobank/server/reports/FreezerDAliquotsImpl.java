@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
+import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FreezerDAliquotsImpl extends AbstractReport {
 
@@ -37,7 +37,7 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         + " aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate), "
         + GROUPBY_DATE + "(aliquot.linkDate)";
 
-    private boolean groupByYear;
+    private DateRangeRowPostProcess dateRangePostProcess;
 
     public FreezerDAliquotsImpl(List<Object> parameters,
         List<ReportOption> options) {
@@ -52,27 +52,13 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         String groupBy = (String) parameters.remove(0);
         queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
             groupBy);
-        groupByYear = groupBy.equals("Year");
+        dateRangePostProcess = new DateRangeRowPostProcess(
+            groupBy.equals("Year"), 2);
     }
 
     @Override
-    public List<Object> postProcess(WritableApplicationService appService,
-        List<Object> results) {
-        List<Object> compressedDates = new ArrayList<Object>();
-        if (groupByYear) {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3], castOb[4] });
-            }
-        } else {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0], castOb[1],
-                    castOb[3] + "-" + castOb[2], castOb[4] });
-            }
-        }
-        return compressedDates;
+    protected AbstractRowPostProcess getRowPostProcess() {
+        return dateRangePostProcess;
     }
 
 }

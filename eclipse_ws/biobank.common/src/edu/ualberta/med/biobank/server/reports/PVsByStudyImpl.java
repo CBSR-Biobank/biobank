@@ -1,12 +1,11 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PVsByStudyImpl extends AbstractReport {
 
@@ -20,7 +19,7 @@ public class PVsByStudyImpl extends AbstractReport {
         + " GROUP BY Alias.patient.study.nameShort, "
         + "Year(Alias.dateProcessed), {0}(Alias.dateProcessed)";
 
-    private boolean groupByYear;
+    private DateRangeRowPostProcess dateRangePostProcess;
 
     public PVsByStudyImpl(List<Object> parameters, List<ReportOption> options) {
         super(QUERY, parameters, options);
@@ -33,27 +32,8 @@ public class PVsByStudyImpl extends AbstractReport {
         }
         String groupBy = (String) parameters.remove(0);
         queryString = MessageFormat.format(queryString, groupBy);
-        groupByYear = groupBy.equals("Year");
-    }
-
-    @Override
-    public List<Object> postProcess(WritableApplicationService appService,
-        List<Object> results) {
-        List<Object> compressedDates = new ArrayList<Object>();
-        if (groupByYear) {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0], castOb[2],
-                    castOb[3] });
-            }
-        } else {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0],
-                    castOb[2] + "-" + castOb[1], castOb[3] });
-            }
-        }
-        return compressedDates;
+        dateRangePostProcess = new DateRangeRowPostProcess(
+            groupBy.equals("Year"), 1);
     }
 
 }

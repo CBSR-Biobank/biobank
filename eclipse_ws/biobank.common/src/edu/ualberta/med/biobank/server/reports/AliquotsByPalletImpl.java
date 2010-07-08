@@ -29,9 +29,11 @@ public class AliquotsByPalletImpl extends AbstractReport {
         parameters.add(parameters.remove(0));
     }
 
+    // Use Collections.sort, so can't use RowPostProcess
     @Override
     protected List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
+
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         // get the info
         for (Object ob : results) {

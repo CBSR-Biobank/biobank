@@ -7,10 +7,10 @@ public class ReportListProxy extends BiobankListProxy {
 
     private static final long serialVersionUID = 1L;
 
-    private PostProcess pp;
+    private AbstractRowPostProcess pp;
 
     public ReportListProxy(ApplicationService appService, HQLCriteria criteria,
-        PostProcess pp) {
+        AbstractRowPostProcess pp) {
         super(appService, criteria);
         this.pp = pp;
     }
@@ -20,7 +20,7 @@ public class ReportListProxy extends BiobankListProxy {
         if (pp == null) {
             return object;
         }
-        return pp.postProcess(object);
+        return pp.rowPostProcess(object);
     }
 
 }

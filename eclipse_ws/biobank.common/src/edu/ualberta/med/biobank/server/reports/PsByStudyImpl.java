@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
+import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 import edu.ualberta.med.biobank.common.util.ReportOption;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PsByStudyImpl extends AbstractReport {
 
@@ -17,7 +17,7 @@ public class PsByStudyImpl extends AbstractReport {
         + SITE_ID
         + " group by pv.patient.study.nameShort, year(pv.dateProcessed), {0}(pv.dateProcessed)";
 
-    private boolean groupByYear;
+    private DateRangeRowPostProcess dateRangePostProcess;
 
     public PsByStudyImpl(List<Object> parameters, List<ReportOption> options) {
         super(QUERY, parameters, options);
@@ -30,27 +30,13 @@ public class PsByStudyImpl extends AbstractReport {
         }
         String groupBy = (String) parameters.remove(0);
         queryString = MessageFormat.format(queryString, groupBy);
-        groupByYear = groupBy.equals("Year");
+        dateRangePostProcess = new DateRangeRowPostProcess(
+            groupBy.equals("Year"), 1);
     }
 
     @Override
-    public List<Object> postProcess(WritableApplicationService appService,
-        List<Object> results) {
-        List<Object> compressedDates = new ArrayList<Object>();
-        if (groupByYear) {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0], castOb[2],
-                    castOb[3] });
-            }
-        } else {
-            for (Object ob : results) {
-                Object[] castOb = (Object[]) ob;
-                compressedDates.add(new Object[] { castOb[0],
-                    castOb[2] + "-" + castOb[1], castOb[3] });
-            }
-        }
-        return compressedDates;
+    protected AbstractRowPostProcess getRowPostProcess() {
+        return dateRangePostProcess;
     }
 
 }
