@@ -112,7 +112,7 @@ public class AliquotRequestImpl extends AbstractReport {
                 String inventoryId = aliquot.getInventoryId();
                 Date dateDrawn = aliquot.getPatientVisit().getDateDrawn();
                 String stName = aliquot.getSampleType().getNameShort();
-                String aliquotLabel = new AliquotWrapper(null, aliquot)
+                String aliquotLabel = new AliquotWrapper(appService, aliquot)
                     .getPositionString(true, false);
                 modifiedResults.add(new Object[] { pnumber, inventoryId,
                     dateDrawn, stName, aliquotLabel });
