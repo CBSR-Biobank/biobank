@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
-import edu.ualberta.med.biobank.views.IAdapterTreeView;
+import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.TreeFilter;
 
 public class AdapterTreeWidget extends Composite {
@@ -33,7 +33,7 @@ public class AdapterTreeWidget extends Composite {
     private TreeViewer treeViewer;
 
     public AdapterTreeWidget(Composite parent,
-        final IAdapterTreeView parentView, boolean patternFilter) {
+        final AbstractViewWithAdapterTree parentView, boolean patternFilter) {
         super(parent, SWT.NONE);
 
         setLayout(new FillLayout());

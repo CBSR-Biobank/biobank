@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;

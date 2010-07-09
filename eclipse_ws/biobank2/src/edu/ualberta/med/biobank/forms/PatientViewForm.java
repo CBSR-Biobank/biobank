@@ -52,8 +52,8 @@ public class PatientViewForm extends BiobankViewForm {
         form.setText("Patient: " + patient.getPnumber());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_PATIENT));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
         createPatientVisitSection();
@@ -79,8 +79,8 @@ public class PatientViewForm extends BiobankViewForm {
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable = new PatientVisitInfoTable(section,
-            patient.getPatientVisitCollection());
+        visitsTable = new PatientVisitInfoTable(section, patient
+            .getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);

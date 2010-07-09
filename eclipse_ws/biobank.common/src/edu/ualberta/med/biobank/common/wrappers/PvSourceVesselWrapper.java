@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvSourceVessel;

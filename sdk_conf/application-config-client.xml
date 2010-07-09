@@ -18,7 +18,7 @@
 	
 	<bean id="Interceptor" class="gov.nih.nci.system.client.proxy.ApplicationServiceProxy" singleton="false">
 		<property name="proxyFactory">
-			<bean class="gov.nih.nci.system.client.proxy.ProxyHelperImpl" singleton="false"/>
+			<bean class="edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl" singleton="false"/>
 		</property>
 	</bean>
 

@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;

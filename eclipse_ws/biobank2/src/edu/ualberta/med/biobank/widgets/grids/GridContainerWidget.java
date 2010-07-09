@@ -9,10 +9,10 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
-import edu.ualberta.med.biobank.util.RowColPos;
 
 public class GridContainerWidget extends AbstractGridWidget {
 

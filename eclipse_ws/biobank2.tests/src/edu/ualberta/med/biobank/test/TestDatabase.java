@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.test;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.VarCharLengths;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;

@@ -22,7 +22,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,12 +44,12 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.reports.QueryObject;
-import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.CustomQueryObject;
-import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
-import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.CustomQueryObject;
+import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryObject;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -180,8 +179,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                         dlg.getName(), tree.getInput());
                     newReport.setParent(custom);
                     custom.addChild(newReport);
-                    ReportsView.getTree().refresh();
-                    ReportsView.getTree().expandAll();
+                    ReportsView.currentInstance.getTreeViewer().refresh();
+                    ReportsView.currentInstance.getTreeViewer().expandAll();
                 }
             }
         });
@@ -543,7 +542,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
 
     @Override
     public void setFocus() {
-        ReportsView.getTree().setSelection(new StructuredSelection(node));
+        ReportsView.currentInstance.setSelectedNode(node);
     }
 
     @Override

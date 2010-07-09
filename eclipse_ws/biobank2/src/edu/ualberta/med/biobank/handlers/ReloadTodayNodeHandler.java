@@ -7,13 +7,14 @@ import org.eclipse.core.commands.IHandler;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.views.AbstractAdministrationView;
-import edu.ualberta.med.biobank.views.AbstractViewWithTree;
+import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 
 public class ReloadTodayNodeHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        AbstractViewWithTree view = SessionManager.getCurrentViewWithTree();
+        AbstractViewWithAdapterTree view = SessionManager
+            .getCurrentAdapterViewWithTree();
         if (view instanceof AbstractAdministrationView) {
             ((AbstractAdministrationView) view).reload();
         }

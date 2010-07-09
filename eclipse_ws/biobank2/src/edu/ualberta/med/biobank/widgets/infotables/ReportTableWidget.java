@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.BiobankListProxy;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 

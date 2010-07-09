@@ -27,6 +27,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -38,8 +40,6 @@ import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;

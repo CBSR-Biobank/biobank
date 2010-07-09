@@ -1,19 +1,19 @@
 package edu.ualberta.med.biobank.test.speed;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 public class TestContainer extends SpeedTest {
 
@@ -26,8 +26,8 @@ public class TestContainer extends SpeedTest {
     public void testHql() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
-            + " where site.id = ? and containerType.topLevel = true", Arrays
-            .asList(new Object[] { site.getId() }));
+            + " where site.id = ? and containerType.topLevel = true",
+            Arrays.asList(new Object[] { site.getId() }));
         List<Container> containers = appService.query(criteria);
         for (Container c : containers) {
             logger.info(c.getLabel() + ": number of children: "
@@ -38,8 +38,8 @@ public class TestContainer extends SpeedTest {
 
                 + " left join fetch cp.container as child"
 
-                + " where cp.parentContainer.id = ?", Arrays
-                .asList(new Object[] { c.getId() }));
+                + " where cp.parentContainer.id = ?",
+                Arrays.asList(new Object[] { c.getId() }));
             List<ContainerPosition> childrenPos = appService.query(criteria);
 
             for (ContainerPosition childPos : childrenPos) {
@@ -55,8 +55,8 @@ public class TestContainer extends SpeedTest {
     public void testNonWrapper() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
-            + " where site.id = ? and containerType.topLevel = true", Arrays
-            .asList(new Object[] { site.getId() }));
+            + " where site.id = ? and containerType.topLevel = true",
+            Arrays.asList(new Object[] { site.getId() }));
         List<Container> containers = appService.query(criteria);
         for (Container c : containers) {
             logger.info(c.getLabel() + ": number of children: "
@@ -88,8 +88,8 @@ public class TestContainer extends SpeedTest {
         HQLCriteria criteria = new HQLCriteria(
             "select distinct ap.container from "
                 + AliquotPosition.class.getName() + " as ap "
-                + "join ap.container as c " + "where c.site.id = ?", Arrays
-                .asList(new Object[] { site.getId() }));
+                + "join ap.container as c " + "where c.site.id = ?",
+            Arrays.asList(new Object[] { site.getId() }));
         List<Container> containers = appService.query(criteria);
 
         int count = 0;

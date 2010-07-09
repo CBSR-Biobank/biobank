@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import gov.nih.nci.system.applicationservice.ApplicationException;

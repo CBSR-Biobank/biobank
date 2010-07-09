@@ -102,6 +102,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SEARCH = "search";
     public static final String IMG_TODAY = "today";
     public static final String IMG_CALENDAR = "calendar";
+    public static final String IMG_BULLET = "bullet";
     public static final String IMG_SCAN_EDIT = "scanEdit";
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
 
@@ -191,6 +192,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_2_ARROW_LEFT, "2left_arrow.png");
         registerImage(registry, IMG_2_ARROW_RIGHT, "2right_arrow.png");
         registerImage(registry, IMG_BIN, "bin.png");
+        registerImage(registry, IMG_BULLET, "bullet.png");
         registerImage(registry, IMG_BOX, "bin.png");
         registerImage(registry, IMG_CABINET, "cabinet.png");
         registerImage(registry, IMG_CABINET_LINK_ASSIGN,

@@ -37,6 +37,8 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -46,8 +48,6 @@ import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletLabelValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
