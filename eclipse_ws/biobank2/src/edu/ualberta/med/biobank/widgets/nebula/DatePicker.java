@@ -167,9 +167,7 @@ class DatePicker extends VPanel {
             Body b = iter.next();
             if (b.newColumn) {
                 VLabel sep = new VLabel(body, SWT.SEPARATOR | SWT.VERTICAL);
-                sep
-                    .setLayoutData(new GridData(SWT.FILL, SWT.FILL, false,
-                        false));
+                sep.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
                 body.getLayout(VGridLayout.class).numColumns++;
                 addBodyPanel();
             }
@@ -299,10 +297,11 @@ class DatePicker extends VPanel {
                         dayPanel.getMenu().setVisible(true);
                     }
                     break;
+
+                /* DOES NOT WORK */
                 case SWT.MouseWheel:
-                    scrollCalendar((event.count > 0) ? SWT.ARROW_UP
-                        : SWT.ARROW_DOWN);
                     break;
+
                 case SWT.Selection:
                     if (event.widget == null) {
                         VButton button = (VButton) event.data;
@@ -361,6 +360,19 @@ class DatePicker extends VPanel {
             dayButtons[day].addListener(SWT.Selection, dayListener);
             dayButtons[day].addListener(SWT.Traverse, dayListener);
         }
+    }
+
+    public void addDoubleClickListenerToDays(Listener doubleClick) {
+        if (dayButtons != null)
+            for (int day = 0; day < dayButtons.length; day++)
+                dayButtons[day].addListener(SWT.MouseDoubleClick, doubleClick);
+    }
+
+    public void removeDoubleClickListenerToDays(Listener doubleClick) {
+        if (dayButtons != null)
+            for (int day = 0; day < dayButtons.length; day++)
+                dayButtons[day].removeListener(SWT.MouseDoubleClick,
+                    doubleClick);
     }
 
     /**
@@ -568,22 +580,6 @@ class DatePicker extends VPanel {
                     }
                 });
                 break;
-            case Header.TIME:
-                timeButton = new VButton(header, SWT.TOGGLE | SWT.NO_FOCUS);
-                timeButton.setMargins(3, 5);
-                timeButton.setImage(Resources.getIconClock());
-                timeButton.setData(CDT.PickerPart, PickerPart.MonthPrev);
-                timeButton.setPainter(cdt.getPainter());
-                cdt.getPainter().update(timeButton);
-                timeButton.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-                    false, false));
-                timeButton.addListener(SWT.Selection, new Listener() {
-                    @Override
-                    public void handleEvent(Event event) {
-                        handleHeaderSelection((VButton) event.data);
-                    }
-                });
-                break;
             case Header.YEAR:
                 yearButton = new VButton(header, SWT.TOGGLE | SWT.NO_FOCUS);
                 yearButton.setData(CDT.PickerPart, PickerPart.YearLabel);
@@ -727,8 +723,8 @@ class DatePicker extends VPanel {
                         }
 
                         Calendar tmpcal = cdt.getCalendarInstance();
-                        tmpcal.set(Calendar.MONTH, (Integer) button
-                            .getData("Month")); //$NON-NLS-1$
+                        tmpcal.set(Calendar.MONTH,
+                            (Integer) button.getData("Month")); //$NON-NLS-1$
                         cdt.setSelection(tmpcal.getTime());
 
                         if (cdt.field.length == 1
@@ -749,9 +745,8 @@ class DatePicker extends VPanel {
         }
     }
 
-    private void createTime(@SuppressWarnings("unused") Body b) {
-        System.err
-            .println("WARNING: unpredictable createTime event was called.");
+    @SuppressWarnings("unused")
+    private void createTime(Body b) {
     }
 
     private void createYears(Body b) {
@@ -796,8 +791,8 @@ class DatePicker extends VPanel {
                         }
 
                         Calendar tmpcal = cdt.getCalendarInstance();
-                        tmpcal.set(Calendar.YEAR, Integer.parseInt(button
-                            .getText()));
+                        tmpcal.set(Calendar.YEAR,
+                            Integer.parseInt(button.getText()));
                         cdt.setSelection(tmpcal.getTime());
 
                         if (cdt.field.length == 1
@@ -859,8 +854,8 @@ class DatePicker extends VPanel {
 
         if (button != null && button.getSelection()) {
             VPanel panel = button.getData(Key.Panel, VPanel.class);
-            panel.getParent().getLayout(VStackLayout.class).setTopControl(
-                panel, 500);
+            panel.getParent().getLayout(VStackLayout.class)
+                .setTopControl(panel, 500);
         } else {
             for (VPanel panel : bodyPanels) {
                 panel.getLayout(VStackLayout.class).setTopControl(null, 500);
@@ -1269,8 +1264,8 @@ class DatePicker extends VPanel {
                         Resources.getString(
                             "date_ordinal_" + cal.get(Calendar.DATE), locale) //$NON-NLS-1$
                     };
-                    MessageFormat formatter = new MessageFormat(Resources
-                        .getString("today_verbose.text", locale), locale); //$NON-NLS-1$
+                    MessageFormat formatter = new MessageFormat(
+                        Resources.getString("today_verbose.text", locale), locale); //$NON-NLS-1$
                     today.setText(formatter.format(margs));
                 } else {
                     today.setText(Resources.getString("today.text", locale)); //$NON-NLS-1$

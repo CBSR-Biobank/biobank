@@ -9,6 +9,7 @@
  * 	 IBM Corporation - SWT's CCombo was relied upon _heavily_ for example and reference
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula;
 
 import org.eclipse.swt.SWT;
@@ -536,7 +537,6 @@ public abstract class BaseCombo extends Canvas {
     /**
      * returns the menu for this combo
      */
-
     @Override
     public Menu getMenu() {
         if (checkText()) {
@@ -648,7 +648,8 @@ public abstract class BaseCombo extends Canvas {
      * @param popup
      * @see #preClose(Shell)
      */
-    protected void postClose(@SuppressWarnings("unused") Shell popup) {
+    @SuppressWarnings("unused")
+    protected void postClose(Shell popup) {
         // subclasses to implement if necessary
     }
 
@@ -662,8 +663,8 @@ public abstract class BaseCombo extends Canvas {
      * @param popup
      * @see #preOpen(Shell)
      */
-
-    protected void postOpen(@SuppressWarnings("unused") Shell popup) {
+    @SuppressWarnings("unused")
+    protected void postOpen(Shell popup) {
         // subclasses to implement if necessary
     }
 
@@ -678,7 +679,8 @@ public abstract class BaseCombo extends Canvas {
      * @param popup
      * @see #postClose(Shell)
      */
-    protected void preClose(@SuppressWarnings("unused") Shell popup) {
+    @SuppressWarnings("unused")
+    protected void preClose(Shell popup) {
         // subclasses to implement if necessary
     }
 
@@ -692,7 +694,8 @@ public abstract class BaseCombo extends Canvas {
      * @param popup
      * @see #postOpen(Shell)
      */
-    protected void preOpen(@SuppressWarnings("unused") Shell popup) {
+    @SuppressWarnings("unused")
+    protected void preOpen(Shell popup) {
         // subclasses to implement if necessary
     }
 
@@ -961,7 +964,8 @@ public abstract class BaseCombo extends Canvas {
      * 
      * @param e
      */
-    protected void setModifyEventProperties(@SuppressWarnings("unused") Event e) {
+    @SuppressWarnings("unused")
+    protected void setModifyEventProperties(Event e) {
         // subclasses to implement
     }
 
@@ -988,8 +992,7 @@ public abstract class BaseCombo extends Canvas {
      * @param callback a runnable to be run when the operation completes.
      * @see BaseCombo#setOpen(boolean)
      */
-    protected synchronized void setOpen(boolean open,
-        @SuppressWarnings("unused") final Runnable callback) {
+    protected synchronized void setOpen(boolean open, final Runnable callback) {
         if (content == null || content.isDisposed()) {
             if (contentShell != null) {
                 contentShell.dispose();
@@ -1017,10 +1020,31 @@ public abstract class BaseCombo extends Canvas {
         if (!open) {
             if (!holdOpen) {
                 this.open = false;
+
                 preClose(contentShell);
-                contentShell.setVisible(true);
-                System.err
-                    .println("ERROR BaseCombo: Animation Runner Unsupported.");
+
+                // Point location =
+                // positionControl.getComposite().toDisplay(positionControl.getLocation());
+                // Point contentLocation = contentShell.getLocation();
+                // if(location.y > contentLocation.y) {
+                // aStyle |= Animator.UP;
+                // }
+
+                Point start = contentShell.getSize();
+                Point end = new Point(start.x, 0);
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        postClose(contentShell);
+                        if (callback != null) {
+                            callback.run();
+                        }
+                    }
+                };
+
+                AnimationRunner runner = new AnimationRunner();
+                runner.runEffect(new ResizeEffect(contentShell, start, end,
+                    200, new LinearInOut(), runnable, runnable));
 
                 if (checkText()) {
                     text.setFocus();
@@ -1065,9 +1089,23 @@ public abstract class BaseCombo extends Canvas {
             // visible
             preOpen(contentShell);
 
+            Point start = new Point(size.x, 0);
+            Point end = new Point(size.x, size.y);
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    setContentFocus();
+                    postOpen(contentShell);
+                    if (callback != null) {
+                        callback.run();
+                    }
+                }
+            };
+
             contentShell.setVisible(true);
-            System.err
-                .println("ERROR BaseCombo: Animation Runner Unsupported.");
+            AnimationRunner runner = new AnimationRunner();
+            runner.runEffect(new ResizeEffect(contentShell, start, end, 200,
+                new LinearInOut(), runnable, runnable));
             contentShell.setRedraw(true);
         }
         if (BUTTON_AUTO == buttonVisibility) {

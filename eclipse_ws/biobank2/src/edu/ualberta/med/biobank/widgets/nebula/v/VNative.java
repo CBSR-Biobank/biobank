@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import java.lang.reflect.Constructor;
@@ -96,8 +97,8 @@ public class VNative<T extends Control> extends VControl {
     @Override
     public String getText() {
         try {
-            return (String) control.getClass().getMethod("getText").invoke(
-                control);
+            return (String) control.getClass().getMethod("getText")
+                .invoke(control);
         } catch (Exception e) {
             e.printStackTrace();
             return super.getText();
@@ -155,8 +156,8 @@ public class VNative<T extends Control> extends VControl {
     @Override
     public void setText(String text) {
         try {
-            control.getClass().getMethod("setText", String.class).invoke(
-                control, text);
+            control.getClass().getMethod("setText", String.class)
+                .invoke(control, text);
         } catch (Exception e) {
             e.printStackTrace();
             super.setText(text);

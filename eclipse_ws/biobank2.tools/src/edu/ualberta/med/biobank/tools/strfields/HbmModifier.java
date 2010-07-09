@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.strfields;
+package edu.ualberta.med.biobank.tools.strfields;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

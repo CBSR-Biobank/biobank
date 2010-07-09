@@ -8,6 +8,7 @@
  * Contributors:
  *    Jeremy Dowdall <jeremyd@aspencloud.com> - initial API and implementation
  *****************************************************************************/
+
 package edu.ualberta.med.biobank.widgets.nebula.v;
 
 import org.eclipse.swt.SWT;

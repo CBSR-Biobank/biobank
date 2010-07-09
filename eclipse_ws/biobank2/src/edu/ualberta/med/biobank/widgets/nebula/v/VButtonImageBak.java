@@ -115,7 +115,7 @@ class VButtonImageBak {
     private Map<ImageData, Set<VButton>> buttons = new HashMap<ImageData, Set<VButton>>();
 
     private VButtonImageBak() {
-        // 
+        //
     }
 
     private void createImage(VButton button) {
