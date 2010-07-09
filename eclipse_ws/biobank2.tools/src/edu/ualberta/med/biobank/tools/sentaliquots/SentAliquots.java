@@ -98,16 +98,13 @@ public class SentAliquots {
                 .getPnumber();
             if (!aliquotPnumber.equals(patientNo)) {
                 System.out
-                    .println(" does not match patient number for aliquot "
+                    .println(" ERROR: does not match patient number for aliquot "
                         + aliquotPnumber);
                 continue;
             }
 
             System.out.println(" old position " + aliquot.getPositionString());
             aliquot.setComment(closeComment);
-            if (aliquot.getPosition() != null) {
-                System.out.println("need to assign position to null");
-            }
             aliquot.setPosition(null);
             aliquot.setActivityStatus(closedStatus);
             aliquot.persist();
