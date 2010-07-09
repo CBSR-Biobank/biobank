@@ -465,7 +465,6 @@ public class AliquotWrapper extends
                 posWrapper.setRow(rowColPosition.row);
                 posWrapper.setCol(rowColPosition.col);
                 posWrapper.setAliquot(this);
-                positionWrapper = posWrapper;
                 wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
                 return posWrapper;
             }
@@ -477,7 +476,6 @@ public class AliquotWrapper extends
                 AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
                     appService);
                 posWrapper.setAliquot(this);
-                positionWrapper = posWrapper;
                 wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
                 return posWrapper;
             }

@@ -11,7 +11,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     extends ModelWrapper<E> {
 
     protected RowColPos rowColPosition;
-    protected AbstractPositionWrapper<T> positionWrapper;
+    private AbstractPositionWrapper<T> positionWrapper;
 
     // used to allow position to be assigned to null
     protected boolean newPositionSet;
@@ -63,6 +63,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     protected void resetInternalField() {
         rowColPosition = null;
         positionWrapper = null;
+        newPositionSet = false;
     }
 
     public RowColPos getPosition() {
@@ -128,7 +129,6 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     @Override
     public void reload() throws Exception {
         parent = null;
-        newPositionSet = false;
         super.reload();
     }
 
