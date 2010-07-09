@@ -178,11 +178,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         Date dateDrawn) {
         List<PatientVisitWrapper> visits = getPatientVisitCollection();
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
-        for (PatientVisitWrapper visit : visits) {
-            if (visit.getDateDrawn().equals(dateDrawn)
-                && visit.getDateProcessed().equals(dateProcessed))
-                result.add(visit);
-        }
+        if (visits != null)
+            for (PatientVisitWrapper visit : visits) {
+                if (visit.getDateDrawn().equals(dateDrawn)
+                    && visit.getDateProcessed().equals(dateProcessed))
+                    result.add(visit);
+            }
         return result;
     }
 
@@ -263,7 +264,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private boolean hasShipments() {
-        return (this.getShipmentCollection().size() > 0);
+        if (getShipmentCollection() != null
+            && getShipmentCollection().size() > 0)
+            return true;
+        return false;
     }
 
     private void checkNoMorePatientVisits() throws BiobankCheckException {
@@ -277,8 +281,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public long getAliquotsCount() {
         long total = 0;
         List<PatientVisitWrapper> pvs = getPatientVisitCollection();
-        for (PatientVisitWrapper pv : pvs)
-            total += pv.getAliquotsCount();
+        if (pvs != null)
+            for (PatientVisitWrapper pv : pvs)
+                total += pv.getAliquotsCount();
         return total;
     }
 

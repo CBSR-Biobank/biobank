@@ -533,7 +533,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public long getAliquotsCount() {
-        return getAliquotCollection().size();
+        if (getAliquotCollection() != null)
+            return getAliquotCollection().size();
+        else
+            return 0;
     }
 
     public boolean hasAliquots() {

@@ -122,9 +122,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
 
     public boolean hasVisitForPatient(PatientWrapper patient) {
         List<PatientVisitWrapper> pvs = patient.getPatientVisitCollection();
-        for (PatientVisitWrapper pv : pvs)
-            if (pv.getShipment().equals(this))
-                return true;
+        if (pvs != null)
+            for (PatientVisitWrapper pv : pvs)
+                if (pv.getShipment() != null && pv.getShipment().equals(this))
+                    return true;
         return false;
     }
 
@@ -481,9 +482,10 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
      */
     public boolean hasPatient(String patientNumber) {
         List<PatientWrapper> ps = getPatientCollection();
-        for (PatientWrapper p : ps)
-            if (p.getPnumber().equals(patientNumber))
-                return true;
+        if (ps != null)
+            for (PatientWrapper p : ps)
+                if (p.getPnumber().equals(patientNumber))
+                    return true;
         return false;
     }
 

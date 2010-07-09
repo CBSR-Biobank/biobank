@@ -559,7 +559,12 @@ public class ContainerWrapper extends
         if (children != null) {
             return children.size();
         }
-        return wrappedObject.getChildPositionCollection().size();
+        Collection<ContainerPosition> positions = wrappedObject
+            .getChildPositionCollection();
+        if (positions != null)
+            return positions.size();
+        else
+            return 0;
     }
 
     @SuppressWarnings("unchecked")

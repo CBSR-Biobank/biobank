@@ -636,17 +636,19 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public List<ClinicWrapper> getClinicCollection() {
         List<ContactWrapper> contacts = getContactCollection();
         List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
-        for (ContactWrapper contact : contacts) {
-            clinicWrappers.add(contact.getClinic());
-        }
+        if (contacts != null)
+            for (ContactWrapper contact : contacts) {
+                clinicWrappers.add(contact.getClinic());
+            }
         return clinicWrappers;
     }
 
     public boolean hasClinic(String clinicNameShort) {
         List<ClinicWrapper> clinics = getClinicCollection();
-        for (ClinicWrapper c : clinics)
-            if (c.getNameShort().equals(clinicNameShort))
-                return true;
+        if (clinics != null)
+            for (ClinicWrapper c : clinics)
+                if (c.getNameShort().equals(clinicNameShort))
+                    return true;
         return false;
     }
 

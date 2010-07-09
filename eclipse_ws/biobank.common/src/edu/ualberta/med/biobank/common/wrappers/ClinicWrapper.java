@@ -348,9 +348,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      */
     public ContactWrapper getContact(String contactName) {
         List<ContactWrapper> contacts = getContactCollection();
-        for (ContactWrapper contact : contacts)
-            if (contact.getName().equals(contactName))
-                return contact;
+        if (contacts != null)
+            for (ContactWrapper contact : contacts)
+                if (contact.getName().equals(contactName))
+                    return contact;
         return null;
     }
 
@@ -402,7 +403,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
                     shipmentCollection.add(new ShipmentWrapper(appService, s));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
-            }
+            } else
+                return new ArrayList<ShipmentWrapper>();
         }
         return shipmentCollection;
     }
@@ -441,9 +443,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      */
     public ShipmentWrapper getShipment(Date dateReceived) {
         List<ShipmentWrapper> shipments = getShipmentCollection();
-        for (ShipmentWrapper ship : shipments)
-            if (ship.getDateReceived().equals(dateReceived))
-                return ship;
+        if (shipments != null)
+            for (ShipmentWrapper ship : shipments)
+                if (ship.getDateReceived().equals(dateReceived))
+                    return ship;
         return null;
     }
 
@@ -453,13 +456,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      */
     public ShipmentWrapper getShipment(Date dateReceived, String patientNumber) {
         List<ShipmentWrapper> shipments = getShipmentCollection();
-        for (ShipmentWrapper ship : shipments)
-            if (ship.getDateReceived().equals(dateReceived)) {
-                List<PatientWrapper> patients = ship.getPatientCollection();
-                for (PatientWrapper p : patients)
-                    if (p.getPnumber().equals(patientNumber))
-                        return ship;
-            }
+        if (shipments != null)
+            for (ShipmentWrapper ship : shipments)
+                if (ship.getDateReceived().equals(dateReceived)) {
+                    List<PatientWrapper> patients = ship.getPatientCollection();
+                    for (PatientWrapper p : patients)
+                        if (p.getPnumber().equals(patientNumber))
+                            return ship;
+                }
         return null;
     }
 
@@ -481,9 +485,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public long getPatientCount() throws ApplicationException {
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
-        List<PatientVisitWrapper> patientVisits = getPatientVisitCollection();
-        for (PatientVisitWrapper pv : patientVisits)
-            uniquePatients.add(pv.getPatient());
+        List<ShipmentWrapper> ships = getShipmentCollection();
+        if (ships != null)
+            for (ShipmentWrapper ship : ships) {
+                if (ship.getPatientCollection() != null)
+                    uniquePatients.addAll(ship.getPatientCollection());
+            }
         return uniquePatients.size();
     }
 
@@ -509,7 +516,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public long getPatientVisitCount() throws ApplicationException {
-        return getPatientVisitCollection().size();
+        if (getPatientVisitCollection() == null)
+            return 0;
+        else
+            return getPatientVisitCollection().size();
     }
 
     public static List<ClinicWrapper> getAllClinics(
