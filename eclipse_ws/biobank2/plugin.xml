@@ -887,37 +887,6 @@
             </and>
          </enabledWhen>
       </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <and>
-               <reference
-                     definitionId="oneElementSelected">
-               </reference>
-               <with
-                     variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </and>
-         </enabledWhen>
-      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">

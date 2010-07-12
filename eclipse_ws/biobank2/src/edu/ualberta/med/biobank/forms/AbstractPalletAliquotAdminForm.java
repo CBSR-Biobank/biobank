@@ -70,9 +70,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     // the pallet container type name contains this text
     protected String palletNameContains = ""; //$NON-NLS-1$
 
-    private Button scanChoiceSimple;
-    private boolean isScanChoiceSimple;
-
     private boolean scanTubeAloneMode = false;
 
     private Label scanTubeAloneSwitch;
@@ -145,10 +142,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
             Composite composite = toolkit.createComposite(parent);
             composite.setLayout(new GridLayout(2, false));
-            scanChoiceSimple = toolkit.createButton(composite, "Single Scan",
-                SWT.RADIO);
-            scanChoiceSimple.setSelection(true);
-            toolkit.createButton(composite, "Multiple Scan", SWT.RADIO);
         } else {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
@@ -245,9 +238,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void saveUINeededInformation() {
         currentPlateToScan = plateToScanValue.getValue().toString();
-        if (scanChoiceSimple != null) {
-            isScanChoiceSimple = scanChoiceSimple.getSelection();
-        }
     }
 
     protected abstract void scanAndProcessResult(IProgressMonitor monitor)
@@ -273,11 +263,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 return;
             } else {
                 ScanCell[][] scanCells = null;
-                if (isScanChoiceSimple) {
-                    scanCells = ScannerConfigPlugin.scan(plateNum);
-                } else {
-                    scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
-                }
+                scanCells = ScannerConfigPlugin.scan(plateNum);
                 cells = PalletCell.convertArray(scanCells);
             }
         } else {

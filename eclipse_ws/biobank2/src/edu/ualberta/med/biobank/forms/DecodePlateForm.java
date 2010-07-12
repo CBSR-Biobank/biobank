@@ -11,7 +11,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -28,8 +27,6 @@ import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 public class DecodePlateForm extends PlateForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
 
-    private Button multipleScanButton;
-
     private ScanPalletWidget spw;
 
     private Map<RowColPos, PalletCell> cells;
@@ -37,8 +34,6 @@ public class DecodePlateForm extends PlateForm {
     private PlateSelectionWidget plateSelectionWidget;
 
     Integer plateToScan;
-
-    boolean multipleScan;
 
     @Override
     protected void init() throws Exception {
@@ -65,15 +60,8 @@ public class DecodePlateForm extends PlateForm {
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
-        multipleScanButton = new Button(page, SWT.CHECK);
-        multipleScanButton.setText("Multiple Scan");
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.grabExcessHorizontalSpace = true;
-        multipleScanButton.setLayoutData(gd);
-
-        scanButton = toolkit.createButton(page, "Scan && Decode Plate",
-            SWT.PUSH);
+        scanButton = toolkit.createButton(form.getBody(),
+            "Scan && Decode Plate", SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -102,7 +90,6 @@ public class DecodePlateForm extends PlateForm {
 
     protected void scanAndProcessResult() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
-        multipleScan = multipleScanButton.getSelection();
 
         if (plateToScan == null) {
             BioBankPlugin.openAsyncError("Decode Plate Error",
@@ -174,11 +161,7 @@ public class DecodePlateForm extends PlateForm {
         monitor.subTask("Launching scan");
 
         ScanCell[][] decodedCells = null;
-        if (multipleScan) {
-            decodedCells = ScannerConfigPlugin.scanMultipleDpi(plateToScan);
-        } else {
-            decodedCells = ScannerConfigPlugin.scan(plateToScan);
-        }
+        decodedCells = ScannerConfigPlugin.scan(plateToScan);
         cells = PalletCell.convertArray(decodedCells);
     }
 

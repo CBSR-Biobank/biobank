@@ -1108,7 +1108,7 @@ public class CDateTime extends BaseCombo {
 
     private void init(int style) {
         this.style = style;
-        locale = Locale.getDefault();
+        locale = Locale.US;
         try {
             timezone = TimeZone.getDefault();
         } catch (Exception e) {
@@ -1364,7 +1364,7 @@ public class CDateTime extends BaseCombo {
      */
     public void setLocale(Locale locale) {
         if (locale == null)
-            locale = Locale.getDefault();
+            locale = Locale.US;
         if (!this.locale.equals(locale)) {
             this.locale = locale;
             if (format > 0) {
