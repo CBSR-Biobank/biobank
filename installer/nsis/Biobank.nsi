@@ -1,13 +1,14 @@
 ;NSIS Modern User Interface version 1.69
 ;Original templates by Joost Verburg
 ;Redesigned for BZFlag by blast007
-;Redesigned for Biobank2 by Thomas Polasek
+;Redesigned for BioBank2 by Thomas Polasek
 
 ;--------------------------------
-;Biobank2 Version Variables
+;BioBank2 Version Variables
 
   !define VER_MAJOR 2.0
-  !define VER_MINOR .1
+  !define VER_MINOR .3
+  !define EXPORTED_BIOBANK2 "BioBank2_v${VER_MAJOR}${VER_MINOR}_win32"
 
 ;--------------------------------
 ;Compression options
@@ -18,7 +19,7 @@
   ;Uncomment to reduce installer
   ;size by ~35%
   
-  ;TODO uncomment
+  S;etCompress off
   SetCompress auto
   SetCompressor /SOLID lzma
 
@@ -31,11 +32,11 @@
 ;Configuration
 
   ;General
-  Name "Biobank ${VER_MAJOR}${VER_MINOR}"
-  OutFile "..\..\Biobank-${VER_MAJOR}${VER_MINOR}.exe"
+  Name "BioBank ${VER_MAJOR}${VER_MINOR}"
+  OutFile "..\BioBankInstaller-${VER_MAJOR}${VER_MINOR}.exe"
 
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\Biobank\Biobank_v${VER_MAJOR}${VER_MINOR}_win32"
+  InstallDir "$PROGRAMFILES\BioBank2"
 
   ; Make it look pretty in XP
   XPStyle on
@@ -44,6 +45,7 @@
 ;Variables
   Var STARTMENU_STR
   Var STARTMENU_FOLDER
+  Var INSTALL_DIR_STR
   
 
 ;--------------------------------
@@ -70,7 +72,7 @@
 ;Pages
 
   ;Welcome page configuration
-  !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Biobank ${VER_MAJOR}${VER_MINOR}.\r\n\r\nBiobank is an application you must get.\r\n\r\nClick Next to continue."
+  !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of BioBank ${VER_MAJOR}${VER_MINOR}.\r\n\r\nBioBank is an application you must get.\r\n\r\nClick Next to continue."
 
   
   !insertmacro MUI_PAGE_WELCOME
@@ -80,8 +82,9 @@
 
   ;Start Menu Folder Page Configuration
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKLM" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Biobank" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\BioBank" 
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
+  !define MUI_STARTMENUPAGE_DEFAULTFOLDER "BioBank2"
 
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
@@ -109,83 +112,84 @@
 
 
 !macro MACRO_UNINSTALL
-  ; remove directories used.
+  ; remove the directory we will be installing to. (if it exists)
   RMDir /R "$INSTDIR"
-  
+
+  ; remove the previous installation
+  ReadRegStr $INSTALL_DIR_STR HKLM SOFTWARE\BioBank "Install_Dir"
+  IfErrors +2 0
+  RMDir /R "$INSTALL_DIR_STR"
+
   ;delete startmenu (directory stored in registry)
-  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\Biobank "Start Menu Folder"
+  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\BioBank "Start Menu Folder"
   IfErrors +2 0
   RMDir /R "$SMPROGRAMS\$STARTMENU_STR"
   
   ;delete quicklaunch, desktop
-  Delete "$QUICKLAUNCH\Biobank.lnk"
-  Delete "$DESKTOP\Biobank.lnk"
+  Delete "$QUICKLAUNCH\BioBank.lnk"
+  Delete "$DESKTOP\BioBank.lnk"
   
    ;remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Biobank"
-  DeleteRegKey HKLM "SOFTWARE\Biobank"
-  DeleteRegKey HKCU "Software\Biobank"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BioBank"
+  DeleteRegKey HKLM "SOFTWARE\BioBank"
+  DeleteRegKey HKCU "Software\BioBank"
 !macroend
 
 ;--------------------------------
 ;Installer Sections
 
-Section "!Biobank Core(Required)" Biobank
+Section "!BioBank Core(Required)" BioBank
   ;Make it required
   SectionIn RO
   
   
-  ;If we find the Biobank key.. then uninstall the previous version of biobank
-  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\Biobank "Biobank"
+  ;If we find the BioBank key.. then uninstall the previous version of BioBank
+  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\BioBank "BioBank"
   IfErrors +2 0
   !insertmacro MACRO_UNINSTALL
   
-  ; make the eclipse dir
-  SetOutPath $INSTDIR\eclipse
-  File /r ..\eclipse\*
-  
-   ; make the respository dir
-  SetOutPath $INSTDIR\repository
-  File /r ..\repository\*
+  ; copy over the exported biobank directory
+  SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}
+  File /r ..\${EXPORTED_BIOBANK2}\*
   
   ; make the doc dir
-  SetOutPath $INSTDIR\doc
+  SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}\doc
   File licence.rtf
   
   ;Write biobank registry keys
-  WriteRegStr HKLM SOFTWARE\Biobank "Version" "${VER_MAJOR}${VER_MINOR}"
-  WriteRegStr HKLM SOFTWARE\Biobank "Install_Dir" "$INSTDIR"
-  WriteRegStr HKLM SOFTWARE\Biobank "Biobank" "I do not fear computers. I fear the lack of them."
+  WriteRegStr HKLM SOFTWARE\BioBank "Version" "${VER_MAJOR}${VER_MINOR}"
+  WriteRegStr HKLM SOFTWARE\BioBank "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM SOFTWARE\BioBank "BioBank" "I do not fear computers. I fear the lack of them."
   
   
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Biobank" "DisplayName" "Biobank (remove only)"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Biobank" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BioBank" "DisplayName" "BioBank (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BioBank" "UninstallString" '"$INSTDIR\${EXPORTED_BIOBANK2}\uninstall.exe"'
   
   ;Create uninstaller
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
+  WriteUninstaller "$INSTDIR\${EXPORTED_BIOBANK2}\Uninstall.exe"
 
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     
     ;Main start menu shortcuts
-    SetOutPath $INSTDIR
+    SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Biobank-${VER_MAJOR}${VER_MINOR}.lnk" "$INSTDIR\eclipse\biobank2.exe" "" "$INSTDIR\eclipse\biobank2.exe" 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\uninstall.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\uninstall.exe" 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\BioBank-${VER_MAJOR}${VER_MINOR}.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" 0
   !insertmacro MUI_STARTMENU_WRITE_END
 
 SectionEnd
 
 Section "Quick Launch Shortcuts" QuickLaunch
   ;shortcut in the "quick launch bar"
-  SetOutPath $INSTDIR
-  CreateShortCut "$QUICKLAUNCH\Biobank.lnk" "$INSTDIR\eclipse\biobank2.exe" "" "$INSTDIR\eclipse\biobank2.exe" 0
+  SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}
+  CreateShortCut "$QUICKLAUNCH\BioBank.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" 0
 SectionEnd
 
 Section "Desktop Icon" Desktop
   ;shortcut on the "desktop"
-  SetOutPath $INSTDIR
-  CreateShortCut "$DESKTOP\Biobank.lnk" "$INSTDIR\eclipse\biobank2.exe" "" "$INSTDIR\eclipse\biobank2.exe" 0
+  SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}
+  CreateShortCut "$DESKTOP\BioBank.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" 0
 SectionEnd
 
 ;--------------------------------
@@ -193,14 +197,12 @@ SectionEnd
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${Biobank} "Install the main Biobank application"
+    !insertmacro MUI_DESCRIPTION_TEXT ${Biobank} "Install the main BioBank application"
     !insertmacro MUI_DESCRIPTION_TEXT ${QuickLaunch} "Adds a shortcut in the Quick Launch toolbar."
     !insertmacro MUI_DESCRIPTION_TEXT ${Desktop} "Adds a shortcut on the desktop."
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
-;Uninstaller Section
-
 
 
 Section "Uninstall"
