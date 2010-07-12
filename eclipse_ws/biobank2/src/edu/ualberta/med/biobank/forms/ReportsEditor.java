@@ -499,6 +499,7 @@ public class ReportsEditor extends BiobankFormBase {
         }
     }
 
+    @SuppressWarnings("unused")
     public void exportPDFOrPrint(List<?> listData, List<String> columnInfo,
         List<Object[]> params, String path, IProgressMonitor monitor,
         Boolean exportPDF) {
