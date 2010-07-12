@@ -116,13 +116,14 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     private void addContainers() throws Exception {
-        ContainerWrapper top = ContainerHelper.addContainer("01", TestCommon
-            .getNewBarcode(r), null, site, containerTypeMap.get("TopCT"));
+        ContainerWrapper top = ContainerHelper.addContainer("01",
+            TestCommon.getNewBarcode(r), null, site,
+            containerTypeMap.get("TopCT"));
         containerMap.put("Top", top);
 
         ContainerWrapper childL1 = ContainerHelper.addContainer(null,
-            TestCommon.getNewBarcode(r), top, site, containerTypeMap
-                .get("ChildCtL1"), 0, 0);
+            TestCommon.getNewBarcode(r), top, site,
+            containerTypeMap.get("ChildCtL1"), 0, 0);
         containerMap.put("ChildL1", childL1);
     }
 
@@ -201,8 +202,8 @@ public class TestPatientVisit extends TestDatabase {
         visit.delete();
 
         // make sure visit cannot be deleted if it has samples
-        visit = PatientVisitHelper.addPatientVisit(patient, shipment, Utils
-            .getRandomDate(), Utils.getRandomDate());
+        visit = PatientVisitHelper.addPatientVisit(patient, shipment,
+            Utils.getRandomDate(), Utils.getRandomDate());
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
@@ -271,8 +272,8 @@ public class TestPatientVisit extends TestDatabase {
             Assert.assertNotNull(pos.row);
             Assert.assertNotNull(pos.col);
             Assert.assertNotNull(sampleMap.get(pos.row + pos.col * rows));
-            Assert.assertEquals(aliquot, sampleMap
-                .get(pos.row + pos.col * rows));
+            Assert.assertEquals(aliquot,
+                sampleMap.get(pos.row + pos.col * rows));
         }
 
         // delete all samples now
@@ -414,8 +415,8 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
         Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
         Assert.assertEquals("date_time", visit.getPvAttrTypeName("Date"));
-        Assert.assertEquals("select_multiple", visit
-            .getPvAttrTypeName("Consent"));
+        Assert.assertEquals("select_multiple",
+            visit.getPvAttrTypeName("Consent"));
         Assert.assertEquals("select_single", visit.getPvAttrTypeName("Visit"));
 
         // select an invalid label
@@ -441,8 +442,8 @@ public class TestPatientVisit extends TestDatabase {
         Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
         Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
         Assert.assertEquals("date_time", visit.getPvAttrTypeName("Date"));
-        Assert.assertEquals("select_multiple", visit
-            .getPvAttrTypeName("Consent"));
+        Assert.assertEquals("select_multiple",
+            visit.getPvAttrTypeName("Consent"));
         Assert.assertEquals("select_single", visit.getPvAttrTypeName("Visit"));
     }
 
@@ -500,8 +501,8 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
-            .getActivityStatus(appService, "Disabled"));
+        study.setStudyPvAttrActivityStatus("Worksheet",
+            ActivityStatusWrapper.getActivityStatus(appService, "Disabled"));
         study.persist();
         visit.reload();
         try {
@@ -512,8 +513,8 @@ public class TestPatientVisit extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
-            .getActivityStatus(appService, "Active"));
+        study.setStudyPvAttrActivityStatus("Worksheet",
+            ActivityStatusWrapper.getActivityStatus(appService, "Active"));
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
@@ -536,13 +537,16 @@ public class TestPatientVisit extends TestDatabase {
         // change the worksheet value
         visit.setPvAttrValue("Worksheet", "jklmnopqr");
         visit.persist();
+        visit.reload();
 
         // make sure only one value in database
-        HQLCriteria c = new HQLCriteria("select pvattr from "
-            + PatientVisit.class.getName() + " as pv "
-            + "join pv.pvAttrCollection as pvattr "
-            + "join pvattr.studyPvAttr as spvattr where spvattr.label= ?",
-            Arrays.asList(new Object[] { "Worksheet" }));
+        HQLCriteria c = new HQLCriteria(
+            "select pvattr from "
+                + PatientVisit.class.getName()
+                + " as pv "
+                + "join pv.pvAttrCollection as pvattr "
+                + "join pvattr.studyPvAttr as spvattr where pv.id = ? and spvattr.label= ?",
+            Arrays.asList(new Object[] { visit.getId(), "Worksheet" }));
         List<PvAttr> results = appService.query(c);
         Assert.assertEquals(1, results.size());
     }
@@ -605,8 +609,8 @@ public class TestPatientVisit extends TestDatabase {
             shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
 
         // check invalid case
-        PatientWrapper patient2 = PatientHelper.addPatient(Utils
-            .getRandomNumericString(20), study);
+        PatientWrapper patient2 = PatientHelper.addPatient(
+            Utils.getRandomNumericString(20), study);
         visit = PatientVisitHelper.newPatientVisit(patient2, shipment,
             TestCommon.getUniqueDate(r), Utils.getRandomDate());
 
@@ -679,8 +683,8 @@ public class TestPatientVisit extends TestDatabase {
         ss3.setVolume(3.0);
         ss3.persist();
         AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
-            Arrays.asList(ss1, ss2, ss3), ActivityStatusWrapper
-                .getActivityStatus(appService, "Active"));
+            Arrays.asList(ss1, ss2, ss3),
+            ActivityStatusWrapper.getActivityStatus(appService, "Active"));
         Aliquot dbSample = ModelUtils.getObjectWithId(appService,
             Aliquot.class, newSample.getId());
         Assert.assertEquals(dbSample.getSampleType().getId(), newSample
