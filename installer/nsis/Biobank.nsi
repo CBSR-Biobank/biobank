@@ -19,10 +19,8 @@
   ;size by ~35%
   
   ;TODO uncomment
-  ;SetCompress auto
-  ;SetCompressor /SOLID lzma
-  
-  SetCompress off
+  SetCompress auto
+  SetCompressor /SOLID lzma
 
 ;--------------------------------
 ;Include Modern UI
@@ -136,6 +134,8 @@ Section "!Biobank Core(Required)" Biobank
   ;Make it required
   SectionIn RO
   
+  
+  ;If we find the Biobank key.. then uninstall the previous version of biobank
   ReadRegStr $STARTMENU_STR HKLM SOFTWARE\Biobank "Biobank"
   IfErrors +2 0
   !insertmacro MACRO_UNINSTALL
