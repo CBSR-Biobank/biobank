@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.reporting;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,10 +28,12 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 
 import ar.com.fdvs.dj.domain.constants.Font;
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 public class ReportingUtils {
 
@@ -78,42 +81,42 @@ public class ReportingUtils {
     }
 
     private static PrintService getPrinterService(PrinterData data) {
-            // use the standard java method to retrieve print services
-            PrintService[] services = PrintServiceLookup.lookupPrintServices(
-                DocFlavor.SERVICE_FORMATTED.PRINTABLE, null);
-            PrintService service = null;
-            // try to find the correct PrintService using the Swt PrinterData
-            // information
-            for (PrintService ps : services) {
-                if (ps.getName().equals(data.name)) {
-                    service = ps;
-                }
+        // use the standard java method to retrieve print services
+        PrintService[] services = PrintServiceLookup.lookupPrintServices(
+            DocFlavor.SERVICE_FORMATTED.PRINTABLE, null);
+        PrintService service = null;
+        // try to find the correct PrintService using the Swt PrinterData
+        // information
+        for (PrintService ps : services) {
+            if (ps.getName().equals(data.name)) {
+                service = ps;
             }
+        }
         return service;
-                    }
+    }
 
     private static void printViaPrinter(PrinterData data,
         JasperPrint jasperPrint) throws Exception {
         PrintService service = getPrinterService(data);
         if (service != null) {
-                JRExporter exporter = new JRPrintServiceExporter();
-                exporter
+            JRExporter exporter = new JRPrintServiceExporter();
+            exporter
                 .setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
             exporter.setParameter(
-                        JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
-                        service.getAttributes());
-                exporter.setParameter(
-                    JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
-                    Boolean.FALSE);
-                exporter.setParameter(
-                    JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
-                    Boolean.FALSE);
-                try {
-                    exporter.exportReport();
-                } catch (JRException e) {
-                    throw new Exception(
-                        "Printing Canceled. Check your printer settings and try again.");
-                }
+                JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET,
+                service.getAttributes());
+            exporter.setParameter(
+                JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG,
+                Boolean.FALSE);
+            exporter.setParameter(
+                JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG,
+                Boolean.FALSE);
+            try {
+                exporter.exportReport();
+            } catch (JRException e) {
+                throw new Exception(
+                    "Printing Canceled. Check your printer settings and try again.");
+            }
         } else {
             throw new Exception(
                 "Error with printer - No Print Service found with name "
@@ -154,8 +157,8 @@ public class ReportingUtils {
             JasperExportManager.exportReportToPdfFile(jasperPrint, fileName);
         } else {
             throw new Exception("Can't save to file type " + fileName);
-            }
         }
+    }
 
     public static void printReport(JasperPrint jasperPrint) throws Exception {
         // Use SWT PrintDialog instead of the JasperReport method that use java
