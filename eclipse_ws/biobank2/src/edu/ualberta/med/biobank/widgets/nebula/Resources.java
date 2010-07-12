@@ -92,7 +92,7 @@ class Resources {
     }
 
     public static String getString(String key) {
-        return getString(key, Locale.getDefault());
+        return getString(key, Locale.US);
     }
 
     @SuppressWarnings("cast")

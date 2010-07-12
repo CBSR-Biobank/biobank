@@ -1,0 +1,22 @@
+This project is for creating the installer for Biobank.
+
+Requirements:
+
+NSIS (latest version)
+Biobank must be exported to a folder
+
+How to create installer:
+
+Copy this directory (NSIS) to your exported biobank directory (BIOBANK_EXPORT_DIR)
+
+Your file structure should look like this: 
+.
+..
+./eclipse
+./repository
+./nsis
+
+Go to the nsis directory, click right on Biobank.nsi and select compile NSI script.
+
+NSIS will then compile the entire project to the parent directory of BIOBANK_EXPORT_DIR.
+The filename of the installer will be Biobank-${VER_MAJOR}${VER_MINOR}.exe.
