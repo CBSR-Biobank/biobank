@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
-import edu.ualberta.med.biobank.forms.ReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 
 public class ReportTreeWidget extends Composite {
@@ -263,12 +262,17 @@ public class ReportTreeWidget extends Composite {
                 else
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                         .getActivePage()
-                        .openEditor(new ReportInput(node), ReportsEditor.ID);
+                        .openEditor(new ReportInput(node), getEditorFor(node));
             }
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error",
                 "There was an error while building page.");
         }
+    }
+
+    private String getEditorFor(ReportTreeNode node) {
+        return "edu.ualberta.med.biobank.editors.".concat(((Class<?>) node
+            .getQuery()).getSimpleName().concat("Editor"));
     }
 
     @Override

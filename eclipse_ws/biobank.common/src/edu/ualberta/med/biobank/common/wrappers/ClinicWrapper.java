@@ -483,7 +483,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getName();
     }
 
-    public long getPatientCount() throws ApplicationException {
+    public long getPatientCount() {
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
         List<ShipmentWrapper> ships = getShipmentCollection();
         if (ships != null)

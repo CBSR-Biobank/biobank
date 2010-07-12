@@ -19,6 +19,7 @@ public class PVsByStudyImpl extends AbstractReport {
         + " GROUP BY Alias.patient.study.nameShort, "
         + "Year(Alias.dateProcessed), {0}(Alias.dateProcessed)";
 
+    @SuppressWarnings("unused")
     private DateRangeRowPostProcess dateRangePostProcess;
 
     public PVsByStudyImpl(List<Object> parameters, List<ReportOption> options) {
