@@ -7,7 +7,7 @@
 ;Biobank2 Version Variables
 
   !define VER_MAJOR 2.0
-  !define VER_MINOR .01
+  !define VER_MINOR .1
 
 ;--------------------------------
 ;Compression options
@@ -19,10 +19,8 @@
   ;size by ~35%
   
   ;TODO uncomment
-  ;SetCompress auto
-  ;SetCompressor /SOLID lzma
-  
-  SetCompress off
+  SetCompress auto
+  SetCompressor /SOLID lzma
 
 ;--------------------------------
 ;Include Modern UI
@@ -45,7 +43,6 @@
 ;--------------------------------
 ;Variables
   Var STARTMENU_STR
-  Var UNINSTALL_STR
   Var STARTMENU_FOLDER
   
 
@@ -111,13 +108,37 @@
   !insertmacro MUI_LANGUAGE "English"
 
 
+!macro MACRO_UNINSTALL
+  ; remove directories used.
+  RMDir /R "$INSTDIR"
+  
+  ;delete startmenu (directory stored in registry)
+  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\Biobank "Start Menu Folder"
+  IfErrors +2 0
+  RMDir /R "$SMPROGRAMS\$STARTMENU_STR"
+  
+  ;delete quicklaunch, desktop
+  Delete "$QUICKLAUNCH\Biobank.lnk"
+  Delete "$DESKTOP\Biobank.lnk"
+  
+   ;remove registry keys
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Biobank"
+  DeleteRegKey HKLM "SOFTWARE\Biobank"
+  DeleteRegKey HKCU "Software\Biobank"
+!macroend
+
 ;--------------------------------
 ;Installer Sections
 
 Section "!Biobank Core(Required)" Biobank
   ;Make it required
   SectionIn RO
-
+  
+  
+  ;If we find the Biobank key.. then uninstall the previous version of biobank
+  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\Biobank "Biobank"
+  IfErrors +2 0
+  !insertmacro MACRO_UNINSTALL
   
   ; make the eclipse dir
   SetOutPath $INSTDIR\eclipse
@@ -182,23 +203,6 @@ SectionEnd
 
 
 
-
 Section "Uninstall"
-  ; remove directories used.
-  RMDir /R "$INSTDIR"
-  
-  ;delete startmenu (directory stored in registry)
-  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\Biobank "Start Menu Folder"
-  IfErrors +2 0
-  RMDir /R "$SMPROGRAMS\$STARTMENU_STR"
-  
-  ;delete quicklaunch, desktop
-  Delete "$QUICKLAUNCH\Biobank.lnk"
-  Delete "$DESKTOP\Biobank.lnk"
-  
-   ;remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Biobank"
-  DeleteRegKey HKLM "SOFTWARE\Biobank"
-  DeleteRegKey HKCU "Software\Biobank"
-  
+   !insertmacro MACRO_UNINSTALL
 SectionEnd
