@@ -31,6 +31,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientMergeForm extends BiobankEntryForm {
 
+    @SuppressWarnings("unused")
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientMergeForm.class.getName());
 
@@ -215,7 +216,8 @@ public class PatientMergeForm extends BiobankEntryForm {
             PatientAdapter p = (PatientAdapter) SessionManager
                 .searchNode(patient2Wrapper);
             p.getParent().removeChild(p);
-            SessionManager.getCurrentAdapterViewWithTree().getTreeViewer().refresh();
+            SessionManager.getCurrentAdapterViewWithTree().getTreeViewer()
+                .refresh();
 
             patient2Wrapper.delete();
             this.closeEntryOpenView(false, true);

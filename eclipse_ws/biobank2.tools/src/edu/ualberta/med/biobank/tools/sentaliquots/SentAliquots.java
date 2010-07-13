@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.tools.sentaliquots;
 
-import edu.ualberta.med.biobank.common.ServiceConnection;
+import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
