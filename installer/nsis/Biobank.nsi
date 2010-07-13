@@ -6,9 +6,8 @@
 ;--------------------------------
 ;BioBank2 Version Variables
 
-  !define VER_MAJOR 2.0
-  !define VER_MINOR .3
-  !define EXPORTED_BIOBANK2 "BioBank2_v${VER_MAJOR}${VER_MINOR}_win32"
+  !define VERSION_STR "2.0.1.a" 
+  !define EXPORTED_BIOBANK2 "BioBank2_v${VERSION_STR}_win32"
 
 ;--------------------------------
 ;Compression options
@@ -19,7 +18,7 @@
   ;Uncomment to reduce installer
   ;size by ~35%
   
-  S;etCompress off
+  ;SetCompress off
   SetCompress auto
   SetCompressor /SOLID lzma
 
@@ -32,8 +31,8 @@
 ;Configuration
 
   ;General
-  Name "BioBank ${VER_MAJOR}${VER_MINOR}"
-  OutFile "..\BioBankInstaller-${VER_MAJOR}${VER_MINOR}.exe"
+  Name "BioBank ${VERSION_STR}"
+  OutFile "..\BioBankInstaller-${VERSION_STR}.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\BioBank2"
@@ -72,7 +71,7 @@
 ;Pages
 
   ;Welcome page configuration
-  !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of BioBank ${VER_MAJOR}${VER_MINOR}.\r\n\r\nBioBank is an application you must get.\r\n\r\nClick Next to continue."
+  !define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of BioBank ${VERSION_STR}.\r\n\r\nBioBank is an application you must get.\r\n\r\nClick Next to continue."
 
   
   !insertmacro MUI_PAGE_WELCOME
@@ -157,7 +156,7 @@ Section "!BioBank Core(Required)" BioBank
   File licence.rtf
   
   ;Write biobank registry keys
-  WriteRegStr HKLM SOFTWARE\BioBank "Version" "${VER_MAJOR}${VER_MINOR}"
+  WriteRegStr HKLM SOFTWARE\BioBank "Version" "${VERSION_STR}"
   WriteRegStr HKLM SOFTWARE\BioBank "Install_Dir" "$INSTDIR"
   WriteRegStr HKLM SOFTWARE\BioBank "BioBank" "I do not fear computers. I fear the lack of them."
   
@@ -175,7 +174,7 @@ Section "!BioBank Core(Required)" BioBank
     SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\uninstall.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\uninstall.exe" 0
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\BioBank-${VER_MAJOR}${VER_MINOR}.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" 0
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\BioBank.lnk" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" "" "$INSTDIR\${EXPORTED_BIOBANK2}\biobank2.exe" 0
   !insertmacro MUI_STARTMENU_WRITE_END
 
 SectionEnd
