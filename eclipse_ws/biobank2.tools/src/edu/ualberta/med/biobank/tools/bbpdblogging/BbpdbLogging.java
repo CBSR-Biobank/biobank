@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
@@ -23,15 +24,20 @@ public class BbpdbLogging {
     private static final Logger LOGGER = Logger.getLogger(BbpdbLogging.class
         .getName());
 
-    private static String BBPDB_LOG_QUERY = "SELECT login_id,timestamp,form_name,"
-        + "actions.action,logging.patient_nr,logging.inventory_id,"
-        + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
-        + "FROM logging JOIN users on users.user_nr=logging.user_nr "
+    private static String BBPDB_LOG_BASE_QUERY = "FROM logging JOIN users on users.user_nr=logging.user_nr "
         + "JOIN forms ON forms.form_nr=logging.form_nr "
         + "JOIN actions ON actions.shortform=logging.action "
         + "LEFT JOIN freezer ON freezer.index_nr=logging.findex_nr "
         + "LEFT JOIN cabinet ON cabinet.index_nr=logging.cindex_nr "
         + "WHERE timestamp < '2010-05-18' ORDER BY timestamp";
+
+    private static String BBPDB_LOG_COUNT_QUERY = "SELECT count(*) "
+        + BBPDB_LOG_BASE_QUERY;
+
+    private static String BBPDB_LOG_QUERY = "SELECT login_id,timestamp,form_name,"
+        + "actions.action,logging.patient_nr,logging.inventory_id,"
+        + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
+        + BBPDB_LOG_BASE_QUERY;
 
     private GenericAppArgs args;
 
@@ -72,11 +78,17 @@ public class BbpdbLogging {
 
         cbsrSite = getCbsrSite();
 
+        Statement s = con.createStatement();
+        s.execute(BBPDB_LOG_COUNT_QUERY);
+        ResultSet rs = s.getResultSet();
+        rs.next();
+        int numLogRecords = rs.getInt(1);
+
         PreparedStatement ps;
         ps = con.prepareStatement(BBPDB_LOG_QUERY, ResultSet.TYPE_FORWARD_ONLY,
             ResultSet.CONCUR_READ_ONLY);
         ps.setFetchSize(Integer.MIN_VALUE);
-        ResultSet rs = ps.executeQuery();
+        rs = ps.executeQuery();
 
         if (rs == null) {
             throw new Exception("Database query returned null");
@@ -102,6 +114,8 @@ public class BbpdbLogging {
 
             // search for timestamp and if exists skip this record
 
+            // TODO patient number should be the CHR number
+
             String location = null;
             if ((fnum != null) && (rack != null) && (box != null)
                 && (cell != null)) {
@@ -123,7 +137,8 @@ public class BbpdbLogging {
             logMsg.setLocationLabel(location);
             logMsg.persist();
             ++count;
-            System.out.println("wrote logrecord " + count);
+            System.out.println("wrote log record " + count + " of "
+                + numLogRecords);
         }
 
     }
