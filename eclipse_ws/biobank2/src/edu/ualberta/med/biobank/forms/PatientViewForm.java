@@ -8,12 +8,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
@@ -52,8 +50,8 @@ public class PatientViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Patient: " + patient.getPnumber());
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        page.setLayout(new GridLayout(1, false));
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_PATIENT));
 
@@ -63,7 +61,7 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void createPatientSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -88,7 +86,7 @@ public class PatientViewForm extends BiobankViewForm {
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void setValues() throws ApplicationException, BiobankCheckException {
+    private void setValues() {
         setTextValue(siteLabel, patient.getStudy().getSite().getName());
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel, patient.getPatientVisitCollection()

@@ -43,10 +43,7 @@ public class FileBrowser extends BiobankWidget {
                     textfield.setText(path);
                     File file = new File(path);
                     loadFile(file);
-                } else
-                    BioBankPlugin
-                        .openError("File Error",
-                            "Not a valid file. Please select a valid CSV and try again.");
+                }
             }
         });
         // browse.setLayoutData(data);
@@ -65,10 +62,7 @@ public class FileBrowser extends BiobankWidget {
                 BioBankPlugin.openError("IO Error", "Unable to read file.");
             }
             setText(contents);
-        } else
-            BioBankPlugin.openError("File Error",
-                "Not a valid file. Please select a valid CSV and try again.");
-
+        }
     }
 
     public void setText(String text) {

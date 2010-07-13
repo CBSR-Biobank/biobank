@@ -235,6 +235,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         if (addMode) {
+            createButton(parent, IDialogConstants.CANCEL_ID,
+                IDialogConstants.CANCEL_LABEL, false);
             createButton(parent, IDialogConstants.FINISH_ID,
                 IDialogConstants.FINISH_LABEL, false);
             createButton(parent, IDialogConstants.NEXT_ID,
@@ -274,7 +276,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
     @Override
     protected void buttonPressed(int buttonId) {
         if (addMode) {
-            if (IDialogConstants.FINISH_ID == buttonId) {
+            if (IDialogConstants.CANCEL_ID == buttonId)
+                super.buttonPressed(buttonId);
+            else if (IDialogConstants.FINISH_ID == buttonId) {
                 Button nextButton = getButton(IDialogConstants.NEXT_ID);
                 if (nextButton.isEnabled()) {
                     addNewPvSourceVessel();

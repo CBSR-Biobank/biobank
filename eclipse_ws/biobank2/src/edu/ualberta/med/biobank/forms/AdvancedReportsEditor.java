@@ -90,9 +90,9 @@ public class AdvancedReportsEditor extends BiobankFormBase {
 
         GridLayout formLayout = new GridLayout();
         formLayout.marginWidth = 0;
-        form.getBody().setLayout(formLayout);
+        page.setLayout(formLayout);
 
-        top = toolkit.createComposite(form.getBody(), SWT.BORDER);
+        top = toolkit.createComposite(page, SWT.BORDER);
         GridData gdfill = new GridData();
         gdfill.grabExcessHorizontalSpace = true;
         gdfill.grabExcessVerticalSpace = true;

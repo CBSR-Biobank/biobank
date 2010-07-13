@@ -66,9 +66,9 @@ public class PatientEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT));
+        page.setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
 
@@ -78,7 +78,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     private void createPatientSection() throws Exception {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -91,8 +91,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(siteWrapper
-            .getStudyCollection());
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
+            siteWrapper.getStudyCollection());
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {

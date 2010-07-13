@@ -1419,7 +1419,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/patient_add.png"
+                  icon="icons/merge.png"
                   label="Merge Patient"
                   style="push">
             </command>
@@ -1818,7 +1818,7 @@
             name="Shipment View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ReportsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.ReportsEditor"
             default="false"
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.ReportsEditor"
@@ -1875,6 +1875,48 @@
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.forms.LoggingForm"
             name="Logging Form">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotsByPalletEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotsByPalletEditor"
+            name="Aliquots By Pallet">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotCountEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotCountEditor"
+            name="Aliquot Count">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotRequestEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotRequestEditor"
+            name="Aliquot Request">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.QACabinetAliquotsEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.QACabinetAliquotsEditor"
+            name="Cabinet Aliquot QA">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.CabinetDAliquotsEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.CabinetDAliquotsEditor"
+            name="Cabinet Aliquots per Study per Clinic by Date">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.SampleTypePvCountEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.SampleTypePvCountEditor"
+            name="Sample Type Totals by Patient Visit and Study">
       </editor>
    </extension>
    <extension

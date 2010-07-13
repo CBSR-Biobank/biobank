@@ -376,7 +376,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public Set<SampleTypeWrapper> getSampleTypesRecursively()
         throws ApplicationException {
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
-        sampleTypes.addAll(getSampleTypeCollection());
+        List<SampleTypeWrapper> sampleSubSet = getSampleTypeCollection();
+        if (sampleSubSet != null)
+            sampleTypes.addAll(sampleSubSet);
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
             sampleTypes.addAll(type.getSampleTypesRecursively());
         }

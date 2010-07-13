@@ -102,15 +102,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Shipment Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_SHIPMENT));
+        page.setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_SHIPMENT));
         createMainSection();
         createPatientsSection();
     }
 
     private void createMainSection() throws ApplicationException {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -161,26 +161,29 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             shipmentWrapper.setDateShipped(new Date());
 
         dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
-            shipmentWrapper.getDateShipped(), BeansObservables.observeValue(
-                shipmentWrapper, "dateShipped"), "Date shipped should be set");
+            shipmentWrapper.getDateShipped(),
+            BeansObservables.observeValue(shipmentWrapper, "dateShipped"),
+            "Date shipped should be set");
         setFirstControl(dateShippedWidget);
 
         ShippingMethodWrapper selectedShippingMethod = shipmentWrapper
             .getShippingMethod();
         shippingMethodComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Shipping Method", ShippingMethodWrapper
-                .getShippingMethods(appService), selectedShippingMethod, null);
+            client, "Shipping Method",
+            ShippingMethodWrapper.getShippingMethods(appService),
+            selectedShippingMethod, null);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Box Number", null, BeansObservables.observeValue(shipmentWrapper,
-                "boxNumber"), null);
+            "Box Number", null,
+            BeansObservables.observeValue(shipmentWrapper, "boxNumber"), null);
 
         if (shipmentWrapper.getDateReceived() == null)
             shipmentWrapper.setDateReceived(new Date());
 
         dateReceivedWidget = createDateTimeWidget(client, "Date Received",
-            shipmentWrapper.getDateReceived(), BeansObservables.observeValue(
-                shipmentWrapper, "dateReceived"), "Date received should be set");
+            shipmentWrapper.getDateReceived(),
+            BeansObservables.observeValue(shipmentWrapper, "dateReceived"),
+            "Date received should be set");
         dateReceivedWidget.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -189,8 +192,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BeansObservables.observeValue(shipmentWrapper,
-                "comment"), null);
+            "Comments", null,
+            BeansObservables.observeValue(shipmentWrapper, "comment"), null);
 
         if (clinicsComboViewer != null) {
             clinicSelection();

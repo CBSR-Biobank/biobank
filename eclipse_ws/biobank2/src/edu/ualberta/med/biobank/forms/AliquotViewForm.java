@@ -74,15 +74,15 @@ public class AliquotViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Aliquot " + aliquot.getInventoryId());
         GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
         createContainersSection();
         setValues();
     }
 
     private void createInformationSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);

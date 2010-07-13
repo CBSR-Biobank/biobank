@@ -198,8 +198,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void createCancelConfirmWidget() {
-        cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
-            true);
+        cancelConfirmWidget = new CancelConfirmWidget(page, this, true);
     }
 
     protected void internalScanAndProcessResult() {

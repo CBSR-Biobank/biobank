@@ -32,6 +32,7 @@ public class DateTimeWidget extends BiobankWidget {
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
         setLayout(layout);
+        setLayoutData(new GridData());
         dateEntry = new CDateTime(this, CDT.BORDER | CDT.COMPACT
             | CDT.DROP_DOWN | CDT.DATE_SHORT | CDT.TIME_SHORT
             | CDT.CLOCK_24_HOUR | CDT.BORDER | style);

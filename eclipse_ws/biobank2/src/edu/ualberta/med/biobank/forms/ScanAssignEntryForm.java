@@ -136,7 +136,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("ScanAssign.formTitle")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(2, false);
-        form.getBody().setLayout(layout);
+        page.setLayout(layout);
 
         createFieldsSection();
 
@@ -146,7 +146,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createFieldsSection() throws Exception {
-        Composite leftSideComposite = toolkit.createComposite(form.getBody());
+        Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
@@ -357,7 +357,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createContainersVisualisationSection() {
-        containersComposite = toolkit.createComposite(form.getBody());
+        containersComposite = toolkit.createComposite(page);
         GridLayout layout = getNeutralGridLayout();
         layout.numColumns = 3;
         containersComposite.setLayout(layout);
