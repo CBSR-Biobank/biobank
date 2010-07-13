@@ -1,5 +1,48 @@
 #!/usr/bin/perl
 
+
+################################################################################
+
+#This script compiles the exported biobank folder into an executable.
+#BioBankInstaller-${VERSION}.exe is created after a successful compilation.
+
+#Please note that createInstaller.pl expects 7zip directory to be in the same location as this script.
+
+#File structure:
+# .
+# ..
+# 7zip
+# 	|
+#	7-zip.dll
+#	7z.dll
+#	7z.exe
+#	7z.sfx
+#	7zCon.sfx
+#
+# nsis
+#	|
+#	Biobank.nsi
+#	biobank.ico
+#	...ETC
+#
+# biobank2_exported
+#	|
+#	biobank2.exe
+#	biobank2.ini
+#	..ETC
+#
+# scanlibDLL
+#	|
+#	cv210.dll
+#	cxcore210.dll
+#	OpenThreadsWin32.dll
+#
+# createInstaller.pl
+
+#Example: ./createInstaller.pl biobank2_exported scanlibDLL nsis
+
+################################################################################
+
 $NSIS_PROGRAM = "c:/Program\\ Files/nsis/makensis";
 
 $VERSION = "";
@@ -7,6 +50,7 @@ $BIOBANK_FOLDER = "";
 $EXPORT_DIR = "";
 $DLL_DIR = "";
 $NSIS_DIR = "";
+
 
 
 if($#ARGV == 2){	
