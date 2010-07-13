@@ -43,14 +43,19 @@ public class SentAliquots {
     public void doWork(AppArgs appArgs) throws Exception {
         this.appArgs = appArgs;
 
-        appService = ServiceConnection
-            .getAppService("http://" + appArgs.hostUrl + "/biobank2",
-                appArgs.username, appArgs.password);
+        String prefix = "https://";
+        if (appArgs.port == 8080)
+            prefix = "http://";
+
+        String serverUrl = prefix + appArgs.host + ":" + appArgs.port
+            + "/biobank2";
+
+        appService = ServiceConnection.getAppService(serverUrl,
+            appArgs.username, appArgs.password);
 
         site = getCbsrSite();
         if (site == null) {
-            throw new Exception("CBSR site not found on server "
-                + appArgs.hostUrl);
+            throw new Exception("CBSR site not found on server " + appArgs.host);
         }
 
         CSVReader reader = new CSVReader(new FileReader(appArgs.csvFileName));
@@ -137,9 +142,10 @@ public class SentAliquots {
 
         CmdLineParser parser = new CmdLineParser();
         Option hostUrlOpt = parser.addStringOption('h', "hosturl");
-        Option passwordOpt = parser.addStringOption('p', "password");
-        Option usernameOpt = parser.addStringOption('u', "username");
+        Option portOpt = parser.addIntegerOption('p', "port");
+        Option usernameOpt = parser.addStringOption('u', "user");
         Option verboseOpt = parser.addBooleanOption('v', "verbose");
+        Option passwordOpt = parser.addStringOption('w', "password");
 
         try {
             parser.parse(argv);
@@ -155,7 +161,12 @@ public class SentAliquots {
 
         String hostUrl = (String) parser.getOptionValue(hostUrlOpt);
         if (hostUrl != null) {
-            appArgs.hostUrl = hostUrl;
+            appArgs.host = hostUrl;
+        }
+
+        Integer port = (Integer) parser.getOptionValue(portOpt);
+        if (port != null) {
+            appArgs.port = port.intValue();
         }
 
         String password = (String) parser.getOptionValue(passwordOpt);
@@ -183,8 +194,9 @@ public class SentAliquots {
 
 class AppArgs {
     boolean verbose = false;
-    String hostUrl = "localhost:8080";
+    String host = "localhost";
     String username = "testuser";
     String password = "test";
+    int port = 8443;
     String csvFileName = null;
 }
