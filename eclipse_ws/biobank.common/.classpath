@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="conf"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/acegi-security-1.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/antlr-2.7.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/asm.jar"/>
@@ -32,6 +33,5 @@
 	<classpathentry kind="lib" path="lib/server/sdk-writable-core.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="conf"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
