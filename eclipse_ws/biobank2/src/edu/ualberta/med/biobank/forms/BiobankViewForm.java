@@ -37,12 +37,12 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     protected String sessionName;
 
     private static ImageDescriptor reloadActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RELOAD_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RELOAD_FORM));
 
     private static ImageDescriptor editActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_EDIT_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_EDIT_FORM));
 
     private AdapterChangedListener adapterChangedListener;
 

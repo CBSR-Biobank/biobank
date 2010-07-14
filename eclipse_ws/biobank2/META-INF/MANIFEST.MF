@@ -28,5 +28,3 @@ Require-Bundle: org.eclipse.ui,
  scannerConfig;bundle-version="0.9.1"
 Bundle-Version: 1.2.0.a
 Bundle-Vendor: AICML
-Import-Package: edu.ualberta.med.scannerconfig,
- edu.ualberta.med.scannerconfig.scanlib

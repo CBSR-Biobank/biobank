@@ -120,7 +120,7 @@ public class ContainerViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getNameShort() + ")");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
             container.getContainerType().getName()));
 
@@ -134,7 +134,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void createContainerSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);

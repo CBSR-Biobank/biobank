@@ -50,12 +50,10 @@ public class DecodePlateForm extends PlateForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("DecodePlate.tabTitle"));
         GridLayout layout = new GridLayout(2, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(
-            new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        plateSelectionWidget = new PlateSelectionWidget(form.getBody(),
-            SWT.NONE);
+        plateSelectionWidget = new PlateSelectionWidget(page, SWT.NONE);
         plateSelectionWidget.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -73,7 +71,7 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        spw = new ScanPalletWidget(form.getBody(), false);
+        spw = new ScanPalletWidget(page, false);
         spw.setVisible(true);
         toolkit.adapt(spw);
 

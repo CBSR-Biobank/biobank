@@ -175,16 +175,15 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * Search patient visits with the given date processed.
      */
     public List<PatientVisitWrapper> getVisits(Date dateProcessed,
-        Date dateDrawn) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + PatientVisit.class.getName()
-            + " where patient.id = ? and dateProcessed = ? and dateDrawn = ?",
-            Arrays.asList(new Object[] { getId(), dateProcessed, dateDrawn }));
-        List<PatientVisit> visits = appService.query(criteria);
+        Date dateDrawn) {
+        List<PatientVisitWrapper> visits = getPatientVisitCollection();
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
-        for (PatientVisit visit : visits) {
-            result.add(new PatientVisitWrapper(appService, visit));
-        }
+        if (visits != null)
+            for (PatientVisitWrapper visit : visits) {
+                if (visit.getDateDrawn().equals(dateDrawn)
+                    && visit.getDateProcessed().equals(dateProcessed))
+                    result.add(visit);
+            }
         return result;
     }
 
@@ -265,7 +264,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private boolean hasShipments() {
-        return (this.getShipmentCollection().size() > 0);
+        if (getShipmentCollection() != null
+            && getShipmentCollection().size() > 0)
+            return true;
+        return false;
     }
 
     private void checkNoMorePatientVisits() throws BiobankCheckException {
@@ -276,22 +278,16 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public long getAliquotsCount() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(aliquots) from "
-            + Patient.class.getName() + " as p"
-            + " join p.patientVisitCollection as visits"
-            + " join visits.aliquotCollection as aliquots where p.id = ?",
-            Arrays.asList(new Object[] { wrappedObject.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return results.get(0);
+    public long getAliquotsCount() {
+        long total = 0;
+        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
+        if (pvs != null)
+            for (PatientVisitWrapper pv : pvs)
+                total += pv.getAliquotsCount();
+        return total;
     }
 
-    public boolean hasAliquots() throws ApplicationException,
-        BiobankCheckException {
+    public boolean hasAliquots() {
         return (getAliquotsCount() > 0);
     }
 

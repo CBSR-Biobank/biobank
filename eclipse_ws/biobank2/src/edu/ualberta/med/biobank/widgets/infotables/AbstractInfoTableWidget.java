@@ -337,6 +337,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         setDefaultWidgetsEnabled();
 
+        setPageLabelText();
+
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);
         GridData gd = new GridData(SWT.END, SWT.TOP, true, true);

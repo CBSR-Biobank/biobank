@@ -64,10 +64,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
         form.setText("Clinic: " + clinic.getName());
 
         GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CLINIC));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CLINIC));
         createClinicSection();
         createAddressSection(clinic);
         createContactsSection();
@@ -76,7 +76,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createClinicSection() throws Exception {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
@@ -117,8 +117,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private void createContactsSection() {
         Composite client = createSectionWithClient("Contacts");
 
-        contactsTable = new ContactInfoTable(client, clinic
-            .getContactCollection());
+        contactsTable = new ContactInfoTable(client,
+            clinic.getContactCollection());
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
     }

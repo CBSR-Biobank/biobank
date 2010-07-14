@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -560,7 +559,12 @@ public class ContainerWrapper extends
         if (children != null) {
             return children.size();
         }
-        return wrappedObject.getChildPositionCollection().size();
+        Collection<ContainerPosition> positions = wrappedObject
+            .getChildPositionCollection();
+        if (positions != null)
+            return positions.size();
+        else
+            return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -706,13 +710,7 @@ public class ContainerWrapper extends
         if (type == null) {
             throw new WrapperException("sample type is null");
         }
-        HQLCriteria criteria = new HQLCriteria("select sampleType from "
-            + ContainerType.class.getName()
-            + " as ct inner join ct.sampleTypeCollection as sampleType"
-            + " where ct = ? and sampleType = ?", Arrays.asList(new Object[] {
-            wrappedObject.getContainerType(), type.getWrappedObject() }));
-        List<SampleType> types = appService.query(criteria);
-        return types.size() == 1;
+        return getContainerType().getSampleTypeCollection().contains(type);
     }
 
     public String getComment() {

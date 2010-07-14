@@ -345,8 +345,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected abstract String getOkMessage();
 
     protected void addSeparator() {
-        Label separator = toolkit.createSeparator(form.getBody(),
-            SWT.HORIZONTAL);
+        Label separator = toolkit.createSeparator(page, SWT.HORIZONTAL);
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;

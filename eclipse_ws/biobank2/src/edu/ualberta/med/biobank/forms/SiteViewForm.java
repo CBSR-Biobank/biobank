@@ -77,11 +77,11 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Repository Site: " + site.getName());
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_SITE));
+        page.setLayout(new GridLayout(1, false));
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_SITE));
 
         createSiteSection();
         createAddressSection(site);
@@ -92,7 +92,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createSiteSection() throws Exception {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
@@ -164,8 +164,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             }
         }, ClinicWrapper.class);
 
-        clinicsTable = new ClinicInfoTable(section, site
-            .getClinicCollection(true));
+        clinicsTable = new ClinicInfoTable(section,
+            site.getClinicCollection(true));
         clinicsTable.adaptToToolkit(toolkit, true);
         clinicsTable.addDoubleClickListener(collectionDoubleClickListener);
         section.setClient(clinicsTable);
@@ -181,8 +181,8 @@ public class SiteViewForm extends AddressViewFormCommon {
                 }
             }, ContainerTypeWrapper.class);
 
-        containerTypesTable = new ContainerTypeInfoTable(section, site
-            .getContainerTypeCollection());
+        containerTypesTable = new ContainerTypeInfoTable(section,
+            site.getContainerTypeCollection());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable

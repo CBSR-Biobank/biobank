@@ -43,7 +43,7 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Source Vessel Information");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
 
         createGlobalSourceVesselSection();
         setFirstControl(globalSourceWidget);
@@ -76,9 +76,9 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        SourceVesselWrapper.persistSourceVessels(globalSourceWidget
-            .getAddedOrModifiedSampleTypes(), globalSourceWidget
-            .getDeletedSampleTypes());
+        SourceVesselWrapper.persistSourceVessels(
+            globalSourceWidget.getAddedOrModifiedSampleTypes(),
+            globalSourceWidget.getDeletedSampleTypes());
     }
 
     @Override

@@ -125,8 +125,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         try {
             containerType.reload();
         } catch (Exception e) {
-            logger.error("Error while retrieving type "
-                + containerType.getName(), e);
+            logger.error(
+                "Error while retrieving type " + containerType.getName(), e);
         }
     }
 
@@ -134,7 +134,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Container Type Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
             containerType.getName()));
 
@@ -143,7 +143,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     protected void createContainerTypeSection() throws ApplicationException {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -154,21 +154,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, BeansObservables.observeValue(
-                containerType, "name"), new NonEmptyStringValidator(
-                MSG_NO_CONTAINER_TYPE_NAME)));
+            SWT.NONE, "Name", null,
+            BeansObservables.observeValue(containerType, "name"),
+            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, BeansObservables.observeValue(containerType,
-                "nameShort"), new NonEmptyStringValidator(
-                MSG_NO_CONTAINER_TYPE_NAME_SHORT));
+            "Short Name", null,
+            BeansObservables.observeValue(containerType, "nameShort"),
+            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Top Level Container", null, BeansObservables.observeValue(
-                containerType, "topLevel"), null);
+            "Top Level Container", null,
+            BeansObservables.observeValue(containerType, "topLevel"), null);
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Rows",
@@ -182,8 +182,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 "Column capacity is not a valid nubmer", false));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Default Temperature\n(Celcius)", null, BeansObservables
-                .observeValue(containerType, "defaultTemperature"),
+            "Default Temperature\n(Celcius)", null,
+            BeansObservables.observeValue(containerType, "defaultTemperature"),
             new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
 
@@ -195,14 +195,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService), containerType
-                .getActivityStatus(),
+            client, "Activity status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            containerType.getActivityStatus(),
             "Container type must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BeansObservables.observeValue(containerType,
-                "comment"), null);
+            "Comments", null,
+            BeansObservables.observeValue(containerType, "comment"), null);
     }
 
     private void createContainsSection() throws Exception {

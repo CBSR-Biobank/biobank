@@ -46,7 +46,7 @@
   <property name="biobank.importer.jar.files"
             value="mysql-connector-java-5.1.7-bin.jar" />
   <property name="biobank.tools.jar.files"
-            value="commons-io-1.4.jar, jargs.jar, opencsv-2.2.jar" />
+            value="commons-io-1.4.jar, jargs.jar, opencsv-2.2.jar, mysql-connector-java-5.1.7-bin.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
   <property name="test.output" location="testing" />
@@ -410,7 +410,27 @@
 
 
   <target name="build-common-project">
-	<ant dir="${eclipse.proj.dir.common}" target="build" inheritRefs="false" />
+  	<echo message="Building common project" />
+  	<mkdir dir="${eclipse.proj.dir.common}/bin" />
+	<copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/bin">
+      <fileset dir="${eclipse.proj.dir.common}/src">
+  	    <exclude name="**/*.launch" />
+  	    <exclude name="**/*.java" />
+  	  </fileset>
+  	</copy>
+  	<javac debug="true" debuglevel="source,lines,vars" destdir="${eclipse.proj.dir.common}/bin" source="1.6" target="1.6">
+  	  <src path="${eclipse.proj.dir.common}/src" />
+  	    <classpath>
+  		  <path id="biobank.common.classpath">
+   		    <fileset dir="${eclipse.proj.dir.common}/lib/server">
+			  <include name="*.jar" />
+			</fileset>
+			<fileset dir="${eclipse.proj.dir.common}/lib/client">
+			  <include name="*.jar" />
+			</fileset>
+		  </path>
+  	    </classpath>
+  	  </javac>
   </target>
 
 
@@ -481,7 +501,7 @@
           depends="tests-clean,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant target="clean-jars" />
-    <ant dir="${eclipse.proj.dir.common}" target="clean" inheritRefs="false" />
+  	<delete dir="${eclipse.proj.dir.common}/bin" />		
   </target>
 
   <target name="clean-caCore"
