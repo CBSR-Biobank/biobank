@@ -111,6 +111,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             reload();
@@ -134,6 +135,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 public void run() {
                     BusyIndicator.showWhile(Display.getDefault(),
                         new Runnable() {
+                            @Override
                             public void run() {
                                 getSite().getPage().closeEditor(
                                     BiobankViewForm.this, false);

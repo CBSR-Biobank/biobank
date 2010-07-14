@@ -184,6 +184,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             new String[0], plateToScanValue, new ScannerBarcodeValidator(
                 Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {
                     internalScanAndProcessResult();
@@ -211,6 +212,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void internalScanAndProcessResult() {
         saveUINeededInformation();
         IRunnableWithProgress op = new IRunnableWithProgress() {
+            @Override
             public void run(IProgressMonitor monitor) {
                 monitor.beginTask("Scan and process...",
                     IProgressMonitor.UNKNOWN);
@@ -341,6 +343,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void setScanNotLauched(boolean async) {
         if (async)
             Display.getDefault().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     setScanNotLauched();
                 }
@@ -352,6 +355,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void setScanValid(final boolean valid) {
         System.out.println("setScanValid=" + valid);
         Display.getDefault().asyncExec(new Runnable() {
+            @Override
             public void run() {
                 scanValidValue.setValue(valid);
             }
@@ -370,6 +374,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void setScanHasBeenLauched(boolean async) {
         if (async)
             Display.getDefault().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     setScanHasBeenLauched();
                 }

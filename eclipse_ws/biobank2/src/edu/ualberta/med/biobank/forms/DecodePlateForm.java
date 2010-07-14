@@ -113,6 +113,7 @@ public class DecodePlateForm extends PlateForm {
         }
 
         IRunnableWithProgress op = new IRunnableWithProgress() {
+            @Override
             public void run(IProgressMonitor monitor) {
                 monitor.beginTask("Scanning and decoding...",
                     IProgressMonitor.UNKNOWN);
@@ -142,6 +143,7 @@ public class DecodePlateForm extends PlateForm {
         monitor.subTask("Decoding...");
 
         Display.getDefault().asyncExec(new Runnable() {
+            @Override
             public void run() {
                 processScanResult();
                 spw.setCells(cells);

@@ -113,6 +113,7 @@ public class BiobankApplicationServiceImpl extends
         }
     }
 
+    @Override
     public boolean isContainerAdministrator() throws ApplicationException {
         try {
             String userLogin = SecurityContextHolder.getContext()
@@ -129,6 +130,7 @@ public class BiobankApplicationServiceImpl extends
     /**
      * How can we manage security using sql ??
      */
+    @Override
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException {
         throw new ApplicationException(

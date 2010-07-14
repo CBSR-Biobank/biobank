@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public class AdapterFactory {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static AdapterBase getAdapter(ModelWrapper<?> wrapper) {
         Class wrapperClass = wrapper.getClass();
         String wrapperClassName = wrapperClass.getName();

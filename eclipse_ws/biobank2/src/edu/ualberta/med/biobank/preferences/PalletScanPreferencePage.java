@@ -31,6 +31,7 @@ public class PalletScanPreferencePage extends FieldEditorPreferencePage
             "Scanned container type name contains:", getFieldEditorParent()));
     }
 
+    @Override
     public void init(IWorkbench workbench) {
     }
 }

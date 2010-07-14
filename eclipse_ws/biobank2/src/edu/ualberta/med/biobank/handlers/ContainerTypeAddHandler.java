@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class ContainerTypeAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd";
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager
             .searchNode(SessionManager.getInstance().getCurrentSite());

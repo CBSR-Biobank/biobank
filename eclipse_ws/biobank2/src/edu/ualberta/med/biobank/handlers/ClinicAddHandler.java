@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class ClinicAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addClinic";
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager
             .searchNode(SessionManager.getInstance().getCurrentSite());
@@ -20,8 +21,8 @@ public class ClinicAddHandler extends AbstractHandler {
 
         ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
         clinic.setSite(siteAdapter.getWrapper());
-        ClinicAdapter clinicNode = new ClinicAdapter(siteAdapter
-            .getClinicGroupNode(), clinic);
+        ClinicAdapter clinicNode = new ClinicAdapter(
+            siteAdapter.getClinicGroupNode(), clinic);
         clinicNode.openEntryForm();
 
         return null;

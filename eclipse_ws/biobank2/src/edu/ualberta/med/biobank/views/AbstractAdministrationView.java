@@ -43,6 +43,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
         searchListener = new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 internalSearch();
             }
@@ -158,7 +159,7 @@ public abstract class AbstractAdministrationView extends AbstractViewWithTree {
                 }
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
             }

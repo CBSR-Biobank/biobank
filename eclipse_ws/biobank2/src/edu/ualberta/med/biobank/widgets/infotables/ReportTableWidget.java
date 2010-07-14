@@ -93,6 +93,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         collSubList = collection.subList(start, end);
 
         display.syncExec(new Runnable() {
+            @Override
             public void run() {
                 if (!table.isDisposed()) {
                     tableViewer.setInput(collSubList);
@@ -111,6 +112,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
                     break;
                 }
                 display.syncExec(new Runnable() {
+                    @Override
                     public void run() {
                         if (!table.isDisposed()) {
                             viewer.refresh(item, false);
@@ -125,6 +127,7 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
             final Object selectedItem = selItem;
             display.syncExec(new Runnable() {
+                @Override
                 public void run() {
                     if (!table.isDisposed()) {
                         if (paginationRequired) {

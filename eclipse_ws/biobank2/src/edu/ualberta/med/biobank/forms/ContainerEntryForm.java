@@ -254,6 +254,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         containerAdapter.performExpand();
                     } else {
                         Display.getDefault().asyncExec(new Runnable() {
+                            @Override
                             public void run() {
                                 containerAdapter.getParent().addChild(
                                     containerAdapter);

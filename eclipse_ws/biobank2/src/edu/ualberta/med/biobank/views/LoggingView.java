@@ -67,6 +67,7 @@ public class LoggingView extends ViewPart {
     Button clearButton, searchButton;
 
     private final Listener alphaNumericListener = new Listener() {
+        @Override
         public void handleEvent(Event e) {
             /* The user can only enter in alphanumeric */
             /* Applied to Patient#, Inventory ID, Location */
@@ -275,6 +276,7 @@ public class LoggingView extends ViewPart {
         clearButton.setText("Clear");
         clearButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         clearButton.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 switch (e.type) {
                 case SWT.Selection:
@@ -288,6 +290,7 @@ public class LoggingView extends ViewPart {
         searchButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         searchButton.addKeyListener(enterListener);
         searchButton.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 switch (e.type) {
                 case SWT.Selection:
@@ -297,6 +300,7 @@ public class LoggingView extends ViewPart {
             }
         });
         searchButton.addTraverseListener(new TraverseListener() {
+            @Override
             public void keyTraversed(TraverseEvent e) {
                 userCombo.setFocus();
                 e.doit = false;
@@ -338,7 +342,7 @@ public class LoggingView extends ViewPart {
                 }
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
             }
@@ -451,7 +455,8 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Error",
+            BioBankPlugin.openAsyncError(
+                "Error",
                 "There was an error opening: LoggingForm.\n"
                     + ex.getLocalizedMessage());
         }
@@ -501,8 +506,8 @@ public class LoggingView extends ViewPart {
             return arrayListStringToStringList(arrayList);
 
         } catch (ApplicationException ex) {
-            BioBankPlugin.openAsyncError("Error", "There was an error: \n"
-                + ex.getLocalizedMessage());
+            BioBankPlugin.openAsyncError("Error",
+                "There was an error: \n" + ex.getLocalizedMessage());
         }
         return null;
     }

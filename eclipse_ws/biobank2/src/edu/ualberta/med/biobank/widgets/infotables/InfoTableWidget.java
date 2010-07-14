@@ -202,6 +202,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             end);
 
         display.syncExec(new Runnable() {
+            @Override
             public void run() {
                 if (!table.isDisposed()) {
                     tableViewer.setInput(modelSubList);
@@ -222,6 +223,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
 
                 display.syncExec(new Runnable() {
+                    @Override
                     public void run() {
                         if (!table.isDisposed()) {
                             viewer.refresh(item, false);
@@ -237,6 +239,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
             final BiobankCollectionModel selectedItem = selItem;
             display.syncExec(new Runnable() {
+                @Override
                 public void run() {
                     if (!table.isDisposed()) {
                         if (paginationRequired) {
@@ -284,6 +287,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         for (int i = 0; i < listeners.length; ++i) {
             final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
+                @Override
                 public void run() {
                     l.doubleClick(event);
                 }
@@ -340,6 +344,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
+                @Override
                 public void run() {
                     l.addItem(event);
                 }
@@ -354,6 +359,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
+                @Override
                 public void run() {
                     l.editItem(event);
                 }
@@ -368,6 +374,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         for (int i = 0; i < listeners.length; ++i) {
             final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
+                @Override
                 public void run() {
                     l.deleteItem(event);
                 }

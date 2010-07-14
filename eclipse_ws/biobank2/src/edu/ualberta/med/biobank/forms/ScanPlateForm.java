@@ -94,6 +94,7 @@ public class ScanPlateForm extends PlateForm {
         form.getBody().layout(true);
 
         imageCanvas.addPaintListener(new PaintListener() {
+            @Override
             public void paintControl(PaintEvent e) {
                 File plateFile = new File(PALLET_IMAGE_FILE);
 
@@ -148,6 +149,7 @@ public class ScanPlateForm extends PlateForm {
         }
 
         IRunnableWithProgress op = new IRunnableWithProgress() {
+            @Override
             public void run(IProgressMonitor monitor) {
                 monitor.beginTask("Scanning...", IProgressMonitor.UNKNOWN);
                 try {
@@ -176,6 +178,7 @@ public class ScanPlateForm extends PlateForm {
         File plateFile = new File(PALLET_IMAGE_FILE);
         if (plateFile.exists()) {
             PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     imageCanvas.redraw();
                     imageCanvas.update();

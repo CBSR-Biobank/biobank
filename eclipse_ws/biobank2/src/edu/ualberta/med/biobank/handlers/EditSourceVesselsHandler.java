@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class EditSourceVesselsHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.editSourceVessels";
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();

@@ -26,8 +26,8 @@ public class LogWrapper extends ModelWrapper<Log> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "username", "date", "action", "patientNumber",
-            "inventoryId", "positionLabel", "details", "type" };
+        return new String[] { "username", "createdAt", "site", "action",
+            "patientNumber", "inventoryId", "positionLabel", "details", "type" };
     }
 
     @Override
@@ -37,7 +37,7 @@ public class LogWrapper extends ModelWrapper<Log> {
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+        WrapperException {
     }
 
     @Override
@@ -55,14 +55,24 @@ public class LogWrapper extends ModelWrapper<Log> {
         propertyChangeSupport.firePropertyChange("username", old, username);
     }
 
-    public Date getDate() {
-        return wrappedObject.getDate();
+    public Date getCreatedAt() {
+        return wrappedObject.getCreatedAt();
     }
 
-    public void setDate(Date date) {
-        Date old = getDate();
-        wrappedObject.setDate(date);
+    public void setCreatedAt(Date date) {
+        Date old = getCreatedAt();
+        wrappedObject.setCreatedAt(date);
         propertyChangeSupport.firePropertyChange("date", old, date);
+    }
+
+    public String getSite() {
+        return wrappedObject.getSite();
+    }
+
+    public void setSite(String site) {
+        String old = getSite();
+        wrappedObject.setSite(site);
+        propertyChangeSupport.firePropertyChange("date", old, site);
     }
 
     public String getAction() {
@@ -230,7 +240,7 @@ public class LogWrapper extends ModelWrapper<Log> {
 
     @Override
     public String toString() {
-        return getDate() + " -- action: " + getAction() + " / type: "
+        return getCreatedAt() + " -- action: " + getAction() + " / type: "
             + getType() + " / patientNumber: " + getPatientNumber()
             + " / inventoryId: " + getInventoryId() + " / locationLabel: "
             + getLocationLabel() + " / details: " + getDetails();
