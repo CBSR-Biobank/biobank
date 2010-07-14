@@ -46,6 +46,7 @@
   Var STARTMENU_FOLDER
   Var INSTALL_DIR_STR
   
+  
 
 ;--------------------------------
 ;Interface Settings
@@ -111,6 +112,7 @@
 
 
 !macro MACRO_UNINSTALL
+
   ; remove the directory we will be installing to. (if it exists)
   RMDir /R "$INSTDIR"
 
@@ -141,12 +143,21 @@ Section "!BioBank Core(Required)" BioBank
   ;Make it required
   SectionIn RO
   
-  
   ;If we find the BioBank key.. then uninstall the previous version of BioBank
   ReadRegStr $STARTMENU_STR HKLM SOFTWARE\BioBank "BioBank"
-  IfErrors +2 0
-  !insertmacro MACRO_UNINSTALL
+  IfErrors NOT_PREV_INSTALLED 0
   
+  ;Biobank is installed from nsis, remove it.
+  !insertmacro MACRO_UNINSTALL
+ 
+  goto INSTALL_BIOBANK_CORE  
+  
+ 
+NOT_PREV_INSTALLED:
+  ;Move settings to the new location. (Please note that the \ must at the end of the second but not first directory)
+  Exec '"xcopy.exe" "C:\Program Files\BioBank2\BioBank2_v1.2.0_win32\workspace" "$PROFILE\biobank2\" /S /Y /E'
+
+INSTALL_BIOBANK_CORE:
   ; copy over the exported biobank directory
   SetOutPath $INSTDIR\${EXPORTED_BIOBANK2}
   File /r ..\${EXPORTED_BIOBANK2}\*
