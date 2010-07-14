@@ -41,6 +41,8 @@ public class ReportingUtils {
 
     public static Font sansSerifBold = new Font(Font.MEDIUM, "SansSerif", true);
 
+    public static PrinterData data;
+
     public static JasperPrint createStandardReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {
         InputStream reportStream = ReportingUtils.class

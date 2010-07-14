@@ -110,6 +110,7 @@ public class AnimationRunner {
 
         running = true;
         Display.getCurrent().syncExec(new Runnable() {
+            @Override
             public void run() {
                 if (effect != null && !effect.isDone()) {
                     Display.getCurrent().timerExec(delay, this);

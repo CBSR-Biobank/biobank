@@ -74,17 +74,17 @@ public class PatientVisitViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Patient Visit - Date Processed: "
             + patientVisit.getFormattedDateProcessed());
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT_VISIT));
+        page.setLayout(new GridLayout(1, false));
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
         createSamplesSection();
     }
 
     private void createMainSection() throws Exception {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -154,8 +154,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
             : patientVisit.getShipment().getClinic().getName());
         setTextValue(shipmentLabel, patientVisit.getShipment().toString());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
-        setTextValue(dateProcessedLabel, patientVisit
-            .getFormattedDateProcessed());
+        setTextValue(dateProcessedLabel,
+            patientVisit.getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, patientVisit.getFormattedDateDrawn());
         setTextValue(commentLabel, patientVisit.getComment());
 
@@ -167,15 +167,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
-        table = new PvSourceVesselInfoTable(client, patientVisit
-            .getPvSourceVesselCollection());
+        table = new PvSourceVesselInfoTable(client,
+            patientVisit.getPvSourceVesselCollection());
         table.adaptToToolkit(toolkit, true);
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Aliquots");
-        aliquotWidget = new AliquotListInfoTable(parent, patientVisit
-            .getAliquotCollection());
+        aliquotWidget = new AliquotListInfoTable(parent,
+            patientVisit.getAliquotCollection());
         aliquotWidget.adaptToToolkit(toolkit, true);
         aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
         aliquotWidget.addDoubleClickListener(collectionDoubleClickListener);
@@ -196,9 +196,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
         try {
             patientVisit.reload();
         } catch (Exception ex) {
-            logger.error("Error while retrieving patient visit "
-                + patientVisit.getFormattedDateProcessed() + "(patient "
-                + patientVisit.getPatient() + ")", ex);
+            logger.error(
+                "Error while retrieving patient visit "
+                    + patientVisit.getFormattedDateProcessed() + "(patient "
+                    + patientVisit.getPatient() + ")", ex);
         }
     }
 

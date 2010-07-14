@@ -238,7 +238,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         resizeTable();
 
         if (paginationRequired) {
-            setPageLabelText();
             showPaginationWidget();
             enablePaginationWidget(false);
         } else if (paginationWidget != null)
@@ -337,6 +336,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         setDefaultWidgetsEnabled();
+
+        setPageLabelText();
 
         // do not display it yet, wait till collection is added
         paginationWidget.setVisible(false);

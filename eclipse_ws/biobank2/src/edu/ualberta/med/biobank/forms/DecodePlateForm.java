@@ -11,15 +11,14 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
@@ -28,8 +27,6 @@ import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 public class DecodePlateForm extends PlateForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
 
-    private Button multipleScanButton;
-
     private ScanPalletWidget spw;
 
     private Map<RowColPos, PalletCell> cells;
@@ -37,8 +34,6 @@ public class DecodePlateForm extends PlateForm {
     private PlateSelectionWidget plateSelectionWidget;
 
     Integer plateToScan;
-
-    boolean multipleScan;
 
     @Override
     protected void init() throws Exception {
@@ -55,24 +50,15 @@ public class DecodePlateForm extends PlateForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("DecodePlate.tabTitle"));
         GridLayout layout = new GridLayout(2, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(
-            new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        plateSelectionWidget = new PlateSelectionWidget(form.getBody(),
-            SWT.NONE);
+        plateSelectionWidget = new PlateSelectionWidget(page, SWT.NONE);
         plateSelectionWidget.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
-
-        multipleScanButton = new Button(form.getBody(), SWT.CHECK);
-        multipleScanButton.setText("Multiple Scan");
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.grabExcessHorizontalSpace = true;
-        multipleScanButton.setLayoutData(gd);
 
         scanButton = toolkit.createButton(form.getBody(),
             "Scan && Decode Plate", SWT.PUSH);
@@ -85,7 +71,7 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        spw = new ScanPalletWidget(form.getBody(), false);
+        spw = new ScanPalletWidget(page, false);
         spw.setVisible(true);
         toolkit.adapt(spw);
 
@@ -104,7 +90,6 @@ public class DecodePlateForm extends PlateForm {
 
     protected void scanAndProcessResult() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
-        multipleScan = multipleScanButton.getSelection();
 
         if (plateToScan == null) {
             BioBankPlugin.openAsyncError("Decode Plate Error",
@@ -176,11 +161,7 @@ public class DecodePlateForm extends PlateForm {
         monitor.subTask("Launching scan");
 
         ScanCell[][] decodedCells = null;
-        if (multipleScan) {
-            decodedCells = ScannerConfigPlugin.scanMultipleDpi(plateToScan);
-        } else {
-            decodedCells = ScannerConfigPlugin.scan(plateToScan);
-        }
+        decodedCells = ScannerConfigPlugin.scan(plateToScan);
         cells = PalletCell.convertArray(decodedCells);
     }
 

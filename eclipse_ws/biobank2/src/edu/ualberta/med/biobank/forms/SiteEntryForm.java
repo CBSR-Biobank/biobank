@@ -65,7 +65,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() throws ApplicationException {
         form.setText("Repository Site Information");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         // currentActivityStatus = site.getActivityStatus();
         createSiteSection();
         createAddressArea(site);
@@ -78,18 +78,18 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private void createSiteSection() throws ApplicationException {
         toolkit
             .createLabel(
-                form.getBody(),
+                page,
                 "Studies, Clinics, and Container Types can be added after submitting this information.",
                 SWT.LEFT);
 
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_SITE));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_SITE));
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
@@ -97,14 +97,14 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             new NonEmptyStringValidator(MSG_NO_SITE_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, BeansObservables
-                .observeValue(site, "nameShort"), new NonEmptyStringValidator(
-                "Site short name cannot be blank"));
+            "Short Name", null,
+            BeansObservables.observeValue(site, "nameShort"),
+            new NonEmptyStringValidator("Site short name cannot be blank"));
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService), site.getActivityStatus(),
-            "Site must have an activity status");
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            site.getActivityStatus(), "Site must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, BeansObservables.observeValue(site, "comment"),
@@ -125,9 +125,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
-        site
-            .setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-                .getSelection()).getFirstElement());
+        site.setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+            .getSelection()).getFirstElement());
         site.persist();
         SessionManager.getInstance().updateSites();
 

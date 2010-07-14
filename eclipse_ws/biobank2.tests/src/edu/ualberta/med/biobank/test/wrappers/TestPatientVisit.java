@@ -14,8 +14,9 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -49,7 +50,6 @@ import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestPatientVisit extends TestDatabase {

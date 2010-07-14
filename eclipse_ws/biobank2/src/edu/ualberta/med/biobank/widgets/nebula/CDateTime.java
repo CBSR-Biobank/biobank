@@ -14,9 +14,9 @@ package edu.ualberta.med.biobank.widgets.nebula;
 import java.text.AttributedCharacterIterator;
 import java.text.CharacterIterator;
 import java.text.DateFormat;
+import java.text.DateFormat.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.text.DateFormat.Field;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -88,8 +88,8 @@ public class CDateTime extends BaseCombo {
                 buffer = (count > 0) ? buffer : ""; //$NON-NLS-1$
                 buffer += String.valueOf(c);
                 if (buffer.length() > digits) {
-                    buffer = buffer.substring(buffer.length() - digits, buffer
-                        .length());
+                    buffer = buffer.substring(buffer.length() - digits,
+                        buffer.length());
                 }
             }
             return (++count > (digits - 1));
@@ -110,6 +110,7 @@ public class CDateTime extends BaseCombo {
             count = 0;
         }
 
+        @Override
         public String toString() {
             if (buffer.length() < digits) {
                 char[] ca = new char[digits - buffer.length()];
@@ -127,6 +128,7 @@ public class CDateTime extends BaseCombo {
      */
     class SpinnerLayout extends VLayout {
 
+        @Override
         protected Point computeSize(VPanel panel, int wHint, int hHint,
             boolean flushCache) {
             Point size = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -148,6 +150,7 @@ public class CDateTime extends BaseCombo {
             return size;
         }
 
+        @Override
         protected void layout(VPanel panel, boolean flushCache) {
             Rectangle cRect = panel.getClientArea();
             if (cRect.isEmpty())
@@ -225,6 +228,7 @@ public class CDateTime extends BaseCombo {
     private CDateTimePainter painter;
 
     Listener doubleClickListener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             if (event.type == SWT.MouseDoubleClick) {
                 event.doit = false;
@@ -238,6 +242,7 @@ public class CDateTime extends BaseCombo {
      * Delegates events to their appropriate handler
      */
     Listener textListener = new Listener() {
+        @Override
         public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.FocusIn:
@@ -433,6 +438,7 @@ public class CDateTime extends BaseCombo {
             setContent(pickerPanel.getComposite());
 
             canvas.addListener(SWT.KeyDown, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     if (SWT.ESC == event.keyCode) {
                         event.doit = false;
@@ -480,6 +486,7 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("accept.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setOpen(false);
             }
@@ -490,6 +497,7 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("cancel.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setSelection(cancelDate);
                 setOpen(false);
@@ -502,6 +510,7 @@ public class CDateTime extends BaseCombo {
         b.setToolTipText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 setOpen(false);
                 setSelection(null);
@@ -527,6 +536,7 @@ public class CDateTime extends BaseCombo {
                 c.dispose();
                 if (contentShell != null) {
                     Display.getDefault().asyncExec(new Runnable() {
+                        @Override
                         public void run() {
                             if (contentShell != null
                                 && !contentShell.isDisposed()) {
@@ -868,6 +878,7 @@ public class CDateTime extends BaseCombo {
         return calendar.getTimeInMillis();
     }
 
+    @Override
     public boolean getEditable() {
         return !panel.hasStyle(SWT.READ_ONLY);
     }
@@ -933,10 +944,12 @@ public class CDateTime extends BaseCombo {
         return hasSelection() ? selection[0] : null;
     }
 
+    @Override
     public int getStyle() {
         return style;
     }
 
+    @Override
     public String getText() {
         return checkText() ? text.getText() : null;
     }
@@ -1195,7 +1208,7 @@ public class CDateTime extends BaseCombo {
     // setSelectedDates(tmp);
     // }
     // }
-    //	
+    //
     // void select(Date date1, Date date2, int field, int increment) {
     // if(date1 != null && date2 != null) {
     // Date start = date1.before(date2) ? date1 : date2;
@@ -1255,6 +1268,7 @@ public class CDateTime extends BaseCombo {
      * org.eclipse.nebula.cwt.base.BaseCombo#setButtonImage(org.eclipse.swt.
      * graphics.Image)
      */
+    @Override
     public void setButtonImage(Image image) {
         super.setButtonImage(image);
     }
@@ -1275,6 +1289,7 @@ public class CDateTime extends BaseCombo {
      * 
      * @see org.eclipse.nebula.cwt.base.BaseCombo#setEditable(boolean)
      */
+    @Override
     public void setEditable(boolean editable) {
         super.setEditable(editable);
         if (checkPicker()) {
@@ -1361,6 +1376,7 @@ public class CDateTime extends BaseCombo {
         }
     }
 
+    @Override
     protected void setModifyEventProperties(Event e) {
         e.data = calendar.getTime();
     }
@@ -1378,10 +1394,12 @@ public class CDateTime extends BaseCombo {
         updateText();
     }
 
+    @Override
     public void setOpen(boolean open) {
         setOpen(open, null);
     }
 
+    @Override
     public void setOpen(boolean open, Runnable callback) {
         if (open) {
             cancelDate = getSelection();
@@ -1723,6 +1741,7 @@ public class CDateTime extends BaseCombo {
         final int selEnd = s1;
 
         Runnable runnable = new Runnable() {
+            @Override
             public void run() {
                 if ((text != null) && (!text.isDisposed())) {
                     if (!string.equals(text.getText())) {
@@ -1759,8 +1778,7 @@ public class CDateTime extends BaseCombo {
 
         char c = e.character;
         if (((e.text.length() == 1) && String.valueOf(c).equals(e.text) && Character
-            .isDigit(c))
-            || (e.text.length() > 1)) {
+            .isDigit(c)) || (e.text.length() > 1)) {
             if (e.text.length() == 1) {
                 if (editField == null) {
                     int cf = getCalendarField();

@@ -114,9 +114,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT_VISIT));
+        page.setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
         if (patientVisit.isNew()) {
@@ -125,7 +125,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void createMainSection() throws Exception {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -138,8 +138,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Patient", patient
-            .getPnumber());
+        createReadOnlyLabelledField(client, SWT.NONE, "Patient",
+            patient.getPnumber());
 
         List<ShipmentWrapper> allShipments = patient.getShipmentCollection();
         List<ShipmentWrapper> recentShipments = new ArrayList<ShipmentWrapper>();
@@ -167,9 +167,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }
-        createDateTimeWidget(client, "Date Processed", patientVisit
-            .getDateProcessed(), BeansObservables.observeValue(patientVisit,
-            "dateProcessed"), "Date processed should be set");
+        createDateTimeWidget(client, "Date Processed",
+            patientVisit.getDateProcessed(),
+            BeansObservables.observeValue(patientVisit, "dateProcessed"),
+            "Date processed should be set");
 
         createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
             BeansObservables.observeValue(patientVisit, "dateDrawn"),
@@ -178,8 +179,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BeansObservables.observeValue(patientVisit,
-                "comment"), null);
+            "Comments", null,
+            BeansObservables.observeValue(patientVisit, "comment"), null);
     }
 
     private void createSourcesSection() {
@@ -249,8 +250,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
             control = s;
         } else {
-            Assert.isTrue(false, "Invalid pvInfo type: "
-                + pvCustomInfo.getType());
+            Assert.isTrue(false,
+                "Invalid pvInfo type: " + pvCustomInfo.getType());
             return null;
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);

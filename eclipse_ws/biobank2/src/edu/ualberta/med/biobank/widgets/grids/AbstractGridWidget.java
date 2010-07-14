@@ -11,9 +11,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Cell;
-import edu.ualberta.med.biobank.util.RowColPos;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total

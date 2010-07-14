@@ -81,13 +81,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     protected void createFormContent() throws ApplicationException {
         form.setText("Clinic Information");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
             BioBankPlugin.IMG_CLINIC));
 
         toolkit
             .createLabel(
-                form.getBody(),
+                page,
                 "Clinics can be associated with studies after submitting this initial information.",
                 SWT.LEFT);
         createClinicInfoSection();
@@ -95,13 +95,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         createContactSection();
         createButtonsSection();
 
-        // TODO: When adding help uncomment line below
-        // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
-        // IJavaHelpContextIds.XXXXX);
     }
 
     private void createClinicInfoSection() throws ApplicationException {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -154,7 +151,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     }
 
     private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);

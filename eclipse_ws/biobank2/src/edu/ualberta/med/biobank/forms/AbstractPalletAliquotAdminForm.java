@@ -30,12 +30,12 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -69,9 +69,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     // the pallet container type name contains this text
     protected String palletNameContains = ""; //$NON-NLS-1$
-
-    private Button scanChoiceSimple;
-    private boolean isScanChoiceSimple;
 
     private boolean scanTubeAloneMode = false;
 
@@ -145,10 +142,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
             Composite composite = toolkit.createComposite(parent);
             composite.setLayout(new GridLayout(2, false));
-            scanChoiceSimple = toolkit.createButton(composite, "Single Scan",
-                SWT.RADIO);
-            scanChoiceSimple.setSelection(true);
-            toolkit.createButton(composite, "Multiple Scan", SWT.RADIO);
         } else {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
@@ -205,8 +198,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void createCancelConfirmWidget() {
-        cancelConfirmWidget = new CancelConfirmWidget(form.getBody(), this,
-            true);
+        cancelConfirmWidget = new CancelConfirmWidget(page, this, true);
     }
 
     protected void internalScanAndProcessResult() {
@@ -246,9 +238,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void saveUINeededInformation() {
         currentPlateToScan = plateToScanValue.getValue().toString();
-        if (scanChoiceSimple != null) {
-            isScanChoiceSimple = scanChoiceSimple.getSelection();
-        }
     }
 
     protected abstract void scanAndProcessResult(IProgressMonitor monitor)
@@ -274,11 +263,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 return;
             } else {
                 ScanCell[][] scanCells = null;
-                if (isScanChoiceSimple) {
-                    scanCells = ScannerConfigPlugin.scan(plateNum);
-                } else {
-                    scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
-                }
+                scanCells = ScannerConfigPlugin.scan(plateNum);
                 cells = PalletCell.convertArray(scanCells);
             }
         } else {

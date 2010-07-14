@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceVesselEntryInfoTable;
@@ -43,7 +43,7 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Source Vessel Information");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
 
         createGlobalSourceVesselSection();
         setFirstControl(globalSourceWidget);
@@ -76,9 +76,9 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        SourceVesselWrapper.persistSourceVessels(globalSourceWidget
-            .getAddedOrModifiedSampleTypes(), globalSourceWidget
-            .getDeletedSampleTypes());
+        SourceVesselWrapper.persistSourceVessels(
+            globalSourceWidget.getAddedOrModifiedSampleTypes(),
+            globalSourceWidget.getDeletedSampleTypes());
     }
 
     @Override

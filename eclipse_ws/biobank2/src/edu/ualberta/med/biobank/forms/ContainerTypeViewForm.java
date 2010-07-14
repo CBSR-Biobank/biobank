@@ -72,7 +72,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container Type: " + containerType.getName());
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
             containerType.getName()));
 
@@ -94,7 +94,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createContainerTypeSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
@@ -130,7 +130,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(rowCapacityLabel, containerType.getRowCapacity());
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
-        setTextValue(numSchemeLabel,
+        setTextValue(
+            numSchemeLabel,
             containerType.getChildLabelingScheme() == null ? "" : containerType
                 .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
@@ -205,7 +206,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     private void createButtons() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(4, false));
         toolkit.paintBordersFor(client);
     }

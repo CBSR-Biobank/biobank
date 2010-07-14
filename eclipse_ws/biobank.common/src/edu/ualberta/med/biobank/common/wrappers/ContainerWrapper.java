@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
@@ -18,9 +19,7 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -191,8 +190,8 @@ public class ContainerWrapper extends
     private void checkLabelUniqueForType() throws BiobankCheckException,
         ApplicationException {
         String notSameContainer = "";
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSite().getId(), getLabel(),
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { getSite().getId(), getLabel(),
                 getContainerType().getWrappedObject() }));
         if (!isNew()) {
             notSameContainer = " and id <> ?";
@@ -467,8 +466,9 @@ public class ContainerWrapper extends
                         aliquot.reload();
                     } catch (Exception e) {
                     }
-                    aliquots.put(new RowColPos(position.getRow(), position
-                        .getCol()), aliquot);
+                    aliquots.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        aliquot);
                 }
                 propertiesMap.put("aliquots", aliquots);
             }
@@ -559,7 +559,12 @@ public class ContainerWrapper extends
         if (children != null) {
             return children.size();
         }
-        return wrappedObject.getChildPositionCollection().size();
+        Collection<ContainerPosition> positions = wrappedObject
+            .getChildPositionCollection();
+        if (positions != null)
+            return positions.size();
+        else
+            return 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -580,8 +585,9 @@ public class ContainerWrapper extends
                         // child.reload();
                     } catch (Exception e) {
                     }
-                    children.put(new RowColPos(position.getRow(), position
-                        .getCol()), child);
+                    children.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        child);
                 }
                 propertiesMap.put("children", children);
             }
@@ -704,13 +710,7 @@ public class ContainerWrapper extends
         if (type == null) {
             throw new WrapperException("sample type is null");
         }
-        HQLCriteria criteria = new HQLCriteria("select sampleType from "
-            + ContainerType.class.getName()
-            + " as ct inner join ct.sampleTypeCollection as sampleType"
-            + " where ct = ? and sampleType = ?", Arrays.asList(new Object[] {
-            wrappedObject.getContainerType(), type.getWrappedObject() }));
-        List<SampleType> types = appService.query(criteria);
-        return types.size() == 1;
+        return getContainerType().getSampleTypeCollection().contains(type);
     }
 
     public String getComment() {
@@ -729,8 +729,7 @@ public class ContainerWrapper extends
         if (wrappedObject != null)
             if (((getContainerType() != null)
                 && (getContainerType().getRowCapacity() != null) && (getContainerType()
-                .getColCapacity() != null))
-                || (getContainerType() == null))
+                .getColCapacity() != null)) || (getContainerType() == null))
                 if (((getPosition() != null) && (getPosition().row != null) && (getPosition().col != null))
                     || (getPosition() == null))
                     if (wrappedObject.getSite() != null)
@@ -770,9 +769,9 @@ public class ContainerWrapper extends
         HQLCriteria criteria = new HQLCriteria("select c from "
             + Container.class.getName()
             + " as c left join c.containerType.childContainerTypeCollection "
-            + "as ct where c.site = ? and c.label = ? and ct=?", Arrays
-            .asList(new Object[] { getSite().getWrappedObject(), parentLabel,
-                getContainerType().getWrappedObject() }));
+            + "as ct where c.site = ? and c.label = ? and ct=?",
+            Arrays.asList(new Object[] { getSite().getWrappedObject(),
+                parentLabel, getContainerType().getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -797,8 +796,8 @@ public class ContainerWrapper extends
                 + " as parent where parent.id in (select ct.id" + " from "
                 + ContainerType.class.getName() + " as ct"
                 + " left join ct.childContainerTypeCollection as child "
-                + " where child.id in (" + typeIds + ")))", Arrays
-                .asList(new Object[] { site.getId(), label }));
+                + " where child.id in (" + typeIds + ")))",
+            Arrays.asList(new Object[] { site.getId(), label }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -845,8 +844,8 @@ public class ContainerWrapper extends
         String productBarcode) throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
-            + " where site.id = ? and productBarcode = ?", Arrays
-            .asList(new Object[] { siteWrapper.getId(), productBarcode }));
+            + " where site.id = ? and productBarcode = ?",
+            Arrays.asList(new Object[] { siteWrapper.getId(), productBarcode }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 0) {
             return null;

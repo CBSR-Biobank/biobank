@@ -7,50 +7,30 @@ import org.eclipse.ui.part.ViewPart;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
-public abstract class AbstractViewWithTree extends ViewPart implements
-    IAdapterTreeView {
+public abstract class AbstractViewWithTree<T> extends ViewPart {
 
-    protected AdapterTreeWidget adaptersTree;
-
-    protected RootNode rootNode;
+    public abstract TreeViewer getTreeViewer();
 
     @Override
-    public TreeViewer getTreeViewer() {
-        return adaptersTree.getTreeViewer();
-    }
+    public abstract void setFocus();
 
-    @Override
-    public void setFocus() {
-        adaptersTree.setFocus();
-    }
-
-    public AdapterBase getSelectedNode() {
+    @SuppressWarnings("unchecked")
+    public T getSelectedNode() {
         IStructuredSelection treeSelection = (IStructuredSelection) getTreeViewer()
             .getSelection();
         if (treeSelection != null && treeSelection.size() > 0) {
-            return (AdapterBase) treeSelection.getFirstElement();
+            return (T) treeSelection.getFirstElement();
         }
         return null;
     }
 
-    public abstract void reload();
-
-    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
-        return rootNode.accept(new NodeSearchVisitor(wrapper));
-    }
-
-    public void setSelectedNode(AdapterBase node) {
-        if (adaptersTree != null) {
-            adaptersTree.getTreeViewer().setSelection(
-                new StructuredSelection(node));
+    public void setSelectedNode(T node) {
+        if (getTreeViewer() != null) {
+            getTreeViewer().setSelection(new StructuredSelection(node));
         }
     }
 
-    public void opened() {
+    public abstract AdapterBase searchNode(ModelWrapper<?> wrapper);
 
-    }
 }

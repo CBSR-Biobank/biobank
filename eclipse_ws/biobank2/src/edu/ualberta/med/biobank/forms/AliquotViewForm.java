@@ -9,11 +9,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
@@ -74,15 +74,15 @@ public class AliquotViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Aliquot " + aliquot.getInventoryId());
         GridLayout layout = new GridLayout(1, false);
-        form.getBody().setLayout(layout);
-        form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        page.setLayout(layout);
+        page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
         createContainersSection();
         setValues();
     }
 
     private void createInformationSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -105,7 +105,7 @@ public class AliquotViewForm extends BiobankViewForm {
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,
             SWT.WRAP | SWT.MULTI, "Comment");
-        positionLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+        positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Position");
     }
 

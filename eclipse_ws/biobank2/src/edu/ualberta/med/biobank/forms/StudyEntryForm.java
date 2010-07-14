@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -97,11 +97,11 @@ public class StudyEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Study Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
-        form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_STUDY));
+        page.setLayout(new GridLayout(1, false));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_STUDY));
 
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -113,19 +113,19 @@ public class StudyEntryForm extends BiobankEntryForm {
         setTextValue(siteLabel, study.getSite().getName());
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, BeansObservables
-                .observeValue(study, "name"), new NonEmptyStringValidator(
-                "Study name cannot be blank")));
+            SWT.NONE, "Name", null,
+            BeansObservables.observeValue(study, "name"),
+            new NonEmptyStringValidator("Study name cannot be blank")));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, BeansObservables.observeValue(study,
-                "nameShort"), new NonEmptyStringValidator(
-                "Study short name cannot be blank"));
+            "Short Name", null,
+            BeansObservables.observeValue(study, "nameShort"),
+            new NonEmptyStringValidator("Study short name cannot be blank"));
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService), study.getActivityStatus(),
-            "Study must have an activity status");
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            study.getActivityStatus(), "Study must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, BeansObservables.observeValue(study, "comment"),
@@ -237,7 +237,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);

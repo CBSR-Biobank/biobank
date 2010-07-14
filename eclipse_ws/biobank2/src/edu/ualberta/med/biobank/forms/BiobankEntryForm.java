@@ -40,13 +40,17 @@ import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.menus.CommandContributionItemParameter;
+import org.eclipse.ui.services.ISourceProviderService;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -76,23 +80,23 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     // The widget that is to get the focus when the form is created
     private Control firstControl;
 
-    private Action confirmAction;
+    public Action confirmAction;
 
     private static ImageDescriptor printActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PRINTER));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PRINTER));
 
     private static ImageDescriptor resetActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RESET_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RESET_FORM));
 
     private static ImageDescriptor cancelActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CANCEL_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CANCEL_FORM));
 
     private static ImageDescriptor confirmActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CONFIRM_FORM));
+        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CONFIRM_FORM));
 
     protected KeyListener keyListener = new KeyAdapter() {
         @Override
@@ -316,9 +320,14 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void setConfirmEnabled(boolean enabled) {
-        if (confirmAction != null) {
-            confirmAction.setEnabled(enabled);
-        }
+        ISourceProviderService service = (ISourceProviderService) PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow()
+            .getService(ISourceProviderService.class);
+        ConfirmState confirmSourceProvider = (ConfirmState) service
+            .getSourceProvider(ConfirmState.SESSION_STATE);
+        confirmSourceProvider.setState(enabled);
+        confirmAction.setEnabled(enabled);
+        form.getToolBarManager().update(true);
     }
 
     public void setFormHeaderErrorMessage(String message, int type) {
@@ -336,8 +345,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     protected abstract String getOkMessage();
 
     protected void addSeparator() {
-        Label separator = toolkit.createSeparator(form.getBody(),
-            SWT.HORIZONTAL);
+        Label separator = toolkit.createSeparator(page, SWT.HORIZONTAL);
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
@@ -352,34 +360,26 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addConfirmAction() {
-        confirmAction = new Action("Confirm") {
+        confirmAction = new Action() {
             @Override
             public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    @Override
-                    public void run() {
-                        confirm();
-                    }
-                });
+                confirm();
             }
         };
+        confirmAction
+            .setActionDefinitionId("edu.ualberta.med.biobank.commands.confirm");
         confirmAction.setImageDescriptor(confirmActionImage);
+        confirmAction.setToolTipText("Confirm");
         form.getToolBarManager().add(confirmAction);
     }
 
     protected void addCancelAction() {
-        Action cancel = new Action("Cancel") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    @Override
-                    public void run() {
-                        cancel();
-                    }
-                });
-            }
-        };
-        cancel.setImageDescriptor(cancelActionImage);
+        CommandContributionItem cancel = new CommandContributionItem(
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Cancel",
+                "edu.ualberta.med.biobank.commands.cancel", null,
+                cancelActionImage, null, null, "Cancel", "Cancel", "Cancel",
+                SWT.NONE, "Cancel", true));
         form.getToolBarManager().add(cancel);
     }
 
@@ -409,22 +409,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addResetAction() {
-        Action reset = new Action("Reset") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            reset();
-                        } catch (Exception ex) {
-                            BioBankPlugin.openAsyncError("Error on reset", ex);
-                        }
-                    }
-                });
-            }
-        };
-        reset.setImageDescriptor(resetActionImage);
+        CommandContributionItem reset = new CommandContributionItem(
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Reset",
+                "edu.ualberta.med.biobank.commands.reset", null,
+                resetActionImage, null, null, "Reset", "Reset", "Reset",
+                SWT.NONE, "Reset", true));
         form.getToolBarManager().add(reset);
     }
 

@@ -26,10 +26,10 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
+import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
+import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.advanced.HQLField;
-import edu.ualberta.med.biobank.common.reports.advanced.QueryTreeNode;
-import edu.ualberta.med.biobank.common.reports.advanced.SearchUtils;
 
 public class QueryTree extends TreeViewer {
 
@@ -270,7 +270,7 @@ public class QueryTree extends TreeViewer {
             .get(0);
         Class<?> type = root.getNodeInfo().getType();
 
-        addClausesForNode(root, whereClauses);
+        addClausesForNode(root, whereClauses, fromClauses);
         generateSubClauses(root, whereClauses, fromClauses);
 
         String where = compileWhereClause(whereClauses);
@@ -352,7 +352,7 @@ public class QueryTree extends TreeViewer {
                 List<String> collectionWhereClauses = new ArrayList<String>();
                 HashSet<String> collectionFromClauses = new HashSet<String>();
                 Boolean addedSubFields = addClausesForNode(childCollection,
-                    collectionWhereClauses);
+                    collectionWhereClauses, collectionFromClauses);
                 Boolean addedSubChildren = generateSubClauses(childCollection,
                     collectionWhereClauses, collectionFromClauses);
                 String hqlString = newSelect
@@ -368,11 +368,11 @@ public class QueryTree extends TreeViewer {
                 List<String> leftList = new ArrayList<String>();
                 List<String> rightList = new ArrayList<String>();
                 boolean addedLFields = addClausesForNode(subChildren.get(0),
-                    leftList);
+                    leftList, fromClauses);
                 boolean addedLChildren = generateSubClauses(subChildren.get(0),
                     leftList, fromClauses);
                 boolean addedRFields = addClausesForNode(subChildren.get(1),
-                    rightList);
+                    rightList, fromClauses);
                 boolean addedRChildren = generateSubClauses(subChildren.get(1),
                     rightList, fromClauses);
                 if (leftList.size() > 0) {
@@ -387,7 +387,8 @@ public class QueryTree extends TreeViewer {
                 addedChildren = addedChildren || addedLChildren
                     || addedRChildren;
             } else {
-                Boolean addedSubFields = addClausesForNode(child, whereClauses);
+                Boolean addedSubFields = addClausesForNode(child, whereClauses,
+                    fromClauses);
                 Boolean addedSubChildren = generateSubClauses(child,
                     whereClauses, fromClauses);
                 if ((addedSubFields || addedSubChildren)
@@ -405,18 +406,25 @@ public class QueryTree extends TreeViewer {
     }
 
     private boolean addClausesForNode(QueryTreeNode node,
-        List<String> clauseList) {
+        List<String> clauseList, HashSet<String> fromClauses) {
         List<HQLField> fields = node.getFieldData();
         HQLField field;
         boolean addedClause = false;
         for (int i = 0; i < fields.size(); i++) {
             field = fields.get(i);
-            if (field.getDisplay())
+            if (field.getDisplay()) {
                 extraSelectClauses.put(field.getFname().substring(0, 1)
                     .toUpperCase()
                     + field.getFname().substring(1).replace(".name", ""), field
                     .getPath()
                     + field.getFname());
+                if (field.getPath().contains("Collection"))
+                    fromClauses.add(field.getPath().substring(0,
+                        field.getPath().length() - 1).replace("_", ".")
+                        + " as "
+                        + field.getPath().substring(0,
+                            field.getPath().length() - 1));
+            }
             if (field.getType() == String.class) {
                 if (field.getValue() != null
                     && ((String) field.getValue()).compareTo("") != 0) {

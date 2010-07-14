@@ -164,8 +164,8 @@ public class WidgetCreator {
             return createButton(composite, modelObservableValue, uvs,
                 bindingKey);
         } else {
-            Assert.isTrue(false, "invalid widget class "
-                + widgetClass.getName());
+            Assert.isTrue(false,
+                "invalid widget class " + widgetClass.getName());
         }
         return null;
     }
@@ -274,8 +274,9 @@ public class WidgetCreator {
             text.addKeyListener(keyListener);
         }
         if (modelObservableValue != null) {
-            Binding binding = dbc.bindValue(SWTObservables.observeText(text
-                .getTextBox(), SWT.Modify), modelObservableValue, uvs, null);
+            Binding binding = dbc.bindValue(
+                SWTObservables.observeText(text.getTextBox(), SWT.Modify),
+                modelObservableValue, uvs, null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
@@ -492,8 +493,9 @@ public class WidgetCreator {
 
     public void addGlobalBindValue(IObservableValue statusObservable) {
         Assert.isNotNull(dbc);
-        dbc.bindValue(statusObservable, new AggregateValidationStatus(dbc
-            .getBindings(), AggregateValidationStatus.MAX_SEVERITY));
+        dbc.bindValue(statusObservable,
+            new AggregateValidationStatus(dbc.getBindings(),
+                AggregateValidationStatus.MAX_SEVERITY));
     }
 
     protected AbstractValidator createValidator(
@@ -597,17 +599,19 @@ public class WidgetCreator {
 
     public Control createWidget(Composite parent, Class<?> widgetClass,
         int widgetOptions, String value) {
-        if ((widgetClass == Combo.class) || (widgetClass == BiobankText.class)
-            || (widgetClass == Label.class)) {
+        if (widgetClass == BiobankText.class) {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
-
             BiobankText field = createText(parent, widgetOptions | SWT.LEFT,
                 null, null);
-
-            // Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
-            // | SWT.BORDER, false);
+            if (value != null) {
+                field.setText(value);
+            }
+            return field;
+        } else if (widgetClass == Label.class) {
+            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
+                | SWT.BORDER, false);
             if (value != null) {
                 field.setText(value);
             }
@@ -618,8 +622,8 @@ public class WidgetCreator {
             toolkit.adapt(button, true, true);
             return button;
         } else {
-            Assert.isTrue(false, "invalid widget class "
-                + widgetClass.getName());
+            Assert.isTrue(false,
+                "invalid widget class " + widgetClass.getName());
         }
         return null;
     }

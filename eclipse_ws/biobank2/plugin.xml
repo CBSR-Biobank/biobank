@@ -118,6 +118,18 @@
             name="Quit">
       </command>
       <command
+            id="edu.ualberta.med.biobank.commands.reset"
+            name="Reset">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.cancel"
+            name="Cancel">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.confirm"
+            name="Confirm">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.siteAdd"
             name="Add Repository Site">
       </command>
@@ -207,6 +219,10 @@
             id="edu.ualberta.med.biobank.commands.patients.patientDelete"
             name="Delete patient">
       </command>
+       <command
+             id="edu.ualberta.med.biobank.commands.patients.patientMerge"
+             name="Merge patient">
+       </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
             name="Add Patient Visit">
@@ -276,6 +292,47 @@
             </reference>
          </activeWhen>
       </handler>
+		<handler
+            class="edu.ualberta.med.biobank.handlers.CancelHandler"
+            commandId="edu.ualberta.med.biobank.commands.cancel">
+     <activeWhen>
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+           </instanceof>
+        </with>
+     </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ConfirmHandler"
+            commandId="edu.ualberta.med.biobank.commands.confirm">
+         <activeWhen>
+            <and>
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+                  </instanceof>
+               </with>
+               <reference
+                     definitionId="biobank2.confirmEnabled">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>   
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ResetHandler"
+            commandId="edu.ualberta.med.biobank.commands.reset">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="edu.ualberta.med.biobank.forms.BiobankEntryForm">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
             commandId="edu.ualberta.med.biobank.commands.print">
@@ -1257,18 +1314,6 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
-                  icon="icons/patient_delete.png"
-                  label="Delete Patient"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
                   icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
@@ -1359,6 +1404,24 @@
                         definitionId="biobank2.patientsPerspectiveSelected">
                   </reference>
                </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
+                  icon="icons/patient_delete.png"
+                  label="Delete Patient"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/merge.png"
+                  label="Merge Patient"
+                  style="push">
             </command>
          </toolbar>
          <toolbar
@@ -1667,6 +1730,13 @@
             name="Patient View">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.forms.PatientMergeForm"
+            default="false"
+            icon="icons/patient.png"
+            id="edu.ualberta.med.biobank.forms.PatientMergeForm"
+            name="Patient Merge">
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
             default="false"
             icon="icons/patientVisit.png"
@@ -1748,7 +1818,7 @@
             name="Shipment View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ReportsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.ReportsEditor"
             default="false"
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.ReportsEditor"
@@ -1805,6 +1875,48 @@
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.forms.LoggingForm"
             name="Logging Form">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotsByPalletEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotsByPalletEditor"
+            name="Aliquots By Pallet">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotCountEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotCountEditor"
+            name="Aliquot Count">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotRequestEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotRequestEditor"
+            name="Aliquot Request">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.QACabinetAliquotsEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.QACabinetAliquotsEditor"
+            name="Cabinet Aliquot QA">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.CabinetDAliquotsEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.CabinetDAliquotsEditor"
+            name="Cabinet Aliquots per Study per Clinic by Date">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.SampleTypePvCountEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.SampleTypePvCountEditor"
+            name="Sample Type Totals by Patient Visit and Study">
       </editor>
    </extension>
    <extension
@@ -1888,6 +2000,19 @@
          </parameter>
       </key>
       <key
+      		commandId="edu.ualberta.med.biobank.commands.reset"
+      		schemeId="biobank2.scheme"
+      		sequence="M1+R"/>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.confirm"
+            schemeId="biobank2.scheme"
+            sequence="M1+S">
+      </key>
+      <key
+      		commandId="edu.ualberta.med.biobank.commands.cancel"
+      		schemeId="biobank2.scheme"
+      		sequence="M1+E"/>
+      <key
             commandId="org.eclipse.ui.file.close"
             sequence="M1+W"
             schemeId="biobank2.scheme" />
@@ -1970,6 +2095,13 @@
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.siteSelectionId"
                priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.ConfirmState">
+         <variable
+               name="edu.ualberta.med.biobank.sourceprovider.confirmState"
+               priorityLevel="activeEditorId">
          </variable>
       </sourceProvider>
    </extension>
@@ -2147,6 +2279,26 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.logging">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.editorDirty">
+         <with
+               variable="activeEditorId">
+            <test
+                  forcePluginActivation="true"
+                  property="dirty"
+                  value="true">
+            </test>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.confirmEnabled">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
+            <equals
+                  value="confirmEnabled">
             </equals>
          </with>
       </definition>

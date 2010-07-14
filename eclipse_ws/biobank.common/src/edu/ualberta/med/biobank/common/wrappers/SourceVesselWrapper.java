@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.StudySourceVessel;

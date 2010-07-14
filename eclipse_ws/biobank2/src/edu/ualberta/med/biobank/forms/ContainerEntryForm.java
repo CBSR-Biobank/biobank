@@ -24,7 +24,7 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -97,13 +97,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         currentContainerType = container.getContainerType();
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         createContainerSection();
         createButtonsSection();
     }
 
     private void createContainerSection() throws Exception {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -119,8 +119,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .equals(container.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
-                BiobankText.class, SWT.NONE, "Label", null, BeansObservables
-                    .observeValue(container, "label"),
+                BiobankText.class, SWT.NONE, "Label", null,
+                BeansObservables.observeValue(container, "label"),
                 new NonEmptyStringValidator(MSG_CONTAINER_NAME_EMPTY)));
         } else {
             BiobankText l = createReadOnlyLabelledField(client, SWT.NONE,
@@ -129,19 +129,20 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         Control c = createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Product Barcode", null, BeansObservables.observeValue(
-                container, "productBarcode"), null);
+            SWT.NONE, "Product Barcode", null,
+            BeansObservables.observeValue(container, "productBarcode"), null);
         if (getFirstControl() == null)
             setFirstControl(c);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService), container
-                .getActivityStatus(), "Container must have an activity status");
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            container.getActivityStatus(),
+            "Container must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BeansObservables.observeValue(container,
-                "comment"), null);
+            "Comments", null,
+            BeansObservables.observeValue(container, "comment"), null);
 
         createContainerTypesSection(client);
     }
@@ -194,7 +195,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     }
 
     private void createButtonsSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout();
         layout.horizontalSpacing = 10;
         layout.numColumns = 2;

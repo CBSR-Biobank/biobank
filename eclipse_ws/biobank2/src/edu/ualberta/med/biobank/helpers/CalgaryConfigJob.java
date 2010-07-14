@@ -18,10 +18,10 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.config.calgary.CalgaryClinics;
-import edu.ualberta.med.biobank.common.config.calgary.CalgaryContainerTypes;
-import edu.ualberta.med.biobank.common.config.calgary.CalgarySite;
-import edu.ualberta.med.biobank.common.config.calgary.CalgaryStudies;
+import edu.ualberta.med.biobank.client.config.calgary.CalgaryClinics;
+import edu.ualberta.med.biobank.client.config.calgary.CalgaryContainerTypes;
+import edu.ualberta.med.biobank.client.config.calgary.CalgarySite;
+import edu.ualberta.med.biobank.client.config.calgary.CalgaryStudies;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;

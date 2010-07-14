@@ -31,6 +31,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -40,7 +41,6 @@ import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
@@ -120,7 +120,7 @@ public class ContainerViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Container " + container.getLabel() + " ("
             + container.getContainerType().getNameShort() + ")");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
             container.getContainerType().getName()));
 
@@ -134,7 +134,7 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void createContainerSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
@@ -266,8 +266,8 @@ public class ContainerViewForm extends BiobankViewForm {
             if (canCreate) {
                 // Initialisation action for selection
                 initSelectionCv = createComboViewer(childrenActionSection,
-                    "Initialize selection to", containerTypes, containerTypes
-                        .get(0));
+                    "Initialize selection to", containerTypes,
+                    containerTypes.get(0));
                 Button initializeSelectionButton = toolkit.createButton(
                     childrenActionSection, "Initialize", SWT.PUSH);
                 initializeSelectionButton
@@ -344,8 +344,16 @@ public class ContainerViewForm extends BiobankViewForm {
                     }
                     refresh(initDone, false);
                     monitor.done();
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            containerWidget.getMultiSelectionManager()
+                                .clearMultiSelection();
+                        }
+                    });
                 }
             });
+
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error while creating children", e);
             refresh(false, false);
@@ -373,6 +381,13 @@ public class ContainerViewForm extends BiobankViewForm {
                     }
                     refresh(deleteDones, true);
                     monitor.done();
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            containerWidget.getMultiSelectionManager()
+                                .clearMultiSelection();
+                        }
+                    });
                 }
             });
         } catch (Exception e) {

@@ -27,6 +27,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -38,8 +40,6 @@ import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
@@ -105,7 +105,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("ScanLink.form.title")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(2, false);
-        form.getBody().setLayout(layout);
+        page.setLayout(layout);
 
         createFieldsComposite();
 
@@ -118,15 +118,15 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         lastWidget.setNextWidget(cancelConfirmWidget);
 
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-            typesFilledValue, Messages
-                .getString("ScanLink.sampleType.select.validationMsg"));
+            typesFilledValue,
+            Messages.getString("ScanLink.sampleType.select.validationMsg"));
     }
 
     /**
      * Pallet visualisation
      */
     private void createPalletSection() {
-        Composite client = toolkit.createComposite(form.getBody());
+        Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         client.setLayout(layout);
         GridData gd = new GridData();
@@ -340,7 +340,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createFieldsComposite() throws Exception {
-        Composite leftSideComposite = toolkit.createComposite(form.getBody());
+        Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         leftSideComposite.setLayout(layout);
@@ -532,9 +532,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         .getInstance().getCurrentSite());
                 if (aliquots.size() > 0) {
                     cell.setStatus(AliquotCellStatus.ERROR);
-                    cell
-                        .setInformation(Messages
-                            .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
+                    cell.setInformation(Messages
+                        .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     AliquotWrapper aliquot = aliquots.get(0);
                     String palletPosition = LabelingScheme
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));

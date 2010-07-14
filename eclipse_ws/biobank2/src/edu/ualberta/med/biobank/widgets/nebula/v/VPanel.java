@@ -41,6 +41,7 @@ public class VPanel extends VControl {
         composite = parent;
 
         topLevelListener = new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Dispose:
@@ -61,11 +62,13 @@ public class VPanel extends VControl {
         composite.addListener(SWT.Paint, topLevelListener);
 
         composite.setLayout(new Layout() {
+            @Override
             protected Point computeSize(Composite composite, int wHint,
                 int hHint, boolean flushCache) {
                 return VPanel.this.computeSize(wHint, hHint, flushCache);
             }
 
+            @Override
             protected void layout(Composite composite, boolean flushCache) {
                 VPanel.this.setBounds(composite.getClientArea());
                 VPanel.this.layout(flushCache);
@@ -164,7 +167,7 @@ public class VPanel extends VControl {
         return layout;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "unused" })
     public <T extends VLayout> T getLayout(Class<T> clazz) {
         return (T) layout;
     }
@@ -226,6 +229,7 @@ public class VPanel extends VControl {
         children.remove(vchild);
     }
 
+    @Override
     public void setActivatable(boolean activatable) {
         super.setActivatable(activatable);
         for (VControl child : children) {
@@ -239,6 +243,7 @@ public class VPanel extends VControl {
         layout();
     }
 
+    @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         for (VControl child : children) {
@@ -303,6 +308,7 @@ public class VPanel extends VControl {
     public void setWidget(Composite widget) {
         this.widget = widget;
         this.widget.addListener(SWT.KeyDown, new Listener() {
+            @Override
             public void handleEvent(Event event) {
             }
         });

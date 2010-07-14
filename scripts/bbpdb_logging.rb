@@ -38,7 +38,6 @@ left join freezer on freezer.index_nr=logging.findex_nr
 left join cabinet on cabinet.index_nr=logging.cindex_nr
 where timestamp < "2010-05-18"
 order by timestamp
-limit 2000
 BBPDB_QUERY_END
 
   HEADINGS = [ 'login_id', 'timestamp', 'action', 'patient_nr', 'inventory_id',

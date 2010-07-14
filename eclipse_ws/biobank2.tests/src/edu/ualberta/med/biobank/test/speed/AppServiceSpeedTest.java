@@ -1,5 +1,9 @@
 package edu.ualberta.med.biobank.test.speed;
 
+import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -12,10 +16,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import edu.ualberta.med.biobank.common.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AppServiceSpeedTest {
 
@@ -38,15 +38,13 @@ public class AppServiceSpeedTest {
     public AppServiceSpeedTest() throws Exception {
         PropertyConfigurator.configure("conf/log4j.properties");
 
-        File file = new File("conf/all.keystore");
-
         String defaultServerUrl = "http://localhost:8080";
         // String defaultServerUrl = "https://136.159.173.90:9443";
         // String defaultServerUrl = "https://cbsr.med.ualberta.ca:8443";
 
-        appService = ServiceConnection.getAppService(System.getProperty(
-            "server.url", defaultServerUrl)
-            + "/biobank2", file.toURI().toURL(), "testuser", "test");
+        appService = ServiceConnection.getAppService(
+            System.getProperty("server.url", defaultServerUrl) + "/biobank2",
+            "testuser", "test");
 
         cbsrSite = getCbsrSite();
 
@@ -146,8 +144,8 @@ public class AppServiceSpeedTest {
         for (File file : files) {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");
-                classes.addAll(findClasses(file, packageName + "."
-                    + file.getName()));
+                classes.addAll(findClasses(file,
+                    packageName + "." + file.getName()));
             } else if (file.getName().endsWith(".class")) {
                 classes
                     .add(Class.forName(packageName

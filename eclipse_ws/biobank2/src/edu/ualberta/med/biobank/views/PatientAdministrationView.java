@@ -34,7 +34,7 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
         PatientWrapper patient = PatientWrapper.getPatientInSite(SessionManager
-            .getAppService(), text, SessionManager.getInstance()
+            .getAppService(), text.trim(), SessionManager.getInstance()
             .getCurrentSite());
         if (patient != null) {
             return Arrays.asList(patient);
@@ -76,8 +76,8 @@ public class PatientAdministrationView extends AbstractAdministrationView {
         boolean create = BioBankPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
-            PatientWrapper patient = new PatientWrapper(SessionManager
-                .getAppService());
+            PatientWrapper patient = new PatientWrapper(
+                SessionManager.getAppService());
             patient.setPnumber(text);
             openNewPatientForm(patient);
         }

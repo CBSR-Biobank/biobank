@@ -13,6 +13,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.widgets.nebula.CDT;
@@ -24,6 +25,15 @@ public class DateTimeWidget extends BiobankWidget {
 
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
 
+    private Listener dataEntryModifyListener = new Listener() {
+        @Override
+        public void handleEvent(Event event) {
+            if (event.type == SWT.Modify) {
+                fireModifyListeners();
+            }
+        }
+    };
+
     public DateTimeWidget(Composite parent, int style, Date date) {
         super(parent, style);
 
@@ -32,6 +42,7 @@ public class DateTimeWidget extends BiobankWidget {
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
         setLayout(layout);
+        setLayoutData(new GridData());
         dateEntry = new CDateTime(this, CDT.BORDER | CDT.COMPACT
             | CDT.DROP_DOWN | CDT.DATE_SHORT | CDT.TIME_SHORT
             | CDT.CLOCK_24_HOUR | CDT.BORDER | style);
@@ -41,6 +52,8 @@ public class DateTimeWidget extends BiobankWidget {
             dateEntry.setPattern(DateFormatter.TIME_FORMAT);
         else
             dateEntry.setPattern(DateFormatter.DATE_FORMAT);
+
+        dateEntry.addListener(SWT.Modify, dataEntryModifyListener);
 
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;

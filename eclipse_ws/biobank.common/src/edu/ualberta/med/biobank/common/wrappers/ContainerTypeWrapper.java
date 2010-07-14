@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -21,8 +23,6 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -207,8 +207,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         BiobankCheckException {
         String queryString = "select count(c) from "
             + Container.class.getName() + " as c where c.containerType=?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject }));
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -221,8 +221,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         String queryString = "select ct from "
             + ContainerType.class.getName()
             + " as ct inner join ct.childContainerTypeCollection as child where child.id = ?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject.getId() }));
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject.getId() }));
         List<ContainerType> results = appService.query(c);
         return transformToWrapperList(appService, results);
     }
@@ -376,7 +376,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public Set<SampleTypeWrapper> getSampleTypesRecursively()
         throws ApplicationException {
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
-        sampleTypes.addAll(getSampleTypeCollection());
+        List<SampleTypeWrapper> sampleSubSet = getSampleTypeCollection();
+        if (sampleSubSet != null)
+            sampleTypes.addAll(sampleSubSet);
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
             sampleTypes.addAll(type.getSampleTypesRecursively());
         }
@@ -584,8 +586,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         Capacity dbCapacity = oldObject.getCapacity();
         if (!(currentCapacity.getRowCapacity().equals(
             dbCapacity.getRowCapacity()) && currentCapacity.getColCapacity()
-            .equals(dbCapacity.getColCapacity()))
-            && existsContainersWithType) {
+            .equals(dbCapacity.getColCapacity())) && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to alter dimensions. A container of this type exists "
                     + "in storage. Remove all instances before attempting to "
@@ -632,8 +633,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + ContainerType.class.getName()
-            + " where site.id = ? and topLevel=true", Arrays
-            .asList(new Object[] { site.getId() }));
+            + " where site.id = ? and topLevel=true",
+            Arrays.asList(new Object[] { site.getId() }));
         List<ContainerType> types = appService.query(criteria);
         return transformToWrapperList(appService, types);
     }
@@ -665,8 +666,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
         String query = "from " + ContainerType.class.getName()
             + " where site = ? and name " + nameComparison + " ?";
-        HQLCriteria criteria = new HQLCriteria(query, Arrays
-            .asList(new Object[] { siteWrapper.getWrappedObject(),
+        HQLCriteria criteria = new HQLCriteria(query,
+            Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
                 containerNameParameter }));
         List<ContainerType> containerTypes = appService.query(criteria);
         return transformToWrapperList(appService, containerTypes);
@@ -707,8 +708,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public long getContainersCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(*) from "
-            + Container.class.getName() + " where containerType.id=?", Arrays
-            .asList(new Object[] { getId() }));
+            + Container.class.getName() + " where containerType.id=?",
+            Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");

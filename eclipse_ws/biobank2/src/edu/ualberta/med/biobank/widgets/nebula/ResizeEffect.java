@@ -31,6 +31,7 @@ public class ResizeEffect extends AbstractEffect {
      * @param onStop
      * @param onCancel
      */
+    @Deprecated
     public static void resize(AnimationRunner runner, Control w, int x, int y,
         int duration, IMovement movement, Runnable onStop, Runnable onCancel) {
         Point oldSize = w.getSize();
@@ -55,10 +56,12 @@ public class ResizeEffect extends AbstractEffect {
         this.control = control;
     }
 
+    @Override
     public void applyEffect(final long currentTime) {
         if (!control.isDisposed()) {
-            control.setSize((int) (src.x + diff.x
-                * easingFunction.getValue((int) currentTime)),
+            control.setSize(
+                (int) (src.x + diff.x
+                    * easingFunction.getValue((int) currentTime)),
                 (int) (src.y + diff.y
                     * easingFunction.getValue((int) currentTime)));
         }

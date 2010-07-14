@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfoTable;
@@ -43,7 +43,7 @@ public class ShippingMethodEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Shipping Method Information");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
 
         createGlobalShippingMethodSection();
         setFirstControl(globalShippingWidget);
@@ -76,9 +76,9 @@ public class ShippingMethodEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        ShippingMethodWrapper.persistShippingMethods(globalShippingWidget
-            .getAddedOrModifiedShippingMethods(), globalShippingWidget
-            .getDeletedShippingMethods());
+        ShippingMethodWrapper.persistShippingMethods(
+            globalShippingWidget.getAddedOrModifiedShippingMethods(),
+            globalShippingWidget.getDeletedShippingMethods());
     }
 
     @Override

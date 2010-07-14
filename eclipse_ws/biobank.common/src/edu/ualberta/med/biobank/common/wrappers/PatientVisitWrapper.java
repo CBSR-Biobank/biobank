@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
@@ -532,23 +532,14 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public long getAliquotsCount() throws ApplicationException,
-        BiobankCheckException {
-        String queryString = "select count(aliquots) from "
-            + PatientVisit.class.getName() + " as pv"
-            + " left join pv.aliquotCollection as aliquots"
-            + " where pv.id = ?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        return results.get(0);
+    public long getAliquotsCount() {
+        if (getAliquotCollection() != null)
+            return getAliquotCollection().size();
+        else
+            return 0;
     }
 
-    public boolean hasAliquots() throws ApplicationException,
-        BiobankCheckException {
+    public boolean hasAliquots() {
         return getAliquotsCount() > 0;
     }
 

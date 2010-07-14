@@ -10,7 +10,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -55,7 +55,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Sample Types");
-        form.getBody().setLayout(new GridLayout(1, false));
+        page.setLayout(new GridLayout(1, false));
 
         createGlobalSampleTypeSection();
 
@@ -139,9 +139,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             currentSite.removeSampleTypes(siteWidget.getDeletedSampleTypes());
             currentSite.persist();
         }
-        SampleTypeWrapper.persistGlobalSampleTypes(globalSampleWidget
-            .getAddedOrModifiedSampleTypes(), globalSampleWidget
-            .getDeletedSampleTypes());
+        SampleTypeWrapper.persistGlobalSampleTypes(
+            globalSampleWidget.getAddedOrModifiedSampleTypes(),
+            globalSampleWidget.getDeletedSampleTypes());
     }
 
     @Override

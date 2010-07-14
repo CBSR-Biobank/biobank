@@ -8,8 +8,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.util.LabelingScheme;
-import edu.ualberta.med.biobank.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 
 public class TestLabelingScheme extends TestDatabase {
 
@@ -54,8 +54,8 @@ public class TestLabelingScheme extends TestDatabase {
             String result = LabelingScheme.rowColToTwoCharNumeric(pos,
                 totalRows);
             Assert.assertEquals(result.length(), 2);
-            Assert.assertEquals(new Integer(pos.row + 1).toString(), result
-                .substring(1, 2));
+            Assert.assertEquals(new Integer(pos.row + 1).toString(),
+                result.substring(1, 2));
             Assert.assertEquals(pos.col.toString(), result.substring(0, 1));
         }
 
@@ -85,10 +85,14 @@ public class TestLabelingScheme extends TestDatabase {
                     totalCols);
                 Assert.assertTrue((cbsrString.length() == 2)
                     || (cbsrString.length() == 3));
-                Assert.assertEquals(CBSR_ALPHA.get((row + col * totalRows)
-                    % CBSR_ALPHA.size()), cbsrString.substring(1));
-                Assert.assertEquals(CBSR_ALPHA.get((row + col * totalRows)
-                    / CBSR_ALPHA.size()), cbsrString.substring(0, 1));
+                Assert
+                    .assertEquals(
+                        CBSR_ALPHA.get((row + col * totalRows)
+                            % CBSR_ALPHA.size()), cbsrString.substring(1));
+                Assert
+                    .assertEquals(
+                        CBSR_ALPHA.get((row + col * totalRows)
+                            / CBSR_ALPHA.size()), cbsrString.substring(0, 1));
             }
         }
 
@@ -147,8 +151,8 @@ public class TestLabelingScheme extends TestDatabase {
                     }
                     Assert.assertEquals(CBSR_ALPHA.get(row).charAt(0),
                         posString.charAt(0));
-                    Assert.assertEquals(col + 1, Integer.valueOf(
-                        posString.substring(1)).intValue());
+                    Assert.assertEquals(col + 1,
+                        Integer.valueOf(posString.substring(1)).intValue());
                 }
             }
 

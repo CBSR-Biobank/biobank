@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
-public abstract class AbstractAdministrationView extends AbstractViewWithTree {
+public abstract class AbstractAdministrationView extends AbstractViewWithAdapterTree {
 
     protected BiobankText treeText;
 

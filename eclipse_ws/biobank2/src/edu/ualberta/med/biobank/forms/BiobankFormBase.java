@@ -30,6 +30,7 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.ScrolledPageBook;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -66,7 +67,11 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected FormToolkit toolkit;
 
+    protected ScrolledPageBook book;
+
     protected ScrolledForm form;
+
+    protected Composite page;
 
     private Map<String, Control> widgets;
 
@@ -190,6 +195,24 @@ public abstract class BiobankFormBase extends EditorPart {
         form = mform.getForm();
         toolkit.decorateFormHeading(form.getForm());
 
+        form.getBody().setLayout(new GridLayout());
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.verticalAlignment = SWT.FILL;
+        form.getBody().setLayoutData(gd);
+
+        book = toolkit.createPageBook(form.getBody(), SWT.V_SCROLL);
+        book.setLayout(new GridLayout());
+        GridData gd2 = new GridData();
+        gd2.grabExcessHorizontalSpace = true;
+        gd2.grabExcessVerticalSpace = true;
+        gd2.horizontalAlignment = SWT.FILL;
+        gd2.verticalAlignment = SWT.FILL;
+        book.setLayoutData(gd2);
+        page = book.createPage("page");
+        book.showPage("page");
         // start a new runnable so that database objects are populated in a
         // separate thread.
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
@@ -214,7 +237,7 @@ public abstract class BiobankFormBase extends EditorPart {
     protected abstract void createFormContent() throws Exception;
 
     protected Section createSection(String title) {
-        Section section = toolkit.createSection(form.getBody(), Section.TWISTIE
+        Section section = toolkit.createSection(page, Section.TWISTIE
             | Section.TITLE_BAR | Section.EXPANDED);
         if (title != null) {
             section.setText(title);
@@ -258,8 +281,8 @@ public abstract class BiobankFormBase extends EditorPart {
             }
 
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
-            titem.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-                BioBankPlugin.IMG_ADD));
+            titem.setImage(BioBankPlugin.getDefault().getImageRegistry()
+                .get(BioBankPlugin.IMG_ADD));
             titem.setToolTipText(tooltip);
             titem.addSelectionListener(listener);
         }

@@ -71,8 +71,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
         PvSourceVesselEntryInfoTable infoTable) {
         super(parent);
         Assert.isNotNull(studySourceVessels);
-        internalSourceVessel = new PvSourceVesselWrapper(SessionManager
-            .getAppService());
+        internalSourceVessel = new PvSourceVesselWrapper(
+            SessionManager.getAppService());
         if (pvSourceVessel == null) {
             addMode = true;
         } else {
@@ -108,8 +108,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY));
         if (addMode) {
             setTitle("Add Source Vessel");
             setMessage("Add a source vessel to a patient visit");
@@ -200,8 +200,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
             GridData.VERTICAL_ALIGN_BEGINNING));
         volumeText = widgetCreator
             .createBoundWidget(contents, BiobankText.class, SWT.BORDER,
-                volumeLabel, new String[0], BeansObservables.observeValue(
-                    internalSourceVessel, "volume"), null);
+                volumeLabel, new String[0],
+                BeansObservables.observeValue(internalSourceVessel, "volume"),
+                null);
         gd = (GridData) volumeText.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -234,6 +235,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         if (addMode) {
+            createButton(parent, IDialogConstants.CANCEL_ID,
+                IDialogConstants.CANCEL_LABEL, false);
             createButton(parent, IDialogConstants.FINISH_ID,
                 IDialogConstants.FINISH_LABEL, false);
             createButton(parent, IDialogConstants.NEXT_ID,
@@ -273,7 +276,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
     @Override
     protected void buttonPressed(int buttonId) {
         if (addMode) {
-            if (IDialogConstants.FINISH_ID == buttonId) {
+            if (IDialogConstants.CANCEL_ID == buttonId)
+                super.buttonPressed(buttonId);
+            else if (IDialogConstants.FINISH_ID == buttonId) {
                 Button nextButton = getButton(IDialogConstants.NEXT_ID);
                 if (nextButton.isEnabled()) {
                     addNewPvSourceVessel();
@@ -301,8 +306,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
             sourceVesselsComboViewer.getCombo().setFocus();
             updateWidgetVisibilityAndValues();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            BioBankPlugin.openAsyncError("Error adding the source vessel", e);
         }
     }
 
