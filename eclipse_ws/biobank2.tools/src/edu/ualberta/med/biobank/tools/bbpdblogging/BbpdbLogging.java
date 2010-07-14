@@ -10,11 +10,9 @@ import java.sql.Timestamp;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.util.LogSql;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class BbpdbLogging {
 
@@ -27,6 +25,7 @@ public class BbpdbLogging {
     private static String BBPDB_LOG_BASE_QUERY = "FROM logging JOIN users on users.user_nr=logging.user_nr "
         + "JOIN forms ON forms.form_nr=logging.form_nr "
         + "JOIN actions ON actions.shortform=logging.action "
+        + "JOIN patient ON patient.patient_nr=logging.patient_nr "
         + "LEFT JOIN freezer ON freezer.index_nr=logging.findex_nr "
         + "LEFT JOIN cabinet ON cabinet.index_nr=logging.cindex_nr "
         + "WHERE timestamp < '2010-05-18' ORDER BY timestamp";
@@ -35,17 +34,15 @@ public class BbpdbLogging {
         + BBPDB_LOG_BASE_QUERY;
 
     private static String BBPDB_LOG_QUERY = "SELECT login_id,timestamp,form_name,"
-        + "actions.action,logging.patient_nr,logging.inventory_id,"
+        + "actions.action,dec_chr_nr,logging.inventory_id,"
         + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
         + BBPDB_LOG_BASE_QUERY;
 
     private GenericAppArgs args;
 
-    private Connection con;
+    private Connection bbpdbCon;
 
-    private WritableApplicationService appService;
-
-    private SiteWrapper cbsrSite = null;
+    private Connection biobank2Con;
 
     public static void main(String[] argv) {
         try {
@@ -64,29 +61,21 @@ public class BbpdbLogging {
     public BbpdbLogging(GenericAppArgs args) throws Exception {
         this.args = args;
         PropertyConfigurator.configure("conf/log4j.properties");
-        con = DriverManager.getConnection("jdbc:mysql://" + args.host
+        bbpdbCon = DriverManager.getConnection("jdbc:mysql://" + args.host
             + ":3306/bbpdb", "dummy", "ozzy498");
 
-        String prefix = "https://";
-        if (args.port == 8080)
-            prefix = "http://";
+        biobank2Con = DriverManager.getConnection("jdbc:mysql://" + args.host
+            + ":3306/biobank2", "dummy", "ozzy498");
 
-        String serverUrl = prefix + args.host + ":" + args.port + "/biobank2";
-
-        appService = ServiceConnection.getAppService(serverUrl, args.username,
-            args.password);
-
-        cbsrSite = getCbsrSite();
-
-        Statement s = con.createStatement();
+        Statement s = bbpdbCon.createStatement();
         s.execute(BBPDB_LOG_COUNT_QUERY);
         ResultSet rs = s.getResultSet();
         rs.next();
         int numLogRecords = rs.getInt(1);
 
         PreparedStatement ps;
-        ps = con.prepareStatement(BBPDB_LOG_QUERY, ResultSet.TYPE_FORWARD_ONLY,
-            ResultSet.CONCUR_READ_ONLY);
+        ps = bbpdbCon.prepareStatement(BBPDB_LOG_QUERY,
+            ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         ps.setFetchSize(Integer.MIN_VALUE);
         rs = ps.executeQuery();
 
@@ -112,9 +101,7 @@ public class BbpdbLogging {
             Integer bin = rs.getInt(14);
             String binpos = rs.getString(15);
 
-            // search for timestamp and if exists skip this record
-
-            // TODO patient number should be the CHR number
+            ++count;
 
             String location = null;
             if ((fnum != null) && (rack != null) && (box != null)
@@ -126,7 +113,7 @@ public class BbpdbLogging {
                     binpos);
             }
 
-            LogWrapper logMsg = new LogWrapper(appService);
+            Log logMsg = new Log();
             logMsg.setUsername(loginId);
             logMsg.setDate(timestamp);
             logMsg.setType(formName);
@@ -135,21 +122,14 @@ public class BbpdbLogging {
             logMsg.setInventoryId(inventoryId);
             logMsg.setDetails(details);
             logMsg.setLocationLabel(location);
-            logMsg.persist();
-            ++count;
+
+            s = biobank2Con.createStatement();
+            s.execute(LogSql.getLogMessageSQLStatement(logMsg));
+
             System.out.println("wrote log record " + count + " of "
                 + numLogRecords);
         }
 
-    }
-
-    private SiteWrapper getCbsrSite() throws Exception {
-        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
-            if (site.getName().equals("Canadian BioSample Repository")) {
-                return site;
-            }
-        }
-        throw new Exception("CBSR site not found");
     }
 
 }
