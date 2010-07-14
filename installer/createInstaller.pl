@@ -39,7 +39,11 @@
 #
 # createInstaller.pl
 
-#Example: ./createInstaller.pl biobank2_exported scanlibDLL nsis
+#Example: 
+#	./createInstaller.pl biobank2_exported scanlibDLL nsis
+
+#This will create:
+#	BioBankInstaller-$VERSION.exe
 
 ################################################################################
 
