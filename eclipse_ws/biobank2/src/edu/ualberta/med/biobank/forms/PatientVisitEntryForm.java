@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -89,7 +90,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patient = ((PatientAdapter) patientVisitAdapter.getParent())
             .getWrapper();
         retrieve();
-        patientVisit.logEdit();
+        patientVisit.logEdit(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
         String tabName;
         if (patientVisit.isNew()) {
             tabName = "New Patient Visit";
@@ -115,8 +117,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT_VISIT));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
         if (patientVisit.isNew()) {
@@ -138,8 +140,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Patient", patient
-            .getPnumber());
+        createReadOnlyLabelledField(client, SWT.NONE, "Patient",
+            patient.getPnumber());
 
         List<ShipmentWrapper> allShipments = patient.getShipmentCollection();
         List<ShipmentWrapper> recentShipments = new ArrayList<ShipmentWrapper>();
@@ -167,9 +169,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }
-        createDateTimeWidget(client, "Date Processed", patientVisit
-            .getDateProcessed(), BeansObservables.observeValue(patientVisit,
-            "dateProcessed"), "Date processed should be set");
+        createDateTimeWidget(client, "Date Processed",
+            patientVisit.getDateProcessed(),
+            BeansObservables.observeValue(patientVisit, "dateProcessed"),
+            "Date processed should be set");
 
         createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
             BeansObservables.observeValue(patientVisit, "dateDrawn"),
@@ -178,8 +181,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI
-            | SWT.WRAP, "Comments", null, BeansObservables.observeValue(
-            patientVisit, "comment"), null);
+            | SWT.WRAP, "Comments", null,
+            BeansObservables.observeValue(patientVisit, "comment"), null);
     }
 
     private void createSourcesSection() {
@@ -249,8 +252,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             }
             control = s;
         } else {
-            Assert.isTrue(false, "Invalid pvInfo type: "
-                + pvCustomInfo.getType());
+            Assert.isTrue(false,
+                "Invalid pvInfo type: " + pvCustomInfo.getType());
             return null;
         }
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);

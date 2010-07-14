@@ -19,8 +19,9 @@ public class ServiceConnection {
 
     public static BiobankApplicationService getAppService(String serverUrl,
         String userName, String password) throws Exception {
-        return getAppService(serverUrl, ServiceConnection.class
-            .getResource(KEYSTORE_FILE_PATH), userName, password);
+        return getAppService(serverUrl,
+            ServiceConnection.class.getResource(KEYSTORE_FILE_PATH), userName,
+            password);
     }
 
     public static BiobankApplicationService getAppService(String serverUrl,
@@ -37,7 +38,7 @@ public class ServiceConnection {
             appService = (BiobankApplicationService) ApplicationServiceProvider
                 .getApplicationServiceFromUrl(serverUrl, userName, password);
         }
-        appService.logActivity("login", null, null, null, null, null);
+        appService.logActivity("login", null, null, null, null, null, null);
         return appService;
     }
 
@@ -69,6 +70,6 @@ public class ServiceConnection {
 
     public static void logout(WritableApplicationService appService) {
         ((BiobankApplicationService) appService).logActivity("logout", null,
-            null, null, null, null);
+            null, null, null, null, null);
     }
 }

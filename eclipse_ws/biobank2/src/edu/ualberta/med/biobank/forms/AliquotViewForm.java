@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -58,7 +59,8 @@ public class AliquotViewForm extends BiobankViewForm {
         aliquotAdapter = (AliquotAdapter) adapter;
         aliquot = aliquotAdapter.getAliquot();
         retrieveAliquot();
-        aliquot.logLookup();
+        aliquot.logLookup(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
         setPartName("Aliquot: " + aliquot.getInventoryId());
     }
 

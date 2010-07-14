@@ -538,8 +538,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             + PatientVisit.class.getName() + " as pv"
             + " left join pv.aliquotCollection as aliquots"
             + " where pv.id = ?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject.getId() }));
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -577,7 +577,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void log(String action, String details) {
+    protected void log(String action, String site, String details) {
         String worksheet = "";
         try {
             String attr = getPvAttrValue("Worksheet");
@@ -586,7 +586,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         } catch (Exception e) {
         }
-        ((BiobankApplicationService) appService).logActivity(action,
+        ((BiobankApplicationService) appService).logActivity(action, site,
             getPatient().getPnumber(), null, null, "visit " + details
                 + " (Date Processed:" + getFormattedDateProcessed() + worksheet
                 + ")", "Visit");
