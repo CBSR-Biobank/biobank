@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class QACabinetAliquotsEditor extends ReportsEditor {
+public class QAAliquotsEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.QACabinetAliquotsEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
 
     DateTimeWidget start;
     DateTimeWidget end;
@@ -36,10 +36,10 @@ public class QACabinetAliquotsEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        start = widgetCreator.createDateTimeWidget(parent, "Start Date:", null,
-            null, null);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date:", null,
-            null, null);
+        start = widgetCreator.createDateTimeWidget(parent,
+            "Start Date (Linked)", null, null, null);
+        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+            null, null, null);
         sampleType = createSampleTypeComboOption("Sample Type", parent);
         createValidatedIntegerText("# Aliquots", parent);
     }
@@ -98,8 +98,8 @@ public class QACabinetAliquotsEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Start Date (Processed)");
-        paramNames.add("End Date (Processed)");
+        paramNames.add("Start Date (Linked)");
+        paramNames.add("End Date (Linked)");
         paramNames.add("Sample Type");
         paramNames.add("# Aliquots");
         return paramNames;
