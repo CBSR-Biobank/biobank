@@ -12,9 +12,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class QueryObject {
 
-    /**
-     * Description of this query object
-     */
     private String description;
 
     /**
