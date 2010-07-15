@@ -1,15 +1,15 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import edu.ualberta.med.biobank.common.BiobankCheckException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class QueryObject {
 
@@ -27,7 +27,7 @@ public abstract class QueryObject {
         aMap.put(NewPVsByStudyClinic.NAME, NewPVsByStudyClinic.class);
         aMap.put(NewPsByStudyClinic.NAME, NewPsByStudyClinic.class);
         aMap.put(PsByStudy.NAME, PsByStudy.class);
-        aMap.put(PVsByStudy.NAME, PVsByStudy.class);
+        aMap.put(NewPVsByStudy.NAME, NewPVsByStudy.class);
         aMap.put(PatientVisitSummary.NAME, PatientVisitSummary.class);
         aMap.put(PatientWBC.NAME, PatientWBC.class);
         aMap.put(AliquotsByPallet.NAME, AliquotsByPallet.class);
@@ -123,8 +123,8 @@ public abstract class QueryObject {
 
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) throws ApplicationException, BiobankCheckException {
-        return postProcess(appService, executeQuery(appService,
-            preProcess(params)));
+        return postProcess(appService,
+            executeQuery(appService, preProcess(params)));
     }
 
     @SuppressWarnings("unused")

@@ -149,14 +149,14 @@ public class LogWrapper extends ModelWrapper<Log> {
 
         StringBuffer datePart = new StringBuffer();
         if ((startDate != null) && (endDate != null)) {
-            datePart.append(" date >= ? and date <= ?");
+            datePart.append(" createdAt >= ? and createdAt <= ?");
             parametersArgs.add(startDate);
             parametersArgs.add(endDate);
         } else if (startDate != null) {
-            datePart.append(" date >= ?");
+            datePart.append(" createdAt >= ?");
             parametersArgs.add(startDate);
         } else if (endDate != null) {
-            datePart.append(" date <= ?");
+            datePart.append(" createdAt <= ?");
             parametersArgs.add(endDate);
         }
 
