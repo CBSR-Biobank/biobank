@@ -12,10 +12,11 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "User", "Date",
-        "Action", "Type", "Patient #", "Inventory ID", "Location", "Details" };
+    private static final String[] HEADINGS = new String[] { "Site", "User",
+        "Date", "Action", "Type", "Patient #", "Inventory ID", "Location",
+        "Details" };
 
-    private static final int[] BOUNDS = new int[] { 102, 110, 80, 100, 102,
+    private static final int[] BOUNDS = new int[] { 80, 102, 110, 80, 100, 102,
         102, 120, 200 };
 
     private static final int PAGE_SIZE_ROWS = 20;
@@ -25,6 +26,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     }
 
     class TableRowData {
+        String site;
         String user;
         String date;
         String action;
@@ -36,8 +38,9 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { user, date, action, type,
-                patientNumber, inventoryId, positionLabel, details }, "\t");
+            return StringUtils.join(new String[] { site, user, date, action,
+                type, patientNumber, inventoryId, positionLabel, details },
+                "\t");
         }
     }
 
@@ -55,20 +58,22 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.user;
+                    return item.site;
                 case 1:
-                    return item.date;
+                    return item.user;
                 case 2:
-                    return item.action;
+                    return item.date;
                 case 3:
-                    return item.type;
+                    return item.action;
                 case 4:
-                    return item.patientNumber;
+                    return item.type;
                 case 5:
-                    return item.inventoryId;
+                    return item.patientNumber;
                 case 6:
-                    return item.positionLabel;
+                    return item.inventoryId;
                 case 7:
+                    return item.positionLabel;
+                case 8:
                     return item.details;
                 default:
                     return "";
@@ -81,6 +86,7 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
     public Object getCollectionModelObject(LogWrapper logQuery)
         throws Exception {
         TableRowData info = new TableRowData();
+        info.site = logQuery.getSite();
         info.user = logQuery.getUsername();
         info.action = logQuery.getAction();
         info.type = logQuery.getType();

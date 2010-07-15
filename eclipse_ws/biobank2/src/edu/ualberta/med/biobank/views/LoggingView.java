@@ -291,6 +291,8 @@ public class LoggingView extends ViewPart {
         sessionMonitor();
         clearFields();
 
+        // if logged in and select the site selected in "working site" combo
+        // box, only if not "All Sites" are selected
         if (SessionManager.getInstance().isConnected()) {
             setEnableAllFields(true);
             loadComboFields();
