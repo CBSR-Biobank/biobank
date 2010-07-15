@@ -521,13 +521,13 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     protected void launchFakeScan() throws Exception {
-        // if (isFakeScanLinkedOnly) {
-        // cells = PalletCell.getRandomAliquotsNotAssigned(appService,
-        // SessionManager.getInstance().getCurrentSite().getId());
-        // } else {
-        // cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
-        // SessionManager.getInstance().getCurrentSite().getId());
-        // }
+        if (isFakeScanLinkedOnly) {
+            cells = PalletCell.getRandomAliquotsNotAssigned(appService,
+                SessionManager.getInstance().getCurrentSite().getId());
+        } else {
+            cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
+                SessionManager.getInstance().getCurrentSite().getId());
+        }
     }
 
     /**
