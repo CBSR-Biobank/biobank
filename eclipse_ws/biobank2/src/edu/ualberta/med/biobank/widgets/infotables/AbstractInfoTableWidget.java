@@ -119,6 +119,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
                 col.getColumn().setResizable(true);
                 col.getColumn().setMoveable(true);
                 col.getColumn().addListener(SWT.SELECTED, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         col.getColumn().pack();
                     }

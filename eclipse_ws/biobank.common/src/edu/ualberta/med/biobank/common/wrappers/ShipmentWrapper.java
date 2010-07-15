@@ -125,8 +125,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         throws ApplicationException, BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
             + PatientVisit.class.getName()
-            + " where patient.id=? and shipment.id= ?", Arrays
-            .asList(new Object[] { patient.getId(), getId() }));
+            + " where patient.id=? and shipment.id= ?",
+            Arrays.asList(new Object[] { patient.getId(), getId() }));
 
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -153,8 +153,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         }
         if (!patientsInError.isEmpty()) {
             // remove last ", "
-            patientsInError = patientsInError.substring(0, patientsInError
-                .length() - 2);
+            patientsInError = patientsInError.substring(0,
+                patientsInError.length() - 2);
             throw new BiobankCheckException("Patient(s) " + patientsInError
                 + " are not part of a study that has contact with clinic "
                 + getClinic().getName());
@@ -443,8 +443,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Shipment.class.getName()
-            + " where clinic.site.id = ? and waybill = ?", Arrays
-            .asList(new Object[] { site.getId(), waybill }));
+            + " where clinic.site.id = ? and waybill = ?",
+            Arrays.asList(new Object[] { site.getId(), waybill }));
         List<Shipment> shipments = appService.query(criteria);
         List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
         for (Shipment s : shipments) {
@@ -491,8 +491,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             "select count(distinct patients.id) from "
                 + Shipment.class.getName()
                 + " as shipment inner join shipment.patientCollection as patients"
-                + " where shipment.id = ? and patients.pnumber = ?", Arrays
-                .asList(new Object[] { getId(), patientNumber }));
+                + " where shipment.id = ? and patients.pnumber = ?",
+            Arrays.asList(new Object[] { getId(), patientNumber }));
         List<Long> results = appService.query(criteria);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -550,15 +550,15 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    protected void log(String action, String details) {
+    protected void log(String action, String site, String details) {
         String fullDetails = "shipment " + details + " - Received:"
             + getFormattedDateReceived();
         String waybill = getWaybill();
         if (waybill != null) {
             fullDetails += " - Waybill:" + waybill;
         }
-        ((BiobankApplicationService) appService).logActivity(action, null,
-            null, null, fullDetails, "Shipment");
+        ((BiobankApplicationService) appService).logActivity(action, site,
+            null, null, null, fullDetails, "Shipment");
     }
 
     @Override

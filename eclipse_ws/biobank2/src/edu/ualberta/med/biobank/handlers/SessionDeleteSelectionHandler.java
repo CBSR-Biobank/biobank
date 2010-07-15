@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class SessionDeleteSelectionHandler extends AbstractHandler implements
     IHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         AdapterBase adapter = SessionManager.getSelectedNode();
         Assert.isNotNull(adapter, "adapter is null");

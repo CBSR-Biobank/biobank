@@ -7,6 +7,7 @@ public class MainPerspective implements IPerspectiveFactory {
 
     public static final String ID = "edu.ualberta.med.biobank.perspective.main";
 
+    @Override
     public void createInitialLayout(IPageLayout layout) {
     }
 }

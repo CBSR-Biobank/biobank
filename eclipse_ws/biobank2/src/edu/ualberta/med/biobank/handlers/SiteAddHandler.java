@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class SiteAddHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();

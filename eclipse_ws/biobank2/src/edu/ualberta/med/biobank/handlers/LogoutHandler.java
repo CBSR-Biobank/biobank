@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.SessionManager;
 
 public class LogoutHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
         IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()

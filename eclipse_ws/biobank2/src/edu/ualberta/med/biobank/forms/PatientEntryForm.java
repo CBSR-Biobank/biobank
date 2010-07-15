@@ -52,7 +52,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         patientAdapter = (PatientAdapter) adapter;
         retrievePatient();
-        patientAdapter.getWrapper().logEdit();
+        patientAdapter.getWrapper().logEdit(
+            SessionManager.getInstance().getCurrentSite().getNameShort());
         String tabName;
         if (patientAdapter.getWrapper().isNew()) {
             tabName = "New Patient";
@@ -67,8 +68,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         form.getBody().setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
 
@@ -91,8 +92,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(siteWrapper
-            .getStudyCollection());
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
+            siteWrapper.getStudyCollection());
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {

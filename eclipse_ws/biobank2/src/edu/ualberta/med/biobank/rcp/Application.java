@@ -25,6 +25,7 @@ public class Application implements IApplication {
      * @seeorg.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
      * IApplicationContext)
      */
+    @Override
     public Object start(IApplicationContext context) throws Exception {
         Display display = PlatformUI.createDisplay();
 
@@ -60,12 +61,14 @@ public class Application implements IApplication {
      * 
      * @see org.eclipse.equinox.app.IApplication#stop()
      */
+    @Override
     public void stop() {
         final IWorkbench workbench = PlatformUI.getWorkbench();
         if (workbench == null)
             return;
         final Display display = workbench.getDisplay();
         display.syncExec(new Runnable() {
+            @Override
             public void run() {
                 if (!display.isDisposed())
                     workbench.close();

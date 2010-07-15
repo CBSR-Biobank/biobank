@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.treeview.SiteAdapter;
 public class ContainerAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerAdd";
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
             Collection<ContainerTypeWrapper> top = ContainerTypeWrapper
@@ -40,8 +41,8 @@ public class ContainerAddHandler extends AbstractHandler {
             ContainerWrapper containerWrapper = new ContainerWrapper(
                 SessionManager.getAppService());
             containerWrapper.setSite(siteAdapter.getWrapper());
-            ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
-                .getContainersGroupNode(), containerWrapper);
+            ContainerAdapter containerNode = new ContainerAdapter(
+                siteAdapter.getContainersGroupNode(), containerWrapper);
 
             containerNode.openEntryForm();
         } catch (Exception e) {

@@ -8,6 +8,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class QuitHandler extends AbstractHandler implements IHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         HandlerUtil.getActiveWorkbenchWindow(event).close();
         return null;

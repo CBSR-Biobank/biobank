@@ -98,6 +98,7 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     protected void bindChangeListener() {
         final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
+            @Override
             public void handleChange(ChangeEvent event) {
                 IObservableValue validationStatus = (IObservableValue) event
                     .getSource();

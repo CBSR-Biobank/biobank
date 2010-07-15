@@ -16,6 +16,7 @@ public class DecodePlateHandler extends AbstractHandler implements IHandler {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DecodePlateHandler.class.getName());
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         FormInput input = new FormInput(null, "Decode Plate");
         try {

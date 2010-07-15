@@ -1,5 +1,21 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import edu.ualberta.med.biobank.common.BiobankCheckException;
+import edu.ualberta.med.biobank.common.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.VarCharLengths;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.SDKQueryResult;
+import gov.nih.nci.system.query.example.DeleteExampleQuery;
+import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
@@ -12,22 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
-import edu.ualberta.med.biobank.common.BiobankCheckException;
-import edu.ualberta.med.biobank.common.BiobankStringLengthException;
-import edu.ualberta.med.biobank.common.VarCharLengths;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
@@ -332,8 +332,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 + propertyName + "= ?", Arrays.asList(new Object[] { value }));
         } else {
             c = new HQLCriteria("from " + objectClass.getName()
-                + " where id <> ? and " + propertyName + "= ?", Arrays
-                .asList(new Object[] { getId(), value }));
+                + " where id <> ? and " + propertyName + "= ?",
+                Arrays.asList(new Object[] { getId(), value }));
         }
 
         List<Object> results = appService.query(c);
@@ -346,8 +346,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkNoDuplicatesInSite(Class<?> objectClass,
         String propertyName, String value, Integer siteId, String errorMessage)
         throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { value }));
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { value }));
         String siteIdTest = "site.id=?";
         if (siteId == null) {
             siteIdTest = "site.id is null";
@@ -513,18 +513,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrappedObject(otherWrapper.wrappedObject);
     }
 
-    public void logLookup() {
-        log("select", "LOOKUP");
+    public void logLookup(String site) {
+        log("select", site, "LOOKUP");
     }
 
-    public void logEdit() {
+    public void logEdit(String site) {
         if (!isNew()) {
-            log("edit", "EDIT");
+            log("edit", site, "EDIT");
         }
     }
 
-    protected void log(@SuppressWarnings("unused") String action,
-        @SuppressWarnings("unused") String details) {
+    @SuppressWarnings("unused")
+    protected void log(String action, String site, String details) {
 
     }
 }

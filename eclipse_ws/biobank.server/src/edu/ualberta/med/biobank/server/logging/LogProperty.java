@@ -9,9 +9,15 @@ public enum LogProperty {
             log.setUsername(value);
         }
     },
-    DATE("date") {
+    CREATED_AT("createdAt") {
         @Override
         public void setValue(Log log, String value) {
+        }
+    },
+    SITE("site") {
+        @Override
+        public void setValue(Log log, String value) {
+            log.setSite(value);
         }
     },
     ACTION("action") {

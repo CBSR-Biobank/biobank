@@ -106,13 +106,14 @@ public class BiobankApplicationServiceImpl extends
                 return am.checkPermission(userLogin, clazz.getName(),
                     privilegeName);
             }
-            return am.checkPermission(userLogin, clazz.getName(), "id", id
-                .toString(), privilegeName);
+            return am.checkPermission(userLogin, clazz.getName(), "id",
+                id.toString(), privilegeName);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
     }
 
+    @Override
     public boolean isContainerAdministrator() throws ApplicationException {
         try {
             String userLogin = SecurityContextHolder.getContext()
@@ -129,6 +130,7 @@ public class BiobankApplicationServiceImpl extends
     /**
      * How can we manage security using sql ??
      */
+    @Override
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException {
         throw new ApplicationException(
@@ -207,11 +209,11 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public void logActivity(String action, String patientNumber,
+    public void logActivity(String action, String site, String patientNumber,
         String inventoryID, String locationLabel, String details, String type) {
         Logger logger = Logger.getLogger("Biobank.Activity");
         logger.log(Level.toLevel("INFO"), MessageGenerator
-            .generateStringMessage(action, patientNumber, inventoryID,
+            .generateStringMessage(action, site, patientNumber, inventoryID,
                 locationLabel, details, type));
     }
 

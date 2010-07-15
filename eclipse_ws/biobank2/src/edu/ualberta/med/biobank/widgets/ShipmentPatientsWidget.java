@@ -83,6 +83,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             label.setLayoutData(gd);
             newPatientText = new BiobankText(this, SWT.NONE, toolkit);
             newPatientText.addListener(SWT.DefaultSelection, new Listener() {
+                @Override
                 public void handleEvent(Event e) {
                     addPatient();
                     newPatientText.setFocus();

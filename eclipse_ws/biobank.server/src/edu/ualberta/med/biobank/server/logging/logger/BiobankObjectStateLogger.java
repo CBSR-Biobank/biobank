@@ -46,9 +46,9 @@ public abstract class BiobankObjectStateLogger {
         Map<String, Object> statesMap) {
         Log log = getLogObject(obj, statesMap);
         if (log != null) {
-            String message = MessageGenerator.generateStringMessage(action, log
-                .getPatientNumber(), log.getInventoryId(), log
-                .getLocationLabel(), log.getDetails(), log.getType());
+            String message = MessageGenerator.generateStringMessage(action,
+                log.getSite(), log.getPatientNumber(), log.getInventoryId(),
+                log.getLocationLabel(), log.getDetails(), log.getType());
             UserInfo userInfo = BiobankThreadVariable.get();
             if (null == userInfo)
                 userInfo = new UserInfo();
@@ -98,8 +98,7 @@ public abstract class BiobankObjectStateLogger {
             try {
                 Class<?> loggerClass = Class
                     .forName(BiobankObjectStateLogger.class.getPackage()
-                        .getName()
-                        + "." + className);
+                        .getName() + "." + className);
                 stateLogger = (BiobankObjectStateLogger) loggerClass
                     .newInstance();
                 loggersMap.put(entityTypeName, stateLogger);

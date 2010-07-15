@@ -55,6 +55,7 @@ public class DefaultTopPreferencePage extends PreferencePage implements
         return composite;
     }
 
+    @Override
     public void init(IWorkbench workbench) {
     }
 

@@ -180,8 +180,8 @@ public class AliquotWrapper extends
             HQLCriteria criteria = new HQLCriteria("from "
                 + Aliquot.class.getName()
                 + " where aliquotPosition.row=? and aliquotPosition.col=?"
-                + " and aliquotPosition.container=?", Arrays
-                .asList(new Object[] { position.row, position.col,
+                + " and aliquotPosition.container=?",
+                Arrays.asList(new Object[] { position.row, position.col,
                     parentContainer.getWrappedObject() }));
 
             List<Aliquot> samples = appService.query(criteria);
@@ -387,14 +387,14 @@ public class AliquotWrapper extends
         BiobankCheckException {
         // assume that the aliquot label position is 2 or 3 letters
         // will search with both possible positions
-        String lastContainerLabel = positionString.substring(0, positionString
-            .length() - 2);
+        String lastContainerLabel = positionString.substring(0,
+            positionString.length() - 2);
         String aliquotPositionLabel = positionString.replace(
             lastContainerLabel, "");
         List<AliquotWrapper> aliquots = getAliquotsInSiteWithPositionLabel(
             appService, site, lastContainerLabel, aliquotPositionLabel);
-        lastContainerLabel = positionString.substring(0, positionString
-            .length() - 3);
+        lastContainerLabel = positionString.substring(0,
+            positionString.length() - 3);
         aliquotPositionLabel = positionString.replace(lastContainerLabel, "");
         aliquots.addAll(getAliquotsInSiteWithPositionLabel(appService, site,
             lastContainerLabel, aliquotPositionLabel));
@@ -461,8 +461,8 @@ public class AliquotWrapper extends
     }
 
     @Override
-    protected void log(String action, String details) {
-        ((BiobankApplicationService) appService).logActivity(action,
+    protected void log(String action, String site, String details) {
+        ((BiobankApplicationService) appService).logActivity(action, site,
             getPatientVisit().getPatient().getPnumber(), getInventoryId(),
             getPositionString(true, false), "aliquot " + details, "Aliquot");
     }

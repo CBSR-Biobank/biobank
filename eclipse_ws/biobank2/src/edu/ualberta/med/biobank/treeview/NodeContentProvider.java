@@ -16,6 +16,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.
      * Object)
      */
+    @Override
     public Object[] getChildren(Object element) {
         Assert.isTrue(element instanceof AdapterBase, "Invalid object");
         return ((AdapterBase) element).getChildren().toArray();
@@ -28,6 +29,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      * org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object
      * )
      */
+    @Override
     public Object getParent(Object element) {
         Assert.isTrue(element instanceof AdapterBase, "Invalid object");
         return ((AdapterBase) element).getParent();
@@ -40,6 +42,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.
      * Object)
      */
+    @Override
     public boolean hasChildren(Object element) {
         Assert.isTrue(element instanceof AdapterBase, "Invalid object");
         return ((AdapterBase) element).hasChildren();
@@ -52,6 +55,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      * org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java
      * .lang.Object)
      */
+    @Override
     public Object[] getElements(Object element) {
         return getChildren(element);
     }
@@ -61,6 +65,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      * 
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      */
+    @Override
     public void dispose() {
         // do nothing
     }
@@ -72,6 +77,7 @@ public class NodeContentProvider implements ITreeContentProvider,
      * org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface
      * .viewers.Viewer, java.lang.Object, java.lang.Object)
      */
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = (TreeViewer) viewer;
         if (oldInput != null) {

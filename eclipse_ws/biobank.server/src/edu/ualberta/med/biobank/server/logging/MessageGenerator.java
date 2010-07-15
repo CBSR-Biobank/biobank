@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.server.logging;
 
-
 public class MessageGenerator {
 
-    public static String generateStringMessage(String action,
+    public static String generateStringMessage(String action, String site,
         String patientNumber, String inventoryID, String locationLabel,
         String details, String type) {
 
         StringBuffer sb = new StringBuffer();
         append(sb, LogProperty.ACTION.getPropertyName(), action);
+        append(sb, LogProperty.SITE.getPropertyName(), site);
         append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(), patientNumber);
         append(sb, LogProperty.INVENTORY_ID.getPropertyName(), inventoryID);
         append(sb, LogProperty.LOCATION_LABEL.getPropertyName(), locationLabel);

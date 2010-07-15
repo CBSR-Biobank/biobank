@@ -32,7 +32,7 @@ public class OpenPatientFormHandler extends AbstractHandler implements IHandler 
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("rawtypes")
         final Map parameters = event.getParameters();
         final String editorId = (String) parameters.get(EDITOR_ID_PARAM);
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();

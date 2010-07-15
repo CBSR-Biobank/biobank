@@ -17,6 +17,7 @@ public class BiobankLogProxy implements MethodInterceptor {
     private static Logger log = Logger.getLogger(BiobankLogProxy.class
         .getName());
 
+    @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
 
         String userName = null;
