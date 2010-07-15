@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.client.reports;
 
-public class AliquotSCount extends AbstractReport {
+public class AliquotSCount extends BiobankReport {
 
     protected static final String NAME = "Sample Types by Study";
 

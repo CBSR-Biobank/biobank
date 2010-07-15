@@ -33,8 +33,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
-import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 
 public class ReportTreeWidget extends Composite {
@@ -251,18 +249,16 @@ public class ReportTreeWidget extends Composite {
         ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
             .getSelection()).getFirstElement();
         try {
-            if (node.getQuery() != null) {
-                if (node.getQuery() instanceof QueryTreeNode)
-                    PlatformUI
-                        .getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .openEditor(new ReportInput(node),
-                            AdvancedReportsEditor.ID);
-                else
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .openEditor(new ReportInput(node), getEditorFor(node));
+            if (node.getReport() != null) {
+                /*
+                 * if (node.getQuery() instanceof QueryTreeNode) PlatformUI
+                 * .getWorkbench() .getActiveWorkbenchWindow() .getActivePage()
+                 * .openEditor(new ReportInput(node), AdvancedReportsEditor.ID);
+                 * else
+                 */
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage()
+                    .openEditor(new ReportInput(node), getEditorFor(node));
             }
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error",
@@ -271,8 +267,8 @@ public class ReportTreeWidget extends Composite {
     }
 
     private String getEditorFor(ReportTreeNode node) {
-        return "edu.ualberta.med.biobank.editors.".concat(((Class<?>) node
-            .getQuery()).getSimpleName().concat("Editor"));
+        return "edu.ualberta.med.biobank.editors.".concat(node.getReport()
+            .getClass().getSimpleName().concat("Editor"));
     }
 
     @Override

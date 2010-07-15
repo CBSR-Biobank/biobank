@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.client.reports;
 
 import java.util.Date;
 
-public class PatientVisitSummary extends AbstractReport {
+public class PatientVisitSummary extends BiobankReport {
 
     protected static final String NAME = "Patient Visit Statistics by Study and Clinic";
 

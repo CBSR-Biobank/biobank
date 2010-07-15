@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.client.reports;
 
 import java.util.Date;
 
-public class QAFreezerAliquots extends AbstractReport {
+public class QAFreezerAliquots extends BiobankReport {
 
     protected static final String NAME = "Freezer Aliquot QA";
     int numResults;

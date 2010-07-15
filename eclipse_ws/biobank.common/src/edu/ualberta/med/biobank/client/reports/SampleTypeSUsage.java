@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.client.reports;
 
 
-public class SampleTypeSUsage extends AbstractReport {
+public class SampleTypeSUsage extends BiobankReport {
 
     public static String NAME = "Sample Type Usage by Study";
 

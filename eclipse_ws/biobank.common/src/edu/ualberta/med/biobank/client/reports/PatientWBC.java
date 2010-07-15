@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.client.reports;
 
-public class PatientWBC extends AbstractReport {
+public class PatientWBC extends BiobankReport {
 
     protected static final String NAME = "Patient WBC Aliquots";
 

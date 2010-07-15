@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.client.reports;
 
 
-public class FreezerSAliquots extends AbstractReport {
+public class FreezerSAliquots extends BiobankReport {
 
     protected static final String NAME = "Freezer Aliquots per Study";
 

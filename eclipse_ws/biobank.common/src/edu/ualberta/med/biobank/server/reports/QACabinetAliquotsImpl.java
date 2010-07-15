@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -31,17 +31,10 @@ public class QACabinetAliquotsImpl extends AbstractReport {
 
     private int numResults;
 
-    public QACabinetAliquotsImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY, parameters, options);
-        for (int i = 0; i < options.size() - 1; i++) {
-            ReportOption option = options.get(i);
-            if (parameters.get(i) == null)
-                parameters.set(i, option.getDefaultValue());
-            if (option.getType().equals(String.class))
-                parameters.set(i, "%" + parameters.get(i) + "%");
-        }
-        numResults = (Integer) parameters.remove(parameters.size() - 1);
+    public QACabinetAliquotsImpl(BiobankReport report) {
+        super(QUERY, report);
+        numResults = (Integer) report.getParams().remove(
+            report.getParams().size() - 1);
     }
 
     @Override

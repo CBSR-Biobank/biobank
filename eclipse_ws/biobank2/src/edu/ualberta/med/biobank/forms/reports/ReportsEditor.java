@@ -47,12 +47,11 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.AbstractReport;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
-import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
@@ -62,12 +61,11 @@ import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class ReportsEditor<T extends AbstractReport> extends
-    BiobankFormBase {
+public abstract class ReportsEditor extends BiobankFormBase {
 
     // Report
-    protected T report;
     private ReportTreeNode node;
+    private BiobankReport report;
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
@@ -87,7 +85,6 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
 
     // Mostly for visibility reasons
     private String path;
-    private List<Object> params;
 
     // Global status
     private IObservableValue statusObservable;
@@ -95,19 +92,9 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
     @Override
     protected void init() throws Exception {
         widgetCreator.initDataBinding();
-
         reportData = new ArrayList<Object>();
-        node = ((ReportInput) getEditorInput()).getNode();
-        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
-        String op = "=";
-        if (siteWrap.getName().compareTo("All Sites") == 0)
-            op = "!=";
-        try {
-            report = (T) node.getNewInstance(op, siteWrap.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        node = (ReportTreeNode) ((ReportInput) getEditorInput()).getNode();
+        report = node.getReport();
         this.setPartName(report.getName());
     }
 
@@ -217,7 +204,22 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
 
     private void generate() {
         try {
-            params = getParams();
+            SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+            String op = "=";
+            if (site.getName().compareTo("All Sites") == 0)
+                op = "!=";
+            report.setSiteInfo(op, site.getId());
+
+            List<Object> params = new ArrayList<Object>();
+            List<String> strings = new ArrayList<String>();
+            for (Object ob : getParams()) {
+                if (ob instanceof String)
+                    strings.add((String) ob);
+                else
+                    params.add(ob);
+            }
+            report.setParams(params);
+            report.setStrings(strings);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Input Error", e1);
             return;
@@ -233,14 +235,7 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                         @Override
                         public void run() {
                             try {
-                                SiteWrapper site = SessionManager.getInstance()
-                                    .getCurrentSite();
-                                String op = "=";
-                                if (site.getName().compareTo("All Sites") == 0)
-                                    op = "!=";
-                                report = (T) node.getNewInstance(op,
-                                    site.getId());
-                                reportData = generateReport(op, site.getId());
+                                reportData = generateReport();
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
@@ -248,21 +243,16 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                             }
                         }
 
-                        private List<Object> generateReport(String op,
-                            Integer siteId) throws ApplicationException,
-                            BiobankCheckException {
-                            if (report instanceof AbstractReport) {
-                                return ((AbstractReport) report).generate(
-                                    SessionManager.getAppService(), params, op,
-                                    siteId);
-                            }
+                        private List<Object> generateReport()
+                            throws ApplicationException, BiobankCheckException {
+                            return report.generate(SessionManager
+                                .getAppService());
                             // TODO: FIXME
                             /*
                              * if (report instanceof QueryObject) { return
                              * ((QueryObject) report).generate(
                              * SessionManager.getAppService(), params); }
                              */
-                            return null;
                         }
                     };
                     monitor.beginTask("Generating Report...",
@@ -312,7 +302,7 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                                 exportPDFButton.setToolTipText("Export PDF");
                             }
                             reportTable = new ReportTableWidget<Object>(page,
-                                reportData, report.getColumnNames(),
+                                reportData, getColumnNames(),
                                 getColumnWidths(), 24);
                             reportTable.adaptToToolkit(toolkit, true);
                             form.reflow(true);
@@ -405,14 +395,13 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
         if (doPrint) {
             final List<Object[]> printParams = new ArrayList<Object[]>();
             final List<Object> paramVals = getParams();
-            List<ReportOption> queryOptions = report.getOptions();
             int i = 0;
-            for (ReportOption option : queryOptions) {
-                params.add(new Object[] { option.getName(), paramVals.get(i) });
+            for (String name : getParamNames()) {
+                printParams.add(new Object[] { name, paramVals.get(i) });
                 i++;
             }
             final List<String> columnInfo = new ArrayList<String>();
-            String[] names = report.getColumnNames();
+            String[] names = getColumnNames();
             for (int i1 = 0; i1 < names.length; i1++) {
                 columnInfo.add(names[i1]);
             }
@@ -574,6 +563,10 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
         throws Exception;
 
     protected abstract int[] getColumnWidths();
+
+    protected abstract String[] getColumnNames();
+
+    protected abstract List<String> getParamNames();
 
     protected abstract List<Object> getParams() throws Exception;
 

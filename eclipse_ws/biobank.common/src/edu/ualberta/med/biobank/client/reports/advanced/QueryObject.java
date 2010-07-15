@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.client.reports.advanced;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.client.reports.IReport;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportOption;
@@ -11,7 +10,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public abstract class QueryObject implements IReport {
+public abstract class QueryObject {
 
     /**
      * Description of this query object
@@ -42,11 +41,6 @@ public abstract class QueryObject implements IReport {
         queryOptions.add(new ReportOption(name, type, defaultValue));
     }
 
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
     public List<Object> generate(WritableApplicationService appService,
         List<Object> params) throws ApplicationException, BiobankCheckException {
         return postProcess(appService,
@@ -71,15 +65,10 @@ public abstract class QueryObject implements IReport {
         return results;
     }
 
-    @Override
     public String[] getColumnNames() {
         return columnNames;
     }
 
-    @Override
-    public List<ReportOption> getOptions() {
-        return queryOptions;
-    }
 
     @Override
     public String toString() {

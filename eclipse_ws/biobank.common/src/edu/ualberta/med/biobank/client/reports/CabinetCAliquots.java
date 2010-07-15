@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.client.reports;
 
-public class CabinetCAliquots extends AbstractReport {
+public class CabinetCAliquots extends BiobankReport {
 
     public static final String NAME = "Cabinet Aliquots per Study per Clinic";
 

@@ -13,7 +13,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.AliquotCount;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -21,7 +20,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class QACabinetAliquotsEditor extends ReportsEditor<AliquotCount> {
+public class QACabinetAliquotsEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.QACabinetAliquotsEditor";
 
@@ -88,6 +87,22 @@ public class QACabinetAliquotsEditor extends ReportsEditor<AliquotCount> {
                 labelText, new String[0], numAliquots,
                 new IntegerNumberValidator("Enter a valid integer.", false));
         return widget;
+    }
+
+    @Override
+    protected String[] getColumnNames() {
+        return new String[] { "Label", "Inventory ID", "Patient", "Visit",
+            "Date Processed", "Sample Type" };
+    }
+
+    @Override
+    protected List<String> getParamNames() {
+        List<String> paramNames = new ArrayList<String>();
+        paramNames.add("Start Date (Processed)");
+        paramNames.add("End Date (Processed)");
+        paramNames.add("Sample Type");
+        paramNames.add("# Aliquots");
+        return paramNames;
     }
 
 }

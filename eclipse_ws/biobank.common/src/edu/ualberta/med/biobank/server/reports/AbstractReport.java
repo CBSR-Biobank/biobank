@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
-import edu.ualberta.med.biobank.common.util.ReportOption;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -15,9 +15,7 @@ public class AbstractReport {
 
     protected String queryString;
 
-    protected List<Object> parameters;
-
-    protected List<ReportOption> options;
+    protected BiobankReport report;
 
     protected static final String SITE_OPERATOR = "$$siteOperator$$";
 
@@ -31,17 +29,14 @@ public class AbstractReport {
 
     protected static final String GROUPBY_DATE_SEARCH_STRING = replacePatternString(GROUPBY_DATE);
 
-    protected AbstractReport(String queryString, List<Object> parameters,
-        List<ReportOption> options) {
+    protected AbstractReport(String queryString, BiobankReport report) {
         this.queryString = queryString;
-        this.parameters = parameters;
-        this.options = options;
+        this.report = report;
     }
 
-    public List<Object> generate(WritableApplicationService appService,
-        String siteOperator, Integer siteId) throws ApplicationException {
-        return postProcess(appService,
-            executeQuery(appService, siteOperator, siteId));
+    public List<Object> generate(WritableApplicationService appService)
+        throws ApplicationException {
+        return postProcess(appService, executeQuery(appService));
     }
 
     /**
@@ -54,13 +49,14 @@ public class AbstractReport {
     }
 
     @SuppressWarnings("unused")
-    public List<Object> executeQuery(WritableApplicationService appService,
-        String siteOperator, Integer siteId) throws ApplicationException {
+    public List<Object> executeQuery(WritableApplicationService appService)
+        throws ApplicationException {
         queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
-            siteOperator);
-        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING,
-            siteId.toString());
-        HQLCriteria criteria = new HQLCriteria(queryString, parameters);
+            report.getOp());
+        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING, report
+            .getSiteId().toString());
+        // do string substitutions here
+        HQLCriteria criteria = new HQLCriteria(queryString, report.getParams());
         return new ReportListProxy(appService, criteria, getRowPostProcess());
     }
 

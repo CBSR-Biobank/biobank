@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.client.reports;
 
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.util.DateGroup;
 
-public class NewPsByStudyClinic extends AbstractReport {
+public class NewPsByStudyClinic extends BiobankReport {
 
     protected static final String NAME = "New Patients per Study per Clinic by Date";
 
@@ -21,8 +19,4 @@ public class NewPsByStudyClinic extends AbstractReport {
         return NAME;
     }
 
-    @Override
-    protected void doColumnModification(List<Object> parameters) {
-        columnNames[2] = (String) parameters.get(0);
-    }
 }

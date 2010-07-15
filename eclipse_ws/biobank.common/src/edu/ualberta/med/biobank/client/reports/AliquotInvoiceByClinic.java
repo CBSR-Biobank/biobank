@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.client.reports;
 
 import java.util.Date;
 
-public class AliquotInvoiceByClinic extends AbstractReport {
+public class AliquotInvoiceByClinic extends BiobankReport {
 
     protected static final String NAME = "Aliquots per Clinic by Date";
 

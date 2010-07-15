@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 
@@ -23,9 +21,8 @@ public class CabinetCAliquotsImpl extends AbstractReport {
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name";
 
-    public CabinetCAliquotsImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY, parameters, options);
+    public CabinetCAliquotsImpl(BiobankReport report) {
+        super(QUERY, report);
     }
 
 }

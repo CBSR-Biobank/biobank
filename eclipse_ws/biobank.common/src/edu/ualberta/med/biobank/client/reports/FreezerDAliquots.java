@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.client.reports;
 
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.util.DateGroup;
 
-public class FreezerDAliquots extends AbstractReport {
+public class FreezerDAliquots extends BiobankReport {
 
     protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";
 
@@ -20,10 +18,5 @@ public class FreezerDAliquots extends AbstractReport {
     @Override
     public String getName() {
         return NAME;
-    }
-
-    @Override
-    protected void doColumnModification(List<Object> parameters) {
-        columnNames[2] = (String) parameters.get(0);
     }
 }

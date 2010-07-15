@@ -7,10 +7,9 @@ import java.util.StringTokenizer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.client.reports.AliquotRequest;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 
-public class AliquotRequestEditor extends ReportsEditor<AliquotRequest> {
+public class AliquotRequestEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotRequestEditor";
 
@@ -62,5 +61,18 @@ public class AliquotRequestEditor extends ReportsEditor<AliquotRequest> {
             throw new Exception(
                 "Not a valid file. Please select a valid CSV and try again.");
         return params;
+    }
+
+    @Override
+    protected String[] getColumnNames() {
+        return new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
+            "Location" };
+    }
+
+    @Override
+    protected List<String> getParamNames() {
+        List<String> paramName = new ArrayList<String>();
+        paramName.add("CSV File");
+        return paramName;
     }
 }

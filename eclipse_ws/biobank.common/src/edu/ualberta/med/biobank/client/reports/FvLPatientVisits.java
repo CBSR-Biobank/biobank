@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.client.reports;
 
 
-public class FvLPatientVisits extends AbstractReport {
+public class FvLPatientVisits extends BiobankReport {
 
     protected static final String NAME = "Clinic Activity by Study";
 

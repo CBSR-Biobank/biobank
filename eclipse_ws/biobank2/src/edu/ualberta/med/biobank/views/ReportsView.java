@@ -11,7 +11,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.client.reports.AbstractReport;
+import edu.ualberta.med.biobank.client.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.client.reports.AdvancedReportTreeNode;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
@@ -22,7 +24,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.widgets.ReportTreeWidget;
 
-public class ReportsView extends AbstractViewWithTree<ReportTreeNode> {
+public class ReportsView extends AbstractViewWithTree<AbstractReportTreeNode> {
 
     public static BiobankLogger logger = BiobankLogger
         .getLogger(ReportsView.class.getName());
@@ -59,9 +61,9 @@ public class ReportsView extends AbstractViewWithTree<ReportTreeNode> {
         gd.grabExcessVerticalSpace = true;
         reportTree.setLayoutData(gd);
 
-        ReportTreeNode root = new ReportTreeNode("", null);
-        ReportTreeNode standard = new ReportTreeNode("Standard", null);
-        ReportTreeNode advanced = new ReportTreeNode("Advanced", null);
+        AbstractReportTreeNode root = new ReportTreeNode("", null);
+        AbstractReportTreeNode standard = new ReportTreeNode("Standard", null);
+        AbstractReportTreeNode advanced = new ReportTreeNode("Advanced", null);
 
         // create standard's subnodes
         ReportTreeNode aliquots = new ReportTreeNode("Aliquots", null);
@@ -84,9 +86,10 @@ public class ReportsView extends AbstractViewWithTree<ReportTreeNode> {
         initializeNewReports(aliquots, clinics, patientVisits, patients, misc);
         List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs();
         for (Class<?> obj : advancedObjs) {
-            ReportTreeNode child = new ReportTreeNode(obj.getSimpleName()
-                .replace("Wrapper", ""), QueryTree.constructTree(new HQLField(
-                "", obj.getSimpleName(), obj)));
+            AdvancedReportTreeNode child = new AdvancedReportTreeNode(obj
+                .getSimpleName().replace("Wrapper", ""),
+                QueryTree.constructTree(new HQLField("", obj.getSimpleName(),
+                    obj)));
             advanced.addChild(child);
             child.setParent(advanced);
         }
@@ -103,8 +106,8 @@ public class ReportsView extends AbstractViewWithTree<ReportTreeNode> {
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].getName().contains(".xml")) {
                         String name = files[i].getName().replace(".xml", "");
-                        ReportTreeNode customNode = new ReportTreeNode(name,
-                            QueryTreeNode.getTreeFromFile(files[i]));
+                        AdvancedReportTreeNode customNode = new AdvancedReportTreeNode(
+                            name, QueryTreeNode.getTreeFromFile(files[i]));
                         customNode.setParent(custom);
                         custom.addChild(customNode);
                     }
@@ -124,11 +127,11 @@ public class ReportsView extends AbstractViewWithTree<ReportTreeNode> {
     private void initializeNewReports(ReportTreeNode aliquots,
         ReportTreeNode clinics, ReportTreeNode patientVisits,
         ReportTreeNode patients, ReportTreeNode misc) {
-        String[] names = AbstractReport.getReportNames();
+        String[] names = BiobankReport.getReportNames();
         for (int i = 0; i < names.length; i++) {
             try {
                 ReportTreeNode child = new ReportTreeNode(names[i],
-                    AbstractReport.getReportByName(names[i]));
+                    BiobankReport.getReportByName(names[i]));
                 addInTree(aliquots, clinics, patientVisits, patients, misc,
                     names, i, child);
             } catch (Exception e) {

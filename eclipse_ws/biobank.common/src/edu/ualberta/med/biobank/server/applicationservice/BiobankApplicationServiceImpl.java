@@ -1,10 +1,9 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
-import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
@@ -221,12 +220,9 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<Object> launchReport(String reportClassName,
-        List<Object> parameters, List<ReportOption> options,
-        String siteOperator, Integer siteId) throws ApplicationException {
-        AbstractReport report = ReportFactory.createReport(reportClassName,
-            parameters, options);
-        return report.generate(this, siteOperator, siteId);
+    public List<Object> launchReport(BiobankReport report)
+        throws ApplicationException {
+        return ReportFactory.createReport(report).generate(this);
     }
 
 }

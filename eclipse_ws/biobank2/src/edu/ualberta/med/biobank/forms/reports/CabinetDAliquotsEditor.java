@@ -8,10 +8,9 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.client.reports.CabinetDAliquots;
 import edu.ualberta.med.biobank.common.util.DateGroup;
 
-public class CabinetDAliquotsEditor extends ReportsEditor<CabinetDAliquots> {
+public class CabinetDAliquotsEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.CabinetDAliquotsEditor";
     private ComboViewer dateRangeCombo;
@@ -19,6 +18,15 @@ public class CabinetDAliquotsEditor extends ReportsEditor<CabinetDAliquots> {
     @Override
     protected int[] getColumnWidths() {
         return new int[] { 100, 100, 100, 100 };
+    }
+
+    @Override
+    protected String[] getColumnNames() {
+        return new String[] {
+            "Study",
+            "Clinic",
+            ((IStructuredSelection) dateRangeCombo.getSelection())
+                .getFirstElement().toString(), "Total" };
     }
 
     @Override
@@ -34,6 +42,13 @@ public class CabinetDAliquotsEditor extends ReportsEditor<CabinetDAliquots> {
         params.add(((IStructuredSelection) dateRangeCombo.getSelection())
             .getFirstElement().toString());
         return params;
+    }
+
+    @Override
+    protected List<String> getParamNames() {
+        List<String> param = new ArrayList<String>();
+        param.add("Group By");
+        return param;
     }
 
 }

@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 
@@ -23,9 +21,8 @@ public class AliquotInvoiceByClinicImpl extends AbstractReport {
         + " ORDER BY "
         + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
 
-    public AliquotInvoiceByClinicImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY_STRING, parameters, options);
+    public AliquotInvoiceByClinicImpl(BiobankReport report) {
+        super(QUERY_STRING, report);
     }
 
 }

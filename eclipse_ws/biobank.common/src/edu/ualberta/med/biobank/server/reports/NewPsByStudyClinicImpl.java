@@ -1,11 +1,10 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import java.text.MessageFormat;
-import java.util.List;
 
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
-import edu.ualberta.med.biobank.common.util.ReportOption;
 
 public class NewPsByStudyClinicImpl extends AbstractReport {
 
@@ -21,17 +20,9 @@ public class NewPsByStudyClinicImpl extends AbstractReport {
 
     private DateRangeRowPostProcess dateRangePostProcess;
 
-    public NewPsByStudyClinicImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY, parameters, options);
-        for (int i = 0; i < options.size(); i++) {
-            ReportOption option = options.get(i);
-            if (parameters.get(i) == null)
-                parameters.set(i, option.getDefaultValue());
-            if (option.getType().equals(String.class))
-                parameters.set(i, "%" + parameters.get(i) + "%");
-        }
-        String groupBy = (String) parameters.remove(0);
+    public NewPsByStudyClinicImpl(BiobankReport report) {
+        super(QUERY, report);
+        String groupBy = report.getStrings().get(0);
         queryString = MessageFormat.format(queryString, groupBy);
         dateRangePostProcess = new DateRangeRowPostProcess(
             groupBy.equals("Year"), 2);

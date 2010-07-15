@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -28,8 +26,8 @@ public class PatientWBCImpl extends AbstractReport {
         + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.containerType.name like '"
         + TYPE_NAME + "')";
 
-    public PatientWBCImpl(List<Object> parameters, List<ReportOption> options) {
-        super(QUERY, parameters, options);
+    public PatientWBCImpl(BiobankReport report) {
+        super(QUERY, report);
     }
 
 }

@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
@@ -41,14 +41,9 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + " as s inner join s.contactCollection as c where s.site.id "
         + SITE_OPERATOR + SITE_ID + " ORDER BY s.nameShort";
 
-    public PatientVisitSummaryImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY_STRING, parameters, options);
-        for (int i = 0; i < options.size(); i++) {
-            ReportOption option = options.get(i);
-            if (parameters.get(i) == null)
-                parameters.set(i, option.getDefaultValue());
-        }
+    public PatientVisitSummaryImpl(BiobankReport report) {
+        super(QUERY_STRING, report);
+        List<Object> parameters = report.getParams();
         int size = parameters.size();
         for (int j = 0; j < 6; j++) {
             for (int i = 0; i < size; i++) {

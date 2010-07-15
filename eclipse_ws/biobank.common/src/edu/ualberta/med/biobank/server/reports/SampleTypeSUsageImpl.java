@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.server.reports;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -24,21 +24,21 @@ public class SampleTypeSUsageImpl extends AbstractReport {
         + SampleStorage.class.getName() + " ss) and st.site = " + SITE_ID
         + " OR " + SITE_ID + "=-9999";
 
-    public SampleTypeSUsageImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super("", parameters, options);
+    public SampleTypeSUsageImpl(BiobankReport report) {
+        super("", report);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Object> executeQuery(WritableApplicationService appService,
-        String siteOperator, Integer siteId) throws ApplicationException {
+    public List<Object> executeQuery(WritableApplicationService appService)
+        throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
+        List<Object> parameters = report.getParams();
         HQLCriteria c1 = new HQLCriteria(QUERY1.replaceAll(
-            SITE_ID_SEARCH_STRING, siteId.toString()), parameters);
+            SITE_ID_SEARCH_STRING, report.getSiteId().toString()), parameters);
         results = ((ListProxy) appService.query(c1)).getListChunk();
         HQLCriteria c2 = new HQLCriteria(QUERY2.replaceAll(
-            SITE_ID_SEARCH_STRING, siteId.toString()), parameters);
+            SITE_ID_SEARCH_STRING, report.getSiteId().toString()), parameters);
         results.addAll(specialPostProcess(appService.query(c2)));
         return results;
     }

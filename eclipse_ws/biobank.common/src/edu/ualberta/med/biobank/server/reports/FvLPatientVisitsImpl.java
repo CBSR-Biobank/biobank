@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class FvLPatientVisitsImpl extends AbstractReport {
@@ -16,8 +14,8 @@ public class FvLPatientVisitsImpl extends AbstractReport {
         + SITE_ID
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.nameShort";
 
-    public FvLPatientVisitsImpl(List<Object> parameters, List<ReportOption> options) {
-        super(QUERY, parameters, options);
+    public FvLPatientVisitsImpl(BiobankReport report) {
+        super(QUERY, report);
     }
 
 }

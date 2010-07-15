@@ -1,12 +1,11 @@
 package edu.ualberta.med.biobank.forms.reports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.client.reports.AliquotCount;
-
-public class AliquotCountEditor extends ReportsEditor<AliquotCount> {
+public class AliquotCountEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor";
 
@@ -21,7 +20,17 @@ public class AliquotCountEditor extends ReportsEditor<AliquotCount> {
 
     @Override
     protected List<Object> getParams() {
-        return null;
+        return new ArrayList<Object>();
+    }
+
+    @Override
+    protected String[] getColumnNames() {
+        return new String[] { "Sample Type", "Total" };
+    }
+
+    @Override
+    protected List<String> getParamNames() {
+        return new ArrayList<String>();
     }
 
 }
