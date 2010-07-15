@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.LogQuery;
-import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
+import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -60,6 +60,8 @@ public class LoggingView extends ViewPart {
     private Button clearButton, searchButton;
 
     private Color colorWhite;
+
+    private String[] siteComboOptions;
 
     private final Listener alphaNumericListener = new Listener() {
         @Override
@@ -285,45 +287,48 @@ public class LoggingView extends ViewPart {
                 e.doit = false;
             }
         });
-        setSiteManagement();
+
+        sessionMonitor();
         clearFields();
 
-        if (SessionManager.getInstance().isConnected()
-            && SessionManager.getInstance().getCurrentSite() != null
-            && !SessionManager.getInstance().isAllSitesSelected()) {
+        if (SessionManager.getInstance().isConnected()) {
             setEnableAllFields(true);
             loadComboFields();
+            if (!SessionManager.getInstance().isAllSitesSelected()) {
+                String currentSiteName = SessionManager.getInstance()
+                    .getCurrentSite().getNameShort();
+                for (int i = 0; i < siteComboOptions.length; ++i) {
+                    if (siteComboOptions[i].equals(currentSiteName)) {
+                        siteCombo.select(i);
+                    }
+                }
+            }
         } else
             setEnableAllFields(false);
-
     }
 
-    private void setSiteManagement() {
-        ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
+    // monitors the logged in / out state
+    private void sessionMonitor() {
+        ISourceProvider siteSelectionStateSourceProvider = getSessionStateSourceProvider();
 
         siteStateListener = new ISourceProviderListener() {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
 
-                if (sourceValue == null || (Integer) sourceValue < 0) {
+                if (sourceValue.equals(SessionState.LOGGED_OUT)) {
                     setEnableAllFields(false);
-                    return;
-                }
-
-                if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
-                    if (SessionManager.getInstance().isAllSitesSelected()) {
-                        setEnableAllFields(false);
-                    } else {
-                        loadComboFields();
-                        setEnableAllFields(true);
-                    }
+                } else if (sourceValue.equals(SessionState.LOGGED_IN)) {
+                    loadComboFields();
+                    setEnableAllFields(true);
                 }
             }
 
             @SuppressWarnings({ "rawtypes" })
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -335,18 +340,18 @@ public class LoggingView extends ViewPart {
     public void dispose() {
         super.dispose();
         if (siteStateListener != null) {
-            getSiteSelectionStateSourceProvider().removeSourceProviderListener(
+            getSessionStateSourceProvider().removeSourceProviderListener(
                 siteStateListener);
         }
     }
 
-    private ISourceProvider getSiteSelectionStateSourceProvider() {
+    private ISourceProvider getSessionStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         ISourceProvider siteSelectionStateSourceProvider = service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+            .getSourceProvider(SessionState.SESSION_STATE);
         return siteSelectionStateSourceProvider;
     }
 
@@ -370,13 +375,14 @@ public class LoggingView extends ViewPart {
     }
 
     private void loadComboFields() {
-        siteCombo.setItems(this.loadComboList(ComboListType.SITE));
+        siteComboOptions = loadComboList(ComboListType.SITE);
+        siteCombo.setItems(siteComboOptions);
         siteCombo.select(0);
-        userCombo.setItems(this.loadComboList(ComboListType.USER));
+        userCombo.setItems(loadComboList(ComboListType.USER));
         userCombo.select(0);
-        typeCombo.setItems(this.loadComboList(ComboListType.TYPE));
+        typeCombo.setItems(loadComboList(ComboListType.TYPE));
         typeCombo.select(0);
-        actionCombo.setItems(this.loadComboList(ComboListType.ACTION));
+        actionCombo.setItems(loadComboList(ComboListType.ACTION));
         actionCombo.select(0);
     }
 
