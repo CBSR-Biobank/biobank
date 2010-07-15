@@ -145,6 +145,8 @@ public class BiobankText extends Composite {
 
     @Override
     public void removeListener(int eventType, Listener listener) {
+        if (text == null)
+            return;
         text.removeListener(eventType, listener);
     }
 

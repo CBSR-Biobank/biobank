@@ -1,23 +1,26 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class NewPsByStudyClinic extends QueryObject {
 
     protected static final String NAME = "New Patients per Study per Clinic by Date";
 
-    protected static final String query = "select pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed), count(*) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.dateProcessed=(select min(pvCollection.dateProcessed) from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection as pvCollection where p=pv.patient) and pv.patient.study.site {0} {1,number,#} group by pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed)";
+    protected static final String query = "select pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed), count(*) from edu.ualberta.med.biobank.model.PatientVisit pv where pv.dateProcessed=(select min(pvCollection.dateProcessed) from edu.ualberta.med.biobank.model.Patient p join p.patientVisitCollection as pvCollection where p=pv.patient and pvCollection.dateProcessed between ? and ?) and pv.patient.study.site {0} {1,number,#} group by pv.patient.study.nameShort, pv.shipment.clinic.name, year(pv.dateProcessed), {2}(pv.dateProcessed)";
 
     public NewPsByStudyClinic(String op, Integer siteId) {
         super(
-            "Displays the total number of patients added per study per clinic grouped by date processed in a calendar week/month/quarter/year.",
+            "Displays the total number of patients added per study per clinic grouped by date processed in a calendar week/month/quarter/year, within a given date range.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
+        addOption("Start Date (Processed)", Date.class, new Date(0));
+        addOption("End Date (Processed)", Date.class, new Date());
     }
 
     @Override

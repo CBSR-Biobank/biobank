@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -15,17 +16,19 @@ public class NewPVsByStudyClinic extends QueryObject {
         + "Alias.shipment.clinic.name, Year(Alias.dateProcessed), "
         + "{2}(Alias.dateProcessed), count(*) from "
         + PatientVisit.class.getName()
-        + " as Alias where Alias.patient.study.site {0} {1,number,#}"
+        + " as Alias where Alias.patient.study.site {0} {1,number,#} and Alias.dateProcessed between ? and ?"
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
         + "Year(Alias.dateProcessed), {2}(Alias.dateProcessed)";
 
     public NewPVsByStudyClinic(String op, Integer siteId) {
         super(
             "Displays the total number of patient visits added per study per "
-                + "clinic grouped by date processed in a calendar week/month/quarter/year.",
+                + "clinic grouped by date processed in a calendar week/month/quarter/year, within a given date range.",
             MessageFormat.format(query, op, siteId, "{0}"), new String[] {
                 "Study", "Clinic", "", "Total" });
         addOption("Date Range", DateGroup.class, DateGroup.Month);
+        addOption("Start Date (Processed)", Date.class, new Date(0));
+        addOption("End Date (Processed)", Date.class, new Date());
     }
 
     @Override
