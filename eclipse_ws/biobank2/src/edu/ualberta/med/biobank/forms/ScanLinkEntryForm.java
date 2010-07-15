@@ -118,8 +118,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         lastWidget.setNextWidget(cancelConfirmWidget);
 
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
-            typesFilledValue, Messages
-                .getString("ScanLink.sampleType.select.validationMsg"));
+            typesFilledValue,
+            Messages.getString("ScanLink.sampleType.select.validationMsg"));
     }
 
     /**
@@ -420,7 +420,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // form.layout(true, true);
             }
         });
-        setScanValid(true);
+        setScanValid(everythingOk);
     }
 
     @Override
@@ -461,7 +461,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     || (cell != null
                         && cell.getStatus() != AliquotCellStatus.TYPE && cell
                         .getStatus() != AliquotCellStatus.NO_TYPE)) {
-                    processCellStatus(cell);
+                    processCellStatus(cell, false);
                 }
                 everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
                     && everythingOk;
@@ -515,16 +515,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
     }
 
-    private void processCellStatus(PalletCell cell) throws ApplicationException {
-        processCellStatus(cell, false);
-    }
-
     /**
      * Process the cell: apply a status and set correct information
      */
-    private void processCellStatus(PalletCell cell, boolean independantProcess)
-        throws ApplicationException {
-        if (cell != null) {
+    private AliquotCellStatus processCellStatus(PalletCell cell,
+        boolean independantProcess) throws ApplicationException {
+        if (cell == null) {
+            return AliquotCellStatus.EMPTY;
+        } else {
             String value = cell.getValue();
             if (value != null) {
                 List<AliquotWrapper> aliquots = AliquotWrapper
@@ -532,9 +530,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         .getInstance().getCurrentSite());
                 if (aliquots.size() > 0) {
                     cell.setStatus(AliquotCellStatus.ERROR);
-                    cell
-                        .setInformation(Messages
-                            .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
+                    cell.setInformation(Messages
+                        .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     AliquotWrapper aliquot = aliquots.get(0);
                     String palletPosition = LabelingScheme
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
@@ -558,6 +555,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             } else {
                 cell.setStatus(AliquotCellStatus.EMPTY);
             }
+            return cell.getStatus();
         }
     }
 
@@ -674,7 +672,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        processCellStatus(cell, true);
+        AliquotCellStatus status = processCellStatus(cell, true);
+        boolean ok = isScanValid() && (status != AliquotCellStatus.ERROR);
+        setScanValid(ok);
+        typesSelectionPerRowComposite.setEnabled(ok);
         spw.redraw();
         form.layout();
     }
