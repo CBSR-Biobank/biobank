@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -36,7 +37,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
         aliquot = aliquotAdapter.getAliquot();
-        aliquot.logEdit();
+        aliquot.logEdit(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
         setPartName("Aliquot Entry");
     }
 
@@ -80,11 +82,12 @@ public class AliquotEntryForm extends BiobankEntryForm {
             client, "Type", sampleTypes, aliquot.getSampleType(),
             "Aliquot must have a sample type");
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Link Date", aliquot
-            .getFormattedLinkDate());
+        createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
+            aliquot.getFormattedLinkDate());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)", aliquot
-            .getQuantity() == null ? null : aliquot.getQuantity().toString());
+        createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)",
+            aliquot.getQuantity() == null ? null : aliquot.getQuantity()
+                .toString());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill",
             aliquot.getPatientVisit().getShipment().getWaybill());
@@ -98,17 +101,17 @@ public class AliquotEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Date Drawn", aliquot
             .getPatientVisit().getFormattedDateDrawn());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Position", aliquot
-            .getPositionString(true, false));
+        createReadOnlyLabelledField(client, SWT.NONE, "Position",
+            aliquot.getPositionString(true, false));
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService), aliquot
-                .getActivityStatus(), "Aliquot must have an activity status");
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            aliquot.getActivityStatus(), "Aliquot must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
-            | SWT.MULTI, "Comments", null, BeansObservables.observeValue(
-            aliquot, "comment"), null);
+            | SWT.MULTI, "Comments", null,
+            BeansObservables.observeValue(aliquot, "comment"), null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }

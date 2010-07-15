@@ -139,9 +139,10 @@ public class LogWrapper extends ModelWrapper<Log> {
     }
 
     public static List<LogWrapper> getLogs(
-        WritableApplicationService appService, String username, Date startDate,
-        Date endDate, String action, String patientNumber, String inventoryId,
-        String locationLabel, String details, String type) throws Exception {
+        WritableApplicationService appService, String site, String username,
+        Date startDate, Date endDate, String action, String patientNumber,
+        String inventoryId, String locationLabel, String details, String type)
+        throws Exception {
         StringBuffer parametersString = new StringBuffer();
         List<Object> parametersArgs = new ArrayList<Object>();
         addParam(parametersString, parametersArgs, "username", username);
@@ -166,6 +167,7 @@ public class LogWrapper extends ModelWrapper<Log> {
             parametersString.append(" " + datePart);
         }
 
+        addParam(parametersString, parametersArgs, "site", site);
         addParam(parametersString, parametersArgs, "action", action);
         addParam(parametersString, parametersArgs, "patientNumber",
             patientNumber);
@@ -218,6 +220,12 @@ public class LogWrapper extends ModelWrapper<Log> {
             sb.append(" ").append("locationLabel").append(" like ?");
             parameters.add(value + " (%");
         }
+    }
+
+    public static List<String> getPossibleSites(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria("select distinct(site) from "
+            + Log.class.getName()));
     }
 
     public static List<String> getPossibleUsernames(

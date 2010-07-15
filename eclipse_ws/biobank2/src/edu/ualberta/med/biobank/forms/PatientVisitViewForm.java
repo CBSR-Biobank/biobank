@@ -10,6 +10,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -65,7 +66,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        patientVisit.logLookup();
+        patientVisit.logLookup(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
 
         setPartName("Visit " + patientVisit.getFormattedDateProcessed());
     }
@@ -76,8 +78,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
             + patientVisit.getFormattedDateProcessed());
         form.getBody().setLayout(new GridLayout(1, false));
         form.getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT_VISIT));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
         createSamplesSection();
@@ -154,8 +156,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
             : patientVisit.getShipment().getClinic().getName());
         setTextValue(shipmentLabel, patientVisit.getShipment().toString());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
-        setTextValue(dateProcessedLabel, patientVisit
-            .getFormattedDateProcessed());
+        setTextValue(dateProcessedLabel,
+            patientVisit.getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, patientVisit.getFormattedDateDrawn());
         setTextValue(commentLabel, patientVisit.getComment());
 
@@ -167,15 +169,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
-        table = new PvSourceVesselInfoTable(client, patientVisit
-            .getPvSourceVesselCollection());
+        table = new PvSourceVesselInfoTable(client,
+            patientVisit.getPvSourceVesselCollection());
         table.adaptToToolkit(toolkit, true);
     }
 
     private void createSamplesSection() {
         Composite parent = createSectionWithClient("Aliquots");
-        aliquotWidget = new AliquotListInfoTable(parent, patientVisit
-            .getAliquotCollection());
+        aliquotWidget = new AliquotListInfoTable(parent,
+            patientVisit.getAliquotCollection());
         aliquotWidget.adaptToToolkit(toolkit, true);
         aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
         aliquotWidget.addDoubleClickListener(collectionDoubleClickListener);
@@ -196,9 +198,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
         try {
             patientVisit.reload();
         } catch (Exception ex) {
-            logger.error("Error while retrieving patient visit "
-                + patientVisit.getFormattedDateProcessed() + "(patient "
-                + patientVisit.getPatient() + ")", ex);
+            logger.error(
+                "Error while retrieving patient visit "
+                    + patientVisit.getFormattedDateProcessed() + "(patient "
+                    + patientVisit.getPatient() + ")", ex);
         }
     }
 
