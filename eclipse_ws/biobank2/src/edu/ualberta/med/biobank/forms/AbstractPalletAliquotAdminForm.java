@@ -275,12 +275,18 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 return;
             } else {
                 ScanCell[][] scanCells = null;
-                if (isScanChoiceSimple) {
-                    scanCells = ScannerConfigPlugin.scan(plateNum);
-                } else {
-                    scanCells = ScannerConfigPlugin.scanMultipleDpi(plateNum);
+                try {
+                    if (isScanChoiceSimple) {
+                        scanCells = ScannerConfigPlugin.scan(plateNum);
+                    } else {
+                        scanCells = ScannerConfigPlugin
+                            .scanMultipleDpi(plateNum);
+                    }
+                    cells = PalletCell.convertArray(scanCells);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$
+                        ex, "You can still define barcodes one  by one.");
                 }
-                cells = PalletCell.convertArray(scanCells);
             }
         } else {
             launchFakeScan();

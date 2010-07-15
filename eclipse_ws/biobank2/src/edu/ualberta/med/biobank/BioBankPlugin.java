@@ -105,7 +105,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_EDIT = "scanEdit";
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
 
-    // 
+    //
     // ContainerTypeAdapter and Container missing on purpose.
     //
     private static Map<String, String> classToImageKey;
@@ -152,8 +152,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         BioBankPlugin.IMG_PALLET, };
 
     public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
-        .getName()
-        + ".barcode";
+        .getName() + ".barcode";
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BioBankPlugin.class.getName());
@@ -309,13 +308,27 @@ public class BioBankPlugin extends AbstractUIPlugin {
         logger.error(title, e);
     }
 
-    public static void openAsyncError(String title, Exception e) {
+    public static void openAsyncError(String title, Exception e,
+        String secondMessage) {
         String msg = e.getMessage();
         if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
             msg = e.getCause().getMessage();
         }
-        openAsyncError(title, e.getMessage());
+        if (msg == null) {
+            msg = "";
+        }
+        if (secondMessage != null) {
+            if (!msg.isEmpty()) {
+                msg += "\n";
+            }
+            msg += secondMessage;
+        }
+        openAsyncError(title, msg);
         logger.error(title, e);
+    }
+
+    public static void openAsyncError(String title, Exception e) {
+        openAsyncError(title, e, null);
     }
 
     /**
@@ -465,8 +478,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             return null;
         }
         if (classToImageKey.containsKey(typeName)) {
-            return BioBankPlugin.getDefault().getImageRegistry().get(
-                classToImageKey.get(typeName));
+            return BioBankPlugin.getDefault().getImageRegistry()
+                .get(classToImageKey.get(typeName));
         }
 
         String imageKey = null;

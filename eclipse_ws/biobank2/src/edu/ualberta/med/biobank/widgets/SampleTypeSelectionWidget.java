@@ -143,7 +143,10 @@ public class SampleTypeSelectionWidget {
     }
 
     public void addOneToNumber() {
-        this.number++;
+        if (number == null) {
+            number = 0;
+        }
+        number++;
         setNumber(number);
         if (getSelection() != null) {
             selectionDone.setValue(true);
