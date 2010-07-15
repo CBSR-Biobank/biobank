@@ -108,8 +108,9 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             if (i > 0) {
                 printName = printName.substring(0, i);
             }
-            ((BiobankApplicationService) appService).logActivity("print", null,
-                null, null, null, printName);
+            ((BiobankApplicationService) appService).logActivity("print",
+                SessionManager.getInstance().getCurrentSite().getNameShort(),
+                null, null, null, null, printName);
             return true;
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);

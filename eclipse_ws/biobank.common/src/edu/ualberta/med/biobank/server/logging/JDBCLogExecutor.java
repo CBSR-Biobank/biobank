@@ -3,9 +3,10 @@ package edu.ualberta.med.biobank.server.logging;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
-import edu.ualberta.med.biobank.common.util.LogSql;
 import edu.ualberta.med.biobank.model.Log;
 
 /**
@@ -23,6 +24,11 @@ public class JDBCLogExecutor implements Runnable {
     private String dbUser = null;
     private String dbPwd = null;
 
+    public static final String COMMA = ",";
+
+    public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm:ss");
+
     /**
      * Constructor for JDBCExcecutor.
      * 
@@ -37,13 +43,13 @@ public class JDBCLogExecutor implements Runnable {
     private void setDBProperties() {
         if (this.props != null) {
 
-            this.setDbDriverClass(LogSql.initString(this.props
+            this.setDbDriverClass(initString(this.props
                 .getProperty("hibernate.connection.driver_class")));
-            this.setDbPwd(LogSql.initString(this.props
+            this.setDbPwd(initString(this.props
                 .getProperty("hibernate.connection.password")));
-            this.setDbUser(LogSql.initString(this.props
+            this.setDbUser(initString(this.props
                 .getProperty("hibernate.connection.username")));
-            this.setDbUrl(LogSql.initString(this.props
+            this.setDbUrl(initString(this.props
                 .getProperty("hibernate.connection.url")));
         }
     }
@@ -57,7 +63,7 @@ public class JDBCLogExecutor implements Runnable {
                 conn = createConn();
                 conn.setAutoCommit(false);
                 stmt = conn.createStatement();
-                String statement = LogSql.getLogMessageSQLStatement(log);
+                String statement = getLogMessageSQLStatement(log);
                 stmt.execute(statement);
                 conn.commit();
             } catch (Exception e) {
@@ -134,6 +140,60 @@ public class JDBCLogExecutor implements Runnable {
 
     public void setDbUser(String dbUser) {
         this.dbUser = dbUser;
+    }
+
+    /**
+     * Returns a SQL Insert statement based on an Log Object instance.
+     */
+    private String getLogMessageSQLStatement(Log log) {
+
+        StringBuffer sql = new StringBuffer();
+        sql.append("INSERT INTO log (");
+        sql.append(LogProperty.USERNAME);
+        sql.append(COMMA + LogProperty.SITE);
+        sql.append(COMMA + LogProperty.CREATED_AT);
+        sql.append(COMMA + LogProperty.ACTION);
+        sql.append(COMMA + LogProperty.PATIENT_NUMBER);
+        sql.append(COMMA + LogProperty.INVENTORY_ID);
+        sql.append(COMMA + LogProperty.LOCATION_LABEL);
+        sql.append(COMMA + LogProperty.DETAILS);
+        sql.append(COMMA + LogProperty.TYPE);
+        sql.append(") VALUES ('");
+        sql.append(initString(log.getUsername()));
+        sql.append("','");
+        sql.append(initString(log.getSite()));
+        sql.append("','");
+        sql.append(initString(log.getCreatedAt()));
+        sql.append("','");
+        sql.append(initString(log.getAction()));
+        sql.append("','");
+        sql.append(initString(log.getPatientNumber()));
+        sql.append("','");
+        sql.append(initString(log.getInventoryId()));
+        sql.append("','");
+        sql.append(initString(log.getLocationLabel()));
+        sql.append("','");
+        sql.append(initString(log.getDetails()));
+        sql.append("','");
+        sql.append(initString(log.getType()));
+        sql.append("');");
+        return sql.toString();
+    }
+
+    public String initString(String str) {
+        String test = "";
+        if (str != null) {
+            test = str.trim().replaceAll("'", "''");
+
+        }
+        return test;
+    }
+
+    public String initString(Date date) {
+        if (date == null) {
+            return "";
+        }
+        return dateTimeFormatter.format(date);
     }
 
 }
