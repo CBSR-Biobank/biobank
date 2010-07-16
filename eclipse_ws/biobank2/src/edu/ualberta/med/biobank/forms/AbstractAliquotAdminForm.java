@@ -69,7 +69,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
                 if (BioBankPlugin.isAskPrintActivityLog()) {
                     boolean doPrint = MessageDialog.openQuestion(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        "Print", "Do you want to print information ??");
+                        "Print", "Do you want to print information ?");
                     if (doPrint) {
                         print();
                     }

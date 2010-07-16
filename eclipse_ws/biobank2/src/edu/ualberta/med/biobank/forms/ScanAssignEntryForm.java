@@ -49,7 +49,6 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.validators.PalletLabelValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -109,7 +108,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private NonEmptyStringValidator productBarcodeValidator;
 
-    private PalletLabelValidator palletLabelValidator;
+    private NonEmptyStringValidator palletLabelValidator;
 
     private String palletFoundWithProductBarcodeLabel;
 
@@ -171,7 +170,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
         productBarcodeValidator = new NonEmptyStringValidator( //$NON-NLS-1$
             Messages.getString("ScanAssign.productBarcode.validationMsg"));
-        palletLabelValidator = new PalletLabelValidator(
+        palletLabelValidator = new NonEmptyStringValidator(
             Messages.getString("ScanAssign.palletLabel.validationMsg"));
 
         palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
