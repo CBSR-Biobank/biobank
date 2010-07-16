@@ -28,20 +28,22 @@ import edu.ualberta.med.biobank.test.wrappers.TestStudy;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
-@SuiteClasses( { TestSite.class, TestPatient.class, TestPatientVisit.class,
+@SuiteClasses({ TestSite.class, TestPatient.class, TestPatientVisit.class,
     TestStudy.class, TestContainerLabelingScheme.class,
     TestPvSourceVessel.class, TestActivityStatus.class, TestAliquot.class,
     TestClinic.class, TestSampleStorage.class, TestSourceVessel.class,
     TestSampleType.class, TestContainer.class, TestContainerType.class,
-    TestShipment.class, TestContact.class, TestShippingMethod.class })
+    TestShipment.class, TestContact.class, TestShippingMethod.class,
+    TestLabelingScheme.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        appService = ServiceConnection.getAppService(System.getProperty(
-            "server", "http://localhost:8080")
-            + "/biobank2", "testuser", "test");
+        appService = ServiceConnection
+            .getAppService(
+                System.getProperty("server", "http://localhost:8080")
+                    + "/biobank2", "testuser", "test");
         DbHelper.setAppService(appService);
     }
 

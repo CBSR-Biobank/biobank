@@ -8,7 +8,7 @@ public class LabelingScheme {
 
     /**
      * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
-     * string position.
+     * string position. Could be A2 or F12.
      */
     public static RowColPos sbsToRowCol(String pos) throws Exception {
         if ((pos.length() != 2) && (pos.length() != 3)) {
@@ -21,7 +21,7 @@ public class LabelingScheme {
 
     /**
      * Get the string corresponding to the given RowColPos and using the SBS
-     * standard
+     * standard. 2:1 will return C2.
      */
     public static String rowColToSbs(RowColPos rcp) {
         return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
@@ -29,8 +29,8 @@ public class LabelingScheme {
 
     /**
      * Get the index corresponding to the given label, using the CBSR labelling.
-     * Use the 2 last character in case we have a full position string
-     * (01AA01A2).
+     * Use the 2 last characters in case we have a full position string. For
+     * 01AB, will use only AB and will return 1:0.
      * 
      * @throws Exception
      */
@@ -47,8 +47,8 @@ public class LabelingScheme {
 
     /**
      * get the RowColPos in the given container corresponding to the given label
-     * using the CBSR labeling. Use the 2 last character in case we have a full
-     * position string (01AA01A2)
+     * using the CBSR labelling. Use the 2 last characters in case we have a
+     * full position string.For 01AB, will use only AB and will return 1:0.
      */
     public static RowColPos cbsrTwoCharToRowCol(String label, int rowCap,
         int colCap, String containerTypeName) throws Exception {
@@ -67,8 +67,9 @@ public class LabelingScheme {
 
     /**
      * Get the RowColPos in the given container corresponding to the given label
-     * using the 2 char numeric labeling.Use the 2 last character in case we
-     * have a full position string (01AA01A2)
+     * using the 2 char numeric labelling. Use the 2 last characters in case we
+     * have a full position string For 01AA11, will use only 11 and will return
+     * 10
      */
     public static RowColPos twoCharNumericToRowCol(String label, int totalRows)
         throws Exception {
@@ -82,7 +83,7 @@ public class LabelingScheme {
     }
 
     /**
-     * convert a position in row*column to two letter (in the CBSR way)
+     * Convert a position in row*column to two letter (in the CBSR way)
      */
     public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows,
         int totalCols) {
@@ -115,7 +116,7 @@ public class LabelingScheme {
     }
 
     /**
-     * Convert a position in row*column to Dewar labeling (AA, BB, CC...).
+     * Convert a position in row*column to Dewar labelling (AA, BB, CC...).
      */
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
         int pos = rcp.col + (colCapacity * rcp.row);
@@ -125,8 +126,8 @@ public class LabelingScheme {
 
     /**
      * Get the RowColPos in the given container corresponding to the given label
-     * using the dewar labeling. Use the 2 last character in case we have a full
-     * position string (01AA)
+     * using the dewar labelling. Use the 2 last character in case we have a
+     * full position string: for 01BB, will use only BB.
      */
     public static RowColPos dewarToRowCol(String label, int totalCol) {
         int len = label.length();
@@ -141,8 +142,8 @@ public class LabelingScheme {
     }
 
     /**
-     * Get the 2 char string corresponding to a RowColPos position inside the
-     * given containerType
+     * Get the 2 char string corresponding to a RowColPos position given the
+     * container capacity
      */
     public static String getPositionString(RowColPos rcp,
         Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity) {
@@ -165,7 +166,7 @@ public class LabelingScheme {
 
     /**
      * Get the RowColPos position corresponding to the 2 char string position
-     * inside the given container type
+     * given the container capacity
      */
     public static RowColPos getRowColFromPositionString(String position,
         Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity)
