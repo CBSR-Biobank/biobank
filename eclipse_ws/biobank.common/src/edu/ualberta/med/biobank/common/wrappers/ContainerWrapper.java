@@ -78,7 +78,7 @@ public class ContainerWrapper extends
     private void checkHasPosition() throws BiobankCheckException {
         if ((getContainerType() != null)
             && !getContainerType().getTopLevel().booleanValue()
-            && (rowColPosition == null)) {
+            && (getPosition() == null)) {
             throw new BiobankCheckException(
                 "A child container must have a position");
         }
