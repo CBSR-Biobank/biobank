@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 import edu.ualberta.med.biobank.model.Aliquot;

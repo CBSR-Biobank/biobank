@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -10,9 +10,10 @@ public class CabinetDAliquotsImpl extends AbstractReport {
 
     private static final String TYPE_NAME = "%Cabinet%";
 
-    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort,"
+    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, "
         + " aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate),"
-        + " {0}(aliquot.linkDate), count(aliquot.linkDate) from "
+        + GROUPBY_DATE
+        + "(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition.container.id in"
         + " (select path1.container.id from "
@@ -26,7 +27,8 @@ public class CabinetDAliquotsImpl extends AbstractReport {
         + SITE_OPERATOR
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"
-        + " aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate), {0}(aliquot.linkDate)";
+        + " aliquot.patientVisit.shipment.clinic.name, year(aliquot.linkDate), "
+        + GROUPBY_DATE + "(aliquot.linkDate)";
 
     private DateRangeRowPostProcess dateRangePostProcess;
 

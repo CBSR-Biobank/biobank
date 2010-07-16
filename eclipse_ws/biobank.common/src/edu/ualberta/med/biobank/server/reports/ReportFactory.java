@@ -1,9 +1,8 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportFactory {
@@ -12,12 +11,13 @@ public class ReportFactory {
     public static AbstractReport createReport(BiobankReport report)
         throws ApplicationException {
         try {
-            String reportClass = report.getClass().getSimpleName() + "Impl";
-            reportClass = reportClass.replace(".client.", ".server.");
+            String reportClass = BiobankReport.editorPath.concat(report
+                .getClassName().concat("Impl"));
+            reportClass = reportClass.replace(".editors", ".server.reports");
             Class<AbstractReport> clazz = (Class<AbstractReport>) Class
                 .forName(reportClass);
-            Constructor<AbstractReport> constructor = clazz.getConstructor(
-                List.class, List.class);
+            Constructor<AbstractReport> constructor = clazz
+                .getConstructor(BiobankReport.class);
             return constructor.newInstance(report);
         } catch (Exception ex) {
             throw new ApplicationException(ex);

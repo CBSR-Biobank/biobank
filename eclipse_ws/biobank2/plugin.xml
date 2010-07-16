@@ -1908,21 +1908,21 @@
             class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByStudyEditortsEditor"
+            id="edu.ualberta.med.biobank.editors.AliquotsByStudyEditor"
             name="Aliquots per Study">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyClinicEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicEditortsEditor"
+            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicEditor"
             name="Aliquots per Study per Clinic">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyClinicDateEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicDateEditortsEditor"
+            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicDateEditor"
             name="Aliquots per Study per Clinic by Date">
       </editor>
       <editor
@@ -1973,6 +1973,20 @@
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor"
             name="Sample Type Usage">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.PatientWBCEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.PatientWBCEditor"
+            name="Patient WBC Aliquots">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.PatientVisitSummaryEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"
+            name="Patient Visit Summary">
       </editor>
    </extension>
    <extension

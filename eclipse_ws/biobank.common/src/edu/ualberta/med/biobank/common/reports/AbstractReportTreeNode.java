@@ -1,9 +1,9 @@
-package edu.ualberta.med.biobank.client.reports;
+package edu.ualberta.med.biobank.common.reports;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractReportTreeNode {
+public class AbstractReportTreeNode {
     private AbstractReportTreeNode parent;
     private List<AbstractReportTreeNode> children;
     private String name;

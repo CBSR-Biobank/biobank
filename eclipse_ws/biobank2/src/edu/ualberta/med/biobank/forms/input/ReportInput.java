@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.forms.input;
 
-import edu.ualberta.med.biobank.client.reports.AbstractReportTreeNode;
-import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 
 public class ReportInput extends FormInput {
 
-    public ReportInput(ReportTreeNode node) {
+    public ReportInput(AbstractReportTreeNode node) {
         super(node);
     }
 
@@ -15,7 +15,7 @@ public class ReportInput extends FormInput {
     }
 
     public AbstractReportTreeNode getNode() {
-        return (ReportTreeNode) getAdapter(ReportTreeNode.class);
+        return (AbstractReportTreeNode) getAdapter(ReportTreeNode.class);
     }
 
 }

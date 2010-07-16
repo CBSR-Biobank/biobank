@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.server.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -55,7 +55,8 @@ public class AbstractReport {
             report.getOp());
         queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING, report
             .getSiteId().toString());
-        // do string substitutions here
+        queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
+            report.getGroupBy());
         HQLCriteria criteria = new HQLCriteria(queryString, report.getParams());
         return new ReportListProxy(appService, criteria, getRowPostProcess());
     }

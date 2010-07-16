@@ -32,7 +32,9 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 
 public class ReportTreeWidget extends Composite {
@@ -66,22 +68,24 @@ public class ReportTreeWidget extends Composite {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return ((ReportTreeNode) inputElement).getChildren().toArray();
+                return ((AbstractReportTreeNode) inputElement).getChildren()
+                    .toArray();
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return !((ReportTreeNode) element).isLeaf();
+                return !((AbstractReportTreeNode) element).isLeaf();
             }
 
             @Override
             public Object getParent(Object element) {
-                return ((ReportTreeNode) element).getParent();
+                return ((AbstractReportTreeNode) element).getParent();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                return ((ReportTreeNode) parentElement).getChildren().toArray();
+                return ((AbstractReportTreeNode) parentElement).getChildren()
+                    .toArray();
             }
         });
         treeViewer.setLabelProvider(new ILabelProvider() {
@@ -92,7 +96,7 @@ public class ReportTreeWidget extends Composite {
 
             @Override
             public String getText(Object element) {
-                return ((ReportTreeNode) element).getLabel();
+                return ((AbstractReportTreeNode) element).getLabel();
             }
 
             @Override
@@ -246,29 +250,27 @@ public class ReportTreeWidget extends Composite {
     }
 
     private void executeDoubleClick(DoubleClickEvent event) {
-        ReportTreeNode node = (ReportTreeNode) ((IStructuredSelection) event
+        AbstractReportTreeNode node = (AbstractReportTreeNode) ((IStructuredSelection) event
             .getSelection()).getFirstElement();
         try {
-            if (node.getReport() != null) {
-                /*
-                 * if (node.getQuery() instanceof QueryTreeNode) PlatformUI
-                 * .getWorkbench() .getActiveWorkbenchWindow() .getActivePage()
-                 * .openEditor(new ReportInput(node), AdvancedReportsEditor.ID);
-                 * else
-                 */
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            if (node instanceof ReportTreeNode
+                && ((ReportTreeNode) node).getReport() != null)
+                PlatformUI
+                    .getWorkbench()
+                    .getActiveWorkbenchWindow()
                     .getActivePage()
-                    .openEditor(new ReportInput(node), getEditorFor(node));
-            }
+                    .openEditor(new ReportInput(node),
+                        ((ReportTreeNode) node).getReport().getEditorId());
+            else
+                PlatformUI
+                    .getWorkbench()
+                    .getActiveWorkbenchWindow()
+                    .getActivePage()
+                    .openEditor(new ReportInput(node), AdvancedReportsEditor.ID);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error", ex,
                 "There was an error while building page.");
         }
-    }
-
-    private String getEditorFor(ReportTreeNode node) {
-        return "edu.ualberta.med.biobank.editors.".concat(node.getReport()
-            .getClass().getSimpleName().concat("Editor"));
     }
 
     @Override

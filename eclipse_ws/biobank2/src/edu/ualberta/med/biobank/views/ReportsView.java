@@ -11,13 +11,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.client.reports.AbstractReportTreeNode;
-import edu.ualberta.med.biobank.client.reports.AdvancedReportTreeNode;
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
-import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -61,16 +61,17 @@ public class ReportsView extends AbstractViewWithTree<AbstractReportTreeNode> {
         gd.grabExcessVerticalSpace = true;
         reportTree.setLayoutData(gd);
 
-        AbstractReportTreeNode root = new ReportTreeNode("", null);
-        AbstractReportTreeNode standard = new ReportTreeNode("Standard", null);
-        AbstractReportTreeNode advanced = new ReportTreeNode("Advanced", null);
+        AbstractReportTreeNode root = new AbstractReportTreeNode("");
+        AbstractReportTreeNode standard = new AbstractReportTreeNode("Standard");
+        AbstractReportTreeNode advanced = new AbstractReportTreeNode("Advanced");
 
         // create standard's subnodes
-        ReportTreeNode aliquots = new ReportTreeNode("Aliquots", null);
-        ReportTreeNode clinics = new ReportTreeNode("Clinics", null);
-        ReportTreeNode patientVisits = new ReportTreeNode("PatientVisits", null);
-        ReportTreeNode patients = new ReportTreeNode("Patients", null);
-        ReportTreeNode misc = new ReportTreeNode("Sample Types", null);
+        AbstractReportTreeNode aliquots = new AbstractReportTreeNode("Aliquots");
+        AbstractReportTreeNode clinics = new AbstractReportTreeNode("Clinics");
+        AbstractReportTreeNode patientVisits = new AbstractReportTreeNode(
+            "PatientVisits");
+        AbstractReportTreeNode patients = new AbstractReportTreeNode("Patients");
+        AbstractReportTreeNode misc = new AbstractReportTreeNode("Sample Types");
 
         standard.addChild(aliquots);
         standard.addChild(clinics);
@@ -94,7 +95,7 @@ public class ReportsView extends AbstractViewWithTree<AbstractReportTreeNode> {
             child.setParent(advanced);
         }
 
-        ReportTreeNode custom = new ReportTreeNode("Custom", null);
+        AbstractReportTreeNode custom = new AbstractReportTreeNode("Custom");
         custom.setParent(advanced);
         advanced.addChild(custom);
 
@@ -124,39 +125,39 @@ public class ReportsView extends AbstractViewWithTree<AbstractReportTreeNode> {
         getTreeViewer().expandAll();
     }
 
-    private void initializeNewReports(ReportTreeNode aliquots,
-        ReportTreeNode clinics, ReportTreeNode patientVisits,
-        ReportTreeNode patients, ReportTreeNode misc) {
+    private void initializeNewReports(AbstractReportTreeNode aliquots,
+        AbstractReportTreeNode clinics, AbstractReportTreeNode patientVisits,
+        AbstractReportTreeNode patients, AbstractReportTreeNode misc) {
         String[] names = BiobankReport.getReportNames();
         for (int i = 0; i < names.length; i++) {
             try {
-                ReportTreeNode child = new ReportTreeNode(names[i],
+                ReportTreeNode child = new ReportTreeNode(
                     BiobankReport.getReportByName(names[i]));
                 addInTree(aliquots, clinics, patientVisits, patients, misc,
-                    names, i, child);
+                    child);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void addInTree(ReportTreeNode aliquots, ReportTreeNode clinics,
-        ReportTreeNode patientVisits, ReportTreeNode patients,
-        ReportTreeNode misc, String[] names, int i, ReportTreeNode child)
-        throws Exception {
-        if (names[i].contains("Aliquot")) {
+    private void addInTree(AbstractReportTreeNode aliquots,
+        AbstractReportTreeNode clinics, AbstractReportTreeNode patientVisits,
+        AbstractReportTreeNode patients, AbstractReportTreeNode misc,
+        ReportTreeNode child) throws Exception {
+        if (child.getLabel().contains("Aliquot")) {
             aliquots.addChild(child);
             child.setParent(aliquots);
-        } else if (names[i].contains("Sample Type")) {
+        } else if (child.getLabel().contains("Sample Type")) {
             misc.addChild(child);
             child.setParent(misc);
-        } else if (names[i].contains("Patient Visit")) {
+        } else if (child.getLabel().contains("Patient Visit")) {
             patientVisits.addChild(child);
             child.setParent(patientVisits);
-        } else if (names[i].contains("Patient")) {
+        } else if (child.getLabel().contains("Patient")) {
             patients.addChild(child);
             child.setParent(patients);
-        } else if (names[i].contains("Clinic")) {
+        } else if (child.getLabel().contains("Clinic")) {
             clinics.addChild(child);
             child.setParent(clinics);
         } else

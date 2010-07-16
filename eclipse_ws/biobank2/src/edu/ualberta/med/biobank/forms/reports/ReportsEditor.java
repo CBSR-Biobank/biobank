@@ -47,11 +47,12 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.BiobankReport;
-import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.DateGroup;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
@@ -211,15 +212,18 @@ public abstract class ReportsEditor extends BiobankFormBase {
             report.setSiteInfo(op, site.getId());
 
             List<Object> params = new ArrayList<Object>();
-            List<String> strings = new ArrayList<String>();
+            String grouping = "";
             for (Object ob : getParams()) {
-                if (ob instanceof String)
-                    strings.add((String) ob);
-                else
+                try {
+                    // FIXME: horrible hack: need better way to test value
+                    DateGroup.valueOf((String) ob);
+                    grouping = (String) ob;
+                } catch (Exception e) {
                     params.add(ob);
+                }
             }
             report.setParams(params);
-            report.setStrings(strings);
+            report.setGroupBy(grouping);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Input Error", e1);
             return;
