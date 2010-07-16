@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -89,7 +90,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patient = ((PatientAdapter) patientVisitAdapter.getParent())
             .getWrapper();
         retrieve();
-        patientVisit.logEdit();
+        patientVisit.logEdit(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
         String tabName;
         if (patientVisit.isNew()) {
             tabName = "New Patient Visit";
