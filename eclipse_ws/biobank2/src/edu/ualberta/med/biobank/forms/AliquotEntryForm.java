@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -36,7 +37,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
         aliquot = aliquotAdapter.getAliquot();
-        aliquot.logEdit();
+        aliquot.logEdit(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
         setPartName("Aliquot Entry");
     }
 

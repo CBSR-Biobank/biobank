@@ -571,7 +571,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        setScanValid(currentScanState != AliquotCellStatus.ERROR);
+        setScanValid(!cells.isEmpty()
+            && currentScanState != AliquotCellStatus.ERROR);
     }
 
     private void showOnlyPallet(boolean show) {

@@ -236,8 +236,11 @@ public class TestSite extends TestDatabase {
     public void testGetContainerCollection() throws Exception {
         String name = "testGetContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
+        // int totalContainers = ContainerHelper.addTopContainersWithChildren(
+        // site, name, r.nextInt(3) + 1);
+
         int totalContainers = ContainerHelper.addTopContainersWithChildren(
-            site, name, r.nextInt(3) + 1);
+            site, name, 1);
 
         List<ContainerWrapper> containers = site.getContainerCollection();
         int sizeFound = containers.size();
@@ -449,14 +452,14 @@ public class TestSite extends TestDatabase {
             .addSite("testDelete" + r.nextInt(), false);
 
         // object is in database
-        Site siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
-            .getId());
+        Site siteInDB = ModelUtils.getObjectWithId(appService, Site.class,
+            site.getId());
         Assert.assertNotNull(siteInDB);
 
         site.delete();
 
-        siteInDB = ModelUtils.getObjectWithId(appService, Site.class, site
-            .getId());
+        siteInDB = ModelUtils.getObjectWithId(appService, Site.class,
+            site.getId());
         // object is not anymore in database
         Assert.assertNull(siteInDB);
     }
@@ -599,8 +602,8 @@ public class TestSite extends TestDatabase {
 
         // set non existing type, expect exception
         try {
-            site.setSitePvAttr(Utils.getRandomString(10, 15), Utils
-                .getRandomString(10, 15));
+            site.setSitePvAttr(Utils.getRandomString(10, 15),
+                Utils.getRandomString(10, 15));
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -917,9 +920,9 @@ public class TestSite extends TestDatabase {
             for (PatientVisitWrapper visit : patient
                 .getPatientVisitCollection()) {
                 for (int i = 0; i < 2; ++i) {
-                    AliquotHelper.addAliquot(allSampleTypes.get(r
-                        .nextInt(sampleTypeCount)), container, visit,
-                        sampleCount / 12, sampleCount % 12);
+                    AliquotHelper.addAliquot(
+                        allSampleTypes.get(r.nextInt(sampleTypeCount)),
+                        container, visit, sampleCount / 12, sampleCount % 12);
                     ++sampleCount;
                 }
             }

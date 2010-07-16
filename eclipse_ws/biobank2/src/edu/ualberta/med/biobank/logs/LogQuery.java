@@ -21,6 +21,7 @@ public class LogQuery {
         // searchQuery.put("containerType", "");
         // searchQuery.put("containerLabel", "");
 
+        searchQuery.put("site", "");
         searchQuery.put("user", "");
         searchQuery.put("type", "");
         searchQuery.put("action", "");
@@ -46,6 +47,10 @@ public class LogQuery {
 
     public boolean queryDatabase() {
         try {
+            String site = searchQuery.get("site");
+            site = site.equals("NONE") ? "" : site;
+            site = site.equals("ALL") ? null : site;
+
             String user = searchQuery.get("user");
             user = user.equals("NONE") ? "" : user;
             user = user.equals("ALL") ? null : user;
@@ -92,8 +97,8 @@ public class LogQuery {
             }
 
             dbResults = LogWrapper.getLogs(SessionManager.getAppService(),
-                user, startDate, endDate, action, patientNumber, inventoryId,
-                location, details, type);
+                site, user, startDate, endDate, action, patientNumber,
+                inventoryId, location, details, type);
 
         } catch (Exception e) {
             e.printStackTrace();

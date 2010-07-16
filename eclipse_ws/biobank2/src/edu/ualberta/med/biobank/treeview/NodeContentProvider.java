@@ -105,7 +105,9 @@ public class NodeContentProvider implements ITreeContentProvider,
     @Override
     public void add(DeltaEvent event) {
         AdapterBase node = ((AdapterBase) event.receiver()).getParent();
-        viewer.refresh(node, false);
+        if (!viewer.isBusy()) {
+            viewer.refresh(node, false);
+        }
     }
 
     @Override

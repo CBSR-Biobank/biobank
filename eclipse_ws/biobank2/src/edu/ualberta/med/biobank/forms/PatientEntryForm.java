@@ -52,7 +52,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         patientAdapter = (PatientAdapter) adapter;
         retrievePatient();
-        patientAdapter.getWrapper().logEdit();
+        patientAdapter.getWrapper().logEdit(
+            SessionManager.getInstance().getCurrentSite().getNameShort());
         String tabName;
         if (patientAdapter.getWrapper().isNew()) {
             tabName = "New Patient";

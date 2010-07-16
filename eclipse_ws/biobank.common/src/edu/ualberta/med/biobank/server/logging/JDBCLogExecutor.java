@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.server.logging;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 
 import edu.ualberta.med.biobank.common.util.LogSql;
@@ -22,6 +23,11 @@ public class JDBCLogExecutor implements Runnable {
     private String dbDriverClass = null;
     private String dbUser = null;
     private String dbPwd = null;
+
+    public static final String COMMA = ",";
+
+    public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(
+        "yyyy-MM-dd HH:mm:ss");
 
     /**
      * Constructor for JDBCExcecutor.

@@ -539,15 +539,15 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    protected void log(String action, String details) {
+    protected void log(String action, String site, String details) {
         String fullDetails = "shipment " + details + " - Received:"
             + getFormattedDateReceived();
         String waybill = getWaybill();
         if (waybill != null) {
             fullDetails += " - Waybill:" + waybill;
         }
-        ((BiobankApplicationService) appService).logActivity(action, null,
-            null, null, fullDetails, "Shipment");
+        ((BiobankApplicationService) appService).logActivity(action, site,
+            null, null, null, fullDetails, "Shipment");
     }
 
     @Override

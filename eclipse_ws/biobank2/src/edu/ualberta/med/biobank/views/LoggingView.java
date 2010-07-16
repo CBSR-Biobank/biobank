@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.LogQuery;
-import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
+import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -45,27 +45,24 @@ public class LoggingView extends ViewPart {
     private ISourceProviderListener siteStateListener;
 
     private static enum ComboListType {
-        USER, TYPE, ACTION
+        SITE, USER, TYPE, ACTION
     }
 
-    private Composite top;
-
-    private Label userLabel, typeLabel, actionLabel, patientNumLabel,
-        inventoryIdLabel, startDateLabel, endDateLabel, detailsLabel,
-        locationLabel;
-    // containerTypeLabel, containerLabelLabel
-
-    BiobankText patientNumTextInput, inventoryIdTextInput, detailsTextInput,
-        locationTextInput;
+    private BiobankText patientNumTextInput, inventoryIdTextInput,
+        detailsTextInput, locationTextInput;
     // containerLabelTextInput
 
-    Combo userCombo, typeCombo, actionCombo;
+    private Combo siteCombo, userCombo, typeCombo, actionCombo;
 
-    DateTimeWidget startDateWidget, endDateWidget;
+    private DateTimeWidget startDateWidget, endDateWidget;
 
     // containerTypeCombo
 
-    Button clearButton, searchButton;
+    private Button clearButton, searchButton;
+
+    private Color colorWhite;
+
+    private String[] siteComboOptions;
 
     private final Listener alphaNumericListener = new Listener() {
         @Override
@@ -95,98 +92,92 @@ public class LoggingView extends ViewPart {
     /* TODO implement Auto-fill text/combo box hybrid */
     @Override
     public void createPartControl(Composite parent) {
+        colorWhite = new Color(parent.getDisplay(), 255, 255, 255);
 
-        GridLayout gridlayout = new GridLayout();
-        gridlayout.makeColumnsEqualWidth = false;
-        gridlayout.numColumns = 2;
-        gridlayout.verticalSpacing = 5;
+        GridLayout gridlayout = new GridLayout(2, false);
+        gridlayout.verticalSpacing = 2;
         gridlayout.horizontalSpacing = 5;
         gridlayout.marginLeft = 1;
         gridlayout.marginRight = 5;
+        gridlayout.marginBottom = 10;
 
-        GridData griddata = new GridData();// SWT.LEFT, SWT.LEFT, true, true
-        griddata.grabExcessHorizontalSpace = true;
-        griddata.grabExcessVerticalSpace = true;
-        griddata.exclude = false;
+        parent.setLayout(gridlayout);
+        parent.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
+        parent.setBackground(colorWhite);
 
-        Color colorWhite = new Color(parent.getDisplay(), 255, 255, 255);
+        Label label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Site:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        top = new Composite(parent, SWT.BORDER);
-        top.setLayout(gridlayout);
-        top.setLayoutData(griddata);
-        top.setBackground(colorWhite);
-        top.setVisible(true);
+        siteCombo = new Combo(parent, SWT.READ_ONLY);
+        siteCombo.setFocus();
+        siteCombo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        siteCombo.addKeyListener(enterListener);
 
-        userLabel = new Label(top, SWT.NO_BACKGROUND);
-        userLabel.setText("User:");
-        userLabel.setAlignment(SWT.LEFT);
-        userLabel.setBackground(colorWhite);
-        userLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("User:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        userCombo = new Combo(top, SWT.READ_ONLY);
-        userCombo.setVisible(true);
+        userCombo = new Combo(parent, SWT.READ_ONLY);
         userCombo.setFocus();
-        userCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        userCombo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         userCombo.addKeyListener(enterListener);
 
-        typeLabel = new Label(top, SWT.NO_BACKGROUND);
-        typeLabel.setText("Type:");
-        typeLabel.setAlignment(SWT.LEFT);
-        typeLabel.setBackground(colorWhite);
-        typeLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Type:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        typeCombo = new Combo(top, SWT.READ_ONLY);
+        typeCombo = new Combo(parent, SWT.READ_ONLY);
         typeCombo.setVisible(true);
-        typeCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        typeCombo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         typeCombo.addKeyListener(enterListener);
 
-        actionLabel = new Label(top, SWT.NO_BACKGROUND);
-        actionLabel.setText("Action:");
-        actionLabel.setAlignment(SWT.LEFT);
-        actionLabel.setBackground(colorWhite);
-        actionLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Action:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        actionCombo = new Combo(top, SWT.READ_ONLY);
+        actionCombo = new Combo(parent, SWT.READ_ONLY);
         actionCombo.setVisible(true);
-        actionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        actionCombo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         actionCombo.addKeyListener(enterListener);
 
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
+        new Label(parent, SWT.NONE);
+        new Label(parent, SWT.NONE);
 
-        patientNumLabel = new Label(top, SWT.NO_BACKGROUND);
-        patientNumLabel.setText("Patient #:");
-        patientNumLabel.setAlignment(SWT.LEFT);
-        patientNumLabel.setBackground(colorWhite);
-        patientNumLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Patient #:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        patientNumTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
+        patientNumTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
         patientNumTextInput.setVisible(true);
         patientNumTextInput
             .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         patientNumTextInput.addListener(SWT.Verify, alphaNumericListener);
         patientNumTextInput.addKeyListener(enterListener);
 
-        inventoryIdLabel = new Label(top, SWT.NO_BACKGROUND);
-        inventoryIdLabel.setText("Inventory ID:");
-        inventoryIdLabel.setAlignment(SWT.LEFT);
-        inventoryIdLabel.setBackground(colorWhite);
-        inventoryIdLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Inventory ID:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        inventoryIdTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
+        inventoryIdTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
         inventoryIdTextInput.setVisible(true);
         inventoryIdTextInput.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL));
         inventoryIdTextInput.addListener(SWT.Verify, alphaNumericListener);
         inventoryIdTextInput.addKeyListener(enterListener);
 
-        locationLabel = new Label(top, SWT.NO_BACKGROUND);
-        locationLabel.setText("Location:");
-        locationLabel.setAlignment(SWT.LEFT);
-        locationLabel.setBackground(colorWhite);
-        locationLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Location:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        locationTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
+        locationTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
         locationTextInput.setVisible(true);
         locationTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         locationTextInput.addListener(SWT.Verify, alphaNumericListener);
@@ -195,11 +186,8 @@ public class LoggingView extends ViewPart {
         /*
          * new Label(top, SWT.NONE); new Label(top, SWT.NONE);
          * 
-         * containerTypeLabel = new Label(top, SWT.NO_BACKGROUND);
-         * containerTypeLabel.setText("Container Type:");
-         * containerTypeLabel.setAlignment(SWT.LEFT);
-         * containerTypeLabel.setBackground(colorWhite);
-         * containerTypeLabel.setVisible(true);
+         * label = new Label(top, SWT.NO_BACKGROUND);
+         * label.setText("Container Type:"); label.setAlignment(SWT.LEFT);
          * 
          * containerTypeCombo = new Combo(top, SWT.READ_ONLY);
          * containerTypeCombo.setItems(this.loadContainerTypeList());
@@ -207,57 +195,50 @@ public class LoggingView extends ViewPart {
          * containerTypeCombo .setLayoutData(new
          * GridData(GridData.FILL_HORIZONTAL));
          * 
-         * containerLabelLabel = new Label(top, SWT.NO_BACKGROUND);
-         * containerLabelLabel.setText("Container Label:");
-         * containerLabelLabel.setAlignment(SWT.LEFT);
-         * containerLabelLabel.setBackground(colorWhite);
-         * containerLabelLabel.setVisible(true);
+         * label = new Label(top, SWT.NO_BACKGROUND);
+         * label.setText("Container Label:"); label.setAlignment(SWT.LEFT);
          * 
-         * containerLabelTextInput = new BiobankText(top, SWT.SINGLE |
-         * SWT.BORDER); containerLabelTextInput.setVisible(true);
-         * containerLabelTextInput.setLayoutData(new GridData(
-         * GridData.FILL_HORIZONTAL));
-         * containerLabelTextInput.addListener(SWT.Verify, new Listener() {
-         * public void handleEvent(Event e) { String string = e.text; for (int i
-         * = 0; i < string.length(); i++) { // input must be alpha numeric if
+         * labelTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
+         * labelTextInput.setVisible(true); labelTextInput.setLayoutData(new
+         * GridData( GridData.FILL_HORIZONTAL));
+         * labelTextInput.addListener(SWT.Verify, new Listener() { public void
+         * handleEvent(Event e) { String string = e.text; for (int i = 0; i <
+         * string.length(); i++) { // input must be alpha numeric if
          * (!(string.matches("\\p{Alnum}+"))) { e.doit = false; return; } } }
          * });
          */
-        detailsLabel = new Label(top, SWT.NO_BACKGROUND);
-        detailsLabel.setText("Details:");
-        detailsLabel.setAlignment(SWT.LEFT);
-        detailsLabel.setBackground(colorWhite);
-        detailsLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Details:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        detailsTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
+        detailsTextInput = new BiobankText(parent, SWT.SINGLE | SWT.BORDER);
         detailsTextInput.setVisible(true);
         detailsTextInput.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         detailsTextInput.addKeyListener(enterListener);
 
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
+        new Label(parent, SWT.NONE);
+        new Label(parent, SWT.NONE);
 
-        startDateLabel = new Label(top, SWT.NO_BACKGROUND);
-        startDateLabel.setText("Start Date:");
-        startDateLabel.setAlignment(SWT.LEFT);
-        startDateLabel.setBackground(colorWhite);
-        startDateLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("Start Date:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        startDateWidget = new DateTimeWidget(top, SWT.DATE, null);
+        startDateWidget = new DateTimeWidget(parent, SWT.DATE, null);
         startDateWidget.setBackground(colorWhite);
 
-        endDateLabel = new Label(top, SWT.NO_BACKGROUND);
-        endDateLabel.setText("End Date:");
-        endDateLabel.setAlignment(SWT.LEFT);
-        endDateLabel.setBackground(colorWhite);
-        endDateLabel.setVisible(true);
+        label = new Label(parent, SWT.NO_BACKGROUND);
+        label.setText("End Date:");
+        label.setAlignment(SWT.LEFT);
+        label.setBackground(colorWhite);
 
-        endDateWidget = new DateTimeWidget(top, SWT.DATE, null);
+        endDateWidget = new DateTimeWidget(parent, SWT.DATE, null);
         endDateWidget.setBackground(colorWhite);
 
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
-        new Label(top, SWT.NONE);
+        new Label(parent, SWT.NONE);
+        new Label(parent, SWT.NONE);
+        new Label(parent, SWT.NONE);
 
         GridLayout gridlayoutButton = new GridLayout();
         gridlayoutButton.makeColumnsEqualWidth = false;
@@ -267,7 +248,7 @@ public class LoggingView extends ViewPart {
         gridlayoutButton.marginLeft = 0;
         gridlayoutButton.marginRight = 0;
 
-        Composite buttonComposite = new Composite(top, SWT.NONE);
+        Composite buttonComposite = new Composite(parent, SWT.NONE);
         buttonComposite.setLayout(gridlayoutButton);
         buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         buttonComposite.setBackground(colorWhite);
@@ -303,49 +284,54 @@ public class LoggingView extends ViewPart {
         searchButton.addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {
-                userCombo.setFocus();
+                siteCombo.setFocus();
                 e.doit = false;
             }
         });
-        setSiteManagement();
+
+        sessionMonitor();
         clearFields();
 
-        if (SessionManager.getInstance().isConnected()
-            && SessionManager.getInstance().getCurrentSite() != null
-            && !SessionManager.getInstance().isAllSitesSelected()) {
+        // if logged in and select the site selected in "working site" combo
+        // box, only if not "All Sites" are selected
+        if (SessionManager.getInstance().isConnected()) {
             setEnableAllFields(true);
             loadComboFields();
+            if (!SessionManager.getInstance().isAllSitesSelected()) {
+                String currentSiteName = SessionManager.getInstance()
+                    .getCurrentSite().getNameShort();
+                for (int i = 0; i < siteComboOptions.length; ++i) {
+                    if (siteComboOptions[i].equals(currentSiteName)) {
+                        siteCombo.select(i);
+                    }
+                }
+            }
         } else
             setEnableAllFields(false);
-
     }
 
-    private void setSiteManagement() {
-        ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
+    // monitors the logged in / out state
+    private void sessionMonitor() {
+        ISourceProvider siteSelectionStateSourceProvider = getSessionStateSourceProvider();
 
         siteStateListener = new ISourceProviderListener() {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
 
-                if (sourceValue == null || (Integer) sourceValue < 0) {
+                if (sourceValue.equals(SessionState.LOGGED_OUT)) {
                     setEnableAllFields(false);
-                    return;
-                }
-
-                if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
-                    if (SessionManager.getInstance().isAllSitesSelected()) {
-                        setEnableAllFields(false);
-                    } else {
-                        loadComboFields();
-                        setEnableAllFields(true);
-                    }
+                } else if (sourceValue.equals(SessionState.LOGGED_IN)) {
+                    loadComboFields();
+                    setEnableAllFields(true);
                 }
             }
 
             @SuppressWarnings("rawtypes")
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -357,18 +343,18 @@ public class LoggingView extends ViewPart {
     public void dispose() {
         super.dispose();
         if (siteStateListener != null) {
-            getSiteSelectionStateSourceProvider().removeSourceProviderListener(
+            getSessionStateSourceProvider().removeSourceProviderListener(
                 siteStateListener);
         }
     }
 
-    private ISourceProvider getSiteSelectionStateSourceProvider() {
+    private ISourceProvider getSessionStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         ISourceProvider siteSelectionStateSourceProvider = service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+            .getSourceProvider(SessionState.SESSION_STATE);
         return siteSelectionStateSourceProvider;
     }
 
@@ -377,6 +363,7 @@ public class LoggingView extends ViewPart {
     }
 
     private void setEnableAllFields(boolean enabled) {
+        siteCombo.setEnabled(enabled);
         userCombo.setEnabled(enabled);
         typeCombo.setEnabled(enabled);
         actionCombo.setEnabled(enabled);
@@ -391,15 +378,19 @@ public class LoggingView extends ViewPart {
     }
 
     private void loadComboFields() {
-        userCombo.setItems(this.loadComboList(ComboListType.USER));
+        siteComboOptions = loadComboList(ComboListType.SITE);
+        siteCombo.setItems(siteComboOptions);
+        siteCombo.select(0);
+        userCombo.setItems(loadComboList(ComboListType.USER));
         userCombo.select(0);
-        typeCombo.setItems(this.loadComboList(ComboListType.TYPE));
+        typeCombo.setItems(loadComboList(ComboListType.TYPE));
         typeCombo.select(0);
-        actionCombo.setItems(this.loadComboList(ComboListType.ACTION));
+        actionCombo.setItems(loadComboList(ComboListType.ACTION));
         actionCombo.select(0);
     }
 
     private void clearFields() {
+        siteCombo.select(0);
         userCombo.select(0);
         typeCombo.select(0);
         actionCombo.select(0);
@@ -424,6 +415,8 @@ public class LoggingView extends ViewPart {
 
         FormInput input = new FormInput(null, "Logging Form Input");
         try {
+            LogQuery.getInstance().setSearchQueryItem("site",
+                siteCombo.getText());
             LogQuery.getInstance().setSearchQueryItem("user",
                 userCombo.getText());
             LogQuery.getInstance().setSearchQueryItem("type",
@@ -472,6 +465,11 @@ public class LoggingView extends ViewPart {
             }
 
             switch (possibleList) {
+            case SITE:
+                arrayList = LogWrapper.getPossibleSites(SessionManager
+                    .getAppService());
+                break;
+
             case USER:
                 arrayList = LogWrapper.getPossibleUsernames(SessionManager
                     .getAppService());

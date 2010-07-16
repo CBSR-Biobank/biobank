@@ -14,14 +14,15 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     private AbstractPositionWrapper<T> positionWrapper;
 
     // used to allow position to be assigned to null
-    protected boolean newPositionSet;
+    protected boolean nullPositionSet;
 
     private ContainerWrapper parent;
 
     public AbstractPositionHolder(WritableApplicationService appService,
         E wrappedObject) {
         super(appService, wrappedObject);
-        newPositionSet = false;
+
+        nullPositionSet = false;
     }
 
     public AbstractPositionHolder(WritableApplicationService appService) {
@@ -30,7 +31,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
 
     @Override
     public void persist() throws Exception {
-        boolean origPositionSet = (!newPositionSet && (rowColPosition != null));
+        boolean origPositionSet = (!nullPositionSet && (rowColPosition != null));
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
         if ((posWrapper != null) && origPositionSet) {
             posWrapper.setRow(rowColPosition.row);
@@ -42,7 +43,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        boolean origPositionSet = (!newPositionSet && rowColPosition != null);
+        boolean origPositionSet = (!nullPositionSet && rowColPosition != null);
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
         if (posWrapper != null) {
             posWrapper.persistChecks();
@@ -63,11 +64,11 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     protected void resetInternalField() {
         rowColPosition = null;
         positionWrapper = null;
-        newPositionSet = false;
+        nullPositionSet = false;
     }
 
     public RowColPos getPosition() {
-        if (!newPositionSet && (rowColPosition == null)) {
+        if (!nullPositionSet && (rowColPosition == null)) {
             AbstractPositionWrapper<T> pos = getPositionWrapper();
             if (pos != null) {
                 rowColPosition = new RowColPos(pos.getRow(), pos.getCol());
@@ -83,8 +84,8 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
             position);
         if (position == null) {
             positionWrapper = null;
+            nullPositionSet = true;
         }
-        newPositionSet = true;
     }
 
     public void setPosition(Integer row, Integer col) {

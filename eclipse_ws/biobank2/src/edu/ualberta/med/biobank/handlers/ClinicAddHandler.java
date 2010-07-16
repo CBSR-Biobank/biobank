@@ -21,8 +21,8 @@ public class ClinicAddHandler extends AbstractHandler {
 
         ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
         clinic.setSite(siteAdapter.getWrapper());
-        ClinicAdapter clinicNode = new ClinicAdapter(siteAdapter
-            .getClinicGroupNode(), clinic);
+        ClinicAdapter clinicNode = new ClinicAdapter(
+            siteAdapter.getClinicGroupNode(), clinic);
         clinicNode.openEntryForm();
 
         return null;

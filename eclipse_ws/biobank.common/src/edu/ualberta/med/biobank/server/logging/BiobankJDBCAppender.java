@@ -63,7 +63,7 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
         Log log = populateObjectStateLogMesage(msg);
         java.util.Date d = new java.util.Date();
         d.setTime(new Long(System.currentTimeMillis()).longValue());
-        log.setDate(new Date());
+        log.setCreatedAt(new Date());
         log.setUsername(userInfo.getUsername());
 
         JDBCLogExecutor exe = new JDBCLogExecutor(log, getJDBCProperties());
@@ -84,8 +84,8 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
             String messagetemp = (String) stringTokenizer.nextElement();
             if (messagetemp.indexOf("=") <= 0)
                 continue;
-            String attributeName = messagetemp.substring(0, messagetemp
-                .indexOf("="));
+            String attributeName = messagetemp.substring(0,
+                messagetemp.indexOf("="));
             String value = messagetemp.substring(messagetemp.indexOf("=") + 1);
             for (LogProperty logProperties : LogProperty.values()) {
                 boolean set = logProperties.setLogValueIfInString(log,

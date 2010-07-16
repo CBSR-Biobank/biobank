@@ -115,7 +115,7 @@ public class BbpdbLogging {
 
             Log logMsg = new Log();
             logMsg.setUsername(loginId);
-            logMsg.setDate(timestamp);
+            logMsg.setCreatedAt(timestamp);
             logMsg.setType(formName);
             logMsg.setAction(action);
             logMsg.setPatientNumber(pnumber);

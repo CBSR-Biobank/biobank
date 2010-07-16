@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -263,13 +264,21 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 return;
             } else {
                 ScanCell[][] scanCells = null;
-                scanCells = ScannerConfigPlugin.scan(plateNum);
-                cells = PalletCell.convertArray(scanCells);
+                try {
+                    scanCells = ScannerConfigPlugin.scan(plateNum);
+                    cells = PalletCell.convertArray(scanCells);
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$
+                        ex, "You can still define barcodes one  by one.");
+                }
             }
         } else {
             launchFakeScan();
         }
-        if (cells != null) {
+        setScanHasBeenLauched(true);
+        if (cells == null) {
+            cells = new HashMap<RowColPos, PalletCell>();
+        } else {
             if (isRescanMode() && oldCells != null) {
                 // rescan: merge previous scan with new in case the scanner
                 // wasn't
@@ -291,11 +300,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                     }
                 }
             }
-            setScanHasBeenLauched(true);
             appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
                 cells.keySet().size());
-        } else {
-            setScanNotLauched(true);
         }
     }
 
@@ -323,7 +329,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void setScanNotLauched() {
         scanHasBeenLaunchedValue.setValue(false);
-        scanTubeAloneSwitch.setVisible(false);
+        // scanTubeAloneSwitch.setVisible(false);
     }
 
     protected void setScanNotLauched(boolean async) {
@@ -339,7 +345,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void setScanValid(final boolean valid) {
-        System.out.println("setScanValid=" + valid);
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -348,9 +353,13 @@ public abstract class AbstractPalletAliquotAdminForm extends
         });
     }
 
+    protected boolean isScanValid() {
+        return scanValidValue.getValue().equals(true);
+    }
+
     protected void setScanHasBeenLauched() {
         scanHasBeenLaunchedValue.setValue(true);
-        scanTubeAloneSwitch.setVisible(true);
+        // scanTubeAloneSwitch.setVisible(true);
     }
 
     protected boolean isScanHasBeenLaunched() {
@@ -451,22 +460,26 @@ public abstract class AbstractPalletAliquotAdminForm extends
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
-                scanTubeAloneMode = !scanTubeAloneMode;
-                if (scanTubeAloneMode) {
-                    scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
-                        .getImageRegistry()
-                        .get(BioBankPlugin.IMG_SCAN_CLOSE_EDIT));
-                } else {
-                    scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
-                        .getImageRegistry().get(BioBankPlugin.IMG_SCAN_EDIT));
+                if (isScanHasBeenLaunched()) {
+                    scanTubeAloneMode = !scanTubeAloneMode;
+                    if (scanTubeAloneMode) {
+                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                            .getImageRegistry()
+                            .get(BioBankPlugin.IMG_SCAN_CLOSE_EDIT));
+                    } else {
+                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                            .getImageRegistry()
+                            .get(BioBankPlugin.IMG_SCAN_EDIT));
+                    }
                 }
             }
         });
-        scanTubeAloneSwitch.setVisible(false);
+        // scanTubeAloneSwitch.setVisible(false);
     }
 
     @Override
     public void reset() throws Exception {
         scanValidValue.setValue(true);
+        cells = null;
     }
 }

@@ -308,14 +308,28 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetSetPosition() {
+    public void testGetSetPosition() throws Exception {
         RowColPos position = new RowColPos();
         position.row = 1;
         position.col = 3;
         aliquot.setPosition(position);
         RowColPos newPosition = aliquot.getPosition();
-        Assert.assertTrue((newPosition.row == position.row)
-            && (newPosition.col == position.col));
+        Assert.assertEquals(position.row, newPosition.row);
+        Assert.assertEquals(position.col, newPosition.col);
+
+        // ensure position remains after persist
+        aliquot.persist();
+        aliquot.reload();
+        newPosition = aliquot.getPosition();
+        Assert.assertEquals(position.row, newPosition.row);
+        Assert.assertEquals(position.col, newPosition.col);
+
+        // test setting position to null
+        aliquot.setPosition(null);
+        aliquot.persist();
+        aliquot.reload();
+        newPosition = aliquot.getPosition();
+        Assert.assertEquals(null, newPosition);
     }
 
     @Test
