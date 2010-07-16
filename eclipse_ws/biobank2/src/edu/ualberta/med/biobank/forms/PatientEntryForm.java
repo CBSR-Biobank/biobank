@@ -155,6 +155,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
+        studiesViewer.setSelection(null);
         patientAdapter.getWrapper().reset();
         pnumberNonEmptyValidator.validate(null);
     }
