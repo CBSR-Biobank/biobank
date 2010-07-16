@@ -435,7 +435,9 @@ public abstract class ReportsEditor extends BiobankFormBase {
                             exportCSV(columnInfo, printParams, path, monitor);
                             ((BiobankApplicationService) SessionManager
                                 .getAppService()).logActivity("exportCSV",
-                                null, null, null, report.getName(), "report");
+                                SessionManager.getInstance().getCurrentSite()
+                                    .getNameShort(), null, null, null,
+                                report.getName(), "report");
                         } else {
                             for (Object object : reportData) {
                                 if (monitor.isCanceled()) {
@@ -474,8 +476,9 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 return;
             }
             ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("exportPDF", null, null, null, report.getName(),
-                    "report");
+                .logActivity("exportPDF", SessionManager.getInstance()
+                    .getCurrentSite().getNameShort(), null, null, null,
+                    report.getName(), "report");
         } else {
             try {
                 ReportingUtils.printReport(createDynamicReport(
@@ -485,8 +488,9 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 return;
             }
             ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("print", null, null, null, report.getName(),
-                    "report");
+                .logActivity("print", SessionManager.getInstance()
+                    .getCurrentSite().getNameShort(), null, null, null,
+                    report.getName(), "report");
         }
     }
 

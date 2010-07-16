@@ -5,12 +5,8 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import jargs.gnu.CmdLineParser;
-import jargs.gnu.CmdLineParser.Option;
-import jargs.gnu.CmdLineParser.OptionException;
 
 import java.io.FileReader;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -43,14 +39,19 @@ public class SentAliquots {
     public void doWork(AppArgs appArgs) throws Exception {
         this.appArgs = appArgs;
 
-        appService = ServiceConnection
-            .getAppService("http://" + appArgs.hostUrl + "/biobank2",
-                appArgs.username, appArgs.password);
+        String prefix = "https://";
+        if (appArgs.port == 8080)
+            prefix = "http://";
+
+        String serverUrl = prefix + appArgs.host + ":" + appArgs.port
+            + "/biobank2";
+
+        appService = ServiceConnection.getAppService(serverUrl,
+            appArgs.username, appArgs.password);
 
         site = getCbsrSite();
         if (site == null) {
-            throw new Exception("CBSR site not found on server "
-                + appArgs.hostUrl);
+            throw new Exception("CBSR site not found on server " + appArgs.host);
         }
 
         CSVReader reader = new CSVReader(new FileReader(appArgs.csvFileName));
@@ -98,16 +99,13 @@ public class SentAliquots {
                 .getPnumber();
             if (!aliquotPnumber.equals(patientNo)) {
                 System.out
-                    .println(" does not match patient number for aliquot "
+                    .println(" ERROR: does not match patient number for aliquot "
                         + aliquotPnumber);
                 continue;
             }
 
             System.out.println(" old position " + aliquot.getPositionString());
             aliquot.setComment(closeComment);
-            if (aliquot.getPosition() != null) {
-                System.out.println("need to assign position to null");
-            }
             aliquot.setPosition(null);
             aliquot.setActivityStatus(closedStatus);
             aliquot.persist();
@@ -125,69 +123,15 @@ public class SentAliquots {
 
     public static void main(String argv[]) {
         try {
-            SentAliquots.getInstance().doWork(parseCommandLine(argv));
+            AppArgs args = new AppArgs(argv);
+            if (args.error) {
+                System.out.println(args.errorMsg + "\n" + USAGE);
+                System.exit(-1);
+            }
+            SentAliquots.getInstance().doWork(args);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /*
-     * Parses the command line arguments and returns them in an AppArgs object.
-     */
-    private static AppArgs parseCommandLine(String argv[])
-        throws URISyntaxException {
-        AppArgs appArgs = new AppArgs();
-
-        CmdLineParser parser = new CmdLineParser();
-        Option hostUrlOpt = parser.addStringOption('h', "hosturl");
-        Option passwordOpt = parser.addStringOption('p', "password");
-        Option usernameOpt = parser.addStringOption('u', "username");
-        Option verboseOpt = parser.addBooleanOption('v', "verbose");
-
-        try {
-            parser.parse(argv);
-        } catch (OptionException e) {
-            System.out.println(e.getMessage());
-            System.exit(-1);
-        }
-
-        Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
-        if (verbose != null) {
-            appArgs.verbose = verbose.booleanValue();
-        }
-
-        String hostUrl = (String) parser.getOptionValue(hostUrlOpt);
-        if (hostUrl != null) {
-            appArgs.hostUrl = hostUrl;
-        }
-
-        String password = (String) parser.getOptionValue(passwordOpt);
-        if (hostUrl != null) {
-            appArgs.password = password;
-        }
-
-        String username = (String) parser.getOptionValue(usernameOpt);
-        if (username != null) {
-            appArgs.username = username;
-        }
-
-        String[] args = parser.getRemainingArgs();
-        if (args.length != 1) {
-            System.out.println("Error: invalid arguments\n" + USAGE);
-            System.exit(-1);
-        }
-
-        appArgs.csvFileName = args[0];
-
-        return appArgs;
-    }
-
-}
-
-class AppArgs {
-    boolean verbose = false;
-    String hostUrl = "localhost:8080";
-    String username = "testuser";
-    String password = "test";
-    String csvFileName = null;
 }

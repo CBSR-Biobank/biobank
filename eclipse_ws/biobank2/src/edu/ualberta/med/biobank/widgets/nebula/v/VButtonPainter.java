@@ -23,6 +23,9 @@ import org.eclipse.swt.widgets.Event;
 @SuppressWarnings("restriction")
 public class VButtonPainter extends VControlPainter {
 
+    static boolean isWindows = System.getProperty("os.name").startsWith(
+        "Windows");
+
     @Override
     public void paintBackground(VControl control, Event e) {
         VButton button = (VButton) control;
@@ -49,15 +52,20 @@ public class VButtonPainter extends VControlPainter {
                 } else {
                     // Bug 260624 - ButtonDrawData#draw does not respect alpha
                     // setting
-                    Image img = new Image(e.display, new Rectangle(0, 0,
-                        button.bounds.width, button.bounds.height));
-                    GC gc = new GC(img);
-                    Theme theme = new Theme(e.display);
-                    theme.drawBackground(gc, img.getBounds(), data);
-                    e.gc.drawImage(img, button.bounds.x, button.bounds.y);
-                    theme.dispose();
-                    gc.dispose();
-                    img.dispose();
+                    //
+                    // BioBank2 - the following code crashes on Linux 64 bit
+                    // systems
+                    if (isWindows) {
+                        Image img = new Image(e.display, new Rectangle(0, 0,
+                            button.bounds.width, button.bounds.height));
+                        GC gc = new GC(img);
+                        Theme theme = new Theme(e.display);
+                        theme.drawBackground(gc, img.getBounds(), data);
+                        e.gc.drawImage(img, button.bounds.x, button.bounds.y);
+                        theme.dispose();
+                        gc.dispose();
+                        img.dispose();
+                    }
                 }
             } else {
                 super.paintBackground(control, e);

@@ -41,8 +41,8 @@ public class ContainerAddHandler extends AbstractHandler {
             ContainerWrapper containerWrapper = new ContainerWrapper(
                 SessionManager.getAppService());
             containerWrapper.setSite(siteAdapter.getWrapper());
-            ContainerAdapter containerNode = new ContainerAdapter(siteAdapter
-                .getContainersGroupNode(), containerWrapper);
+            ContainerAdapter containerNode = new ContainerAdapter(
+                siteAdapter.getContainersGroupNode(), containerWrapper);
 
             containerNode.openEntryForm();
         } catch (Exception e) {

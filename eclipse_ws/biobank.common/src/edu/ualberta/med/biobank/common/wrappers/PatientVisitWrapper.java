@@ -568,7 +568,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void log(String action, String details) {
+    protected void log(String action, String site, String details) {
         String worksheet = "";
         try {
             String attr = getPvAttrValue("Worksheet");
@@ -577,7 +577,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
         } catch (Exception e) {
         }
-        ((BiobankApplicationService) appService).logActivity(action,
+        ((BiobankApplicationService) appService).logActivity(action, site,
             getPatient().getPnumber(), null, null, "visit " + details
                 + " (Date Processed:" + getFormattedDateProcessed() + worksheet
                 + ")", "Visit");

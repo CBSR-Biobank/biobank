@@ -261,7 +261,7 @@ public class ReportTreeWidget extends Composite {
                     .openEditor(new ReportInput(node), getEditorFor(node));
             }
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Error",
+            BioBankPlugin.openAsyncError("Error", ex,
                 "There was an error while building page.");
         }
     }

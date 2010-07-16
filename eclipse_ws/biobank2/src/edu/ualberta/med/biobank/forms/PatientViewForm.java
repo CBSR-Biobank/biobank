@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -39,7 +40,8 @@ public class PatientViewForm extends BiobankViewForm {
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getWrapper();
         retrievePatient();
-        patient.logLookup();
+        patient.logLookup(SessionManager.getInstance().getCurrentSite()
+            .getNameShort());
         setPartName("Patient " + patient.getPnumber());
     }
 
@@ -52,8 +54,8 @@ public class PatientViewForm extends BiobankViewForm {
         form.setText("Patient: " + patient.getPnumber());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_PATIENT));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
         createPatientVisitSection();
@@ -79,8 +81,8 @@ public class PatientViewForm extends BiobankViewForm {
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable = new PatientVisitInfoTable(section, patient
-            .getPatientVisitCollection());
+        visitsTable = new PatientVisitInfoTable(section,
+            patient.getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);
