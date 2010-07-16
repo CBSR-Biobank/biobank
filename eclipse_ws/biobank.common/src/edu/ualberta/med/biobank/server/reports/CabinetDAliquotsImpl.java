@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import edu.ualberta.med.biobank.client.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
@@ -35,12 +32,6 @@ public class CabinetDAliquotsImpl extends AbstractReport {
 
     public CabinetDAliquotsImpl(BiobankReport report) {
         super(QUERY, report);
-        List<Object> parameters = report.getParams();
-        List<String> strings = report.getStrings();
-        String groupBy = strings.get(0);
-        queryString = MessageFormat.format(queryString, groupBy);
-        dateRangePostProcess = new DateRangeRowPostProcess(
-            groupBy.equals("Year"), 2);
     }
 
     @Override

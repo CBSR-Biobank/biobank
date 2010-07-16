@@ -1877,11 +1877,25 @@
             name="Logging Form">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotInvoiceByClinicEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotInvoiceByClinicEditor"
+            name="Aliquots by Clinic">
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.reports.AliquotsByPalletEditor"
             default="false"
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.AliquotsByPalletEditor"
-            name="Aliquots By Pallet">
+            name="Aliquots by Pallet">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotInvoiceByPatientEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotInvoiceByPatientEditor"
+            name="Aliquots by Patient">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.AliquotCountEditor"
@@ -1891,6 +1905,27 @@
             name="Aliquot Count">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotsByStudyEditortsEditor"
+            name="Aliquots per Study">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyClinicEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicEditortsEditor"
+            name="Aliquots per Study per Clinic">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.AliquotsByStudyClinicDateEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.AliquotsByStudyClinicDateEditortsEditor"
+            name="Aliquots per Study per Clinic by Date">
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.reports.AliquotRequestEditor"
             default="false"
             icon="icons/reportsPerspective.png"
@@ -1898,18 +1933,25 @@
             name="Aliquot Request">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.QACabinetAliquotsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.FvLPatientVisitsEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.QACabinetAliquotsEditor"
-            name="Cabinet Aliquot QA">
+            id="edu.ualberta.med.biobank.editors.FvLPatientVisitsEditor"
+            name="Clinic Activity">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.CabinetDAliquotsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.PsByStudyClinicDateEditor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.CabinetDAliquotsEditor"
-            name="Cabinet Aliquots per Study per Clinic by Date">
+            id="edu.ualberta.med.biobank.editors.PsByStudyClinicDateEditor"
+            name="Patients/PatientVisits by Study, Clinic and Date">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.PsByStudyDateEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.PsByStudyDateEditor"
+            name="Patients/PatientVisits by Study and Date">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.SampleTypePvCountEditor"
@@ -1917,6 +1959,20 @@
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.SampleTypePvCountEditor"
             name="Sample Type Totals by Patient Visit and Study">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.QAAliquotsEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.QAAliquotsEditor"
+            name="Aliquot QA">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.reports.SampleTypeSUsageEditor"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor"
+            name="Sample Type Usage">
       </editor>
    </extension>
    <extension

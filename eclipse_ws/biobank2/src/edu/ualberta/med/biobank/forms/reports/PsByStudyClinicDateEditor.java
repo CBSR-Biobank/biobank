@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.util.DateGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
-public class NewPsByStudyDateEditor extends ReportsEditor {
+public class PsByStudyClinicDateEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.NewPsByStudyDateEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.PsByStudyClinicDateEditor";
     private ComboViewer dateRangeCombo;
     protected DateTimeWidget start;
     protected DateTimeWidget end;

@@ -29,7 +29,7 @@ public class BiobankReport {
         // load map
         for (Object prop : props.keySet()) {
             String key = (String) prop;
-            String pieces[] = key.split(".");
+            String pieces[] = key.split("[.]");
             ReportData r;
             if (REPORTS.get(prop) == null)
                 r = new ReportData();
