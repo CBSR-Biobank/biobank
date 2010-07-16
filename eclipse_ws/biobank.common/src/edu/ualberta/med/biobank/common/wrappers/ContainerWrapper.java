@@ -95,6 +95,17 @@ public class ContainerWrapper extends
 
     @Override
     public void persist() throws Exception {
+        // check if position was deleted
+        if (getPosition() == null) {
+            // get original position
+            ContainerPosition rawPos = wrappedObject.getPosition();
+            if (rawPos != null) {
+                AbstractPositionWrapper<ContainerPosition> pos = new ContainerPositionWrapper(
+                    appService, rawPos);
+                pos.delete();
+            }
+            wrappedObject.setPosition(null);
+        }
         super.persist();
         persistPath();
     }
@@ -968,15 +979,27 @@ public class ContainerWrapper extends
     @Override
     protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        ContainerPosition pos = wrappedObject.getPosition();
-        if (pos != null) {
-            return new ContainerPositionWrapper(appService, pos);
-        } else if (initIfNoPosition) {
-            ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
-                appService);
-            posWrapper.setContainer(this);
-            wrappedObject.setPosition(posWrapper.getWrappedObject());
-            return posWrapper;
+        if (nullPositionSet) {
+            if (rowColPosition != null) {
+                ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                    appService);
+                posWrapper.setRow(rowColPosition.row);
+                posWrapper.setCol(rowColPosition.col);
+                posWrapper.setContainer(this);
+                wrappedObject.setPosition(posWrapper.getWrappedObject());
+                return posWrapper;
+            }
+        } else {
+            ContainerPosition pos = wrappedObject.getPosition();
+            if (pos != null) {
+                return new ContainerPositionWrapper(appService, pos);
+            } else if (initIfNoPosition) {
+                ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                    appService);
+                posWrapper.setContainer(this);
+                wrappedObject.setPosition(posWrapper.getWrappedObject());
+                return posWrapper;
+            }
         }
         return null;
     }

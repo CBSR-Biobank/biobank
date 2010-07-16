@@ -458,7 +458,7 @@ public class AliquotWrapper extends
     @Override
     protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        if (newPositionSet) {
+        if (nullPositionSet) {
             if (rowColPosition != null) {
                 AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
                     appService);

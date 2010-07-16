@@ -515,6 +515,16 @@ public class TestContainer extends TestDatabase {
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
+
+        // set position to null
+        child.reload();
+        child.setPosition(null);
+        try {
+            child.persist();
+            Assert.fail("should not be allowed to set an null position");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
