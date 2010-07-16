@@ -21,9 +21,9 @@ public class CabinetDAliquotsImpl extends AbstractReport {
         + " as path1, "
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.containerType.name like ''"
+        + " path2.container.containerType.name like '"
         + TYPE_NAME
-        + "'') and aliquot.patientVisit.patient.study.site "
+        + "') and aliquot.patientVisit.patient.study.site "
         + SITE_OPERATOR
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"

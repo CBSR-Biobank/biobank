@@ -22,6 +22,10 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
+        start = widgetCreator.createDateTimeWidget(parent,
+            "Start Date (Linked)", null, null, null);
+        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+            null, null, null);
     }
 
     @Override
