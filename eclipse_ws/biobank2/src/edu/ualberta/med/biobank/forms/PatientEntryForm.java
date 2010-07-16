@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -43,6 +42,11 @@ public class PatientEntryForm extends BiobankEntryForm {
     private SiteWrapper siteWrapper;
 
     private ComboViewer studiesViewer;
+
+    private BiobankText pnumber;
+
+    private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
+        MSG_NO_PATIENT_NUMBER);
 
     @Override
     public void init() {
@@ -105,11 +109,12 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         studiesViewer = createComboViewerWithNoSelectionValidator(client,
             "Study", studies, selectedStudy, "A study should be selected");
+        setFirstControl(studiesViewer.getControl());
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Patient Number", null, BeansObservables.observeValue(
-                patientAdapter.getWrapper(), "pnumber"),
-            new NonEmptyStringValidator(MSG_NO_PATIENT_NUMBER)));
+        pnumber = (BiobankText) createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.NONE, "Patient Number", null,
+            BeansObservables.observeValue(patientAdapter.getWrapper(),
+                "pnumber"), pnumberNonEmptyValidator);
     }
 
     @Override
@@ -145,9 +150,8 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        StudyWrapper study = patientAdapter.getWrapper().getStudy();
-        if (study != null) {
-            studiesViewer.setSelection(new StructuredSelection(study));
-        }
+        studiesViewer.setSelection(null);
+        patientAdapter.getWrapper().reset();
+        pnumberNonEmptyValidator.validate(null);
     }
 }
