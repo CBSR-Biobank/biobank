@@ -6,6 +6,7 @@ lib-sources/
 lib-sources.tar.bz2
 eclipse_ws/.metadata
 eclipse_ws/biobank.common/bin
+eclipse_ws/biobank.common/output
 eclipse_ws/biobank.common/conf/*.xml
 eclipse_ws/biobank.common/lib/*.jar
 eclipse_ws/biobank.common/lib/client/*.jar
