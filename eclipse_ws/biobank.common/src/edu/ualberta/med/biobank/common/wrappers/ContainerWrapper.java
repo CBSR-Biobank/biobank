@@ -71,7 +71,17 @@ public class ContainerWrapper extends
         checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
+        checkHasPosition();
         super.persistChecks();
+    }
+
+    private void checkHasPosition() throws BiobankCheckException {
+        if ((getContainerType() != null)
+            && !getContainerType().getTopLevel().booleanValue()
+            && (rowColPosition == null)) {
+            throw new BiobankCheckException(
+                "A child container must have a position");
+        }
     }
 
     /**
@@ -95,17 +105,6 @@ public class ContainerWrapper extends
 
     @Override
     public void persist() throws Exception {
-        // check if position was deleted
-        if (getPosition() == null) {
-            // get original position
-            ContainerPosition rawPos = wrappedObject.getPosition();
-            if (rawPos != null) {
-                AbstractPositionWrapper<ContainerPosition> pos = new ContainerPositionWrapper(
-                    appService, rawPos);
-                pos.delete();
-            }
-            wrappedObject.setPosition(null);
-        }
         super.persist();
         persistPath();
     }
@@ -158,7 +157,10 @@ public class ContainerWrapper extends
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            return parent.getContainerType().getPositionString(getPosition());
+            RowColPos pos = getPosition();
+            if (pos != null) {
+                return parent.getContainerType().getPositionString(pos);
+            }
         }
         return null;
     }
