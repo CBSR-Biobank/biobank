@@ -90,6 +90,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
     // Global status
     private IObservableValue statusObservable;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void init() throws Exception {
         widgetCreator.initDataBinding();
@@ -236,6 +237,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 @Override
                 public void run(final IProgressMonitor monitor) {
                     Thread t = new Thread("Querying") {
+                        @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
                             try {

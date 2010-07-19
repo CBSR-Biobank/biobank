@@ -130,7 +130,8 @@ public class AliquotWrapper extends
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()
                     + " does not allow inserts of sample type "
-                    + getSampleType().getName() + ".");
+                    + ((getSampleType() == null) ? "null" : getSampleType()
+                        .getName()) + ".");
             }
         }
     }
@@ -458,7 +459,7 @@ public class AliquotWrapper extends
     @Override
     protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
         boolean initIfNoPosition) {
-        if (newPositionSet) {
+        if (nullPositionSet) {
             if (rowColPosition != null) {
                 AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
                     appService);

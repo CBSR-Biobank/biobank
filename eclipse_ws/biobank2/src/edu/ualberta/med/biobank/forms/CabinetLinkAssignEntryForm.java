@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
-import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -111,7 +111,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean positionTextModified;
 
-    private CabinetLabelValidator newCabinetPositionValidator;
+    private NonEmptyStringValidator newCabinetPositionValidator;
 
     protected boolean inventoryIdModified;
 
@@ -382,7 +382,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.position.label"));
         newCabinetPositionLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        newCabinetPositionValidator = new CabinetLabelValidator(
+        newCabinetPositionValidator = new NonEmptyStringValidator(
             Messages.getString("Cabinet.position.validationMsg"));
         displayOldCabinetFields(false);
         newCabinetPosition = (BiobankText) widgetCreator.createBoundWidget(
@@ -453,10 +453,27 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected void initContainersFromPosition() {
         try {
-            String binLabel = newCabinetPosition.getText().substring(0, 6);
-            List<ContainerWrapper> foundContainers = ContainerWrapper
-                .getContainersInSite(appService, SessionManager.getInstance()
-                    .getCurrentSite(), binLabel);
+            String fullLabel = newCabinetPosition.getText();
+            List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
+            int removeSize = 2;
+            List<String> labelsTested = new ArrayList<String>();
+            while (removeSize < 5) {
+                String binLabel = fullLabel.substring(0, fullLabel.length()
+                    - removeSize);
+                labelsTested.add(binLabel);
+                for (ContainerWrapper cont : ContainerWrapper
+                    .getContainersInSite(appService, SessionManager
+                        .getInstance().getCurrentSite(), binLabel)) {
+                    boolean canContainSamples = cont.getContainerType()
+                        .getSampleTypeCollection() != null
+                        && cont.getContainerType().getSampleTypeCollection()
+                            .size() > 0;
+                    if (canContainSamples) {
+                        foundContainers.add(cont);
+                    }
+                }
+                removeSize++;
+            }
             List<ContainerWrapper> cabinetContainers = new ArrayList<ContainerWrapper>();
             for (ContainerWrapper container : foundContainers) {
                 ContainerWrapper cont = container;
@@ -472,23 +489,37 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawer = bin.getParent();
                 cabinet = drawer.getParent();
             } else if (cabinetContainers.size() == 0) {
-                String errorMsg = Messages.getFormattedString(
-                    "Cabinet.activitylog.checkParent.error.found", binLabel); //$NON-NLS-1$
+                String errorMsg = Messages
+                    .getFormattedString(
+                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested)); //$NON-NLS-1$
                 BioBankPlugin.openAsyncError(
                     "Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);
                 return;
             } else {
-                BioBankPlugin.openAsyncError("Container problem",
-                    "More than one container found for " + binLabel //$NON-NLS-1$
-                        + " --- should do something"); //$NON-NLS-1$
+                BioBankPlugin
+                    .openAsyncError(
+                        "Container problem",
+                        "More than one container found for " + getBinLabelMessage(labelsTested) //$NON-NLS-1$
+                            + " --- should do something"); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);
                 return;
             }
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Init container from position", ex);
         }
+    }
+
+    private String getBinLabelMessage(List<String> labelsTested) {
+        String res = "";
+        for (int i = 0; i < labelsTested.size(); i++) {
+            if (i != 0) {
+                res += " or ";
+            }
+            res += labelsTested.get(i);
+        }
+        return res;
     }
 
     protected void setMoveMode(boolean moveMode) {

@@ -185,8 +185,9 @@ public class LogWrapper extends ModelWrapper<Log> {
         List<LogWrapper> wrappers = new ArrayList<LogWrapper>();
         for (Log l : logs) {
             // CASE is important for inventory id
-            if ((inventoryId != null)
-                && (l.getInventoryId().equals(inventoryId))) {
+            String logInvId = l.getInventoryId();
+            if ((inventoryId == null)
+                || ((inventoryId != null) && (logInvId.equals(inventoryId)))) {
                 wrappers.add(new LogWrapper(appService, l));
             }
         }

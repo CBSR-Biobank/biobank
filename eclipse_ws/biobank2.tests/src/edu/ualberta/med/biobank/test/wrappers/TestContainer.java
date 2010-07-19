@@ -175,11 +175,15 @@ public class TestContainer extends TestDatabase {
 
                         containerMap.put(mapPrefix + "ChildL4", childL4);
                     }
+                    childL3.reload();
                     containerMap.put(mapPrefix + "ChildL3", childL3);
                 }
+                childL2.reload();
                 containerMap.put(mapPrefix + "ChildL2", childL2);
             }
+            childL1.reload();
             containerMap.put(mapPrefix + "ChildL1", childL1);
+            parent.reload();
             containerMap.put(mapPrefix + "Top", parent);
         }
 
@@ -486,10 +490,21 @@ public class TestContainer extends TestDatabase {
 
         top = containerMap.get("Top");
 
-        ContainerHelper.addContainer(null, "uvwxyz", containerMap.get("Top"),
-            site, containerTypeMap.get("ChildCtL1"), 0, 0);
+        child = ContainerHelper.addContainer(null, "uvwxyz",
+            containerMap.get("Top"), site, containerTypeMap.get("ChildCtL1"),
+            0, 0);
 
-        child = ContainerHelper.newContainer(null, "uvwxyz", top, site,
+        // set position to null
+        child.setPosition(null);
+        try {
+            child.persist();
+            Assert.fail("should not be allowed to set an null position");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // create new child
+        child = ContainerHelper.newContainer(null, "uvwxyzabcdef", top, site,
             containerTypeMap.get("ChildCtL1"), top.getRowCapacity(),
             top.getColCapacity());
 
