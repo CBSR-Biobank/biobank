@@ -19,6 +19,7 @@ public class BbpdbLogging {
     private static String USAGE = "Usage: bbpdblogging [options]\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
+    @SuppressWarnings("unused")
     private static final Logger LOGGER = Logger.getLogger(BbpdbLogging.class
         .getName());
 
@@ -38,6 +39,7 @@ public class BbpdbLogging {
         + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
         + BBPDB_LOG_BASE_QUERY;
 
+    @SuppressWarnings("unused")
     private GenericAppArgs args;
 
     private Connection bbpdbCon;
