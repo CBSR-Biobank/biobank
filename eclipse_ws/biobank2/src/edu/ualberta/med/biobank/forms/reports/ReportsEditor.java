@@ -47,7 +47,6 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
@@ -90,7 +89,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
     // Global status
     private IObservableValue statusObservable;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void init() throws Exception {
         widgetCreator.initDataBinding();
@@ -237,7 +235,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 @Override
                 public void run(final IProgressMonitor monitor) {
                     Thread t = new Thread("Querying") {
-                        @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
                             try {
@@ -250,7 +247,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                         }
 
                         private List<Object> generateReport()
-                            throws ApplicationException, BiobankCheckException {
+                            throws ApplicationException {
                             return report.generate(SessionManager
                                 .getAppService());
                             // TODO: FIXME

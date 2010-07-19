@@ -17,7 +17,7 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
 
     @Override
     protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
+        return new int[] { 100, 100, 100, 100, 100, 100, 100, 100, 100 };
     }
 
     @Override

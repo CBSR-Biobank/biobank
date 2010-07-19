@@ -50,6 +50,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
                 parameters.add(parameters.get(i));
             }
         }
+        report.setParams(parameters);
     }
 
     @Override

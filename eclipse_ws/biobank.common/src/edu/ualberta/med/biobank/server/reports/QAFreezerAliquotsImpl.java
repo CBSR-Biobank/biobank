@@ -13,7 +13,7 @@ public class QAFreezerAliquotsImpl extends AbstractReport {
     private static final String CONTAINER_TYPE_NAME = "%Freezer%";
 
     private static final String QUERY = "select aliquot.aliquotPosition.container.label, aliquot.inventoryId, "
-        + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
+        + "aliquot.patientVisit.patient.pnumber, "
         + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "

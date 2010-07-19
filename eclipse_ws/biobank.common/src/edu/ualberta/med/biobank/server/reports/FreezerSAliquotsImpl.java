@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class FreezerSAliquotsImpl extends AbstractReport {
 

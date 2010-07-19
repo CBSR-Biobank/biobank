@@ -13,7 +13,7 @@ public class AliquotSCountImpl extends AbstractReport {
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
-        + "') and Alias.patientVisit.patient.study.site "
+        + "') and Alias.linkDate between ? and ? and Alias.patientVisit.patient.study.site "
         + SITE_OPERATOR
         + SITE_ID
         + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name";

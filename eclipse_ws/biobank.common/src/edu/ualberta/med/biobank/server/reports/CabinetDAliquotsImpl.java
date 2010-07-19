@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.server.reports;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class CabinetDAliquotsImpl extends AbstractReport {
 
@@ -32,6 +34,8 @@ public class CabinetDAliquotsImpl extends AbstractReport {
 
     public CabinetDAliquotsImpl(BiobankReport report) {
         super(QUERY, report);
+        dateRangePostProcess = new DateRangeRowPostProcess(report.getGroupBy()
+            .equals("Year"), 2);
     }
 
     @Override

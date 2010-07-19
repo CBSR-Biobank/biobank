@@ -31,7 +31,7 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     @Override
     protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100, 100 };
+        return new int[] { 100, 100, 100, 100, 100 };
     }
 
     @Override
@@ -91,7 +91,7 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Label", "Inventory ID", "Patient", "Visit",
+        return new String[] { "Label", "Inventory ID", "Patient",
             "Date Processed", "Sample Type" };
     }
 

@@ -11,7 +11,7 @@ public class PsByStudyImpl extends AbstractReport {
         + GROUPBY_DATE
         + "(pv.dateProcessed), "
         + "count(distinct pv.patient) from edu.ualberta.med.biobank.model.PatientVisit pv"
-        + " where pv.dateProcessed between ? and ? pv.patient.study.site "
+        + " where pv.dateProcessed between ? and ? and pv.patient.study.site "
         + SITE_OPERATOR + SITE_ID
         + " group by pv.patient.study.nameShort, year(pv.dateProcessed), "
         + GROUPBY_DATE + "(pv.dateProcessed)";

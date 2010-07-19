@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class FreezerDAliquotsImpl extends AbstractReport {
 
@@ -38,12 +39,8 @@ public class FreezerDAliquotsImpl extends AbstractReport {
 
     public FreezerDAliquotsImpl(BiobankReport report) {
         super(QUERY, report);
-        List<Object> parameters = report.getParams();
-        String groupBy = (String) parameters.remove(0);
-        queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
-            groupBy);
-        dateRangePostProcess = new DateRangeRowPostProcess(
-            groupBy.equals("Year"), 2);
+        dateRangePostProcess = new DateRangeRowPostProcess(report.getGroupBy()
+            .equals("Year"), 2);
     }
 
     @Override
