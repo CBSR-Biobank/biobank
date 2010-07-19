@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.server.reports;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class CabinetDAliquotsImpl extends AbstractReport {
 
@@ -23,7 +21,7 @@ public class CabinetDAliquotsImpl extends AbstractReport {
         + " as path2 where locate(path2.path, path1.path) > 0 and"
         + " path2.container.containerType.name like '"
         + TYPE_NAME
-        + "') and aliquot.patientVisit.patient.study.site "
+        + "') and aliquot.linkDate between ? and ? and aliquot.patientVisit.patient.study.site "
         + SITE_OPERATOR
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"

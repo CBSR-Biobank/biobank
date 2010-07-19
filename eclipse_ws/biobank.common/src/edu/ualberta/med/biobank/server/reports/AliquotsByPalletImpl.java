@@ -27,7 +27,7 @@ public class AliquotsByPalletImpl extends AbstractReport {
         super(QUERY, report);
         List<Object> params = report.getParams();
         params.add(params.remove(0));
-        report.setParams(params);
+        this.report.setParams(params);
     }
 
     // Use Collections.sort, so can't use RowPostProcess
