@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,7 +23,9 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 public class ActivityLogDialog extends TitleAreaDialog {
 
-    Text activityLogFileText;
+    Text activityLogDirText;
+    Button browseBtn;
+    Button activityLogDirBtn;
 
     public ActivityLogDialog(Shell parentShell) {
         super(parentShell);
@@ -52,19 +55,42 @@ public class ActivityLogDialog extends TitleAreaDialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(3, false);
-        layout.marginTop = 10;
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginTop = 5;
+        layout.marginLeft = 2;
+        layout.verticalSpacing = 3;
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        activityLogFileText = createFileLocationSelector(contents, "&Log file");
+        activityLogDirBtn = new Button(contents, SWT.CHECK);
+        activityLogDirBtn.setText("Save activity logs into a file");
+        activityLogDirBtn.setSelection(true);
+        activityLogDirBtn.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                activityLogDirText.setEditable(activityLogDirBtn.getSelection());
+                browseBtn.setEnabled(activityLogDirBtn.getSelection());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
+        activityLogDirText = createFileLocationSelector(contents, "&Log path");
 
         return contents;
     }
 
     private Text createFileLocationSelector(final Composite parent,
         String labelText) {
-        createLabel(parent, labelText);
+        final Composite fileSelectionComposite = new Composite(parent, SWT.NONE);
+        GridLayout layout = new GridLayout(3, false);
+        fileSelectionComposite.setLayout(layout);
+        fileSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+            true, true));
+
+        createLabel(fileSelectionComposite, labelText);
 
         final String defaultPath;
         String biobank2Dir = System.getProperty("user.home")
@@ -75,23 +101,28 @@ public class ActivityLogDialog extends TitleAreaDialog {
         else
             defaultPath = System.getProperty("user.home");
 
-        final Text text = new Text(parent, SWT.BORDER | SWT.FILL);
+        final Text text = new Text(fileSelectionComposite, SWT.BORDER
+            | SWT.FILL);
         text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             false));
         text.setText(defaultPath);
-        Button btn = new Button(parent, SWT.BUTTON1);
-        btn.setText("  Browse...  ");
-        btn.addSelectionListener(new SelectionListener() {
+
+        browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
+        browseBtn.setText("  Browse...  ");
+        browseBtn.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                DirectoryDialog fd = new DirectoryDialog(parent.getShell(),
-                    SWT.SAVE);
+                DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
+                    .getShell(), SWT.SAVE);
                 fd.setText("Select Directory");
                 fd.setFilterPath(defaultPath);
                 String selected = fd.open();
                 if (selected != null)
                     text.setText(selected);
+                else {
+                    text.setText("");
+                }
 
             }
 
@@ -106,13 +137,42 @@ public class ActivityLogDialog extends TitleAreaDialog {
     @Override
     protected void okPressed() {
 
-        String activityLogDir = activityLogFileText.getText();
-        if (new File(activityLogDir).exists()) {
+        String activityLogDir = activityLogDirText.getText();
+
+        if (activityLogDirBtn.getSelection()) {
+            if (new File(activityLogDir).exists()) {
+
+                BioBankPlugin
+                    .getDefault()
+                    .getPreferenceStore()
+                    .setValue(
+                        PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+                        activityLogDir.toString());
+                BioBankPlugin
+                    .getDefault()
+                    .getPreferenceStore()
+                    .setValue(
+                        PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
+                        true);
+                super.okPressed();
+            }
+
+            else {
+                MessageDialog.openError(getShell(), "Invalid Path",
+                    "Please enter a valid directory.");
+
+            }
+        } else {
             BioBankPlugin
                 .getDefault()
                 .getPreferenceStore()
-                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-                    activityLogDir.toString());
+                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
+            BioBankPlugin
+                .getDefault()
+                .getPreferenceStore()
+                .setValue(
+                    PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
+                    false);
             super.okPressed();
         }
 

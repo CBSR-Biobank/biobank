@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ActivityLogDialog;
 import edu.ualberta.med.biobank.dialogs.LoginDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 public class BiobankStartup implements IStartup {
 
@@ -63,9 +64,23 @@ public class BiobankStartup implements IStartup {
                     IWorkbenchWindow window = workbench
                         .getActiveWorkbenchWindow();
                     if (window != null) {
-                        ActivityLogDialog dlg2 = new ActivityLogDialog(window
-                            .getShell());
-                        dlg2.open();
+
+                        boolean logSave = BioBankPlugin
+                            .getDefault()
+                            .getPreferenceStore()
+                            .getBoolean(
+                                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE);
+                        String logPath = BioBankPlugin
+                            .getDefault()
+                            .getPreferenceStore()
+                            .getString(
+                                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH);
+
+                        if (logSave && logPath.equals("")) {
+                            ActivityLogDialog dlg2 = new ActivityLogDialog(
+                                window.getShell());
+                            dlg2.open();
+                        }
 
                         LoginDialog dlg = new LoginDialog(window.getShell());
                         dlg.open();
