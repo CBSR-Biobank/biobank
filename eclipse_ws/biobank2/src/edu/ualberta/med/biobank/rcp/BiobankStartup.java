@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.dialogs.ActivityLogDialog;
 import edu.ualberta.med.biobank.dialogs.LoginDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
@@ -62,6 +63,10 @@ public class BiobankStartup implements IStartup {
                     IWorkbenchWindow window = workbench
                         .getActiveWorkbenchWindow();
                     if (window != null) {
+                        ActivityLogDialog dlg2 = new ActivityLogDialog(window
+                            .getShell());
+                        dlg2.open();
+
                         LoginDialog dlg = new LoginDialog(window.getShell());
                         dlg.open();
                     }
@@ -79,8 +84,8 @@ public class BiobankStartup implements IStartup {
             .getBundle(), new Path("META-INF/MANIFEST.MF"), null);
         urlManifest = FileLocator.toFileURL(urlManifest);
 
-        Manifest manifest = new Manifest(new FileInputStream(urlManifest
-            .getFile()));
+        Manifest manifest = new Manifest(new FileInputStream(
+            urlManifest.getFile()));
         Attributes attributes = manifest.getMainAttributes();
         return attributes.getValue("Bundle-Version");
     }
