@@ -171,7 +171,7 @@ public class SearchUtils {
             add(searchableFields, path, "comment", String.class);
             add(searchableFields, path, "waybill", String.class);
             add(searchableFields, path, "boxNumber", String.class);
-            add(searchableFields, path, "shippingCompany", String.class);
+            add(searchableFields, path, "shippingMethod", String.class);
         } else if (c == Container.class) {
             if (collection)
                 path = path.replace('.', '_') + "containerCollection.";
