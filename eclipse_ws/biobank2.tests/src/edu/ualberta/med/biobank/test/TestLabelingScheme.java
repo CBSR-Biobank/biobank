@@ -14,7 +14,9 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
-public class TestLabelingScheme extends TestDatabase {
+public class TestLabelingScheme {
+
+    private Random r;
 
     private static final Map<Integer, String> CBSR_ALPHA;
     static {
@@ -46,13 +48,11 @@ public class TestLabelingScheme extends TestDatabase {
         CBSR_ALPHA = Collections.unmodifiableMap(aMap);
     };
 
-    @Override
     @Before
     public void setUp() throws Exception {
         r = new Random();
     }
 
-    @Override
     @After
     public void tearDown() throws Exception {
     }
