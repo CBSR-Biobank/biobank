@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.reports;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -28,6 +29,11 @@ public class AliquotRequestEditor extends ReportsEditor {
     @Override
     protected List<Object> getParams() throws Exception {
         return parseCSV();
+    }
+
+    @Override
+    protected List<Object> getPrintParams() {
+        return Arrays.asList(new Object[] { csvSelector.getFilePath() });
     }
 
     protected FileBrowser createFileBrowserOption(String fieldLabel,

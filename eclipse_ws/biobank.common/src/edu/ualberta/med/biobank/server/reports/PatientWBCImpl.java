@@ -9,7 +9,7 @@ public class PatientWBCImpl extends AbstractReport {
 
     private static final String TYPE_NAME = "%Cabinet%";
 
-    private static final String QUERY = "Select Alias.patient.study.nameShort, Alias.shipment.clinic.name, "
+    private static final String QUERY = "Select Alias.patient.study.nameShort, Alias.shipment.clinic.nameShort, "
         + "Alias.patient.pnumber, Alias.dateProcessed, aliquot.sampleType.name, aliquot.inventoryId, aliquot.aliquotPosition.container.label  from "
         + PatientVisit.class.getName()
         + " as Alias left join Alias.aliquotCollection as aliquot where aliquot.aliquotPosition not in (from "

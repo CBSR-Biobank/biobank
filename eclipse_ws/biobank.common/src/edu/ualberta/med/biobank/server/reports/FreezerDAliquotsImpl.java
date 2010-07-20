@@ -12,7 +12,7 @@ public class FreezerDAliquotsImpl extends AbstractReport {
     private static final String TYPE_NAME = "%Freezer%";
 
     private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort,"
-        + " aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate), "
+        + " aliquot.patientVisit.shipment.clinic.nameShort , year(aliquot.linkDate), "
         + GROUPBY_DATE
         + "(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
@@ -32,7 +32,7 @@ public class FreezerDAliquotsImpl extends AbstractReport {
         + SITE_OPERATOR
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"
-        + " aliquot.patientVisit.shipment.clinic.name,  year(aliquot.linkDate), "
+        + " aliquot.patientVisit.shipment.clinic.nameShort,  year(aliquot.linkDate), "
         + GROUPBY_DATE + "(aliquot.linkDate)";
 
     private DateRangeRowPostProcess dateRangePostProcess;

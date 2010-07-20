@@ -18,7 +18,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + " as pv where pv.patient = p and pv.shipment.clinic = c.clinic and"
         + " s=p.study and pv.dateProcessed between ? and ?) {0} {1})";
 
-    private static String QUERY_STRING = "select s.nameShort, c.clinic.name, "
+    private static String QUERY_STRING = "select s.nameShort, c.clinic.nameShort, "
         + MessageFormat.format(PVCOUNT_STRING, "=", "1")
         + ", "
         + MessageFormat.format(PVCOUNT_STRING, "=", "2")
@@ -37,7 +37,8 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + PatientVisit.class.getName()
         + " as patients where patients.shipment.clinic=c.clinic and"
         + " patients.patient.study=s and patients.dateProcessed between ? and ?)"
-        + " from " + Study.class.getName()
+        + " from "
+        + Study.class.getName()
         + " as s inner join s.contactCollection as c where s.site.id "
         + SITE_OPERATOR + SITE_ID + " ORDER BY s.nameShort";
 

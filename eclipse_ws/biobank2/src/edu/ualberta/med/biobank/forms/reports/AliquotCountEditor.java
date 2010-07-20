@@ -48,7 +48,11 @@ public class AliquotCountEditor extends ReportsEditor {
 
     @Override
     protected List<String> getParamNames() {
-        return new ArrayList<String>();
+        List<String> paramNames = new ArrayList<String>();
+        paramNames.add("Start Date (Linked)");
+        paramNames.add("End Date (Linked)");
+        return paramNames;
+
     }
 
 }

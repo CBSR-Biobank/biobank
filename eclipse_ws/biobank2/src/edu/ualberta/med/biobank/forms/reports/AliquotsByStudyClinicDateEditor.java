@@ -64,6 +64,8 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     protected List<String> getParamNames() {
         List<String> param = new ArrayList<String>();
         param.add("Group By");
+        param.add("Start Date (Linked)");
+        param.add("End Date (Linked)");
         return param;
     }
 

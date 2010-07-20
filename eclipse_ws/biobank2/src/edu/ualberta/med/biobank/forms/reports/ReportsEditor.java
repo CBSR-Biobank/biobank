@@ -58,6 +58,7 @@ import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -361,16 +362,19 @@ public abstract class ReportsEditor extends BiobankFormBase {
             bw.write("," + columnInfo.get(j));
         }
         bw.println();
+        BiobankLabelProvider stringConverter = reportTable.getLabelProvider();
         for (Object row : reportData) {
             if (monitor.isCanceled()) {
                 throw new Exception("Exporting canceled.");
             }
             Object[] castOb = (Object[]) row;
-            bw.write("\"" + castOb[0] + "\"");
+            bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\"");
             for (int j = 1; j < columnInfo.size(); j++) {
-                bw.write(",\"" + castOb[j] + "\"");
+                bw.write(",\"" + stringConverter.getColumnText(castOb, j)
+                    + "\"");
             }
             bw.println();
+
         }
         bw.close();
     }
@@ -397,7 +401,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 "Print table contents?");
         if (doPrint) {
             final List<Object[]> printParams = new ArrayList<Object[]>();
-            final List<Object> paramVals = getParams();
+            final List<Object> paramVals = getPrintParams();
             int i = 0;
             for (String name : getParamNames()) {
                 printParams.add(new Object[] { name, paramVals.get(i) });
@@ -448,8 +452,9 @@ public abstract class ReportsEditor extends BiobankFormBase {
                                 }
                                 Map<String, String> map = new HashMap<String, String>();
                                 for (int j = 0; j < columnInfo.size(); j++) {
-                                    map.put(columnInfo.get(j),
-                                        (((Object[]) object)[j]).toString());
+                                    map.put(columnInfo.get(j), (reportTable
+                                        .getLabelProvider().getColumnText(
+                                        object, j)));
                                 }
                                 listData.add(map);
                             }
@@ -576,5 +581,9 @@ public abstract class ReportsEditor extends BiobankFormBase {
     protected abstract List<String> getParamNames();
 
     protected abstract List<Object> getParams() throws Exception;
+
+    protected List<Object> getPrintParams() throws Exception {
+        return getParams();
+    }
 
 }

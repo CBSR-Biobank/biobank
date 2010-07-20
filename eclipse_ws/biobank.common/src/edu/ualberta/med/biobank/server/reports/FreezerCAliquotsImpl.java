@@ -10,7 +10,7 @@ public class FreezerCAliquotsImpl extends AbstractReport {
     private static final String TYPE_NAME = "%Freezer%";
 
     private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, "
-        + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
+        + "aliquot.patientVisit.shipment.clinic.nameShort, count(*) from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition not in (from "
         + AliquotPosition.class.getName()
@@ -26,7 +26,7 @@ public class FreezerCAliquotsImpl extends AbstractReport {
         + "') and aliquot.linkDate between ? and ? and aliquot.patientVisit.patient.study.site"
         + SITE_OPERATOR
         + SITE_ID
-        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name";
+        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.nameShort";
 
     public FreezerCAliquotsImpl(BiobankReport report) {
         super(QUERY, report);

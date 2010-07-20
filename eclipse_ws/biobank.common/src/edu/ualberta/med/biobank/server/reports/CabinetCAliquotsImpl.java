@@ -8,7 +8,7 @@ public class CabinetCAliquotsImpl extends AbstractReport {
 
     private static final String TYPE_NAME = "%Cabinet%";
 
-    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name, count(*) from "
+    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.nameShort, count(*) from "
         + Aliquot.class.getName()
         + " as aliquot where aliquot.aliquotPosition.container.id in (select path1.container.id from "
         + ContainerPath.class.getName()
@@ -19,7 +19,7 @@ public class CabinetCAliquotsImpl extends AbstractReport {
         + "') and aliquot.linkDate between ? and ? and aliquot.patientVisit.patient.study.site"
         + SITE_OPERATOR
         + SITE_ID
-        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name";
+        + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.nameShort";
 
     public CabinetCAliquotsImpl(BiobankReport report) {
         super(QUERY, report);

@@ -90,8 +90,9 @@ public class AliquotRequestImpl extends AbstractReport {
                 if (j < queried.size())
                     results.add(queried.get(j));
                 else
-                    results.add(new Object[] { pnumber, "", dateDrawn,
-                        typeName, "NOT FOUND" });
+                    results.add(new Object[] { pnumber, "",
+                        DateFormatter.formatAsDate(dateDrawn), typeName,
+                        "NOT FOUND" });
             }
         }
         return results;
