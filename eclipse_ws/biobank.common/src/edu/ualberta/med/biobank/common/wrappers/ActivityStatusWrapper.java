@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +48,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     @Override
     protected void deleteChecks() throws Exception {
-        throw new BiobankCheckException("object of this type cannot be deleted");
     }
 
     @Override
@@ -57,8 +58,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        throw new BiobankCheckException(
-            "should not be adding objects of this type");
+        checkUnique();
     }
 
     @Override
@@ -108,6 +108,61 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public static ActivityStatusWrapper getActiveActivityStatus(
         WritableApplicationService appService) throws Exception {
         return getActivityStatus(appService, ACTIVE_STATUS_STRING);
+    }
+
+    public void checkUnique() throws BiobankCheckException,
+        ApplicationException {
+        String globalMsg = "global";
+
+        checkNoDuplicates("name", getName(), "A " + globalMsg
+            + " activity status with name \"" + getName()
+            + "\" already exists.");
+
+    }
+
+    // XXX test checkNoDuplicates
+    private void checkNoDuplicates(String propertyName, String value,
+        String errorMessage) throws ApplicationException, BiobankCheckException {
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { value }));
+
+        String notSameObject = "";
+        if (!isNew()) {
+            notSameObject = " and id <> ?";
+            parameters.add(getId());
+        }
+        HQLCriteria criteria = new HQLCriteria("select count(*) from "
+            + ActivityStatus.class.getName() + " where " + propertyName + "=? "
+            + notSameObject, parameters);
+        List<Long> result = appService.query(criteria);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        if (result.get(0) > 0) {
+            throw new BiobankCheckException(errorMessage);
+        }
+    }
+
+    public static void persistActivityStatuses(
+        List<ActivityStatusWrapper> addedOrModifiedTypes,
+        List<ActivityStatusWrapper> typesToDelete)
+        throws BiobankCheckException, Exception {
+        if (addedOrModifiedTypes != null) {
+            for (ActivityStatusWrapper ss : addedOrModifiedTypes) {
+                ss.persist();
+            }
+        }
+        if (typesToDelete != null) {
+            for (ActivityStatusWrapper ss : typesToDelete) {
+                ss.delete();
+            }
+        }
+    }
+
+    public void setName(String name) {
+        String old = getName();
+        wrappedObject.setName(name);
+        propertyChangeSupport.firePropertyChange("name", old, name);
     }
 
     /**

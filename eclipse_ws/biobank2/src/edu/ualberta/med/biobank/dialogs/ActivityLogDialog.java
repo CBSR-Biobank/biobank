@@ -77,12 +77,12 @@ public class ActivityLogDialog extends TitleAreaDialog {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        activityLogDirText = createFileLocationSelector(contents, "&Log path");
+        createFileLocationSelector(contents, "&Log path");
 
         return contents;
     }
 
-    private Text createFileLocationSelector(final Composite parent,
+    private void createFileLocationSelector(final Composite parent,
         String labelText) {
         final Composite fileSelectionComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
@@ -101,11 +101,11 @@ public class ActivityLogDialog extends TitleAreaDialog {
         else
             defaultPath = System.getProperty("user.home");
 
-        final Text text = new Text(fileSelectionComposite, SWT.BORDER
-            | SWT.FILL);
-        text.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
-            false));
-        text.setText(defaultPath);
+        final Text activityLogDirText = new Text(fileSelectionComposite,
+            SWT.BORDER | SWT.FILL);
+        activityLogDirText.setLayoutData(new GridData(GridData.FILL,
+            GridData.FILL, true, false));
+        activityLogDirText.setText(defaultPath);
 
         browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
         browseBtn.setText("  Browse...  ");
@@ -119,19 +119,17 @@ public class ActivityLogDialog extends TitleAreaDialog {
                 fd.setFilterPath(defaultPath);
                 String selected = fd.open();
                 if (selected != null)
-                    text.setText(selected);
+                    activityLogDirText.setText(selected);
                 else {
-                    text.setText("");
+                    activityLogDirText.setText("");
                 }
 
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
             }
         });
-        return text;
     }
 
     @Override
