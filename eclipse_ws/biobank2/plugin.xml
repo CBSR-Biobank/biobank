@@ -271,6 +271,14 @@
             id="edu.ualberta.med.biobank.commands.logging"
             name="Logging">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.edit"
+            name="Edit">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.reload"
+            name="Reload">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -886,6 +894,30 @@
                </not>
             </and>
          </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditHandler"
+            commandId="edu.ualberta.med.biobank.commands.edit">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="edu.ualberta.med.biobank.forms.BiobankViewForm">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ReloadHandler"
+            commandId="edu.ualberta.med.biobank.commands.reload">
+         <activeWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="edu.ualberta.med.biobank.forms.BiobankViewForm">
+               </instanceof>
+            </with>
+         </activeWhen>
       </handler>
    </extension>
    <extension
@@ -2113,6 +2145,16 @@
             commandId="edu.ualberta.med.biobank.commands.logging"
             schemeId="biobank2.scheme"
             sequence="M1+M2+K">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.reload"
+            schemeId="biobank2.scheme"
+            sequence="M1+T">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.edit"
+            schemeId="biobank2.scheme"
+            sequence="M1+D">
       </key>
    </extension>
     <extension

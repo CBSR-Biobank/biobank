@@ -172,7 +172,7 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() {
+    public void reload() {
         retrieveAliquot();
         setValues();
         setPartName("Aliquot: " + aliquot.getInventoryId());

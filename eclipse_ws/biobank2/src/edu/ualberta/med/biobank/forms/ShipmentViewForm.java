@@ -136,7 +136,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
         retrieveShipment();
         setPartName("Shipment " + shipment.getWaybill());
         if (!form.isDisposed()) {

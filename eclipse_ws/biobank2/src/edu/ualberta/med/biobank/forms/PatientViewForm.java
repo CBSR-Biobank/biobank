@@ -97,7 +97,7 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
         setValues();
         retrievePatient();
         setPartName("Patient " + patient.getPnumber());

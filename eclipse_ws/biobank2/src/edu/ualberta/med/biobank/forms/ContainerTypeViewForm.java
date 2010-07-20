@@ -212,7 +212,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
         retrieveContainerType();
         setPartName("Container Type " + containerType.getName());
         form.setText("Container Type: " + containerType.getName());
