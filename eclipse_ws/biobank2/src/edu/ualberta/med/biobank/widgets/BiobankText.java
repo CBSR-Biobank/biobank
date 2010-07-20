@@ -10,6 +10,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -92,6 +93,13 @@ public class BiobankText extends BiobankWidget {
                 alreadyFocused = false;
             }
         };
+    }
+
+    @Override
+    public void setBackground(Color color) {
+        if (text == null)
+            return;
+        text.setBackground(color);
     }
 
     public void setText(String text) {

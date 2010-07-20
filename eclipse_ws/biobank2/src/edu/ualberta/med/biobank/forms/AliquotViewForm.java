@@ -38,6 +38,8 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private BiobankText shipmentWaybillLabel;
 
+    private BiobankText studyLabel;
+
     private BiobankText patientLabel;
 
     private BiobankText dateProcessedLabel;
@@ -98,6 +100,7 @@ public class AliquotViewForm extends BiobankViewForm {
             "Volume (ml)");
         shipmentWaybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipment Waybill");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
@@ -160,6 +163,8 @@ public class AliquotViewForm extends BiobankViewForm {
             : aliquot.getQuantity().toString());
         setTextValue(shipmentWaybillLabel, aliquot.getPatientVisit()
             .getShipment().getWaybill());
+        setTextValue(studyLabel, aliquot.getPatientVisit().getPatient()
+            .getStudy().getNameShort());
         setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
             .getPnumber());
         setTextValue(dateProcessedLabel, aliquot.getPatientVisit()

@@ -92,6 +92,9 @@ public class AliquotEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill",
             aliquot.getPatientVisit().getShipment().getWaybill());
 
+        createReadOnlyLabelledField(client, SWT.NONE, "Study", aliquot
+            .getPatientVisit().getPatient().getStudy().getNameShort());
+
         createReadOnlyLabelledField(client, SWT.NONE, "Patient Number", aliquot
             .getPatientVisit().getPatient().getPnumber());
 
