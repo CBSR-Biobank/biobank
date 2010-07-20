@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
@@ -111,7 +111,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean positionTextModified;
 
-    private NonEmptyStringValidator newCabinetPositionValidator;
+    private StringLengthValidator newCabinetPositionValidator;
 
     protected boolean inventoryIdModified;
 
@@ -382,7 +382,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.position.label"));
         newCabinetPositionLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        newCabinetPositionValidator = new NonEmptyStringValidator(
+        newCabinetPositionValidator = new StringLengthValidator(4,
             Messages.getString("Cabinet.position.validationMsg"));
         displayOldCabinetFields(false);
         newCabinetPosition = (BiobankText) widgetCreator.createBoundWidget(
