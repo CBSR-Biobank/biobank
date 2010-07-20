@@ -454,7 +454,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             adapter.resetObject();
             boolean openView = adapter.getModelObject() != null
                 && !adapter.getModelObject().isNew();
-            closeEntryOpenView(false, openView);
+            closeEntryOpenView(true, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e);
         }
