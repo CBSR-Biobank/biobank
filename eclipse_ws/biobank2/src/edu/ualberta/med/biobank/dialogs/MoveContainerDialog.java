@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.validators.ContainerLabelValidator;
+import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
@@ -51,7 +51,7 @@ public class MoveContainerDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
-            "Destination Address", null, newLabel, new ContainerLabelValidator(
+            "Destination Address", null, newLabel, new StringLengthValidator(2,
                 "Destination label must be another container "
                     + "(4 characters minimum)."));
     }

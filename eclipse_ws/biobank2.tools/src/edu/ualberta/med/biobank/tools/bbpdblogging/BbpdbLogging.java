@@ -84,7 +84,6 @@ public class BbpdbLogging {
         // importPass2();
     }
 
-    @SuppressWarnings("unused")
     private void importPass1() throws Exception {
         Statement s = bbpdbCon.createStatement();
         s.execute(BBPDB_LOG_COUNT_QUERY);
@@ -151,6 +150,7 @@ public class BbpdbLogging {
 
     }
 
+    @SuppressWarnings("unused")
     private void importPass2() throws Exception {
         Statement s = biobank2Con.createStatement();
         s.execute("SELECT * FROM log WHERE created_at < '2010-05-18'");
