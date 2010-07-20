@@ -11,6 +11,15 @@ public class AdvancedReportTreeNode extends AbstractReportTreeNode {
         this.query = query;
     }
 
+    @Override
+    public String getToolTipText() {
+        try {
+            return getQueryTreeNode().getLabel();
+        } catch (Exception e) {
+        }
+        return "";
+    }
+
     public QueryTreeNode getQueryTreeNode() {
         return query;
     }

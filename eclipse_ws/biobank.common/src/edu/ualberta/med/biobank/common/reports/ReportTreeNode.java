@@ -8,6 +8,7 @@ public class ReportTreeNode extends AbstractReportTreeNode {
         this.report = report;
     }
 
+    @Override
     public String getToolTipText() {
         try {
             return getReport().getDescription();

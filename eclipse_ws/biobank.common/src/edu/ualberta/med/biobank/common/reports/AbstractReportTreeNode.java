@@ -44,4 +44,8 @@ public class AbstractReportTreeNode {
     public void setParent(AbstractReportTreeNode n) {
         parent = n;
     }
+
+    public String getToolTipText() {
+        return null;
+    }
 }

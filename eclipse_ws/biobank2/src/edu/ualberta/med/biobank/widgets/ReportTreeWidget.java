@@ -33,6 +33,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
@@ -225,9 +226,9 @@ public class ReportTreeWidget extends Composite {
                         label.setBackground(display
                             .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
                         label.setData("_TREEITEM", item);
-                        String text = ((ReportTreeNode) item.getData())
+                        String text = ((AbstractReportTreeNode) item.getData())
                             .getToolTipText();
-                        if (text.equalsIgnoreCase(""))
+                        if (text == null || text.equalsIgnoreCase(""))
                             return;
                         else
                             label.setText(text);
@@ -261,7 +262,7 @@ public class ReportTreeWidget extends Composite {
                     .getActivePage()
                     .openEditor(new ReportInput(node),
                         ((ReportTreeNode) node).getReport().getEditorId());
-            else
+            else if (node instanceof AdvancedReportTreeNode)
                 PlatformUI
                     .getWorkbench()
                     .getActiveWorkbenchWindow()

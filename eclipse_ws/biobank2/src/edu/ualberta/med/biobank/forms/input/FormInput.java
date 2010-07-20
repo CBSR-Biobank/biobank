@@ -8,7 +8,7 @@ import org.eclipse.ui.IPersistableElement;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class FormInput implements IEditorInput {
-    private Object obj;
+    protected Object obj;
     private boolean hasPreviousForm;
     private String name;
 
