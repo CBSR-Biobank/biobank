@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm;
+import edu.ualberta.med.biobank.forms.ActivityStatusEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
@@ -25,7 +25,7 @@ public class EditActivityStatusHandler extends AbstractHandler {
         SiteWrapper siteWrapper = SessionManager.getInstance().getCurrentSite();
         SiteAdapter sa = new SiteAdapter(sessionAdapter, siteWrapper);
         AdapterBase.openForm(new FormInput(sa),
-            ActivityStatusMethodEntryForm.ID);
+            ActivityStatusEntryForm.ID);
         return null;
     }
 

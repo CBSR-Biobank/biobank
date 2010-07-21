@@ -8,16 +8,16 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class ActivityStatusMethodInfoTable extends
+public class ActivityStatusInfoTable extends
     InfoTableWidget<ActivityStatusWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Activity Status method" };
 
     private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
 
-    public ActivityStatusMethodInfoTable(Composite parent,
-        List<ActivityStatusWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, BOUNDS, 10);
+    public ActivityStatusInfoTable(Composite parent,
+        List<ActivityStatusWrapper> activityStatusCollection) {
+        super(parent, activityStatusCollection, HEADINGS, BOUNDS, 10);
     }
 
     @Override

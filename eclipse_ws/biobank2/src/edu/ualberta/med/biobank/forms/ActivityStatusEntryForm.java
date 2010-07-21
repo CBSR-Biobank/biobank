@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -17,19 +13,19 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ActivityStatusEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ActivityStatusMethodEntryForm extends BiobankEntryForm {
+public class ActivityStatusEntryForm extends BiobankEntryForm {
 
     private ActivityStatusEntryInfoTable activityStatusTable;
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(ActivityStatusMethodEntryForm.class.getName());
+        .getLogger(ActivityStatusEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm";
     public static final String OK_MESSAGE = "View and edit activity status methods.";
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+    // sets state to dirty when the table is changed.
+    private BiobankEntryFormWidgetListener tableChangeListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
             setDirty(true);
@@ -53,28 +49,20 @@ public class ActivityStatusMethodEntryForm extends BiobankEntryForm {
 
     private void createGlobalActivityStatusMethodSection() throws Exception {
         Section section = createSection("Global Activity Status methods");
-        List<ActivityStatusWrapper> globalActivityStatuses;
-        Collection<ActivityStatusWrapper> globalActivityStatusColl = ActivityStatusWrapper
-            .getAllActivityStatuses(appService);
-        if (globalActivityStatusColl != null)
-            globalActivityStatuses = new ArrayList<ActivityStatusWrapper>(
-                globalActivityStatusColl);
-        else
-            globalActivityStatuses = new ArrayList<ActivityStatusWrapper>();
 
         activityStatusTable = new ActivityStatusEntryInfoTable(section,
-            globalActivityStatuses, "Add a new global activity status method",
+            "Add a new global activity status method",
             "Edit the global activity status methods", null);
 
         activityStatusTable.adaptToToolkit(toolkit, true);
-        activityStatusTable.addSelectionChangedListener(listener);
+        activityStatusTable.addSelectionChangedListener(tableChangeListener);
         toolkit.paintBordersFor(activityStatusTable);
 
         addSectionToolbar(section, "Add Global Activity Status Method",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    activityStatusTable.addActivityStatus();
+                    activityStatusTable.addActivityStatusExternal();
                 }
             });
 
@@ -83,12 +71,13 @@ public class ActivityStatusMethodEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        ActivityStatusWrapper.persistActivityStatuses(
-            activityStatusTable.getAddedOrModifiedActivityStatuss(),
-            activityStatusTable.getDeletedActivityStatuss());
+        activityStatusTable.save();
+    }
 
-        activityStatusTable.getDeletedActivityStatuss().clear();
-        activityStatusTable.getAddedOrModifiedActivityStatuss().clear();
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        activityStatusTable.reset();
     }
 
     @Override
@@ -99,22 +88,6 @@ public class ActivityStatusMethodEntryForm extends BiobankEntryForm {
     @Override
     protected String getOkMessage() {
         return null;
-    }
-
-    @Override
-    public void reset() throws Exception {
-        super.reset();
-
-        List<ActivityStatusWrapper> globalActivityStatusMethods = null;
-        try {
-            globalActivityStatusMethods = new ArrayList<ActivityStatusWrapper>(
-                ActivityStatusWrapper.getAllActivityStatuses(appService));
-        } catch (ApplicationException e) {
-            logger.error("Can't reset global activity status methods", e);
-        }
-        if (globalActivityStatusMethods != null) {
-            activityStatusTable.setCollection(globalActivityStatusMethods);
-        }
     }
 
     @Override

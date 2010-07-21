@@ -1943,7 +1943,7 @@
             name="Sample Type Totals by Patient Visit and Study">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
+            class="edu.ualberta.med.biobank.forms.ActivityStatusEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
             name="Activity StatusMethod Entry">

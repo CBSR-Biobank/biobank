@@ -747,8 +747,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public long getShipmentCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where clinic.site.id = ?", Arrays
-            .asList(new Object[] { getId() }));
+            + Shipment.class.getName() + " where clinic.site.id = ?",
+            Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");

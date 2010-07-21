@@ -46,6 +46,15 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (object instanceof ShippingMethodWrapper)
+            return ((ShippingMethodWrapper) object).getName().equals(
+                this.getName());
+        else
+            return false;
+    }
+
+    @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
         checkUnique();
@@ -113,8 +122,8 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     public boolean isUsed() throws ApplicationException, BiobankCheckException {
         String queryString = "select count(s) from " + Shipment.class.getName()
             + " as s where s.shippingMethod=?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject }));
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -135,8 +144,8 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
 
     private void checkNoDuplicates(String propertyName, String value,
         String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { value }));
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { value }));
 
         // if global type, check the name is use nowhere
 

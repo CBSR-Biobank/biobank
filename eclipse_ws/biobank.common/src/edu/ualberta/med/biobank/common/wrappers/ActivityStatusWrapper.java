@@ -22,8 +22,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  */
 public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
-    private static Map<String, ActivityStatusWrapper> activityStatusMap = new HashMap<String, ActivityStatusWrapper>();
-
     public static final String ACTIVE_STATUS_STRING = "Active";
 
     public static final String CLOSED_STATUS_STRING = "Closed";
@@ -62,6 +60,16 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (object instanceof ActivityStatusWrapper)
+            return ((ActivityStatusWrapper) object).getName().equals(
+                this.getName());
+        else
+
+            return false;
+    }
+
+    @Override
     public int compareTo(ModelWrapper<ActivityStatus> wrapper) {
         if (wrapper instanceof ActivityStatusWrapper) {
             String name1 = wrappedObject.getName();
@@ -75,9 +83,9 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static Collection<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
-        if (activityStatusMap.size() > 0) {
-            return activityStatusMap.values();
-        }
+
+        Map<String, ActivityStatusWrapper> activityStatusMap = new HashMap<String, ActivityStatusWrapper>();
+
         HQLCriteria c = new HQLCriteria("from "
             + ActivityStatus.class.getName());
         List<ActivityStatus> result = appService.query(c);
@@ -90,15 +98,26 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name) throws Exception {
-        if (activityStatusMap.size() == 0) {
-            getAllActivityStatuses(appService);
-        }
-        ActivityStatusWrapper activityStatus = activityStatusMap.get(name);
-        if (activityStatus == null) {
+
+        HQLCriteria c = new HQLCriteria("from "
+            + ActivityStatus.class.getName() + " where name = ?",
+            Arrays.asList(new Object[] { name }));
+
+        List<ActivityStatus> result = appService.query(c);
+
+        if (result.size() == 1) {
+            return new ActivityStatusWrapper(appService, result.get(0));
+
+        } else if (result.size() == 0) {
             throw new BiobankCheckException("activity status \"" + name
                 + "\" does not exist");
+
+        } else if (result.size() > 1) {
+            throw new BiobankCheckException(" Too many instances of \"" + name
+                + "\"");
         }
-        return activityStatus;
+        return null;
+
     }
 
     /**

@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -17,45 +15,34 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 public class ActivityStatusDialog extends BiobankDialog {
 
     private static final String TITLE = "Activity Status Method ";
-
     private static final String MSG_NO_ST_NAME = "Activity status  method must have a name.";
+    BiobankText activityStatusBBText;
+    String activityStatusStr;
+    private String message, defaultText;
+    private boolean addMode;
 
-    private ActivityStatusWrapper origActivityStatus;
-
-    // this is the object that is modified via the bound widgets
-    private ActivityStatusWrapper ActivityStatus;
-
-    private String message;
-
-    private ActivityStatusWrapper oldActivityStatus;
-
-    public ActivityStatusDialog(Shell parent,
-        ActivityStatusWrapper ActivityStatus, String message) {
+    public ActivityStatusDialog(Shell parent, boolean addMode, String message,
+        String defaultText) {
         super(parent);
-        Assert.isNotNull(ActivityStatus);
-        origActivityStatus = ActivityStatus;
-        this.ActivityStatus = new ActivityStatusWrapper(null);
-        ActivityStatus.setName(ActivityStatus.getName());
+        this.addMode = addMode;
+        this.defaultText = defaultText;
         this.message = message;
-        oldActivityStatus = new ActivityStatusWrapper(
-            SessionManager.getAppService());
     }
 
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText(((origActivityStatus.getName() == null) ? "Add "
-            : "Edit ") + TITLE);
+        shell.setText((this.addMode ? "Add " : "Edit ") + TITLE);
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        if (origActivityStatus.getName() == null) {
+        if (addMode)
             setTitle("Add Activity Status Method");
-        } else {
+        else
             setTitle("Edit Activity Status Method");
-        }
+
         setMessage(message);
         return contents;
     }
@@ -66,21 +53,27 @@ public class ActivityStatusDialog extends BiobankDialog {
         content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, PojoObservables.observeValue(ActivityStatus, "name"),
+        activityStatusBBText = (BiobankText) createBoundWidgetWithLabel(content,
+            BiobankText.class, SWT.BORDER, "Name", null, null,
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
-
+        if (defaultText != null)
+            activityStatusBBText.setText(defaultText);
     }
 
     @Override
     protected void okPressed() {
-        oldActivityStatus.setName(origActivityStatus.getName());
-        origActivityStatus.setName(ActivityStatus.getName());
+        this.activityStatusStr = activityStatusBBText.getText();
         super.okPressed();
     }
 
-    public ActivityStatusWrapper getOrigActivityStatus() {
-        return oldActivityStatus;
-    }
+    public ActivityStatusWrapper getNewActivityStatus() {
+        if (this.activityStatusStr != null) {
+            ActivityStatusWrapper asw = new ActivityStatusWrapper(
+                SessionManager.getAppService());
+            asw.setName(this.activityStatusStr);
+            return asw;
+        } else
+            return null;
 
+    }
 }
