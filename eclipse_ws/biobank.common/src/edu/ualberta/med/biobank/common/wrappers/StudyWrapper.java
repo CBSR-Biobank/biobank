@@ -39,8 +39,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private ActivityStatusWrapper activityStatus;
 
-    private SiteWrapper site;
-
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -106,22 +104,86 @@ public class StudyWrapper extends ModelWrapper<Study> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    @Deprecated
     public SiteWrapper getSite() {
-        if (site == null) {
-            Site s = wrappedObject.getSite();
-            if (s == null)
-                return null;
-            site = new SiteWrapper(appService, s);
-        }
-        return site;
+        return null;
     }
 
+    @SuppressWarnings("unused")
+    @Deprecated
     public void setSite(SiteWrapper site) {
-        this.site = site;
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = site.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SiteWrapper> getSiteCollection(boolean sort) {
+        List<SiteWrapper> siteCollection = (List<SiteWrapper>) propertiesMap
+            .get("siteCollection");
+        if (siteCollection == null) {
+            siteCollection = new ArrayList<SiteWrapper>();
+            Collection<Site> children = wrappedObject.getSiteCollection();
+            if (children != null) {
+                for (Site type : children) {
+                    siteCollection.add(new SiteWrapper(appService, type));
+                }
+                propertiesMap.put("siteCollection", siteCollection);
+            }
+        }
+        if ((siteCollection != null) && sort)
+            Collections.sort(siteCollection);
+        return siteCollection;
+    }
+
+    public List<SiteWrapper> getSiteCollection() {
+        return getSiteCollection(false);
+    }
+
+    private void setSiteCollection(Collection<Site> allSiteObjects,
+        List<SiteWrapper> allSiteWrappers) {
+        Collection<Site> oldSites = wrappedObject.getSiteCollection();
+        wrappedObject.setSiteCollection(allSiteObjects);
+        propertyChangeSupport.firePropertyChange("siteCollection", oldSites,
+            allSiteObjects);
+        propertiesMap.put("siteCollection", allSiteWrappers);
+    }
+
+    public void addSites(List<SiteWrapper> newSites) {
+        if ((newSites == null) || (newSites.size() == 0))
+            return;
+
+        Collection<Site> allSiteObjects = new HashSet<Site>();
+        List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
+        // already added Sites
+        List<SiteWrapper> currentList = getSiteCollection();
+        if (currentList != null) {
+            for (SiteWrapper Site : currentList) {
+                allSiteObjects.add(Site.getWrappedObject());
+                allSiteWrappers.add(Site);
+            }
+        }
+        // new Sites added
+        for (SiteWrapper Site : newSites) {
+            allSiteObjects.add(Site.getWrappedObject());
+            allSiteWrappers.add(Site);
+        }
+        setSiteCollection(allSiteObjects, allSiteWrappers);
+    }
+
+    public void removeSites(List<SiteWrapper> SitesToRemove) {
+        if (SitesToRemove != null && SitesToRemove.size() > 0) {
+            Collection<Site> allSiteObjects = new HashSet<Site>();
+            List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
+            // already added Sites
+            List<SiteWrapper> currentList = getSiteCollection();
+            if (currentList != null) {
+                for (SiteWrapper Site : currentList) {
+                    if (!SitesToRemove.contains(Site)) {
+                        allSiteObjects.add(Site.getWrappedObject());
+                        allSiteWrappers.add(Site);
+                    }
+                }
+            }
+            setSiteCollection(allSiteObjects, allSiteWrappers);
+        }
     }
 
     @Override
@@ -136,7 +198,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "site", "contactCollection", "sampleStorageCollection",
+            "siteCollection", "contactCollection", "sampleStorageCollection",
             "sourceVesselCollection", "studyPvAttrCollection",
             "patientCollection" };
     }
@@ -150,11 +212,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         checkNotEmpty(getName(), "Name");
-        checkNoDuplicatesInSite(Study.class, "name", getName(), getSite()
-            .getId(), "A study with name \"" + getName() + "\" already exists.");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicatesInSite(Study.class, "nameShort", getNameShort(),
-            getSite().getId(), "A study with short name \"" + getNameShort()
+        checkNoDuplicates(Study.class, "name", getName(),
+            "A study with name \"" + getName() + "\" already exists.");
+        checkNoDuplicates(Study.class, "nameShort", getNameShort(),
+            "A study with short name \"" + getNameShort()
                 + "\" already exists.");
         checkValidActivityStatus();
         checkContactsFromSameSite();
@@ -892,7 +954,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void reload() throws Exception {
         super.reload();
         activityStatus = null;
-        site = null;
     }
 
 }

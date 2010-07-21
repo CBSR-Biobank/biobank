@@ -136,11 +136,9 @@ public class AliquotWrapper extends
         }
     }
 
+    @Deprecated
     @Override
     public SiteWrapper getSite() {
-        if (getPatientVisit() != null) {
-            return getPatientVisit().getPatient().getStudy().getSite();
-        }
         return null;
     }
 
