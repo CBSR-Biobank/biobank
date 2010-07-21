@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.widgets;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -11,6 +12,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -18,9 +26,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
@@ -49,6 +59,67 @@ public class AdapterTreeWidget extends Composite {
         } else {
             treeViewer = new TreeViewer(this);
         }
+        /*----------------------------DND-----------------------------------*/
+
+        treeViewer.addDragSupport(DND.DROP_MOVE,
+            new Transfer[] { TextTransfer.getInstance() },
+            new DragSourceListener() {
+
+                @Override
+                public void dragStart(DragSourceEvent event) {
+                    System.out.println("DRAG START");
+                }
+
+                @Override
+                public void dragSetData(DragSourceEvent event) {
+                    IStructuredSelection selection = (IStructuredSelection) treeViewer
+                        .getSelection();
+
+                    if (TextTransfer.getInstance().isSupportedType(
+                        event.dataType)) {
+                        event.data = "DX:" + selection.toString();
+                        System.out.println(event.toString());
+                    }
+                }
+
+                @Override
+                public void dragFinished(DragSourceEvent event) {
+                    System.out.println("DRAG END");
+                }
+            });
+        treeViewer.addDropSupport(DND.DROP_MOVE,
+            new Transfer[] { TextTransfer.getInstance() },
+            new DropTargetAdapter() {
+
+                @Override
+                public void dragOver(DropTargetEvent event) {
+
+                    if (event.item != null) {
+                        TreeItem item = (TreeItem) event.item;
+
+                        ModelWrapper<?> wrapper = ((AdapterBase) (item
+                            .getData())).getModelObject();
+
+                        if (wrapper instanceof ContainerWrapper) {
+                            ContainerWrapper container = (ContainerWrapper) wrapper;
+                            System.out.println("container type: "
+                                + container.getContainerType().getNameShort());
+                        }
+
+                        if (!(wrapper instanceof ContainerWrapper))
+                            event.feedback = DND.FEEDBACK_NONE;
+                        else
+                            event.feedback = DND.FEEDBACK_EXPAND
+                                | DND.FEEDBACK_SELECT;
+
+                        System.out.println(item);
+
+                    }
+
+                }
+            });
+
+        /*----------------------------DND-----------------------------------*/
 
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
