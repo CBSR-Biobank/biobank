@@ -219,24 +219,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
             "A study with short name \"" + getNameShort()
                 + "\" already exists.");
         checkValidActivityStatus();
-        checkContactsFromSameSite();
     }
 
     private void checkValidActivityStatus() throws BiobankCheckException {
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
                 "the clinic does not have an activity status");
-        }
-    }
-
-    private void checkContactsFromSameSite() throws BiobankCheckException {
-        if (getContactCollection() != null) {
-            for (ContactWrapper contact : getContactCollection()) {
-                if (!contact.getClinic().getSite().equals(getSite())) {
-                    throw new BiobankCheckException(
-                        "Contact associated with this study should be from the same site.");
-                }
-            }
         }
     }
 
@@ -272,9 +260,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
             + Contact.class.getName()
             + " as contacts left join contacts.studyCollection as studies "
             + "where (studies.id <> ?  or studies is null)"
-            + "and contacts.clinic.site.id = ? "
-            + "order by contacts.clinic.name", Arrays.asList(new Object[] {
-            getId(), getSite().getId() }));
+            + "order by contacts.clinic.name",
+            Arrays.asList(new Object[] { getId() }));
         List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
         List<Contact> rawContacts = appService.query(criteria);
         for (Contact rawContact : rawContacts) {

@@ -90,7 +90,7 @@ public class TestPatientVisit extends TestDatabase {
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ShipmentHelper.addShipment(clinic, patient);
+        shipment = ShipmentHelper.addShipment(site, clinic, patient);
     }
 
     private void addContainerTypes() throws Exception {
@@ -163,7 +163,7 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic, patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime(), date);

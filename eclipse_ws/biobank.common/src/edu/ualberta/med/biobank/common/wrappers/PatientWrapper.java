@@ -190,13 +190,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     /**
      * Search a patient in the site with the given number
      */
-    public static PatientWrapper getPatientInSite(
-        WritableApplicationService appService, String patientNumber,
-        SiteWrapper siteWrapper) throws ApplicationException {
+    public static PatientWrapper getPatient(
+        WritableApplicationService appService, String patientNumber)
+        throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Patient.class.getName()
-            + " where study.site.id = ? and pnumber = ?",
-            Arrays.asList(new Object[] { siteWrapper.getId(), patientNumber }));
+            + Patient.class.getName() + " where pnumber = ?",
+            Arrays.asList(new Object[] { patientNumber }));
         List<Patient> patients = appService.query(criteria);
         if (patients.size() == 1) {
             return new PatientWrapper(appService, patients.get(0));
@@ -327,11 +326,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            "select p from "
-                + Patient.class.getName()
-                + " as p join p.shipmentCollection as ships"
-                + " where p.study.site.id = ? and ships.dateReceived >= ? and ships.dateReceived <= ?",
+        HQLCriteria criteria = new HQLCriteria("select p from "
+            + Patient.class.getName()
+            + " as p join p.shipmentCollection as ships"
+            + " where ships.site.id = ?"
+            + " and ships.dateReceived >= ? and ships.dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<Patient> res = appService.query(criteria);
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();

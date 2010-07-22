@@ -54,6 +54,7 @@ public class TestDatabase {
     public void tearDown() throws Exception {
         try {
             SampleTypeHelper.deleteCreatedSampleTypes();
+            SiteHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
             SourceVesselHelper.deleteCreatedSourceVessels();
             ShippingMethodHelper.deleteCreateShippingMethods();
@@ -74,10 +75,10 @@ public class TestDatabase {
                 && !Collection.class.isAssignableFrom(method.getReturnType())
                 && !Map.class.isAssignableFrom(method.getReturnType())
                 && !method.getReturnType().isArray()
-                && !method.getReturnType().getName().startsWith(
-                    "edu.ualberta.med.biobank.common")
-                && !method.getReturnType().getName().startsWith(
-                    "edu.ualberta.med.biobank.util")) {
+                && !method.getReturnType().getName()
+                    .startsWith("edu.ualberta.med.biobank.common")
+                && !method.getReturnType().getName()
+                    .startsWith("edu.ualberta.med.biobank.util")) {
                 GetterInfo getterInfo = new GetterInfo();
                 getterInfo.getMethod = method;
                 map.put(method.getName(), getterInfo);

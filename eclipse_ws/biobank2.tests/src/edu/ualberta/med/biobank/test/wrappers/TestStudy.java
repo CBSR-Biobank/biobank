@@ -53,7 +53,8 @@ public class TestStudy extends TestDatabase {
         study.persist();
         study.reload();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
         return PatientVisitHelper.addPatientVisits(patient, shipment);
 
     }
@@ -143,11 +144,10 @@ public class TestStudy extends TestDatabase {
     @Test
     public void testContactsNotAssoc() throws Exception {
         String name = "testContactsNotAssoc" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study1 = StudyHelper.addStudy(name);
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
-        site.reload();
 
+        SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "CL1");
         int contactCount = ContactHelper.addContactsToClinic(clinic, "CL1-CT",
             5, 10);
@@ -646,11 +646,11 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
         // clinic 1 = 1 patient for study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
@@ -692,9 +692,9 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1, patient3);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
@@ -748,9 +748,9 @@ public class TestStudy extends TestDatabase {
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1, patient2);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();
@@ -872,24 +872,6 @@ public class TestStudy extends TestDatabase {
         s1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         s1.persist();
-    }
-
-    @Test
-    public void testPersistFailCheckContactsFromSameSite() throws Exception {
-        String name = "testPersistFailCheckContactsFromSameSite";
-        StudyWrapper study = StudyHelper.addStudy(name);
-
-        SiteWrapper site2 = SiteHelper.addSite(name + "_2");
-        ClinicWrapper clinic = ClinicHelper.addClinic(site2, name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-
-        study.addContacts(Arrays.asList(contact));
-        try {
-            study.persist();
-            Assert.fail("Contact should be in same site");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test

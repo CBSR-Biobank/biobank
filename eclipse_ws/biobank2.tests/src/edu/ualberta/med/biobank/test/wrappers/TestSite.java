@@ -386,28 +386,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testDeleteFailNoMoreStudy() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
-        String name = "testDeleteFailNoMoreStudy" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name, false);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        site.reload();
-
-        try {
-            site.delete();
-            Assert.fail("Should not delete the site : a study is still there");
-        } catch (BiobankCheckException bce) {
-            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
-                .size());
-        }
-        study.delete();
-        site.reload();
-        site.delete();
-        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
-    }
-
-    @Test
     public void testDeleteFailNoMoreClinic() throws Exception {
         int oldTotal = SiteWrapper.getSites(appService).size();
         String name = "testDeleteFailNoMoreClinic" + r.nextInt();
@@ -695,36 +673,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetPatientCountForSite() throws Exception {
-        String name = "testGetPatientCountForClinic" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study1.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
-            study1);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
-            study2);
-        PatientWrapper patient3 = PatientHelper.addPatient(name + "PATIENT3",
-            study2);
-
-        site.reload();
-        Assert.assertEquals(3, site.getPatientCount().longValue());
-
-        // remove a patient
-        patient2.delete();
-        site.reload();
-        Assert.assertEquals(2, site.getPatientCount().longValue());
-
-        // remove all patients
-        patient1.delete();
-        patient3.delete();
-        site.reload();
-        Assert.assertEquals(0, site.getPatientCount().longValue());
-    }
-
-    @Test
     public void testGetPatientVisitCountForSite() throws Exception {
         String name = "testGetPatientVisitCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -751,9 +699,9 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1, patient3);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
@@ -817,10 +765,10 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1);
 
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient2);
 
         // shipment 1 has patient visits for patient1 and patient2

@@ -52,15 +52,15 @@ public class TestShippingMethod extends TestDatabase {
             .addShippingMethod(name + "_2");
 
         ShipmentWrapper shipment1 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment1.setShippingMethod(company1);
         shipment1.persist();
         ShipmentWrapper shipment2 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment2.setShippingMethod(company2);
         shipment2.persist();
         ShipmentWrapper shipment3 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment3.setShippingMethod(company2);
         shipment3.persist();
 
@@ -85,17 +85,17 @@ public class TestShippingMethod extends TestDatabase {
             .addShippingMethod(name);
 
         ShipmentWrapper shipment1 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment1.setShippingMethod(company);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
         ShipmentWrapper shipment2 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment2.setShippingMethod(company);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
         ShipmentWrapper shipment3 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment3.setShippingMethod(company);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
@@ -171,7 +171,7 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ShipmentWrapper shipment1 = ShipmentHelper
-            .addShipment(clinic, patient1);
+            .addShipment(site, clinic, patient1);
         shipment1.setShippingMethod(company);
         shipment1.persist();
         company.reload();

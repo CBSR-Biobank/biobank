@@ -53,12 +53,8 @@ public class DbHelper {
         }
     }
 
-    public static void deleteStudies(List<StudyWrapper> studies)
-        throws Exception {
-        if (studies == null)
-            return;
-
-        for (StudyWrapper study : studies) {
+    public static void deleteCreatedStudies() throws Exception {
+        for (StudyWrapper study : StudyWrapper.getAllStudies(appService)) {
             deletePatients(study.getPatientCollection());
             deleteFromList(study.getSampleStorageCollection());
             study.reload();

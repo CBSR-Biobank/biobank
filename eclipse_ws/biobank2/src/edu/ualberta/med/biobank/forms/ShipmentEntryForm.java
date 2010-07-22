@@ -236,7 +236,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         shipmentPatientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,
-            shipmentWrapper, site, toolkit, true);
+            shipmentWrapper, toolkit, true);
         shipmentPatientsWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override

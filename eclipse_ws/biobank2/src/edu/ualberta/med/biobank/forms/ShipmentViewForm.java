@@ -84,7 +84,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         ShipmentPatientsWidget shipPatientsWidget = new ShipmentPatientsWidget(
-            client, SWT.NONE, shipment, null, toolkit, false);
+            client, SWT.NONE, shipment, toolkit, false);
         shipPatientsWidget
             .addDoubleClickListener(collectionDoubleClickListener);
     }
