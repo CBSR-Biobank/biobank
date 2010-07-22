@@ -1039,4 +1039,8 @@ public class ContainerWrapper extends
         activityStatus = null;
     }
 
+    public boolean isContainerFull() {
+        return (this.getChildCount() == this.getContainerType()
+            .getRowCapacity() * this.getContainerType().getColCapacity());
+    }
 }
