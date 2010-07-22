@@ -75,8 +75,7 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 0, 0);
 
-        StudyWrapper study = StudyHelper.addStudy(site,
-            "studyname" + r.nextInt());
+        StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
@@ -214,7 +213,7 @@ public class TestAliquot extends TestDatabase {
         Exception {
         String name = "testCheckParentFromSameSite" + r.nextInt();
         SiteWrapper newSite = SiteHelper.addSite(name);
-        StudyWrapper newStudy = StudyHelper.addStudy(newSite, name);
+        StudyWrapper newStudy = StudyHelper.addStudy(name);
         PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
         ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
@@ -443,10 +442,10 @@ public class TestAliquot extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
             name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, site, name);
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
             .getClinicCollection().get(0), patient);
@@ -478,10 +477,10 @@ public class TestAliquot extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
             name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, site, name);
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
             .getClinicCollection().get(0), patient);
@@ -543,10 +542,10 @@ public class TestAliquot extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
             name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, site, name);
 
         ShipmentWrapper shipment = ShipmentHelper.addShipment(study
             .getClinicCollection().get(0), patient);

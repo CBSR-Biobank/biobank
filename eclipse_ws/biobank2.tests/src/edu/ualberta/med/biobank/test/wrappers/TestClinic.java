@@ -135,14 +135,14 @@ public class TestClinic extends TestDatabase {
         String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name, true);
-        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addContacts(Arrays.asList(DbHelper.chooseRandomlyInList(clinic
             .getContactCollection())));
         study1.persist();
 
         ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2",
             true);
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addContacts(Arrays.asList(
             DbHelper.chooseRandomlyInList(clinic.getContactCollection()),
             DbHelper.chooseRandomlyInList(clinic2.getContactCollection())));
@@ -159,11 +159,11 @@ public class TestClinic extends TestDatabase {
         String name = "testGetStudyCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name, true);
-        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addContacts(Arrays.asList(DbHelper.chooseRandomlyInList(clinic
             .getContactCollection())));
         study1.persist();
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addContacts(Arrays.asList(DbHelper.chooseRandomlyInList(clinic
             .getContactCollection())));
         study2.persist();
@@ -340,7 +340,7 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
@@ -402,13 +402,12 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
-            + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
@@ -430,13 +429,12 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
-            + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
@@ -461,13 +459,12 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
-            + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
@@ -496,7 +493,7 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
@@ -508,8 +505,7 @@ public class TestClinic extends TestDatabase {
         PatientVisitHelper.addPatientVisit(patient2, shipment1,
             Utils.getRandomDate(), Utils.getRandomDate());
 
-        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
-            + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
@@ -556,13 +552,12 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
-            + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
@@ -595,13 +590,12 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        StudyWrapper study2 = StudyHelper.addStudy(clinic.getSite(), name
-            + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
@@ -645,7 +639,7 @@ public class TestClinic extends TestDatabase {
         ContactWrapper contact2 = ContactHelper
             .addContact(clinic2, name + "_2");
 
-        StudyWrapper study = StudyHelper.addStudy(clinic1.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact1, contact2));
         study.persist();
 

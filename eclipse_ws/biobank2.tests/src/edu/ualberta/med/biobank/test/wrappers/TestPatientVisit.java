@@ -80,7 +80,7 @@ public class TestPatientVisit extends TestDatabase {
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
         site = SiteHelper.addSite("Site - Patient Visit Test "
             + Utils.getRandomString(10));
-        study = StudyHelper.addStudy(site, "Study - Patient Visit Test "
+        study = StudyHelper.addStudy("Study - Patient Visit Test "
             + Utils.getRandomString(10));
         clinic = ClinicHelper.addClinic(site, "Clinic - Patient Visit Test "
             + Utils.getRandomString(10));

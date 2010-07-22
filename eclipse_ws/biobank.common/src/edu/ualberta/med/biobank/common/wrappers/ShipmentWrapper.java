@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -237,6 +238,18 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         } else {
             setClinic(clinic.wrappedObject);
         }
+    }
+
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        return (site != null) ? new SiteWrapper(appService, site) : null;
+    }
+
+    public void setSite(SiteWrapper siteWrapper) {
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = siteWrapper.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     @SuppressWarnings("unchecked")

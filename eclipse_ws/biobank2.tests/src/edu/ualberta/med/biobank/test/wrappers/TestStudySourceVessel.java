@@ -5,13 +5,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
 import edu.ualberta.med.biobank.test.TestDatabase;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
@@ -33,8 +31,7 @@ public class TestStudySourceVessel extends TestDatabase {
         ssv.setSourceVessel(null);
         Assert.assertNull(ssv.getSourceVessel());
 
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper sourceVessel = SourceVesselHelper
             .addSourceVessel(name);
@@ -62,8 +59,7 @@ public class TestStudySourceVessel extends TestDatabase {
     @Test
     public void testGetSetStudy() throws Exception {
         String name = "testGetSetStudy" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper sourceVessel = SourceVesselHelper
             .addSourceVessel(name);
@@ -73,7 +69,7 @@ public class TestStudySourceVessel extends TestDatabase {
         ssv.reload();
         Assert.assertEquals(study, ssv.getStudy());
 
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "_2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         ssv.setStudy(study2);
         ssv.persist();
 
@@ -85,8 +81,7 @@ public class TestStudySourceVessel extends TestDatabase {
     public void testBasicGettersAndSetters() throws BiobankCheckException,
         Exception {
         String name = "testBasicGettersAndSetters" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper sourceVessel = SourceVesselHelper
             .addSourceVessel(name);
@@ -100,8 +95,7 @@ public class TestStudySourceVessel extends TestDatabase {
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
 
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper ss1 = SourceVesselHelper.addSourceVessel("QWERTY"
             + name);
@@ -121,8 +115,7 @@ public class TestStudySourceVessel extends TestDatabase {
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
 
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper ss1 = SourceVesselHelper.addSourceVessel(name);
         StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
@@ -139,8 +132,7 @@ public class TestStudySourceVessel extends TestDatabase {
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetNew" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper ss1 = SourceVesselHelper.addSourceVessel(name);
         StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
@@ -155,8 +147,7 @@ public class TestStudySourceVessel extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselWrapper ss1 = SourceVesselHelper.addSourceVessel(name);
         StudySourceVesselWrapper ssv1 = StudySourceVesselHelper

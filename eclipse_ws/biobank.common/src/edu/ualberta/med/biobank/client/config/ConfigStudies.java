@@ -47,7 +47,6 @@ public class ConfigStudies {
         String nameShort, String activityStatusName, String comment)
         throws Exception {
         StudyWrapper study = new StudyWrapper(site.getAppService());
-        study.setSite(site);
         study.setName(name);
         study.setNameShort(nameShort);
         study.setActivityStatus(CalgarySite

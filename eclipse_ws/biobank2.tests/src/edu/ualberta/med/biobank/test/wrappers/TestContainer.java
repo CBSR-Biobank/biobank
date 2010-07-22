@@ -856,8 +856,8 @@ public class TestContainer extends TestDatabase {
     }
 
     private PatientVisitWrapper addPatientVisit() throws Exception {
-        StudyWrapper study = StudyHelper.addStudy(site, "Study1");
-        ContactHelper.addContactsToStudy(study, "contactsStudy1");
+        StudyWrapper study = StudyHelper.addStudy("Study1");
+        ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
@@ -922,8 +922,8 @@ public class TestContainer extends TestDatabase {
             containerTypeMap.get("ChildCtL3"), selectedSampleTypes);
         containerTypeMap.put("ChildCtL3", childTypeL3);
 
-        StudyWrapper study = StudyHelper.addStudy(site, "Study1");
-        ContactHelper.addContactsToStudy(study, "contactsStudy1");
+        StudyWrapper study = StudyHelper.addStudy("Study1");
+        ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);

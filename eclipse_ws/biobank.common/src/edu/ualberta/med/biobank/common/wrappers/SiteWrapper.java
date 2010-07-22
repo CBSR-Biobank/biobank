@@ -59,9 +59,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
     protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
             "address", "clinicCollection", "siteCollection",
-            "containerCollection", "sampleTypeCollection",
-            "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode", "allSampleTypeCollection" };
+            "containerCollection", "shipmentCollection",
+            "sampleTypeCollection", "sitePvAttrCollection", "street1",
+            "street2", "city", "province", "postalCode",
+            "allSampleTypeCollection" };
     }
 
     public String getName() {
@@ -494,6 +495,56 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
+        List<ShipmentWrapper> pvCollection = (List<ShipmentWrapper>) propertiesMap
+            .get("shipmentCollection");
+        if (pvCollection == null) {
+            Collection<Shipment> children = wrappedObject
+                .getShipmentCollection();
+            if (children != null) {
+                pvCollection = new ArrayList<ShipmentWrapper>();
+                for (Shipment pv : children) {
+                    pvCollection.add(new ShipmentWrapper(appService, pv));
+                }
+                propertiesMap.put("shipmentCollection", pvCollection);
+            }
+        }
+        if ((pvCollection != null) && sort)
+            Collections.sort(pvCollection);
+        return pvCollection;
+    }
+
+    public List<ShipmentWrapper> getShipmentCollection() {
+        return getShipmentCollection(true);
+    }
+
+    public void addShipments(List<ShipmentWrapper> visits) {
+        if (visits != null && visits.size() > 0) {
+            Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
+            List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
+            // already added visits
+            List<ShipmentWrapper> currentList = getShipmentCollection();
+            if (currentList != null) {
+                for (ShipmentWrapper study : currentList) {
+                    allShipmentObjects.add(study.getWrappedObject());
+                    allShipmentWrappers.add(study);
+                }
+            }
+            // new visits added
+            for (ShipmentWrapper visit : visits) {
+                allShipmentObjects.add(visit.getWrappedObject());
+                allShipmentWrappers.add(visit);
+            }
+            Collection<Shipment> oldVisits = wrappedObject
+                .getShipmentCollection();
+            wrappedObject.setShipmentCollection(allShipmentObjects);
+            propertyChangeSupport.firePropertyChange("shipmentCollection",
+                oldVisits, allShipmentObjects);
+            propertiesMap.put("shipmentCollection", allShipmentWrappers);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public List<SampleTypeWrapper> getSampleTypeCollection(boolean sort) {
         List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
             .get("sampleTypeCollection");
@@ -747,8 +798,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public long getShipmentCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where clinic.site.id = ?", Arrays
-            .asList(new Object[] { getId() }));
+            + Shipment.class.getName() + " where site.id = ?",
+            Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -759,8 +810,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public Long getPatientCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria("select count(patients) from "
             + Site.class.getName() + " as site "
-            + "join site.studyCollection as studies "
-            + "join studies.patientCollection as patients "
+            + "join site.shipmentCollection as shipments "
+            + "join shipments.patientCollection as patients "
             + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -772,9 +823,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public Long getPatientVisitCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria("select count(visits) from "
             + Site.class.getName() + " as site "
-            + "join site.studyCollection as studies "
-            + "join studies.patientCollection as patients "
-            + "join patients.patientVisitCollection as visits "
+            + "join site.shipmentCollection as shipments "
+            + "join shipments.patientVisitCollection as visits "
             + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -786,9 +836,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public Long getAliquotCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
             + Site.class.getName() + " as site "
-            + "join site.studyCollection as studies "
-            + "join studies.patientCollection as patients "
-            + "join patients.patientVisitCollection as visits "
+            + "join site.shipmentCollection as shipments "
+            + "join shipments.patientVisitCollection as visits "
             + "join visits.aliquotCollection as aliquots where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);

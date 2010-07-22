@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.internal;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class SampleStorageHelper extends DbHelper {
@@ -27,12 +28,12 @@ public class SampleStorageHelper extends DbHelper {
         return sampleStorage;
     }
 
-    public static int addSampleStorages(StudyWrapper study, String name)
-        throws Exception {
+    public static int addSampleStorages(StudyWrapper study, SiteWrapper site,
+        String name) throws Exception {
         int nber = r.nextInt(15) + 1;
         for (int i = 0; i < nber; i++) {
-            SampleTypeWrapper type = SampleTypeHelper.addSampleType(study
-                .getSite(), name + i);
+            SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name
+                + i);
             addSampleStorage(study, type);
         }
         study.reload();

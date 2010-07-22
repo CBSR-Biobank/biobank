@@ -65,15 +65,13 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public boolean checkPatientNumberUnique() throws ApplicationException {
         String isSamePatient = "";
         List<Object> params = new ArrayList<Object>();
-        params.add(getStudy().getSite().getId());
         params.add(getPnumber());
         if (!isNew()) {
             isSamePatient = " and id <> ?";
             params.add(getId());
         }
         HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
-            + " where study.site.id = ? and pnumber = ?" + isSamePatient,
-            params);
+            + " where pnumber = ?" + isSamePatient, params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;

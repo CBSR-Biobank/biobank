@@ -57,8 +57,8 @@ public class TestPatient extends TestDatabase {
         super.setUp();
         site = SiteHelper.addSite("Site - Patient Test "
             + Utils.getRandomString(10));
-        study = StudyHelper.addStudy(site,
-            "Study - Patient Test " + Utils.getRandomString(10));
+        study = StudyHelper.addStudy("Study - Patient Test "
+            + Utils.getRandomString(10));
         containerMap = new HashMap<String, ContainerWrapper>();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
     }
@@ -529,7 +529,7 @@ public class TestPatient extends TestDatabase {
         ship2.persist();
 
         List<PatientWrapper> todayPatients = PatientWrapper
-            .getPatientsInTodayShipments(appService, study.getSite());
+            .getPatientsInTodayShipments(appService, site);
         Assert.assertEquals(2, todayPatients.size());
         Assert.assertTrue(todayPatients.contains(patient2));
         Assert.assertTrue(todayPatients.contains(patient3));

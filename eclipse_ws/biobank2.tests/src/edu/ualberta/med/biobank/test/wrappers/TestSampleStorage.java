@@ -26,8 +26,7 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
@@ -39,8 +38,7 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testGetSetStudy() throws Exception {
         String name = "testGetSetStudy" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
@@ -49,7 +47,7 @@ public class TestSampleStorage extends TestDatabase {
 
         Assert.assertEquals(study, sampleStorage.getStudy());
 
-        StudyWrapper newStudy = StudyHelper.addStudy(site, name + "NEW");
+        StudyWrapper newStudy = StudyHelper.addStudy(name + "NEW");
         sampleStorage.setStudy(newStudy);
         sampleStorage.persist();
 
@@ -64,7 +62,7 @@ public class TestSampleStorage extends TestDatabase {
     public void testGetSetSampleType() throws Exception {
         String name = "testGetSetSampleType" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
@@ -90,13 +88,12 @@ public class TestSampleStorage extends TestDatabase {
         int oldTotal = appService.search(SampleStorage.class,
             new SampleStorage()).size();
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
-        SampleStorageHelper.addSampleStorage(study, DbHelper
-            .chooseRandomlyInList(types));
+        SampleStorageHelper.addSampleStorage(study,
+            DbHelper.chooseRandomlyInList(types));
         int newTotal = appService.search(SampleStorage.class,
             new SampleStorage()).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
@@ -105,8 +102,7 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testActivityStatus() throws Exception {
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
@@ -129,8 +125,7 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
@@ -153,8 +148,7 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
             appService, false);
@@ -180,8 +174,7 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
         SampleType type = new SampleType();
         type.setName("Plasma");
@@ -211,7 +204,7 @@ public class TestSampleStorage extends TestDatabase {
     // new SampleStorage()).size();
     // SiteWrapper site = SiteHelper.addSite(name);
     //
-    // StudyWrapper study1 = StudyHelper.addStudy(site, name);
+    // StudyWrapper study1 = StudyHelper.addStudy(name);
     // List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
     // appService, false);
     // SampleStorageHelper.addSampleStorage(study1, DbHelper
@@ -220,7 +213,7 @@ public class TestSampleStorage extends TestDatabase {
     // Assert.assertEquals(nbSampleStorage, appService.search(
     // SampleStorage.class, new SampleStorage()).size());
     //
-    // StudyWrapper study = StudyHelper.addStudy(site, "studyname"
+    // StudyWrapper study = StudyHelper.addStudy("studyname"
     // + r.nextInt());
     // PatientWrapper patient = PatientHelper.addPatient("5684", study);
     // study.persist();

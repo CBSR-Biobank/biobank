@@ -32,8 +32,8 @@ public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper newShipment(ClinicWrapper clinic)
         throws Exception {
-        return newShipment(clinic, TestCommon.getNewWaybill(r), Utils
-            .getRandomDate());
+        return newShipment(clinic, TestCommon.getNewWaybill(r),
+            Utils.getRandomDate());
     }
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
@@ -43,8 +43,8 @@ public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper addShipment(ClinicWrapper clinic,
         String waybill, PatientWrapper... patients) throws Exception {
-        ShipmentWrapper shipment = newShipment(clinic, waybill, Utils
-            .getRandomDate(), patients);
+        ShipmentWrapper shipment = newShipment(clinic, waybill,
+            Utils.getRandomDate(), patients);
         shipment.persist();
         clinic.reload();
         return shipment;
@@ -52,7 +52,7 @@ public class ShipmentHelper extends DbHelper {
 
     public static ShipmentWrapper addShipmentWithRandomPatient(
         ClinicWrapper clinic, String name) throws Exception {
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();

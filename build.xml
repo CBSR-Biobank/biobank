@@ -501,7 +501,7 @@
           depends="tests-clean,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant target="clean-jars" />
-  	<delete dir="${eclipse.proj.dir.common}/output" />		
+  	<delete dir="${eclipse.proj.dir.common}/output" />
   </target>
 
   <target name="clean-caCore"
@@ -517,7 +517,7 @@
   <property name="dest.dir.results" value="testing" />
   <property name="dest.dir.results.raw" value="${dest.dir.results}/raw" />
   <path id="common.class.path">
-    <fileset dir="${eclipse.proj.dir.common}/lib">
+    <fileset dir="${eclipse.proj.dir.common}/lib/client">
       <include name="*.jar" />
     </fileset>
   </path>

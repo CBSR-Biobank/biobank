@@ -371,9 +371,9 @@ public class TestContainerType extends TestDatabase {
                     TestCommon.getNewBarcode(r), null, site, ct);
                 containers.add(top);
             } else {
-                containers.add(ContainerHelper.addContainer(null, TestCommon
-                    .getNewBarcode(r), containers.get(containers.size() - 1),
-                    site, ct, 0, 0));
+                containers.add(ContainerHelper.addContainer(null,
+                    TestCommon.getNewBarcode(r),
+                    containers.get(containers.size() - 1), site, ct, 0, 0));
             }
 
             ct.reload();
@@ -488,8 +488,8 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.persist();
         childTypeL3.reload();
         childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
-        Assert.assertEquals(selectedSampleTypes.size(), childTypeL3SampleTypes
-            .size());
+        Assert.assertEquals(selectedSampleTypes.size(),
+            childTypeL3SampleTypes.size());
         for (SampleTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
@@ -515,8 +515,8 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.reload();
         List<SampleTypeWrapper> childTypeL3SampleTypes = childTypeL3
             .getSampleTypeCollection();
-        Assert.assertEquals(selectedSampleTypes.size(), childTypeL3SampleTypes
-            .size());
+        Assert.assertEquals(selectedSampleTypes.size(),
+            childTypeL3SampleTypes.size());
         for (SampleTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
@@ -542,20 +542,20 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.reload();
 
         // add containers
-        ContainerWrapper top = ContainerHelper.addContainer("01", TestCommon
-            .getNewBarcode(r), null, site, containerTypeMap.get("TopCT"));
-        ContainerWrapper cont1 = ContainerHelper.addContainer(null, TestCommon
-            .getNewBarcode(r), top, site, containerTypeMap.get("ChildCtL1"), 0,
-            0);
-        ContainerWrapper cont2 = ContainerHelper.addContainer(null, TestCommon
-            .getNewBarcode(r), cont1, site, containerTypeMap.get("ChildCtL2"),
-            0, 0);
-        ContainerWrapper cont3 = ContainerHelper.addContainer(null, TestCommon
-            .getNewBarcode(r), cont2, site, containerTypeMap.get("ChildCtL3"),
-            0, 0);
+        ContainerWrapper top = ContainerHelper.addContainer("01",
+            TestCommon.getNewBarcode(r), null, site,
+            containerTypeMap.get("TopCT"));
+        ContainerWrapper cont1 = ContainerHelper.addContainer(null,
+            TestCommon.getNewBarcode(r), top, site,
+            containerTypeMap.get("ChildCtL1"), 0, 0);
+        ContainerWrapper cont2 = ContainerHelper.addContainer(null,
+            TestCommon.getNewBarcode(r), cont1, site,
+            containerTypeMap.get("ChildCtL2"), 0, 0);
+        ContainerWrapper cont3 = ContainerHelper.addContainer(null,
+            TestCommon.getNewBarcode(r), cont2, site,
+            containerTypeMap.get("ChildCtL3"), 0, 0);
 
-        StudyWrapper study = StudyHelper.addStudy(site, "studyname"
-            + r.nextInt());
+        StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
@@ -566,8 +566,8 @@ public class TestContainerType extends TestDatabase {
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.addAliquot(selectedSampleTypes
-            .get(1), cont3, pv, 0, 1);
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(
+            selectedSampleTypes.get(1), cont3, pv, 0, 1);
 
         childTypeL3
             .removeSampleTypes(Arrays.asList(selectedSampleTypes.get(1)));
@@ -682,14 +682,15 @@ public class TestContainerType extends TestDatabase {
         Assert
             .assertEquals(3, topType.getChildContainerTypeCollection().size());
 
-        ContainerWrapper top = ContainerHelper.addContainer("01", TestCommon
-            .getNewBarcode(r), null, site, containerTypeMap.get("TopCT"));
-        top.addChild(0, 0, ContainerHelper.newContainer(null, TestCommon
-            .getNewBarcode(r), top, site, childType1));
-        top.addChild(0, 1, ContainerHelper.newContainer(null, TestCommon
-            .getNewBarcode(r), top, site, childType1_2));
-        top.addChild(0, 2, ContainerHelper.newContainer(null, TestCommon
-            .getNewBarcode(r), top, site, childType1_3));
+        ContainerWrapper top = ContainerHelper.addContainer("01",
+            TestCommon.getNewBarcode(r), null, site,
+            containerTypeMap.get("TopCT"));
+        top.addChild(0, 0, ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType1));
+        top.addChild(0, 1, ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType1_2));
+        top.addChild(0, 2, ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType1_3));
         top.persist();
         top.reload();
 

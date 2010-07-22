@@ -40,7 +40,7 @@ public class TestShippingMethod extends TestDatabase {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
@@ -75,7 +75,7 @@ public class TestShippingMethod extends TestDatabase {
         String name = "testGetShipmentCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
@@ -165,7 +165,7 @@ public class TestShippingMethod extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        StudyWrapper study = StudyHelper.addStudy(clinic.getSite(), name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
