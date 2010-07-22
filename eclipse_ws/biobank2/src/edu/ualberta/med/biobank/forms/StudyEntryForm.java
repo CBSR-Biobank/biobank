@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -107,10 +106,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
-        setTextValue(siteLabel, study.getSite().getName());
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
@@ -271,11 +266,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getAddedOrModifiedSampleStorages());
         study.removeSampleStorages(sampleStorageEntryTable
             .getDeletedSampleStorages());
-
-        SiteAdapter siteAdapter = studyAdapter
-            .getParentFromClass(SiteAdapter.class);
-        study.setSite(siteAdapter.getWrapper());
-
         study.persist();
 
         studyAdapter.getParent().performExpand();

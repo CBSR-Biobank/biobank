@@ -20,9 +20,8 @@ public class StudyAddHandler extends AbstractHandler {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchNode(site);
         Assert.isNotNull(siteAdapter);
         StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
-        study.setSite(site);
-        StudyAdapter studyNode = new StudyAdapter(siteAdapter
-            .getStudiesGroupNode(), study);
+        StudyAdapter studyNode = new StudyAdapter(SessionManager.getInstance()
+            .getSession(), study);
         studyNode.openEntryForm();
         return null;
     }

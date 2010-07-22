@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class StudyGroup extends AdapterBase {
 
-    public StudyGroup(SiteAdapter parent, int id) {
+    public StudyGroup(SessionAdapter parent, int id) {
         super(parent, id, "Studies", true, true);
     }
 
@@ -46,8 +46,9 @@ public class StudyGroup extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addStudy(StudyGroup.this
-                        .getParentFromClass(SiteAdapter.class), false);
+                    addStudy(
+                        StudyGroup.this.getParentFromClass(SiteAdapter.class),
+                        false);
                 }
             });
         }
@@ -96,9 +97,8 @@ public class StudyGroup extends AdapterBase {
 
     public static void addStudy(SiteAdapter siteAdapter, boolean hasPreviousForm) {
         StudyWrapper study = new StudyWrapper(siteAdapter.getAppService());
-        study.setSite(siteAdapter.getWrapper());
-        StudyAdapter adapter = new StudyAdapter(siteAdapter
-            .getStudiesGroupNode(), study);
+        StudyAdapter adapter = new StudyAdapter(SessionManager.getInstance()
+            .getSession().getStudiesGroupNode(), study);
         adapter.openEntryForm(hasPreviousForm);
     }
 
