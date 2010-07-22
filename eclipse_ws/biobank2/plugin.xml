@@ -273,7 +273,7 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-            name="Edit Activity Status Methods">
+            name="Edit Activity Status">
       </command>
    </extension>
    <extension
@@ -996,7 +996,7 @@
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
                       id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
-                      label="Edit Activity Status Methods"
+                      label="Edit Activity Status"
                       style="push">
                 </command>
          </menu>

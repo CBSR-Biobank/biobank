@@ -82,6 +82,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
         }
     }
 
+    // if add is false then we are editing
     private boolean addOrEditActivityStatus(boolean add,
         ActivityStatusWrapper selectActivityStatus, String message) {
 
@@ -161,7 +162,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
 
                         if (!MessageDialog.openConfirm(PlatformUI
                             .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Activity Status Method",
+                            .getShell(), "Delete Activity Status",
                             "Are you sure you want to delete activity status\""
                                 + ActivityStatus.getName() + "\"?")) {
                             return;
@@ -185,8 +186,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     }
 
     private void removeActivityStatus(ActivityStatusWrapper asw) {
-        for (ActivityStatusWrapper i : this.localActivityStatuses) {// XXX
-                                                                    // contains
+        for (ActivityStatusWrapper i : this.localActivityStatuses) {
             if (i.getName().equals(asw.getName())) {
                 this.localActivityStatuses.remove(asw);
                 break;
@@ -197,9 +197,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
 
     private void addActivityStatus(ActivityStatusWrapper asw)
         throws BiobankCheckException {
-
-        for (ActivityStatusWrapper i : this.localActivityStatuses) { // XXX
-                                                                     // contains
+        for (ActivityStatusWrapper i : this.localActivityStatuses) {
             if (i.getName().equals(asw.getName())) {
                 throw new BiobankCheckException(
                     "Activity status already added.");

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -56,7 +55,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        checkUnique();
     }
 
     @Override
@@ -96,6 +94,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return activityStatusMap.values();
     }
 
+    // TODO test getActivityStatus
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name) throws Exception {
 
@@ -127,39 +126,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public static ActivityStatusWrapper getActiveActivityStatus(
         WritableApplicationService appService) throws Exception {
         return getActivityStatus(appService, ACTIVE_STATUS_STRING);
-    }
-
-    public void checkUnique() throws BiobankCheckException,
-        ApplicationException {
-        String globalMsg = "global";
-
-        checkNoDuplicates("name", getName(), "A " + globalMsg
-            + " activity status with name \"" + getName()
-            + "\" already exists.");
-
-    }
-
-    // XXX test checkNoDuplicates
-    private void checkNoDuplicates(String propertyName, String value,
-        String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { value }));
-
-        String notSameObject = "";
-        if (!isNew()) {
-            notSameObject = " and id <> ?";
-            parameters.add(getId());
-        }
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + ActivityStatus.class.getName() + " where " + propertyName + "=? "
-            + notSameObject, parameters);
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        if (result.get(0) > 0) {
-            throw new BiobankCheckException(errorMessage);
-        }
     }
 
     public static void persistActivityStatuses(

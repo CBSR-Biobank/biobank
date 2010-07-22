@@ -22,9 +22,9 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
         .getLogger(ActivityStatusEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm";
-    public static final String OK_MESSAGE = "View and edit activity status methods.";
+    public static final String OK_MESSAGE = "View and edit activity statuses.";
 
-    // sets state to dirty when the table is changed.
+    // FIXME -- setDirty doesn't get called.
     private BiobankEntryFormWidgetListener tableChangeListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
@@ -34,12 +34,12 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
 
     @Override
     public void init() throws Exception {
-        setPartName("Activity Status Methods Entry");
+        setPartName("Activity Status Entry");
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Activity Status Method Information");
+        form.setText("Activity Status Information");
         page.setLayout(new GridLayout(1, false));
 
         createGlobalActivityStatusMethodSection();
@@ -48,17 +48,17 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
     }
 
     private void createGlobalActivityStatusMethodSection() throws Exception {
-        Section section = createSection("Global Activity Status methods");
+        Section section = createSection("Global Activity Statuses");
 
         activityStatusTable = new ActivityStatusEntryInfoTable(section,
-            "Add a new global activity status method",
-            "Edit the global activity status methods", null);
+            "Add a new global activity status",
+            "Edit the global activity status", null);
 
         activityStatusTable.adaptToToolkit(toolkit, true);
         activityStatusTable.addSelectionChangedListener(tableChangeListener);
         toolkit.paintBordersFor(activityStatusTable);
 
-        addSectionToolbar(section, "Add Global Activity Status Method",
+        addSectionToolbar(section, "Add Global Activity Status",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -69,6 +69,9 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
         section.setClient(activityStatusTable);
     }
 
+    // the table figures out what to add/delete
+    // there is a maximum of one hql call to the database if no changes have
+    // been made.
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
         activityStatusTable.save();
@@ -97,7 +100,7 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
             && !SessionManager.canDelete(ActivityStatusWrapper.class)) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
-                "Cannot access Activity Status Method editor. Access Denied.");
+                "Cannot access Activity Status editor. Access Denied.");
         }
     }
 

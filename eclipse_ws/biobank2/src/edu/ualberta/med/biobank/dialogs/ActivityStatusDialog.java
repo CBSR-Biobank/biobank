@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -14,12 +16,14 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ActivityStatusDialog extends BiobankDialog {
 
-    private static final String TITLE = "Activity Status Method ";
-    private static final String MSG_NO_ST_NAME = "Activity status  method must have a name.";
+    private static final String TITLE = "Activity Status";
+    private static final String MSG_NO_ST_NAME = "Activity status must have a name.";
     BiobankText activityStatusBBText;
     String activityStatusStr;
     private String message, defaultText;
     private boolean addMode;
+    NonEmptyStringValidator emptyString = new NonEmptyStringValidator(
+        MSG_NO_ST_NAME);
 
     public ActivityStatusDialog(Shell parent, boolean addMode, String message,
         String defaultText) {
@@ -39,9 +43,9 @@ public class ActivityStatusDialog extends BiobankDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         if (addMode)
-            setTitle("Add Activity Status Method");
+            setTitle("Add Activity Status");
         else
-            setTitle("Edit Activity Status Method");
+            setTitle("Edit Activity Status");
 
         setMessage(message);
         return contents;
@@ -53,11 +57,20 @@ public class ActivityStatusDialog extends BiobankDialog {
         content.setLayout(new GridLayout(2, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        activityStatusBBText = (BiobankText) createBoundWidgetWithLabel(content,
-            BiobankText.class, SWT.BORDER, "Name", null, null,
-            new NonEmptyStringValidator(MSG_NO_ST_NAME));
+        activityStatusBBText = (BiobankText) createBoundWidgetWithLabel(
+            content, BiobankText.class, SWT.BORDER, "Name", null, null,
+            emptyString);
+
+        activityStatusBBText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                emptyString.validate(activityStatusBBText.getText());
+            }
+        });
+
         if (defaultText != null)
             activityStatusBBText.setText(defaultText);
+
     }
 
     @Override

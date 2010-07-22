@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class ActivityStatusInfoTable extends
     InfoTableWidget<ActivityStatusWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Activity Status method" };
+    private static final String[] HEADINGS = new String[] { "Activity Status" };
 
     private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
 
@@ -54,9 +54,9 @@ public class ActivityStatusInfoTable extends
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        ActivityStatusWrapper shipping = (ActivityStatusWrapper) item.o;
-        Assert.isNotNull(shipping);
-        return shipping;
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) item.o;
+        Assert.isNotNull(activityStatus);
+        return activityStatus;
     }
 
     @Override
