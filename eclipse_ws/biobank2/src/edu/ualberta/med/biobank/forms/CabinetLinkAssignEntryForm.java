@@ -149,8 +149,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             true);
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
-            resultShownValue, Messages
-                .getString("Cabinet.checkButton.validationMsg"));
+            resultShownValue,
+            Messages.getString("Cabinet.checkButton.validationMsg"));
 
         radioNew.setSelection(true);
         setMoveMode(false);
@@ -175,8 +175,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         ContainerTypeWrapper cabinetType = null;
         ContainerTypeWrapper drawerType = null;
         if (types.size() == 0) {
-            BioBankPlugin.openAsyncError(Messages
-                .getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
+            BioBankPlugin.openAsyncError(
+                Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
                 Messages.getFormattedString("Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
                     cabinetNameContains));
         } else {
@@ -187,14 +187,15 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawerType = children.get(0);
             }
         }
-        cabinetWidget = ContainerDisplayFatory
-            .createWidget(client, cabinetType);
+        cabinetWidget = ContainerDisplayFatory.createWidget(client,
+            cabinetType, true);
         toolkit.adapt(cabinetWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = ContainerDisplayFatory.createWidget(client, drawerType);
+        drawerWidget = ContainerDisplayFatory.createWidget(client, drawerType,
+            true);
         toolkit.adapt(drawerWidget);
         GridData gdBin = new GridData();
         gdBin.verticalSpan = 2;
@@ -213,8 +214,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         fieldsComposite.setLayoutData(gd);
 
         // radio button to choose new or move
-        radioNew = toolkit.createButton(fieldsComposite, Messages
-            .getString("Cabinet.button.new.text"), //$NON-NLS-1$
+        radioNew = toolkit.createButton(fieldsComposite,
+            Messages.getString("Cabinet.button.new.text"), //$NON-NLS-1$
             SWT.RADIO);
         radioNew.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -224,8 +225,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             }
         });
-        Button radioMove = toolkit.createButton(fieldsComposite, Messages
-            .getString("Cabinet.button.move.text"), SWT.RADIO); //$NON-NLS-1$
+        Button radioMove = toolkit.createButton(fieldsComposite,
+            Messages.getString("Cabinet.button.move.text"), SWT.RADIO); //$NON-NLS-1$
         gd = new GridData();
         gd.horizontalSpan = 2;
         radioMove.setLayoutData(gd);
@@ -262,8 +263,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
         inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE, Messages
-                .getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
+            fieldsComposite, BiobankText.class, SWT.NONE,
+            Messages.getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
             BeansObservables.observeValue(aliquot, "inventoryId"), //$NON-NLS-1$
             inventoryIDValidator);
         gd = (GridData) inventoryIdText.getLayoutData();
@@ -308,8 +309,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         createTypeCombo(fieldsComposite);
 
-        checkButton = toolkit.createButton(fieldsComposite, Messages
-            .getString("Cabinet.checkButton.text"), //$NON-NLS-1$
+        checkButton = toolkit.createButton(fieldsComposite,
+            Messages.getString("Cabinet.checkButton.text"), //$NON-NLS-1$
             SWT.PUSH);
         gd = new GridData();
         gd.horizontalSpan = 3;
@@ -345,8 +346,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         // for move mode: field to enter old position. Check needed to be sure
         // nothing is wrong with the aliquot
         oldCabinetPositionCheckLabel = widgetCreator.createLabel(
-            fieldsComposite, Messages
-                .getString("Cabinet.old.position.check.label"));
+            fieldsComposite,
+            Messages.getString("Cabinet.old.position.check.label"));
         oldCabinetPositionCheckLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         oldCabinetPositionCheckValidator = new AbstractValidator(
@@ -383,8 +384,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.position.label"));
         newCabinetPositionLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        newCabinetPositionValidator = new CabinetLabelValidator(Messages
-            .getString("Cabinet.position.validationMsg"));
+        newCabinetPositionValidator = new CabinetLabelValidator(
+            Messages.getString("Cabinet.position.validationMsg"));
         displayOldCabinetFields(false);
         newCabinetPosition = (BiobankText) widgetCreator.createBoundWidget(
             fieldsComposite, BiobankText.class, SWT.NONE,
@@ -676,7 +677,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     studyText = linkFormPatientManagement.getCurrentPatient()
                         .getStudy().getNameShort();
                 }
-                BioBankPlugin.openError("No Sample Types",
+                BioBankPlugin.openError(
+                    "No Sample Types",
                     "There are no sample types that "
                         + "are defined for current patient study (" + studyText
                         + ") and that are defined as possible for bin "
@@ -760,8 +762,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
         canLaunchCheck.setValue(true);
         PatientWrapper patient = aliquot.getPatientVisit().getPatient();
-        linkFormPatientManagement.setCurrentPatientAndVisit(patient, aliquot
-            .getPatientVisit());
+        linkFormPatientManagement.setCurrentPatientAndVisit(patient,
+            aliquot.getPatientVisit());
         String positionString = aliquot.getPositionString(true, false);
         if (positionString == null) {
             widgetCreator.hideWidget(oldCabinetPositionCheckLabel);

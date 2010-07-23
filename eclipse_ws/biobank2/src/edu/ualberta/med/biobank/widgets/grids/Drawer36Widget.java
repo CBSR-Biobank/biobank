@@ -18,7 +18,10 @@ import edu.ualberta.med.biobank.model.ContainerCell;
 import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.util.RowColPos;
 
-public class DrawerWidget extends AbstractContainerDisplayWidget {
+/**
+ * Drawer 36 display.
+ */
+public class Drawer36Widget extends AbstractContainerDisplayWidget {
 
     public static final int SQUARE_CELL_WIDTH = 70;
 
@@ -45,7 +48,7 @@ public class DrawerWidget extends AbstractContainerDisplayWidget {
 
     public static int LEGEND_HEIGHT = 20;
 
-    public DrawerWidget(Composite parent) {
+    public Drawer36Widget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override

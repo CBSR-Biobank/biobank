@@ -17,23 +17,25 @@ public class ContainerDisplayFatory {
         if (container != null) {
             containerType = container.getContainerType();
         }
-        return createWidget(parent, container, containerType);
+        return createWidget(parent, container, containerType, false);
     }
 
     public static AbstractContainerDisplayWidget createWidget(Composite parent,
-        ContainerTypeWrapper containerType) {
-        return createWidget(parent, null, containerType);
+        ContainerTypeWrapper containerType, boolean createDefaultContainer) {
+        return createWidget(parent, null, containerType, createDefaultContainer);
     }
 
     private static AbstractContainerDisplayWidget createWidget(
         Composite parent, ContainerWrapper container,
-        ContainerTypeWrapper containerType) {
-        AbstractContainerDisplayWidget widget;
+        ContainerTypeWrapper containerType, boolean createDefaultContainer) {
+        AbstractContainerDisplayWidget widget = null;
         if (containerType == null) {
-            widget = new GridContainerWidget(parent);
-            ((GridContainerWidget) widget).setStorageSize(3, 5);
-        } else if (containerType.getName().startsWith("Drawer")) {
-            widget = new DrawerWidget(parent);
+            if (createDefaultContainer) {
+                widget = new GridContainerWidget(parent);
+                ((GridContainerWidget) widget).setStorageSize(3, 5);
+            }
+        } else if (containerType.getName().equals("Drawer 36")) {
+            widget = new Drawer36Widget(parent);
         } else {
             widget = new GridContainerWidget(parent);
         }

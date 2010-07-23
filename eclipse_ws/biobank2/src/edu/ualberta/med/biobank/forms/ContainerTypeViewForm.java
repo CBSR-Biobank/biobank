@@ -130,7 +130,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(rowCapacityLabel, containerType.getRowCapacity());
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
-        setTextValue(numSchemeLabel,
+        setTextValue(
+            numSchemeLabel,
             containerType.getChildLabelingScheme() == null ? "" : containerType
                 .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
@@ -194,7 +195,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     protected void createVisualizeContainer() {
         Composite client = createSectionWithClient("Container Visual");
-        ContainerDisplayFatory.createWidget(client, containerType);
+        ContainerDisplayFatory.createWidget(client, containerType, false);
     }
 
     private void setChildContainerTypesValues() {

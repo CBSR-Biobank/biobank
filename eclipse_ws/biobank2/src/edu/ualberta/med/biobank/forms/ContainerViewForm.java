@@ -266,8 +266,8 @@ public class ContainerViewForm extends BiobankViewForm {
             if (canCreate) {
                 // Initialisation action for selection
                 initSelectionCv = createComboViewer(childrenActionSection,
-                    "Initialize selection to", containerTypes, containerTypes
-                        .get(0));
+                    "Initialize selection to", containerTypes,
+                    containerTypes.get(0));
                 Button initializeSelectionButton = toolkit.createButton(
                     childrenActionSection, "Initialize", SWT.PUSH);
                 initializeSelectionButton
