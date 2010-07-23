@@ -191,8 +191,8 @@ public class ContainerWrapper extends
     private void checkLabelUniqueForType() throws BiobankCheckException,
         ApplicationException {
         String notSameContainer = "";
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { getSite().getId(), getLabel(),
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { getSite().getId(), getLabel(),
                 getContainerType().getWrappedObject() }));
         if (!isNew()) {
             notSameContainer = " and id <> ?";
@@ -467,8 +467,9 @@ public class ContainerWrapper extends
                         aliquot.reload();
                     } catch (Exception e) {
                     }
-                    aliquots.put(new RowColPos(position.getRow(), position
-                        .getCol()), aliquot);
+                    aliquots.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        aliquot);
                 }
                 propertiesMap.put("aliquots", aliquots);
             }
@@ -580,8 +581,9 @@ public class ContainerWrapper extends
                         // child.reload();
                     } catch (Exception e) {
                     }
-                    children.put(new RowColPos(position.getRow(), position
-                        .getCol()), child);
+                    children.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        child);
                 }
                 propertiesMap.put("children", children);
             }
@@ -729,8 +731,7 @@ public class ContainerWrapper extends
         if (wrappedObject != null)
             if (((getContainerType() != null)
                 && (getContainerType().getRowCapacity() != null) && (getContainerType()
-                .getColCapacity() != null))
-                || (getContainerType() == null))
+                .getColCapacity() != null)) || (getContainerType() == null))
                 if (((getPosition() != null) && (getPosition().row != null) && (getPosition().col != null))
                     || (getPosition() == null))
                     if (wrappedObject.getSite() != null)
@@ -770,9 +771,9 @@ public class ContainerWrapper extends
         HQLCriteria criteria = new HQLCriteria("select c from "
             + Container.class.getName()
             + " as c left join c.containerType.childContainerTypeCollection "
-            + "as ct where c.site = ? and c.label = ? and ct=?", Arrays
-            .asList(new Object[] { getSite().getWrappedObject(), parentLabel,
-                getContainerType().getWrappedObject() }));
+            + "as ct where c.site = ? and c.label = ? and ct=?",
+            Arrays.asList(new Object[] { getSite().getWrappedObject(),
+                parentLabel, getContainerType().getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -797,15 +798,15 @@ public class ContainerWrapper extends
                 + " as parent where parent.id in (select ct.id" + " from "
                 + ContainerType.class.getName() + " as ct"
                 + " left join ct.childContainerTypeCollection as child "
-                + " where child.id in (" + typeIds + ")))", Arrays
-                .asList(new Object[] { site.getId(), label }));
+                + " where child.id in (" + typeIds + ")))",
+            Arrays.asList(new Object[] { site.getId(), label }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
 
     /**
-     * get the containers with label label and from same site that this
-     * containerWrapper and holding sample type
+     * get the containers with label label and site siteWrapper and holding
+     * given sample type
      */
     public static List<ContainerWrapper> getContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
@@ -820,6 +821,23 @@ public class ContainerWrapper extends
                 + " left join ct.sampleTypeCollection as sampleType "
                 + " where sampleType = ?))", Arrays.asList(new Object[] {
                 siteWrapper.getId(), label, sampleType.getWrappedObject() }));
+        List<Container> containers = appService.query(criteria);
+        return transformToWrapperList(appService, containers);
+    }
+
+    public static List<ContainerWrapper> getEmptyContainersHoldingSampleType(
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        SampleTypeWrapper sampleType) throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName()
+            + " where site.id = ? and aliquotPositionCollection.size = 0"
+            + " and containerType in (select parent from "
+            + ContainerType.class.getName()
+            + " as parent where parent.id in (select ct.id" + " from "
+            + ContainerType.class.getName() + " as ct"
+            + " left join ct.sampleTypeCollection as sampleType "
+            + " where sampleType = ?))", Arrays.asList(new Object[] {
+            siteWrapper.getId(), sampleType.getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -845,8 +863,8 @@ public class ContainerWrapper extends
         String productBarcode) throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName()
-            + " where site.id = ? and productBarcode = ?", Arrays
-            .asList(new Object[] { siteWrapper.getId(), productBarcode }));
+            + " where site.id = ? and productBarcode = ?",
+            Arrays.asList(new Object[] { siteWrapper.getId(), productBarcode }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 0) {
             return null;

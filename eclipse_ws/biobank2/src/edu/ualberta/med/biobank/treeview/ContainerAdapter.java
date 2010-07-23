@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.dialogs.MoveAliquotsToDialog;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
@@ -93,7 +94,45 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
+        if (getContainer().hasAliquots()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Move All Aliquots To");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    moveAliquots();
+                }
+            });
+        }
+
         addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
+    }
+
+    protected void moveAliquots() {
+        final MoveAliquotsToDialog mc = new MoveAliquotsToDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            getContainer());
+        if (mc.open() == Dialog.OK) {
+            try {
+                if (setNewPositionFromLabel(mc.getNewLabel())) {
+                    // update new parent
+                    ContainerWrapper newParentContainer = getContainer()
+                        .getParent();
+                    ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
+                        .searchNode(newParentContainer);
+                    if (parentAdapter != null) {
+                        parentAdapter.getContainer().reload();
+                        parentAdapter.performExpand();
+                    }
+                    // update old parent
+                    // oldParent.getContainer().reload();
+                    // oldParent.removeAll();
+                    // oldParent.performExpand();
+                }
+            } catch (Exception e) {
+                BioBankPlugin.openError(e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -142,8 +181,8 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
-        String newParentContainerLabel = newLabel.substring(0, newLabel
-            .length() - 2);
+        String newParentContainerLabel = newLabel.substring(0,
+            newLabel.length() - 2);
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newParentContainerLabel);
         if (newParentContainers.size() == 0) {
@@ -218,7 +257,7 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         Assert.isNotNull(modelObject, "site null");
         ((ContainerWrapper) modelObject).reload();
-        return ((ContainerWrapper) modelObject).getChildren().values();
+        return getContainer().getChildren().values();
     }
 
     @Override

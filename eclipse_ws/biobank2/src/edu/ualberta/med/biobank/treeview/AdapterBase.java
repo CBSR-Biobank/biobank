@@ -220,8 +220,8 @@ public abstract class AdapterBase {
 
     public void insertAfter(AdapterBase existingNode, AdapterBase newNode) {
         int pos = children.indexOf(existingNode);
-        Assert.isTrue(pos >= 0, "existing node not found: "
-            + existingNode.getLabel());
+        Assert.isTrue(pos >= 0,
+            "existing node not found: " + existingNode.getLabel());
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -560,8 +560,8 @@ public abstract class AdapterBase {
         closeEditor(input);
         try {
             IEditorPart part = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().openEditor(input,
-                    id, focusOnEditor);
+                .getActiveWorkbenchWindow().getActivePage()
+                .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
             logger.error("Can't open form with id " + id, e);
@@ -584,7 +584,9 @@ public abstract class AdapterBase {
     }
 
     public void openViewForm() {
-        openForm(new FormInput(this), getViewFormId());
+        if (getViewFormId() != null) {
+            openForm(new FormInput(this), getViewFormId());
+        }
     }
 
     public void openEntryForm() {
@@ -693,4 +695,25 @@ public abstract class AdapterBase {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || !(o instanceof AdapterBase)) {
+            return false;
+        }
+        if (modelObject == null) {
+            return false;
+        }
+        return modelObject.equals(((AdapterBase) o).getModelObject());
+    }
+
+    @Override
+    public int hashCode() {
+        if (modelObject == null) {
+            return super.hashCode();
+        }
+        return modelObject.hashCode();
+    }
 }
