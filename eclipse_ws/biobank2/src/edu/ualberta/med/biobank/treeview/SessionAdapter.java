@@ -8,7 +8,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -127,8 +126,9 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof SiteWrapper);
-        return new SiteAdapter(this, (SiteWrapper) child);
+        // Assert.isTrue(child instanceof SiteWrapper);
+        // return new SiteAdapter(this, (SiteWrapper) child);
+        return null;
     }
 
     @Override
