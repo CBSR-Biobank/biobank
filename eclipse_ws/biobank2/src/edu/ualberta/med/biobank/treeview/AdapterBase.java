@@ -695,25 +695,4 @@ public abstract class AdapterBase {
         return null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || !(o instanceof AdapterBase)) {
-            return false;
-        }
-        if (modelObject == null) {
-            return false;
-        }
-        return modelObject.equals(((AdapterBase) o).getModelObject());
-    }
-
-    @Override
-    public int hashCode() {
-        if (modelObject == null) {
-            return super.hashCode();
-        }
-        return modelObject.hashCode();
-    }
 }

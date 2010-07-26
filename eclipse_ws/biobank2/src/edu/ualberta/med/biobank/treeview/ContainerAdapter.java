@@ -21,6 +21,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -29,6 +30,7 @@ import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
+import edu.ualberta.med.biobank.util.RowColPos;
 
 public class ContainerAdapter extends AdapterBase {
 
@@ -114,21 +116,44 @@ public class ContainerAdapter extends AdapterBase {
             getContainer());
         if (mc.open() == Dialog.OK) {
             try {
-                if (setNewPositionFromLabel(mc.getNewLabel())) {
-                    // update new parent
-                    ContainerWrapper newParentContainer = getContainer()
-                        .getParent();
-                    ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                        .searchNode(newParentContainer);
-                    if (parentAdapter != null) {
-                        parentAdapter.getContainer().reload();
-                        parentAdapter.performExpand();
+                final ContainerWrapper newContainer = mc.getNewContainer();
+                IRunnableContext context = new ProgressMonitorDialog(Display
+                    .getDefault().getActiveShell());
+                context.run(true, false, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        monitor.beginTask("Moving aliquots from container "
+                            + getContainer().getFullInfoLabel() + " to "
+                            + newContainer.getFullInfoLabel(),
+                            IProgressMonitor.UNKNOWN);
+                        try {
+                            for (RowColPos rcp : getContainer().getAliquots()
+                                .keySet()) {
+                                AliquotWrapper aliquot = getContainer()
+                                    .getAliquots().get(rcp);
+                                newContainer.addAliquot(rcp.row, rcp.col,
+                                    aliquot);
+                            }
+                            newContainer.persist();
+                            newContainer.reload();
+                        } catch (Exception e) {
+                            BioBankPlugin.openAsyncError("Move problem", e);
+                        }
+                        monitor.done();
+                        BioBankPlugin.openAsyncInformation(
+                            "Aliquots moved",
+                            newContainer.getAliquots().size()
+                                + " aliquots are now in "
+                                + newContainer.getFullInfoLabel() + ".");
                     }
-                    // update old parent
-                    // oldParent.getContainer().reload();
-                    // oldParent.removeAll();
-                    // oldParent.performExpand();
+                });
+                ContainerAdapter newContainerAdapter = (ContainerAdapter) SessionManager
+                    .searchNode(newContainer);
+                if (newContainerAdapter != null) {
+                    getContainer().reload();
+                    newContainerAdapter.performDoubleClick();
                 }
+                getContainer().reload();
             } catch (Exception e) {
                 BioBankPlugin.openError(e.getMessage(), e);
             }

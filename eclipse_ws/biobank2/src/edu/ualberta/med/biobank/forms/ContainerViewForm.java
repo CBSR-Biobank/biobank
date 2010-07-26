@@ -476,10 +476,14 @@ public class ContainerViewForm extends BiobankViewForm {
             deleteComboList.add("All");
             deleteComboList.addAll(containerTypes);
 
-            initSelectionCv.setInput(containerTypes);
-            initSelectionCv.getCombo().select(0);
-            deleteCv.setInput(deleteComboList);
-            deleteCv.getCombo().select(0);
+            if (initSelectionCv != null) {
+                initSelectionCv.setInput(containerTypes);
+                initSelectionCv.getCombo().select(0);
+            }
+            if (deleteCv != null) {
+                deleteCv.setInput(deleteComboList);
+                deleteCv.getCombo().select(0);
+            }
 
             if (aliquotsWidget != null) {
                 aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
