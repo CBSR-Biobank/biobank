@@ -606,10 +606,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             freezerLabel.setText(freezerContainer.getFullInfoLabel());
             freezerWidget.setContainerType(freezerContainer.getContainerType());
             freezerWidget.setSelection(hotelContainer.getPosition());
+            freezerWidget.redraw();
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setContainerType(hotelContainer.getContainerType());
             hotelWidget.setSelection(currentPalletWrapper.getPosition());
+            hotelWidget.redraw();
 
             palletLabel.setText(currentPalletWrapper.getLabel());
         }
@@ -892,7 +894,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         reset(false);
         fieldsComposite.setEnabled(true);
         showOnlyPallet(true);
-        form.layout(true);
+        form.layout(true, true);
         palletproductBarcodeText.setFocus();
         setCanLaunchScan(false);
     }

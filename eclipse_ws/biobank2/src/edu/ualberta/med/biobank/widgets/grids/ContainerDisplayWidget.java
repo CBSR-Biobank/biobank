@@ -40,6 +40,16 @@ public class ContainerDisplayWidget extends Canvas {
 
     protected AbstractContainerDisplay containerDisplay;
 
+    /**
+     * max width this container will have : used to calculate cells width
+     */
+    protected int maxWidth = -1;
+
+    /**
+     * max height this container will have : used to calculate cells height
+     */
+    protected int maxHeight = -1;
+
     public ContainerDisplayWidget(Composite parent) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
@@ -70,12 +80,16 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public Cell getObjectAtCoordinates(int x, int y) {
-        return containerDisplay.getObjectAtCoordinates(this, x, y);
+        if (containerDisplay != null) {
+            return containerDisplay.getObjectAtCoordinates(this, x, y);
+        }
+        return null;
     }
 
     public void initLegend() {
-        // TODO ok ?
-        containerDisplay.initLegend();
+        if (containerDisplay != null) {
+            containerDisplay.initLegend();
+        }
     }
 
     public void setCells(Map<RowColPos, ? extends Cell> cells) {
@@ -89,12 +103,25 @@ public class ContainerDisplayWidget extends Canvas {
      * cell height will be used
      */
     public void setStorageSize(int rows, int columns) {
-        containerDisplay.setStorageSize(rows, columns);
-        redraw();
+        if (containerDisplay != null) {
+            containerDisplay.setStorageSize(rows, columns);
+            redraw();
+        }
     }
 
+    /**
+     * Modify dimensions of the grid. maxWidth and maxHeight are used to
+     * calculate the size of the cells
+     * 
+     * @param maxWidth max width the grid should have
+     * @param maxHeight max height the grid should have
+     */
     public void setDisplaySize(int maxWidth, int maxHeight) {
-        containerDisplay.setDisplaySize(maxWidth, maxHeight);
+        this.maxWidth = maxWidth;
+        this.maxHeight = maxHeight;
+        if (containerDisplay != null) {
+            containerDisplay.setDisplaySize(maxWidth, maxHeight);
+        }
     }
 
     public void setSelection(RowColPos selection) {
@@ -114,8 +141,8 @@ public class ContainerDisplayWidget extends Canvas {
         this.container = container;
         if (container != null) {
             setContainerType(container.getContainerType());
+            containerDisplay.setContainer(container);
         }
-        containerDisplay.setContainer(container);
     }
 
     public void setContainerType(ContainerTypeWrapper type) {
@@ -126,7 +153,6 @@ public class ContainerDisplayWidget extends Canvas {
         boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer);
-        containerDisplay.setContainerType(containerType);
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {
@@ -140,8 +166,11 @@ public class ContainerDisplayWidget extends Canvas {
         } else {
             containerDisplay = new GridContainerDisplay();
         }
-        if (containerType != null) {
-            containerDisplay.setContainerType(containerType);
+        if (containerDisplay != null) {
+            containerDisplay.setDisplaySize(maxWidth, maxHeight);
+            if (containerType != null) {
+                containerDisplay.setContainerType(containerType);
+            }
         }
     }
 
