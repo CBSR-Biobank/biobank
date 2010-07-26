@@ -15,6 +15,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -223,6 +225,20 @@ public class ContainerViewForm extends BiobankViewForm {
             .createWidget(client, container);
         containerWidget.initLegend();
         containerWidget.setCells(cells);
+
+        containerWidget.addDragDetectListener(new DragDetectListener() {
+
+            @Override
+            public void dragDetected(DragDetectEvent e) {
+                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
+                    .getObjectAtCoordinates(e.x, e.y);
+                containerWidget.setSelection(new RowColPos(cell.getRow(), cell
+                    .getCol()));
+
+            }
+
+        });
+
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
