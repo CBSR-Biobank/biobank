@@ -20,6 +20,7 @@ public class PatientVisitStateLogger extends BiobankObjectStateLogger {
         if (obj instanceof PatientVisit) {
             Log log = new Log();
             Patient patient = (Patient) statesMap.get("patient");
+            log.setSite(patient.getStudy().getSite().getNameShort());
             log.setPatientNumber(patient.getPnumber());
             String details = "";
             Date dateProcesssed = (Date) statesMap.get("dateProcessed");
