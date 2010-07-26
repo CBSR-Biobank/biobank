@@ -24,7 +24,7 @@ public class SessionAdapter extends AdapterBase {
 
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
 
-    public static final int STUDIES_BASE_NODE_ID = 1;
+    public static final int STUDIES_BASE_NODE_ID = -1;
 
     private WritableApplicationService appService;
 

@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
@@ -45,10 +44,7 @@ public class PatientAdapter extends AdapterBase {
         PatientWrapper patient = getWrapper();
         StudyWrapper study = patient.getStudy();
         if (study != null) {
-            SiteWrapper site = study.getSite();
-            Assert.isNotNull(site, "site is null");
-            return site.getNameShort() + " - " + study.getName() + " - "
-                + getTooltipText("Patient");
+            return study.getName() + " - " + getTooltipText("Patient");
 
         }
         return getTooltipText("Patient");

@@ -18,6 +18,7 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
 
     private ActivityStatusEntryInfoTable activityStatusTable;
 
+    @SuppressWarnings("unused")
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ActivityStatusEntryForm.class.getName());
 

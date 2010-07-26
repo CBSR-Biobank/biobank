@@ -101,8 +101,8 @@ public class ActivityLogDialog extends TitleAreaDialog {
         else
             defaultPath = System.getProperty("user.home");
 
-        final Text activityLogDirText = new Text(fileSelectionComposite,
-            SWT.BORDER | SWT.FILL);
+        activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
+            | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
             GridData.FILL, true, false));
         activityLogDirText.setText(defaultPath);

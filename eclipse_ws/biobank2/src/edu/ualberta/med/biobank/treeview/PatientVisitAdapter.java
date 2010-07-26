@@ -53,10 +53,9 @@ public class PatientVisitAdapter extends AdapterBase {
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
             Assert.isNotNull(study, "study is null");
-            SiteWrapper site = study.getSite();
+            SiteWrapper site = visit.getShipment().getSite();
             Assert.isNotNull(site, "site is null");
-            return site.getNameShort() + " - " + study.getName() + " - "
-                + patient.getPnumber() + " - "
+            return site.getNameShort() + " - " + patient.getPnumber() + " - "
                 + getTooltipText("Patient Visit");
 
         }

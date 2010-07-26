@@ -3,14 +3,12 @@ package edu.ualberta.med.biobank.widgets.infotables.entry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -29,8 +27,6 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     public ClinicAddInfoTable(Composite parent, StudyWrapper study) {
         super(parent, study.getContactCollection(true));
         this.study = study;
-        SiteWrapper site = study.getSite();
-        Assert.isNotNull(site, "site is null");
         addDeleteSupport();
     }
 
@@ -76,7 +72,8 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             public void deleteItem(InfoTableEvent event) {
                 ContactWrapper contact = getSelection();
                 if (contact != null) {
-                    if (!BioBankPlugin.openConfirm("Delete Contact",
+                    if (!BioBankPlugin.openConfirm(
+                        "Delete Contact",
                         "Are you sure you want to delete contact \""
                             + contact.getName() + "\"")) {
                         return;

@@ -125,9 +125,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
             combinedPvInfo.setLabel(label);
             combinedPvInfo.setType(study.getStudyPvAttrType(label));
 
-            int style = SWT.LEFT;
-            if (combinedPvInfo.getType().equals("text")
-                || combinedPvInfo.getType().equals("select_multiple")) {
+            int style = SWT.NONE;
+            if (combinedPvInfo.getType().equals("select_multiple")) {
                 style |= SWT.WRAP;
             }
 
@@ -149,8 +148,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void setPatientVisitValues() {
-        setTextValue(siteLabel, patientVisit.getPatient().getStudy().getSite()
-            .getName());
+        setTextValue(siteLabel, patientVisit.getShipment().getSite().getName());
         setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
         setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
             : patientVisit.getShipment().getClinic().getName());
