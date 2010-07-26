@@ -17,7 +17,7 @@ public class PatientStateLogger extends BiobankObjectStateLogger {
             Log log = new Log();
             Study study = (Study) statesMap.get("study");
             log.setSite(study.getSite().getNameShort());
-            log.setPatientNumber((String) statesMap.get("pNumber"));
+            log.setPatientNumber((String) statesMap.get("pnumber"));
             log.setType("Patient");
             return log;
         }
