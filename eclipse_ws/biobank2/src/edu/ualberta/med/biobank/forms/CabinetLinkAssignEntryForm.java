@@ -172,9 +172,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         cabinetLabel = toolkit.createLabel(client, "Cabinet"); //$NON-NLS-1$
         drawerLabel = toolkit.createLabel(client, "Drawer"); //$NON-NLS-1$
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        drawerLabel.setLayoutData(gd);
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService, SessionManager.getInstance()

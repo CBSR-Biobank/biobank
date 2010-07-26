@@ -49,4 +49,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<Object> launchReport(String reportClassName,
         List<Object> parameters, List<ReportOption> options,
         String siteOperator, Integer siteId) throws ApplicationException;
+
+    public void modifyPassword(String oldPassword, String newPassword)
+        throws Exception;
 }

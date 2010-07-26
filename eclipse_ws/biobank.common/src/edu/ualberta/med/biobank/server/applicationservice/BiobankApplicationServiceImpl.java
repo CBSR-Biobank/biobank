@@ -10,6 +10,7 @@ import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
+import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.query.SDKQuery;
@@ -22,6 +23,7 @@ import gov.nih.nci.system.util.ClassCache;
 import java.util.List;
 import java.util.Set;
 
+import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -229,4 +231,22 @@ public class BiobankApplicationServiceImpl extends
         return report.generate(this, siteOperator, siteId);
     }
 
+    @Override
+    public void modifyPassword(String oldPassword, String newPassword)
+        throws Exception {
+        UserProvisioningManager upm = SecurityServiceProvider
+            .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+
+        Authentication authentication = SecurityContextHolder.getContext()
+            .getAuthentication();
+        String userLogin = authentication.getName();
+        if (oldPassword.equals(authentication.getCredentials())) {
+            User user = upm.getUser(userLogin);
+            user.setPassword(newPassword);
+            upm.modifyUser(user);
+        } else {
+            throw new Exception(
+                "Cannot modify password: verification password is incorrect");
+        }
+    }
 }
