@@ -1,15 +1,15 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Cell;
@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.util.RowColPos;
  * Draw a grid according to specific parameters : total number of rows, total
  * number of columns, width and height of the cells
  */
-public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget {
+public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     private int cellWidth = 60;
 
@@ -32,16 +32,6 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
     private int rows;
 
     private int columns;
-
-    /**
-     * max width this container will have : used to calculate cells width
-     */
-    protected int maxWidth = -1;
-
-    /**
-     * max height this container will have : used to calculate cells height
-     */
-    protected int maxHeight = -1;
 
     /**
      * Height used when legend in under the grid
@@ -62,33 +52,27 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
 
     public boolean legendOnSide = false;
 
-    public AbstractGridWidget(Composite parent) {
-        super(parent, SWT.DOUBLE_BUFFERED);
-        addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                paintGrid(e);
-            }
-        });
-    }
-
-    protected void paintGrid(PaintEvent e) {
+    @Override
+    protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
         for (int indexRow = 0; indexRow < rows; indexRow++) {
             for (int indexCol = 0; indexCol < columns; indexCol++) {
                 int xPosition = cellWidth * indexCol;
                 int yPosition = cellHeight * indexRow;
                 Rectangle rectangle = new Rectangle(xPosition, yPosition,
                     cellWidth, cellHeight);
-                drawRectangle(e, rectangle, indexRow, indexCol);
-                String topText = getTopTextForBox(indexRow, indexCol);
+                drawRectangle(e, displayWidget, rectangle, indexRow, indexCol);
+                String topText = getTopTextForBox(displayWidget.getCells(),
+                    indexRow, indexCol);
                 if (topText != null) {
                     drawText(e, topText, rectangle, SWT.TOP);
                 }
-                String middleText = getMiddleTextForBox(indexRow, indexCol);
+                String middleText = getMiddleTextForBox(
+                    displayWidget.getCells(), indexRow, indexCol);
                 if (middleText != null) {
                     drawText(e, middleText, rectangle, SWT.CENTER);
                 }
-                String bottomText = getBottomTextForBox(indexRow, indexCol);
+                String bottomText = getBottomTextForBox(
+                    displayWidget.getCells(), indexRow, indexCol);
                 if (bottomText != null) {
                     drawText(e, bottomText, rectangle, SWT.BOTTOM);
                 }
@@ -119,19 +103,22 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
         return new Point(width, height);
     }
 
-    protected void drawRectangle(PaintEvent e, Rectangle rectangle,
+    protected void drawRectangle(PaintEvent e,
+        ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
-        if (selection != null && selection.row == indexRow
-            && selection.col == indexCol) {
+        if (displayWidget.getSelection() != null
+            && displayWidget.getSelection().row == indexRow
+            && displayWidget.getSelection().col == indexCol) {
             Color color = e.display.getSystemColor(SWT.COLOR_YELLOW);
             e.gc.setBackground(color);
             e.gc.fillRectangle(rectangle);
         }
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
-        if (cells != null) {
-            if (getMultiSelectionManager().isEnabled()) {
-                Cell cell = cells.get(new RowColPos(indexRow, indexCol));
+        if (displayWidget.getCells() != null) {
+            if (displayWidget.getMultiSelectionManager().isEnabled()) {
+                Cell cell = displayWidget.getCells().get(
+                    new RowColPos(indexRow, indexCol));
                 if (cell != null && cell.isSelected()) {
                     Rectangle rect = new Rectangle(rectangle.x + 5,
                         rectangle.y + 5, rectangle.width - 10,
@@ -146,16 +133,19 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
     }
 
     @SuppressWarnings("unused")
-    protected String getTopTextForBox(int indexRow, int indexCol) {
+    protected String getTopTextForBox(Map<RowColPos, ? extends Cell> cells,
+        int indexRow, int indexCol) {
         return null;
     }
 
-    protected String getMiddleTextForBox(int indexRow, int indexCol) {
-        return getDefaultTextForBox(indexRow, indexCol);
+    protected String getMiddleTextForBox(Map<RowColPos, ? extends Cell> cells,
+        int indexRow, int indexCol) {
+        return getDefaultTextForBox(cells, indexRow, indexCol);
     }
 
     @SuppressWarnings("unused")
-    protected String getBottomTextForBox(int indexRow, int indexCol) {
+    protected String getBottomTextForBox(Map<RowColPos, ? extends Cell> cells,
+        int indexRow, int indexCol) {
         return null;
     }
 
@@ -242,29 +232,14 @@ public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget 
     }
 
     /**
-     * Modify dimensions of the grid. maxWidth and maxHeight are used to
-     * calculate the size of the cells
-     * 
-     * @param rows total number of rows
-     * @param columns total number of columns
-     * @param maxWidth max width the grid should have
-     * @param maxHeight max height the grid should have
-     */
-    public void setGridSizes(int rows, int columns, int maxWidth, int maxHeight) {
-        this.maxWidth = maxWidth;
-        this.maxHeight = maxHeight;
-        setStorageSize(rows, columns);
-    }
-
-    /**
      * Modify only the number of rows and columns of the grid. If no max width
      * and max height has been given to the grid, the default cell width and
      * cell height will be used
      */
+    @Override
     public void setStorageSize(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        redraw();
     }
 
     public int getCellWidth() {

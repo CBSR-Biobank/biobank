@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
@@ -195,7 +195,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     protected void createVisualizeContainer() {
         Composite client = createSectionWithClient("Container Visual");
-        ContainerDisplayFatory.createWidget(client, containerType, false);
+        ContainerDisplayWidget containerDisplay = new ContainerDisplayWidget(
+            client);
+        containerDisplay.setContainerType(containerType);
     }
 
     private void setChildContainerTypesValues() {

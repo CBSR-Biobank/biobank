@@ -3,15 +3,12 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.ContainerCell;
@@ -21,7 +18,7 @@ import edu.ualberta.med.biobank.util.RowColPos;
 /**
  * Drawer 36 display.
  */
-public class Drawer36Widget extends AbstractContainerDisplayWidget {
+public class Drawer36Display extends AbstractContainerDisplay {
 
     public static final int SQUARE_CELL_WIDTH = 70;
 
@@ -48,16 +45,6 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
 
     public static int LEGEND_HEIGHT = 20;
 
-    public Drawer36Widget(Composite parent) {
-        super(parent, SWT.DOUBLE_BUFFERED);
-        addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                paintDrawer(e);
-            }
-        });
-    }
-
     @Override
     public void initLegend() {
         hasLegend = true;
@@ -66,12 +53,20 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
         legendStatus.add(ContainerStatus.INITIALIZED);
     }
 
-    protected void paintDrawer(PaintEvent e) {
+    @Override
+    public Point getSizeToApply() {
         int fullHeight = HEIGHT;
         if (hasLegend) {
             fullHeight += LEGEND_HEIGHT;
         }
-        setSize(WIDTH, fullHeight);
+        return new Point(WIDTH, fullHeight);
+    }
+
+    @Override
+    protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
+        if (legendStatus != null) {
+            LEGEND_WIDTH = WIDTH / legendStatus.size();
+        }
         GC gc = e.gc;
         int currentX = 0;
         int rectYTotal = 0;
@@ -104,15 +99,18 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
                 width, height);
 
             gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-            gc.setBackground(getStatus(boxIndex).getColor());
+            gc.setBackground(getStatus(displayWidget.getCells(), boxIndex)
+                .getColor());
             gc.fillRectangle(rectangle);
-            if (selection != null && (selection.row + 1) == boxIndex) {
+            if (displayWidget.getSelection() != null
+                && (displayWidget.getSelection().row + 1) == boxIndex) {
                 gc.setBackground(e.display.getSystemColor(SWT.COLOR_YELLOW));
                 gc.fillRectangle(rectangle);
             }
             gc.drawRectangle(rectangle);
 
-            String text = getDefaultTextForBox(boxIndex - 1, 0);
+            String text = getDefaultTextForBox(displayWidget.getCells(),
+                boxIndex - 1, 0);
             if (text != null) {
                 drawTextOnCenter(gc, text, rectangle);
             }
@@ -123,9 +121,10 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
                 rectYTotal = 0;
             }
 
-            if (cells != null) {
-                if (getMultiSelectionManager().isEnabled()) {
-                    Cell cell = cells.get(new RowColPos(boxIndex - 1, 0));
+            if (displayWidget.getCells() != null) {
+                if (displayWidget.getMultiSelectionManager().isEnabled()) {
+                    Cell cell = displayWidget.getCells().get(
+                        new RowColPos(boxIndex - 1, 0));
                     if (cell != null && cell.isSelected()) {
                         Rectangle rect = new Rectangle(rectangle.x + 5,
                             rectangle.y + 5, rectangle.width - 10,
@@ -145,7 +144,8 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
         }
     }
 
-    private ContainerStatus getStatus(int boxIndex) {
+    private ContainerStatus getStatus(Map<RowColPos, ? extends Cell> cells,
+        int boxIndex) {
         ContainerStatus status = null;
         if (cells != null) {
             status = ((ContainerCell) cells.get(new RowColPos(boxIndex - 1, 0)))
@@ -166,26 +166,10 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
         gc.drawText(text, xTextPosition, yTextPosition, true);
     }
 
-    public void setCellsStatus(Map<RowColPos, ContainerCell> cells) {
-        this.cells = cells;
-        Assert.isTrue(cells != null);
-        computeSize(-1, -1);
-        if (legendStatus != null) {
-            LEGEND_WIDTH = WIDTH / legendStatus.size();
-        }
-        redraw();
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
-    public void setCells(Map<RowColPos, ? extends Cell> cells) {
-        Assert.isNotNull(cells);
-        setCellsStatus((Map<RowColPos, ContainerCell>) cells);
-    }
-
-    @Override
-    public Cell getObjectAtCoordinates(int x, int y) {
-        if (cells == null) {
+    public Cell getObjectAtCoordinates(ContainerDisplayWidget displayWidget,
+        int x, int y) {
+        if (displayWidget.getCells() == null) {
             return null;
         }
         int gridCellWidth = RECTANGLE_CELL_WIDTH;
@@ -204,8 +188,9 @@ public class Drawer36Widget extends AbstractContainerDisplayWidget {
         // convert subcell to real cell
         int xGridCellNumOffset = 9;
         int yGridCellNumOffset = 3;
-        return cells.get(new RowColPos(cellNum + xGrid * xGridCellNumOffset
-            - yGrid * yGridCellNumOffset - 1, 0));
+        return displayWidget.getCells().get(
+            new RowColPos(cellNum + xGrid * xGridCellNumOffset - yGrid
+                * yGridCellNumOffset - 1, 0));
     }
 
     protected void drawLegend(PaintEvent e, Color color, int index, String text) {

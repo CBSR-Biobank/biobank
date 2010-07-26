@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.util.RowColPos;
 
 public class MultiSelectionManager {
 
-    private AbstractContainerDisplayWidget container;
+    private ContainerDisplayWidget container;
 
     private MouseListener selectionMouseListener;
     private MouseTrackListener selectionMouseTrackListener;
@@ -41,7 +41,7 @@ public class MultiSelectionManager {
 
     private boolean enabled = false;
 
-    public MultiSelectionManager(AbstractContainerDisplayWidget container) {
+    public MultiSelectionManager(ContainerDisplayWidget container) {
         this.container = container;
         selectedCells = new TreeMap<RowColPos, Cell>();
         listeners = new ArrayList<MultiSelectionListener>();

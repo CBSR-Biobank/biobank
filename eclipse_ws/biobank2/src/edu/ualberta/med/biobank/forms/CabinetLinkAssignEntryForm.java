@@ -58,8 +58,7 @@ import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
@@ -73,8 +72,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private Label cabinetLabel;
     private Label drawerLabel;
-    private AbstractContainerDisplayWidget cabinetWidget;
-    private AbstractContainerDisplayWidget drawerWidget;
+    private ContainerDisplayWidget cabinetWidget;
+    private ContainerDisplayWidget drawerWidget;
 
     private BiobankText inventoryIdText;
     private Label oldCabinetPositionLabel;
@@ -158,7 +157,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private void createLocationSection() throws ApplicationException {
         Composite client = toolkit.createComposite(form.getBody());
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = new GridLayout(3, false);
         client.setLayout(layout);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.CENTER;
@@ -168,6 +167,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         cabinetLabel = toolkit.createLabel(client, "Cabinet"); //$NON-NLS-1$
         drawerLabel = toolkit.createLabel(client, "Drawer"); //$NON-NLS-1$
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        drawerLabel.setLayoutData(gd);
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService, SessionManager.getInstance()
@@ -187,19 +189,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawerType = children.get(0);
             }
         }
-        cabinetWidget = ContainerDisplayFatory.createWidget(client,
-            cabinetType, true);
+        cabinetWidget = new ContainerDisplayWidget(client);
+        cabinetWidget.setContainerType(cabinetType, true);
         toolkit.adapt(cabinetWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = ContainerDisplayFatory.createWidget(client, drawerType,
-            true);
+        drawerWidget = new ContainerDisplayWidget(client);
+        drawerWidget.setContainerType(drawerType, true);
         toolkit.adapt(drawerWidget);
-        GridData gdBin = new GridData();
-        gdBin.verticalSpan = 2;
-        drawerWidget.setLayoutData(gdBin);
     }
 
     private void createFieldsSection() throws ApplicationException {
@@ -793,6 +792,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
+            drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
         }

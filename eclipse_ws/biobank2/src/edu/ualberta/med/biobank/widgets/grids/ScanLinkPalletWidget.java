@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.util.ArrayList;
-
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 
@@ -14,20 +11,20 @@ import edu.ualberta.med.biobank.model.PalletCell;
  */
 public class ScanLinkPalletWidget extends ScanPalletWidget {
 
-    public ScanLinkPalletWidget(Composite parent) {
-        super(parent);
+    public ScanLinkPalletWidget(Composite client) {
+        super(client);
     }
 
-    @Override
-    public void initLegend() {
-        hasLegend = true;
-        statusAvailable = new ArrayList<AliquotCellStatus>();
-        statusAvailable.add(AliquotCellStatus.EMPTY);
-        statusAvailable.add(AliquotCellStatus.NO_TYPE);
-        statusAvailable.add(AliquotCellStatus.TYPE);
-        statusAvailable.add(AliquotCellStatus.ERROR);
-        legendWidth = PALLET_WIDTH / statusAvailable.size();
-    }
+    // @Override
+    // public void initLegend() {
+    // hasLegend = true;
+    // statusAvailable = new ArrayList<AliquotCellStatus>();
+    // statusAvailable.add(AliquotCellStatus.EMPTY);
+    // statusAvailable.add(AliquotCellStatus.NO_TYPE);
+    // statusAvailable.add(AliquotCellStatus.TYPE);
+    // statusAvailable.add(AliquotCellStatus.ERROR);
+    // legendWidth = PALLET_WIDTH / statusAvailable.size();
+    // }
 
     public boolean isEverythingTyped() {
         if (cells != null) {
@@ -41,9 +38,9 @@ public class ScanLinkPalletWidget extends ScanPalletWidget {
         }
         return false;
     }
-
-    @Override
-    protected String getBottomTextForBox(int indexRow, int indexCol) {
-        return null;
-    }
+    //
+    // @Override
+    // protected String getBottomTextForBox(int indexRow, int indexCol) {
+    // return null;
+    // }
 }
