@@ -89,7 +89,6 @@ public class LoggingView extends ViewPart {
     public LoggingView() {
     }
 
-    /* TODO implement Auto-fill text/combo box hybrid */
     @Override
     public void createPartControl(Composite parent) {
         colorWhite = new Color(parent.getDisplay(), 255, 255, 255);
@@ -330,7 +329,6 @@ public class LoggingView extends ViewPart {
             @SuppressWarnings("rawtypes")
             @Override
             public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
-                // TODO Auto-generated method stub
 
             }
         };

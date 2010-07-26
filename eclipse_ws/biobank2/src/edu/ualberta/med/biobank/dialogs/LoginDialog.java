@@ -128,8 +128,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         setTitle("Login to a BioBank server");
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY));
         setMessage("Enter server name and login details.");
         return contents;
     }
@@ -156,8 +156,8 @@ public class LoginDialog extends TitleAreaDialog {
         String lastServer = pluginPrefs.get(LAST_SERVER, "");
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             "Server field cannot be empty");
-        serverWidget = createWritableCombo(contents, "&Server", servers
-            .toArray(new String[0]), "server", lastServer, validator);
+        serverWidget = createWritableCombo(contents, "&Server",
+            servers.toArray(new String[0]), "server", lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
         NonEmptyStringValidator passwordValidator = null;
@@ -182,9 +182,9 @@ public class LoginDialog extends TitleAreaDialog {
                 "Password field cannot be empty");
         }
 
-        userNameWidget = createWritableCombo(contents, "&User Name", userNames
-            .toArray(new String[0]), "username", pluginPrefs.get(
-            LAST_USER_NAME, ""), userNameValidator);
+        userNameWidget = createWritableCombo(contents, "&User Name",
+            userNames.toArray(new String[0]), "username",
+            pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
 
         passwordWidget = createPassWordText(contents, "&Password", "password",
             passwordValidator);
@@ -200,8 +200,8 @@ public class LoginDialog extends TitleAreaDialog {
         String propertyObserved, AbstractValidator validator) {
         createLabel(parent, labelText);
         Text text = new Text(parent, SWT.BORDER | SWT.PASSWORD);
-        arrangeAndBindControl(text, validator, SWTObservables.observeText(text,
-            SWT.Modify), propertyObserved);
+        arrangeAndBindControl(text, validator,
+            SWTObservables.observeText(text, SWT.Modify), propertyObserved);
         return text;
     }
 
@@ -215,9 +215,9 @@ public class LoginDialog extends TitleAreaDialog {
             uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
         }
-        dbc.bindValue(observable, PojoObservables.observeValue(authentication,
-            propertyObserved), uvs, null);
-
+        dbc.bindValue(observable,
+            PojoObservables.observeValue(authentication, propertyObserved),
+            uvs, null);
     }
 
     private Label createLabel(Composite parent, String labelText) {
@@ -238,8 +238,8 @@ public class LoginDialog extends TitleAreaDialog {
         if (selection != null) {
             combo.select(combo.indexOf(selection));
         }
-        arrangeAndBindControl(combo, validator, SWTObservables
-            .observeSelection(combo), propertyObserved);
+        arrangeAndBindControl(combo, validator,
+            SWTObservables.observeSelection(combo), propertyObserved);
         return combo;
     }
 
@@ -262,8 +262,9 @@ public class LoginDialog extends TitleAreaDialog {
                 }
             }
         });
-        dbc.bindValue(statusObservable, new AggregateValidationStatus(dbc
-            .getBindings(), AggregateValidationStatus.MAX_SEVERITY));
+        dbc.bindValue(statusObservable,
+            new AggregateValidationStatus(dbc.getBindings(),
+                AggregateValidationStatus.MAX_SEVERITY));
     }
 
     protected void setOkButtonEnabled(boolean enabled) {
@@ -302,8 +303,8 @@ public class LoginDialog extends TitleAreaDialog {
             .getSelection());
 
         SessionHelper sessionHelper = new SessionHelper(serverWidget.getText(),
-            secureConnection, userNameWidget.getText(), passwordWidget
-                .getText());
+            secureConnection, userNameWidget.getText(),
+            passwordWidget.getText());
 
         BusyIndicator.showWhile(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
