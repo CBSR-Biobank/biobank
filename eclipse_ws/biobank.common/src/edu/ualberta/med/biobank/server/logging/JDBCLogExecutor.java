@@ -141,5 +141,3 @@ public class JDBCLogExecutor implements Runnable {
     public void setDbUser(String dbUser) {
         this.dbUser = dbUser;
     }
-
-}
