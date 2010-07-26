@@ -178,7 +178,7 @@
     <copy file="sdk_conf/validator-extension-Config.xml" tofile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
     <copy file="sdk_conf/application-config.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
     <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
-  	<copy file="sdk_conf/application-config-client-info.xml" tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
+    <copy file="sdk_conf/application-config-client-info.xml" tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
     <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
     <copy file="security-logs/log4j.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
@@ -262,16 +262,17 @@
       <filelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
       <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
+      <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar"/>
     </copy>
     <copy todir="${eclipse.proj.dir.common}/lib/server">
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar"/>
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar"/>
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar"/>
     </copy>
-  	<copy todir="${eclipse.proj.dir.common}/conf">
-  	  <filelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
-  	            files="application-config-client.xml,application-config-client-info.xml" />
-  	</copy>
+    <copy todir="${eclipse.proj.dir.common}/conf">
+      <filelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
+  	        files="application-config-client.xml,application-config-client-info.xml" />
+    </copy>
     <copy todir="${eclipse.proj.dir}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
@@ -410,27 +411,27 @@
 
 
   <target name="build-common-project">
-  	<echo message="Building common project" />
-  	<mkdir dir="${eclipse.proj.dir.common}/output" />
-	<copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
+    <echo message="Building common project" />
+    <mkdir dir="${eclipse.proj.dir.common}/output" />
+    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
       <fileset dir="${eclipse.proj.dir.common}/src">
-  	    <exclude name="**/*.launch" />
-  	    <exclude name="**/*.java" />
-  	  </fileset>
-  	</copy>
-  	<javac debug="true" debuglevel="source,lines,vars" destdir="${eclipse.proj.dir.common}/output" source="1.6" target="1.6">
-  	  <src path="${eclipse.proj.dir.common}/src" />
-  	    <classpath>
-  		  <path id="biobank.common.classpath">
-   		    <fileset dir="${eclipse.proj.dir.common}/lib/server">
-			  <include name="*.jar" />
-			</fileset>
-			<fileset dir="${eclipse.proj.dir.common}/lib/client">
-			  <include name="*.jar" />
-			</fileset>
-		  </path>
-  	    </classpath>
-  	  </javac>
+  	<exclude name="**/*.launch" />
+  	<exclude name="**/*.java" />
+      </fileset>
+    </copy>
+    <javac debug="true" debuglevel="source,lines,vars" destdir="${eclipse.proj.dir.common}/output" source="1.6" target="1.6">
+      <src path="${eclipse.proj.dir.common}/src" />
+      <classpath>
+  	<path id="biobank.common.classpath">
+   	  <fileset dir="${eclipse.proj.dir.common}/lib/server">
+	    <include name="*.jar" />
+	  </fileset>
+	  <fileset dir="${eclipse.proj.dir.common}/lib/client">
+	    <include name="*.jar" />
+	  </fileset>
+	</path>
+      </classpath>
+    </javac>
   </target>
 
 
@@ -501,7 +502,7 @@
           depends="tests-clean,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant target="clean-jars" />
-  	<delete dir="${eclipse.proj.dir.common}/output" />
+    <delete dir="${eclipse.proj.dir.common}/output" />
   </target>
 
   <target name="clean-caCore"
