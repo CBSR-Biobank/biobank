@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
@@ -78,11 +77,7 @@ public class StudyGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
-        Assert.isNotNull(currentSite, "null site");
-        // read from database again
-        currentSite.reload();
-        return currentSite.getStudyCollection();
+        return StudyWrapper.getAllStudies(getAppService());
     }
 
     @Override

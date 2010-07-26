@@ -367,9 +367,6 @@
                <reference
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
-               <reference
-                    definitionId="biobank2.siteSelected">
-               </reference>
             </and>
          </activeWhen>
       </handler>

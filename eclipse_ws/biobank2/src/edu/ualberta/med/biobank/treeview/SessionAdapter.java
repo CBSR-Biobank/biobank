@@ -126,8 +126,9 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        // Assert.isTrue(child instanceof SiteWrapper);
-        // return new SiteAdapter(this, (SiteWrapper) child);
+        if (child instanceof SiteWrapper) {
+            return new SiteAdapter(this, (SiteWrapper) child);
+        }
         return null;
     }
 
@@ -159,4 +160,14 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
+    @Override
+    public void rebuild() {
+        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
+            if (!(child instanceof StudyGroup)) {
+                removeChild(child);
+            }
+        }
+        notifyListeners();
+        loadChildren(false);
+    }
 }
