@@ -271,6 +271,10 @@
             id="edu.ualberta.med.biobank.commands.logging"
             name="Logging">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
+            name="Edit Activity Status">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -887,6 +891,20 @@
             </and>
          </enabledWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
+            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -971,8 +989,14 @@
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
-                      id="edu.ualberta.med.biobank.menu.editShippingMethods"
+                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
                       label="Edit Shipping Methods"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
+                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
+                      label="Edit Activity Status"
                       style="push">
                 </command>
          </menu>
@@ -1917,6 +1941,12 @@
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.SampleTypePvCountEditor"
             name="Sample Type Totals by Patient Visit and Study">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ActivityStatusEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
+            name="Activity StatusMethod Entry">
       </editor>
    </extension>
    <extension

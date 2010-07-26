@@ -44,6 +44,9 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private ComboViewer studiesViewer;
 
+    private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
+        MSG_NO_PATIENT_NUMBER);
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof PatientAdapter),
@@ -105,11 +108,12 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         studiesViewer = createComboViewerWithNoSelectionValidator(client,
             "Study", studies, selectedStudy, "A study should be selected");
+        setFirstControl(studiesViewer.getControl());
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Patient Number", null, BeansObservables.observeValue(
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Patient Number", null, BeansObservables.observeValue(
                 patientAdapter.getWrapper(), "pnumber"),
-            new NonEmptyStringValidator(MSG_NO_PATIENT_NUMBER)));
+            pnumberNonEmptyValidator);
     }
 
     @Override
@@ -149,5 +153,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
+        studiesViewer.setSelection(null);
+        patientAdapter.getWrapper().reset();
+        pnumberNonEmptyValidator.validate(null);
     }
 }
