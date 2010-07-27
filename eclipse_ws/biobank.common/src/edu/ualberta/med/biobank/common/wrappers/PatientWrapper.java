@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
@@ -180,8 +181,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
         if (visits != null)
             for (PatientVisitWrapper visit : visits) {
-                if (visit.getDateDrawn().equals(dateDrawn)
-                    && visit.getDateProcessed().equals(dateProcessed))
+                if ((DateCompare.compare(visit.getDateDrawn(), dateDrawn) == 0)
+                    && (DateCompare.compare(visit.getDateProcessed(),
+                        dateProcessed) == 0))
                     result.add(visit);
             }
         return result;

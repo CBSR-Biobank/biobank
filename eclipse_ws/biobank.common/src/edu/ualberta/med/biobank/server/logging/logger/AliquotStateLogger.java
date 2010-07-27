@@ -23,6 +23,7 @@ public class AliquotStateLogger extends BiobankObjectStateLogger {
         if (obj instanceof Aliquot) {
             Log log = new Log();
             PatientVisit visit = (PatientVisit) statesMap.get("patientVisit");
+            log.setSite(visit.getPatient().getStudy().getSite().getNameShort());
             log.setPatientNumber(visit.getPatient().getPnumber());
             log.setInventoryId((String) statesMap.get("inventoryId"));
             AliquotPosition pos = (AliquotPosition) statesMap

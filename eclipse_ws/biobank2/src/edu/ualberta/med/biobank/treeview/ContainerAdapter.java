@@ -21,9 +21,12 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.dialogs.MoveAliquotsToDialog;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
 import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
@@ -88,12 +91,73 @@ public class ContainerAdapter extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    moveAction();
+                    moveAction(null);
+                }
+            });
+        }
+
+        if (getContainer().hasAliquots()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Move All Aliquots To");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    moveAliquots();
                 }
             });
         }
 
         addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
+    }
+
+    protected void moveAliquots() {
+        final MoveAliquotsToDialog mc = new MoveAliquotsToDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            getContainer());
+        if (mc.open() == Dialog.OK) {
+            try {
+                final ContainerWrapper newContainer = mc.getNewContainer();
+                IRunnableContext context = new ProgressMonitorDialog(Display
+                    .getDefault().getActiveShell());
+                context.run(true, false, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        monitor.beginTask("Moving aliquots from container "
+                            + getContainer().getFullInfoLabel() + " to "
+                            + newContainer.getFullInfoLabel(),
+                            IProgressMonitor.UNKNOWN);
+                        try {
+                            for (RowColPos rcp : getContainer().getAliquots()
+                                .keySet()) {
+                                AliquotWrapper aliquot = getContainer()
+                                    .getAliquots().get(rcp);
+                                newContainer.addAliquot(rcp.row, rcp.col,
+                                    aliquot);
+                            }
+                            newContainer.persist();
+                            newContainer.reload();
+                        } catch (Exception e) {
+                            BioBankPlugin.openAsyncError("Move problem", e);
+                        }
+                        monitor.done();
+                        BioBankPlugin.openAsyncInformation(
+                            "Aliquots moved",
+                            newContainer.getAliquots().size()
+                                + " aliquots are now in "
+                                + newContainer.getFullInfoLabel() + ".");
+                    }
+                });
+                ContainerAdapter newContainerAdapter = (ContainerAdapter) SessionManager
+                    .searchNode(newContainer);
+                if (newContainerAdapter != null) {
+                    getContainer().reload();
+                    newContainerAdapter.performDoubleClick();
+                }
+                getContainer().reload();
+            } catch (Exception e) {
+                BioBankPlugin.openError(e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -106,11 +170,11 @@ public class ContainerAdapter extends AdapterBase {
         return true;
     }
 
-    private void moveAction() {
+    public void moveAction(ContainerWrapper destParentContainer) {
         final ContainerAdapter oldParent = (ContainerAdapter) getParent();
         final MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            getContainer());
+            getContainer(), destParentContainer);
         if (mc.open() == Dialog.OK) {
             try {
                 if (setNewPositionFromLabel(mc.getNewLabel())) {
@@ -142,8 +206,8 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
-        String newParentContainerLabel = newLabel.substring(0, newLabel
-            .length() - 2);
+        String newParentContainerLabel = newLabel.substring(0,
+            newLabel.length() - 2);
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newParentContainerLabel);
         if (newParentContainers.size() == 0) {
@@ -218,7 +282,7 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         Assert.isNotNull(modelObject, "site null");
         ((ContainerWrapper) modelObject).reload();
-        return ((ContainerWrapper) modelObject).getChildren().values();
+        return getContainer().getChildren().values();
     }
 
     @Override

@@ -278,6 +278,10 @@
       <command
             id="edu.ualberta.med.biobank.commands.reload"
             name="Reload">
+	  </command>
+	  <command
+            id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
+            name="Edit Activity Status">
       </command>
    </extension>
    <extension
@@ -917,6 +921,20 @@
                      value="edu.ualberta.med.biobank.forms.BiobankViewForm">
                </instanceof>
             </with>
+            </activeWhen>
+            </handler>
+<handler
+            class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
+            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
          </activeWhen>
       </handler>
    </extension>
@@ -1003,8 +1021,14 @@
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
-                      id="edu.ualberta.med.biobank.menu.editShippingMethods"
+                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
                       label="Edit Shipping Methods"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
+                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
+                      label="Edit Activity Status"
                       style="push">
                 </command>
          </menu>
@@ -2026,6 +2050,12 @@
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.AliquotSCountEditor"
             name="Aliquot Study Count">
+            </editor>
+<editor
+            class="edu.ualberta.med.biobank.forms.ActivityStatusEntryForm"
+            default="false"
+            id="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
+            name="Activity StatusMethod Entry">
       </editor>
    </extension>
    <extension

@@ -28,8 +28,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         if (!file.exists()) {
             file.mkdir();
         }
-        store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-            path);
+        store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);

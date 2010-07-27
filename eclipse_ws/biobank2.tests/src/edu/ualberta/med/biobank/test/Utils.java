@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.test;
 
-import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
-
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 public class Utils {
 
@@ -31,14 +29,14 @@ public class Utils {
     }
 
     public static Date getRandomDate() {
-        try {
-            String dateStr = String.format("%04d-%02d-%02d %02d:%02d", 2000 + r
-                .nextInt(100), r.nextInt(12) + 1, r.nextInt(30) + 1, r
-                .nextInt(24) + 1, r.nextInt(60) + 1);
-            return DateFormatter.dateFormatter.parse(dateStr);
-        } catch (ParseException e) {
-            throw new RuntimeException("could not generate a random date");
-        }
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2000 + r.nextInt(40));
+        cal.set(Calendar.DAY_OF_YEAR, r.nextInt(365) + 1);
+        cal.set(Calendar.HOUR_OF_DAY, r.nextInt(24));
+        cal.set(Calendar.MINUTE, r.nextInt(60));
+        cal.set(Calendar.SECOND, r.nextInt(60));
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 
 }

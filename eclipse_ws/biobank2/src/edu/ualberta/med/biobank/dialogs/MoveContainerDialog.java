@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.validators.ContainerLabelValidator;
+import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
@@ -19,14 +19,17 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
  */
 public class MoveContainerDialog extends BiobankDialog {
 
-    private ContainerWrapper container;
+    private ContainerWrapper containerToMove;
+    private ContainerWrapper destParentContainer;
 
     private IObservableValue newLabel = new WritableValue("", String.class);
 
-    public MoveContainerDialog(Shell parent, ContainerWrapper container) {
+    public MoveContainerDialog(Shell parent, ContainerWrapper container,
+        ContainerWrapper destParentContainer) {
         super(parent);
         Assert.isNotNull(container);
-        this.container = container;
+        this.containerToMove = container;
+        this.destParentContainer = destParentContainer;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class MoveContainerDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle("Move Container " + container.getLabel());
+        setTitle("Move Container " + containerToMove.getLabel());
         setMessage("Select the destination for this container.");
         return contents;
     }
@@ -50,10 +53,14 @@ public class MoveContainerDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
-            "Destination Address", null, newLabel, new ContainerLabelValidator(
+        BiobankText text = (BiobankText) createBoundWidgetWithLabel(contents,
+            BiobankText.class, SWT.FILL, "Destination Address", null, newLabel,
+            new StringLengthValidator(2,
                 "Destination label must be another container "
                     + "(4 characters minimum)."));
+        if (destParentContainer != null) {
+            text.setText(destParentContainer.getLabel());
+        }
     }
 
     public String getNewLabel() {

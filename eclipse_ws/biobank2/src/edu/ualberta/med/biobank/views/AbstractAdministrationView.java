@@ -59,7 +59,7 @@ public abstract class AbstractAdministrationView extends
         gd.grabExcessHorizontalSpace = true;
         treeText.setLayoutData(gd);
 
-        adaptersTree = new AdapterTreeWidget(parent, this, false);
+        adaptersTree = new AdapterTreeWidget(parent, false);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;

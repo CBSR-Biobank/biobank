@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.formatters;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +30,10 @@ public class DateFormatter {
         return format(dateTimeFormatter, date);
     }
 
+    public static String formatAsDateTime(Timestamp timestamp) {
+        return format(dateTimeFormatter, timestamp);
+    }
+
     public static String formatAsTime(Date date) {
         return format(timeFormatter, date);
     }
@@ -38,6 +43,13 @@ public class DateFormatter {
             return "";
         }
         return sdf.format(date);
+    }
+
+    public static String format(SimpleDateFormat sdf, Timestamp timestamp) {
+        if (timestamp == null) {
+            return "";
+        }
+        return sdf.format(timestamp);
     }
 
     public static Date parseToDate(String string) {
