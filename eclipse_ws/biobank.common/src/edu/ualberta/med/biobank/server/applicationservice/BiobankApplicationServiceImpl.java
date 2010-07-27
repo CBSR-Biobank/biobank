@@ -275,14 +275,18 @@ public class BiobankApplicationServiceImpl extends
             Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
             String userLogin = authentication.getName();
-            if (oldPassword.equals(authentication.getCredentials())) {
-                User user = upm.getUser(userLogin);
-                user.setPassword(newPassword);
-                upm.modifyUser(user);
-            } else {
+            if (!oldPassword.equals(authentication.getCredentials())) {
                 throw new ApplicationException(
-                    "Cannot modify password: verification password is incorrect");
+                    "Cannot modify password: verification password is incorrect.");
             }
+            if (oldPassword.equals(newPassword)) {
+                throw new ApplicationException(
+                    "New password needs to be different from the old one.");
+            }
+            User user = upm.getUser(userLogin);
+            user.setPassword(newPassword);
+            user.setStartDate(null);
+            upm.modifyUser(user);
         } catch (ApplicationException ae) {
             log.error("Error modifying password", ae);
             throw ae;
@@ -457,6 +461,27 @@ public class BiobankApplicationServiceImpl extends
         } else {
             throw new ApplicationException(
                 "Only Website Administrators can delete users");
+        }
+    }
+
+    @Override
+    public boolean needPasswordModification() throws ApplicationException {
+        try {
+            String userLogin = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+            User user = upm.getUser(userLogin);
+            if (user == null) {
+                throw new ApplicationException("Error retrieving security user");
+            }
+            return user.getStartDate() != null;
+        } catch (ApplicationException ae) {
+            log.error("Error checking password status", ae);
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error checking password status", ex);
+            throw new ApplicationException(ex);
         }
     }
 }
