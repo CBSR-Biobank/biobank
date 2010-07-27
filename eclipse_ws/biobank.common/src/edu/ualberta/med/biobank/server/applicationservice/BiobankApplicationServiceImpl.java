@@ -9,8 +9,10 @@ import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
+import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import gov.nih.nci.security.authorization.domainobjects.User;
+import gov.nih.nci.security.dao.GroupSearchCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.query.SDKQuery;
@@ -20,6 +22,7 @@ import gov.nih.nci.system.query.example.ExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -248,5 +251,56 @@ public class BiobankApplicationServiceImpl extends
             throw new Exception(
                 "Cannot modify password: verification password is incorrect");
         }
+    }
+
+    @Override
+    public List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups()
+        throws Exception {
+        List<edu.ualberta.med.biobank.common.security.Group> list = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
+        for (Object object : getCSMGroups()) {
+            Group group = (Group) object;
+            list.add(new edu.ualberta.med.biobank.common.security.Group(group
+                .getGroupId(), group.getGroupName()));
+        }
+        return list;
+    }
+
+    private List<?> getCSMGroups() throws Exception {
+        UserProvisioningManager upm = SecurityServiceProvider
+            .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+        return upm.getObjects(new GroupSearchCriteria(new Group()));
+    }
+
+    @Override
+    public List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers()
+        throws Exception {
+        UserProvisioningManager upm = SecurityServiceProvider
+            .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+
+        List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
+        for (Object object : getCSMGroups()) {
+            Group serverGroup = (Group) object;
+            for (Object userObj : upm.getUsers(serverGroup.getGroupId()
+                .toString())) {
+                User serverUser = (User) userObj;
+                edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
+                userDTO.setLogin(serverUser.getLoginName());
+                userDTO.setFirstName(serverUser.getFirstName());
+                userDTO.setLastName(serverUser.getLastName());
+                userDTO.setPassword(serverUser.getPassword());
+                userDTO.setEmail(serverUser.getEmailId());
+                List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
+                for (Object o : upm
+                    .getGroups(serverUser.getUserId().toString())) {
+                    Group userGroup = (Group) o;
+                    groups
+                        .add(new edu.ualberta.med.biobank.common.security.Group(
+                            userGroup.getGroupId(), userGroup.getGroupName()));
+                }
+                userDTO.addGroups(groups);
+                list.add(userDTO);
+            }
+        }
+        return list;
     }
 }

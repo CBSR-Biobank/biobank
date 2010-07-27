@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -52,4 +54,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void modifyPassword(String oldPassword, String newPassword)
         throws Exception;
+
+    public List<Group> getSecurityGroups() throws Exception;
+
+    public List<User> getSecurityUsers() throws Exception;
 }
