@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,8 +16,11 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DragDetectEvent;
-import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.DropTargetListener;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -50,6 +54,7 @@ import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -226,19 +231,6 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget.initLegend();
         containerWidget.setCells(cells);
 
-        containerWidget.addDragDetectListener(new DragDetectListener() {
-
-            @Override
-            public void dragDetected(DragDetectEvent e) {
-                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
-                    .getObjectAtCoordinates(e.x, e.y);
-                containerWidget.setSelection(new RowColPos(cell.getRow(), cell
-                    .getCol()));
-
-            }
-
-        });
-
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
@@ -267,6 +259,90 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         containerWidget.displayFullInfoString(true);
+
+        // final DragSource dragSource = new DragSource(containerWidget,
+        // DND.DROP_COPY | DND.DROP_MOVE);
+        // dragSource.setTransfer(new Transfer[] { MultiSelectNodeTransfer
+        // .getInstance() });
+        // dragSource.addDragListener(new DragSourceListener() {
+        //
+        // @Override
+        // public void dragStart(DragSourceEvent event) {
+        // System.out.println("DRAG START");
+        //
+        // }
+        //
+        // @Override
+        // public void dragSetData(DragSourceEvent event) {
+        // // TODO Auto-generated method stub
+        //
+        // }
+        //
+        // @Override
+        // public void dragFinished(DragSourceEvent event) {
+        // // TODO Auto-generated method stub
+        //
+        // }
+        // });
+
+        Iterator<?> it = cells.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            ContainerCell cc = ((ContainerCell) pairs.getValue());
+
+        }
+
+        DropTarget dropTarget = new DropTarget(containerWidget, DND.DROP_COPY
+            | DND.DROP_MOVE);
+        dropTarget.setTransfer(new Transfer[] { MultiSelectNodeTransfer
+            .getInstance() });
+        dropTarget.addDropListener(new DropTargetListener() {
+
+            @Override
+            public void dragEnter(DropTargetEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void dragLeave(DropTargetEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void dragOperationChanged(DropTargetEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void dragOver(DropTargetEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void drop(DropTargetEvent event) {
+                // TODO Auto-generated method stub
+                System.out.println(event);
+
+                // TreeItem item = (TreeItem) event.item;
+                // ModelWrapper<?> wrapper = ((AdapterBase) (item.getData()))
+                // .getModelObject();
+                // if (wrapper != null && (wrapper instanceof ContainerWrapper))
+                // {
+                // ContainerWrapper dstContainer = (ContainerWrapper) wrapper;
+                // }
+
+            }
+
+            @Override
+            public void dropAccept(DropTargetEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 
         createChildrenActionsSection(client);
     }

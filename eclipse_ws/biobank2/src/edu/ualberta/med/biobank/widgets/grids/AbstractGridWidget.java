@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.Cell;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
- * number of columns, width and height of the cells
+ * number of columns, width and height of the cell s
  */
 public abstract class AbstractGridWidget extends AbstractContainerDisplayWidget {
 

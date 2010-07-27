@@ -154,6 +154,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     @Override
     public void dragSetData(DragSourceEvent event) {
         event.data = getSelectedContainer();
+        event.doit = true;
     }
 
     @Override

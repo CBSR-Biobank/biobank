@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs;
 import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -69,8 +68,10 @@ public class ActivityLogDialog extends TitleAreaDialog {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                activityLogDirText.setEditable(activityLogDirBtn.getSelection());
-                browseBtn.setEnabled(activityLogDirBtn.getSelection());
+
+                boolean saveActivityLogs = activityLogDirBtn.getSelection();
+                activityLogDirText.setEditable(saveActivityLogs);
+                browseBtn.setEnabled(saveActivityLogs);
             }
 
             @Override
@@ -92,20 +93,14 @@ public class ActivityLogDialog extends TitleAreaDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String defaultPath;
-        String biobank2Dir = System.getProperty("user.home")
+        final String biobank2Dir = System.getProperty("user.home")
             + System.getProperty("file.separator") + "biobank2";
 
-        if (new File(biobank2Dir).exists())
-            defaultPath = biobank2Dir;
-        else
-            defaultPath = System.getProperty("user.home");
-
-        final Text activityLogDirText = new Text(fileSelectionComposite,
-            SWT.BORDER | SWT.FILL);
+        activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
+            | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
             GridData.FILL, true, false));
-        activityLogDirText.setText(defaultPath);
+        activityLogDirText.setText(biobank2Dir);
 
         browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
         browseBtn.setText("  Browse...  ");
@@ -116,14 +111,13 @@ public class ActivityLogDialog extends TitleAreaDialog {
                 DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
                     .getShell(), SWT.SAVE);
                 fd.setText("Select Directory");
-                fd.setFilterPath(defaultPath);
+                fd.setFilterPath(biobank2Dir);
                 String selected = fd.open();
                 if (selected != null)
                     activityLogDirText.setText(selected);
                 else {
                     activityLogDirText.setText("");
                 }
-
             }
 
             @Override
@@ -138,29 +132,39 @@ public class ActivityLogDialog extends TitleAreaDialog {
         String activityLogDir = activityLogDirText.getText();
 
         if (activityLogDirBtn.getSelection()) {
-            if (new File(activityLogDir).exists()) {
 
-                BioBankPlugin
-                    .getDefault()
-                    .getPreferenceStore()
-                    .setValue(
-                        PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-                        activityLogDir.toString());
-                BioBankPlugin
-                    .getDefault()
-                    .getPreferenceStore()
-                    .setValue(
-                        PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-                        true);
-                super.okPressed();
+            File activityLogDirFile = new File(activityLogDir);
+
+            if (!activityLogDirFile.exists()) {
+                boolean createPath = BioBankPlugin.openConfirm("Create path?",
+                    "Path: " + activityLogDir
+                        + "\ndoes not exist, would you like to create it?");
+
+                if (!createPath) {
+                    return;
+                }
+                if (!activityLogDirFile.mkdirs()) {
+                    BioBankPlugin.openAsyncError("Error Creating Path",
+                        "An error occured, could not create path: "
+                            + activityLogDir + ".");
+                    return;
+                }
             }
 
-            else {
-                MessageDialog.openError(getShell(), "Invalid Path",
-                    "Please enter a valid directory.");
+            BioBankPlugin
+                .getDefault()
+                .getPreferenceStore()
+                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+                    activityLogDir.toString());
+            BioBankPlugin
+                .getDefault()
+                .getPreferenceStore()
+                .setValue(
+                    PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
+                    true);
+            super.okPressed();
 
-            }
-        } else {
+        } else { /* don't save to a log file */
             BioBankPlugin
                 .getDefault()
                 .getPreferenceStore()
