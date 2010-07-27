@@ -91,7 +91,7 @@ public class ContainerAdapter extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    moveAction();
+                    moveAction(null);
                 }
             });
         }
@@ -170,11 +170,11 @@ public class ContainerAdapter extends AdapterBase {
         return true;
     }
 
-    private void moveAction() {
+    public void moveAction(ContainerWrapper destParentContainer) {
         final ContainerAdapter oldParent = (ContainerAdapter) getParent();
         final MoveContainerDialog mc = new MoveContainerDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            getContainer());
+            getContainer(), destParentContainer);
         if (mc.open() == Dialog.OK) {
             try {
                 if (setNewPositionFromLabel(mc.getNewLabel())) {

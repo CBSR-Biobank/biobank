@@ -20,6 +20,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
     private TreeViewer treeViewer;
 
+    private ContainerAdapter srcContainerAdapter;
     private ContainerWrapper srcContainer;
     private boolean dstLocationSelected;
 
@@ -40,9 +41,9 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                     .openError("Cannot move multiple container",
                         "You cannot move multiple containers, please drag them one at a time.");
 
-            ContainerAdapter adapter = (ContainerAdapter) ts.getFirstElement();
-            if (adapter != null)
-                return adapter.getContainer();
+            srcContainerAdapter = (ContainerAdapter) ts.getFirstElement();
+            if (srcContainerAdapter != null)
+                return srcContainerAdapter.getContainer();
 
         }
         return null;
@@ -120,6 +121,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                     // TODO implement the moving of containers here.
                     System.out.println("Valid Drag Detected:");
                     System.out.println(srcContainer + " --> " + dstContainer);
+                    srcContainerAdapter.moveAction(dstContainer);
                     return;
                 } else {
                     BioBankPlugin
