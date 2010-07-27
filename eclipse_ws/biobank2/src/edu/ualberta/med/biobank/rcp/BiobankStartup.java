@@ -17,7 +17,6 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.ActivityLogDialog;
 import edu.ualberta.med.biobank.dialogs.LoginDialog;
-import edu.ualberta.med.biobank.dialogs.PasswordChangeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
@@ -65,11 +64,6 @@ public class BiobankStartup implements IStartup {
                     IWorkbenchWindow window = workbench
                         .getActiveWorkbenchWindow();
                     if (window != null) {
-
-                        /* XXX debug */
-                        PasswordChangeDialog dlgx = new PasswordChangeDialog(
-                            window.getShell());
-                        dlgx.open();
 
                         boolean logSave = BioBankPlugin
                             .getDefault()
