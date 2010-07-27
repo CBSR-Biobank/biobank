@@ -42,6 +42,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public boolean isContainerAdministrator() throws ApplicationException;
 
+    public boolean isWebsiteAdministrator() throws ApplicationException;
+
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
 
@@ -53,9 +55,14 @@ public interface BiobankApplicationService extends WritableApplicationService {
         String siteOperator, Integer siteId) throws ApplicationException;
 
     public void modifyPassword(String oldPassword, String newPassword)
-        throws Exception;
+        throws ApplicationException;
 
-    public List<Group> getSecurityGroups() throws Exception;
+    public List<Group> getSecurityGroups() throws ApplicationException;
 
-    public List<User> getSecurityUsers() throws Exception;
+    public List<User> getSecurityUsers() throws ApplicationException;
+
+    public void persistUser(edu.ualberta.med.biobank.common.security.User user)
+        throws ApplicationException;
+
+    public void deleteUser(String login) throws ApplicationException;
 }

@@ -23,6 +23,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,8 @@ public class BiobankApplicationServiceImpl extends
     private static final String SITE_ADMIN_PG_ID = "11";
 
     private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
+
+    private static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
 
     private static final String CREATE_PRIVILEGE = "CREATE";
 
@@ -132,6 +135,34 @@ public class BiobankApplicationServiceImpl extends
                 CONTAINER_ADMINISTRATION_STRING, "CREATE");
         } catch (Exception e) {
             throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public boolean isWebsiteAdministrator() throws ApplicationException {
+        try {
+            String userLogin = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+            User user = upm.getUser(userLogin);
+            if (user == null) {
+                throw new ApplicationException("Error retrieving security user");
+            }
+            Set<?> groups = upm.getGroups(user.getUserId().toString());
+            for (Object obj : groups) {
+                Group group = (Group) obj;
+                if (group.getGroupName().equals(GROUP_WEBSITE_ADMINISTRATOR)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (ApplicationException ae) {
+            log.error("Error checking isWebsiteAdministrator", ae);
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error checking isWebsiteAdministrator", ex);
+            throw new ApplicationException(ex);
         }
     }
 
@@ -236,35 +267,56 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public void modifyPassword(String oldPassword, String newPassword)
-        throws Exception {
-        UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+        throws ApplicationException {
+        try {
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
 
-        Authentication authentication = SecurityContextHolder.getContext()
-            .getAuthentication();
-        String userLogin = authentication.getName();
-        if (oldPassword.equals(authentication.getCredentials())) {
-            User user = upm.getUser(userLogin);
-            user.setPassword(newPassword);
-            upm.modifyUser(user);
-        } else {
-            throw new Exception(
-                "Cannot modify password: verification password is incorrect");
+            Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+            String userLogin = authentication.getName();
+            if (oldPassword.equals(authentication.getCredentials())) {
+                User user = upm.getUser(userLogin);
+                user.setPassword(newPassword);
+                upm.modifyUser(user);
+            } else {
+                throw new ApplicationException(
+                    "Cannot modify password: verification password is incorrect");
+            }
+        } catch (ApplicationException ae) {
+            log.error("Error modifying password", ae);
+            throw ae;
+        } catch (Exception ex) {
+            log.error("Error modifying password", ex);
+            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups()
-        throws Exception {
-        List<edu.ualberta.med.biobank.common.security.Group> list = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
-        for (Object object : getCSMGroups()) {
-            Group group = (Group) object;
-            list.add(new edu.ualberta.med.biobank.common.security.Group(group
-                .getGroupId(), group.getGroupName()));
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                List<edu.ualberta.med.biobank.common.security.Group> list = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
+                for (Object object : getCSMGroups()) {
+                    Group group = (Group) object;
+                    list.add(new edu.ualberta.med.biobank.common.security.Group(
+                        group.getGroupId(), group.getGroupName()));
+                }
+                return list;
+            } catch (Exception ex) {
+                log.error("Error retrieving security groups", ex);
+                throw new ApplicationException(ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can retrieve security groups");
         }
-        return list;
     }
 
+    /**
+     * Retrieve only groups for application biobank2
+     */
     private List<?> getCSMGroups() throws Exception {
         UserProvisioningManager upm = SecurityServiceProvider
             .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
@@ -273,34 +325,138 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public List<edu.ualberta.med.biobank.common.security.User> getSecurityUsers()
-        throws Exception {
-        UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
 
-        List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
-        for (Object object : getCSMGroups()) {
-            Group serverGroup = (Group) object;
-            for (Object userObj : upm.getUsers(serverGroup.getGroupId()
-                .toString())) {
-                User serverUser = (User) userObj;
-                edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
-                userDTO.setLogin(serverUser.getLoginName());
-                userDTO.setFirstName(serverUser.getFirstName());
-                userDTO.setLastName(serverUser.getLastName());
-                userDTO.setPassword(serverUser.getPassword());
-                userDTO.setEmail(serverUser.getEmailId());
-                List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
-                for (Object o : upm
-                    .getGroups(serverUser.getUserId().toString())) {
-                    Group userGroup = (Group) o;
-                    groups
-                        .add(new edu.ualberta.med.biobank.common.security.Group(
-                            userGroup.getGroupId(), userGroup.getGroupName()));
+                List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
+                for (Object object : getCSMGroups()) {
+                    Group serverGroup = (Group) object;
+                    for (Object userObj : upm.getUsers(serverGroup.getGroupId()
+                        .toString())) {
+                        User serverUser = (User) userObj;
+                        edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
+                        userDTO.setLogin(serverUser.getLoginName());
+                        userDTO.setFirstName(serverUser.getFirstName());
+                        userDTO.setLastName(serverUser.getLastName());
+                        String password = serverUser.getPassword();
+                        if (password != null) {
+                            userDTO.setPassword("******");
+                        }
+                        if (userDTO.getLogin().equals("newuser")) {
+                            System.out.println("*********" + password);
+                        }
+                        userDTO.setEmail(serverUser.getEmailId());
+                        List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
+                        for (Object o : upm.getGroups(serverUser.getUserId()
+                            .toString())) {
+                            Group userGroup = (Group) o;
+                            groups
+                                .add(new edu.ualberta.med.biobank.common.security.Group(
+                                    userGroup.getGroupId(), userGroup
+                                        .getGroupName()));
+                        }
+                        userDTO.setGroups(groups);
+                        list.add(userDTO);
+                    }
                 }
-                userDTO.addGroups(groups);
-                list.add(userDTO);
+                return list;
+            } catch (ApplicationException ae) {
+                log.error("Error retrieving security users", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error retrieving security users", ex);
+                throw new ApplicationException(ex);
             }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can retrieve security users");
         }
-        return list;
+    }
+
+    @Override
+    public void persistUser(edu.ualberta.med.biobank.common.security.User user)
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                if (user.getLogin() == null) {
+                    throw new ApplicationException("Login should be set");
+                }
+                User serverUser = upm.getUser(user.getLogin());
+                if (serverUser == null) {
+                    serverUser = new User();
+                    serverUser.setLoginName(user.getLogin());
+                }
+                serverUser.setFirstName(user.getFirstName());
+                serverUser.setLastName(user.getLastName());
+                serverUser.setEmailId(user.getEmail());
+                String password = user.getPassword();
+                if (password != null && !password.equals("******")) {
+                    serverUser.setPassword(password);
+                }
+                Set<Group> groups = new HashSet<Group>();
+                for (edu.ualberta.med.biobank.common.security.Group groupDto : user
+                    .getGroups()) {
+                    Group g = upm.getGroupById(groupDto.getId().toString());
+                    if (g == null) {
+                        throw new ApplicationException("Invalid group "
+                            + groupDto + " user groups.");
+                    }
+                    groups.add(g);
+                }
+                if (groups.size() == 0) {
+                    throw new Exception("No group has been set for this user.");
+                }
+                serverUser.setGroups(groups);
+                if (serverUser.getUserId() == null) {
+                    upm.createUser(serverUser);
+                } else {
+                    upm.modifyUser(serverUser);
+                }
+            } catch (ApplicationException ae) {
+                log.error("Error persisting security user", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error persisting security user", ex);
+                throw new ApplicationException(ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can add/modify users");
+        }
+    }
+
+    @Override
+    public void deleteUser(String login) throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                String currentLogin = SecurityContextHolder.getContext()
+                    .getAuthentication().getName();
+                if (currentLogin.equals(login)) {
+                    throw new ApplicationException("User cannot delete himself");
+                }
+                User serverUser = upm.getUser(login);
+                if (serverUser == null) {
+                    throw new ApplicationException("Security user " + login
+                        + " not found.");
+                }
+                upm.removeUser(serverUser.getUserId().toString());
+            } catch (ApplicationException ae) {
+                log.error("Error deleting security user", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error deleting security user", ex);
+                throw new ApplicationException(ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can delete users");
+        }
     }
 }

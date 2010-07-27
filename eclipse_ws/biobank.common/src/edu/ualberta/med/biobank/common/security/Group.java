@@ -35,4 +35,9 @@ public class Group implements Serializable {
         return name;
     }
 
+    @Override
+    public String toString() {
+        return getId() + "/" + getName();
+    }
+
 }

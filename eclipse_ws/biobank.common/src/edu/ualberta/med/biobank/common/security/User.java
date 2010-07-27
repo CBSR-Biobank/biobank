@@ -66,16 +66,18 @@ public class User implements Serializable {
         return needToChangePassword;
     }
 
-    public void addGroups(List<Group> groups) {
-        this.groups.addAll(groups);
-    }
-
-    public void removeGroups(List<Group> groups) {
-        this.groups.removeAll(groups);
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
     public List<Group> getGroups() {
         return groups;
+    }
+
+    @Override
+    public String toString() {
+        return getLogin() + "/" + getFirstName() + "/" + getLastName() + "/"
+            + getPassword() + "/" + getEmail();
     }
 
 }
