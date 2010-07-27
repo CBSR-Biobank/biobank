@@ -238,7 +238,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         ((GridData) samplesMultiSelect.getLayoutData()).exclude = !show;
         childContainerTypesMultiSelect.setVisible(!show);
         ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude = show;
-        // form.layout(true, true);
+        form.layout(true, true);
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {

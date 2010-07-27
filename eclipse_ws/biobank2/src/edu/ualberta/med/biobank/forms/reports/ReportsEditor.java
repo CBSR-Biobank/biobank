@@ -92,6 +92,7 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
     // Global status
     private IObservableValue statusObservable;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void init() throws Exception {
         widgetCreator.initDataBinding();
@@ -230,6 +231,7 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                 @Override
                 public void run(final IProgressMonitor monitor) {
                     Thread t = new Thread("Querying") {
+                        @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
                             try {
@@ -248,6 +250,7 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                             }
                         }
 
+                        @SuppressWarnings({ "unused", "cast" })
                         private List<Object> generateReport(String op,
                             Integer siteId) throws ApplicationException,
                             BiobankCheckException {

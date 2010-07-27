@@ -3,15 +3,20 @@ package edu.ualberta.med.biobank.test;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import junit.framework.Assert;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 
-public class TestLabelingScheme extends TestDatabase {
+public class TestLabelingScheme {
+
+    private Random r;
 
     private static final Map<Integer, String> CBSR_ALPHA;
     static {
@@ -42,6 +47,15 @@ public class TestLabelingScheme extends TestDatabase {
         aMap.put(23, "Z");
         CBSR_ALPHA = Collections.unmodifiableMap(aMap);
     };
+
+    @Before
+    public void setUp() throws Exception {
+        r = new Random();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+    }
 
     @Test
     public void testTwoCharNumeric() throws Exception {

@@ -6,10 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.LogSql;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
@@ -38,6 +41,16 @@ public class BbpdbLogging {
         + "details,fnum,rack,box,cell,cnum,drawer,bin,binpos "
         + BBPDB_LOG_BASE_QUERY;
 
+    private static String BBPDB_PV_QUERY = "SELECT dec_chr_nr, visit_nr, "
+        + "clinic_site, date_received, date_taken, worksheet "
+        + "FROM patient_visit "
+        + "join patient on patient.patient_nr=patient_visit.patient_nr "
+        + "where visit_nr = ?";
+
+    private static Pattern VISIT_NR_DETAILS_RE = Pattern
+        .compile("Visit #(\\d+)");
+
+    @SuppressWarnings("unused")
     private GenericAppArgs args;
 
     private Connection bbpdbCon;
@@ -67,6 +80,11 @@ public class BbpdbLogging {
         biobank2Con = DriverManager.getConnection("jdbc:mysql://" + args.host
             + ":3306/biobank2", "dummy", "ozzy498");
 
+        importPass1();
+        // importPass2();
+    }
+
+    private void importPass1() throws Exception {
         Statement s = bbpdbCon.createStatement();
         s.execute(BBPDB_LOG_COUNT_QUERY);
         ResultSet rs = s.getResultSet();
@@ -132,4 +150,65 @@ public class BbpdbLogging {
 
     }
 
+    @SuppressWarnings("unused")
+    private void importPass2() throws Exception {
+        Statement s = biobank2Con.createStatement();
+        s.execute("SELECT * FROM log WHERE created_at < '2010-05-18'");
+        ResultSet rs = s.getResultSet();
+
+        while (rs.next()) {
+            Integer id = rs.getInt(1);
+            String action = rs.getString(5);
+            String details = rs.getString(9);
+            String newDetails = null;
+
+            if (details.startsWith("Visit")) {
+                if (action.equals("Select")) {
+                    Matcher visitNrMatcher = VISIT_NR_DETAILS_RE
+                        .matcher(details);
+                    if (visitNrMatcher.find()) {
+                        newDetails = convertPvDetails(new Integer(
+                            visitNrMatcher.group(1)));
+                    }
+                }
+            }
+
+            if (newDetails != null) {
+                PreparedStatement ps = biobank2Con
+                    .prepareStatement("UPDATE log SET details = ? where id = ?");
+                ps.setString(1, newDetails);
+                ps.setInt(2, id);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    private String convertPvDetails(Integer visitNr) throws Exception {
+        PreparedStatement ps = bbpdbCon.prepareStatement(BBPDB_PV_QUERY);
+        ps.setInt(1, visitNr.intValue());
+        ResultSet rs = ps.executeQuery();
+
+        if (rs == null) {
+            throw new Exception("Database query returned null");
+        }
+
+        Timestamp dateProcessed = null;
+        String worksheet = null;
+        int count = 0;
+
+        while (rs.next()) {
+            dateProcessed = rs.getTimestamp(4);
+            worksheet = rs.getString(6);
+            ++count;
+        }
+
+        if ((count == 0) || (count > 1)) {
+            LOGGER.error("could not retrieve visit number " + visitNr);
+            return null;
+        }
+
+        return "visit LOOKUP (Date Processed:"
+            + DateFormatter.formatAsDateTime(dateProcessed) + " - Worksheet:"
+            + worksheet + ")";
+    }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.Study;
 
 public class ShipmentStateLogger extends BiobankObjectStateLogger {
 
@@ -17,6 +18,8 @@ public class ShipmentStateLogger extends BiobankObjectStateLogger {
             Log log = new Log();
             String details = "";
             Date dateReceived = (Date) statesMap.get("dateReceived");
+            Study study = (Study) statesMap.get("study");
+            log.setSite(study.getSite().getNameShort());
             if (dateReceived != null) {
                 details = "Received:" + dateTimeFormatter.format(dateReceived);
             }

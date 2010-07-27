@@ -1,31 +1,31 @@
 package edu.ualberta.med.biobank.validators;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class CabinetLabelValidator extends AbstractValidator {
+/**
+ * This validator will evaluate to false if the string is less than the
+ * specified length.
+ * 
+ */
+public class StringLengthValidator extends AbstractValidator {
 
-    private static final Pattern PATTERN = Pattern
-        .compile("^\\d{2}[A-Z]{2}\\d{2}[A-Z]{2}$");
+    private int length;
 
-    public CabinetLabelValidator(String message) {
+    public StringLengthValidator(int length, String message) {
         super(message);
+        this.length = length;
     }
 
     @Override
     public IStatus validate(Object value) {
-        if (!(value instanceof String)) {
+        if ((value != null) && !(value instanceof String)) {
             throw new RuntimeException(
                 "Not supposed to be called for non-strings.");
         }
 
-        String v = (String) value;
-        Matcher m = PATTERN.matcher(v);
-        if (m.matches()) {
+        if ((value != null) && ((String) value).length() >= length) {
             hideDecoration();
             return Status.OK_STATUS;
         }

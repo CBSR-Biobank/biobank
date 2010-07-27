@@ -71,7 +71,17 @@ public class ContainerWrapper extends
         checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
+        checkHasPosition();
         super.persistChecks();
+    }
+
+    private void checkHasPosition() throws BiobankCheckException {
+        if ((getContainerType() != null)
+            && !getContainerType().getTopLevel().booleanValue()
+            && (getPosition() == null)) {
+            throw new BiobankCheckException(
+                "A child container must have a position");
+        }
     }
 
     /**
@@ -95,17 +105,6 @@ public class ContainerWrapper extends
 
     @Override
     public void persist() throws Exception {
-        // check if position was deleted
-        if (getPosition() == null) {
-            // get original position
-            ContainerPosition rawPos = wrappedObject.getPosition();
-            if (rawPos != null) {
-                AbstractPositionWrapper<ContainerPosition> pos = new ContainerPositionWrapper(
-                    appService, rawPos);
-                pos.delete();
-            }
-            wrappedObject.setPosition(null);
-        }
         super.persist();
         persistPath();
     }
@@ -158,7 +157,10 @@ public class ContainerWrapper extends
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            return parent.getContainerType().getPositionString(getPosition());
+            RowColPos pos = getPosition();
+            if (pos != null) {
+                return parent.getContainerType().getPositionString(pos);
+            }
         }
         return null;
     }
@@ -814,8 +816,8 @@ public class ContainerWrapper extends
     }
 
     /**
-     * get the containers with label label and from same site that this
-     * containerWrapper and holding sample type
+     * get the containers with label label and site siteWrapper and holding
+     * given sample type
      */
     public static List<ContainerWrapper> getContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
@@ -830,6 +832,34 @@ public class ContainerWrapper extends
                 + " left join ct.sampleTypeCollection as sampleType "
                 + " where sampleType = ?))", Arrays.asList(new Object[] {
                 siteWrapper.getId(), label, sampleType.getWrappedObject() }));
+        List<Container> containers = appService.query(criteria);
+        return transformToWrapperList(appService, containers);
+    }
+
+    public static List<ContainerWrapper> getEmptyContainersHoldingSampleType(
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        List<SampleTypeWrapper> sampleTypes, Integer rowCapacity,
+        Integer colCapacity) throws ApplicationException {
+        String typesIds = "(";
+        for (int i = 0; i < sampleTypes.size(); i++) {
+            SampleTypeWrapper st = sampleTypes.get(i);
+            typesIds += st.getId();
+            if (i != sampleTypes.size() - 1) {
+                typesIds += ", ";
+            }
+        }
+        typesIds += ")";
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where site.id = ?"
+            + " and aliquotPositionCollection.size = 0"
+            + " and containerType.capacity.rowCapacity >= ?"
+            + " and containerType.capacity.colCapacity >= ?"
+            + " and containerType.id in (select ct.id" + " from "
+            + ContainerType.class.getName() + " as ct"
+            + " left join ct.sampleTypeCollection as sampleType"
+            + " where sampleType.id in " + typesIds + ")",
+            Arrays.asList(new Object[] { siteWrapper.getId(), rowCapacity,
+                colCapacity }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }

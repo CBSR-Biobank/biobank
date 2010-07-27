@@ -130,7 +130,8 @@ public class AliquotWrapper extends
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()
                     + " does not allow inserts of sample type "
-                    + getSampleType().getName() + ".");
+                    + ((getSampleType() == null) ? "null" : getSampleType()
+                        .getName()) + ".");
             }
         }
     }

@@ -22,9 +22,9 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 public class ActivityLogDialog extends TitleAreaDialog {
 
-    Text activityLogDirText;
-    Button browseBtn;
-    Button activityLogDirBtn;
+    private Text activityLogDirText;
+    private Button browseBtn;
+    private Button activityLogDirBtn;
 
     public ActivityLogDialog(Shell parentShell) {
         super(parentShell);
@@ -96,6 +96,14 @@ public class ActivityLogDialog extends TitleAreaDialog {
         final String biobank2Dir = System.getProperty("user.home")
             + System.getProperty("file.separator") + "biobank2";
 
+<<<<<<< HEAD
+=======
+        if (new File(biobank2Dir).exists())
+            defaultPath = biobank2Dir;
+        else
+            defaultPath = System.getProperty("user.home");
+
+>>>>>>> 25064cf0ee2518387afbba3002e62db1f9c5e0aa
         activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
             | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,

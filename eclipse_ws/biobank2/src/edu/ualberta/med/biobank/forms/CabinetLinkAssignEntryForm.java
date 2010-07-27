@@ -16,7 +16,6 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
@@ -55,11 +54,10 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
-import edu.ualberta.med.biobank.validators.CabinetLabelValidator;
+import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
@@ -69,12 +67,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(CabinetLinkAssignEntryForm.class.getName());
 
+    private enum AliquotMode {
+        NEW_ALIQUOT, MOVE_ALIQUOT
+    };
+
     private LinkFormPatientManagement linkFormPatientManagement;
 
     private Label cabinetLabel;
     private Label drawerLabel;
-    private AbstractContainerDisplayWidget cabinetWidget;
-    private AbstractContainerDisplayWidget drawerWidget;
+    private ContainerDisplayWidget cabinetWidget;
+    private ContainerDisplayWidget drawerWidget;
 
     private BiobankText inventoryIdText;
     private Label oldCabinetPositionLabel;
@@ -111,7 +113,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean positionTextModified;
 
-    private CabinetLabelValidator newCabinetPositionValidator;
+    private StringLengthValidator newCabinetPositionValidator;
 
     protected boolean inventoryIdModified;
 
@@ -123,9 +125,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private static final String SAMPLE_TYPE_LIST_BINDING = "sample-type-list-binding";
 
+    private AliquotMode aliquotMode;
+
     @Override
     protected void init() throws Exception {
         super.init();
+        aliquotMode = AliquotMode.NEW_ALIQUOT;
         setPartName(Messages.getString("Cabinet.tabTitle")); //$NON-NLS-1$
         aliquot = new AliquotWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
@@ -152,7 +157,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.checkButton.validationMsg"));
 
         radioNew.setSelection(true);
-        setMoveMode(false);
+        setAliquotMode(AliquotMode.NEW_ALIQUOT);
     }
 
     private void createLocationSection() throws ApplicationException {
@@ -186,18 +191,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawerType = children.get(0);
             }
         }
-        cabinetWidget = ContainerDisplayFatory
-            .createWidget(client, cabinetType);
+        cabinetWidget = new ContainerDisplayWidget(client);
+        cabinetWidget.setContainerType(cabinetType, true);
         toolkit.adapt(cabinetWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = ContainerDisplayFatory.createWidget(client, drawerType);
+        drawerWidget = new ContainerDisplayWidget(client);
+        drawerWidget.setContainerType(drawerType, true);
         toolkit.adapt(drawerWidget);
-        GridData gdBin = new GridData();
-        gdBin.verticalSpan = 2;
-        drawerWidget.setLayoutData(gdBin);
     }
 
     private void createFieldsSection() throws ApplicationException {
@@ -219,7 +222,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioNew.getSelection()) {
-                    setMoveMode(false);
+                    setAliquotMode(AliquotMode.NEW_ALIQUOT);
                 }
             }
         });
@@ -232,7 +235,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (!radioNew.getSelection()) {
-                    setMoveMode(true);
+                    setAliquotMode(AliquotMode.MOVE_ALIQUOT);
                 }
             }
         });
@@ -382,7 +385,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.position.label"));
         newCabinetPositionLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        newCabinetPositionValidator = new CabinetLabelValidator(
+        newCabinetPositionValidator = new StringLengthValidator(4,
             Messages.getString("Cabinet.position.validationMsg"));
         displayOldCabinetFields(false);
         newCabinetPosition = (BiobankText) widgetCreator.createBoundWidget(
@@ -453,10 +456,27 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected void initContainersFromPosition() {
         try {
-            String binLabel = newCabinetPosition.getText().substring(0, 6);
-            List<ContainerWrapper> foundContainers = ContainerWrapper
-                .getContainersInSite(appService, SessionManager.getInstance()
-                    .getCurrentSite(), binLabel);
+            String fullLabel = newCabinetPosition.getText();
+            List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
+            int removeSize = 2;
+            List<String> labelsTested = new ArrayList<String>();
+            while (removeSize < 5) {
+                String binLabel = fullLabel.substring(0, fullLabel.length()
+                    - removeSize);
+                labelsTested.add(binLabel);
+                for (ContainerWrapper cont : ContainerWrapper
+                    .getContainersInSite(appService, SessionManager
+                        .getInstance().getCurrentSite(), binLabel)) {
+                    boolean canContainSamples = cont.getContainerType()
+                        .getSampleTypeCollection() != null
+                        && cont.getContainerType().getSampleTypeCollection()
+                            .size() > 0;
+                    if (canContainSamples) {
+                        foundContainers.add(cont);
+                    }
+                }
+                removeSize++;
+            }
             List<ContainerWrapper> cabinetContainers = new ArrayList<ContainerWrapper>();
             for (ContainerWrapper container : foundContainers) {
                 ContainerWrapper cont = container;
@@ -472,17 +492,20 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawer = bin.getParent();
                 cabinet = drawer.getParent();
             } else if (cabinetContainers.size() == 0) {
-                String errorMsg = Messages.getFormattedString(
-                    "Cabinet.activitylog.checkParent.error.found", binLabel); //$NON-NLS-1$
+                String errorMsg = Messages
+                    .getFormattedString(
+                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested)); //$NON-NLS-1$
                 BioBankPlugin.openAsyncError(
                     "Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);
                 return;
             } else {
-                BioBankPlugin.openAsyncError("Container problem",
-                    "More than one container found for " + binLabel //$NON-NLS-1$
-                        + " --- should do something"); //$NON-NLS-1$
+                BioBankPlugin
+                    .openAsyncError(
+                        "Container problem",
+                        "More than one container found for " + getBinLabelMessage(labelsTested) //$NON-NLS-1$
+                            + " --- should do something"); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);
                 return;
             }
@@ -491,44 +514,60 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
     }
 
-    protected void setMoveMode(boolean moveMode) {
+    private String getBinLabelMessage(List<String> labelsTested) {
+        String res = "";
+        for (int i = 0; i < labelsTested.size(); i++) {
+            if (i != 0) {
+                res += " or ";
+            }
+            res += labelsTested.get(i);
+        }
+        return res;
+    }
+
+    protected void setAliquotMode(AliquotMode mode) {
         try {
+            aliquotMode = mode;
             reset();
 
-            linkFormPatientManagement.enabledPatientText(!moveMode);
-            linkFormPatientManagement.enabledVisitsList(!moveMode);
-            linkFormPatientManagement.enableValidators(!moveMode);
-            inventoryIDValidator.setManageOldInventoryIDs(moveMode);
+            boolean enabled = (aliquotMode == AliquotMode.NEW_ALIQUOT);
+
+            linkFormPatientManagement.enabledPatientText(enabled);
+            linkFormPatientManagement.enabledVisitsList(enabled);
+            linkFormPatientManagement.enableValidators(enabled);
+            inventoryIDValidator.setManageOldInventoryIDs(!enabled);
             // Validator has change: we need to re-validate
             inventoryIDValidator.validate("");
-            displayOldCabinetFields(moveMode);
-            enableAndShowSampleTypeCombo(!moveMode);
+            displayOldCabinetFields(!enabled);
+            enableAndShowSampleTypeCombo();
             canLaunchCheck.setValue(true);
-            if (moveMode) {
-                setFirstControl(inventoryIdText);
+            if (enabled) {
+                linkFormPatientManagement.setFirstControl();
                 setFocus();
             } else {
-                linkFormPatientManagement.setFirstControl();
+                setFirstControl(inventoryIdText);
                 setFocus();
             }
             form.layout(true, true);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Error setting move mode " + moveMode, //$NON-NLS-1$
+            BioBankPlugin.openAsyncError(
+                "Error setting move mode " + aliquotMode, //$NON-NLS-1$
                 ex);
         }
     }
 
-    private void enableAndShowSampleTypeCombo(boolean enable) {
-        if (enable) {
+    private void enableAndShowSampleTypeCombo() {
+        boolean enabled = (aliquotMode == AliquotMode.NEW_ALIQUOT);
+        if (enabled) {
             widgetCreator.addBinding(SAMPLE_TYPE_LIST_BINDING);
         } else {
             widgetCreator.removeBinding(SAMPLE_TYPE_LIST_BINDING);
         }
-        viewerSampleTypes.getCombo().setEnabled(enable);
-        widgetCreator.showWidget(sampleTypeComboLabel, enable);
-        widgetCreator.showWidget(viewerSampleTypes.getCombo(), enable);
-        widgetCreator.showWidget(sampleTypeTextLabel, !enable);
-        widgetCreator.showWidget(sampleTypeText, !enable);
+        viewerSampleTypes.getCombo().setEnabled(enabled);
+        widgetCreator.showWidget(sampleTypeComboLabel, enabled);
+        widgetCreator.showWidget(viewerSampleTypes.getCombo(), enabled);
+        widgetCreator.showWidget(sampleTypeTextLabel, !enabled);
+        widgetCreator.showWidget(sampleTypeText, !enabled);
     }
 
     private void createTypeCombo(Composite fieldsComposite)
@@ -545,14 +584,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 Messages.getString("Cabinet.sampleType.validationMsg"), true, SAMPLE_TYPE_LIST_BINDING); //$NON-NLS-1$
         GridData gd = (GridData) viewerSampleTypes.getCombo().getLayoutData();
         gd.horizontalSpan = 2;
+        System.out.println("assigning selection changed listener");
         viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
+                    if (aliquotMode == AliquotMode.MOVE_ALIQUOT)
+                        return;
                     IStructuredSelection stSelection = (IStructuredSelection) viewerSampleTypes
                         .getSelection();
                     aliquot.setSampleType((SampleTypeWrapper) stSelection
                         .getFirstElement());
+                    System.out.println("aliquot sample type: "
+                        + aliquot.getSampleType());
                 }
             });
 
@@ -643,8 +687,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
      * current selected bin. Then set these types to the types combo
      * 
      * @return the size of type combo list
+     * @throws Exception
      */
     private int setTypeCombosLists() {
+        if (aliquotMode == AliquotMode.MOVE_ALIQUOT)
+            return -1;
+
         viewerSampleTypes.getCombo().setEnabled(true);
         List<SampleTypeWrapper> studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
         if (linkFormPatientManagement.getCurrentPatient() != null
@@ -693,21 +741,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         }
         viewerSampleTypes.setInput(studiesSampleTypes);
-        if (radioNew.getSelection()) {
-            viewerSampleTypes.getCombo().setEnabled(true);
-            if (studiesSampleTypes.size() == 1) {
-                viewerSampleTypes.getCombo().select(0);
-                aliquot.setSampleType(studiesSampleTypes.get(0));
-            } else {
-                viewerSampleTypes.getCombo().deselectAll();
-                aliquot.setSampleType(null);
-            }
+        viewerSampleTypes.getCombo().setEnabled(true);
+        if (studiesSampleTypes.size() == 1) {
+            viewerSampleTypes.getCombo().select(0);
+            aliquot.setSampleType(studiesSampleTypes.get(0));
         } else {
-            SampleTypeWrapper type = aliquot.getSampleType();
-            if (type != null) {
-                viewerSampleTypes.setSelection(new StructuredSelection(type));
-            }
-            viewerSampleTypes.getCombo().setEnabled(false);
+            viewerSampleTypes.getCombo().deselectAll();
+            aliquot.setSampleType(null);
         }
         return studiesSampleTypes.size();
     }
@@ -774,7 +814,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             oldCabinetPositionCheck.setText(oldCabinetPositionCheck.getText());
         }
         oldCabinetPosition.setText(positionString);
-        sampleTypeText.setText(aliquot.getSampleType().getNameShort());
+        sampleTypeText.setText(aliquot.getSampleType().getName());
         form.layout(true, true);
         appendLogNLS(
             "Cabinet.activitylog.aliquotInfo", aliquot.getInventoryId(), //$NON-NLS-1$
@@ -791,6 +831,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
+            drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
         }

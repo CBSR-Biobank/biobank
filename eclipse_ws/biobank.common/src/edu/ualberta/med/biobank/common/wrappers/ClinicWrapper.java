@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -443,10 +444,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      */
     public ShipmentWrapper getShipment(Date dateReceived) {
         List<ShipmentWrapper> shipments = getShipmentCollection();
-        if (shipments != null)
-            for (ShipmentWrapper ship : shipments)
-                if (ship.getDateReceived().equals(dateReceived))
+        if (shipments != null) {
+            for (ShipmentWrapper ship : shipments) {
+                if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0)
                     return ship;
+            }
+        }
         return null;
     }
 
@@ -458,7 +461,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         List<ShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null)
             for (ShipmentWrapper ship : shipments)
-                if (ship.getDateReceived().equals(dateReceived)) {
+                if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0) {
                     List<PatientWrapper> patients = ship.getPatientCollection();
                     for (PatientWrapper p : patients)
                         if (p.getPnumber().equals(patientNumber))

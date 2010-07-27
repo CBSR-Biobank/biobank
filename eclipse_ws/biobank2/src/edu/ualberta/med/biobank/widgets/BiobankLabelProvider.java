@@ -126,7 +126,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getNameShort();
         } else if (element instanceof SampleTypeWrapper) {
-            return ((SampleTypeWrapper) element).getName();
+            return ((SampleTypeWrapper) element).getNameShort();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {

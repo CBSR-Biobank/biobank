@@ -15,6 +15,8 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,8 +44,7 @@ import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
@@ -80,7 +81,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private BiobankText colLabel;
 
-    private AbstractContainerDisplayWidget containerWidget;
+    private ContainerDisplayWidget containerWidget;
 
     private Map<RowColPos, ContainerCell> cells;
 
@@ -219,15 +220,28 @@ public class ContainerViewForm extends BiobankViewForm {
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
-        containerWidget = ContainerDisplayFatory
-            .createWidget(client, container);
+        containerWidget = new ContainerDisplayWidget(client);
+        containerWidget.setContainer(container);
         containerWidget.initLegend();
         containerWidget.setCells(cells);
+
+        containerWidget.addDragDetectListener(new DragDetectListener() {
+
+            @Override
+            public void dragDetected(DragDetectEvent e) {
+                Cell cell = ((ContainerDisplayWidget) e.widget)
+                    .getObjectAtCoordinates(e.x, e.y);
+                containerWidget.setSelection(new RowColPos(cell.getRow(), cell
+                    .getCol()));
+
+            }
+
+        });
 
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
+                Cell cell = ((ContainerDisplayWidget) e.widget)
                     .getObjectAtCoordinates(e.x, e.y);
                 if (cell != null)
                     openFormFor((ContainerCell) cell);
@@ -492,10 +506,14 @@ public class ContainerViewForm extends BiobankViewForm {
             deleteComboList.add("All");
             deleteComboList.addAll(containerTypes);
 
-            initSelectionCv.setInput(containerTypes);
-            initSelectionCv.getCombo().select(0);
-            deleteCv.setInput(deleteComboList);
-            deleteCv.getCombo().select(0);
+            if (initSelectionCv != null) {
+                initSelectionCv.setInput(containerTypes);
+                initSelectionCv.getCombo().select(0);
+            }
+            if (deleteCv != null) {
+                deleteCv.setInput(deleteComboList);
+                deleteCv.getCombo().select(0);
+            }
 
             if (aliquotsWidget != null) {
                 aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
