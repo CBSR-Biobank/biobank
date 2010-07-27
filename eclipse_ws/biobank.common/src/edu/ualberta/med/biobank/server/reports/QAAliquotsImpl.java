@@ -7,9 +7,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class QACabinetAliquotsImpl extends AbstractReport {
-
-    private static final String CONTAINER_TYPE_NAME = "%Cabinet%";
+public class QAAliquotsImpl extends AbstractReport {
 
     private static final String QUERY = "select aliquot.aliquotPosition.container.label,"
         + " aliquot.inventoryId, aliquot.patientVisit.patient.pnumber, "
@@ -23,15 +21,12 @@ public class QACabinetAliquotsImpl extends AbstractReport {
         + " as path1, "
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.containerType.name like '"
-        + CONTAINER_TYPE_NAME
-        + "') and aliquot.patientVisit.patient.study.site "
-        + SITE_OPERATOR
-        + SITE_ID + " ORDER BY RAND()";
+        + " path2.container.containerType.nameShort like ?) and aliquot.patientVisit.patient.study.site "
+        + SITE_OPERATOR + SITE_ID + " ORDER BY RAND()";
 
     private int numResults;
 
-    public QACabinetAliquotsImpl(BiobankReport report) {
+    public QAAliquotsImpl(BiobankReport report) {
         super(QUERY, report);
         numResults = (Integer) report.getParams().remove(
             report.getParams().size() - 1);

@@ -65,13 +65,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public abstract class ReportsEditor extends BiobankFormBase {
 
     // Report
-    private ReportTreeNode node;
+    protected ReportTreeNode node;
     private BiobankReport report;
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
     // Sections
-    private Composite buttonSection;
+    protected Composite buttonSection;
     private Composite parameterSection;
     private ReportTableWidget<Object> reportTable;
 

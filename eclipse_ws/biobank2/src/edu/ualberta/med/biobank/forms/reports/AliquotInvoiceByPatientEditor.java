@@ -43,7 +43,7 @@ public class AliquotInvoiceByPatientEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Inventory ID", "Clinic", "Patient Number",
+        return new String[] { "Inventory ID", "Patient Number", "Clinic",
             "Link Date", "Sample Type" };
     }
 
