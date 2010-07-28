@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -54,14 +53,11 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
 
     private List<ActivityStatusWrapper> getActivityStatusesFromServer()
         throws ApplicationException {
-        List<ActivityStatusWrapper> activityStatusesList;
-        Collection<ActivityStatusWrapper> globalActivityStatusColl = ActivityStatusWrapper
+        List<ActivityStatusWrapper> activityStatusesList = ActivityStatusWrapper
             .getAllActivityStatuses(SessionManager.getAppService());
-        if (globalActivityStatusColl != null)
-            activityStatusesList = new ArrayList<ActivityStatusWrapper>(
-                globalActivityStatusColl);
-        else
+        if (activityStatusesList == null) {
             activityStatusesList = new ArrayList<ActivityStatusWrapper>();
+        }
         return activityStatusesList;
     }
 
@@ -86,30 +82,27 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     private boolean addOrEditActivityStatus(boolean add,
         ActivityStatusWrapper selectActivityStatus, String message) {
 
-        ActivityStatusWrapper oldActivityStatusWrapper = selectActivityStatus;
-
         ActivityStatusDialog dlg = new ActivityStatusDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(), add,
-            message,
-            oldActivityStatusWrapper != null ? oldActivityStatusWrapper
-                .getName() : null);
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            selectActivityStatus, message);
 
         if (dlg.open() == Dialog.OK) {
             try {
                 ActivityStatusWrapper newActivityStatusWrapper = dlg
-                    .getNewActivityStatus();
+                    .getActivityStatus();
 
                 if (newActivityStatusWrapper == null)
                     return false;
 
                 if (add) {
                     addActivityStatus(newActivityStatusWrapper);
-                } else {
-                    // FIXME editing activity statuses do not update the
-                    // infotable correctly
-                    removeActivityStatus(oldActivityStatusWrapper);
-                    addActivityStatus(newActivityStatusWrapper);
                 }
+                // else {
+                // // FIXME editing activity statuses do not update the
+                // // infotable correctly
+                // removeActivityStatus(oldActivityStatusWrapper);
+                // addActivityStatus(newActivityStatusWrapper);
+                // }
                 refresh();
                 notifyListeners();
                 return true;
@@ -123,7 +116,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     }
 
     public void addActivityStatusExternal() {
-        addOrEditActivityStatus(true, null, addMessage);
+        addOrEditActivityStatus(true,
+            new ActivityStatusWrapper(SessionManager.getAppService()),
+            addMessage);
     }
 
     private void addEditSupport() {
