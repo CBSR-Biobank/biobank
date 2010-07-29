@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.util;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+
 public class LabelingScheme {
 
     public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -84,6 +86,8 @@ public class LabelingScheme {
 
     /**
      * Convert a position in row*column to two letter (in the CBSR way)
+     * 
+     * @throws BiobankCheckException
      */
     public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows,
         int totalCols) {
@@ -97,7 +101,6 @@ public class LabelingScheme {
             index = totalRows * rcp.col + rcp.row;
         }
 
-        assert index < lettersLength * lettersLength;
         pos1 = index / lettersLength;
         pos2 = index % lettersLength;
 
@@ -106,6 +109,28 @@ public class LabelingScheme {
                 + String.valueOf(CBSR_LABELLING_PATTERN.charAt(pos2));
         }
         return null;
+    }
+
+    /* Check labeling scheme limits for a given gridsize */
+    public static boolean checkBounds(Integer labelingScheme, int totalRows,
+        int totalCols) {
+        int lettersLength = 0;
+        switch (labelingScheme) {
+        // FIXME: This is wrong.. but i dont understand limits for labels..
+        case 1:
+            lettersLength = SBS_ROW_LABELLING_PATTERN.length();
+            return (totalRows <= lettersLength && totalCols <= 12);
+        case 2:
+            lettersLength = CBSR_LABELLING_PATTERN.length();
+            return (totalRows * totalCols < lettersLength * lettersLength);
+        case 3:
+            return (totalRows * totalCols <= 99);
+        case 4:
+            lettersLength = CBSR_LABELLING_PATTERN.length();
+            return (totalRows * totalCols <= lettersLength);
+        default:
+            return false;
+        }
     }
 
     /**
