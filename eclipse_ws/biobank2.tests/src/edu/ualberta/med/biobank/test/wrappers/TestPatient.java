@@ -357,8 +357,8 @@ public class TestPatient extends TestDatabase {
         }
         patient.reload();
 
-        List<ShipmentWrapper> savedShipments = patient
-            .getShipmentCollection(true);
+        List<ShipmentWrapper> savedShipments = patient.getShipmentCollection(
+            true, true);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (ShipmentWrapper shipment : savedShipments) {
             Assert.assertTrue(shipments.contains(shipment));
@@ -446,7 +446,7 @@ public class TestPatient extends TestDatabase {
 
         ContainerWrapper childL1 = containerMap.get("ChildL1");
         int maxCols = childL1.getColCapacity();
-        int count = r.nextInt(5) + 1;
+        int count = 5;
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
             for (int i = 0; i < count; i++) {
