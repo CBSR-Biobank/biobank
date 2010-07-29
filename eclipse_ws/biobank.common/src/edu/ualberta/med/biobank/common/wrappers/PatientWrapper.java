@@ -102,6 +102,24 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             throw new BiobankCheckException("A patient with number \""
                 + getPnumber() + "\" already exists.");
         }
+        checkVisitsFromLinkedShipment();
+    }
+
+    private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
+        List<ShipmentWrapper> shipments = getShipmentCollection();
+        List<PatientVisitWrapper> visits = getPatientVisitCollection();
+        if (visits != null && visits.size() > 0) {
+            if (shipments == null || shipments.size() == 0) {
+                throw new BiobankCheckException(
+                    "This patient should be linked to a shipment if we want to add a visit linked to this same shipment.");
+            }
+            for (PatientVisitWrapper visit : visits) {
+                if (!shipments.contains(visit.getShipment())) {
+                    throw new BiobankCheckException(
+                        "Visits should be linked to shipment in which this patient participate.");
+                }
+            }
+        }
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
