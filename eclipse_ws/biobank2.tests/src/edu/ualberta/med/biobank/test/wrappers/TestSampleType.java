@@ -23,31 +23,16 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         String name = "testGettersAndSetters" + r.nextInt();
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(null, name);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
 
         testGettersAndSetters(type);
-    }
-
-    @Test
-    public void testGetSetSite() throws Exception {
-        String name = "testGetSite" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
-
-        Assert.assertEquals(site, type.getSite());
-
-        SiteWrapper site2 = SiteHelper.addSite(name + "SITE2");
-        type.setSite(site2);
-
-        Assert.assertEquals(site2, type.getSite());
-        Assert.assertFalse(site.equals(type.getSite()));
     }
 
     @Test
     public void testGetContainerTypeCollection() throws Exception {
         String name = "testGetContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
         List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
         sampleTypes.add(type);
         int containerTypeNber = 10;
@@ -70,7 +55,7 @@ public class TestSampleType extends TestDatabase {
     public void testGetContainerTypeCollectionBoolean() throws Exception {
         String name = "testGetContainerTypeCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
         List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
         sampleTypes.add(type);
         int containerTypeNber = 10;
@@ -108,18 +93,14 @@ public class TestSampleType extends TestDatabase {
 
         List<SampleTypeWrapper> sampleTypes1 = new ArrayList<SampleTypeWrapper>();
         List<SampleTypeWrapper> sampleTypes2 = new ArrayList<SampleTypeWrapper>();
-        SampleTypeWrapper sampleType1 = SampleTypeHelper.addSampleType(site,
-            "ST1");
+        SampleTypeWrapper sampleType1 = SampleTypeHelper.addSampleType("ST1");
         sampleTypes1.add(sampleType1);
-        SampleTypeWrapper sampleType2 = SampleTypeHelper.addSampleType(site,
-            "ST2");
+        SampleTypeWrapper sampleType2 = SampleTypeHelper.addSampleType("ST2");
         sampleTypes1.add(sampleType2);
         sampleTypes2.add(sampleType2);
-        SampleTypeWrapper sampleType3 = SampleTypeHelper.addSampleType(site,
-            "ST3");
+        SampleTypeWrapper sampleType3 = SampleTypeHelper.addSampleType("ST3");
         sampleTypes1.add(sampleType3);
-        SampleTypeWrapper sampleType4 = SampleTypeHelper.addSampleType(site,
-            "ST4");
+        SampleTypeWrapper sampleType4 = SampleTypeHelper.addSampleType("ST4");
         sampleTypes2.add(sampleType4);
         containerType1.addSampleTypes(sampleTypes1);
         int type1Size = sampleTypes1.size();
@@ -145,22 +126,21 @@ public class TestSampleType extends TestDatabase {
 
     @Test
     public void testGetGlobalSampleTypes() throws Exception {
-        int startSize = SampleTypeWrapper.getGlobalSampleTypes(appService,
+        int startSize = SampleTypeWrapper.getAllSampleTypes(appService,
             false).size();
 
         String name = "testGetGlobalSampleTypes" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleType(site, name);
-        Assert.assertEquals(startSize, SampleTypeWrapper.getGlobalSampleTypes(
-            appService, false).size());
+        SampleTypeHelper.addSampleType(name);
+        Assert.assertEquals(startSize,
+            SampleTypeWrapper.getAllSampleTypes(appService, false).size());
 
-        SampleTypeHelper.addSampleType(null, name + "_2");
+        SampleTypeHelper.addSampleType(name + "_2");
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
-            .getGlobalSampleTypes(appService, false).size());
+            .getAllSampleTypes(appService, false).size());
 
-        SampleTypeHelper.addSampleType(null, "QWERTY" + name);
-        SampleTypeHelper.addSampleType(null, "ASDFG" + name);
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        SampleTypeHelper.addSampleType("QWERTY" + name);
+        SampleTypeHelper.addSampleType("ASDFG" + name);
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, true);
         if (types.size() > 1) {
             for (int i = 0; i < types.size() - 1; i++) {
@@ -173,19 +153,19 @@ public class TestSampleType extends TestDatabase {
 
     @Test
     public void testPersistGlobalSampleTypes() throws Exception {
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         int startSize = types.size();
 
         String name = "testPersistGlobalSampleTypes" + r.nextInt();
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(null, name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         SampleTypeWrapper.persistGlobalSampleTypes(Arrays.asList(type), null);
         Assert.assertEquals(startSize + 1, SampleTypeWrapper
-            .getGlobalSampleTypes(appService, false).size());
+            .getAllSampleTypes(appService, false).size());
 
         SampleTypeWrapper.persistGlobalSampleTypes(null, Arrays.asList(type));
-        Assert.assertEquals(startSize, SampleTypeWrapper.getGlobalSampleTypes(
-            appService, false).size());
+        Assert.assertEquals(startSize,
+            SampleTypeWrapper.getAllSampleTypes(appService, false).size());
     }
 
     @Test
@@ -193,8 +173,7 @@ public class TestSampleType extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         int oldTotal = appService.search(SampleType.class, new SampleType())
             .size();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleType(site, name);
+        SampleTypeHelper.addSampleType(name);
 
         int newTotal = appService.search(SampleType.class, new SampleType())
             .size();
@@ -204,8 +183,7 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testPersistFailNoName() throws Exception {
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         type.setName(null);
         try {
             type.persist();
@@ -221,8 +199,7 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testPersistFailNoNameShort() throws Exception {
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         type.setNameShort(null);
         try {
             type.persist();
@@ -238,11 +215,9 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testPersistFailNameUnique() throws Exception {
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleType(site, name);
+        SampleTypeHelper.addSampleType(name);
 
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name
-            + "_2");
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(name + "_2");
         type.setName(name);
         try {
             type.persist();
@@ -258,10 +233,9 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testPersistFailNameShortUnique() throws Exception {
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleType(site, name);
+        SampleTypeHelper.addSampleType(name);
 
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         type.setName(name + "_2");
         try {
             type.persist();
@@ -277,9 +251,7 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name,
-            false);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name, false);
 
         // object is in database
         SampleType typeInDB = ModelUtils.getObjectWithId(appService,
@@ -297,8 +269,7 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
         type.reload();
         String oldName = type.getName();
         type.setName("toto");
@@ -309,8 +280,7 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         type.reset();
         Assert.assertEquals(null, type.getName());
     }
@@ -318,11 +288,10 @@ public class TestSampleType extends TestDatabase {
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, "QWERTY"
-            + name);
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(site, "ASDFG"
-            + name);
+        SampleTypeWrapper type = SampleTypeHelper
+            .addSampleType("QWERTY" + name);
+        SampleTypeWrapper type2 = SampleTypeHelper
+            .addSampleType("ASDFG" + name);
         Assert.assertTrue(type.compareTo(type2) > 0);
         Assert.assertTrue(type2.compareTo(type) < 0);
     }

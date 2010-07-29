@@ -22,7 +22,7 @@ public class ShipmentViewNodeSearchVisitor extends NodeSearchVisitor {
     @Override
     public AdapterBase visit(AbstractTodayNode todayNode) {
         if (wrapper instanceof ClinicWrapper) {
-            return todayNode.getChild(wrapper.getId(), true);
+            return todayNode.getChild(wrapper, true);
         }
         return visitChildren(todayNode);
     }
@@ -32,14 +32,14 @@ public class ShipmentViewNodeSearchVisitor extends NodeSearchVisitor {
         if (wrapper == null) {
             return searchedNode.getChild((int) date.getTime());
         } else if (wrapper instanceof ClinicWrapper) {
-            return searchedNode.getChild(wrapper.getId(), true);
+            return searchedNode.getChild(wrapper, true);
         }
         return visitChildren(searchedNode);
     }
 
     public AdapterBase visit(DateNode dateNode) {
         if (wrapper instanceof ClinicWrapper) {
-            return dateNode.getChild(wrapper.getId(), true);
+            return dateNode.getChild(wrapper, true);
         }
         return visitChildren(dateNode);
     }
@@ -47,7 +47,7 @@ public class ShipmentViewNodeSearchVisitor extends NodeSearchVisitor {
     @Override
     public AdapterBase visit(ClinicAdapter clinicAdapter) {
         if (wrapper instanceof ShipmentWrapper) {
-            return clinicAdapter.getChild(wrapper.getId(), true);
+            return clinicAdapter.getChild(wrapper, true);
         }
         return null;
     }

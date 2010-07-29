@@ -108,7 +108,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     private void createGlobalSampleTypeSection() throws Exception {
         Section section = createSection("Global sample types");
         List<SampleTypeWrapper> globalSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         if (globalSampleTypes == null) {
             globalSampleTypes = new ArrayList<SampleTypeWrapper>();
         }
@@ -159,7 +159,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         super.reset();
         List<SampleTypeWrapper> globalSampleTypes = null;
         try {
-            globalSampleTypes = SampleTypeWrapper.getGlobalSampleTypes(
+            globalSampleTypes = SampleTypeWrapper.getAllSampleTypes(
                 appService, true);
         } catch (ApplicationException e) {
             logger.error("Can't reset global sample types", e);

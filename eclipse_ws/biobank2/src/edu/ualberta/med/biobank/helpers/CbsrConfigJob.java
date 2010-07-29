@@ -82,7 +82,7 @@ public class CbsrConfigJob {
         appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
-            sampleTypesList = SampleTypeWrapper.getGlobalSampleTypes(
+            sampleTypesList = SampleTypeWrapper.getAllSampleTypes(
                 appService, false);
             shippingCompaniesList = ShippingMethodWrapper
                 .getShippingMethods(appService);

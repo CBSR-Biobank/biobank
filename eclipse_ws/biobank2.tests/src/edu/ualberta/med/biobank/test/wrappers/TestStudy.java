@@ -231,7 +231,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = SampleStorageHelper.addSampleStorages(study, site, name);
 
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name);
+        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
         SampleStorageWrapper newStorage = SampleStorageHelper.newSampleStorage(
             study, type);
         study.addSampleStorage(Arrays.asList(newStorage));

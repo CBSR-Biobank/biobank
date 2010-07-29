@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -18,7 +17,6 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSampleStorage extends TestDatabase {
@@ -28,7 +26,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
@@ -40,7 +38,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGetSetStudy" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
@@ -61,10 +59,9 @@ public class TestSampleStorage extends TestDatabase {
     @Test
     public void testGetSetSampleType() throws Exception {
         String name = "testGetSetSampleType" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleTypeWrapper type = DbHelper.chooseRandomlyInList(types);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
@@ -72,7 +69,7 @@ public class TestSampleStorage extends TestDatabase {
 
         Assert.assertEquals(type, sampleStorage.getSampleType());
 
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(site, name);
+        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(name);
         sampleStorage.setSampleType(newType);
         sampleStorage.persist();
 
@@ -90,7 +87,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
@@ -104,7 +101,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper ss = SampleStorageHelper.newSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
@@ -127,7 +124,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testDelete" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
@@ -150,7 +147,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));

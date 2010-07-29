@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SitePvAttr;
@@ -34,8 +33,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
     private static Map<String, PvAttrTypeWrapper> pvAttrTypeMap;
 
     private Map<String, SitePvAttrWrapper> sitePvAttrMap;
-
-    private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
 
     private Set<SitePvAttrWrapper> deletedSitePvAttr = new HashSet<SitePvAttrWrapper>();
 
@@ -60,9 +57,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
             "address", "clinicCollection", "siteCollection",
             "containerCollection", "shipmentCollection",
-            "sampleTypeCollection", "sitePvAttrCollection", "street1",
-            "street2", "city", "province", "postalCode",
-            "allSampleTypeCollection" };
+            "sitePvAttrCollection", "street1", "street2", "city", "province",
+            "postalCode" };
     }
 
     public String getName() {
@@ -544,116 +540,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<SampleTypeWrapper> getSampleTypeCollection(boolean sort) {
-        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
-            .get("sampleTypeCollection");
-        if (sampleTypeCollection == null) {
-            Collection<SampleType> children = wrappedObject
-                .getSampleTypeCollection();
-            if (children != null) {
-                sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
-                for (SampleType type : children) {
-                    sampleTypeCollection.add(new SampleTypeWrapper(appService,
-                        type));
-                }
-                propertiesMap.put("sampleTypeCollection", sampleTypeCollection);
-            }
-        }
-        if ((sampleTypeCollection != null) && sort)
-            Collections.sort(sampleTypeCollection);
-        return sampleTypeCollection;
-    }
-
-    public List<SampleTypeWrapper> getSampleTypeCollection() {
-        return getSampleTypeCollection(false);
-    }
-
-    /**
-     * Include globals sample types
-     * 
-     * @throws ApplicationException
-     */
-    @SuppressWarnings("unchecked")
-    public List<SampleTypeWrapper> getAllSampleTypeCollection(boolean sort)
-        throws ApplicationException {
-        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
-            .get("allSampleTypeCollection");
-        if (sampleTypeCollection == null) {
-            sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
-            List<SampleTypeWrapper> siteSampleTypes = getSampleTypeCollection();
-            if (siteSampleTypes != null) {
-                sampleTypeCollection.addAll(siteSampleTypes);
-            }
-            List<SampleTypeWrapper> globalSampleTypes = SampleTypeWrapper
-                .getGlobalSampleTypes(appService, false);
-            if (globalSampleTypes != null) {
-                sampleTypeCollection.addAll(globalSampleTypes);
-            }
-            propertiesMap.put("allSampleTypeCollection", sampleTypeCollection);
-        }
-        if ((sampleTypeCollection != null) && sort)
-            Collections.sort(sampleTypeCollection);
-        return sampleTypeCollection;
-    }
-
-    public List<SampleTypeWrapper> getAllSampleTypeCollection()
-        throws ApplicationException {
-        return getAllSampleTypeCollection(false);
-    }
-
-    public void addSampleTypes(List<SampleTypeWrapper> types) {
-        if (types != null && types.size() > 0) {
-            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-            Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
-            // already added types
-            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
-            if (currentList != null) {
-                for (SampleTypeWrapper type : currentList) {
-                    allTypeObjects.add(type.getWrappedObject());
-                    allTypeWrappers.add(type);
-                }
-            }
-            // new types
-            for (SampleTypeWrapper type : types) {
-                type.setSite(wrappedObject);
-                allTypeObjects.add(type.getWrappedObject());
-                allTypeWrappers.add(type);
-                deletedSampleTypes.remove(type);
-            }
-            setSampleTypes(allTypeObjects, allTypeWrappers);
-        }
-    }
-
-    public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
-        if (typesToRemove != null && typesToRemove.size() > 0) {
-            deletedSampleTypes.addAll(typesToRemove);
-            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-            Collection<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
-            // already added types
-            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
-            if (currentList != null) {
-                for (SampleTypeWrapper type : currentList) {
-                    if (!deletedSampleTypes.contains(type)) {
-                        allTypeObjects.add(type.getWrappedObject());
-                        allTypeWrappers.add(type);
-                    }
-                }
-            }
-            setSampleTypes(allTypeObjects, allTypeWrappers);
-        }
-    }
-
-    private void setSampleTypes(Collection<SampleType> allTypeObjects,
-        Collection<SampleTypeWrapper> allTypeWrappers) {
-        Collection<SampleType> oldTypes = wrappedObject
-            .getSampleTypeCollection();
-        wrappedObject.setSampleTypeCollection(allTypeObjects);
-        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldTypes, allTypeObjects);
-        propertiesMap.put("sampleTypeCollection", allTypeWrappers);
-    }
-
     protected static Map<String, PvAttrTypeWrapper> getPvAttrTypeMap(
         WritableApplicationService appService) throws ApplicationException {
         if (pvAttrTypeMap == null) {
@@ -745,7 +631,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     protected void persistDependencies(Site origObject) throws Exception {
-        deleteSampleTypes();
         persistSitePvAttr();
     }
 
@@ -767,14 +652,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         for (SitePvAttrWrapper sitePvAttr : deletedSitePvAttr) {
             if (!sitePvAttr.isNew()) {
                 sitePvAttr.delete();
-            }
-        }
-    }
-
-    private void deleteSampleTypes() throws Exception {
-        for (SampleTypeWrapper st : deletedSampleTypes) {
-            if (!st.isNew()) {
-                st.delete();
             }
         }
     }
@@ -888,7 +765,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
     protected void resetInternalField() {
         sitePvAttrMap = null;
         pvAttrTypeMap = null;
-        deletedSampleTypes.clear();
         deletedSitePvAttr.clear();
     }
 

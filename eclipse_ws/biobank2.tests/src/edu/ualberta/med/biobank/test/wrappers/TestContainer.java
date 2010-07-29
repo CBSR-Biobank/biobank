@@ -869,7 +869,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testCanHoldSample() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         List<SampleTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
@@ -907,7 +907,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGetSamples() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         List<SampleTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         List<SampleTypeWrapper> unselectedSampleTypes = new ArrayList<SampleTypeWrapper>();
@@ -1024,7 +1024,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGetContainersHoldingSampleType() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         List<SampleTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         ContainerTypeWrapper childTypeL3 = TestCommon.addSampleTypes(
@@ -1387,7 +1387,7 @@ public class TestContainer extends TestDatabase {
 
         // add a aliquot to childL4
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         PatientVisitWrapper pv = addPatientVisit();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);

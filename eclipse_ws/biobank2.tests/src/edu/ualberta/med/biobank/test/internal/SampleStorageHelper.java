@@ -32,8 +32,7 @@ public class SampleStorageHelper extends DbHelper {
         String name) throws Exception {
         int nber = r.nextInt(15) + 1;
         for (int i = 0; i < nber; i++) {
-            SampleTypeWrapper type = SampleTypeHelper.addSampleType(site, name
-                + i);
+            SampleTypeWrapper type = SampleTypeHelper.addSampleType(name + i);
             addSampleStorage(study, type);
         }
         study.reload();

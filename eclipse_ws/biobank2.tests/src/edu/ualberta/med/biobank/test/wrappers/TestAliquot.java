@@ -56,8 +56,8 @@ public class TestAliquot extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite("sitename" + r.nextInt());
         siteId = site.getId();
-        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
-            site, "sampletype" + r.nextInt());
+        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper
+            .addSampleType("sampletype" + r.nextInt());
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
@@ -173,8 +173,8 @@ public class TestAliquot extends TestDatabase {
         throws BiobankCheckException, Exception {
         SampleTypeWrapper oldSampleType = aliquot.getSampleType();
 
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(
-            oldSampleType.getSite(), "sampletype_2");
+        SampleTypeWrapper type2 = SampleTypeHelper
+            .addSampleType("sampletype_2");
         aliquot.setSampleType(type2);
         try {
             aliquot.persist();
@@ -238,8 +238,8 @@ public class TestAliquot extends TestDatabase {
     public void testDelete() throws Exception {
         aliquot.persist();
         SampleTypeWrapper type1 = aliquot.getSampleType();
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(
-            aliquot.getSite(), "sampletype_2");
+        SampleTypeWrapper type2 = SampleTypeHelper
+            .addSampleType("sampletype_2");
         SampleTypeHelper.removeFromCreated(type2);
         type2.delete();
 
@@ -363,8 +363,7 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = aliquot.getSampleType();
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(
-            aliquot.getSite(), "newStw");
+        SampleTypeWrapper newType = SampleTypeHelper.addSampleType("newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newType.getId());
         aliquot.setSampleType(newType);
@@ -382,16 +381,14 @@ public class TestAliquot extends TestDatabase {
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
-        ss1.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
-            "ss1"));
+        ss1.setSampleType(SampleTypeHelper.addSampleType("ss1"));
         ss1.setVolume(1.0);
         ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
         ss1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
-        ss2.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
-            "ss2"));
+        ss2.setSampleType(SampleTypeHelper.addSampleType("ss2"));
         ss2.setVolume(2.0);
         ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
         ss2.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
@@ -441,8 +438,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsInSite() throws Exception {
         String name = "testGetAliquotsInSite" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
-            name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
@@ -476,8 +472,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsInSiteWithPositionLabel() throws Exception {
         String name = "testGetAliquotsInSiteWithPositionLabel" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
-            name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
@@ -541,8 +536,7 @@ public class TestAliquot extends TestDatabase {
     public void testDebugRandomMethods() throws Exception {
         String name = "testDebugRandomMethods" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
-            name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);

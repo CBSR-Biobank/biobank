@@ -181,7 +181,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                         .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
                         "That sample type has already been added.");
-            type.checkNameAndShortNameUniquesForSiteAndGlobal();
+            type.checkNameAndShortNameUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;

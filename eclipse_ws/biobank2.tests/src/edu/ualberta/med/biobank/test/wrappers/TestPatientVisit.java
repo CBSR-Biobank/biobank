@@ -98,7 +98,7 @@ public class TestPatientVisit extends TestDatabase {
         ContainerTypeWrapper topType, childType;
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
@@ -207,7 +207,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         AliquotWrapper aliquot = AliquotHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), visit, 0, 0);
         visit.reload();
@@ -239,7 +239,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         int allSampleTypesCount = allSampleTypes.size();
         ContainerWrapper container = containerMap.get("ChildL1");
 
@@ -671,7 +671,7 @@ public class TestPatientVisit extends TestDatabase {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper ss1 = SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));

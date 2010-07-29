@@ -186,6 +186,29 @@ public abstract class AdapterBase {
         return children;
     }
 
+    public AdapterBase getChild(ModelWrapper<?> wrapper) {
+        return getChild(wrapper, false);
+    }
+
+    public AdapterBase getChild(ModelWrapper<?> wrapper, boolean reloadChildren) {
+        if (reloadChildren) {
+            loadChildren(false);
+        }
+        if (children.size() == 0)
+            return null;
+
+        Class<?> wrapperClass = wrapper.getClass();
+        Integer wrapperId = wrapper.getId();
+        for (AdapterBase child : children) {
+            ModelWrapper<?> childModelObject = child.getModelObject();
+            if ((childModelObject != null)
+                && childModelObject.getClass().equals(wrapperClass)
+                && child.getId().equals(wrapperId))
+                return child;
+        }
+        return null;
+    }
+
     public AdapterBase getChild(int id) {
         return getChild(id, false);
     }
@@ -198,7 +221,7 @@ public abstract class AdapterBase {
             return null;
 
         for (AdapterBase child : children) {
-            if (child.getId() == id)
+            if (child.getId().equals(id))
                 return child;
         }
         return null;
@@ -364,7 +387,7 @@ public abstract class AdapterBase {
             Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
             if (children != null) {
                 for (ModelWrapper<?> child : children) {
-                    AdapterBase node = getChild(child.getId());
+                    AdapterBase node = getChild(child);
                     if (node == null) {
                         node = createChildNode(child);
                         addChild(node);
@@ -419,7 +442,7 @@ public abstract class AdapterBase {
                                 // first see if this object is among the
                                 // children, if not then it is being loaded
                                 // for the first time
-                                AdapterBase node = getChild(child.getId());
+                                AdapterBase node = getChild(child);
                                 if (node == null) {
                                     Assert.isTrue(newNodes.size() > 0);
                                     node = newNodes.get(0);

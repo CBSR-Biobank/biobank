@@ -37,7 +37,7 @@ public class NodeSearchVisitor {
 
     public AdapterBase visit(SessionAdapter session) {
         if (wrapper instanceof SiteWrapper) {
-            return session.getChild(wrapper.getId(), true);
+            return session.getChild(wrapper, true);
         }
         return visitChildren(session);
     }
@@ -48,7 +48,7 @@ public class NodeSearchVisitor {
 
     public AdapterBase visit(StudyGroup sGroup) {
         if (wrapper instanceof StudyWrapper) {
-            return sGroup.getChild(wrapper.getId(), true);
+            return sGroup.getChild(wrapper, true);
         }
         return null;
     }
@@ -59,28 +59,28 @@ public class NodeSearchVisitor {
 
     public AdapterBase visit(PatientAdapter patient) {
         if (wrapper instanceof PatientVisitWrapper) {
-            return patient.getChild(wrapper.getId(), true);
+            return patient.getChild(wrapper, true);
         }
         return visitChildren(patient);
     }
 
     public AdapterBase visit(SampleTypeAdapter sampleType) {
         if (wrapper instanceof AliquotWrapper) {
-            return sampleType.getChild(wrapper.getId(), true);
+            return sampleType.getChild(wrapper, true);
         }
         return null;
     }
 
     public AdapterBase visit(ClinicGroup clinics) {
         if (wrapper instanceof ClinicWrapper) {
-            return clinics.getChild(wrapper.getId(), true);
+            return clinics.getChild(wrapper, true);
         }
         return null;
     }
 
     public AdapterBase visit(ContainerTypeGroup stGroup) {
         if (wrapper instanceof ContainerTypeWrapper) {
-            return stGroup.getChild(wrapper.getId(), true);
+            return stGroup.getChild(wrapper, true);
         }
         return null;
     }
@@ -91,7 +91,7 @@ public class NodeSearchVisitor {
             if (container.getContainerType() != null) {
                 if (Boolean.TRUE.equals(container.getContainerType()
                     .getTopLevel())) {
-                    return scGroup.getChild(wrapper.getId(), true);
+                    return scGroup.getChild(wrapper, true);
                 } else {
                     List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
                     ContainerWrapper currentContainer = container;
@@ -141,7 +141,7 @@ public class NodeSearchVisitor {
     private AdapterBase visitChildContainers(ContainerAdapter container,
         final List<ContainerWrapper> parents) {
         if (parents.contains(container.getContainer())) {
-            AdapterBase child = container.getChild(wrapper.getId(), true);
+            AdapterBase child = container.getChild(wrapper, true);
             if (child == null) {
                 for (AdapterBase childContainer : container.getChildren()) {
                     AdapterBase foundChild;
@@ -164,7 +164,7 @@ public class NodeSearchVisitor {
 
     public AdapterBase visit(ShipmentAdapter shipment) {
         if (wrapper instanceof PatientVisitWrapper) {
-            return shipment.getChild(wrapper.getId(), true);
+            return shipment.getChild(wrapper, true);
         }
         return null;
     }

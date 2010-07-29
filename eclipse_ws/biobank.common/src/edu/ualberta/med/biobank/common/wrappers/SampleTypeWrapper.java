@@ -12,14 +12,11 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SampleTypeWrapper extends ModelWrapper<SampleType> {
-
-    private SiteWrapper site;
 
     public SampleTypeWrapper(WritableApplicationService appService,
         SampleType wrappedObject) {
@@ -32,8 +29,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "site",
-            "containerTypeCollection" };
+        return new String[] { "name", "nameShort", "containerTypeCollection" };
     }
 
     public String getName() {
@@ -55,34 +51,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         wrappedObject.setNameShort(nameShort);
         propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
             nameShort);
-    }
-
-    public SiteWrapper getSite() {
-        if (site == null) {
-            Site s = wrappedObject.getSite();
-            if (s == null)
-                return null;
-            site = new SiteWrapper(appService, s);
-        }
-        return site;
-    }
-
-    protected void setSite(Site site) {
-        if (site == null)
-            this.site = null;
-        else
-            this.site = new SiteWrapper(appService, site);
-        Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
-    public void setSite(SiteWrapper site) {
-        if (site == null) {
-            setSite((Site) null);
-        } else {
-            setSite(site.getWrappedObject());
-        }
     }
 
     /**
@@ -125,44 +93,23 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         ApplicationException {
         checkNotEmpty(getName(), "Name");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNameAndShortNameUniquesForSiteAndGlobal();
+        checkNameAndShortNameUnique();
     }
 
-    public void checkNameAndShortNameUniquesForSiteAndGlobal()
-        throws ApplicationException, BiobankCheckException {
-        Integer siteId = null;
-        String siteMsg = ".";
-        String globalMsg = "";
-        if (getSite() == null) {
-            globalMsg = "global";
-            siteMsg = " or is used by a site.";
-        } else {
-            siteId = getSite().getId();
-            siteMsg = " for site " + getSite().getNameShort()
-                + " or in global types.";
-        }
-        checkNoDuplicatesInSiteAndGlobal("name", getName(), siteId, "A "
-            + globalMsg + " sample type with name \"" + getName()
-            + "\" already exists" + siteMsg);
+    public void checkNameAndShortNameUnique() throws ApplicationException,
+        BiobankCheckException {
+        checkNoDuplicates("name", getName(), "A sample type with name \""
+            + getName() + "\" already exists");
 
-        checkNoDuplicatesInSiteAndGlobal("nameShort", getNameShort(), siteId,
-            "A " + globalMsg + " sample type with short name \""
-                + getNameShort() + "\" already exists" + siteMsg);
+        checkNoDuplicates("nameShort", getNameShort(),
+            "A sample type with short name \"" + getNameShort()
+                + "\" already exists");
     }
 
-    private void checkNoDuplicatesInSiteAndGlobal(String propertyName,
-        String value, Integer siteId, String errorMessage)
-        throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { value }));
-        String siteTest = "";
-        if (siteId != null) {
-            // if Sample Type is for a specific site: check the property does
-            // not exists for this site, nor for global types
-            siteTest = " and (site.id=? or site.id is null)";
-            parameters.add(siteId);
-        }
-        // if global type, check the name is use nowhere
+    private void checkNoDuplicates(String propertyName, String value,
+        String errorMessage) throws ApplicationException, BiobankCheckException {
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { value }));
 
         String notSameObject = "";
         if (!isNew()) {
@@ -171,7 +118,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
             + SampleType.class.getName() + " where " + propertyName + "=? "
-            + siteTest + notSameObject, parameters);
+            + notSameObject, parameters);
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -213,11 +160,10 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
     }
 
-    public static List<SampleTypeWrapper> getGlobalSampleTypes(
+    public static List<SampleTypeWrapper> getAllSampleTypes(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName()
-            + " where site = null");
+        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName());
 
         List<SampleType> sampleTypes = appService.query(c);
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -238,22 +184,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         Exception {
         if (addedOrModifiedTypes != null) {
             for (SampleTypeWrapper ss : addedOrModifiedTypes) {
-                if (ss.getSite() == null) {
-                    ss.persist();
-                } else {
-                    throw new WrapperException(
-                        "Trying to add/modify a non global sample type");
-                }
+                ss.persist();
             }
         }
         if (typesToDelete != null) {
             for (SampleTypeWrapper ss : typesToDelete) {
-                if (ss.getSite() == null) {
-                    ss.delete();
-                } else {
-                    throw new WrapperException(
-                        "Trying to delete a non global sample type");
-                }
+                ss.delete();
             }
         }
     }
@@ -279,8 +215,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         BiobankCheckException {
         String queryString = "select count(s) from " + Aliquot.class.getName()
             + " as s where s.sampleType=?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject }));
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -291,7 +227,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     public void reload() throws Exception {
         super.reload();
-        site = null;
     }
 
 }

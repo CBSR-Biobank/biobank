@@ -39,7 +39,7 @@ public class ConfigSite {
             return;
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         if ((allSampleTypes == null) || (allSampleTypes.size() == 0)) {
             throw new Exception("no global sample types found in the database");
         }

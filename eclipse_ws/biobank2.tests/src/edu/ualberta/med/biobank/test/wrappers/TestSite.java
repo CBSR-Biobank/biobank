@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -187,105 +186,6 @@ public class TestSite extends TestDatabase {
         // one container added
         Assert.assertEquals(totalContainers + 1, site.getContainerCollection()
             .size());
-    }
-
-    @Test
-    public void testGetSampleTypeCollection() throws Exception {
-        String name = "testGetSampleTypeCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-
-        List<SampleTypeWrapper> types = site.getSampleTypeCollection();
-        int sizeFound = types.size();
-
-        Assert.assertEquals(nber, sizeFound);
-    }
-
-    @Test
-    public void testGetSampleTypeCollectionBoolean() throws Exception {
-        String name = "testGetSampleTypeCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleTypes(site, name);
-
-        List<SampleTypeWrapper> types = site.getSampleTypeCollection(true);
-        if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
-                SampleTypeWrapper type1 = types.get(i);
-                SampleTypeWrapper type2 = types.get(i + 1);
-                Assert.assertTrue(type1.compareTo(type2) <= 0);
-            }
-        }
-    }
-
-    @Test
-    public void testAddSampleTypes() throws Exception {
-        String name = "testAddSampleTypes" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
-        site.addSampleTypes(Arrays.asList(type));
-        site.persist();
-
-        site.reload();
-        // one container added
-        Assert.assertEquals(nber + 1, site.getSampleTypeCollection().size());
-    }
-
-    @Test
-    public void testRemoveSampleTypes() throws Exception {
-        String name = "testRemoveSampleTypes" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-
-        SampleTypeWrapper type = DbHelper.chooseRandomlyInList(site
-            .getSampleTypeCollection());
-        int idContainer = type.getId();
-        site.removeSampleTypes(Arrays.asList(type));
-        // don't need to delete the type, thanks to method
-        // deleteSampleTypeDifference of persistDependencies
-        SampleTypeHelper.removeFromCreated(type);
-        site.persist();
-
-        site.reload();
-        // one type removed
-        Assert.assertEquals(nber - 1, site.getSampleTypeCollection().size());
-
-        // type should not be anymore in the type collection
-        // (removed the good one)
-        for (SampleTypeWrapper t : site.getSampleTypeCollection()) {
-            Assert.assertFalse(t.getId().equals(idContainer));
-        }
-    }
-
-    @Test
-    public void testGetAllSampleTypeCollection() throws Exception {
-        String name = "testGetAllSampleTypeCollection" + r.nextInt();
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
-            appService, false);
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-        site.persist();
-
-        site.reload();
-        List<SampleTypeWrapper> all = site.getAllSampleTypeCollection();
-        Assert.assertEquals(nber + types.size(), all.size());
-    }
-
-    @Test
-    public void testGetAllSampleTypeCollectionBoolean() throws Exception {
-        String name = "testGetAllSampleTypeCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleTypes(site, name);
-
-        List<SampleTypeWrapper> types = site.getAllSampleTypeCollection(true);
-        if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
-                SampleTypeWrapper type1 = types.get(i);
-                SampleTypeWrapper type2 = types.get(i + 1);
-                Assert.assertTrue(type1.compareTo(type2) <= 0);
-            }
-        }
     }
 
     @Test
@@ -752,7 +652,7 @@ public class TestSite extends TestDatabase {
         study2.persist();
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
             "Pallet96", "P96", 2, 8, 12, true);
         ctype.addSampleTypes(allSampleTypes);
