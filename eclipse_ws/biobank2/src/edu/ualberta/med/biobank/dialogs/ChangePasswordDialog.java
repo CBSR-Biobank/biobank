@@ -15,15 +15,16 @@ import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.handlers.LogoutHandler;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
-public class PasswordChangeDialog extends TitleAreaDialog {
+public class ChangePasswordDialog extends TitleAreaDialog {
 
     Text oldPassText;
     Text newPass1Text;
     Text newPass2Text;
 
-    public PasswordChangeDialog(Shell parentShell) {
+    public ChangePasswordDialog(Shell parentShell) {
         super(parentShell);
 
         GridLayout gl = new GridLayout(3, true);
@@ -79,7 +80,7 @@ public class PasswordChangeDialog extends TitleAreaDialog {
             @Override
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
-                if (text.getText().length() < 5)
+                if (text.getText().length() < 1)
                     setErrorMessage("Please enter your new password (atleast 5 characters)");
                 else {
                     setErrorMessage(null);
@@ -113,7 +114,7 @@ public class PasswordChangeDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
-        if ((this.newPass1Text.getText().length() < 5)) {
+        if ((this.newPass1Text.getText().length() < 1)) {
             newPass1Text.notifyListeners(SWT.Modify, new Event());
             return;
         }
@@ -122,9 +123,17 @@ public class PasswordChangeDialog extends TitleAreaDialog {
             return;
         }
         try {
+
             ((BiobankApplicationService) SessionManager.getAppService())
                 .modifyPassword(this.oldPassText.getText(),
                     this.newPass2Text.getText());
+            /*
+             * TODO instead of logging the user out, update all references to
+             * the old password
+             */
+            LogoutHandler lh = new LogoutHandler();
+            lh.execute(null);
+
             super.okPressed();
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error changing password", e);

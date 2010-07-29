@@ -19,14 +19,17 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
  */
 public class MoveContainerDialog extends BiobankDialog {
 
-    private ContainerWrapper container;
+    private ContainerWrapper srcContainer;
+    private ContainerWrapper dstContainer;
 
     private IObservableValue newLabel = new WritableValue("", String.class);
 
-    public MoveContainerDialog(Shell parent, ContainerWrapper container) {
+    public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
+        ContainerWrapper dstContainer) {
         super(parent);
-        Assert.isNotNull(container);
-        this.container = container;
+        Assert.isNotNull(srcContainer);
+        this.srcContainer = srcContainer;
+        this.dstContainer = dstContainer;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class MoveContainerDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle("Move Container " + container.getLabel());
+        setTitle("Move Container " + srcContainer.getLabel());
         setMessage("Select the destination for this container.");
         return contents;
     }
@@ -50,10 +53,14 @@ public class MoveContainerDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
-            "Destination Address", null, newLabel, new StringLengthValidator(2,
+        BiobankText bbt = (BiobankText) createBoundWidgetWithLabel(contents,
+            BiobankText.class, SWT.FILL, "Destination Address", null, newLabel,
+            new StringLengthValidator(2,
                 "Destination label must be another container "
                     + "(4 characters minimum)."));
+
+        if (this.dstContainer != null)
+            bbt.setText(this.dstContainer.getLabel());
     }
 
     public String getNewLabel() {

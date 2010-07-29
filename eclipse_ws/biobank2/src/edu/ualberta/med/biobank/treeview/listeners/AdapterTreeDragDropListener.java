@@ -104,10 +104,14 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
             return;
         }
         TreeItem item = (TreeItem) event.item;
+
         ModelWrapper<?> wrapper = ((AdapterBase) (item.getData()))
             .getModelObject();
+
         if (wrapper != null && (wrapper instanceof ContainerWrapper)) {
             ContainerWrapper dstContainer = (ContainerWrapper) wrapper;
+            ContainerAdapter containerAdapter = new ContainerAdapter(
+                (AdapterBase) item.getParent().getData(), this.srcContainer);
 
             if (dstContainer != null) {
 
@@ -120,6 +124,8 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                     // TODO implement the moving of containers here.
                     System.out.println("Valid Drag Detected:");
                     System.out.println(srcContainer + " --> " + dstContainer);
+                    moveContainerTo(containerAdapter);
+
                     return;
                 } else {
                     BioBankPlugin
@@ -161,6 +167,11 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     public void dragFinished(DragSourceEvent event) {
         srcContainer = null;
         dstLocationSelected = false;
+    }
+
+    /* TODO move containers in tree view */
+    private void moveContainerTo(ContainerAdapter containerAdapter) {
+        // containerAdapter.moveAliquots();
     }
 
 }

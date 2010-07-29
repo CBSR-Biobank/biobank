@@ -8,7 +8,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.dialogs.PasswordChangeDialog;
+import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 
 public class ChangePasswordHandler extends AbstractHandler implements IHandler {
 
@@ -17,7 +17,7 @@ public class ChangePasswordHandler extends AbstractHandler implements IHandler {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                PasswordChangeDialog dlgx = new PasswordChangeDialog(PlatformUI
+                ChangePasswordDialog dlgx = new ChangePasswordDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell());
                 dlgx.open();
 
