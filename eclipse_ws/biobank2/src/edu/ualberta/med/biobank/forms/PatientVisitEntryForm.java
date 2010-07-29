@@ -11,12 +11,14 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -32,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -78,6 +81,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             setDirty(true);
         }
     };
+
+    private List<ShipmentWrapper> allShipments;
+
+    private ArrayList<ShipmentWrapper> recentShipments;
 
     @Override
     public void init() {
@@ -143,28 +150,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Patient",
             patient.getPnumber());
 
-        List<ShipmentWrapper> allShipments = patient.getShipmentCollection();
-        List<ShipmentWrapper> recentShipments = new ArrayList<ShipmentWrapper>();
-        // filter for last 7 days
-        Calendar c = Calendar.getInstance();
-        for (ShipmentWrapper shipment : allShipments) {
-            c.setTime(shipment.getDateReceived());
-            c.add(Calendar.DAY_OF_MONTH, 7);
-            if (c.getTime().after(new Date()))
-                recentShipments.add(shipment);
-        }
-        ShipmentWrapper selectedShip = null;
-        if (!patientVisit.isNew()) {
-            selectedShip = patientVisit.getShipment();
-            // need to add into the list, to be able to see it.
-            recentShipments.add(selectedShip);
-        } else if (recentShipments.size() == 1) {
-            selectedShip = recentShipments.get(0);
-        }
-        shipmentsComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Shipment", recentShipments, selectedShip,
-            "A shipment should be selected");
-        setFirstControl(shipmentsComboViewer.getControl());
+        createShipmentsCombo(client);
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
@@ -183,6 +169,72 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null,
             BeansObservables.observeValue(patientVisit, "comment"), null);
+    }
+
+    private void createShipmentsCombo(Composite client) throws Exception {
+        ShipmentWrapper selectedShip = initShipmentsCollections();
+
+        Label label = widgetCreator.createLabel(client, "Shipment");
+
+        Composite composite = new Composite(client, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 0;
+        layout.marginWidth = 0;
+        composite.setLayout(layout);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        composite.setLayoutData(gd);
+        toolkit.adapt(composite);
+        toolkit.paintBordersFor(composite);
+
+        shipmentsComboViewer = widgetCreator
+            .createComboViewerWithNoSelectionValidator(composite, label,
+                recentShipments, selectedShip, "A shipment should be selected",
+                false, null);
+        setFirstControl(shipmentsComboViewer.getControl());
+
+        if (((BiobankApplicationService) SessionManager.getAppService())
+            .isWebsiteAdministrator()) {
+            final Button shipmentsListCheck = toolkit.createButton(composite,
+                "Last 7 days", SWT.CHECK);
+            shipmentsListCheck.setSelection(true);
+            shipmentsListCheck.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    ISelection currentSelection = shipmentsComboViewer
+                        .getSelection();
+                    if (shipmentsListCheck.getSelection()) {
+                        shipmentsComboViewer.setInput(recentShipments);
+                    } else {
+                        shipmentsComboViewer.setInput(allShipments);
+                    }
+                    shipmentsComboViewer.setSelection(currentSelection);
+                }
+            });
+        }
+    }
+
+    private ShipmentWrapper initShipmentsCollections() {
+        allShipments = patient.getShipmentCollection(true, false);
+        recentShipments = new ArrayList<ShipmentWrapper>();
+        // filter for last 7 days
+        Calendar c = Calendar.getInstance();
+        for (ShipmentWrapper shipment : allShipments) {
+            c.setTime(shipment.getDateReceived());
+            c.add(Calendar.DAY_OF_MONTH, 7);
+            if (c.getTime().after(new Date()))
+                recentShipments.add(shipment);
+        }
+        ShipmentWrapper selectedShip = null;
+        if (!patientVisit.isNew()) {
+            selectedShip = patientVisit.getShipment();
+            // need to add into the list, to be able to see it.
+            recentShipments.add(selectedShip);
+        } else if (recentShipments.size() == 1) {
+            selectedShip = recentShipments.get(0);
+        }
+        return selectedShip;
     }
 
     private void createSourcesSection() {
