@@ -451,7 +451,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getString("Cabinet.position.label"));
             oldCabinetPositionCheck.setText(oldCabinetPosition.getText());
         }
-        form.layout(true, true);
+        page.layout(true, true);
     }
 
     protected void initContainersFromPosition() {
@@ -548,7 +548,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 setFirstControl(inventoryIdText);
                 setFocus();
             }
-            form.layout(true, true);
+            page.layout(true, true);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError(
                 "Error setting move mode " + aliquotMode, //$NON-NLS-1$
@@ -815,7 +815,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
         oldCabinetPosition.setText(positionString);
         sampleTypeText.setText(aliquot.getSampleType().getName());
-        form.layout(true, true);
+        page.layout(true, true);
         appendLogNLS(
             "Cabinet.activitylog.aliquotInfo", aliquot.getInventoryId(), //$NON-NLS-1$
             positionString);
@@ -835,7 +835,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
         }
-        form.layout(true, true);
+        page.layout(true, true);
+        book.reflow(true);
     }
 
     private void hidePositions() {
