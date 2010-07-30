@@ -57,8 +57,7 @@ import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
@@ -76,8 +75,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private Label cabinetLabel;
     private Label drawerLabel;
-    private AbstractContainerDisplayWidget cabinetWidget;
-    private AbstractContainerDisplayWidget drawerWidget;
+    private ContainerDisplayWidget cabinetWidget;
+    private ContainerDisplayWidget drawerWidget;
 
     private BiobankText inventoryIdText;
     private Label oldCabinetPositionLabel;
@@ -192,18 +191,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawerType = children.get(0);
             }
         }
-        cabinetWidget = ContainerDisplayFatory
-            .createWidget(client, cabinetType);
+        cabinetWidget = new ContainerDisplayWidget(client);
+        cabinetWidget.setContainerType(cabinetType, true);
         toolkit.adapt(cabinetWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = ContainerDisplayFatory.createWidget(client, drawerType);
+        drawerWidget = new ContainerDisplayWidget(client);
+        drawerWidget.setContainerType(drawerType, true);
         toolkit.adapt(drawerWidget);
-        GridData gdBin = new GridData();
-        gdBin.verticalSpan = 2;
-        drawerWidget.setLayoutData(gdBin);
     }
 
     private void createFieldsSection() throws ApplicationException {
@@ -587,7 +584,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 Messages.getString("Cabinet.sampleType.validationMsg"), true, SAMPLE_TYPE_LIST_BINDING); //$NON-NLS-1$
         GridData gd = (GridData) viewerSampleTypes.getCombo().getLayoutData();
         gd.horizontalSpan = 2;
-        System.out.println("assigning selection changed listener");
         viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -598,8 +594,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         .getSelection();
                     aliquot.setSampleType((SampleTypeWrapper) stSelection
                         .getFirstElement());
-                    System.out.println("aliquot sample type: "
-                        + aliquot.getSampleType());
                 }
             });
 
@@ -834,6 +828,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
+            drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
         }

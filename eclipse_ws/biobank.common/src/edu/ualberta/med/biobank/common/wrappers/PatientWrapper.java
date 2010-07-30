@@ -100,6 +100,24 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             throw new BiobankCheckException("A patient with number \""
                 + getPnumber() + "\" already exists.");
         }
+        checkVisitsFromLinkedShipment();
+    }
+
+    private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
+        List<ShipmentWrapper> shipments = getShipmentCollection();
+        List<PatientVisitWrapper> visits = getPatientVisitCollection();
+        if (visits != null && visits.size() > 0) {
+            if (shipments == null || shipments.size() == 0) {
+                throw new BiobankCheckException(
+                    "This patient should be linked to a shipment if we want to add a visit linked to this same shipment.");
+            }
+            for (PatientVisitWrapper visit : visits) {
+                if (!shipments.contains(visit.getShipment())) {
+                    throw new BiobankCheckException(
+                        "Visits should be linked to shipment in which this patient participate.");
+                }
+            }
+        }
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
@@ -130,8 +148,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                     @Override
                     public int compare(PatientVisitWrapper pv1,
                         PatientVisitWrapper pv2) {
-                        int res = pv1.getDateProcessed().compareTo(
-                            pv2.getDateProcessed());
+                        int res = pv1.compareTo(pv2);
                         if (ascending) {
                             return res;
                         }
@@ -208,7 +225,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * Shipment.setPatientCollection method
      */
     @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
+        final boolean ascending) {
         List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (shipmentCollection == null) {
@@ -223,14 +241,26 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             }
         }
-        if (sort) {
-            Collections.sort(shipmentCollection);
+
+        if (sort && shipmentCollection != null) {
+            Collections.sort(shipmentCollection,
+                new Comparator<ShipmentWrapper>() {
+                    @Override
+                    public int compare(ShipmentWrapper ship1,
+                        ShipmentWrapper ship2) {
+                        int res = ship1.compareTo(ship2);
+                        if (ascending) {
+                            return res;
+                        }
+                        return -res;
+                    }
+                });
         }
         return shipmentCollection;
     }
 
     public List<ShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(false);
+        return getShipmentCollection(false, true);
     }
 
     @Override

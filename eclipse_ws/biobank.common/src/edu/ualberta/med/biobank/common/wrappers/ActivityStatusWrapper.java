@@ -1,7 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,9 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
+        checkNoDuplicates(ActivityStatus.class, "name", getName(),
+            "An activity status with name \"" + getName()
+                + "\" already exists.");
     }
 
     @Override
@@ -79,7 +83,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return 0;
     }
 
-    public static Collection<ActivityStatusWrapper> getAllActivityStatuses(
+    public static List<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
 
         Map<String, ActivityStatusWrapper> activityStatusMap = new HashMap<String, ActivityStatusWrapper>();
@@ -91,7 +95,10 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
             activityStatusMap.put(ac.getName(), new ActivityStatusWrapper(
                 appService, ac));
         }
-        return activityStatusMap.values();
+        List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>(
+            activityStatusMap.values());
+        Collections.sort(activities);
+        return activities;
     }
 
     // TODO test getActivityStatus

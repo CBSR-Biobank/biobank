@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -73,8 +74,8 @@ public class SampleStorageDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY));
         if (origSampleStorage.getSampleType() == null) {
             setTitle("New Sample Storage");
         } else {
@@ -114,7 +115,7 @@ public class SampleStorageDialog extends BiobankDialog {
             .createComboViewerWithNoSelectionValidator(
                 contents,
                 "Activity Status",
-                ActivityStatusWrapper.getAllActivityStatuses(sampleStorage
+                ActivityStatusWrapper.getAllActivityStatuses(SessionManager
                     .getAppService()), sampleStorage.getActivityStatus(),
                 "A sample type should be selected");
         activityStatusComboViewer
@@ -135,9 +136,9 @@ public class SampleStorageDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Volume (ml)", new String[0], PojoObservables.observeValue(
-                sampleStorage, "volume"), new DoubleNumberValidator(
-                "Volume should be a real number", false));
+            "Volume (ml)", new String[0],
+            PojoObservables.observeValue(sampleStorage, "volume"),
+            new DoubleNumberValidator("Volume should be a real number", false));
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Quantity", new String[0], PojoObservables.observeValue(

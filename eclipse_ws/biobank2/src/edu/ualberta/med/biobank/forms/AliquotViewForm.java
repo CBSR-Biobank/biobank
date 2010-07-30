@@ -16,8 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 
 public class AliquotViewForm extends BiobankViewForm {
 
@@ -148,8 +147,9 @@ public class AliquotViewForm extends BiobankViewForm {
                     .createLabel(containerComposite, container.getLabel()
                         + " (" + container.getContainerType().getNameShort()
                         + ") ");
-                AbstractContainerDisplayWidget containerWidget = ContainerDisplayFatory
-                    .createWidget(containerComposite, container);
+                ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
+                    containerComposite);
+                containerWidget.setContainer(container);
                 containerWidget.setSelection(position);
                 toolkit.adapt(containerWidget);
             }

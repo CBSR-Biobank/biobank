@@ -607,10 +607,9 @@ public abstract class AdapterBase {
     }
 
     public void openViewForm() {
-        String formId = getViewFormId();
-        if (formId == null)
-            return;
-        openForm(new FormInput(this), formId);
+        if (getViewFormId() != null) {
+            openForm(new FormInput(this), getViewFormId());
+        }
     }
 
     public void openEntryForm() {

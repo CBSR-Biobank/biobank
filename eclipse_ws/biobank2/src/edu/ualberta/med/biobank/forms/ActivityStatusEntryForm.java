@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ActivityStatusEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -17,10 +16,6 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 public class ActivityStatusEntryForm extends BiobankEntryForm {
 
     private ActivityStatusEntryInfoTable activityStatusTable;
-
-    @SuppressWarnings("unused")
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ActivityStatusEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm";
     public static final String OK_MESSAGE = "View and edit activity statuses.";

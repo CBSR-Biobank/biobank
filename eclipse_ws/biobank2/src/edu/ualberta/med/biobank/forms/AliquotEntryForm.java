@@ -62,19 +62,23 @@ public class AliquotEntryForm extends BiobankEntryForm {
         List<SampleStorageWrapper> allowedSampleStorage = study
             .getSampleStorageCollection();
 
-        ContainerTypeWrapper ct = aliquot.getParent().getContainerType();
-        ct.reload();
-
-        List<SampleTypeWrapper> containerSampleTypeList = ct
-            .getSampleTypeCollection();
+        List<SampleTypeWrapper> containerSampleTypeList = null;
+        if (aliquot.hasParent()) {
+            ContainerTypeWrapper ct = aliquot.getParent().getContainerType();
+            ct.reload();
+            containerSampleTypeList = ct.getSampleTypeCollection();
+        }
 
         List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
-
         for (SampleStorageWrapper ss : allowedSampleStorage) {
             SampleTypeWrapper sst = ss.getSampleType();
-            for (SampleTypeWrapper st : containerSampleTypeList) {
-                if (sst.equals(st))
-                    sampleTypes.add(st);
+            if (containerSampleTypeList == null) {
+                sampleTypes.add(sst);
+            } else {
+                for (SampleTypeWrapper st : containerSampleTypeList) {
+                    if (sst.equals(st))
+                        sampleTypes.add(st);
+                }
             }
         }
 

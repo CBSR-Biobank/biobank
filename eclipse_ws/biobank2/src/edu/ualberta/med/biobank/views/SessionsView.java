@@ -19,7 +19,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
 
     @Override
     public void createPartControl(Composite parent) {
-        adaptersTree = new AdapterTreeWidget(parent, this, false);
+        adaptersTree = new AdapterTreeWidget(parent, false);
         getSite().setSelectionProvider(getTreeViewer());
         rootNode = SessionManager.getInstance().getRootNode();
         getTreeViewer().setInput(rootNode);

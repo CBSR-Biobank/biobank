@@ -23,9 +23,9 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 public class ActivityLogDialog extends TitleAreaDialog {
 
-    Text activityLogDirText;
-    Button browseBtn;
-    Button activityLogDirBtn;
+    private Text activityLogDirText;
+    private Button browseBtn;
+    private Button activityLogDirBtn;
 
     public ActivityLogDialog(Shell parentShell) {
         super(parentShell);

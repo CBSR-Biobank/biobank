@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.server.logging.logger;
 import java.util.Date;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.Site;
 
 public class ShipmentStateLogger extends BiobankObjectStateLogger {
 
@@ -18,8 +18,8 @@ public class ShipmentStateLogger extends BiobankObjectStateLogger {
             Log log = new Log();
             String details = "";
             Date dateReceived = (Date) statesMap.get("dateReceived");
-            Site site = (Site) statesMap.get("site");
-            log.setSite(site.getNameShort());
+            Clinic clinic = (Clinic) statesMap.get("clinic");
+            log.setSite(clinic.getSite().getNameShort());
             if (dateReceived != null) {
                 details = "Received:" + dateTimeFormatter.format(dateReceived);
             }
