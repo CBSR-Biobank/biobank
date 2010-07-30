@@ -119,7 +119,8 @@ public class ReportsView extends AbstractViewWithTree<AbstractReportTreeNode> {
 
         root.addChild(standard);
         standard.setParent(root);
-        root.addChild(advanced);
+        // FIXME: Advanced reports temporarily disabled
+        // root.addChild(advanced);
         advanced.setParent(root);
         getTreeViewer().setInput(root);
         getTreeViewer().expandAll();
