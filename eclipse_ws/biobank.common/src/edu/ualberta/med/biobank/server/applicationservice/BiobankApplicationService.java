@@ -48,7 +48,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
         String targetClassName) throws ApplicationException;
 
     public void logActivity(String action, String site, String patientNumber,
-        String inventoryID, String locationLabel, String details, String type);
+        String inventoryID, String locationLabel, String details, String type)
+        throws Exception;
 
     public List<Object> launchReport(BiobankReport report)
         throws ApplicationException;

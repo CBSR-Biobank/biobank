@@ -568,7 +568,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void log(String action, String site, String details) {
+    protected void log(String action, String site, String details)
+        throws Exception {
         String worksheet = "";
         try {
             String attr = getPvAttrValue("Worksheet");

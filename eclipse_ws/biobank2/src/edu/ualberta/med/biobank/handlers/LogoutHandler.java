@@ -18,7 +18,11 @@ public class LogoutHandler extends AbstractHandler {
             .getActivePage();
         // close all editors
         if (activePage.closeAllEditors(true))
-            SessionManager.getInstance().deleteSession();
+            try {
+                SessionManager.getInstance().deleteSession();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         return null;
     }
 }

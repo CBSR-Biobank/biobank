@@ -483,10 +483,14 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 BioBankPlugin.openAsyncError("Error saving to PDF", e);
                 return;
             }
-            ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("exportPDF", SessionManager.getInstance()
-                    .getCurrentSite().getNameShort(), null, null, null,
-                    report.getName(), "report");
+            try {
+                ((BiobankApplicationService) SessionManager.getAppService())
+                    .logActivity("exportPDF", SessionManager.getInstance()
+                        .getCurrentSite().getNameShort(), null, null, null,
+                        report.getName(), "report");
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Error logging export", e);
+            }
         } else {
             try {
                 ReportingUtils.printReport(createDynamicReport(
@@ -495,10 +499,14 @@ public abstract class ReportsEditor extends BiobankFormBase {
                 BioBankPlugin.openAsyncError("Printer Error", e);
                 return;
             }
-            ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("print", SessionManager.getInstance()
-                    .getCurrentSite().getNameShort(), null, null, null,
-                    report.getName(), "report");
+            try {
+                ((BiobankApplicationService) SessionManager.getAppService())
+                    .logActivity("print", SessionManager.getInstance()
+                        .getCurrentSite().getNameShort(), null, null, null,
+                        report.getName(), "report");
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Error logging print", e);
+            }
         }
     }
 
