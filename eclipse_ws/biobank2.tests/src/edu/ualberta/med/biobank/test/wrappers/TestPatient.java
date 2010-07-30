@@ -312,7 +312,8 @@ public class TestPatient extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
         patient.reload();
 
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
