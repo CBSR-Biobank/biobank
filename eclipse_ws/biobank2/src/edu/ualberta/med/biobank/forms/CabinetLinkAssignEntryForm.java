@@ -584,7 +584,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 Messages.getString("Cabinet.sampleType.validationMsg"), true, SAMPLE_TYPE_LIST_BINDING); //$NON-NLS-1$
         GridData gd = (GridData) viewerSampleTypes.getCombo().getLayoutData();
         gd.horizontalSpan = 2;
-        System.out.println("assigning selection changed listener");
         viewerSampleTypes
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
@@ -595,8 +594,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         .getSelection();
                     aliquot.setSampleType((SampleTypeWrapper) stSelection
                         .getFirstElement());
-                    System.out.println("aliquot sample type: "
-                        + aliquot.getSampleType());
                 }
             });
 

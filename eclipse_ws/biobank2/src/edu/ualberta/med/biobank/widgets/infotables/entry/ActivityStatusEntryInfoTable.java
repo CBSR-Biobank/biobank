@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -40,6 +39,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     private String editMessage;
     private SiteWrapper currentSite;
 
+    List<ActivityStatusWrapper> addedOrModifiedStatuses = new ArrayList<ActivityStatusWrapper>();
+    List<ActivityStatusWrapper> deletedStatuses = new ArrayList<ActivityStatusWrapper>();
+
     public ActivityStatusEntryInfoTable(Composite parent, String addMessage,
         String editMessage, SiteWrapper currentSite)
         throws ApplicationException {
@@ -49,36 +51,30 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
         this.currentSite = currentSite;
         this.localActivityStatuses = getActivityStatusesFromServer();
         addEditSupport();
-        refresh();
+        setCollection(localActivityStatuses);
     }
 
     private List<ActivityStatusWrapper> getActivityStatusesFromServer()
         throws ApplicationException {
-        List<ActivityStatusWrapper> activityStatusesList;
-        Collection<ActivityStatusWrapper> globalActivityStatusColl = ActivityStatusWrapper
+        List<ActivityStatusWrapper> activityStatusesList = ActivityStatusWrapper
             .getAllActivityStatuses(SessionManager.getAppService());
-        if (globalActivityStatusColl != null)
-            activityStatusesList = new ArrayList<ActivityStatusWrapper>(
-                globalActivityStatusColl);
-        else
+        if (activityStatusesList == null) {
             activityStatusesList = new ArrayList<ActivityStatusWrapper>();
+        }
         return activityStatusesList;
     }
 
     public void reset() throws ApplicationException {
-        this.loadTableData(getActivityStatusesFromServer());
+        localActivityStatuses = getActivityStatusesFromServer();
+        reloadCollection(localActivityStatuses);
     }
 
     public void save() throws Exception {
-        List<ActivityStatusWrapper> serverActivityStatuses = getActivityStatusesFromServer();
-
-        for (ActivityStatusWrapper aws : localActivityStatuses) {
-            if (!serverActivityStatuses.contains(aws))
-                aws.persist();
+        for (ActivityStatusWrapper aws : addedOrModifiedStatuses) {
+            aws.persist();
         }
-        for (ActivityStatusWrapper aws : serverActivityStatuses) {
-            if (!localActivityStatuses.contains(aws))
-                aws.delete();
+        for (ActivityStatusWrapper aws : deletedStatuses) {
+            aws.delete();
         }
     }
 
@@ -86,31 +82,27 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     private boolean addOrEditActivityStatus(boolean add,
         ActivityStatusWrapper selectActivityStatus, String message) {
 
-        ActivityStatusWrapper oldActivityStatusWrapper = selectActivityStatus;
-
         ActivityStatusDialog dlg = new ActivityStatusDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(), add,
-            message,
-            oldActivityStatusWrapper != null ? oldActivityStatusWrapper
-                .getName() : null);
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            selectActivityStatus, message);
 
         if (dlg.open() == Dialog.OK) {
             try {
-                ActivityStatusWrapper newActivityStatusWrapper = dlg
-                    .getNewActivityStatus();
-
-                if (newActivityStatusWrapper == null)
-                    return false;
-
-                if (add) {
-                    addActivityStatus(newActivityStatusWrapper);
-                } else {
-                    // FIXME editing activity statuses do not update the
-                    // infotable correctly
-                    removeActivityStatus(oldActivityStatusWrapper);
-                    addActivityStatus(newActivityStatusWrapper);
+                ActivityStatusWrapper statusCopy = dlg.getActivityStatusCopy();
+                String newName = statusCopy.getName();
+                for (ActivityStatusWrapper activity : localActivityStatuses) {
+                    if (activity.getName().equals(newName)) {
+                        throw new BiobankCheckException(
+                            "Activity status with name " + newName
+                                + " already exists.");
+                    }
                 }
-                refresh();
+                selectActivityStatus.setName(statusCopy.getName());
+                if (add) {
+                    localActivityStatuses.add(selectActivityStatus);
+                }
+                addedOrModifiedStatuses.add(selectActivityStatus);
+                reloadCollection(localActivityStatuses);
                 notifyListeners();
                 return true;
 
@@ -123,7 +115,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     }
 
     public void addActivityStatusExternal() {
-        addOrEditActivityStatus(true, null, addMessage);
+        addOrEditActivityStatus(true,
+            new ActivityStatusWrapper(SessionManager.getAppService()),
+            addMessage);
     }
 
     private void addEditSupport() {
@@ -146,16 +140,16 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                ActivityStatusWrapper ActivityStatus = getSelection();
-                if (ActivityStatus != null) {
+                ActivityStatusWrapper activityStatus = getSelection();
+                if (activityStatus != null) {
                     try {
-                        if (!ActivityStatus.isNew()
-                            && ActivityStatus.isActive()) {
+                        if (!activityStatus.isNew()
+                            && activityStatus.isActive()) {
                             BioBankPlugin
                                 .openError(
                                     "Activity Status Delete Error",
                                     "Cannot delete activity status \""
-                                        + ActivityStatus.getName()
+                                        + activityStatus.getName()
                                         + "\" since created activity statuses are using it.");
                             return;
                         }
@@ -164,11 +158,12 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                             .getWorkbench().getActiveWorkbenchWindow()
                             .getShell(), "Delete Activity Status",
                             "Are you sure you want to delete activity status\""
-                                + ActivityStatus.getName() + "\"?")) {
+                                + activityStatus.getName() + "\"?")) {
                             return;
                         }
-                        removeActivityStatus(ActivityStatus);
-
+                        localActivityStatuses.remove(activityStatus);
+                        deletedStatuses.add(activityStatus);
+                        reloadCollection(localActivityStatuses);
                         notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
                         BioBankPlugin.openRemoteConnectErrorMessage();
@@ -179,42 +174,6 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 }
             }
         });
-    }
-
-    public void refresh() {
-        loadTableData(this.localActivityStatuses);
-    }
-
-    private void removeActivityStatus(ActivityStatusWrapper asw) {
-        for (ActivityStatusWrapper i : this.localActivityStatuses) {
-            if (i.getName().equals(asw.getName())) {
-                this.localActivityStatuses.remove(asw);
-                break;
-            }
-        }
-        this.refresh();
-    }
-
-    private void addActivityStatus(ActivityStatusWrapper asw)
-        throws BiobankCheckException {
-        for (ActivityStatusWrapper i : this.localActivityStatuses) {
-            if (i.getName().equals(asw.getName())) {
-                throw new BiobankCheckException(
-                    "Activity status already added.");
-            }
-        }
-        this.localActivityStatuses.add(asw);
-        this.refresh();
-    }
-
-    private void loadTableData(
-        List<ActivityStatusWrapper> activityStatusCollection) {
-
-        reloadCollection(activityStatusCollection);
-        this.localActivityStatuses = activityStatusCollection;
-
-        this.update();
-        this.redraw();
     }
 
     public SiteWrapper getCurrentSite() {

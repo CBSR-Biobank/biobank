@@ -345,9 +345,6 @@ public class BiobankApplicationServiceImpl extends
                         if (password != null) {
                             userDTO.setPassword("******");
                         }
-                        if (userDTO.getLogin().equals("newuser")) {
-                            System.out.println("*********" + password);
-                        }
                         userDTO.setEmail(serverUser.getEmailId());
                         List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
                         for (Object o : upm.getGroups(serverUser.getUserId()

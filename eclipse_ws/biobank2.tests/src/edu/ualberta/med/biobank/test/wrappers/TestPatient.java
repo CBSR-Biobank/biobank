@@ -312,6 +312,7 @@ public class TestPatient extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        patient.reload();
 
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
@@ -357,8 +358,8 @@ public class TestPatient extends TestDatabase {
         }
         patient.reload();
 
-        List<ShipmentWrapper> savedShipments = patient
-            .getShipmentCollection(true);
+        List<ShipmentWrapper> savedShipments = patient.getShipmentCollection(
+            true, true);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (ShipmentWrapper shipment : savedShipments) {
             Assert.assertTrue(shipments.contains(shipment));
@@ -426,27 +427,23 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient1 = PatientHelper.addPatient(patientName, study);
         PatientWrapper patient2 = PatientHelper.addPatient(patientName + "_2",
             study);
-        patient1.delete();
-        study.reload();
 
-        // create new patient with patient visits
-        patient1 = PatientHelper.addPatient(Utils.getRandomNumericString(20),
-            study);
         addContainerTypes();
         addContainers();
         addClinic(patient1);
         patient1.persist();
         ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
-        shipment.addPatients(Arrays.asList(patient1));
+        shipment.addPatients(Arrays.asList(patient1, patient2));
         shipment.persist();
         patient1.reload();
+        patient2.reload();
 
         shipment = patient1.getShipmentCollection().get(0);
         Assert.assertNotNull(shipment);
 
         ContainerWrapper childL1 = containerMap.get("ChildL1");
         int maxCols = childL1.getColCapacity();
-        int count = r.nextInt(5) + 1;
+        int count = 5;
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
             for (int i = 0; i < count; i++) {

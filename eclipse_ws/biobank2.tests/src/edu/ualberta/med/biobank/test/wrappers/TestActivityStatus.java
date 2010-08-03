@@ -15,6 +15,16 @@ import edu.ualberta.med.biobank.test.Utils;
 
 public class TestActivityStatus extends TestDatabase {
 
+    private List<ActivityStatusWrapper> addedstatus = new ArrayList<ActivityStatusWrapper>();
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        for (ActivityStatusWrapper a : addedstatus) {
+            a.delete();
+        }
+    }
+
     @Test
     public void testConstructors() throws Exception {
         new ActivityStatusWrapper(appService);
@@ -25,9 +35,38 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
+        String name = "testDelete" + r.nextInt();
+        ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
+        as.setName(name);
+        as.persist();
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        as.delete();
+        List<ActivityStatusWrapper> allActivityStatuses = ActivityStatusWrapper
+            .getAllActivityStatuses(appService);
+        int after = allActivityStatuses.size();
+        Assert.assertEquals(before - 1, after);
+        Assert.assertFalse(allActivityStatuses.contains(as));
 
+    }
+
+    @Test
+    public void testDeleteFail() throws Exception {
+        String name = "testDeleteFail" + r.nextInt();
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
+        as.setName(name);
+        as.persist();
+        addedstatus.add(as);
+        int after = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        Assert.assertEquals(before + 1, after);
+
+        ActivityStatusWrapper activeAs = ActivityStatusWrapper
+            .getActivityStatus(appService, name);
+
+        // FIXME delete should test we can't remove a used activity status ?
         try {
             activeAs.delete();
             Assert.fail("should not be allowed to delete activity status");
@@ -45,14 +84,40 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testPersist() throws Exception {
-        ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
-        ActivityStatusWrapper as = new ActivityStatusWrapper(appService,
-            activeAs.getWrappedObject());
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        String name = "testPersist" + r.nextInt();
+        ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
+        as.setName(name);
+        as.persist();
+        addedstatus.add(as);
 
+        List<ActivityStatusWrapper> statuses = ActivityStatusWrapper
+            .getAllActivityStatuses(appService);
+        int after = statuses.size();
+        Assert.assertEquals(before + 1, after);
+        Assert.assertTrue(statuses.contains(as));
+    }
+
+    @Test
+    public void testPersistFail() throws Exception {
+        String name = "testPersistFail" + r.nextInt();
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
+        as.setName(name);
+        as.persist();
+        addedstatus.add(as);
+        int after = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        Assert.assertEquals(before + 1, after);
+
+        ActivityStatusWrapper newAs = new ActivityStatusWrapper(appService);
+        newAs.setName(name);
         try {
-            as.persist();
-            Assert.fail("should not be allowed to add objects to the database");
+            newAs.persist();
+            Assert.fail("Cannot have 2 statuses with same name");
+            addedstatus.add(newAs);
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
@@ -100,8 +165,8 @@ public class TestActivityStatus extends TestDatabase {
         ActivityStatusWrapper.getActivityStatus(appService, "Active");
 
         try {
-            ActivityStatusWrapper.getActivityStatus(appService, Utils
-                .getRandomString(15, 20));
+            ActivityStatusWrapper.getActivityStatus(appService,
+                Utils.getRandomString(15, 20));
             Assert
                 .fail("should not be allowed to retreive invalid activity status");
         } catch (BiobankCheckException bce) {
