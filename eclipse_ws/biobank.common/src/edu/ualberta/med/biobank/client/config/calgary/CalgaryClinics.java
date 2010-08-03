@@ -18,8 +18,8 @@ public class CalgaryClinics extends ConfigClinics {
             "Foothills Medical Centre", "1403 29 Street", "Calgary", "Alberta",
             "t2n2t9");
 
-        addContact("CL1-Foothills", "Morna Brown", null, "403-944-4057",
-            "403-944-1745", "morna.brown@calgaryhealthregion.ca");
+        addContact("CL1-Foothills", "Andrijana Lawton", "Research Coordinator",
+            "403-210-7356", "", "Andrijana.Lawton@albertahealthservices.ca");
     }
 
 }
