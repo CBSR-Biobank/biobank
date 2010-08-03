@@ -51,7 +51,8 @@ import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.PalletLabelValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.grids.GridContainerWidget;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -68,11 +69,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private ComboViewer palletTypesViewer;
 
     private Label freezerLabel;
-    private GridContainerWidget freezerWidget;
+    private ContainerDisplayWidget freezerWidget;
     private Label palletLabel;
     private ScanPalletWidget palletWidget;
     private Label hotelLabel;
-    private GridContainerWidget hotelWidget;
+    private ContainerDisplayWidget hotelWidget;
 
     protected ContainerWrapper currentPalletWrapper;
 
@@ -376,18 +377,20 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         freezerComposite.setLayoutData(gdFreezer);
         freezerLabel = toolkit.createLabel(freezerComposite, "Freezer"); //$NON-NLS-1$
         freezerLabel.setLayoutData(new GridData());
-        freezerWidget = new GridContainerWidget(freezerComposite);
+        freezerWidget = new ContainerDisplayWidget(freezerComposite);
+        freezerWidget.initDisplayFromType(true);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setGridSizes(5, 10, ScanPalletWidget.PALLET_WIDTH, 100);
+        freezerWidget.setDisplaySize(ScanPalletDisplay.PALLET_WIDTH, 100);
 
         Composite hotelComposite = toolkit.createComposite(containersComposite);
         hotelComposite.setLayout(getNeutralGridLayout());
         hotelComposite.setLayoutData(new GridData());
         hotelLabel = toolkit.createLabel(hotelComposite, "Hotel"); //$NON-NLS-1$
-        hotelWidget = new GridContainerWidget(hotelComposite);
+        hotelWidget = new ContainerDisplayWidget(hotelComposite);
+        hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
-        hotelWidget.setGridSizes(11, 1, 100,
-            ScanPalletWidget.PALLET_HEIGHT_AND_LEGEND);
+        hotelWidget.setDisplaySize(100,
+            ScanPalletDisplay.PALLET_HEIGHT_AND_LEGEND);
 
         Composite palletComposite = toolkit
             .createComposite(containersComposite);
@@ -603,10 +606,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             freezerLabel.setText(freezerContainer.getFullInfoLabel());
             freezerWidget.setContainerType(freezerContainer.getContainerType());
             freezerWidget.setSelection(hotelContainer.getPosition());
+            freezerWidget.redraw();
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setContainerType(hotelContainer.getContainerType());
             hotelWidget.setSelection(currentPalletWrapper.getPosition());
+            hotelWidget.redraw();
 
             palletLabel.setText(currentPalletWrapper.getLabel());
         }
@@ -889,7 +894,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         reset(false);
         fieldsComposite.setEnabled(true);
         showOnlyPallet(true);
-        form.layout(true);
+        form.layout(true, true);
         palletproductBarcodeText.setFocus();
         setCanLaunchScan(false);
     }

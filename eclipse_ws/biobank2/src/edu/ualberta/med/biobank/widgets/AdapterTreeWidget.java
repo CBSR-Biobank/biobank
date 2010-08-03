@@ -18,22 +18,19 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
-import edu.ualberta.med.biobank.views.IAdapterTreeView;
 import edu.ualberta.med.biobank.views.TreeFilter;
 
 public class AdapterTreeWidget extends Composite {
 
     private TreeViewer treeViewer;
 
-    public AdapterTreeWidget(Composite parent,
-        final IAdapterTreeView parentView, boolean patternFilter) {
+    public AdapterTreeWidget(Composite parent, boolean patternFilter) {
         super(parent, SWT.NONE);
 
         setLayout(new FillLayout());
@@ -49,7 +46,6 @@ public class AdapterTreeWidget extends Composite {
         } else {
             treeViewer = new TreeViewer(this);
         }
-
         treeViewer.setLabelProvider(new NodeLabelProvider());
         treeViewer.setContentProvider(new NodeContentProvider());
         treeViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -63,7 +59,7 @@ public class AdapterTreeWidget extends Composite {
                 Object element = ((StructuredSelection) selection)
                     .getFirstElement();
                 ((AdapterBase) element).performDoubleClick();
-                parentView.getTreeViewer().expandToLevel(element, 1);
+                treeViewer.expandToLevel(element, 1);
             }
         });
         treeViewer.addTreeListener(new ITreeViewerListener() {
@@ -99,8 +95,7 @@ public class AdapterTreeWidget extends Composite {
             }
         });
 
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
+        Menu menu = new Menu(parent.getShell(), SWT.NONE);
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {

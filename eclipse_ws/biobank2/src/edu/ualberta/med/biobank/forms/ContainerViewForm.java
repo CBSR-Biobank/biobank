@@ -42,8 +42,7 @@ import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.grids.AbstractContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayFatory;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
@@ -80,7 +79,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private BiobankText colLabel;
 
-    private AbstractContainerDisplayWidget containerWidget;
+    private ContainerDisplayWidget containerWidget;
 
     private Map<RowColPos, ContainerCell> cells;
 
@@ -219,14 +218,14 @@ public class ContainerViewForm extends BiobankViewForm {
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
-        containerWidget = ContainerDisplayFatory
-            .createWidget(client, container);
+        containerWidget = new ContainerDisplayWidget(client);
+        containerWidget.setContainer(container);
         containerWidget.initLegend();
         containerWidget.setCells(cells);
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                Cell cell = ((AbstractContainerDisplayWidget) e.widget)
+                Cell cell = ((ContainerDisplayWidget) e.widget)
                     .getObjectAtCoordinates(e.x, e.y);
                 if (cell != null)
                     openFormFor((ContainerCell) cell);
@@ -266,8 +265,8 @@ public class ContainerViewForm extends BiobankViewForm {
             if (canCreate) {
                 // Initialisation action for selection
                 initSelectionCv = createComboViewer(childrenActionSection,
-                    "Initialize selection to", containerTypes, containerTypes
-                        .get(0));
+                    "Initialize selection to", containerTypes,
+                    containerTypes.get(0));
                 Button initializeSelectionButton = toolkit.createButton(
                     childrenActionSection, "Initialize", SWT.PUSH);
                 initializeSelectionButton
@@ -476,10 +475,14 @@ public class ContainerViewForm extends BiobankViewForm {
             deleteComboList.add("All");
             deleteComboList.addAll(containerTypes);
 
-            initSelectionCv.setInput(containerTypes);
-            initSelectionCv.getCombo().select(0);
-            deleteCv.setInput(deleteComboList);
-            deleteCv.getCombo().select(0);
+            if (initSelectionCv != null) {
+                initSelectionCv.setInput(containerTypes);
+                initSelectionCv.getCombo().select(0);
+            }
+            if (deleteCv != null) {
+                deleteCv.setInput(deleteComboList);
+                deleteCv.getCombo().select(0);
+            }
 
             if (aliquotsWidget != null) {
                 aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
