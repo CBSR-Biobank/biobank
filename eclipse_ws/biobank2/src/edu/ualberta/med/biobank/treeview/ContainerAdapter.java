@@ -110,7 +110,7 @@ public class ContainerAdapter extends AdapterBase {
         addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
     }
 
-    protected void moveAliquots() {
+    public void moveAliquots() {
         final MoveAliquotsToDialog mc = new MoveAliquotsToDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());

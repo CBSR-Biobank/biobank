@@ -150,6 +150,7 @@ public class SearchView extends ViewPart {
             @Override
             public void run() {
                 String searchString = searchText.getText().trim();
+
                 SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
                     .getSelection()).getFirstElement();
                 try {
