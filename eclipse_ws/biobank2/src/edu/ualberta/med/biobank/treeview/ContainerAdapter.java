@@ -154,6 +154,7 @@ public class ContainerAdapter extends AdapterBase {
                     newContainerAdapter.performDoubleClick();
                 }
                 getContainer().reload();
+                SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
                 BioBankPlugin.openError(e.getMessage(), e);
             }
