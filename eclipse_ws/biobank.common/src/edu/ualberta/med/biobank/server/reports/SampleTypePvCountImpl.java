@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.PatientVisit;
 
@@ -24,9 +22,8 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + SITE_ID
         + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateProcessed";
 
-    public SampleTypePvCountImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY, parameters, options);
+    public SampleTypePvCountImpl(BiobankReport report) {
+        super(QUERY, report);
     }
 
 }

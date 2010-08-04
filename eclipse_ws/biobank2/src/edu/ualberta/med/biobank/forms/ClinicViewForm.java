@@ -144,7 +144,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
         clinic.reload();
         setPartName("Clinic: " + clinic.getName());
         form.setText("Clinic: " + clinic.getName());

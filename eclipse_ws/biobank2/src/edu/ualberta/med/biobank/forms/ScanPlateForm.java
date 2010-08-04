@@ -133,7 +133,7 @@ public class ScanPlateForm extends PlateForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
     }
 
     protected void scanPlate() {

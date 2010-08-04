@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 
@@ -15,13 +13,13 @@ public class AliquotSCountImpl extends AbstractReport {
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
-        + "') and Alias.patientVisit.patient.study.site "
+        + "') and Alias.linkDate between ? and ? and Alias.patientVisit.patient.study.site "
         + SITE_OPERATOR
         + SITE_ID
         + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name";
 
-    public AliquotSCountImpl(List<Object> parameters, List<ReportOption> options) {
-        super(QUERY, parameters, options);
+    public AliquotSCountImpl(BiobankReport report) {
+        super(QUERY, report);
     }
 
 }

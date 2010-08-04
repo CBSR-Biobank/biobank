@@ -93,7 +93,7 @@ public class SessionManager {
         updateMenus();
     }
 
-    public void deleteSession() {
+    public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         siteManager.setEnabled(false);
         rootNode.removeChild(sessionAdapter);

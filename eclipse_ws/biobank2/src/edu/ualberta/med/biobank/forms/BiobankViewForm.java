@@ -5,18 +5,18 @@ import java.util.Map;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.springframework.remoting.RemoteConnectFailureException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -107,50 +107,35 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     }
 
     protected void addToolbarButtons() {
-        Action reloadAction = new Action("Reload") {
-            @Override
-            public void run() {
-                BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            reload();
-                        } catch (final RemoteConnectFailureException exp) {
-                            BioBankPlugin.openRemoteConnectErrorMessage();
-                        } catch (Exception e) {
-                            logger.error(
-                                "BioBankFormBase.createPartControl Error", e);
-                        }
-                    }
-                });
-            }
-        };
-        reloadAction.setImageDescriptor(reloadActionImage);
-        form.getToolBarManager().add(reloadAction);
-
-        if ((adapter != null) && adapter.isEditable()
-            && adapter.getEntryFormId() != null) {
-            Action edit = new Action("Edit") {
-                @Override
-                public void run() {
-                    BusyIndicator.showWhile(Display.getDefault(),
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                getSite().getPage().closeEditor(
-                                    BiobankViewForm.this, false);
-                                adapter.openEntryForm();
-                            }
-                        });
-                }
-            };
-            edit.setImageDescriptor(editActionImage);
-            form.getToolBarManager().add(edit);
-        }
-
-        form.updateToolBar();
+        addReloadAction();
+        addEditAction();
     }
 
-    protected abstract void reload() throws Exception;
+    public void edit() {
+        getSite().getPage().closeEditor(BiobankViewForm.this, false);
+        adapter.openEntryForm();
+    }
+
+    protected void addEditAction() {
+        CommandContributionItem edit = new CommandContributionItem(
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Edit",
+                "edu.ualberta.med.biobank.commands.edit", null,
+                editActionImage, null, null, "Edit", "Edit", "Edit", SWT.NONE,
+                "Edit", true));
+        form.getToolBarManager().add(edit);
+    }
+
+    protected void addReloadAction() {
+        CommandContributionItem reload = new CommandContributionItem(
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Reload",
+                "edu.ualberta.med.biobank.commands.reload", null,
+                reloadActionImage, null, null, "Reload", "Reload", "Reload",
+                SWT.NONE, "Reload", true));
+        form.getToolBarManager().add(reload);
+    }
+
+    public abstract void reload() throws Exception;
 
 }

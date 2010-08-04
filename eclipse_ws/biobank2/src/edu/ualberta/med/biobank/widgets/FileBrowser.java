@@ -74,4 +74,8 @@ public class FileBrowser extends BiobankWidget {
         return text;
     }
 
+    public String getFilePath() {
+        return textfield.getText();
+    }
+
 }

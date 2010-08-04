@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
@@ -18,7 +18,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + " as pv where pv.patient = p and pv.shipment.clinic = c.clinic and"
         + " s=p.study and pv.dateProcessed between ? and ?) {0} {1})";
 
-    private static String QUERY_STRING = "select s.nameShort, c.clinic.name, "
+    private static String QUERY_STRING = "select s.nameShort, c.clinic.nameShort, "
         + MessageFormat.format(PVCOUNT_STRING, "=", "1")
         + ", "
         + MessageFormat.format(PVCOUNT_STRING, "=", "2")
@@ -37,24 +37,21 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + PatientVisit.class.getName()
         + " as patients where patients.shipment.clinic=c.clinic and"
         + " patients.patient.study=s and patients.dateProcessed between ? and ?)"
-        + " from " + Study.class.getName()
+        + " from "
+        + Study.class.getName()
         + " as s inner join s.contactCollection as c where s.site.id "
         + SITE_OPERATOR + SITE_ID + " ORDER BY s.nameShort";
 
-    public PatientVisitSummaryImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY_STRING, parameters, options);
-        for (int i = 0; i < options.size(); i++) {
-            ReportOption option = options.get(i);
-            if (parameters.get(i) == null)
-                parameters.set(i, option.getDefaultValue());
-        }
+    public PatientVisitSummaryImpl(BiobankReport report) {
+        super(QUERY_STRING, report);
+        List<Object> parameters = report.getParams();
         int size = parameters.size();
         for (int j = 0; j < 6; j++) {
             for (int i = 0; i < size; i++) {
                 parameters.add(parameters.get(i));
             }
         }
+        report.setParams(parameters);
     }
 
     @Override

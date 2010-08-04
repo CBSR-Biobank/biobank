@@ -539,7 +539,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    protected void log(String action, String site, String details) {
+    protected void log(String action, String site, String details)
+        throws Exception {
         String fullDetails = "shipment " + details + " - Received:"
             + getFormattedDateReceived();
         String waybill = getWaybill();

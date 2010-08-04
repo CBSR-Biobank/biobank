@@ -436,7 +436,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             .closeEditor(this, saveOnClose);
         if (openView && getNextOpenedFormID() != null) {
             AdapterBase.openForm(new FormInput(getAdapter()),
-                getNextOpenedFormID(), true);
+                getNextOpenedFormID(), false);
 
             int previousFormIndex = entryIndex - 1;
             if (previousFormIndex >= 0
@@ -454,7 +454,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             adapter.resetObject();
             boolean openView = adapter.getModelObject() != null
                 && !adapter.getModelObject().isNew();
-            closeEntryOpenView(false, openView);
+            closeEntryOpenView(true, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e);
         }

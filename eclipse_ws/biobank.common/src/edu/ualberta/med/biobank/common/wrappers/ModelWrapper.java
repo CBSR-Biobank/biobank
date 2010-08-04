@@ -513,18 +513,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrappedObject(otherWrapper.wrappedObject);
     }
 
-    public void logLookup(String site) {
+    public void logLookup(String site) throws Exception {
         log("select", site, "LOOKUP");
     }
 
-    public void logEdit(String site) {
+    public void logEdit(String site) throws Exception {
         if (!isNew()) {
             log("edit", site, "EDIT");
         }
     }
 
     @SuppressWarnings("unused")
-    protected void log(String action, String site, String details) {
+    protected void log(String action, String site, String details)
+        throws Exception {
 
     }
 }

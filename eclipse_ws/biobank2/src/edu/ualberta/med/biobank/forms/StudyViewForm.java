@@ -222,7 +222,7 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
         study.reload();
         setPartName("Study " + study.getNameShort());
         form.setText("Study: " + study.getName());

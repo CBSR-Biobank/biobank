@@ -44,12 +44,13 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.CustomQueryObject;
 import edu.ualberta.med.biobank.client.reports.advanced.HQLField;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryObject;
 import edu.ualberta.med.biobank.client.reports.advanced.QueryTreeNode;
 import edu.ualberta.med.biobank.client.reports.advanced.SearchUtils;
+import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
 import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -80,7 +81,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
 
     private ReportTableWidget<Object> reportTable;
     private List<Object> reportData;
-    private ReportTreeNode node;
+    private AdvancedReportTreeNode node;
 
     private QueryTree tree;
     private QueryTreeNode selectedNode;
@@ -103,8 +104,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         top.setLayout(layout);
         top.setLayoutData(gdfill);
 
-        tree = new QueryTree(top, SWT.BORDER,
-            ((QueryTreeNode) node.getQuery()).clone());
+        tree = new QueryTree(top, SWT.BORDER, node.getQueryTreeNode().clone());
         tree.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -152,19 +152,20 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                 SaveReportDialog dlg = new SaveReportDialog(PlatformUI
                     .getWorkbench().getActiveWorkbenchWindow().getShell());
                 if (dlg.open() == Dialog.OK) {
-                    ReportTreeNode custom = null;
+                    AdvancedReportTreeNode custom = null;
                     if (node.getParent().getLabel().compareTo("Advanced") == 0) {
-                        List<ReportTreeNode> siblings = node.getParent()
-                            .getChildren();
-                        for (ReportTreeNode sibling : siblings) {
+                        List<AbstractReportTreeNode> siblings = node
+                            .getParent().getChildren();
+                        for (AbstractReportTreeNode sibling : siblings) {
                             if (sibling.getLabel().compareTo("Custom") == 0) {
-                                custom = sibling;
+                                custom = (AdvancedReportTreeNode) sibling;
                             }
                         }
                     } else
-                        custom = node.getParent();
-                    List<ReportTreeNode> customNodes = custom.getChildren();
-                    for (ReportTreeNode customNode : customNodes)
+                        custom = (AdvancedReportTreeNode) node.getParent();
+                    List<AbstractReportTreeNode> customNodes = custom
+                        .getChildren();
+                    for (AbstractReportTreeNode customNode : customNodes)
                         if (customNode.getLabel().compareTo(dlg.getName()) == 0) {
                             BioBankPlugin
                                 .openAsyncError(
@@ -175,8 +176,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                     tree.saveTree(Platform.getInstanceLocation().getURL()
                         .getPath()
                         + "/saved_reports/", dlg.getName());
-                    ReportTreeNode newReport = new ReportTreeNode(
-                        dlg.getName(), tree.getInput());
+                    AdvancedReportTreeNode newReport = new AdvancedReportTreeNode(
+                        dlg.getName(), (QueryTreeNode) tree.getInput());
                     newReport.setParent(custom);
                     custom.addChild(newReport);
                     ReportsView.currentInstance.getTreeViewer().refresh();
@@ -547,7 +548,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
 
     @Override
     protected void init() throws Exception {
-        node = ((ReportInput) getEditorInput()).getNode();
+        node = (AdvancedReportTreeNode) ((ReportInput) getEditorInput())
+            .getNode();
 
         reportData = new ArrayList<Object>();
         this.setPartName(node.getLabel());

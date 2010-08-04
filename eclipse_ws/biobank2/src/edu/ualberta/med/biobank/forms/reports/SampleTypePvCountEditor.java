@@ -9,12 +9,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.AliquotCount;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class SampleTypePvCountEditor extends ReportsEditor<AliquotCount> {
+public class SampleTypePvCountEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor";
 
@@ -57,6 +56,19 @@ public class SampleTypePvCountEditor extends ReportsEditor<AliquotCount> {
         });
         combo.getCombo().select(0);
         return combo;
+    }
+
+    @Override
+    protected String[] getColumnNames() {
+        return new String[] { "Patient Number", "Date Processed", "Date Drawn",
+            "Sample Type", "Total" };
+    }
+
+    @Override
+    protected List<String> getParamNames() {
+        List<String> name = new ArrayList<String>();
+        name.add("Study");
+        return name;
     }
 
 }

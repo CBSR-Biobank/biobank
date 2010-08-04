@@ -184,7 +184,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() {
+    public void reload() {
         retrievePatientVisit();
         String date = patientVisit.getFormattedDateProcessed();
         setPartName("Visit " + date);

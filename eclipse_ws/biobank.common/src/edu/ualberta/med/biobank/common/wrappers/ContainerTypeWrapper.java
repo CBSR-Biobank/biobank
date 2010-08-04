@@ -85,6 +85,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         getCapacity().persistChecks();
         if (getChildLabelingScheme() == null) {
             throw new BiobankCheckException("Labeling scheme should be set");
+        } else {
+            // should throw error if labeling scheme too small for container
+            if (!LabelingScheme.checkBounds(getChildLabelingScheme(),
+                getCapacity().getRowCapacity(), getCapacity().getColCapacity()))
+                throw new BiobankCheckException("Labeling scheme cannot label "
+                    + getCapacity().getRowCapacity() + " rows and "
+                    + getCapacity().getColCapacity() + " columns.");
         }
         if (!isNew()) {
             boolean exists = isUsedByContainers();

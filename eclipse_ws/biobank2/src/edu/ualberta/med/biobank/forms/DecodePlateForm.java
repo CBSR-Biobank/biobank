@@ -85,7 +85,7 @@ public class DecodePlateForm extends PlateForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
     }
 
     protected void scanAndProcessResult() {

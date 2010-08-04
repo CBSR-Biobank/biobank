@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
@@ -23,10 +23,11 @@ public class AliquotsByPalletImpl extends AbstractReport {
         + "and path2.container.containerType.nameShort like ?) "
         + "and s.aliquotPosition.container.label = ?";
 
-    public AliquotsByPalletImpl(List<Object> parameters,
-        List<ReportOption> options) {
-        super(QUERY, parameters, options);
-        parameters.add(parameters.remove(0));
+    public AliquotsByPalletImpl(BiobankReport report) {
+        super(QUERY, report);
+        List<Object> params = report.getParams();
+        params.add(params.remove(0));
+        this.report.setParams(params);
     }
 
     // Use Collections.sort, so can't use RowPostProcess
