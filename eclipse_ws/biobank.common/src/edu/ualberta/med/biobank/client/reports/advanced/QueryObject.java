@@ -12,6 +12,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class QueryObject {
 
+    @SuppressWarnings("unused")
     private String description;
 
     /**
@@ -65,7 +66,6 @@ public abstract class QueryObject {
     public String[] getColumnNames() {
         return columnNames;
     }
-
 
     @Override
     public String toString() {
