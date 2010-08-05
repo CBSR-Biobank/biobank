@@ -105,7 +105,7 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Label", "Inventory ID", "Patient",
+        return new String[] { "Location", "Inventory ID", "Patient",
             "Date Processed", "Sample Type" };
     }
 
