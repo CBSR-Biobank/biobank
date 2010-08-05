@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.forms.reports;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -14,15 +12,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class QAAliquotsEditor extends ReportsEditor {
@@ -33,7 +29,7 @@ public class QAAliquotsEditor extends ReportsEditor {
     DateTimeWidget end;
     ComboViewer sampleType;
     IObservableValue numAliquots;
-    protected ComboViewer topCombo;
+    TopContainerListWidget topContainers;
 
     @Override
     protected int[] getColumnWidths() {
@@ -46,32 +42,10 @@ public class QAAliquotsEditor extends ReportsEditor {
             "Start Date (Linked)", null, null, null);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
             null, null, null);
-        topCombo = createCustomCombo("Top Container Type", parent);
+        widgetCreator.createLabel(parent, "Top Containers");
+        topContainers = new TopContainerListWidget(parent, SWT.NONE);
         sampleType = createSampleTypeComboOption("Sample Type", parent);
         createValidatedIntegerText("# Aliquots", parent);
-    }
-
-    private ComboViewer createCustomCombo(String label, Composite parent) {
-        ComboViewer widget = widgetCreator.createComboViewer(parent, label,
-            null, null);
-        appService = SessionManager.getAppService();
-        List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
-        Set<String> topContainerTypes = new HashSet<String>();
-        try {
-            // FIXME: uses all sites by default
-            List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-            for (SiteWrapper site : sites) {
-                containers.addAll(site.getTopContainerCollection());
-            }
-            for (ContainerWrapper c : containers) {
-                topContainerTypes.add(c.getContainerType().getNameShort());
-            }
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error retrieving containers", e);
-        }
-        widget.setInput(topContainerTypes.toArray(new String[] {}));
-        widget.getCombo().select(0);
-        return widget;
     }
 
     @Override
@@ -87,8 +61,7 @@ public class QAAliquotsEditor extends ReportsEditor {
             params.add(end.getDate());
         params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
             .getSelection()).getFirstElement()).getNameShort());
-        params.add(((IStructuredSelection) topCombo.getSelection())
-            .getFirstElement());
+        params.add(topContainers.getSelectedContainers());
         params.add(Integer.parseInt((String) numAliquots.getValue()));
         return params;
     }
@@ -141,7 +114,7 @@ public class QAAliquotsEditor extends ReportsEditor {
         List<String> paramNames = new ArrayList<String>();
         paramNames.add("Start Date (Linked)");
         paramNames.add("End Date (Linked)");
-        paramNames.add("Top Container Type");
+        paramNames.add("Top Container");
         paramNames.add("Sample Type");
         paramNames.add("# Aliquots");
         return paramNames;

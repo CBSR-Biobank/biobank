@@ -210,7 +210,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
             if (site.getName().compareTo("All Sites") == 0)
                 op = "!=";
             report.setSiteInfo(op, site.getId());
-
+            String containerListString = "";
             List<Object> params = new ArrayList<Object>();
             String grouping = "";
             for (Object ob : getParams()) {
@@ -219,10 +219,18 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     DateGroup.valueOf((String) ob);
                     grouping = (String) ob;
                 } catch (Exception e) {
-                    params.add(ob);
+                    if (ob instanceof List) {
+                        for (Object item : (List<?>) ob)
+                            containerListString = containerListString
+                                .concat(item.toString() + ",");
+                        containerListString = containerListString.substring(0,
+                            Math.max(containerListString.length() - 1, 0));
+                    } else
+                        params.add(ob);
                 }
             }
             report.setParams(params);
+            report.setContainerList(containerListString);
             report.setGroupBy(grouping);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Input Error", e1);

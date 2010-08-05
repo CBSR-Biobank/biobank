@@ -19,7 +19,9 @@ public class DAliquotsImpl extends AbstractReport {
         + " as path1, "
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.containerType.nameShort like ?) and aliquot.linkDate between ? and ? and aliquot.patientVisit.patient.study.site "
+        + " path2.container.id in ("
+        + CONTAINER_LIST
+        + ")) and aliquot.linkDate between ? and ? and aliquot.patientVisit.patient.study.site "
         + SITE_OPERATOR
         + SITE_ID
         + " group by aliquot.patientVisit.patient.study.nameShort,"
