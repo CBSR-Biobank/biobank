@@ -47,32 +47,31 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.AbstractReport;
-import edu.ualberta.med.biobank.client.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
-import edu.ualberta.med.biobank.common.util.ReportOption;
+import edu.ualberta.med.biobank.common.util.DateGroup;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.views.ReportsView;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class ReportsEditor<T extends AbstractReport> extends
-    BiobankFormBase {
+public abstract class ReportsEditor extends BiobankFormBase {
 
     // Report
-    protected T report;
-    private ReportTreeNode node;
+    protected ReportTreeNode node;
+    private BiobankReport report;
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
     // Sections
-    private Composite buttonSection;
+    protected Composite buttonSection;
     private Composite parameterSection;
     private ReportTableWidget<Object> reportTable;
 
@@ -87,28 +86,16 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
 
     // Mostly for visibility reasons
     private String path;
-    private List<Object> params;
 
     // Global status
     private IObservableValue statusObservable;
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void init() throws Exception {
         widgetCreator.initDataBinding();
-
         reportData = new ArrayList<Object>();
-        node = ((ReportInput) getEditorInput()).getNode();
-        SiteWrapper siteWrap = SessionManager.getInstance().getCurrentSite();
-        String op = "=";
-        if (siteWrap.getName().compareTo("All Sites") == 0)
-            op = "!=";
-        try {
-            report = (T) node.getNewInstance(op, siteWrap.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        node = (ReportTreeNode) ((ReportInput) getEditorInput()).getNode();
+        report = node.getReport();
         this.setPartName(report.getName());
     }
 
@@ -218,7 +205,25 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
 
     private void generate() {
         try {
-            params = getParams();
+            SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+            String op = "=";
+            if (site.getName().compareTo("All Sites") == 0)
+                op = "!=";
+            report.setSiteInfo(op, site.getId());
+
+            List<Object> params = new ArrayList<Object>();
+            String grouping = "";
+            for (Object ob : getParams()) {
+                try {
+                    // FIXME: horrible hack: need better way to test value
+                    DateGroup.valueOf((String) ob);
+                    grouping = (String) ob;
+                } catch (Exception e) {
+                    params.add(ob);
+                }
+            }
+            report.setParams(params);
+            report.setGroupBy(grouping);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Input Error", e1);
             return;
@@ -231,18 +236,10 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                 @Override
                 public void run(final IProgressMonitor monitor) {
                     Thread t = new Thread("Querying") {
-                        @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
                             try {
-                                SiteWrapper site = SessionManager.getInstance()
-                                    .getCurrentSite();
-                                String op = "=";
-                                if (site.getName().compareTo("All Sites") == 0)
-                                    op = "!=";
-                                report = (T) node.getNewInstance(op,
-                                    site.getId());
-                                reportData = generateReport(op, site.getId());
+                                reportData = generateReport();
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
@@ -250,22 +247,16 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                             }
                         }
 
-                        @SuppressWarnings({ "unused", "cast" })
-                        private List<Object> generateReport(String op,
-                            Integer siteId) throws ApplicationException,
-                            BiobankCheckException {
-                            if (report instanceof AbstractReport) {
-                                return ((AbstractReport) report).generate(
-                                    SessionManager.getAppService(), params, op,
-                                    siteId);
-                            }
+                        private List<Object> generateReport()
+                            throws ApplicationException {
+                            return report.generate(SessionManager
+                                .getAppService());
                             // TODO: FIXME
                             /*
                              * if (report instanceof QueryObject) { return
                              * ((QueryObject) report).generate(
                              * SessionManager.getAppService(), params); }
                              */
-                            return null;
                         }
                     };
                     monitor.beginTask("Generating Report...",
@@ -315,7 +306,7 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                                 exportPDFButton.setToolTipText("Export PDF");
                             }
                             reportTable = new ReportTableWidget<Object>(page,
-                                reportData, report.getColumnNames(),
+                                reportData, getColumnNames(),
                                 getColumnWidths(), 24);
                             reportTable.adaptToToolkit(toolkit, true);
                             form.reflow(true);
@@ -371,16 +362,19 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
             bw.write("," + columnInfo.get(j));
         }
         bw.println();
+        BiobankLabelProvider stringConverter = reportTable.getLabelProvider();
         for (Object row : reportData) {
             if (monitor.isCanceled()) {
                 throw new Exception("Exporting canceled.");
             }
             Object[] castOb = (Object[]) row;
-            bw.write("\"" + castOb[0] + "\"");
+            bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\"");
             for (int j = 1; j < columnInfo.size(); j++) {
-                bw.write(",\"" + castOb[j] + "\"");
+                bw.write(",\"" + stringConverter.getColumnText(castOb, j)
+                    + "\"");
             }
             bw.println();
+
         }
         bw.close();
     }
@@ -407,15 +401,14 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                 "Print table contents?");
         if (doPrint) {
             final List<Object[]> printParams = new ArrayList<Object[]>();
-            final List<Object> paramVals = getParams();
-            List<ReportOption> queryOptions = report.getOptions();
+            final List<Object> paramVals = getPrintParams();
             int i = 0;
-            for (ReportOption option : queryOptions) {
-                params.add(new Object[] { option.getName(), paramVals.get(i) });
+            for (String name : getParamNames()) {
+                printParams.add(new Object[] { name, paramVals.get(i) });
                 i++;
             }
             final List<String> columnInfo = new ArrayList<String>();
-            String[] names = report.getColumnNames();
+            String[] names = getColumnNames();
             for (int i1 = 0; i1 < names.length; i1++) {
                 columnInfo.add(names[i1]);
             }
@@ -459,8 +452,9 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                                 }
                                 Map<String, String> map = new HashMap<String, String>();
                                 for (int j = 0; j < columnInfo.size(); j++) {
-                                    map.put(columnInfo.get(j),
-                                        (((Object[]) object)[j]).toString());
+                                    map.put(columnInfo.get(j), (reportTable
+                                        .getLabelProvider().getColumnText(
+                                        object, j)));
                                 }
                                 listData.add(map);
                             }
@@ -489,10 +483,14 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                 BioBankPlugin.openAsyncError("Error saving to PDF", e);
                 return;
             }
-            ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("exportPDF", SessionManager.getInstance()
-                    .getCurrentSite().getNameShort(), null, null, null,
-                    report.getName(), "report");
+            try {
+                ((BiobankApplicationService) SessionManager.getAppService())
+                    .logActivity("exportPDF", SessionManager.getInstance()
+                        .getCurrentSite().getNameShort(), null, null, null,
+                        report.getName(), "report");
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Error logging export", e);
+            }
         } else {
             try {
                 ReportingUtils.printReport(createDynamicReport(
@@ -501,10 +499,14 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
                 BioBankPlugin.openAsyncError("Printer Error", e);
                 return;
             }
-            ((BiobankApplicationService) SessionManager.getAppService())
-                .logActivity("print", SessionManager.getInstance()
-                    .getCurrentSite().getNameShort(), null, null, null,
-                    report.getName(), "report");
+            try {
+                ((BiobankApplicationService) SessionManager.getAppService())
+                    .logActivity("print", SessionManager.getInstance()
+                        .getCurrentSite().getNameShort(), null, null, null,
+                        report.getName(), "report");
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Error logging print", e);
+            }
         }
     }
 
@@ -582,6 +584,14 @@ public abstract class ReportsEditor<T extends AbstractReport> extends
 
     protected abstract int[] getColumnWidths();
 
+    protected abstract String[] getColumnNames();
+
+    protected abstract List<String> getParamNames();
+
     protected abstract List<Object> getParams() throws Exception;
+
+    protected List<Object> getPrintParams() throws Exception {
+        return getParams();
+    }
 
 }

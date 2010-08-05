@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.client.config.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class ConfigContainers {
@@ -35,6 +37,34 @@ public class ConfigContainers {
             throw new Exception("container type " + name + " not in database");
         }
         return type;
+    }
+
+    protected static ContainerWrapper addTopLevelContainer(SiteWrapper site,
+        String label, ContainerTypeWrapper type) throws Exception {
+        ContainerWrapper container = new ContainerWrapper(site.getAppService());
+        container.setLabel(label);
+        container.setSite(site);
+        container.setContainerType(type);
+        container.setActivityStatus(CbsrSite.getActiveActivityStatus());
+        container.setTemperature(type.getDefaultTemperature());
+        container.persist();
+        container.reload();
+        return container;
+    }
+
+    protected static ContainerWrapper addContainer(SiteWrapper site,
+        ContainerTypeWrapper type, ContainerWrapper parent, int row, int col)
+        throws Exception {
+        ContainerWrapper container = new ContainerWrapper(site.getAppService());
+        container.setSite(site);
+        container.setContainerType(type);
+        container.setActivityStatus(CbsrSite.getActiveActivityStatus());
+        container.setPosition(row, col);
+        container.setParent(parent);
+        container.setTemperature(type.getDefaultTemperature());
+        container.persist();
+        container.reload();
+        return container;
     }
 
 }

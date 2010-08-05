@@ -41,7 +41,7 @@ public class PvListViewForm extends BiobankViewForm {
     }
 
     @Override
-    protected void reload() throws Exception {
+    public void reload() throws Exception {
     }
 
 }

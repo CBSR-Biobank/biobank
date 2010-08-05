@@ -44,14 +44,18 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
             page.setPerspective(main);
         }
         if (BioBankPlugin.isAskPrintActivityLog()
-            && page.getPerspective().getId().equals(
-                AliquotManagementPerspective.ID)) {
+            && page.getPerspective().getId()
+                .equals(AliquotManagementPerspective.ID)) {
             BioBankPlugin.openInformation("Can't close",
                 "Please end aliquot management session before closing");
             return false;
         }
         if (SessionManager.getInstance().isConnected()) {
-            ServiceConnection.logout(SessionManager.getAppService());
+            try {
+                ServiceConnection.logout(SessionManager.getAppService());
+            } catch (Exception e) {
+                return true;
+            }
         }
         return true;
     }

@@ -55,8 +55,12 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         patientAdapter = (PatientAdapter) adapter;
         retrievePatient();
-        patientAdapter.getWrapper().logEdit(
-            SessionManager.getInstance().getCurrentSite().getNameShort());
+        try {
+            patientAdapter.getWrapper().logEdit(
+                SessionManager.getInstance().getCurrentSite().getNameShort());
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Log edit failed", e);
+        }
         String tabName;
         if (patientAdapter.getWrapper().isNew()) {
             tabName = "New Patient";

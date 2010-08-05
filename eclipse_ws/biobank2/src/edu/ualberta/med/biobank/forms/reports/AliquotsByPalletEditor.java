@@ -17,12 +17,11 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.client.reports.AliquotsByPallet;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
-public class AliquotsByPalletEditor extends ReportsEditor<AliquotsByPallet> {
+public class AliquotsByPalletEditor extends ReportsEditor {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AliquotsByPalletEditor";
 
@@ -40,7 +39,7 @@ public class AliquotsByPalletEditor extends ReportsEditor<AliquotsByPallet> {
     protected List<Object> getParams() {
         List<Object> params = new ArrayList<Object>();
         params.add(palletLabel.getText());
-        params.add(topCombo.getCombo().getText());
+        params.add("%" + topCombo.getCombo().getText() + "%");
         return params;
     }
 
@@ -127,6 +126,19 @@ public class AliquotsByPalletEditor extends ReportsEditor<AliquotsByPallet> {
             topCombo.getCombo().setEnabled(false);
             comboStatus.setValue(false);
         }
+    }
+
+    @Override
+    protected String[] getColumnNames() {
+        return new String[] { "Location", "Inventory ID", "Patient", "Type" };
+    }
+
+    @Override
+    protected List<String> getParamNames() {
+        List<String> paramNames = new ArrayList<String>();
+        paramNames.add("Pallet Label");
+        paramNames.add("Top Container Type");
+        return paramNames;
     }
 
 }

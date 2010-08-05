@@ -105,10 +105,14 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
             return;
         }
         TreeItem item = (TreeItem) event.item;
+
         ModelWrapper<?> wrapper = ((AdapterBase) (item.getData()))
             .getModelObject();
+
         if (wrapper != null && (wrapper instanceof ContainerWrapper)) {
             ContainerWrapper dstContainer = (ContainerWrapper) wrapper;
+            ContainerAdapter containerAdapter = new ContainerAdapter(
+                (AdapterBase) item.getParent().getData(), this.srcContainer);
 
             if (dstContainer != null) {
 
@@ -156,12 +160,18 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     @Override
     public void dragSetData(DragSourceEvent event) {
         event.data = getSelectedContainer();
+        event.doit = true;
     }
 
     @Override
     public void dragFinished(DragSourceEvent event) {
         srcContainer = null;
         dstLocationSelected = false;
+    }
+
+    /* TODO move containers in tree view */
+    private void moveContainerTo(ContainerAdapter containerAdapter) {
+        // containerAdapter.moveAliquots();
     }
 
 }

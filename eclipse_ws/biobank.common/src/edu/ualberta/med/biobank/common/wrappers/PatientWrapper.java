@@ -398,7 +398,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void log(String action, String site, String details) {
+    protected void log(String action, String site, String details)
+        throws Exception {
         ((BiobankApplicationService) appService).logActivity(action, site,
             getPnumber(), null, null, "patient " + details, "Patient");
     }

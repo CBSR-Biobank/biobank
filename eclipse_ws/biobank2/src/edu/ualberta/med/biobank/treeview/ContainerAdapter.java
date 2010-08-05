@@ -110,7 +110,7 @@ public class ContainerAdapter extends AdapterBase {
         addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
     }
 
-    protected void moveAliquots() {
+    public void moveAliquots() {
         final MoveAliquotsToDialog mc = new MoveAliquotsToDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             getContainer());
@@ -154,6 +154,7 @@ public class ContainerAdapter extends AdapterBase {
                     newContainerAdapter.performDoubleClick();
                 }
                 getContainer().reload();
+                SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
                 BioBankPlugin.openError(e.getMessage(), e);
             }

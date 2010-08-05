@@ -54,7 +54,8 @@ public class ServiceConnection {
         return getAppService(serverUrl, null, null);
     }
 
-    public static void logout(WritableApplicationService appService) {
+    public static void logout(WritableApplicationService appService)
+        throws Exception {
         ((BiobankApplicationService) appService).logActivity("logout", null,
             null, null, null, null, null);
     }

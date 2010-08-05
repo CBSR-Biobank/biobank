@@ -419,30 +419,4 @@ public class CbsrContainers extends ConfigContainers {
         }
     }
 
-    private static ContainerWrapper addTopLevelContainer(SiteWrapper site,
-        String label, ContainerTypeWrapper type) throws Exception {
-        ContainerWrapper container = new ContainerWrapper(site.getAppService());
-        container.setLabel(label);
-        container.setSite(site);
-        container.setContainerType(type);
-        container.setActivityStatus(CbsrSite.getActiveActivityStatus());
-        container.persist();
-        container.reload();
-        return container;
-    }
-
-    private static ContainerWrapper addContainer(SiteWrapper site,
-        ContainerTypeWrapper type, ContainerWrapper parent, int row, int col)
-        throws Exception {
-        ContainerWrapper container = new ContainerWrapper(site.getAppService());
-        container.setSite(site);
-        container.setContainerType(type);
-        container.setActivityStatus(CbsrSite.getActiveActivityStatus());
-        container.setPosition(row, col);
-        container.setParent(parent);
-        container.persist();
-        container.reload();
-        return container;
-    }
-
 }

@@ -13,7 +13,7 @@ public class CalgarySite extends ConfigSite {
         getSampleTypeMap(appService);
         site = new SiteWrapper(appService);
         site.setName("Calgary Foothills");
-        site.setNameShort("CF");
+        site.setNameShort("Calgary-F");
         site.setActivityStatus(getActiveActivityStatus());
         site.setStreet1("");
         site.setStreet2("");

@@ -25,5 +25,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views.log;bundle-version="1.0.100",
  biobank.common,
  scannerConfig;bundle-version="0.9.1"
-Bundle-Version: 1.2.2
+Bundle-Version: 1.2.3
 Bundle-Vendor: AICML
+
