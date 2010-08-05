@@ -133,9 +133,12 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             }
         } else {
             // can find more than one shipments
-            return ShipmentWrapper.getShipmentsInSite(SessionManager
-                .getAppService(), dateReceivedWidget.getDate(), SessionManager
-                .getInstance().getCurrentSite());
+            Date date = dateReceivedWidget.getDate();
+            if (date != null) {
+                return ShipmentWrapper.getShipmentsInSite(SessionManager
+                    .getAppService(), date, SessionManager.getInstance()
+                    .getCurrentSite());
+            }
         }
         return null;
     }
@@ -151,8 +154,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 AdapterBase dateNode = parentNode
                     .accept(new ShipmentViewNodeSearchVisitor(date));
                 if (dateNode == null) {
-                    dateNode = new DateNode(parentNode, dateReceivedWidget
-                        .getDate());
+                    dateNode = new DateNode(parentNode,
+                        dateReceivedWidget.getDate());
                     parentNode.addChild(dateNode);
                 }
                 topNode = dateNode;
@@ -187,8 +190,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             boolean create = BioBankPlugin.openConfirm("Shipment not found",
                 "Do you want to create this shipment ?");
             if (create) {
-                ShipmentWrapper shipment = new ShipmentWrapper(SessionManager
-                    .getAppService());
+                ShipmentWrapper shipment = new ShipmentWrapper(
+                    SessionManager.getAppService());
                 if (radioWaybill.getSelection()) {
                     shipment.setWaybill(text);
                 }
@@ -197,7 +200,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 adapter.openEntryForm();
             }
         } else {
-            BioBankPlugin.openMessage("Shipment not found",
+            BioBankPlugin.openMessage(
+                "Shipment not found",
                 "No shipment found for date "
                     + DateFormatter.formatAsDate(dateReceivedWidget.getDate()));
         }

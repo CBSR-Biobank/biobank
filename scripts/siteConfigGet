@@ -30,8 +30,10 @@ function mysqlCsv {
     $MYSQL -h$HOST -u$USER -p$PWD -D$DBNAME -B -e "$*" | $SED 's/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g;s/\"NULL\"/null/g' >> $OUTPUT
 }
 
-QUERIES[0]="select clinic.name, clinic.name_short, activity_status.name, clinic.comment, street1, street2, city,
-province, postal_code from clinic join address on address.id=clinic.address_id
+QUERIES[0]="select clinic.name, clinic.name_short,sends_shipments,activity_status.name,
+clinic.comment, street1, street2, city,province, postal_code
+from clinic
+join address on address.id=clinic.address_id
 join activity_status on activity_status.id=clinic.activity_status_id
 join site on site.id=clinic.site_id
 where site.name_short='$SITE_NAME'

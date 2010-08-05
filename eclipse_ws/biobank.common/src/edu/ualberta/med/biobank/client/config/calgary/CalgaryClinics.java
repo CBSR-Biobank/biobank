@@ -14,7 +14,7 @@ public class CalgaryClinics extends ConfigClinics {
         clinicsMap = new HashMap<String, ClinicWrapper>();
         contactsMap = new HashMap<String, ContactWrapper>();
 
-        addClinic("CL1-Foothills", "CL1-Foothills", true, "Active", null,
+        addClinic("CL1-Foothills", "CL1-Foothills", false, "Active", null,
             "Foothills Medical Centre", "1403 29 Street", "Calgary", "Alberta",
             "t2n2t9");
 
