@@ -57,7 +57,6 @@ import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -580,11 +579,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
     @Override
     public boolean isSaveAsAllowed() {
         return false;
-    }
-
-    @Override
-    public void setFocus() {
-        ReportsView.currentInstance.setSelectedNode(node);
     }
 
     protected abstract void createOptionSection(Composite parameterSection)

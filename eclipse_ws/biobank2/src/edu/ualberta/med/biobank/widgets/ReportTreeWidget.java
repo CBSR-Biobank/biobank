@@ -43,7 +43,7 @@ public class ReportTreeWidget extends Composite {
     private TreeViewer treeViewer;
 
     public ReportTreeWidget(Composite parent) {
-        super(parent, SWT.NONE);
+        super(parent, SWT.BORDER);
 
         setLayout(new FillLayout());
 
@@ -277,6 +277,14 @@ public class ReportTreeWidget extends Composite {
     @Override
     public boolean setFocus() {
         return treeViewer.getTree().setFocus();
+    }
+
+    public void setInput(Object input) {
+        this.treeViewer.setInput(input);
+    }
+
+    public void expandAll() {
+        this.treeViewer.expandAll();
     }
 
 }
