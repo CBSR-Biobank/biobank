@@ -31,12 +31,15 @@ public class ReportsView extends ViewPart {
     private ReportTreeWidget clinicTree;
     private ReportTreeWidget patientTree;
     private ReportTreeWidget sampleTypeTree;
+    private ReportTreeWidget containerTree;
 
     private CTabItem clinicTab;
 
     private CTabItem patientTab;
 
     private CTabItem sampleTypeTab;
+
+    private CTabItem containerTab;
 
     public ReportsView() {
         currentInstance = this;
@@ -93,8 +96,19 @@ public class ReportsView extends ViewPart {
         AbstractReportTreeNode sampleTypeRoot = new AbstractReportTreeNode("");
         sampleTypeTree.setLayoutData(treeGd);
 
+        // Containers
+        containerTab = new CTabItem(top, SWT.NONE);
+        containerTab.setText("Containers");
+        Composite containerBody = new Composite(top, SWT.NONE);
+        containerBody.setLayout(treeLayout);
+        containerBody.setLayoutData(treeGd);
+        containerTab.setControl(containerBody);
+        containerTree = new ReportTreeWidget(containerBody);
+        AbstractReportTreeNode containerRoot = new AbstractReportTreeNode("");
+        containerTree.setLayoutData(treeGd);
+
         initializeNewReports(aliquotRoot, clinicRoot, patientRoot,
-            sampleTypeRoot);
+            sampleTypeRoot, containerRoot);
 
         aliquotTree.setInput(aliquotRoot);
         aliquotTree.expandAll();
@@ -104,6 +118,8 @@ public class ReportsView extends ViewPart {
         patientTree.expandAll();
         sampleTypeTree.setInput(sampleTypeRoot);
         sampleTypeTree.expandAll();
+        containerTree.setInput(containerRoot);
+        containerTree.expandAll();
         /*
          * List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs(); for
          * (Class<?> obj : advancedObjs) { AdvancedReportTreeNode child = new
@@ -133,13 +149,14 @@ public class ReportsView extends ViewPart {
 
     private void initializeNewReports(AbstractReportTreeNode aliquots,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
-        AbstractReportTreeNode misc) {
+        AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers) {
         String[] names = BiobankReport.getReportNames();
         for (int i = 0; i < names.length; i++) {
             try {
                 ReportTreeNode child = new ReportTreeNode(
                     BiobankReport.getReportByName(names[i]));
-                addInTree(aliquots, clinics, patients, misc, child);
+                addInTree(aliquots, clinics, patients, sampleTypes, containers,
+                    child);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -148,19 +165,23 @@ public class ReportsView extends ViewPart {
 
     private void addInTree(AbstractReportTreeNode aliquots,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
-        AbstractReportTreeNode misc, ReportTreeNode child) throws Exception {
+        AbstractReportTreeNode sampleTypes, AbstractReportTreeNode containers,
+        ReportTreeNode child) throws Exception {
         if (child.getLabel().contains("Aliquot")) {
             aliquots.addChild(child);
             child.setParent(aliquots);
         } else if (child.getLabel().contains("Sample Type")) {
-            misc.addChild(child);
-            child.setParent(misc);
+            sampleTypes.addChild(child);
+            child.setParent(sampleTypes);
         } else if (child.getLabel().contains("Patient")) {
             patients.addChild(child);
             child.setParent(patients);
         } else if (child.getLabel().contains("Clinic")) {
             clinics.addChild(child);
             child.setParent(clinics);
+        } else if (child.getLabel().contains("Container")) {
+            containers.addChild(child);
+            child.setParent(containers);
         } else
             throw new Exception("Unable to place report node.");
     }
