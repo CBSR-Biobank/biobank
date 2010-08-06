@@ -737,6 +737,13 @@ public class ContainerWrapper extends
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    public void moveAliquots(ContainerWrapper destination) throws Exception {
+        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
+        for (RowColPos rcp : aliquots.keySet()) {
+            destination.addAliquot(rcp.row, rcp.col, aliquots.get(rcp));
+        }
+    }
+
     @Override
     public boolean checkIntegrity() {
         if (wrappedObject != null)
