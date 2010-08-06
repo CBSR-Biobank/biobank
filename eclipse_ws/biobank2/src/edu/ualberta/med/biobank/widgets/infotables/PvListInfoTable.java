@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -34,11 +33,11 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
-        "Study", "Waybill", "DateShipped", "Clinic", "SourceVessels",
+        "Study", "Waybill", "Date Shipped", "Clinic", "Source Vessels",
         "Aliquots" };
 
-    private static final int[] BOUNDS = new int[] { 150, 150, 150, 150, 150,
-        150, 150, 150 };
+    private static final int[] BOUNDS = new int[] { 100, 100, 150, 130, 120,
+        120, 120, 120 };
 
     public PvListInfoTable(Composite parent, List<PatientVisitWrapper> pvs) {
         super(parent, pvs, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
@@ -113,8 +112,10 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         if (item == null)
             return null;
         TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.pv;
+        if (row != null) {
+            return row.pv;
+        }
+        return null;
     }
 
     @Override
