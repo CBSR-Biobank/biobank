@@ -2095,6 +2095,13 @@
       id="edu.ualberta.med.biobank.editors.ContainerCapacityEditor"
       name="Container Capacity">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.reports.ContainerEmptyLocationsEditor"
+      default="false"
+      icon="icons/reportsPerspective.png"
+      id="edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"
+      name="Container Empty Locations">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
