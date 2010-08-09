@@ -740,7 +740,9 @@ public class ContainerWrapper extends
     public void moveAliquots(ContainerWrapper destination) throws Exception {
         Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
         for (RowColPos rcp : aliquots.keySet()) {
-            destination.addAliquot(rcp.row, rcp.col, aliquots.get(rcp));
+            AliquotWrapper aliquot = aliquots.get(rcp);
+            destination.addAliquot(rcp.row, rcp.col, aliquot);
+            aliquot.persist();
         }
     }
 

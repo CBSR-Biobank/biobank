@@ -31,7 +31,7 @@ public class CalgaryConfig {
         if (appArgs.port == 8080)
             prefix = "http://";
 
-        String serverUrl = prefix + appArgs.host + ":" + appArgs.port
+        String serverUrl = prefix + appArgs.hostname + ":" + appArgs.port
             + "/biobank2";
 
         appService = ServiceConnection.getAppService(serverUrl,

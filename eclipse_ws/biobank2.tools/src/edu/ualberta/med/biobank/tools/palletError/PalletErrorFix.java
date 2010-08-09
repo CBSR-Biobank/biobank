@@ -32,7 +32,7 @@ public class PalletErrorFix {
         if (appArgs.port == 8080)
             prefix = "http://";
 
-        String serverUrl = prefix + appArgs.host + ":" + appArgs.port
+        String serverUrl = prefix + appArgs.hostname + ":" + appArgs.port
             + "/biobank2";
 
         appService = ServiceConnection.getAppService(serverUrl,
@@ -49,7 +49,7 @@ public class PalletErrorFix {
             throw new Exception("CBSR site not found");
         }
 
-        // fix735();
+        fix735();
         fix736();
     }
 
@@ -98,9 +98,9 @@ public class PalletErrorFix {
         }
 
         sourceContainer.moveAliquots(destContainer);
-        destContainer.persist();
         sourceContainer.reload();
         sourceContainer.delete();
+        destContainer.persist();
         System.out.println("aliquots moved and SSAD11 with no parent deleted");
     }
 
