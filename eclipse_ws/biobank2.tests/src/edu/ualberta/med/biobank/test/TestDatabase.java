@@ -53,9 +53,9 @@ public class TestDatabase {
     @After
     public void tearDown() throws Exception {
         try {
-            SampleTypeHelper.deleteCreatedSampleTypes();
             SiteHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
+            SampleTypeHelper.deleteCreatedSampleTypes();
             SourceVesselHelper.deleteCreatedSourceVessels();
             ShippingMethodHelper.deleteCreateShippingMethods();
         } catch (Exception e) {

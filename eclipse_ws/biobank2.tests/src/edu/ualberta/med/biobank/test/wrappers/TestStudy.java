@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -337,7 +339,8 @@ public class TestStudy extends TestDatabase {
         String name = "testSetStudyPvAttr" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Collection<String> types = PvAttrTypeWrapper.getAllPvAttrTypesMap(
+            appService).keySet();
         Assert.assertTrue(types.contains("text"));
         Assert.assertTrue(types.contains("select_single"));
 
@@ -536,7 +539,8 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
 
         int sizeOrig = study.getStudyPvAttrLabels().length;
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Collection<String> types = PvAttrTypeWrapper.getAllPvAttrTypesMap(
+            appService).keySet();
         if (types.size() < 2) {
             Assert.fail("Can't test without PvAttrTypes");
         }

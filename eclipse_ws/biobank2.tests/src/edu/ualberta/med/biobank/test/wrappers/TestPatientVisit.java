@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
@@ -129,7 +130,8 @@ public class TestPatientVisit extends TestDatabase {
 
     private void addPvAttrs() throws Exception {
         // add PvAtt to study
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Collection<String> types = PvAttrTypeWrapper.getAllPvAttrTypesMap(
+            appService).keySet();
         Assert
             .assertTrue("PvAttrTypes not initialized", types.contains("text"));
         study.setStudyPvAttr("PMBC Count", "number");
@@ -163,7 +165,8 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic, patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime(), date);

@@ -358,6 +358,7 @@
          userid="${database.username}" password="${database.password}">
       <transaction src="${data.sql.dir}/createIndices.sql" />
       <transaction src="${data.sql.dir}/activityStatus.sql" />
+      <transaction src="${data.sql.dir}/globalPvAttr.sql" />
       <transaction src="${data.sql.dir}/pvAttrType.sql" />
       <transaction src="${data.sql.dir}/sourceVessels.sql" />
       <transaction src="${data.sql.dir}/sampleTypes.sql" />

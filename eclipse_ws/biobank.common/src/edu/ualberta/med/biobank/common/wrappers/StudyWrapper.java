@@ -593,8 +593,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public void setStudyPvAttr(String label, String type,
         String[] permissibleValues) throws Exception {
-        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
-            .getPvAttrTypeMap(appService);
+        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = PvAttrTypeWrapper
+            .getAllPvAttrTypesMap(appService);
         PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
         if (pvAttrType == null) {
             throw new Exception("the pv attribute type \"" + type

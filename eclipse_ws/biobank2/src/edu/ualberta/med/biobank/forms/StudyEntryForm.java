@@ -20,8 +20,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GlobalPvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -208,15 +208,16 @@ public class StudyEntryForm extends BiobankEntryForm {
         //
         // END KLUDGE
 
-        SiteWrapper site = study.getSite();
         List<String> studyPvInfoLabels = Arrays.asList(study
             .getStudyPvAttrLabels());
 
-        for (String label : site.getSitePvAttrLabels()) {
+        for (GlobalPvAttrWrapper pvAttr : GlobalPvAttrWrapper
+            .getAllGlobalPvAttrs(appService)) {
+            String label = pvAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(label);
-            studyPvAttrCustom.setType(site.getSitePvAttrTypeName(label));
+            studyPvAttrCustom.setType(pvAttr.getTypeName());
             if (studyPvInfoLabels.contains(label)) {
                 studyPvAttrCustom.setAllowedValues(study
                     .getStudyPvAttrPermissible(label));

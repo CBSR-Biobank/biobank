@@ -118,8 +118,8 @@ public class ConfigStudies {
 
     }
 
-    protected void addPvAttr(SiteWrapper site, String studyNameShort,
-        String label, String type, String permissible) throws Exception {
+    protected void addPvAttr(String studyNameShort, String label, String type,
+        String permissible) throws Exception {
         StudyWrapper study = getStudy(studyNameShort);
         if ((permissible != null) && (permissible.length() > 0)) {
             study.setStudyPvAttr(label, type, permissible.split(";"));
@@ -131,20 +131,11 @@ public class ConfigStudies {
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         study.persist();
         study.reload();
-
-        List<String> sitePvAttrs = SiteWrapper.getPvAttrTypeNames(site
-            .getAppService());
-        if (!sitePvAttrs.contains(label)) {
-            // add this pv attr to the site
-            site.setSitePvAttr(label, type);
-            site.persist();
-            site.reload();
-        }
     }
 
-    protected void addPvAttr(SiteWrapper site, String studyNameShort,
-        String label, String type) throws Exception {
-        addPvAttr(site, studyNameShort, label, type, null);
+    protected void addPvAttr(String studyNameShort, String label, String type)
+        throws Exception {
+        addPvAttr(studyNameShort, label, type, null);
     }
 
     protected void addContact(String studyNameShort, String contactName,

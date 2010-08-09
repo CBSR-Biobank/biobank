@@ -155,7 +155,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         ApplicationException {
         if (isUsedBySamples()) {
             throw new BiobankCheckException("Unable to delete sample type "
-                + getName() + ". A aliquots of this type exists in storage."
+                + getName() + ". Aliquots of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
     }

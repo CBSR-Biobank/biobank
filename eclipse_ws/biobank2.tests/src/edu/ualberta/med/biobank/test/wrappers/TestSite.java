@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,10 +19,8 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
-import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -374,138 +371,6 @@ public class TestSite extends TestDatabase {
         newSite.setName("titi");
         newSite.reset();
         Assert.assertEquals(null, newSite.getName());
-    }
-
-    @Test
-    public void testGetSetSitePvAttr() throws Exception {
-        String name = "testGetSetSitePvAttr" + r.nextInt();
-
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        SiteWrapper site2 = SiteHelper.addSite(name + "_secondSite");
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
-        if (types.size() == 0) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-
-        String type = types.get(r.nextInt(types.size()));
-        site2.setSitePvAttr(name, type);
-        site2.persist();
-
-        site2.reload();
-        Assert.assertTrue(Arrays.asList(site2.getSitePvAttrLabels()).contains(
-            name));
-        Assert.assertEquals(type, site2.getSitePvAttrTypeName(name));
-        Assert.assertFalse(Arrays.asList(site.getSitePvAttrLabels()).contains(
-            name));
-
-        // set non existing type, expect exception
-        try {
-            site.setSitePvAttr(Utils.getRandomString(10, 15),
-                Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-
-        // delete non existing label, expect exception
-        try {
-            site.deleteSitePvAttr(Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testRemoveSitePvAttr() throws Exception {
-        String name = "testRemoveSitePvAttr" + r.nextInt();
-
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        int sizeOrig = site.getSitePvAttrLabels().length;
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
-        if (types.size() < 2) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-        site.setSitePvAttr(name, types.get(0));
-        site.setSitePvAttr(name + "_2", types.get(1));
-        site.persist();
-
-        site.reload();
-        Assert.assertEquals(sizeOrig + 2, site.getSitePvAttrLabels().length);
-        site.deleteSitePvAttr(name);
-        Assert.assertEquals(sizeOrig + 1, site.getSitePvAttrLabels().length);
-        site.persist();
-
-        site.reload();
-        Assert.assertEquals(sizeOrig + 1, site.getSitePvAttrLabels().length);
-    }
-
-    @Test
-    public void testGetSitePvAttrType() throws Exception {
-        String name = "testGetSitePvAttrType" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        List<PvAttrTypeWrapper> types = new ArrayList<PvAttrTypeWrapper>(
-            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService).values());
-        if (types.size() == 0) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-        PvAttrTypeWrapper type = types.get(0);
-        String label = "toto";
-        site.setSitePvAttr(label, type.getName());
-
-        // my guess would be that the sitePvAttr map inside the site should
-        // be updated in the setSitePvAttr method
-        Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
-
-        site.persist();
-        site.reload();
-        Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
-
-        // get type for non existing label, expect exception
-        try {
-            site.getSitePvAttrType(Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testGetSitePvAttrTypeName() throws Exception {
-        String name = "testGetSitePvAttrTypeName" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        List<PvAttrTypeWrapper> types = new ArrayList<PvAttrTypeWrapper>(
-            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService).values());
-        if (types.size() == 0) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-        PvAttrTypeWrapper type = types.get(0);
-        String label = "toto";
-        site.setSitePvAttr(label, type.getName());
-
-        Assert.assertEquals(type.getName(), site.getSitePvAttrTypeName(label));
-
-        site.persist();
-        site.reload();
-        Assert.assertEquals(type.getName(), site.getSitePvAttrTypeName(label));
-    }
-
-    @Test
-    public void testSetSitePvAttrTypeNames() throws Exception {
-        String name = "testGetSitePvAttrTypeNames" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
-        Assert.assertTrue("No PvAttrTypes", types.size() > 0);
-        int count = 1;
-        for (String type : types) {
-            site.setSitePvAttr(name + count, type);
-            ++count;
-        }
     }
 
     @Test
