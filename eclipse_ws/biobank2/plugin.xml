@@ -2109,6 +2109,13 @@
       id="edu.ualberta.med.biobank.editors.FTAReportEditor"
       name="FTA Report">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.reports.InvoicingReportEditor"
+      default="false"
+      icon="icons/reportsPerspective.png"
+      id="edu.ualberta.med.biobank.editors.InvoicingReportEditor"
+      name="Invoicing Report">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

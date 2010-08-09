@@ -170,7 +170,8 @@ public class ReportsView extends ViewPart {
         if (child.getLabel().contains("Aliquot")) {
             aliquots.addChild(child);
             child.setParent(aliquots);
-        } else if (child.getLabel().contains("Sample Type")) {
+        } else if (child.getLabel().contains("Sample Type")
+            || child.getLabel().contains("Invoicing")) {
             sampleTypes.addChild(child);
             child.setParent(sampleTypes);
         } else if (child.getLabel().contains("Patient")) {
