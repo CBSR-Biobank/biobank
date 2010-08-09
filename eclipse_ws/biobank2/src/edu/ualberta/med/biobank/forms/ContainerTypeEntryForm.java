@@ -242,7 +242,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {
-        allSampleTypes = site.getAllSampleTypeCollection();
+        allSampleTypes = SampleTypeWrapper.getAllSampleTypes(appService, true);
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Types", "Available Sample Types", 100);

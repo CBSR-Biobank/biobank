@@ -12,9 +12,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SampleTypeEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -29,11 +27,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     public static final String OK_MESSAGE = "Add or edit a sample type";
 
-    private SiteWrapper mainSite;
-
-    private SampleTypeEntryInfoTable globalSampleWidget;
-
-    List<SampleTypeEntryInfoTable> siteWidgets = new ArrayList<SampleTypeEntryInfoTable>();
+    private SampleTypeEntryInfoTable sampleWidget;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -44,104 +38,44 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public void init() throws Exception {
-        SiteAdapter siteAdapter = (SiteAdapter) adapter;
-        mainSite = siteAdapter.getWrapper();
-        if (SessionManager.getInstance().isAllSitesSelected()) {
-            mainSite = null;
-        }
-        setPartName("Sample Types Entry");
+        setPartName("Sample Types");
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Sample Types");
         page.setLayout(new GridLayout(1, false));
-
         createGlobalSampleTypeSection();
-
-        setFirstControl(globalSampleWidget);
-
-        if (mainSite == null) {
-            // show all sites
-            try {
-                for (SiteWrapper site : SiteWrapper.getSites(appService)) {
-                    createSiteSampleTypeSection(site);
-                }
-            } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Problem creating sites widgets",
-                    e);
-            }
-        } else {
-            createSiteSampleTypeSection(mainSite);
-        }
-    }
-
-    private void createSiteSampleTypeSection(SiteWrapper widgetSite) {
-        if (widgetSite.canEdit()) {
-            Section section = createSection(widgetSite.getNameShort()
-                + " only sample types");
-            List<SampleTypeWrapper> siteSampleTypes = widgetSite
-                .getSampleTypeCollection(true);
-            if (siteSampleTypes == null) {
-                siteSampleTypes = new ArrayList<SampleTypeWrapper>();
-            }
-            final SampleTypeEntryInfoTable siteSampleWidget = new SampleTypeEntryInfoTable(
-                section, siteSampleTypes,
-                "Add a new sample type to the repository site   ",
-                "Edit the repository site's sample type", widgetSite);
-            siteSampleWidget.adaptToToolkit(toolkit, true);
-            siteSampleWidget.addSelectionChangedListener(listener);
-            toolkit.paintBordersFor(siteSampleWidget);
-
-            addSectionToolbar(section, "Add Site Sample Type",
-                new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        siteSampleWidget.addSampleType();
-                    }
-                }, SampleTypeWrapper.class);
-            section.setClient(siteSampleWidget);
-            siteWidgets.add(siteSampleWidget);
-        }
+        setFirstControl(sampleWidget);
     }
 
     private void createGlobalSampleTypeSection() throws Exception {
-        Section section = createSection("Global sample types");
+        Section section = createSection("Sample Types");
         List<SampleTypeWrapper> globalSampleTypes = SampleTypeWrapper
             .getAllSampleTypes(appService, true);
         if (globalSampleTypes == null) {
             globalSampleTypes = new ArrayList<SampleTypeWrapper>();
         }
-        globalSampleWidget = new SampleTypeEntryInfoTable(section,
-            globalSampleTypes, "Add a new global sample type",
-            "Edit the global sample type", null);
-        globalSampleWidget.adaptToToolkit(toolkit, true);
-        globalSampleWidget.addSelectionChangedListener(listener);
-        toolkit.paintBordersFor(globalSampleWidget);
+        sampleWidget = new SampleTypeEntryInfoTable(section, globalSampleTypes,
+            "Add a new global sample type", "Edit the global sample type", null);
+        sampleWidget.adaptToToolkit(toolkit, true);
+        sampleWidget.addSelectionChangedListener(listener);
+        toolkit.paintBordersFor(sampleWidget);
 
-        addSectionToolbar(section, "Add Global Sample Type",
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    globalSampleWidget.addSampleType();
-                }
-            }, SampleTypeWrapper.class);
-        section.setClient(globalSampleWidget);
+        addSectionToolbar(section, "Add a sample type", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                sampleWidget.addSampleType();
+            }
+        }, SampleTypeWrapper.class);
+        section.setClient(sampleWidget);
     }
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        for (SampleTypeEntryInfoTable siteWidget : siteWidgets) {
-            SiteWrapper currentSite = siteWidget.getCurrentSite();
-            currentSite.reload();
-            currentSite.addSampleTypes(siteWidget
-                .getAddedOrModifiedSampleTypes());
-            currentSite.removeSampleTypes(siteWidget.getDeletedSampleTypes());
-            currentSite.persist();
-        }
         SampleTypeWrapper.persistGlobalSampleTypes(
-            globalSampleWidget.getAddedOrModifiedSampleTypes(),
-            globalSampleWidget.getDeletedSampleTypes());
+            sampleWidget.getAddedOrModifiedSampleTypes(),
+            sampleWidget.getDeletedSampleTypes());
     }
 
     @Override
@@ -159,17 +93,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         super.reset();
         List<SampleTypeWrapper> globalSampleTypes = null;
         try {
-            globalSampleTypes = SampleTypeWrapper.getAllSampleTypes(
-                appService, true);
+            globalSampleTypes = SampleTypeWrapper.getAllSampleTypes(appService,
+                true);
         } catch (ApplicationException e) {
             logger.error("Can't reset global sample types", e);
         }
         if (globalSampleTypes != null) {
-            globalSampleWidget.setLists(globalSampleTypes);
-        }
-
-        for (SampleTypeEntryInfoTable siteWidget : siteWidgets) {
-            siteWidget.reload();
+            sampleWidget.setLists(globalSampleTypes);
         }
     }
 

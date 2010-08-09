@@ -111,8 +111,6 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
         if (wrapper != null && (wrapper instanceof ContainerWrapper)) {
             ContainerWrapper dstContainer = (ContainerWrapper) wrapper;
-            ContainerAdapter containerAdapter = new ContainerAdapter(
-                (AdapterBase) item.getParent().getData(), this.srcContainer);
 
             if (dstContainer != null) {
 

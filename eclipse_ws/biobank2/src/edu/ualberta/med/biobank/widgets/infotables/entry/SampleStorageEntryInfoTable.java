@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -57,10 +56,9 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
      *            adapted to work in Eclipse forms. If widget is not used in a
      *            form this parameter should be null.
      */
-    public SampleStorageEntryInfoTable(Composite parent, SiteWrapper site,
-        StudyWrapper study) {
+    public SampleStorageEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
-        getSampleTypes(site);
+        getSampleTypes();
         this.study = study;
         selectedSampleStorages = study.getSampleStorageCollection();
         if (selectedSampleStorages == null) {
@@ -82,8 +80,9 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
     }
 
     public void addSampleStorage() {
-        addOrEditSampleStorage(true, new SampleStorageWrapper(SessionManager
-            .getAppService()), allSampleTypes);
+        addOrEditSampleStorage(true,
+            new SampleStorageWrapper(SessionManager.getAppService()),
+            allSampleTypes);
     }
 
     private void addOrEditSampleStorage(boolean add,
@@ -148,9 +147,10 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         }
     }
 
-    private void getSampleTypes(SiteWrapper site) {
+    private void getSampleTypes() {
         try {
-            allSampleTypes = site.getAllSampleTypeCollection();
+            allSampleTypes = SampleTypeWrapper.getAllSampleTypes(
+                SessionManager.getAppService(), true);
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage();
         } catch (ApplicationException e) {

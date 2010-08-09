@@ -152,7 +152,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
         sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
-            study.getSite(), study);
+            study);
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);
         sampleStorageEntryTable.addSelectionChangedListener(listener);
 
