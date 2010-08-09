@@ -29,7 +29,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,7 +45,6 @@ import edu.ualberta.med.biobank.widgets.nebula.v.VButton;
 import edu.ualberta.med.biobank.widgets.nebula.v.VCanvas;
 import edu.ualberta.med.biobank.widgets.nebula.v.VGridLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VLabel;
-import edu.ualberta.med.biobank.widgets.nebula.v.VLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VNative;
 import edu.ualberta.med.biobank.widgets.nebula.v.VPanel;
 import edu.ualberta.med.biobank.widgets.nebula.v.VTracker;
@@ -118,58 +116,6 @@ public class CDateTime extends BaseCombo {
                 buffer = String.valueOf(ca).concat(buffer);
             }
             return buffer;
-        }
-    }
-
-    /**
-     * The layout used for a "basic" CDateTime - when it is neither of style
-     * SIMPLE or DROP_DOWN - with style of SPINNER.<br>
-     * Note that there is a spinner, but no button for this style.
-     */
-    class SpinnerLayout extends VLayout {
-
-        @Override
-        protected Point computeSize(VPanel panel, int wHint, int hHint,
-            boolean flushCache) {
-            Point size = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
-            int sWidth = sRect.x + sRect.width
-                - (2 * spinner.getControl().getBorderWidth()) + 1;
-
-            size.x += sWidth;
-            size.x++;
-            size.y += textMarginHeight;
-
-            if (wHint != SWT.DEFAULT) {
-                size.x = Math.min(size.x, wHint);
-            }
-            if (hHint != SWT.DEFAULT) {
-                size.y = Math.min(size.y, hHint);
-            }
-            return size;
-        }
-
-        @Override
-        protected void layout(VPanel panel, boolean flushCache) {
-            Rectangle cRect = panel.getClientArea();
-            if (cRect.isEmpty())
-                return;
-
-            Point tSize = text.getControl().computeSize(SWT.DEFAULT,
-                SWT.DEFAULT);
-            tSize.y += textMarginHeight;
-
-            spinner.setBounds(cRect.x, cRect.y, cRect.width, tSize.y);
-
-            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
-            int sWidth = sRect.x + sRect.width
-                - (2 * spinner.getControl().getBorderWidth()) + 1;
-
-            tSize.x = cRect.width - sWidth;
-
-            text.setBounds(cRect.x, cRect.y + getBorderWidth(), tSize.x,
-                tSize.y);
         }
     }
 
