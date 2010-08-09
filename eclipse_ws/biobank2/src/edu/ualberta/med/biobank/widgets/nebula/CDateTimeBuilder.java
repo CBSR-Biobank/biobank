@@ -16,26 +16,25 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 
-
-
-
 public class CDateTimeBuilder {
 
     public static CDateTimeBuilder getCompact() {
         CDateTimeBuilder builder = new CDateTimeBuilder();
-        builder.setHeader(Header.MonthPrev(), Header.DateNow(), Header
-            .MonthNext(), Header.Month().align(SWT.RIGHT, SWT.FILL, true),
-            Header.Year(), Header.Time());
-        builder.setBody(Body.Days().spacedAt(1).compact(), Body.Months(), Body
-            .Years(), Body.Time());
+        builder.setHeader(Header.MonthPrev(), Header.DateNow(),
+            Header.MonthNext(),
+            Header.Month().align(SWT.RIGHT, SWT.FILL, true), Header.Year(),
+            Header.Time());
+        builder.setBody(Body.Days().spacedAt(1).compact(), Body.Months(),
+            Body.Years(), Body.Time());
         return builder;
     }
 
     public static CDateTimeBuilder getStandard() {
         CDateTimeBuilder builder = new CDateTimeBuilder();
         builder.setHeader(Header.MonthPrev(), Header.MonthNext(), Header
-            .Month().align(SWT.LEFT, SWT.FILL, true), Header.Year().align(
-            SWT.RIGHT, SWT.FILL, false), Header.YearPrev(), Header.YearNext());
+            .Month().align(SWT.LEFT, SWT.FILL, true),
+            Header.Year().align(SWT.RIGHT, SWT.FILL, false), Header.YearPrev(),
+            Header.YearNext());
         builder.setBody(Body.Days().spacedAt(1), Body.Months(), Body.Years(),
             Body.Time().newColumn());
         builder.setFooter(Footer.VerboseToday());

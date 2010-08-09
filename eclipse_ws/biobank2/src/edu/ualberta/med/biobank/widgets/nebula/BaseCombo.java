@@ -1023,28 +1023,13 @@ public abstract class BaseCombo extends Canvas {
 
                 preClose(contentShell);
 
-                // Point location =
-                // positionControl.getComposite().toDisplay(positionControl.getLocation());
-                // Point contentLocation = contentShell.getLocation();
-                // if(location.y > contentLocation.y) {
-                // aStyle |= Animator.UP;
-                // }
-
                 Point start = contentShell.getSize();
                 Point end = new Point(start.x, 0);
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        postClose(contentShell);
-                        if (callback != null) {
-                            callback.run();
-                        }
-                    }
-                };
-
-                AnimationRunner runner = new AnimationRunner();
-                runner.runEffect(new ResizeEffect(contentShell, start, end,
-                    200, new LinearInOut(), runnable, runnable));
+                contentShell.setSize(end);
+                postClose(contentShell);
+                if (callback != null) {
+                    callback.run();
+                }
 
                 if (checkText()) {
                     text.setFocus();
@@ -1089,24 +1074,14 @@ public abstract class BaseCombo extends Canvas {
             // visible
             preOpen(contentShell);
 
-            Point start = new Point(size.x, 0);
-            Point end = new Point(size.x, size.y);
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    setContentFocus();
-                    postOpen(contentShell);
-                    if (callback != null) {
-                        callback.run();
-                    }
-                }
-            };
-
             contentShell.setVisible(true);
-            AnimationRunner runner = new AnimationRunner();
-            runner.runEffect(new ResizeEffect(contentShell, start, end, 200,
-                new LinearInOut(), runnable, runnable));
+            contentShell.setSize(new Point(size.x, size.y));
             contentShell.setRedraw(true);
+            setContentFocus();
+            postOpen(contentShell);
+            if (callback != null) {
+                callback.run();
+            }
         }
         if (BUTTON_AUTO == buttonVisibility) {
             setButtonVisible(!open);
