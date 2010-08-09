@@ -130,9 +130,6 @@ public class CDateTime extends BaseCombo {
         if ((style & CDT.DROP_DOWN) != 0) {
             rstyle |= SWT.DROP_DOWN;
         }
-        if ((style & CDT.SIMPLE) != 0) {
-            rstyle |= SWT.SIMPLE;
-        }
         if ((style & CDT.READ_ONLY) != 0) {
             rstyle |= SWT.READ_ONLY;
         }
@@ -364,15 +361,11 @@ public class CDateTime extends BaseCombo {
      * otherwise it creates the picker.
      */
     private void createPicker() {
-        if (isSimple()) {
-            pickerPanel = panel;
-            setContent(panel.getComposite());
-        } else if (isDropDown()) {
+        if (isDropDown()) {
             disposePicker();
 
             Shell shell = getContentShell();
-            int style = (isSimple() ? SWT.NONE : SWT.BORDER)
-                | SWT.DOUBLE_BUFFERED;
+            int style = SWT.BORDER | SWT.DOUBLE_BUFFERED;
             VCanvas canvas = new VCanvas(shell, style);
             pickerPanel = canvas.getPanel();
             pickerPanel.setWidget(canvas);
@@ -1063,30 +1056,27 @@ public class CDateTime extends BaseCombo {
         calendar = Calendar.getInstance(this.timezone, this.locale);
         calendar.setTime(new Date());
         tabStops = (style & CDT.TAB_FIELDS) != 0;
-        singleSelection = ((style & CDT.SIMPLE) == 0)
-            || ((style & CDT.MULTI) == 0);
+        singleSelection = true;
 
         setFormat(style);
 
-        if (!isSimple()) {
-            if (isDropDown()) {
-                if ((style & CDT.BUTTON_AUTO) != 0) {
-                    setButtonVisibility(BaseCombo.BUTTON_AUTO);
-                } else {
-                    setButtonVisibility(BaseCombo.BUTTON_ALWAYS);
-                }
+        if (isDropDown()) {
+            if ((style & CDT.BUTTON_AUTO) != 0) {
+                setButtonVisibility(BaseCombo.BUTTON_AUTO);
             } else {
-                setButtonVisibility(BaseCombo.BUTTON_NEVER);
-
+                setButtonVisibility(BaseCombo.BUTTON_ALWAYS);
             }
+        } else {
+            setButtonVisibility(BaseCombo.BUTTON_NEVER);
 
-            updateText();
-            activeField = -5;
-            setActiveField(FIELD_NONE);
+        }
 
-            if (checkText()) {
-                addTextListener();
-            }
+        updateText();
+        activeField = -5;
+        setActiveField(FIELD_NONE);
+
+        if (checkText()) {
+            addTextListener();
         }
     }
 
@@ -1446,10 +1436,6 @@ public class CDateTime extends BaseCombo {
             if (checkText()) {
                 updateText();
             }
-            if (isSimple()) {
-                disposePicker();
-                createPicker();
-            }
         } else {
             throw new IllegalArgumentException(
                 "Problem setting pattern: \"" + pattern + "\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1458,11 +1444,6 @@ public class CDateTime extends BaseCombo {
 
     void setScrollable(boolean scrollable) {
         this.scrollable = scrollable;
-        if (isSimple() && !scrollable) {
-            if (picker != null && picker instanceof DatePicker) {
-                updatePicker();
-            }
-        }
     }
 
     /**

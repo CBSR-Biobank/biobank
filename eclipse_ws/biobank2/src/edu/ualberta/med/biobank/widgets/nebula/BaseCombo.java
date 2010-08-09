@@ -179,12 +179,10 @@ public abstract class BaseCombo extends Canvas {
 
     private static int checkStyle(int style) {
         int rstyle = SWT.NONE;
-        if ((style & SWT.BORDER) != 0) {
-            if (win32 || (style & SWT.SIMPLE) != 0) {
+        if (win32) {
+            if ((style & SWT.BORDER) != 0) {
                 rstyle |= SWT.BORDER;
             }
-        }
-        if (win32) {
             rstyle |= SWT.DOUBLE_BUFFERED;
         }
         return rstyle;
@@ -265,7 +263,6 @@ public abstract class BaseCombo extends Canvas {
     /**
      * Flag to indicate that this is a SIMPLE style combo.
      */
-    protected boolean simple;
 
     /**
      * Flag to indicate that this combo's BUTTON should be displayed on the left
@@ -325,7 +322,7 @@ public abstract class BaseCombo extends Canvas {
      * constructors.
      * <p>
      * SWT.TOGGLE, SWT.PUSH, SWT.ARROW, SWT.FLAT, SWT.TRAIL, SWT.LEAD,
-     * SWT.BORDER, SWT.SIMPLE, SWT.DROP_DOWN
+     * SWT.BORDER, SWT.DROP_DOWN
      * </p>
      * 
      * @param parent the visual parent of this widget
@@ -568,12 +565,9 @@ public abstract class BaseCombo extends Canvas {
 
     private void init(int style) {
         this.style = style;
-        simple = (style & SWT.SIMPLE) != 0;
         dropDown = (style & (BUTTON_ONLY | SWT.DROP_DOWN)) != 0;
 
-        if (simple) {
-            panel.setLayout(new VSimpleLayout());
-        } else if (dropDown) {
+        if (dropDown) {
             createButton(style);
             if ((style & BUTTON_ONLY) == 0) {
                 createText(style);
@@ -628,13 +622,6 @@ public abstract class BaseCombo extends Canvas {
      */
     public boolean isOpen() {
         return open;
-    }
-
-    /**
-     * @return if style is CDT.SIMPLE
-     */
-    protected boolean isSimple() {
-        return simple;
     }
 
     /**
@@ -860,10 +847,8 @@ public abstract class BaseCombo extends Canvas {
     protected void setContent(Control content) {
         this.content = content;
         if (this.content != null) {
-            if (!simple) {
-                this.content.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-                    true, true));
-            }
+            this.content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+                true));
         }
     }
 
