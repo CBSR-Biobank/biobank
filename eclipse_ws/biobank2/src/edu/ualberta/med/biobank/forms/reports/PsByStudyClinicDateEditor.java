@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.forms.reports;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.util.DateGroup;
@@ -39,9 +39,9 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
             Arrays.asList(DateGroup.values()), null);
         dateRangeCombo.getCombo().select(0);
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null);
+            "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null);
+            null, null, null, SWT.DATE);
     }
 
     @Override
@@ -49,14 +49,8 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
         List<Object> params = new ArrayList<Object>();
         params.add(((IStructuredSelection) dateRangeCombo.getSelection())
             .getFirstElement().toString());
-        if (start.getDate() == null)
-            params.add(new Date(0));
-        else
-            params.add(start.getDate());
-        if (end.getDate() == null)
-            params.add(new Date());
-        else
-            params.add(end.getDate());
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
         return params;
     }
 

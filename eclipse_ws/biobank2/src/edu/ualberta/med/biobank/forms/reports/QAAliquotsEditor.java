@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms.reports;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -39,9 +38,9 @@ public class QAAliquotsEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null);
+            "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null);
+            null, null, null, SWT.DATE);
         widgetCreator.createLabel(parent, "Top Containers");
         topContainers = new TopContainerListWidget(parent, SWT.NONE);
         sampleType = createSampleTypeComboOption("Sample Type", parent);
@@ -51,14 +50,8 @@ public class QAAliquotsEditor extends ReportsEditor {
     @Override
     protected List<Object> getParams() throws Exception {
         List<Object> params = new ArrayList<Object>();
-        if (start.getDate() == null)
-            params.add(new Date(0));
-        else
-            params.add(start.getDate());
-        if (end.getDate() == null)
-            params.add(new Date());
-        else
-            params.add(end.getDate());
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
         params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
             .getSelection()).getFirstElement()).getNameShort());
         params.add(topContainers.getSelectedContainers());

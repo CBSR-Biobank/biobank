@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.forms.reports;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -31,7 +31,7 @@ public class FTAReportEditor extends ReportsEditor {
     protected void createOptionSection(Composite parent) {
         studyCombo = createStudyComboOption("Study", parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
-            "After Date (Processed)", null, null, null);
+            "After Date (Processed)", null, null, null, SWT.DATE);
     }
 
     @Override
@@ -39,10 +39,7 @@ public class FTAReportEditor extends ReportsEditor {
         List<Object> params = new ArrayList<Object>();
         params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
             .getSelection()).getFirstElement()).getNameShort());
-        if (afterDate.getDate() == null)
-            params.add(new Date(0));
-        else
-            params.add(afterDate.getDate());
+        params.add(ReportsEditor.processDate(afterDate.getDate(), true));
         return params;
     }
 

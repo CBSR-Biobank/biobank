@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -596,4 +597,32 @@ public abstract class ReportsEditor extends BiobankFormBase {
         return getParams();
     }
 
+    public static Date removeTime(Date date) {
+        Calendar cal = Calendar.getInstance(); // locale-specific
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    public static Date processDate(Date date, boolean startDate) {
+        Date processedDate;
+        if (date == null && startDate)
+            processedDate = new Date(0);
+        else if (date == null && !startDate)
+            processedDate = new Date();
+        else
+            processedDate = date;
+        processedDate = removeTime(processedDate);
+        if (!startDate) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(processedDate);
+            c.add(Calendar.DAY_OF_YEAR, 1);
+            c.add(Calendar.MINUTE, -1);
+            return (c.getTime());
+        } else
+            return processedDate;
+    }
 }
