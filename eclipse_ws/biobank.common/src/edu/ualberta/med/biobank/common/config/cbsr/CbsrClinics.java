@@ -1,128 +1,118 @@
-package edu.ualberta.med.biobank.common.cbsr;
+package edu.ualberta.med.biobank.common.config.cbsr;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import edu.ualberta.med.biobank.common.config.ConfigClinics;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
-public class CbsrClinics {
+public class CbsrClinics extends ConfigClinics {
 
-    private static Map<String, ClinicWrapper> clinicsMap = null;
-
-    private static Map<String, ContactWrapper> contactsMap = null;
-
-    public static void createClinics(SiteWrapper site) throws Exception {
+    public CbsrClinics(SiteWrapper site) throws Exception {
+        super(site);
         clinicsMap = new HashMap<String, ClinicWrapper>();
         contactsMap = new HashMap<String, ContactWrapper>();
 
-        addClinic(site, "CL1-Foothills", "CL1-Foothills", true, "Active", null,
+        addClinic("CL1-Foothills", "CL1-Foothills", true, "Active", null,
             "Foothills Medical Centre", "1403 29 Street", "Calgary", "Alberta",
             "t2n2t9");
-        addClinic(site, "CL1-Heritage", "CL1-Heritage", true, "Active",
+        addClinic("CL1-Heritage", "CL1-Heritage", true, "Active",
             "Shirley Cole", "Heritage Medical Research Clinic",
             "Suite 1140, 3350 Hospital Drive", "Calgary", "Alberta", "T2N4N1");
-        addClinic(site, "CL1-Sunridge", "CL1-Sunridge", true, "Active",
+        addClinic("CL1-Sunridge", "CL1-Sunridge", true, "Active",
             "Charlynn Ursu, Sharon Gulewich and Coralea Bignell",
             "Sunridge Medical Gallery, Alberta Health Services Building",
             "#200, 2580- 32 street NE Room 3001", "Calgary", "Alberta",
             "T1Y7M8");
-        addClinic(site, "CL2-Alberta's Children's Hospital",
-            "CL2-Children Hosp", true, "Active", null,
-            "Alberta Children's Hospital", "2888 Shaganappi Trail NW",
-            "Calgary", "Alberta", "t3b6a8");
-        addClinic(site, "ED1-UofA", "ED1-UofA", false, "Active", null,
+        addClinic("CL2-Alberta's Children's Hospital", "CL2-Children Hosp",
+            true, "Active", null, "Alberta Children's Hospital",
+            "2888 Shaganappi Trail NW", "Calgary", "Alberta", "t3b6a8");
+        addClinic("ED1-UofA", "ED1-UofA", false, "Active", null,
             "University of Alberta Hospital", null, "Edmonton", "Alberta",
             "T6G2B7");
-        addClinic(site, "FM1-Phillo King", "FM1-King", true, "Active",
-            "Philo King", "124 Beardsley Crescent", null, "Fort McMurray",
-            "Alberta", "T9H2S2");
-        addClinic(site, "GP1-Queen Elizabeth Hospital", "GP1-QE Hosp", true,
+        addClinic("FM1-Phillo King", "FM1-King", true, "Active", "Philo King",
+            "124 Beardsley Crescent", null, "Fort McMurray", "Alberta",
+            "T9H2S2");
+        addClinic("GP1-Queen Elizabeth Hospital", "GP1-QE Hosp", true,
             "Active", "Sharon Mollins", "Renal Dialysis 2W", "10409-98 Street",
             "Grande Prairie", "Alberta", "T8V0E2");
-        addClinic(site, "HL1-Queen Elizabeth II Hospital", "HL1-QE II", true,
+        addClinic("HL1-Queen Elizabeth II Hospital", "HL1-QE II", true,
             "Active", null, "QE11 Health Sciences Centre",
             "5788 University Avenue", "Halifax", "Nova Scotia", "B3H1V8");
-        addClinic(site, "HL2-IWK Health Center", "HL2-IWK", true, "Active",
-            null, "IWK Health Centre", "5850 University Ave PO Box 9700",
-            "Halifax", "Nova Scotia", "B3K6R8");
-        addClinic(site, "HM1-McMaster University", "HM1-McMaster", true,
-            "Active", null, "McMaster University Medical Centre",
+        addClinic("HL2-IWK Health Center", "HL2-IWK", true, "Active", null,
+            "IWK Health Centre", "5850 University Ave PO Box 9700", "Halifax",
+            "Nova Scotia", "B3K6R8");
+        addClinic("HM1-McMaster University", "HM1-McMaster", true, "Active",
+            null, "McMaster University Medical Centre",
             "1200 Main street West", "Hamilton", "Ontario", "L8N3Z5");
-        addClinic(site, "KN1-Kingston Cancer Center", "KN1-Cancer Ctr", true,
+        addClinic("KN1-Kingston Cancer Center", "KN1-Cancer Ctr", true,
             "Active", null, "Kingston Cancer Centre", "25 King Street",
             "Kingston", "Ontario", "K7L5P9");
-        addClinic(site, "LM1-Lloydminister Hospital", "LM1-Lloyd Hosp", true,
+        addClinic("LM1-Lloydminister Hospital", "LM1-Lloyd Hosp", true,
             "Active", "", "3820 43 Avenue", "Room 307", "Lloydminister",
             "Saskatchewan", "S9V1Y5");
-        addClinic(site, "LN1-St Joseph's Health Center", "LN1-St Joseph", true,
+        addClinic("LN1-St Joseph's Health Center", "LN1-St Joseph", true,
             "Active", null, "St Joseph's Health Centre",
             "800 Comissioners Road East", "London", "Ontario", "N6A4V2");
-        addClinic(site, "MC1-Moncton Hospital", "MC1-Moncton Hosp", true,
-            "Active", null, "Moncton Hospital", "135 MacBeath", "Moncton",
+        addClinic("MC1-Moncton Hospital", "MC1-Moncton Hosp", true, "Active",
+            null, "Moncton Hospital", "135 MacBeath", "Moncton",
             "New Brunswick", "E1C6Z8");
-        addClinic(site, "MN1-Hopital Ste-Justine", "MN1-Ste-Justine", true,
-            "Active", null, "Hopital Ste-Justine", "3175 Cote Ste-Catherine",
-            "Montreal", "Quebec", "H3T1C5");
-        addClinic(site, "MN2-Montreal Children's Hospital",
-            "MN2-Children Hosp", true, "Active", null,
-            "Montreal Children's Hospital", "2300 rue Tupper", "Montreal",
-            "Quebec", "H3H1P3");
-        addClinic(site, "OL1-Jodie Hingst", "OL1-Hingst", true, "Active", "",
+        addClinic("MN1-Hopital Ste-Justine", "MN1-Ste-Justine", true, "Active",
+            null, "Hopital Ste-Justine", "3175 Cote Ste-Catherine", "Montreal",
+            "Quebec", "H3T1C5");
+        addClinic("MN2-Montreal Children's Hospital", "MN2-Children Hosp",
+            true, "Active", null, "Montreal Children's Hospital",
+            "2300 rue Tupper", "Montreal", "Quebec", "H3H1P3");
+        addClinic("OL1-Jodie Hingst", "OL1-Hingst", true, "Active", "",
             "5123 42 Street", null, "Olds", "Alberta", "T4H1X1");
-        addClinic(site, "OT1-Ottawa Hospital", "OT1-Ottawa Hosp", true,
-            "Active", null, "Ottawa Hospital", "501 Smyth Road", "Ottawa",
-            "Ontario", "K1H8L6");
-        addClinic(site, "OT2-Children's Hospital of Eastern Ontario",
+        addClinic("OT1-Ottawa Hospital", "OT1-Ottawa Hosp", true, "Active",
+            null, "Ottawa Hospital", "501 Smyth Road", "Ottawa", "Ontario",
+            "K1H8L6");
+        addClinic("OT2-Children's Hospital of Eastern Ontario",
             "OT2-Children Hosp", true, "Active", null,
             "Children's Hospital of Eastern Ontario", "401 Smyth Road",
             "Ottawa", "Ontario", "K1G4X3");
-        addClinic(site, "QB1-Hopital Enfant-Jesus", "QB1-Enfant-Jesus", true,
+        addClinic("QB1-Hopital Enfant-Jesus", "QB1-Enfant-Jesus", true,
             "Active", null, "CHA Hopital Enfant-Jesus", "1401 18e Rue",
             "Quebec City", "Quebec", "G1J1Z4");
-        addClinic(site, "RD1-Red Deer Regional Hospital", "RD1-Red Deer Hosp",
-            true, "Active", "", "Red Deer Regional Hospital",
+        addClinic("RD1-Red Deer Regional Hospital", "RD1-Red Deer Hosp", true,
+            "Active", "", "Red Deer Regional Hospital",
             "Room 120, 3942 50A Avenue", "Red Deer", "Alberta", "T4N6R2");
-        addClinic(site, "SB1-Saint Johns NB Regional Hospital",
+        addClinic("SB1-Saint Johns NB Regional Hospital",
             "SB1-St John NB Hosp", true, "Active", null,
             "Saint Johns Regional Hospital", "400 University Avenue",
             "St John", "New Brunswick", "E2L4L2");
-        addClinic(site, "SD1-Sudbury Regional Hospital", "SD1-Sudbury Hosp",
-            true, "Active", null, "Sudbury Regional Hospital",
-            "41 Ramsey Lake Road", "Sudbury", "Ontario", "P3E5J1");
-        addClinic(site, "SF1-Health Science Center", "SF1-Health NFLD", true,
+        addClinic("SD1-Sudbury Regional Hospital", "SD1-Sudbury Hosp", true,
+            "Active", null, "Sudbury Regional Hospital", "41 Ramsey Lake Road",
+            "Sudbury", "Ontario", "P3E5J1");
+        addClinic("SF1-Health Science Center", "SF1-Health NFLD", true,
             "Active", "", "Health Science Centre, Eastern Health",
             "300 Prince Philip Drive, Room 4304D", "St John's",
             "Newfoundland and Labrador", "A1B3V6");
-        addClinic(site, "SP1-St Therese Hospital", "SP1-St Therese Hosp",
-            false, "Active", "", "St Therese Hospital",
-            "4713 48 Avenue, PO Box 880", "St Paul", "Alberta", "T0A3A3");
-        addClinic(site, "SS1-Royal University Hospital", "SS1-Royal Hosp",
-            true, "Active", null, "Royal University Hospital",
-            "103 Hospital Drive", "Saskatoon", "Alberta", "S7N0W8");
-        addClinic(site, "TH1-Thunder Bay Regional Hospital",
-            "TH1-Regional Hosp", true, "Active", null,
-            "Thunder Bay Regional Hospital", "980 Oliver Road", "Thunder Bay",
-            "Ontario", "P7B6V4");
-        addClinic(site, "TR1-St Michael's Hospital", "TR1-St Mikes", true,
-            "Closed", null, null, null, "Toronto", "Ontario", null);
-        addClinic(site, "VN1-St Paul's Hospital", "VN1-St Paul", true,
-            "Active", "", "St Paul's Hospital",
+        addClinic("SP1-St Therese Hospital", "SP1-St Therese Hosp", false,
+            "Active", "", "St Therese Hospital", "4713 48 Avenue, PO Box 880",
+            "St Paul", "Alberta", "T0A3A3");
+        addClinic("SS1-Royal University Hospital", "SS1-Royal Hosp", true,
+            "Active", null, "Royal University Hospital", "103 Hospital Drive",
+            "Saskatoon", "Alberta", "S7N0W8");
+        addClinic("TH1-Thunder Bay Regional Hospital", "TH1-Regional Hosp",
+            true, "Active", null, "Thunder Bay Regional Hospital",
+            "980 Oliver Road", "Thunder Bay", "Ontario", "P7B6V4");
+        addClinic("TR1-St Michael's Hospital", "TR1-St Mikes", true, "Closed",
+            null, null, null, "Toronto", "Ontario", null);
+        addClinic("VN1-St Paul's Hospital", "VN1-St Paul", true, "Active", "",
+            "St Paul's Hospital",
             "1081 Burrard Street, Room 318 Comox Building", "Vancouver",
             "British Columbia", "V6Z1Y6");
-        addClinic(site, "VN2-BC Women and Children's Hospital",
-            "VN2-Childrens Hosp", true, "Active", null,
-            "Women's and Children's Health Centre", "4480 Oak Street",
-            "Vancouver", "British Columbia", "V6H3V4");
-        addClinic(site, "WL1-Westlock Health Care Center", "WL1-Westlock Hosp",
+        addClinic("VN2-BC Women and Children's Hospital", "VN2-Childrens Hosp",
+            true, "Active", null, "Women's and Children's Health Centre",
+            "4480 Oak Street", "Vancouver", "British Columbia", "V6H3V4");
+        addClinic("WL1-Westlock Health Care Center", "WL1-Westlock Hosp",
             false, "Active", "", "Westlock Health Care Centre",
             "Clinical Laboratory, 10020 93 Street", "Westlock", "Alberta",
             "T7P2G4");
-        addClinic(site, "WN1-Cancer Care Manitoba", "WN1-Cancer Care", true,
+        addClinic("WN1-Cancer Care Manitoba", "WN1-Cancer Care", true,
             "Active", null, "Cancer Care Manitoba", "675 McDermot Avenue",
             "Winnipeg", "Manitoba", "R3E0V9");
 
@@ -138,6 +128,7 @@ public class CbsrClinics {
             "403-816-1501 work cell",
             "sharon.gulewich@albertahealthservices.ca");
         addContact("CL2-Children Hosp", "unknown", null, null, null, null);
+
         addContact("ED1-UofA", "Bonny Granfield", null, "780-719-6279", null,
             "bgranfield@biosample.ca");
         addContact("ED1-UofA", "Candace Dando", "Research Nurse",
@@ -154,19 +145,27 @@ public class CbsrClinics {
             "jae2@ualberta.ca");
         addContact("ED1-UofA", "Dr. Neesh Pannu", null, "780-401-0682 pager",
             null, null);
+        addContact("ED1-UofA", "Dr. Thomas Lee", "Principle Investigator",
+            "780-248-1033", null, null);
         addContact("ED1-UofA", "Elizabeth Taylor", "Laboratory Technician",
             "780-903-7093", null, "e.taylor@ualberta.ca");
-        addContact("ED1-UofA", "Erin Rezanoff", "Study Coordinator",
+        addContact("ED1-UofA", "Kathy Littlewood", "Research Coordinator",
             "780-407-7448", "780-407-3324",
-            "erin.rezanoff@albertahealthservices.ca");
+            "kathy.littlewood@albertahealthservices.ca");
         addContact("ED1-UofA", "Marleen Irwin", "Research Nurse",
             "780-221-1503", "780-431-3031 (pager)", "mirwin@ualberta.ca");
         addContact("ED1-UofA", "Melanie Peters", null, "780-407-6588", null,
             "melaniepeters@cha.ab.ca");
+        addContact("ED1-UofA", "Rae Foshaug", "Technician", "780-492-2925",
+            null, "raef@ualberta.ca");
+        addContact("ED1-UofA", "Sheri Cholin", "Research Coordinator",
+            "780-407-7448", "780-407-3324",
+            "sheri.cholin@albertahealtherives.ca");
+
         addContact("ED1-UofA", "Sue Szigety", null, "780-407-7868", null,
             "sszigety@ualberta.ca");
         addContact("ED1-UofA", "Wanda MacDonald", "Research Coordinator",
-            "780-248-1037", "780-445-7769 pager", "wmacdona@ualberta.ca");
+            "780-248-1037", "", "wmacdona@ualberta.ca");
         addContact("FM1-King", "Phillo King", null, "780-799-4382", null,
             "pmking@nlhr.ca");
         addContact("GP1-QE Hosp", "Sharon Mollins", null, "780-538-7576", null,
@@ -225,85 +224,6 @@ public class CbsrClinics {
             "780-350-2025", "780-349-5922", "cathy.lent@aspenha.ab.ca");
         addContact("WN1-Cancer Care", "Kathy Hjalmarsson", null,
             "204-787-4254", null, "kathy.hjalmarsson@cancercare.mb.ca");
-    }
-
-    private static ClinicWrapper addClinic(SiteWrapper site, String name,
-        String nameShort, boolean sendsShipments, String activityStatusName,
-        String comment, String street1, String street2, String city,
-        String province, String postalCode) throws Exception {
-        ClinicWrapper clinic = new ClinicWrapper(site.getAppService());
-        clinic.setSite(site);
-        clinic.setName(name);
-        clinic.setNameShort(nameShort);
-        clinic.setSendsShipments(sendsShipments);
-        clinic
-            .setActivityStatus(CbsrSite.getActivityStatus(activityStatusName));
-        clinic.setComment(comment);
-        clinic.setStreet1(street1);
-        clinic.setStreet2(street2);
-        clinic.setCity(city);
-        clinic.setProvince(province);
-        clinic.setPostalCode(postalCode);
-        clinic.persist();
-        clinic.reload();
-        clinicsMap.put(nameShort, clinic);
-        return clinic;
-    }
-
-    public static ClinicWrapper getClinic(String name) throws Exception {
-        ClinicWrapper clinic = clinicsMap.get(name);
-        if (clinic == null) {
-            throw new Exception("clinic with name \"" + name
-                + "\" does not exist");
-        }
-        return clinic;
-    }
-
-    public static List<String> getClinicNames() throws Exception {
-        if (clinicsMap == null) {
-            throw new Exception("clinics have not been added");
-        }
-        return Collections.unmodifiableList(new ArrayList<String>(clinicsMap
-            .keySet()));
-    }
-
-    private static ContactWrapper addContact(String clinicNameShort,
-        String name, String title, String officeNumber, String faxNumber,
-        String emailAddress) throws Exception {
-        ClinicWrapper clinic = clinicsMap.get(clinicNameShort);
-
-        if (clinic == null) {
-            throw new Exception("no clinic with name " + clinicNameShort);
-        }
-
-        ContactWrapper contact = new ContactWrapper(clinic.getAppService());
-        contact.setClinic(clinic);
-        contact.setName(name);
-        contact.setTitle(title);
-        contact.setOfficeNumber(officeNumber);
-        contact.setFaxNumber(faxNumber);
-        contact.setEmailAddress(emailAddress);
-        contact.persist();
-        contact.reload();
-        clinic.reload();
-        contactsMap.put(name, contact);
-        return contact;
-    }
-
-    public static ContactWrapper getContact(String name) throws Exception {
-        ContactWrapper contact = contactsMap.get(name);
-        if (contact == null) {
-            throw new Exception("contact with name \"" + name
-                + "\" does not exist");
-        }
-        return contact;
-    }
-
-    public static List<String> getContactNames() throws Exception {
-        if (contactsMap == null) {
-            throw new Exception("contacts have not been added");
-        }
-        return new ArrayList<String>(contactsMap.keySet());
     }
 
 }
