@@ -15,6 +15,7 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -83,7 +84,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private void createPatientSection() {
         Composite client = toolkit.createComposite(page);
-        GridLayout toplayout = new GridLayout(2, true);
+        GridLayout toplayout = new GridLayout(3, false);
         toplayout.horizontalSpacing = 10;
         client.setLayout(toplayout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -96,6 +97,10 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1Data.horizontalAlignment = SWT.FILL;
         patient1Data.verticalAlignment = SWT.FILL;
         patientArea1.setLayoutData(patient1Data);
+
+        Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP);
+        arrow.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_ARROW_LEFT2));
 
         Composite patientArea2 = toolkit.createComposite(client);
         GridLayout patient2Layout = new GridLayout(2, false);

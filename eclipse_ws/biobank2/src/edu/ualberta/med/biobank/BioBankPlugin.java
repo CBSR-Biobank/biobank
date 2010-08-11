@@ -55,6 +55,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_ARROW_UP = "arrow_up";
     public static final String IMG_ARROW_DOWN = "arrow_down";
     public static final String IMG_ARROW_LEFT = "arrow_left";
+    public static final String IMG_ARROW_LEFT2 = "arrow_left2";
     public static final String IMG_ARROW_RIGHT = "arrow_right";
     public static final String IMG_2_ARROW_LEFT = "2_arrow_left";
     public static final String IMG_2_ARROW_RIGHT = "2_arrow_right";
@@ -187,6 +188,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_ARROW_UP, "arrow_up.png");
         registerImage(registry, IMG_ARROW_DOWN, "arrow_down.png");
         registerImage(registry, IMG_ARROW_LEFT, "arrow_left.png");
+        registerImage(registry, IMG_ARROW_LEFT2, "arrow_left2.png");
         registerImage(registry, IMG_ARROW_RIGHT, "arrow_right.png");
         registerImage(registry, IMG_2_ARROW_LEFT, "2left_arrow.png");
         registerImage(registry, IMG_2_ARROW_RIGHT, "2right_arrow.png");
