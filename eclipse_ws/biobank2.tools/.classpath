@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/opencsv-2.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="/biobank.common/lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

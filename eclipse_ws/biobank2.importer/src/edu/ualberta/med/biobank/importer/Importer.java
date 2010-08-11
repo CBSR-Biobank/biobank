@@ -1,36 +1,11 @@
 package edu.ualberta.med.biobank.importer;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
 import edu.ualberta.med.biobank.common.ServiceConnection;
-import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
-import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrClinics;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainerTypes;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainers;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -57,6 +32,31 @@ import edu.ualberta.med.biobank.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /*
  * a call to get a column from a result set can only be made once, otherwise the
@@ -251,9 +251,9 @@ public class Importer {
                     decodePatientNumbers();
                 }
 
-                appService = ServiceConnection.getAppService("http://"
-                    + System.getProperty("server", "localhost:8080")
-                    + "/biobank2", "testuser", "test");
+                appService = ServiceConnection.getAppService(
+                    "http://" + System.getProperty("server", "localhost:8080")
+                        + "/biobank2", "testuser", "test");
 
                 cbsrSite = getCbsrSite();
 
@@ -286,16 +286,16 @@ public class Importer {
         cbsrSite = CbsrSite.addSite(appService);
 
         logger.info("creating clinics...");
-        CbsrClinics.createClinics(cbsrSite);
+        new CbsrClinics(cbsrSite);
 
         logger.info("creating studies... ");
-        CbsrStudies.createStudies(cbsrSite);
+        new CbsrStudies(cbsrSite);
 
         logger.info("creating container types...");
-        CbsrContainerTypes.createContainerTypes(cbsrSite);
+        new CbsrContainerTypes(cbsrSite);
 
         logger.info("creating containers...");
-        CbsrContainers.createContainers(cbsrSite);
+        new CbsrContainers(cbsrSite);
     }
 
     private static void doImport() throws Exception {
@@ -515,8 +515,10 @@ public class Importer {
             int cabinetNr = rs.getInt(1);
             String drawerNr = rs.getString(2);
             int binNr = rs.getInt(3);
-            String label = String.format("%02d%s%02d", new Object[] {
-                Integer.valueOf(cabinetNr), drawerNr, Integer.valueOf(binNr) });
+            String label = String.format(
+                "%02d%s%02d",
+                new Object[] { Integer.valueOf(cabinetNr), drawerNr,
+                    Integer.valueOf(binNr) });
             List<ContainerWrapper> binList = ContainerWrapper
                 .getContainersInSite(appService, cbsrSite, label);
             if (binList.size() == 0) {
@@ -564,9 +566,9 @@ public class Importer {
                     label = String.format("SS%s%02d", new Object[] { hotelNr,
                         Integer.valueOf(palletNr) });
                 else
-                    label = String.format("%02d%s%02d", new Object[] {
-                        Integer.valueOf(freezerNr), hotelNr,
-                        Integer.valueOf(palletNr) });
+                    label = String.format("%02d%s%02d",
+                        new Object[] { Integer.valueOf(freezerNr), hotelNr,
+                            Integer.valueOf(palletNr) });
                 List<ContainerWrapper> palletList = ContainerWrapper
                     .getContainersInSite(appService, cbsrSite, label);
                 if (palletList.size() == 0) {
@@ -577,8 +579,8 @@ public class Importer {
                     boolean palletFound = false;
                     for (ContainerWrapper bin : palletList) {
                         if (bin.getContainerType().getName().contains("Box")
-                            || bin.getContainerType().getName().contains(
-                                "Pallet")) {
+                            || bin.getContainerType().getName()
+                                .contains("Pallet")) {
                             palletFound = true;
                         }
                     }
@@ -891,8 +893,8 @@ public class Importer {
                 shipment.setClinic(clinic);
 
                 if (clinic.getSendsShipments()) {
-                    shipment.setWaybill(String.format("W-CBSR-%s-%s", clinic
-                        .getNameShort(), getWaybillDate(dateReceived)));
+                    shipment.setWaybill(String.format("W-CBSR-%s-%s",
+                        clinic.getNameShort(), getWaybillDate(dateReceived)));
                 }
                 shipment.setDateReceived(dateReceived);
                 shipment.setDateShipped(defaultDateShipped);
@@ -1254,8 +1256,8 @@ public class Importer {
             return;
         }
 
-        String aliquotLabel = String.format("%s%02d%s", parentContainer
-            .getLabel(), containerNr, containerPos);
+        String aliquotLabel = String.format("%s%02d%s",
+            parentContainer.getLabel(), containerNr, containerPos);
 
         RowColPos pos = container.getContainerType()
             .getRowColFromPositionString(containerPos);

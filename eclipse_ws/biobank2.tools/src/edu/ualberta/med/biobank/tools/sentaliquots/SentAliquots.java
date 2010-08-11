@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.tools.sentaliquots;
 
-import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -46,12 +45,13 @@ public class SentAliquots {
         String serverUrl = prefix + appArgs.hostname + ":" + appArgs.port
             + "/biobank2";
 
-        appService = ServiceConnection.getAppService(serverUrl,
-            appArgs.username, appArgs.password);
+        appService = edu.ualberta.med.biobank.common.ServiceConnection
+            .getAppService(serverUrl, appArgs.username, appArgs.password);
 
         site = getCbsrSite();
         if (site == null) {
-            throw new Exception("CBSR site not found on server " + appArgs.hostname);
+            throw new Exception("CBSR site not found on server "
+                + appArgs.hostname);
         }
 
         CSVReader reader = new CSVReader(new FileReader(appArgs.csvFileName));

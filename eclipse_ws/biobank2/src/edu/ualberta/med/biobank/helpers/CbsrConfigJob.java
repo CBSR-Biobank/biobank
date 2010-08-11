@@ -18,11 +18,11 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.cbsr.CbsrClinics;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainerTypes;
-import edu.ualberta.med.biobank.common.cbsr.CbsrContainers;
-import edu.ualberta.med.biobank.common.cbsr.CbsrSite;
-import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrClinics;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainerTypes;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrContainers;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.common.config.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -42,6 +42,8 @@ public class CbsrConfigJob {
     protected WritableApplicationService appService;
 
     protected SiteWrapper cbsrSite;
+
+    protected CbsrStudies cbsrStudies;
 
     protected Random r = new Random();
 
@@ -157,16 +159,16 @@ public class CbsrConfigJob {
             cbsrSite = CbsrSite.addSite(appService);
             break;
         case 2:
-            CbsrClinics.createClinics(cbsrSite);
+            new CbsrClinics(cbsrSite);
             break;
         case 3:
-            CbsrStudies.createStudies(cbsrSite);
+            cbsrStudies = new CbsrStudies(cbsrSite);
             break;
         case 4:
-            CbsrContainerTypes.createContainerTypes(cbsrSite);
+            new CbsrContainerTypes(cbsrSite);
             break;
         case 5:
-            CbsrContainers.createContainers(cbsrSite);
+            new CbsrContainers(cbsrSite);
             break;
         default:
             throw new Exception("sub task number " + subTaskNumber

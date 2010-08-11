@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.cbsr.CbsrStudies;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -106,7 +105,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
              * studies.get(r.nextInt(studies.size()));
              */
 
-            study = CbsrStudies.getStudy("BBPSP");
+            study = cbsrStudies.getStudy("BBPSP");
             study.reload();
             clinic = study.getContactCollection().get(0).getClinic();
 
@@ -123,8 +122,8 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             patient = patients.get(r.nextInt(patients.size()));
 
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
-            String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
-                .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
+            String dateStr = String.format("2009-%02d-%02d %02d:%02d",
+                r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
             shipment.setDateShipped(DateFormatter.parseToDateTime(dateStr));
             dateStr = String.format("2009-%02d-%02d %02d:%02d",
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
