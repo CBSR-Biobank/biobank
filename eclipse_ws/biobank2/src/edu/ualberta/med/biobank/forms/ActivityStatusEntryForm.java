@@ -38,13 +38,13 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
         form.setText("Activity Status Information");
         page.setLayout(new GridLayout(1, false));
 
-        createGlobalActivityStatusMethodSection();
+        createActivityStatusSection();
         setFirstControl(activityStatusTable);
 
     }
 
-    private void createGlobalActivityStatusMethodSection() throws Exception {
-        Section section = createSection("Global Activity Statuses");
+    private void createActivityStatusSection() throws Exception {
+        Section section = createSection("Activity Statuses");
 
         activityStatusTable = new ActivityStatusEntryInfoTable(section,
             "Add a new global activity status",

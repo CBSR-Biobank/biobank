@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,9 +31,9 @@ public class TestShippingMethod extends TestDatabase {
     public void testGettersAndSetters() throws Exception {
         String name = "testGettersAndSetters" + r.nextInt();
 
-        ShippingMethodWrapper company = ShippingMethodHelper
+        ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
-        testGettersAndSetters(company);
+        testGettersAndSetters(method);
     }
 
     @Test
@@ -46,28 +47,28 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ShippingMethodWrapper company1 = ShippingMethodHelper
+        ShippingMethodWrapper method1 = ShippingMethodHelper
             .addShippingMethod(name);
-        ShippingMethodWrapper company2 = ShippingMethodHelper
+        ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        ShipmentWrapper shipment1 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment1.setShippingMethod(company1);
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment1.setShippingMethod(method1);
         shipment1.persist();
-        ShipmentWrapper shipment2 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment2.setShippingMethod(company2);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment2.setShippingMethod(method2);
         shipment2.persist();
-        ShipmentWrapper shipment3 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment3.setShippingMethod(company2);
+        ShipmentWrapper shipment3 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment3.setShippingMethod(method2);
         shipment3.persist();
 
-        company1.reload();
-        company2.reload();
-        Assert.assertEquals(1, company1.getShipmentCollection().size());
-        Assert.assertEquals(2, company2.getShipmentCollection().size());
+        method1.reload();
+        method2.reload();
+        Assert.assertEquals(1, method1.getShipmentCollection().size());
+        Assert.assertEquals(2, method2.getShipmentCollection().size());
     }
 
     @Test
@@ -81,27 +82,27 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ShippingMethodWrapper company = ShippingMethodHelper
+        ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
 
-        ShipmentWrapper shipment1 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment1.setShippingMethod(company);
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment1.setShippingMethod(method);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
-        ShipmentWrapper shipment2 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment2.setShippingMethod(company);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment2.setShippingMethod(method);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
-        ShipmentWrapper shipment3 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment3.setShippingMethod(company);
+        ShipmentWrapper shipment3 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment3.setShippingMethod(method);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
-        company.reload();
-        List<ShipmentWrapper> shipments = company.getShipmentCollection(true);
+        method.reload();
+        List<ShipmentWrapper> shipments = method.getShipmentCollection(true);
         if (shipments.size() > 1) {
             for (int i = 0; i < shipments.size() - 1; i++) {
                 ShipmentWrapper s1 = shipments.get(i);
@@ -112,8 +113,8 @@ public class TestShippingMethod extends TestDatabase {
     }
 
     @Test
-    public void testGetShippingCompanies() throws Exception {
-        String name = "testGetShippingCompanies" + r.nextInt();
+    public void testGetShippingMethods() throws Exception {
+        String name = "testGetShippingMethods" + r.nextInt();
         int sizeBefore = ShippingMethodWrapper.getShippingMethods(appService)
             .size();
 
@@ -129,29 +130,68 @@ public class TestShippingMethod extends TestDatabase {
     @Test
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
-        ShippingMethodWrapper company = ShippingMethodHelper
+        ShippingMethodWrapper method = ShippingMethodHelper
             .newShippingMethod(name);
-        company.persist();
-        ShippingMethodHelper.createdCompanies.add(company);
+        method.persist();
+        ShippingMethodHelper.createdCompanies.add(method);
 
         ShippingMethod shipComp = new ShippingMethod();
-        shipComp.setId(company.getId());
+        shipComp.setId(method.getId());
         Assert.assertEquals(1, appService
             .search(ShippingMethod.class, shipComp).size());
+
+        ShippingMethodWrapper sm;
+
+        // add 5 shipping methods that will eventually be deleted
+        int before = ShippingMethodWrapper.getShippingMethods(appService)
+            .size();
+        List<ShippingMethodWrapper> toDelete = new ArrayList<ShippingMethodWrapper>();
+        for (int i = 0; i < 5; ++i) {
+            name = "testPersist" + i + r.nextInt();
+            sm = new ShippingMethodWrapper(appService);
+            sm.setName(name);
+            sm.persist();
+            sm.reload();
+            toDelete.add(sm);
+        }
+
+        List<ShippingMethodWrapper> statuses = ShippingMethodWrapper
+            .getShippingMethods(appService);
+        int after = statuses.size();
+        Assert.assertEquals(before + 5, after);
+        Assert.assertTrue(statuses.containsAll(toDelete));
+
+        // create 3 new shipping methods
+        before = after;
+        List<ShippingMethodWrapper> toAdd = new ArrayList<ShippingMethodWrapper>();
+        for (int i = 0; i < 3; ++i) {
+            name = "testPersist" + i + r.nextInt();
+            sm = new ShippingMethodWrapper(appService);
+            sm.setName(name);
+            toAdd.add(sm);
+        }
+
+        ShippingMethodWrapper.persistShippingMethods(toAdd, toDelete);
+
+        // now delete the ones previously added and add the new ones
+        statuses = ShippingMethodWrapper.getShippingMethods(appService);
+        after = statuses.size();
+        Assert.assertEquals(before - 5 + 3, after);
+        Assert.assertTrue(statuses.containsAll(toAdd));
     }
 
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        ShippingMethodWrapper company = ShippingMethodHelper.addShippingMethod(
+        ShippingMethodWrapper method = ShippingMethodHelper.addShippingMethod(
             name, false);
 
         ShippingMethod shipComp = new ShippingMethod();
-        shipComp.setId(company.getId());
+        shipComp.setId(method.getId());
         Assert.assertEquals(1, appService
             .search(ShippingMethod.class, shipComp).size());
 
-        company.delete();
+        method.delete();
 
         Assert.assertEquals(0, appService
             .search(ShippingMethod.class, shipComp).size());
@@ -160,7 +200,7 @@ public class TestShippingMethod extends TestDatabase {
     @Test
     public void testDeleteFailNoShipments() throws Exception {
         String name = "testDeleteFailNoShipments" + r.nextInt();
-        ShippingMethodWrapper company = ShippingMethodHelper.addShippingMethod(
+        ShippingMethodWrapper method = ShippingMethodHelper.addShippingMethod(
             name, false);
 
         SiteWrapper site = SiteHelper.addSite(name);
@@ -170,14 +210,14 @@ public class TestShippingMethod extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment1 = ShipmentHelper
-            .addShipment(site, clinic, patient1);
-        shipment1.setShippingMethod(company);
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment1.setShippingMethod(method);
         shipment1.persist();
-        company.reload();
+        method.reload();
 
         try {
-            company.delete();
+            method.delete();
             Assert.fail("one shipment in the collection");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -185,39 +225,97 @@ public class TestShippingMethod extends TestDatabase {
 
         shipment1.setShippingMethod(null);
         shipment1.persist();
-        company.reload();
-        company.delete();
+        method.reload();
+        method.delete();
     }
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        ShippingMethodWrapper company = ShippingMethodHelper
+        ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
-        company.setName("QQQQ");
-        company.reset();
-        Assert.assertEquals(name, company.getName());
+        method.setName("QQQQ");
+        method.reset();
+        Assert.assertEquals(name, method.getName());
     }
 
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetNew" + r.nextInt();
-        ShippingMethodWrapper company = ShippingMethodHelper
+        ShippingMethodWrapper method = ShippingMethodHelper
             .newShippingMethod(name);
-        company.setName("QQQQ");
-        company.reset();
-        Assert.assertEquals(null, company.getName());
+        method.setName("QQQQ");
+        method.reset();
+        Assert.assertEquals(null, method.getName());
     }
 
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        ShippingMethodWrapper company1 = ShippingMethodHelper
+        ShippingMethodWrapper method1 = ShippingMethodHelper
             .addShippingMethod("QWERTY" + name);
-        ShippingMethodWrapper company2 = ShippingMethodHelper
+        ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod("ASDFG" + name);
-        Assert.assertTrue(company1.compareTo(company2) > 0);
-        Assert.assertTrue(company2.compareTo(company1) < 0);
+        Assert.assertTrue(method1.compareTo(method2) > 0);
+        Assert.assertTrue(method2.compareTo(method1) < 0);
+    }
+
+    @Test
+    public void testIsUsed() throws Exception {
+        String[] names = new String[] { "testIsUsed1", "testIsUsed2" };
+        ShippingMethodWrapper[] methods = new ShippingMethodWrapper[] { null,
+            null };
+
+        int count = 0;
+        for (String name : names) {
+            ShippingMethodWrapper method = ShippingMethodHelper
+                .addShippingMethod(name);
+            method.setName("QQQQ");
+            method.reset();
+            Assert.assertEquals(name, method.getName());
+            methods[count] = method;
+            count++;
+        }
+
+        Assert.assertFalse(methods[0].isUsed());
+        Assert.assertFalse(methods[1].isUsed());
+
+        String name = "testIsUsed" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment1.setShippingMethod(methods[0]);
+        shipment1.setWaybill("QWERTY" + name);
+        shipment1.persist();
+
+        Assert.assertTrue(methods[0].isUsed());
+        Assert.assertFalse(methods[1].isUsed());
+
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            patient1);
+        shipment2.setShippingMethod(methods[1]);
+        shipment2.setWaybill(name + "QWERTY");
+        shipment2.persist();
+
+        Assert.assertTrue(methods[0].isUsed());
+        Assert.assertTrue(methods[1].isUsed());
+
+        shipment1.delete();
+
+        Assert.assertFalse(methods[0].isUsed());
+        Assert.assertTrue(methods[1].isUsed());
+
+        shipment2.delete();
+
+        Assert.assertFalse(methods[0].isUsed());
+        Assert.assertFalse(methods[1].isUsed());
     }
 
 }
