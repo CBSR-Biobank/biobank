@@ -51,6 +51,65 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
+    // TODO finish testing
+    public void testGetStudyCollection() throws Exception {
+        String name = "testGetStudyCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        int studiesNber = r.nextInt(15) + 1;
+        StudyHelper.addStudies(name, studiesNber);
+
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        site.addStudies(studies);
+
+        List<StudyWrapper> siteStudies = site.getStudyCollection();
+
+        Assert.assertEquals(studies.size(), siteStudies.size());
+
+        // delete a study
+        StudyWrapper study = studies.get(r.nextInt(studies.size()));
+        studies.remove(study);
+        study.delete();
+        site.reload();
+        siteStudies = site.getStudyCollection();
+
+        Assert.assertEquals(studies.size(), siteStudies.size());
+    }
+
+    @Test
+    // TODO: update
+    public void testGetStudyCollectionBoolean() throws Exception {
+        String name = "testGetStudyCollectionBoolean" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudies(name, r.nextInt(15) + 5);
+
+        List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
+        if (studiesSorted.size() > 1) {
+            for (int i = 0; i < studiesSorted.size() - 1; i++) {
+                StudyWrapper study1 = studiesSorted.get(i);
+                StudyWrapper study2 = studiesSorted.get(i + 1);
+                Assert.assertTrue(study1.compareTo(study2) <= 0);
+            }
+        }
+    }
+
+    @Test
+    // TODO: update
+    public void testAddStudies() throws Exception {
+        String name = "testAddStudies" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        int studiesNber = r.nextInt(15) + 1;
+        StudyHelper.addStudies(name, studiesNber);
+
+        StudyWrapper study = StudyHelper.newStudy(name + "newStudy");
+        site.addStudies(Arrays.asList(study));
+        site.persist();
+
+        site.reload();
+        // one study added
+        Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
+    }
+
+    @Test
     public void testGetClinicCollection() throws Exception {
         String name = "testGetClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
