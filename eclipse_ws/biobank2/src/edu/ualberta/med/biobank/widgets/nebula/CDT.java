@@ -71,12 +71,6 @@ public class CDT {
      * Style constant for drop down combo behavior (value is 1&lt;&lt;1).
      */
     public static final int DROP_DOWN = 1 << 1;
-
-    /**
-     * Style constant for simple combo behavior (value is 1&lt;&lt;1).
-     */
-    public static final int SIMPLE = 1 << 2;
-
     /**
      * Style constant for a DropCombo with its button to the Left of the text
      * (value is 1&lt;&lt;14).

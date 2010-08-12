@@ -29,7 +29,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,7 +45,6 @@ import edu.ualberta.med.biobank.widgets.nebula.v.VButton;
 import edu.ualberta.med.biobank.widgets.nebula.v.VCanvas;
 import edu.ualberta.med.biobank.widgets.nebula.v.VGridLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VLabel;
-import edu.ualberta.med.biobank.widgets.nebula.v.VLayout;
 import edu.ualberta.med.biobank.widgets.nebula.v.VNative;
 import edu.ualberta.med.biobank.widgets.nebula.v.VPanel;
 import edu.ualberta.med.biobank.widgets.nebula.v.VTracker;
@@ -121,58 +119,6 @@ public class CDateTime extends BaseCombo {
         }
     }
 
-    /**
-     * The layout used for a "basic" CDateTime - when it is neither of style
-     * SIMPLE or DROP_DOWN - with style of SPINNER.<br>
-     * Note that there is a spinner, but no button for this style.
-     */
-    class SpinnerLayout extends VLayout {
-
-        @Override
-        protected Point computeSize(VPanel panel, int wHint, int hHint,
-            boolean flushCache) {
-            Point size = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-
-            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
-            int sWidth = sRect.x + sRect.width
-                - (2 * spinner.getControl().getBorderWidth()) + 1;
-
-            size.x += sWidth;
-            size.x++;
-            size.y += textMarginHeight;
-
-            if (wHint != SWT.DEFAULT) {
-                size.x = Math.min(size.x, wHint);
-            }
-            if (hHint != SWT.DEFAULT) {
-                size.y = Math.min(size.y, hHint);
-            }
-            return size;
-        }
-
-        @Override
-        protected void layout(VPanel panel, boolean flushCache) {
-            Rectangle cRect = panel.getClientArea();
-            if (cRect.isEmpty())
-                return;
-
-            Point tSize = text.getControl().computeSize(SWT.DEFAULT,
-                SWT.DEFAULT);
-            tSize.y += textMarginHeight;
-
-            spinner.setBounds(cRect.x, cRect.y, cRect.width, tSize.y);
-
-            Rectangle sRect = spinner.getControl().computeTrim(0, 0, 0, 0);
-            int sWidth = sRect.x + sRect.width
-                - (2 * spinner.getControl().getBorderWidth()) + 1;
-
-            tSize.x = cRect.width - sWidth;
-
-            text.setBounds(cRect.x, cRect.y + getBorderWidth(), tSize.x,
-                tSize.y);
-        }
-    }
-
     private static final int FIELD_NONE = -1;
 
     private static final int DISCARD = 0;
@@ -183,9 +129,6 @@ public class CDateTime extends BaseCombo {
         int rstyle = SWT.NONE;
         if ((style & CDT.DROP_DOWN) != 0) {
             rstyle |= SWT.DROP_DOWN;
-        }
-        if ((style & CDT.SIMPLE) != 0) {
-            rstyle |= SWT.SIMPLE;
         }
         if ((style & CDT.READ_ONLY) != 0) {
             rstyle |= SWT.READ_ONLY;
@@ -418,15 +361,11 @@ public class CDateTime extends BaseCombo {
      * otherwise it creates the picker.
      */
     private void createPicker() {
-        if (isSimple()) {
-            pickerPanel = panel;
-            setContent(panel.getComposite());
-        } else if (isDropDown()) {
+        if (isDropDown()) {
             disposePicker();
 
             Shell shell = getContentShell();
-            int style = (isSimple() ? SWT.NONE : SWT.BORDER)
-                | SWT.DOUBLE_BUFFERED;
+            int style = SWT.BORDER | SWT.DOUBLE_BUFFERED;
             VCanvas canvas = new VCanvas(shell, style);
             pickerPanel = canvas.getPanel();
             pickerPanel.setWidget(canvas);
@@ -1117,30 +1056,27 @@ public class CDateTime extends BaseCombo {
         calendar = Calendar.getInstance(this.timezone, this.locale);
         calendar.setTime(new Date());
         tabStops = (style & CDT.TAB_FIELDS) != 0;
-        singleSelection = ((style & CDT.SIMPLE) == 0)
-            || ((style & CDT.MULTI) == 0);
+        singleSelection = true;
 
         setFormat(style);
 
-        if (!isSimple()) {
-            if (isDropDown()) {
-                if ((style & CDT.BUTTON_AUTO) != 0) {
-                    setButtonVisibility(BaseCombo.BUTTON_AUTO);
-                } else {
-                    setButtonVisibility(BaseCombo.BUTTON_ALWAYS);
-                }
+        if (isDropDown()) {
+            if ((style & CDT.BUTTON_AUTO) != 0) {
+                setButtonVisibility(BaseCombo.BUTTON_AUTO);
             } else {
-                setButtonVisibility(BaseCombo.BUTTON_NEVER);
-
+                setButtonVisibility(BaseCombo.BUTTON_ALWAYS);
             }
+        } else {
+            setButtonVisibility(BaseCombo.BUTTON_NEVER);
 
-            updateText();
-            activeField = -5;
-            setActiveField(FIELD_NONE);
+        }
 
-            if (checkText()) {
-                addTextListener();
-            }
+        updateText();
+        activeField = -5;
+        setActiveField(FIELD_NONE);
+
+        if (checkText()) {
+            addTextListener();
         }
     }
 
@@ -1500,10 +1436,6 @@ public class CDateTime extends BaseCombo {
             if (checkText()) {
                 updateText();
             }
-            if (isSimple()) {
-                disposePicker();
-                createPicker();
-            }
         } else {
             throw new IllegalArgumentException(
                 "Problem setting pattern: \"" + pattern + "\""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1512,11 +1444,6 @@ public class CDateTime extends BaseCombo {
 
     void setScrollable(boolean scrollable) {
         this.scrollable = scrollable;
-        if (isSimple() && !scrollable) {
-            if (picker != null && picker instanceof DatePicker) {
-                updatePicker();
-            }
-        }
     }
 
     /**

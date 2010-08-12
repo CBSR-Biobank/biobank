@@ -122,7 +122,7 @@ public class CDatePanel extends Composite {
 
     private void addMonth() {
         VNative<CDateTime> picker = VNative.create(CDateTime.class, body,
-            CDT.MULTI | CDT.SIMPLE);
+            CDT.MULTI);
         picker.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         CDateTime cdt = picker.getControl();
