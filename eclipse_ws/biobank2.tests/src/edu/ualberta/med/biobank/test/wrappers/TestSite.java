@@ -36,11 +36,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     @Test
     public void testGettersAndSetters() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"

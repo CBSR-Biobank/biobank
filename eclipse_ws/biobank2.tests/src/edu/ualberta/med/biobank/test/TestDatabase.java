@@ -47,6 +47,7 @@ public class TestDatabase {
         if (appService == null) {
             AllTests.setUp();
             appService = AllTests.appService;
+            Assert.assertNotNull("setUp: appService is null", appService);
         }
     }
 

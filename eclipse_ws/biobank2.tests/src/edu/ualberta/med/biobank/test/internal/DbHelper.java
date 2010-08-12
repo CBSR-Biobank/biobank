@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Assert;
+
 public class DbHelper {
 
     protected static WritableApplicationService appService;
@@ -21,6 +23,7 @@ public class DbHelper {
     protected static Random r = new Random();
 
     public static void setAppService(WritableApplicationService appService) {
+        Assert.assertNotNull("appService is null", appService);
         DbHelper.appService = appService;
     }
 
@@ -37,6 +40,7 @@ public class DbHelper {
 
     public static void deleteContainers(Collection<ContainerWrapper> containers)
         throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         if ((containers == null) || (containers.size() == 0))
             return;
 
@@ -54,6 +58,7 @@ public class DbHelper {
     }
 
     public static void deleteCreatedStudies() throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         for (StudyWrapper study : StudyWrapper.getAllStudies(appService)) {
             deletePatients(study.getPatientCollection());
             deleteFromList(study.getSampleStorageCollection());
@@ -64,6 +69,7 @@ public class DbHelper {
 
     public static void deletePatients(List<PatientWrapper> patients)
         throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         if (patients == null)
             return;
 
@@ -87,6 +93,7 @@ public class DbHelper {
 
     public static void deletePatientVisits(List<PatientVisitWrapper> visits)
         throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         if (visits == null)
             return;
 
@@ -99,6 +106,7 @@ public class DbHelper {
 
     public static void deleteClinics(List<ClinicWrapper> clinics)
         throws Exception {
+        Assert.assertNotNull("appService is null", appService);
         for (ClinicWrapper clinic : clinics) {
             clinic.reload();
             deleteFromList(clinic.getShipmentCollection());
