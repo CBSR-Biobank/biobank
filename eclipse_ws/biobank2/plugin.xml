@@ -283,6 +283,10 @@
             id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
             name="Edit Activity Status">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.changePassword"
+            name="Change Password">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -968,6 +972,20 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ChangePasswordHandler"
+            commandId="edu.ualberta.med.biobank.commands.changePassword">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -1060,6 +1078,12 @@
                       commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
                       id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
                       label="Edit Activity Status"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.changePassword"
+                      id="edu.ualberta.med.biobank.menu.changePassword"
+                      label="Change Password"
                       style="push">
                 </command>
          </menu>
@@ -1401,6 +1425,24 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
+                  icon="icons/patient_delete.png"
+                  label="Delete Patient"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.patientsPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/merge.png"
+                  label="Merge Patient"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
                   icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
@@ -1491,24 +1533,6 @@
                         definitionId="biobank2.patientsPerspectiveSelected">
                   </reference>
                </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
-                  icon="icons/patient_delete.png"
-                  label="Delete Patient"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/merge.png"
-                  label="Merge Patient"
-                  style="push">
             </command>
          </toolbar>
          <toolbar

@@ -70,7 +70,7 @@ public class CalgaryStudies extends ConfigStudies {
         addSampleStorage("HEART", "UrineC900", "6", "0.9", "Active");
         addSampleStorage("HEART", "UrineSA900", "12", "0.9", "Active");
 
-        addContact("HEART", "Morna Brown", "CL1-Foothills");
+        addContact("HEART", "Andrijana Lawton", "CL1-Foothills");
     }
 
 }

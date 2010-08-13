@@ -8,7 +8,7 @@ import java.net.URISyntaxException;
 
 public class GenericAppArgs {
     public boolean verbose = false;
-    public String host = "localhost";
+    public String hostname = "localhost";
     public String username = "testuser";
     public String password = "test";
     public int port = 8443;
@@ -22,7 +22,7 @@ public class GenericAppArgs {
     public GenericAppArgs(String argv[]) throws URISyntaxException {
 
         CmdLineParser parser = new CmdLineParser();
-        Option hostUrlOpt = parser.addStringOption('h', "hosturl");
+        Option hostnameOpt = parser.addStringOption('h', "hostname");
         Option portOpt = parser.addIntegerOption('p', "port");
         Option usernameOpt = parser.addStringOption('u', "user");
         Option verboseOpt = parser.addBooleanOption('v', "verbose");
@@ -40,9 +40,9 @@ public class GenericAppArgs {
             verbose = verbose.booleanValue();
         }
 
-        String host = (String) parser.getOptionValue(hostUrlOpt);
-        if (host != null) {
-            this.host = host;
+        String hostname = (String) parser.getOptionValue(hostnameOpt);
+        if (hostname != null) {
+            this.hostname = hostname;
         }
 
         Integer port = (Integer) parser.getOptionValue(portOpt);
@@ -51,7 +51,7 @@ public class GenericAppArgs {
         }
 
         String password = (String) parser.getOptionValue(passwordOpt);
-        if (host != null) {
+        if (hostname != null) {
             this.password = password;
         }
 
