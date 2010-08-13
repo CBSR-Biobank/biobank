@@ -49,6 +49,15 @@ public class SiteHelper extends DbHelper {
     }
 
     public static void deleteSite(SiteWrapper site) throws Exception {
+        if (!createdSites.contains(site)) {
+            throw new Exception("Site " + site.getName()
+                + " not created with SiteHelper");
+        }
+        createdSites.remove(site);
+        site.delete();
+    }
+
+    private static void deleteSiteInternal(SiteWrapper site) throws Exception {
         site.reload();
         deleteContainers(site.getTopContainerCollection());
         // in case containers with no top level type has been created without a
@@ -64,7 +73,7 @@ public class SiteHelper extends DbHelper {
 
     public static void deleteCreatedSites() throws Exception {
         for (SiteWrapper site : createdSites) {
-            deleteSite(site);
+            deleteSiteInternal(site);
         }
         createdSites.clear();
     }

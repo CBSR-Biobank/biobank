@@ -18,7 +18,9 @@ public class ShipmentHelper extends DbHelper {
         ClinicWrapper clinic, String waybill, Date dateReceived,
         PatientWrapper... patients) throws Exception {
         ShipmentWrapper shipment = new ShipmentWrapper(appService);
-        shipment.setSite(site);
+        if (site != null) {
+            shipment.setSite(site);
+        }
         shipment.setClinic(clinic);
         shipment.setWaybill(waybill);
         if (dateReceived != null) {

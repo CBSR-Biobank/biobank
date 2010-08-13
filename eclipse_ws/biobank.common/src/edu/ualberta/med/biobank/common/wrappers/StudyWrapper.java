@@ -104,16 +104,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    @Deprecated
-    public SiteWrapper getSite() {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public void setSite(SiteWrapper site) {
-    }
-
     @SuppressWarnings("unchecked")
     public List<SiteWrapper> getSiteCollection(boolean sort) {
         List<SiteWrapper> siteCollection = (List<SiteWrapper>) propertiesMap

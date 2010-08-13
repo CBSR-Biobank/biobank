@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -24,8 +23,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
-
-    private Set<GlobalPvAttrWrapper> deletedSitePvAttr = new HashSet<GlobalPvAttrWrapper>();
 
     private AddressWrapper address;
 
@@ -243,14 +240,38 @@ public class SiteWrapper extends ModelWrapper<Site> {
             || (getContainerCollection() != null && getContainerCollection()
                 .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
-                .size() > 0)
-            || (getStudyCollection() != null && getStudyCollection().size() > 0)) {
+                .size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
                     + ". All defined children (studies, clinics, container types, and containers) must be removed first.");
         }
+    }
 
+    public void addStudies(List<StudyWrapper> studies) {
+        if ((studies == null) || (studies.size() == 0))
+            return;
+
+        Collection<Study> allStudyObjects = new HashSet<Study>();
+        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+        // already added studies
+        List<StudyWrapper> currentList = getStudyCollection();
+        if (currentList != null) {
+            for (StudyWrapper study : currentList) {
+                allStudyObjects.add(study.getWrappedObject());
+                allStudyWrappers.add(study);
+            }
+        }
+        // new studies added
+        for (StudyWrapper study : studies) {
+            allStudyObjects.add(study.getWrappedObject());
+            allStudyWrappers.add(study);
+        }
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(allStudyObjects);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            allStudyObjects);
+        propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -274,31 +295,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(true);
-    }
-
-    public void addStudies(List<StudyWrapper> studies) {
-        if (studies != null && studies.size() > 0) {
-            Collection<Study> allStudyObjects = new HashSet<Study>();
-            List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-            // already added studies
-            List<StudyWrapper> currentList = getStudyCollection();
-            if (currentList != null) {
-                for (StudyWrapper study : currentList) {
-                    allStudyObjects.add(study.getWrappedObject());
-                    allStudyWrappers.add(study);
-                }
-            }
-            // new studies added
-            for (StudyWrapper study : studies) {
-                allStudyObjects.add(study.getWrappedObject());
-                allStudyWrappers.add(study);
-            }
-            Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-            wrappedObject.setStudyCollection(allStudyObjects);
-            propertyChangeSupport.firePropertyChange("studyCollection",
-                oldStudies, allStudyObjects);
-            propertiesMap.put("studyCollection", allStudyWrappers);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -501,45 +497,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getShipmentCollection(true);
     }
 
-    public void addShipments(List<ShipmentWrapper> visits) {
-        if (visits != null && visits.size() > 0) {
-            Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
-            List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
-            // already added visits
-            List<ShipmentWrapper> currentList = getShipmentCollection();
-            if (currentList != null) {
-                for (ShipmentWrapper study : currentList) {
-                    allShipmentObjects.add(study.getWrappedObject());
-                    allShipmentWrappers.add(study);
-                }
-            }
-            // new visits added
-            for (ShipmentWrapper visit : visits) {
-                allShipmentObjects.add(visit.getWrappedObject());
-                allShipmentWrappers.add(visit);
-            }
-            Collection<Shipment> oldVisits = wrappedObject
-                .getShipmentCollection();
-            wrappedObject.setShipmentCollection(allShipmentObjects);
-            propertyChangeSupport.firePropertyChange("shipmentCollection",
-                oldVisits, allShipmentObjects);
-            propertiesMap.put("shipmentCollection", allShipmentWrappers);
-        }
-    }
-
-    @Override
-    protected void persistDependencies(Site origObject) throws Exception {
-        persistSitePvAttr();
-    }
-
-    private void persistSitePvAttr() throws Exception {
-        for (GlobalPvAttrWrapper sitePvAttr : deletedSitePvAttr) {
-            if (!sitePvAttr.isNew()) {
-                sitePvAttr.delete();
-            }
-        }
-    }
-
     @Override
     public int compareTo(ModelWrapper<Site> wrapper) {
         if (wrapper instanceof SiteWrapper) {
@@ -556,7 +513,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * 
      * @throws BiobankCheckException
      */
-    public long getShipmentCount() throws ApplicationException,
+    public Long getShipmentCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
             + Shipment.class.getName() + " where clinic.site.id = ?",
@@ -569,11 +526,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public Long getPatientCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(patients) from "
-            + Site.class.getName() + " as site "
-            + "join site.shipmentCollection as shipments "
-            + "join shipments.patientCollection as patients "
-            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(distinct patients) from " + Site.class.getName()
+                + " as site " + "join site.shipmentCollection as shipments "
+                + "join shipments.patientCollection as patients "
+                + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -643,11 +600,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     public String toString() {
         return getName();
-    }
-
-    @Override
-    protected void resetInternalField() {
-        deletedSitePvAttr.clear();
     }
 
     /**

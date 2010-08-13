@@ -538,7 +538,6 @@
   </path>
   <path id="test.class.path">
     <pathelement location="${dest.dir.classes}" />
-    <pathelement location="${eclipse.proj.dir.common}/conf" />
   </path>
   <target name="tests-clean">
     <delete dir="${dest.dir}" />

@@ -40,6 +40,74 @@ import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
 
 public class TestStudy extends TestDatabase {
 
+    @Test
+    public void testGetSiteCollection() throws Exception {
+        String name = "testGetSiteCollection" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        int sitesNber = r.nextInt(15) + 1;
+        SiteHelper.addSites(name, sitesNber);
+
+        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        study.addSites(sites);
+        study.persist();
+        study.reload();
+
+        List<SiteWrapper> studySites = study.getSiteCollection();
+
+        Assert.assertEquals(sites.size(), studySites.size());
+
+        // delete a site
+        SiteWrapper site = sites.get(r.nextInt(sites.size()));
+        SiteHelper.deleteSite(site);
+        study.reload();
+
+        studySites = study.getSiteCollection();
+
+        Assert.assertEquals(sites.size(), studySites.size());
+    }
+
+    @Test
+    public void testGetSiteCollectionSorted() throws Exception {
+        String name = "testGetSiteCollectionSorted" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteHelper.addSites(name, r.nextInt(15) + 5);
+
+        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        study.addSites(sites);
+        study.persist();
+        study.reload();
+
+        List<SiteWrapper> sitesSorted = study.getSiteCollection(true);
+        Assert.assertTrue(sitesSorted.size() > 1);
+        for (int i = 0, n = sitesSorted.size() - 1; i < n; i++) {
+            SiteWrapper study1 = sitesSorted.get(i);
+            SiteWrapper study2 = sitesSorted.get(i + 1);
+            Assert.assertTrue(study1.compareTo(study2) <= 0);
+        }
+    }
+
+    @Test
+    public void testAddSites() throws Exception {
+        String name = "testGetSiteCollection" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        int sitesNber = r.nextInt(15) + 1;
+        SiteHelper.addSites(name, sitesNber);
+
+        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        study.addSites(sites);
+        study.persist();
+        study.reload();
+
+        // add one more site
+        SiteHelper.addSite(name + "newSite");
+        sites = SiteWrapper.getSites(appService);
+        study.addSites(sites);
+        study.persist();
+        study.reload();
+
+        Assert.assertEquals(sitesNber + 1, study.getSiteCollection().size());
+    }
+
     private static List<PatientVisitWrapper> studyAddPatientVisits(
         StudyWrapper study) throws Exception {
         String name = study.getName();
