@@ -563,6 +563,8 @@
   </target>
   <target name="test" depends="tests-compile"
           description="executes test cases">
+    <copy file="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/reports/reports.properties"
+          tofile="${dest.dir.classes}/edu/ualberta/med/biobank/common/reports/reports.properties" />
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="junit.class.path" />
       <classpath refid="application.config.class.path" />
@@ -575,6 +577,7 @@
       <batchtest todir="testing/raw">
         <fileset dir="${eclipse.proj.dir.junit}/src">
           <include name="**/Test*.java" />
+          <exclude name="edu/ualberta/med/biobank/test/speed/**" />
           <exclude name="**/TestCommon.java" />
           <exclude name="**/TestDatabase.java" />
           <exclude name="**/TestFunctionalities.java" />
@@ -603,6 +606,8 @@
   <target name="test-emma" depends="tests-compile"
           description="executes test cases with code coverage">
     <delete file="${test.output}/coverage.emma" />
+    <copy file="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/reports/reports.properties"
+          tofile="${dest.dir.classes}/edu/ualberta/med/biobank/common/reports/reports.properties" />
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="junit.class.path" />
       <classpath refid="application.config.class.path" />
@@ -616,6 +621,7 @@
       <batchtest todir="testing/raw">
         <fileset dir="${eclipse.proj.dir.junit}/src">
           <include name="**/Test*.java" />
+          <exclude name="edu/ualberta/med/biobank/test/speed/**" />
           <exclude name="**/TestCommon.java" />
           <exclude name="**/TestDatabase.java" />
           <exclude name="**/TestFunctionalities.java" />
