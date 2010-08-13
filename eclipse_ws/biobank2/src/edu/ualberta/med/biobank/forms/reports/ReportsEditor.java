@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -62,7 +63,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class ReportsEditor extends BiobankFormBase {
+public abstract class ReportsEditor extends BiobankFormBase implements
+    edu.ualberta.med.biobank.common.util.IBusyListener {
 
     // Report
     protected ReportTreeNode node;
@@ -83,6 +85,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
     private Button printButton;
     private Button exportPDFButton;
     private Button exportCSVButton;
+    private Semaphore semaphore = new Semaphore(1);
 
     // Mostly for visibility reasons
     private String path;
@@ -320,9 +323,10 @@ public abstract class ReportsEditor extends BiobankFormBase {
                             form.reflow(true);
                         }
                     });
-
                 }
             });
+            if (reportData instanceof BiobankListProxy)
+                ((BiobankListProxy) reportData).addBusyListener(this);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Query Error", e);
         }
@@ -624,5 +628,42 @@ public abstract class ReportsEditor extends BiobankFormBase {
             return (c.getTime());
         } else
             return processedDate;
+    }
+
+    @Override
+    public void showBusy() {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                IRunnableContext context = new ProgressMonitorDialog(Display
+                    .getDefault().getActiveShell());
+                try {
+                    context.run(true, true, new IRunnableWithProgress() {
+                        @Override
+                        public void run(final IProgressMonitor monitor) {
+                            try {
+                                semaphore.acquire();
+                                monitor.beginTask("Loading...",
+                                    IProgressMonitor.UNKNOWN);
+                                // waits thread until allowed to proceed
+                                semaphore.acquire();
+                                semaphore.release();
+                                monitor.done();
+
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError("Thread Error", e);
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    System.out.println("Loading Error");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void done() {
+        semaphore.release();
     }
 }
