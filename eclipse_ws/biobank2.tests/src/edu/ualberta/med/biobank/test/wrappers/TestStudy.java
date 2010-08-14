@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.test.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,11 +60,11 @@ public class TestStudy extends TestDatabase {
 
         // delete a site
         SiteWrapper site = sites.get(r.nextInt(sites.size()));
+        sites.remove(site);
         SiteHelper.deleteSite(site);
+
         study.reload();
-
         studySites = study.getSiteCollection();
-
         Assert.assertEquals(sites.size(), studySites.size());
     }
 
@@ -694,6 +696,148 @@ public class TestStudy extends TestDatabase {
 
         PatientHelper.addPatients(name, study);
         Assert.assertTrue(study.hasPatients());
+    }
+
+    @Test
+    public void testGetPatientCount() throws Exception {
+        String name = "testGetPatientCountForSite" + r.nextInt();
+
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
+
+        Map<StudyWrapper, List<PatientWrapper>> studyPatientsMap = new HashMap<StudyWrapper, List<PatientWrapper>>();
+        studyPatientsMap.put(study1, new ArrayList<PatientWrapper>());
+        studyPatientsMap.put(study2, new ArrayList<PatientWrapper>());
+
+        studyPatientsMap.get(study1).add(
+            PatientHelper.addPatient(name + "PATIENT1", study1));
+        studyPatientsMap.get(study1).add(
+            PatientHelper.addPatient(name + "PATIENT2", study1));
+
+        studyPatientsMap.get(study2).add(
+            PatientHelper.addPatient(name + "PATIENT3", study2));
+        studyPatientsMap.get(study2).add(
+            PatientHelper.addPatient(name + "PATIENT4", study2));
+
+        study1.reload();
+        study2.reload();
+
+        PatientWrapper patient;
+
+        for (StudyWrapper study : studyPatientsMap.keySet()) {
+            List<PatientWrapper> patients = studyPatientsMap.get(study);
+            while (patients.size() > 0) {
+                Assert.assertEquals(patients.size(), study.getPatientCount());
+
+                patient = patients.get(0);
+                patients.remove(patient);
+                patient.delete();
+                study.reload();
+            }
+            Assert.assertEquals(0, study.getPatientCount());
+        }
+
+    }
+
+    @Test
+    public void testGetPatientCountForSite() throws Exception {
+        String name = "testGetPatientCountForSite" + r.nextInt();
+        SiteWrapper site1 = SiteHelper.addSite(name + "s1");
+        SiteWrapper site2 = SiteHelper.addSite(name + "s2");
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site1, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site2, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
+        contacts.add(contact1);
+        contacts.add(contact2);
+
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
+        study1.addContacts(contacts);
+        study1.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
+            study1);
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site1, clinic1,
+            patient1);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
+            study1);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site2, clinic2,
+            patient1, patient2);
+        // clinic 1 = 1 patient for study 1
+        PatientVisitHelper.addPatientVisits(patient1, shipment1);
+        PatientVisitHelper.addPatientVisits(patient1, shipment2);
+        // clinic 2 = 2 patients for study 1
+        PatientVisitHelper.addPatientVisits(patient2, shipment2);
+
+        site1.reload();
+        site2.reload();
+        study1.reload();
+
+        Assert.assertEquals(1, study1.getPatientCountForSite(site1));
+        Assert.assertEquals(2, study1.getPatientCountForSite(site2));
+    }
+
+    @Test
+    public void testGetPatientVisitCountForSite() throws Exception {
+        String name = "testGetPatientVisitCountForSite" + r.nextInt();
+        SiteWrapper site1 = SiteHelper.addSite(name + "s1");
+        SiteWrapper site2 = SiteHelper.addSite(name + "s2");
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site1, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site1, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
+        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
+        study2.addContacts(Arrays.asList(contact2));
+        study2.persist();
+
+        PatientWrapper patient1 = PatientHelper
+            .addPatient(name + "_p1", study1);
+        PatientWrapper patient2 = PatientHelper
+            .addPatient(name + "_p2", study2);
+        PatientWrapper patient3 = PatientHelper
+            .addPatient(name + "_p3", study1);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site1, clinic1,
+            patient1, patient3);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site2, clinic2,
+            patient1, patient2);
+
+        // shipment1 has patient visits for patient1 and patient3
+        long nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
+            .size();
+        long nber2 = PatientVisitHelper.addPatientVisits(patient3, shipment1)
+            .size();
+
+        // shipment 2 has patient visits for patient1 and patient2
+        long nber3 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
+            .size();
+        long nber4 = PatientVisitHelper.addPatientVisits(patient2, shipment2)
+            .size();
+
+        site1.reload();
+        site2.reload();
+        study1.reload();
+        study2.reload();
+
+        Assert.assertEquals(nber + nber2,
+            study1.getPatientVisitCountForSite(site1));
+        Assert.assertEquals(0, study2.getPatientVisitCountForSite(site1));
+        Assert.assertEquals(nber3, study1.getPatientVisitCountForSite(site2));
+        Assert.assertEquals(nber4, study2.getPatientVisitCountForSite(site2));
     }
 
     @Test

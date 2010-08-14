@@ -45,6 +45,28 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
+    public void testAddress() throws Exception {
+        SiteWrapper site = new SiteWrapper(appService);
+        Assert.assertEquals(null, site.getStreet1());
+        Assert.assertEquals(null, site.getStreet2());
+        Assert.assertEquals(null, site.getCity());
+        Assert.assertEquals(null, site.getProvince());
+        Assert.assertEquals(null, site.getPostalCode());
+
+        site.setStreet1("testNullAddress1");
+        site.setStreet2("testNullAddress2");
+        site.setCity("testNullAddress3");
+        site.setProvince("testNullAddress4");
+        site.setPostalCode("testNullAddress5");
+
+        Assert.assertNotNull(site.getStreet1());
+        Assert.assertNotNull(site.getStreet2());
+        Assert.assertNotNull(site.getCity());
+        Assert.assertNotNull(site.getProvince());
+        Assert.assertNotNull(site.getPostalCode());
+    }
+
+    @Test
     public void testGetWrappedClass() throws Exception {
         String name = "testGetWrappedClass" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -501,6 +523,7 @@ public class TestSite extends TestDatabase {
 
         Assert.assertTrue(site.compareTo(site2) > 0);
         Assert.assertTrue(site2.compareTo(site) < 0);
+        Assert.assertTrue(site.compareTo(site) == 0);
     }
 
     private void createShipments(SiteWrapper site,
@@ -527,13 +550,13 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         createShipments(site, shipments);
 
-        List<ShipmentWrapper> savedShipments = site.getShipmentCollection(true);
+        List<ShipmentWrapper> savedShipments = site.getShipmentCollection();
         Assert.assertTrue(savedShipments.size() > 1);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (int i = 0, n = savedShipments.size() - 1; i < n; i++) {
             ShipmentWrapper s1 = savedShipments.get(i);
             ShipmentWrapper s2 = savedShipments.get(i + 1);
-            Assert.assertTrue(s1.compareTo(s2) <= 0);
+            Assert.assertTrue(s1.compareTo(s2) < 0);
         }
     }
 
