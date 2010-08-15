@@ -21,8 +21,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -127,13 +125,7 @@ public class ContainerAdapter extends AdapterBase {
                             + newContainer.getFullInfoLabel(),
                             IProgressMonitor.UNKNOWN);
                         try {
-                            for (RowColPos rcp : getContainer().getAliquots()
-                                .keySet()) {
-                                AliquotWrapper aliquot = getContainer()
-                                    .getAliquots().get(rcp);
-                                newContainer.addAliquot(rcp.row, rcp.col,
-                                    aliquot);
-                            }
+                            getContainer().moveAliquots(newContainer);
                             newContainer.persist();
                             newContainer.reload();
                         } catch (Exception e) {

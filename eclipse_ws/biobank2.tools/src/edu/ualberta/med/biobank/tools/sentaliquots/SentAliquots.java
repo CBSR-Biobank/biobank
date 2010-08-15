@@ -43,7 +43,7 @@ public class SentAliquots {
         if (appArgs.port == 8080)
             prefix = "http://";
 
-        String serverUrl = prefix + appArgs.host + ":" + appArgs.port
+        String serverUrl = prefix + appArgs.hostname + ":" + appArgs.port
             + "/biobank2";
 
         appService = ServiceConnection.getAppService(serverUrl,
@@ -51,7 +51,7 @@ public class SentAliquots {
 
         site = getCbsrSite();
         if (site == null) {
-            throw new Exception("CBSR site not found on server " + appArgs.host);
+            throw new Exception("CBSR site not found on server " + appArgs.hostname);
         }
 
         CSVReader reader = new CSVReader(new FileReader(appArgs.csvFileName));
