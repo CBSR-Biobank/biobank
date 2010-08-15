@@ -89,25 +89,42 @@ public class TestStudy extends TestDatabase {
     }
 
     @Test
-    public void testAddSites() throws Exception {
-        String name = "testGetSiteCollection" + r.nextInt();
+    public void testAddAndRemoveSites() throws Exception {
+        String name = "testAddSites" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        int sitesNber = r.nextInt(15) + 1;
-        SiteHelper.addSites(name, sitesNber);
+        int sitesCount1 = r.nextInt(15) + 1;
+        SiteHelper.addSites(name, sitesCount1);
 
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-        study.addSites(sites);
+        List<SiteWrapper> sitesGroup1 = SiteWrapper.getSites(appService);
+        study.addSites(sitesGroup1);
         study.persist();
         study.reload();
 
-        // add one more site
-        SiteHelper.addSite(name + "newSite");
-        sites = SiteWrapper.getSites(appService);
-        study.addSites(sites);
+        Assert.assertEquals(sitesCount1, study.getSiteCollection().size());
+
+        // add more sites
+        int sitesCount2 = r.nextInt(15) + 1;
+        SiteHelper.addSites(name + "_G2", sitesCount2);
+
+        List<SiteWrapper> sitesGroup2 = new ArrayList<SiteWrapper>();
+        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
+            if (!sitesGroup1.contains(site)) {
+                sitesGroup2.add(site);
+            }
+        }
+
+        study.addSites(sitesGroup2);
         study.persist();
         study.reload();
 
-        Assert.assertEquals(sitesNber + 1, study.getSiteCollection().size());
+        Assert.assertEquals(sitesCount1 + sitesCount2, study
+            .getSiteCollection().size());
+
+        study.removeSites(sitesGroup1);
+        Assert.assertEquals(sitesCount2, study.getSiteCollection().size());
+
+        study.removeSites(sitesGroup2);
+        Assert.assertEquals(0, study.getSiteCollection().size());
     }
 
     private static List<PatientVisitWrapper> studyAddPatientVisits(

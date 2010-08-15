@@ -307,7 +307,8 @@ public class TestShipment extends TestDatabase {
         ShipmentHelper.addShipment(site, clinic, patient1);
         ShipmentWrapper shipmentTest = ShipmentHelper.addShipment(site, clinic,
             patient1);
-        ShipmentHelper.addShipment(site, clinic, patient1);
+        ShipmentWrapper shipmentWithDate = ShipmentHelper.addShipment(site,
+            clinic, patient1);
 
         String waybill = shipmentTest.getWaybill();
 
@@ -317,6 +318,13 @@ public class TestShipment extends TestDatabase {
 
         Assert.assertEquals(1, shipsFound.size());
         Assert.assertEquals(shipmentTest, shipsFound.get(0));
+
+        // test for date
+        shipsFound = ShipmentWrapper.getShipmentsInSite(appService,
+            shipmentWithDate.getDateReceived(), site);
+
+        Assert.assertEquals(1, shipsFound.size());
+        Assert.assertEquals(shipmentWithDate, shipsFound.get(0));
     }
 
     @Test
