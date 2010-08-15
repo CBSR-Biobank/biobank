@@ -75,6 +75,9 @@ DROP TABLE object_attribute;
 
 DROP TABLE objectattributes;
 
+ALTER TABLE study_pv_attr
+      ADD `REQUIRED` bit(1) NULL DEFAULT NULL COMMENT '' AFTER PERMISSIBLE;
+
 ALTER TABLE pv_attr
     MODIFY VALUE varchar(255) NULL DEFAULT NULL COMMENT '';
 #
