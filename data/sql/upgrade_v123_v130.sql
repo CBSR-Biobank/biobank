@@ -22,6 +22,9 @@ INSERT INTO `global_pv_attr` (ID, LABEL, PV_ATTR_TYPE_ID) VALUES
 (5,"Visit Type",4),
 (6,"Biopsy Length",1);
 
+ALTER TABLE study_pv_attr
+      ADD `REQUIRED` bit(1) NULL DEFAULT NULL COMMENT '' AFTER PERMISSIBLE;
+
 CREATE TABLE site_study (
     STUDY_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
     SITE_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -74,9 +77,6 @@ DROP TABLE log_message;
 DROP TABLE object_attribute;
 
 DROP TABLE objectattributes;
-
-ALTER TABLE study_pv_attr
-      ADD `REQUIRED` bit(1) NULL DEFAULT NULL COMMENT '' AFTER PERMISSIBLE;
 
 ALTER TABLE pv_attr
     MODIFY VALUE varchar(255) NULL DEFAULT NULL COMMENT '';
