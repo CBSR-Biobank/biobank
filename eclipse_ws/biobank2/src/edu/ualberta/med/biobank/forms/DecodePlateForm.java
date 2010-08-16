@@ -38,8 +38,6 @@ public class DecodePlateForm extends PlateForm {
 
     Integer plateToScan;
 
-    boolean multipleScan;
-
     @Override
     protected void init() throws Exception {
         setPartName(Messages.getString("DecodePlate.tabTitle")); //$NON-NLS-1$
@@ -104,7 +102,6 @@ public class DecodePlateForm extends PlateForm {
 
     protected void scanAndProcessResult() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
-        multipleScan = multipleScanButton.getSelection();
 
         if (plateToScan == null) {
             BioBankPlugin.openAsyncError("Decode Plate Error",
@@ -176,11 +173,7 @@ public class DecodePlateForm extends PlateForm {
         monitor.subTask("Launching scan");
 
         ScanCell[][] decodedCells = null;
-        if (multipleScan) {
-            decodedCells = ScannerConfigPlugin.scanMultipleDpi(plateToScan);
-        } else {
-            decodedCells = ScannerConfigPlugin.scan(plateToScan);
-        }
+        decodedCells = ScannerConfigPlugin.scan(plateToScan);
         cells = PalletCell.convertArray(decodedCells);
     }
 
