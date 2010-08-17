@@ -27,7 +27,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console;bundle-version="3.4.0",
  org.eclipse.ui.views.log;bundle-version="1.0.100",
  biobank.common,
- scannerConfig;bundle-version="0.9.1"
+ scannerConfig;bundle-version="0.9.2"
 Bundle-Version: 1.2.4
 Bundle-Vendor: AICML
 Import-Package: edu.ualberta.med.scannerconfig,
