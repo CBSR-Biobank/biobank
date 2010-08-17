@@ -32,17 +32,48 @@ public class ContainerLabelingSchemeWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name" };
+        return new String[] { "name", "maxRows", "maxCols", "maxCapacity" };
     }
 
     public void setName(String name) {
-        String oldName = name;
+        String oldName = wrappedObject.getName();
         wrappedObject.setName(name);
         propertyChangeSupport.firePropertyChange("name", oldName, name);
     }
 
     public String getName() {
         return wrappedObject.getName();
+    }
+
+    public void setMaxRows(Integer maxRows) {
+        Integer oldMaxRows = wrappedObject.getMaxRows();
+        wrappedObject.setMaxRows(maxRows);
+        propertyChangeSupport.firePropertyChange("name", oldMaxRows, maxRows);
+    }
+
+    public Integer getMaxRows() {
+        return wrappedObject.getMaxRows();
+    }
+
+    public void setMaxCols(Integer maxCols) {
+        Integer oldMaxCols = wrappedObject.getMaxCols();
+        wrappedObject.setMaxCols(maxCols);
+        propertyChangeSupport.firePropertyChange("name", oldMaxCols, maxCols);
+    }
+
+    public Integer getMaxCols() {
+        return wrappedObject.getMaxCols();
+    }
+
+    public void setMaxCapacity(Integer maxCapacity) {
+        Integer oldMaxCapacity = wrappedObject.getMaxCapacity();
+        wrappedObject.setMaxCapacity(maxCapacity);
+        propertyChangeSupport.firePropertyChange("name", oldMaxCapacity,
+            maxCapacity);
+    }
+
+    public Integer getMaxCapacity() {
+        return wrappedObject.getMaxCapacity();
     }
 
     @Override
