@@ -25,6 +25,8 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -54,7 +56,8 @@ public class TestContainerType extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
-        "getChildLabelingScheme", "getChildLabelingSchemeName");
+        "getChildLabelingScheme", "getChildLabelingSchemeName",
+        "getRowCapacity", "getColCapacity");
 
     @Override
     @Before
@@ -126,6 +129,127 @@ public class TestContainerType extends TestDatabase {
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
         testGettersAndSetters(topType, GETTER_SKIP_METHODS);
+    }
+
+    @Test
+    public void testLabelingSchemeCapacity() throws Exception {
+        Integer maxRows = null;
+        Integer maxCols = null;
+        Integer maxCapacity = null;
+
+        List<ContainerLabelingSchemeWrapper> schemeWrappers = ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemes(appService);
+
+        ContainerTypeWrapper cTWrapper = ContainerTypeHelper.newContainerType(
+            site, "Bogus Top Container Type", "BTCT", 2, 1, 1, true);
+
+        for (ContainerLabelingSchemeWrapper schemeWrapper : schemeWrappers) {
+            ContainerLabelingScheme scheme = schemeWrapper.getWrappedObject();
+
+            cTWrapper.setChildLabelingScheme(schemeWrapper.getId());
+
+            maxRows = scheme.getMaxRows();
+            maxCols = scheme.getMaxCols();
+            maxCapacity = scheme.getMaxCapacity();
+
+            Assert.assertNotNull(
+                "Missing maximum capacity for container labeling scheme "
+                    + schemeWrapper.getName(), maxCapacity);
+
+            checkIllgealCapacities(cTWrapper, maxCapacity, maxRows, maxCols);
+            checkLegalCapacities(cTWrapper, maxCapacity, maxRows, maxCols);
+        }
+    }
+
+    private void checkIllgealCapacities(ContainerTypeWrapper wrapper,
+        Integer maxCapacity, Integer maxRows, Integer maxCols) {
+        if (maxRows != null) {
+            try {
+                wrapper.setRowCapacity(maxRows + 1);
+                wrapper.persist();
+                Assert.fail("Not allowed to set row capacity over maximum.");
+            } catch (Exception e) {
+                Assert.assertTrue(true);
+            }
+        }
+
+        if (maxCols != null) {
+            try {
+                wrapper.setColCapacity(maxCols + 1);
+                wrapper.persist();
+                Assert.fail("Not allowed to set col capacity over maximum.");
+            } catch (Exception e) {
+                Assert.assertTrue(true);
+            }
+        }
+
+        if ((maxRows == null) && (maxCols == null)) {
+            try {
+                int capacity = (int) Math.ceil(Math.sqrt(maxCapacity)) + 1;
+                wrapper.setRowCapacity(capacity);
+                wrapper.setColCapacity(capacity);
+                wrapper.persist();
+                Assert.fail("Not allowed to exceed capacity.");
+            } catch (Exception e) {
+                Assert.assertTrue(true);
+            }
+        }
+
+        try {
+            wrapper.setColCapacity(-1);
+            wrapper.setRowCapacity(-1);
+            wrapper.persist();
+            Assert.fail("Not allowed to set negative row or col capacity.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            wrapper.setColCapacity(0);
+            wrapper.setRowCapacity(0);
+            wrapper.persist();
+            Assert.fail("Not allowed to set row or col capacity to zero.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    /**
+     * Check all legal capacities. That is, check all factor pair combinations
+     * (numRows, numCols) of maxCapacity where numRows <= maxRows (if not null)
+     * and numCols <= maxCols (if not null).
+     * 
+     * @param wrapper
+     * @param maxCapacity
+     * @param maxRows
+     * @param maxCols
+     * @throws Exception
+     */
+    private void checkLegalCapacities(ContainerTypeWrapper wrapper,
+        Integer maxCapacity, Integer maxRows, Integer maxCols) throws Exception {
+        for (int numRows = 1, numCols = 1; numRows <= maxCapacity; numRows++) {
+            if ((maxRows != null) && (numRows > maxRows)) {
+                break;
+            }
+
+            if (maxCapacity % numRows == 0) {
+                numCols = maxCapacity / numRows;
+
+                if ((maxCols == null) || (numCols <= maxCols)) {
+                    wrapper.setRowCapacity(numRows);
+                    wrapper.setColCapacity(numCols);
+
+                    wrapper.persist();
+                    wrapper.reload();
+
+                    Assert.assertEquals("[gs]etRowCapacity() failed.", numRows,
+                        (int) wrapper.getRowCapacity());
+
+                    Assert.assertEquals("[gs]etColCapacity() failed.", numCols,
+                        (int) wrapper.getColCapacity());
+                }
+            }
+        }
     }
 
     @Test
@@ -562,7 +686,8 @@ public class TestContainerType extends TestDatabase {
             "ContactClinic");
         study.addContacts(Arrays.asList(contact));
         study.persist();
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);

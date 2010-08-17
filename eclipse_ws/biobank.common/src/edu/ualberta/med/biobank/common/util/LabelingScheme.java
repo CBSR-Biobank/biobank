@@ -115,6 +115,11 @@ public class LabelingScheme {
     public static boolean checkBounds(Integer labelingScheme, int totalRows,
         int totalCols) {
         int lettersLength = 0;
+
+        if (totalRows <= 0 || totalCols <= 0) {
+            return false;
+        }
+
         switch (labelingScheme) {
         // FIXME: This is wrong.. but i dont understand limits for labels..
         case 1:
@@ -122,7 +127,7 @@ public class LabelingScheme {
             return (totalRows <= lettersLength && totalCols <= 12);
         case 2:
             lettersLength = CBSR_LABELLING_PATTERN.length();
-            return (totalRows * totalCols < lettersLength * lettersLength);
+            return (totalRows * totalCols <= lettersLength * lettersLength);
         case 3:
             return (totalRows * totalCols <= 99);
         case 4:
