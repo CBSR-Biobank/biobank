@@ -130,6 +130,16 @@ ALTER TABLE study_source_vessel
 #  Possibly data modifications needed!
 #
 
+ALTER TABLE container_labeling_scheme
+      ADD `MAX_ROWS` int(11) NULL DEFAULT NULL COMMENT '' AFTER NAME,
+      ADD `MAX_COLS` int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_ROWS,
+      ADD `MAX_CAPACITY` int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_COLS;
+
+UPDATE container_labeling_scheme set max_rows=16,max_cols=24,max_capacity=384 where id=1;
+UPDATE container_labeling_scheme set max_capacity=576 where id=2;
+UPDATE container_labeling_scheme set max_capacity=99 where id=3;
+UPDATE container_labeling_scheme set max_rows=2,max_cols=2,max_capacity=4 where id=4;
+
 #
 # DDL END
 #
