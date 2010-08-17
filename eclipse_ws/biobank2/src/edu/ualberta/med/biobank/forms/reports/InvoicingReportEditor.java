@@ -8,23 +8,23 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
-public class AliquotCountEditor extends ReportsEditor {
+public class InvoicingReportEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.AliquotCountEditor";
+    public static String ID = "edu.ualberta.med.biobank.editors.InvoicingReportEditor";
     protected DateTimeWidget start;
     protected DateTimeWidget end;
 
     @Override
     protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
+        return new int[] { 100, 100, 100, 100, 100 };
     }
 
     @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null, SWT.DATE);
+            "Start Date (Processed/Linked)", null, null, null, SWT.DATE);
+        end = widgetCreator.createDateTimeWidget(parent,
+            "End Date (Processed/Linked)", null, null, null, SWT.DATE);
     }
 
     @Override
@@ -37,16 +37,16 @@ public class AliquotCountEditor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Sample Type", "Total" };
+        return new String[] { "Study", "Clinic", "Total Visits", "Sample Type",
+            "Total Aliquots" };
     }
 
     @Override
     protected List<String> getParamNames() {
-        List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Start Date (Linked)");
-        paramNames.add("End Date (Linked)");
-        return paramNames;
-
+        List<String> param = new ArrayList<String>();
+        param.add("Start Date (Processed/Linked)");
+        param.add("End Date (Processed/Linked)");
+        return param;
     }
 
 }

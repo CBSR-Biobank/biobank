@@ -1,28 +1,27 @@
 package edu.ualberta.med.biobank.server.reports;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QAAliquotsImpl extends AbstractReport {
 
-    private static final String QUERY = "select aliquot.aliquotPosition.container.label,"
-        + " aliquot.inventoryId, aliquot.patientVisit.patient.pnumber, "
-        + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
-        + Aliquot.class.getName()
+    private static final String QUERY = "from " + Aliquot.class.getName()
         + " as aliquot where aliquot.patientVisit.dateProcessed "
         + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"
         + " and aliquot.aliquotPosition.container.id "
-        + "in (select path1.container.id from "
-        + ContainerPath.class.getName()
-        + " as path1, "
-        + ContainerPath.class.getName()
+        + "in (select path1.container.id from " + ContainerPath.class.getName()
+        + " as path1, " + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.containerType.nameShort like ?) and aliquot.patientVisit.patient.study.site "
-        + SITE_OPERATOR + SITE_ID + " ORDER BY RAND()";
+        + " path2.container.id in (" + CONTAINER_LIST
+        + ")) and aliquot.patientVisit.patient.study.site " + SITE_OPERATOR
+        + SITE_ID + " ORDER BY RAND()";
 
     private int numResults;
 
@@ -33,8 +32,23 @@ public class QAAliquotsImpl extends AbstractReport {
     }
 
     @Override
-    public List<Object> postProcess(WritableApplicationService appService,
+    protected List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
-        return results.subList(0, numResults);
+        results = results.subList(0, numResults);
+        List<Object> modifiedResults = new ArrayList<Object>();
+        // get the info
+        for (Object ob : results) {
+            Aliquot a = (Aliquot) ob;
+            String pnumber = a.getPatientVisit().getPatient().getPnumber();
+            String inventoryId = a.getInventoryId();
+            String stName = a.getSampleType().getNameShort();
+            String dateProcessed = DateFormatter.formatAsDate(a
+                .getPatientVisit().getDateProcessed());
+            AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
+            String aliquotLabel = aliquotWrapper.getPositionString();
+            modifiedResults.add(new Object[] { aliquotLabel, inventoryId,
+                pnumber, dateProcessed, stName });
+        }
+        return modifiedResults;
     }
 }

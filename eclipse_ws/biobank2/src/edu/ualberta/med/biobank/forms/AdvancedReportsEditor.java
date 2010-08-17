@@ -55,7 +55,6 @@ import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.treeview.QueryTree;
-import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
@@ -180,8 +179,6 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                         dlg.getName(), (QueryTreeNode) tree.getInput());
                     newReport.setParent(custom);
                     custom.addChild(newReport);
-                    ReportsView.currentInstance.getTreeViewer().refresh();
-                    ReportsView.currentInstance.getTreeViewer().expandAll();
                 }
             }
         });
@@ -543,7 +540,6 @@ public class AdvancedReportsEditor extends BiobankFormBase {
 
     @Override
     public void setFocus() {
-        ReportsView.currentInstance.setSelectedNode(node);
     }
 
     @Override

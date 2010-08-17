@@ -42,6 +42,24 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + " as s inner join s.contactCollection as c where s.site.id "
         + SITE_OPERATOR + SITE_ID + " ORDER BY s.nameShort";
 
+    private static String SQL_PVCOUNT_STRING = "(select count(p.id) from patient as p where (select count(pv.id) "
+        + "from patient_visit as pv where pv.patient = p and pv.shipment.clinic = c.clinic and"
+        + " s=p.study and pv.dateProcessed between ? and ?) {0} {1})";
+
+    private static String SQL_QUERY_STRING = "select s.nameShort, clinic.nameShort, "
+        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "1")
+        + ", "
+        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "2")
+        + ", "
+        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "3")
+        + ", "
+        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "4")
+        + ", "
+        + MessageFormat.format(SQL_PVCOUNT_STRING, ">=", "5")
+        + " from"
+        + "(select * from patient_visit pv where pv.dateProcessed between ? and ? join patient p on filteredPvs.patient_id=p.id join study on study.id = p.study_id group by study.nameShort) "
+        + "filteredPvs " + " ";
+
     public PatientVisitSummaryImpl(BiobankReport report) {
         super(QUERY_STRING, report);
         List<Object> parameters = report.getParams();

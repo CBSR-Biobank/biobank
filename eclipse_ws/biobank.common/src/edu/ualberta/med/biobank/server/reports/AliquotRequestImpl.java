@@ -86,14 +86,15 @@ public class AliquotRequestImpl extends AbstractReport {
                     + ((i / 4) + 1)
                     + ", Column 4 \n Value must be less than 1000.");
             List<Object> queried = appService.query(c);
+
             for (int j = 0; j < maxResults; j++) {
                 if (j < queried.size())
                     results.add(queried.get(j));
-                else
-                    results.add(new Object[] { pnumber, "",
-                        DateFormatter.formatAsDate(dateDrawn), typeName,
-                        "NOT FOUND" });
             }
+            if (queried.size() < maxResults)
+                results.add(new Object[] { pnumber, "",
+                    DateFormatter.formatAsDate(dateDrawn), typeName,
+                    "NOT FOUND (" + (maxResults - queried.size()) + ")" });
         }
         return results;
     }

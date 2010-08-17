@@ -2109,6 +2109,34 @@
             id="edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm"
             name="Activity StatusMethod Entry">
       </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.reports.ContainerCapacityEditor"
+      default="false"
+      icon="icons/reportsPerspective.png"
+      id="edu.ualberta.med.biobank.editors.ContainerCapacityEditor"
+      name="Container Capacity">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.reports.ContainerEmptyLocationsEditor"
+      default="false"
+      icon="icons/reportsPerspective.png"
+      id="edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"
+      name="Container Empty Locations">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.reports.FTAReportEditor"
+      default="false"
+      icon="icons/reportsPerspective.png"
+      id="edu.ualberta.med.biobank.editors.FTAReportEditor"
+      name="FTA Report">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.reports.InvoicingReportEditor"
+      default="false"
+      icon="icons/reportsPerspective.png"
+      id="edu.ualberta.med.biobank.editors.InvoicingReportEditor"
+      name="Invoicing Report">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
