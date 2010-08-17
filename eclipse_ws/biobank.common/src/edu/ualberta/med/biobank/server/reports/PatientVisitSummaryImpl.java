@@ -1,81 +1,51 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.text.MessageFormat;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientVisitSummaryImpl extends AbstractReport {
 
-    private static String PVCOUNT_STRING = "(select count(p.id) from "
-        + Patient.class.getName() + " as p where (select count(pv.id) from "
-        + PatientVisit.class.getName()
-        + " as pv where pv.patient = p and pv.shipment.clinic = c.clinic and"
-        + " s=p.study and pv.dateProcessed between ? and ?) {0} {1})";
-
-    private static String QUERY_STRING = "select s.nameShort, c.clinic.nameShort, "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "1")
-        + ", "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "2")
-        + ", "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "3")
-        + ", "
-        + MessageFormat.format(PVCOUNT_STRING, "=", "4")
-        + ", "
-        + MessageFormat.format(PVCOUNT_STRING, ">=", "5")
-        + ", "
-        + "(select count(pvtotal.id) from "
-        + PatientVisit.class.getName()
-        + " as pvtotal where pvtotal.shipment.clinic=c.clinic and"
-        + " pvtotal.patient.study=s and pvtotal.dateProcessed between ? and ?), "
-        + "(select count(distinct patients.patient.id) from "
-        + PatientVisit.class.getName()
-        + " as patients where patients.shipment.clinic=c.clinic and"
-        + " patients.patient.study=s and patients.dateProcessed between ? and ?)"
-        + " from "
-        + Study.class.getName()
-        + " as s inner join s.contactCollection as c where s.site.id "
-        + SITE_OPERATOR + SITE_ID + " ORDER BY s.nameShort";
-
-    private static String SQL_PVCOUNT_STRING = "(select count(p.id) from patient as p where (select count(pv.id) "
-        + "from patient_visit as pv where pv.patient = p and pv.shipment.clinic = c.clinic and"
-        + " s=p.study and pv.dateProcessed between ? and ?) {0} {1})";
-
-    private static String SQL_QUERY_STRING = "select s.nameShort, clinic.nameShort, "
-        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "1")
-        + ", "
-        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "2")
-        + ", "
-        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "3")
-        + ", "
-        + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "4")
-        + ", "
-        + MessageFormat.format(SQL_PVCOUNT_STRING, ">=", "5")
-        + " from"
-        + "(select * from patient_visit pv where pv.dateProcessed between ? and ? join patient p on filteredPvs.patient_id=p.id join study on study.id = p.study_id group by study.nameShort) "
-        + "filteredPvs " + " ";
+    public static String QUERY_STRING = "select study_name, clinic_name, sum(pvCount=1), sum(pvCount=2), "
+        + "sum(pvCount=3), sum(pvCount=4), sum(pvCount >=5), sum(pvCount), count(patient_number) "
+        + "from (select s.name_short "
+        + "as study_name, c.name_short as clinic_name, p.pnumber as patient_number, count(pv.id) as pvCount "
+        + "from patient_visit pv join patient p on pv.patient_id=p.id join study s on s.id = p.study_id "
+        + "join shipment sh on sh.id=pv.shipment_id join clinic c on c.id=sh.clinic_id where pv.date_processed "
+        + "between ? and ? group by s.name_short, c.name_short, p.pnumber) as filteredPvs group by study_name, "
+        + "clinic_name";
 
     public PatientVisitSummaryImpl(BiobankReport report) {
         super(QUERY_STRING, report);
         List<Object> parameters = report.getParams();
-        int size = parameters.size();
-        for (int j = 0; j < 6; j++) {
-            for (int i = 0; i < size; i++) {
-                parameters.add(parameters.get(i));
-            }
-        }
+        this.queryString = queryString.replaceFirst("\\?",
+            "'" + DateFormatter.formatAsDate((Date) parameters.get(0)) + "'");
+        this.queryString = queryString.replaceFirst("\\?",
+            "'" + DateFormatter.formatAsDate((Date) parameters.get(1)) + "'");
         report.setParams(parameters);
+    }
+
+    @Override
+    public List<Object> executeQuery(WritableApplicationService appService)
+        throws ApplicationException {
+        return ((BiobankApplicationService) appService).query(
+            new BiobankSQLCriteria(queryString), Site.class.getName());
     }
 
     @Override
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
-        if (results.get(0) == null)
+        if (results.size() == 0)
             return results;
         List<Object> totalledResults = new ArrayList<Object>();
         String lastStudy = (String) ((Object[]) results.get(0))[0];
@@ -95,13 +65,22 @@ public class PatientVisitSummaryImpl extends AbstractReport {
                     sums[i] = new Long(0);
             }
             for (int i = 0; i < numSums; i++)
-                sums[i] += (Long) castObj[i + 2];
-            totalledResults.add(obj);
+                if (castObj[i + 2] instanceof BigInteger)
+                    sums[i] += ((BigInteger) castObj[i + 2]).longValue();
+                else if (castObj[i + 2] instanceof BigDecimal)
+                    sums[i] += ((BigDecimal) castObj[i + 2]).longValue();
+            totalledResults.add(new Object[] { castObj[0], castObj[1],
+                ((BigDecimal) castObj[2]).longValue(),
+                ((BigDecimal) castObj[3]).longValue(),
+                ((BigDecimal) castObj[4]).longValue(),
+                ((BigDecimal) castObj[5]).longValue(),
+                ((BigDecimal) castObj[6]).longValue(),
+                ((BigDecimal) castObj[7]).longValue(),
+                ((BigInteger) castObj[8]).longValue() });
             lastStudy = (String) castObj[0];
         }
         totalledResults.add(new Object[] { lastStudy, "All Clinics", sums[0],
             sums[1], sums[2], sums[3], sums[4], sums[5], sums[6] });
         return totalledResults;
     }
-
 }
