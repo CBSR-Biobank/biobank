@@ -24,8 +24,7 @@ public class EditActivityStatusHandler extends AbstractHandler {
         Assert.isNotNull(sessionAdapter);
         SiteWrapper siteWrapper = SessionManager.getInstance().getCurrentSite();
         SiteAdapter sa = new SiteAdapter(sessionAdapter, siteWrapper);
-        AdapterBase.openForm(new FormInput(sa),
-            ActivityStatusEntryForm.ID);
+        AdapterBase.openForm(new FormInput(sa), ActivityStatusEntryForm.ID);
         return null;
     }
 

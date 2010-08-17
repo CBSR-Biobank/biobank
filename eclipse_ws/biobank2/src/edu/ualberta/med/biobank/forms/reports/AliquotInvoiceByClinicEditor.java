@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.forms.reports;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -22,22 +22,16 @@ public class AliquotInvoiceByClinicEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null);
+            "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null);
+            null, null, null, SWT.DATE);
     }
 
     @Override
     protected List<Object> getParams() {
         List<Object> params = new ArrayList<Object>();
-        if (start.getDate() == null)
-            params.add(new Date(0));
-        else
-            params.add(start.getDate());
-        if (end.getDate() == null)
-            params.add(new Date());
-        else
-            params.add(end.getDate());
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
         return params;
     }
 

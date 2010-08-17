@@ -52,6 +52,7 @@ public class BiobankReport implements Serializable {
     protected String[] columnNames;
 
     protected List<Object> params;
+    protected String containerList;
 
     private String name;
     private String description;
@@ -141,6 +142,14 @@ public class BiobankReport implements Serializable {
 
     public String getClassName() {
         return className;
+    }
+
+    public void setContainerList(String s) {
+        this.containerList = s;
+    }
+
+    public String getContainerList() {
+        return containerList;
     }
 
 }

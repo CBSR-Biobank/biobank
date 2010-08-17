@@ -6,10 +6,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -57,12 +59,12 @@ import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.views.ReportsView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class ReportsEditor extends BiobankFormBase {
+public abstract class ReportsEditor extends BiobankFormBase implements
+    edu.ualberta.med.biobank.common.util.IBusyListener {
 
     // Report
     protected ReportTreeNode node;
@@ -83,6 +85,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
     private Button printButton;
     private Button exportPDFButton;
     private Button exportCSVButton;
+    private Semaphore semaphore = new Semaphore(1);
 
     // Mostly for visibility reasons
     private String path;
@@ -210,7 +213,7 @@ public abstract class ReportsEditor extends BiobankFormBase {
             if (site.getName().compareTo("All Sites") == 0)
                 op = "!=";
             report.setSiteInfo(op, site.getId());
-
+            String containerListString = "";
             List<Object> params = new ArrayList<Object>();
             String grouping = "";
             for (Object ob : getParams()) {
@@ -219,10 +222,18 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     DateGroup.valueOf((String) ob);
                     grouping = (String) ob;
                 } catch (Exception e) {
-                    params.add(ob);
+                    if (ob instanceof List) {
+                        for (Object item : (List<?>) ob)
+                            containerListString = containerListString
+                                .concat(item.toString() + ",");
+                        containerListString = containerListString.substring(0,
+                            Math.max(containerListString.length() - 1, 0));
+                    } else
+                        params.add(ob);
                 }
             }
             report.setParams(params);
+            report.setContainerList(containerListString);
             report.setGroupBy(grouping);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Input Error", e1);
@@ -312,9 +323,10 @@ public abstract class ReportsEditor extends BiobankFormBase {
                             form.reflow(true);
                         }
                     });
-
                 }
             });
+            if (reportData instanceof BiobankListProxy)
+                ((BiobankListProxy) reportData).addBusyListener(this);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Query Error", e);
         }
@@ -574,11 +586,6 @@ public abstract class ReportsEditor extends BiobankFormBase {
         return false;
     }
 
-    @Override
-    public void setFocus() {
-        ReportsView.currentInstance.setSelectedNode(node);
-    }
-
     protected abstract void createOptionSection(Composite parameterSection)
         throws Exception;
 
@@ -594,4 +601,69 @@ public abstract class ReportsEditor extends BiobankFormBase {
         return getParams();
     }
 
+    public static Date removeTime(Date date) {
+        Calendar cal = Calendar.getInstance(); // locale-specific
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    public static Date processDate(Date date, boolean startDate) {
+        Date processedDate;
+        if (date == null && startDate)
+            processedDate = new Date(0);
+        else if (date == null && !startDate)
+            processedDate = new Date();
+        else
+            processedDate = date;
+        processedDate = removeTime(processedDate);
+        if (!startDate) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(processedDate);
+            c.add(Calendar.DAY_OF_YEAR, 1);
+            c.add(Calendar.MINUTE, -1);
+            return (c.getTime());
+        } else
+            return processedDate;
+    }
+
+    @Override
+    public void showBusy() {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                IRunnableContext context = new ProgressMonitorDialog(Display
+                    .getDefault().getActiveShell());
+                try {
+                    context.run(true, true, new IRunnableWithProgress() {
+                        @Override
+                        public void run(final IProgressMonitor monitor) {
+                            try {
+                                semaphore.acquire();
+                                monitor.beginTask("Loading...",
+                                    IProgressMonitor.UNKNOWN);
+                                // waits thread until allowed to proceed
+                                semaphore.acquire();
+                                semaphore.release();
+                                monitor.done();
+
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError("Thread Error", e);
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    System.out.println("Loading Error");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void done() {
+        semaphore.release();
+    }
 }

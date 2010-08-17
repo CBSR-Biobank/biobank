@@ -19,7 +19,6 @@ import org.springframework.util.Assert;
  * <ul>
  * <li>Read only</li><br>
  * <li>Non-searchable</li><br>
- * <li>Non-iterable</li>
  * </ul>
  */
 public class BiobankListProxy implements List<Object>, Serializable {
@@ -27,15 +26,25 @@ public class BiobankListProxy implements List<Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
     protected List<Object> listChunk;
+    protected List<Object> nextListChunk;
     protected int pageSize;
     protected int offset;
+    protected int nextOffset;
     protected int realSize;
     protected transient ApplicationService appService;
     protected HQLCriteria criteria;
 
+    protected int loadedOffset;
+
+    protected boolean loading;
+
+    private IBusyListener listener;
+
     public BiobankListProxy(ApplicationService appService, HQLCriteria criteria) {
         this.appService = appService;
         this.offset = 0;
+        this.nextOffset = 1000;
+        this.loadedOffset = -2000;
         this.pageSize = appService.getMaxRecordsCount();
         this.criteria = criteria;
         this.realSize = -1;
@@ -87,15 +96,64 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     private void updateListChunk(int index) {
         if (index - offset >= pageSize || index < offset) {
-            offset = (index / pageSize) * pageSize;
-            try {
-                listChunk = appService.query(criteria, offset,
-                    Site.class.getName());
-                if (listChunk.size() != 1000 && realSize == -1)
-                    realSize = offset + listChunk.size();
-            } catch (ApplicationException e) {
-                throw new RuntimeException(e);
+            if (index < loadedOffset + pageSize) {
+                // swap
+                if (loading) {
+                    listener.showBusy();
+                    while (loading) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                    listener.done();
+                }
+                List<Object> temp = listChunk;
+                listChunk = nextListChunk;
+                nextListChunk = temp;
+                int tempOffset = loadedOffset;
+                loadedOffset = offset;
+                offset = tempOffset;
+            } else {
+                // user loading out of order, do a query on demand
+                try {
+                    offset = (index / pageSize) * pageSize;
+                    listChunk = appService.query(criteria, offset,
+                        Site.class.getName());
+                    if (listChunk.size() != 1000 && realSize == -1)
+                        realSize = offset + listChunk.size();
+                } catch (ApplicationException e) {
+                    throw new RuntimeException(e);
+                }
             }
+        } else
+            preLoadList(index);
+    }
+
+    private void preLoadList(final int i) {
+        if ((i - offset) > (pageSize / 2)) {
+            nextOffset = offset + pageSize;
+        } else
+            nextOffset = offset - pageSize;
+        if (loadedOffset != nextOffset && nextOffset >= 0) {
+            loadedOffset = nextOffset;
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        loading = true;
+                        nextListChunk = appService.query(criteria, nextOffset,
+                            Site.class.getName());
+                        if (nextListChunk.size() != 1000 && realSize == -1)
+                            realSize = nextOffset + listChunk.size();
+                        loading = false;
+                    } catch (ApplicationException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+            t.start();
         }
     }
 
@@ -209,5 +267,9 @@ public class BiobankListProxy implements List<Object>, Serializable {
      */
     public void setListChunk(List<Object> listChunk) {
         this.listChunk = listChunk;
+    }
+
+    public void addBusyListener(IBusyListener l) {
+        this.listener = l;
     }
 }

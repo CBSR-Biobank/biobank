@@ -29,6 +29,12 @@ public class AbstractReport {
 
     protected static final String GROUPBY_DATE_SEARCH_STRING = replacePatternString(GROUPBY_DATE);
 
+    protected static final String CONTAINER_LIST = "$$containerList$$";
+
+    protected static final String CONTAINER_LIST_SEARCH_STRING = replacePatternString(CONTAINER_LIST);
+
+    protected static final String FTA_CARD_SAMPLE_TYPE_NAME = "'DNA(Blood)'";
+
     protected AbstractReport(String queryString, BiobankReport report) {
         this.queryString = queryString;
         this.report = report;
@@ -57,6 +63,8 @@ public class AbstractReport {
             .getSiteId().toString());
         queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
             report.getGroupBy());
+        queryString = queryString.replaceAll(CONTAINER_LIST_SEARCH_STRING,
+            report.getContainerList());
         HQLCriteria criteria = new HQLCriteria(queryString, report.getParams());
         return new ReportListProxy(appService, criteria, getRowPostProcess());
     }
