@@ -11,7 +11,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -23,12 +22,10 @@ import edu.ualberta.med.biobank.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class DecodePlateForm extends PlateForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
-
-    private Button multipleScanButton;
 
     private ScanPalletWidget spw;
 
@@ -64,13 +61,6 @@ public class DecodePlateForm extends PlateForm {
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
-
-        multipleScanButton = new Button(form.getBody(), SWT.CHECK);
-        multipleScanButton.setText("Multiple Scan");
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        gd.grabExcessHorizontalSpace = true;
-        multipleScanButton.setLayoutData(gd);
 
         scanButton = toolkit.createButton(form.getBody(),
             "Scan && Decode Plate", SWT.PUSH);
