@@ -178,7 +178,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     /**
      * This method should only be called to save the new sample type list.
      */
-    public static void persistGlobalSampleTypes(
+    public static void persistSampleTypes(
         List<SampleTypeWrapper> addedOrModifiedTypes,
         List<SampleTypeWrapper> typesToDelete) throws BiobankCheckException,
         Exception {

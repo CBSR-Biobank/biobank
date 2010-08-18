@@ -125,18 +125,18 @@ public class TestSampleType extends TestDatabase {
     }
 
     @Test
-    public void testGetGlobalSampleTypes() throws Exception {
-        int startSize = SampleTypeWrapper.getAllSampleTypes(appService,
-            false).size();
+    public void testGetSampleTypes() throws Exception {
+        int startSize = SampleTypeWrapper.getAllSampleTypes(appService, false)
+            .size();
 
-        String name = "testGetGlobalSampleTypes" + r.nextInt();
+        String name = "testGetSampleTypes" + r.nextInt();
         SampleTypeHelper.addSampleType(name);
-        Assert.assertEquals(startSize,
+        Assert.assertEquals(startSize + 1,
             SampleTypeWrapper.getAllSampleTypes(appService, false).size());
 
         SampleTypeHelper.addSampleType(name + "_2");
-        Assert.assertEquals(startSize + 1, SampleTypeWrapper
-            .getAllSampleTypes(appService, false).size());
+        Assert.assertEquals(startSize + 2,
+            SampleTypeWrapper.getAllSampleTypes(appService, false).size());
 
         SampleTypeHelper.addSampleType("QWERTY" + name);
         SampleTypeHelper.addSampleType("ASDFG" + name);
@@ -152,18 +152,18 @@ public class TestSampleType extends TestDatabase {
     }
 
     @Test
-    public void testPersistGlobalSampleTypes() throws Exception {
+    public void testPersistSampleTypes() throws Exception {
         List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         int startSize = types.size();
 
-        String name = "testPersistGlobalSampleTypes" + r.nextInt();
+        String name = "testPersistSampleTypes" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
-        SampleTypeWrapper.persistGlobalSampleTypes(Arrays.asList(type), null);
-        Assert.assertEquals(startSize + 1, SampleTypeWrapper
-            .getAllSampleTypes(appService, false).size());
+        SampleTypeWrapper.persistSampleTypes(Arrays.asList(type), null);
+        Assert.assertEquals(startSize + 1,
+            SampleTypeWrapper.getAllSampleTypes(appService, false).size());
 
-        SampleTypeWrapper.persistGlobalSampleTypes(null, Arrays.asList(type));
+        SampleTypeWrapper.persistSampleTypes(null, Arrays.asList(type));
         Assert.assertEquals(startSize,
             SampleTypeWrapper.getAllSampleTypes(appService, false).size());
     }
