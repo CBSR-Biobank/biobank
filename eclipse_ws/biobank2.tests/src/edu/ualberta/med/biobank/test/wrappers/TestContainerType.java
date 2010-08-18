@@ -15,6 +15,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -22,9 +23,9 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -54,7 +55,8 @@ public class TestContainerType extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
-        "getChildLabelingScheme", "getChildLabelingSchemeName");
+        "getChildLabelingScheme", "getChildLabelingSchemeName",
+        "getRowCapacity", "getColCapacity");
 
     @Override
     @Before
@@ -126,6 +128,117 @@ public class TestContainerType extends TestDatabase {
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
         testGettersAndSetters(topType, GETTER_SKIP_METHODS);
+    }
+
+    @Test
+    public void testLabelingSchemeCapacity() throws Exception {
+        Integer maxRows = null;
+        Integer maxCols = null;
+        Integer maxCapacity = null;
+
+        Collection<ContainerLabelingSchemeWrapper> schemeWrappers = ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values();
+
+        ContainerTypeWrapper cTWrapper = ContainerTypeHelper.newContainerType(
+            site, "Bogus Top Container Type", "BTCT", 2, 1, 1, true);
+
+        for (ContainerLabelingSchemeWrapper schemeWrapper : schemeWrappers) {
+            cTWrapper.setChildLabelingScheme(schemeWrapper.getId());
+
+            maxRows = schemeWrapper.getMaxRows();
+            maxCols = schemeWrapper.getMaxCols();
+            maxCapacity = schemeWrapper.getMaxCapacity();
+
+            Assert.assertNotNull(
+                "Missing maximum capacity for container labeling scheme "
+                    + schemeWrapper.getName(), maxCapacity);
+
+            maxRows = maxRows != null ? maxRows : maxCapacity;
+            maxCols = maxCols != null ? maxCols : maxCapacity;
+
+            Assert.assertTrue("Max rows should not exceed max capacity.",
+                maxRows <= maxCapacity);
+            Assert.assertTrue("Max cols should not exceed max capacity.",
+                maxCols <= maxCapacity);
+
+            checkIllgealCapacities(cTWrapper, maxCapacity, maxRows, maxCols);
+            checkLegalCapacities(cTWrapper, maxCapacity, maxRows, maxCols);
+        }
+    }
+
+    private void checkIllgealCapacities(ContainerTypeWrapper wrapper,
+        Integer maxCapacity, Integer maxRows, Integer maxCols) {
+
+        try {
+            wrapper.setRowCapacity(maxRows + 1);
+            wrapper.setColCapacity(1);
+            wrapper.persist();
+            Assert.fail("Not allowed to set row capacity over maximum.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            wrapper.setRowCapacity(1);
+            wrapper.setColCapacity(maxCols + 1);
+            wrapper.persist();
+            Assert.fail("Not allowed to set col capacity over maximum.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            wrapper.setColCapacity(-1);
+            wrapper.setRowCapacity(-1);
+            wrapper.persist();
+            Assert.fail("Not allowed to set negative row or col capacity.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        try {
+            wrapper.setColCapacity(0);
+            wrapper.setRowCapacity(0);
+            wrapper.persist();
+            Assert.fail("Not allowed to set row or col capacity to zero.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    private void checkLegalCapacities(ContainerTypeWrapper wrapper,
+        Integer maxCapacity, Integer maxRows, Integer maxCols) throws Exception {
+
+        int numRows, numCols;
+
+        for (numRows = 1; numRows <= maxRows; numRows++) {
+            numCols = maxCapacity / numRows;
+            if (numCols <= maxCols) {
+                checkCapacity(wrapper, numRows, numCols);
+            }
+        }
+
+        for (numCols = 1; numCols <= maxCols; numCols++) {
+            numRows = maxCapacity / numCols;
+            if (numRows <= maxRows) {
+                checkCapacity(wrapper, numRows, numCols);
+            }
+        }
+    }
+
+    private void checkCapacity(ContainerTypeWrapper wrapper, Integer numRows,
+        Integer numCols) throws Exception {
+        wrapper.setRowCapacity(numRows);
+        wrapper.setColCapacity(numCols);
+
+        wrapper.persist();
+        wrapper.reload();
+
+        Assert.assertEquals("[gs]etRowCapacity() failed.", numRows,
+            wrapper.getRowCapacity());
+
+        Assert.assertEquals("[gs]etColCapacity() failed.", numCols,
+            wrapper.getColCapacity());
     }
 
     @Test
@@ -562,7 +675,8 @@ public class TestContainerType extends TestDatabase {
             "ContactClinic");
         study.addContacts(Arrays.asList(contact));
         study.persist();
-        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site,
+            clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);

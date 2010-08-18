@@ -284,6 +284,9 @@
     <copy todir="${eclipse.proj.dir.tools}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}"/>
     </copy>
+    <copy todir="${eclipse.proj.dir.tools}/lib">
+      <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}"/>
+    </copy>
   </target>
   <!-- JBoss -->
   <target name="check-jboss-uptodate">

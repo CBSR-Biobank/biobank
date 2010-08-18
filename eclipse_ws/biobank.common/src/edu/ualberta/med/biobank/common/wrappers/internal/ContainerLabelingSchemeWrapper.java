@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -14,6 +16,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerLabelingSchemeWrapper extends
     ModelWrapper<ContainerLabelingScheme> {
+    private static List<ContainerLabelingScheme> allSchemes;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemeWrappersMap;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -32,17 +36,48 @@ public class ContainerLabelingSchemeWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name" };
+        return new String[] { "name", "maxRows", "maxCols", "maxCapacity" };
     }
 
     public void setName(String name) {
-        String oldName = name;
+        String oldName = wrappedObject.getName();
         wrappedObject.setName(name);
         propertyChangeSupport.firePropertyChange("name", oldName, name);
     }
 
     public String getName() {
         return wrappedObject.getName();
+    }
+
+    public void setMaxRows(Integer maxRows) {
+        Integer oldMaxRows = wrappedObject.getMaxRows();
+        wrappedObject.setMaxRows(maxRows);
+        propertyChangeSupport.firePropertyChange("name", oldMaxRows, maxRows);
+    }
+
+    public Integer getMaxRows() {
+        return wrappedObject.getMaxRows();
+    }
+
+    public void setMaxCols(Integer maxCols) {
+        Integer oldMaxCols = wrappedObject.getMaxCols();
+        wrappedObject.setMaxCols(maxCols);
+        propertyChangeSupport.firePropertyChange("name", oldMaxCols, maxCols);
+    }
+
+    public Integer getMaxCols() {
+        return wrappedObject.getMaxCols();
+    }
+
+    public void setMaxCapacity(Integer maxCapacity) {
+        Integer oldMaxCapacity = wrappedObject.getMaxCapacity();
+        wrappedObject.setMaxCapacity(maxCapacity);
+        propertyChangeSupport.firePropertyChange("name", oldMaxCapacity,
+            maxCapacity);
+    }
+
+    public Integer getMaxCapacity() {
+        return wrappedObject.getMaxCapacity();
     }
 
     @Override
@@ -69,12 +104,14 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static List<ContainerLabelingSchemeWrapper> getAllLabelingSchemes(
         WritableApplicationService appService) throws ApplicationException {
-        List<ContainerLabelingScheme> schemes = appService.search(
-            ContainerLabelingScheme.class, new ContainerLabelingScheme());
-        return transformToWrapperList(appService, schemes);
+        if (allSchemes == null) {
+            allSchemes = appService.search(ContainerLabelingScheme.class,
+                new ContainerLabelingScheme());
+        }
+        return transformToWrapperList(appService, allSchemes);
     }
 
-    public static List<ContainerLabelingSchemeWrapper> transformToWrapperList(
+    private static List<ContainerLabelingSchemeWrapper> transformToWrapperList(
         WritableApplicationService appService,
         List<ContainerLabelingScheme> schemes) {
         List<ContainerLabelingSchemeWrapper> list = new ArrayList<ContainerLabelingSchemeWrapper>();
@@ -84,9 +121,32 @@ public class ContainerLabelingSchemeWrapper extends
         return list;
     }
 
+    public static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+        WritableApplicationService appService) throws ApplicationException {
+        List<ContainerLabelingSchemeWrapper> allLabelingSchemes = getAllLabelingSchemes(appService);
+        Map<Integer, ContainerLabelingSchemeWrapper> allLabelingSchemesMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
+
+        for (ContainerLabelingSchemeWrapper scheme : allLabelingSchemes) {
+            allLabelingSchemesMap.put(scheme.getId(), scheme);
+        }
+
+        return allLabelingSchemesMap;
+    }
+
     @Override
     public int compareTo(ModelWrapper<ContainerLabelingScheme> o) {
         return 0;
     }
 
+    @Override
+    public void persist() throws Exception {
+        super.persist();
+        allSchemes = null;
+    }
+
+    @Override
+    public void delete() throws Exception {
+        super.delete();
+        allSchemes = null;
+    }
 }

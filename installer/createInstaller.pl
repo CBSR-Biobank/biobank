@@ -31,23 +31,17 @@
 #       biobank2.ini
 #       ..ETC
 #
-#  scanlibDLL
-#       |
-#       cv210.dll
-#       cxcore210.dll
-#       OpenThreadsWin32.dll
-#
 #  createInstaller.pl
 #
 # Example:
-#       ./createInstaller.pl biobank2_exported scanlibDLL nsis
+#       ./createInstaller.pl biobank2_exported nsis
 #
 # This will create:
 #       BioBank2Installer-$VERSION.exe
 #
 ################################################################################
 
-$NSIS_PROGRAM = "c:/Program\\ Files/nsis/makensis";
+$NSIS_PROGRAM = "c:/Program\\ Files\\ \\(x86\\)/nsis/makensis";
 
 $VERSION = "";
 $BIOBANK_FOLDER = "";
@@ -57,18 +51,15 @@ $NSIS_DIR = "";
 
 
 
-if($#ARGV == 2){
+if($#ARGV == 1){
         $EXPORT_DIR = $ARGV[0];
         $EXPORT_DIR =~ s/\/$//;
 
-        $DLL_DIR = $ARGV[1];
-        $DLL_DIR =~ s/\/$//;
-
-        $NSIS_DIR = $ARGV[2];
+        $NSIS_DIR = $ARGV[1];
         $NSIS_DIR =~ s/\/$//;
 }
 else{
-        print "Usuage: createInstaller.pl exportDir dllDir nsisDir\n";
+        print "Usuage: createInstaller.pl exportDir nsisDir\n";
         exit 0;
 }
 print "\n";
@@ -104,15 +95,6 @@ print "Copying the exported biobank folder...\n";
 `cp -R $EXPORT_DIR tmp/$BIOBANK_FOLDER`;
 -d "tmp/$BIOBANK_FOLDER" or "could not create biobank directory";
 
-
-print "Copying the dll's...\n";
-`cp -f $DLL_DIR/cv210.dll tmp/$BIOBANK_FOLDER/.`;
-`cp -f $DLL_DIR/cxcore210.dll tmp/$BIOBANK_FOLDER/.`;
-`cp -f $DLL_DIR/OpenThreadsWin32.dll tmp/$BIOBANK_FOLDER/.`;
-(-e "tmp/$BIOBANK_FOLDER/cv210.dll" and
- -e "tmp/$BIOBANK_FOLDER/cxcore210.dll" and
- -e "tmp/$BIOBANK_FOLDER/OpenThreadsWin32.dll") or die "could not copy dll's";
-
  print "Copying the nsis's...\n";
 `cp -R $NSIS_DIR tmp/nsis`;
 -d "tmp/nsis" or die "could not create nsis directory";
@@ -136,7 +118,7 @@ print "Compiling nsis script...\n";
 
 print "Moving installer...\n";
 `mv tmp/BioBank2Installer-${VERSION}.exe .`;
--e "BioBan2kInstaller-${VERSION}.exe" or die "could not move installer";
+-e "BioBank2Installer-${VERSION}.exe" or die "could not move installer";
 
 print "Cleaning up....\n";
 `rm -rf tmp`;

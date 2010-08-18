@@ -51,7 +51,8 @@ public class SentAliquots {
 
         site = getCbsrSite();
         if (site == null) {
-            throw new Exception("CBSR site not found on server " + appArgs.hostname);
+            throw new Exception("CBSR site not found on server "
+                + appArgs.hostname);
         }
 
         CSVReader reader = new CSVReader(new FileReader(appArgs.csvFileName));

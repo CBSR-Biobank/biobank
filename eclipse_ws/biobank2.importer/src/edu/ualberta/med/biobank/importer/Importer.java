@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -18,17 +19,16 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Shipment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -796,10 +796,11 @@ public class Importer {
         logger.info("removing old shipments ...");
 
         HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName());
-        List<Shipment> shipments = appService.query(criteria);
-        for (Shipment shipment : shipments) {
-            ClinicShipmentWrapper s = new ClinicShipmentWrapper(appService, shipment);
+            + ClinicShipment.class.getName());
+        List<ClinicShipment> shipments = appService.query(criteria);
+        for (ClinicShipment shipment : shipments) {
+            ClinicShipmentWrapper s = new ClinicShipmentWrapper(appService,
+                shipment);
             s.delete();
         }
     }
@@ -1405,7 +1406,7 @@ public class Importer {
 
     private static Long getShipmentCount() throws Exception {
         HQLCriteria c = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName());
+            + ClinicShipment.class.getName());
         List<Long> result = appService.query(c);
         return result.get(0);
     }
