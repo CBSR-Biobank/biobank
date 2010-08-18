@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -137,24 +136,30 @@ public class TestContainerType extends TestDatabase {
         Integer maxCols = null;
         Integer maxCapacity = null;
 
-        List<ContainerLabelingSchemeWrapper> schemeWrappers = ContainerLabelingSchemeWrapper
-            .getAllLabelingSchemes(appService);
+        Collection<ContainerLabelingSchemeWrapper> schemeWrappers = ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values();
 
         ContainerTypeWrapper cTWrapper = ContainerTypeHelper.newContainerType(
             site, "Bogus Top Container Type", "BTCT", 2, 1, 1, true);
 
         for (ContainerLabelingSchemeWrapper schemeWrapper : schemeWrappers) {
-            ContainerLabelingScheme scheme = schemeWrapper.getWrappedObject();
-
             cTWrapper.setChildLabelingScheme(schemeWrapper.getId());
 
-            maxRows = scheme.getMaxRows();
-            maxCols = scheme.getMaxCols();
-            maxCapacity = scheme.getMaxCapacity();
+            maxRows = schemeWrapper.getMaxRows();
+            maxCols = schemeWrapper.getMaxCols();
+            maxCapacity = schemeWrapper.getMaxCapacity();
 
             Assert.assertNotNull(
                 "Missing maximum capacity for container labeling scheme "
                     + schemeWrapper.getName(), maxCapacity);
+
+            maxRows = maxRows != null ? maxRows : maxCapacity;
+            maxCols = maxCols != null ? maxCols : maxCapacity;
+
+            Assert.assertTrue("Max rows should not exceed max capacity.",
+                maxRows <= maxCapacity);
+            Assert.assertTrue("Max cols should not exceed max capacity.",
+                maxCols <= maxCapacity);
 
             checkIllgealCapacities(cTWrapper, maxCapacity, maxRows, maxCols);
             checkLegalCapacities(cTWrapper, maxCapacity, maxRows, maxCols);
@@ -163,36 +168,23 @@ public class TestContainerType extends TestDatabase {
 
     private void checkIllgealCapacities(ContainerTypeWrapper wrapper,
         Integer maxCapacity, Integer maxRows, Integer maxCols) {
-        if (maxRows != null) {
-            try {
-                wrapper.setRowCapacity(maxRows + 1);
-                wrapper.persist();
-                Assert.fail("Not allowed to set row capacity over maximum.");
-            } catch (Exception e) {
-                Assert.assertTrue(true);
-            }
+
+        try {
+            wrapper.setRowCapacity(maxRows + 1);
+            wrapper.setColCapacity(1);
+            wrapper.persist();
+            Assert.fail("Not allowed to set row capacity over maximum.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
         }
 
-        if (maxCols != null) {
-            try {
-                wrapper.setColCapacity(maxCols + 1);
-                wrapper.persist();
-                Assert.fail("Not allowed to set col capacity over maximum.");
-            } catch (Exception e) {
-                Assert.assertTrue(true);
-            }
-        }
-
-        if ((maxRows == null) && (maxCols == null)) {
-            try {
-                int capacity = (int) Math.ceil(Math.sqrt(maxCapacity)) + 1;
-                wrapper.setRowCapacity(capacity);
-                wrapper.setColCapacity(capacity);
-                wrapper.persist();
-                Assert.fail("Not allowed to exceed capacity.");
-            } catch (Exception e) {
-                Assert.assertTrue(true);
-            }
+        try {
+            wrapper.setRowCapacity(1);
+            wrapper.setColCapacity(maxCols + 1);
+            wrapper.persist();
+            Assert.fail("Not allowed to set col capacity over maximum.");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
         }
 
         try {
@@ -214,42 +206,39 @@ public class TestContainerType extends TestDatabase {
         }
     }
 
-    /**
-     * Check all legal capacities. That is, check all factor pair combinations
-     * (numRows, numCols) of maxCapacity where numRows <= maxRows (if not null)
-     * and numCols <= maxCols (if not null).
-     * 
-     * @param wrapper
-     * @param maxCapacity
-     * @param maxRows
-     * @param maxCols
-     * @throws Exception
-     */
     private void checkLegalCapacities(ContainerTypeWrapper wrapper,
         Integer maxCapacity, Integer maxRows, Integer maxCols) throws Exception {
-        for (int numRows = 1, numCols = 1; numRows <= maxCapacity; numRows++) {
-            if ((maxRows != null) && (numRows > maxRows)) {
-                break;
-            }
 
-            if (maxCapacity % numRows == 0) {
-                numCols = maxCapacity / numRows;
+        int numRows, numCols;
 
-                if ((maxCols == null) || (numCols <= maxCols)) {
-                    wrapper.setRowCapacity(numRows);
-                    wrapper.setColCapacity(numCols);
-
-                    wrapper.persist();
-                    wrapper.reload();
-
-                    Assert.assertEquals("[gs]etRowCapacity() failed.", numRows,
-                        (int) wrapper.getRowCapacity());
-
-                    Assert.assertEquals("[gs]etColCapacity() failed.", numCols,
-                        (int) wrapper.getColCapacity());
-                }
+        for (numRows = 1; numRows <= maxRows; numRows++) {
+            numCols = maxCapacity / numRows;
+            if (numCols <= maxCols) {
+                checkCapacity(wrapper, numRows, numCols);
             }
         }
+
+        for (numCols = 1; numCols <= maxCols; numCols++) {
+            numRows = maxCapacity / numCols;
+            if (numRows <= maxRows) {
+                checkCapacity(wrapper, numRows, numCols);
+            }
+        }
+    }
+
+    private void checkCapacity(ContainerTypeWrapper wrapper, Integer numRows,
+        Integer numCols) throws Exception {
+        wrapper.setRowCapacity(numRows);
+        wrapper.setColCapacity(numCols);
+
+        wrapper.persist();
+        wrapper.reload();
+
+        Assert.assertEquals("[gs]etRowCapacity() failed.", numRows,
+            wrapper.getRowCapacity());
+
+        Assert.assertEquals("[gs]etColCapacity() failed.", numCols,
+            wrapper.getColCapacity());
     }
 
     @Test

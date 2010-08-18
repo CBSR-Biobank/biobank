@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -14,6 +16,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerLabelingSchemeWrapper extends
     ModelWrapper<ContainerLabelingScheme> {
+    private static List<ContainerLabelingScheme> allSchemes;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemeWrappersMap;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -100,12 +104,14 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static List<ContainerLabelingSchemeWrapper> getAllLabelingSchemes(
         WritableApplicationService appService) throws ApplicationException {
-        List<ContainerLabelingScheme> schemes = appService.search(
-            ContainerLabelingScheme.class, new ContainerLabelingScheme());
-        return transformToWrapperList(appService, schemes);
+        if (allSchemes == null) {
+            allSchemes = appService.search(ContainerLabelingScheme.class,
+                new ContainerLabelingScheme());
+        }
+        return transformToWrapperList(appService, allSchemes);
     }
 
-    public static List<ContainerLabelingSchemeWrapper> transformToWrapperList(
+    private static List<ContainerLabelingSchemeWrapper> transformToWrapperList(
         WritableApplicationService appService,
         List<ContainerLabelingScheme> schemes) {
         List<ContainerLabelingSchemeWrapper> list = new ArrayList<ContainerLabelingSchemeWrapper>();
@@ -115,9 +121,32 @@ public class ContainerLabelingSchemeWrapper extends
         return list;
     }
 
+    public static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+        WritableApplicationService appService) throws ApplicationException {
+        List<ContainerLabelingSchemeWrapper> allLabelingSchemes = getAllLabelingSchemes(appService);
+        Map<Integer, ContainerLabelingSchemeWrapper> allLabelingSchemesMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
+
+        for (ContainerLabelingSchemeWrapper scheme : allLabelingSchemes) {
+            allLabelingSchemesMap.put(scheme.getId(), scheme);
+        }
+
+        return allLabelingSchemesMap;
+    }
+
     @Override
     public int compareTo(ModelWrapper<ContainerLabelingScheme> o) {
         return 0;
     }
 
+    @Override
+    public void persist() throws Exception {
+        super.persist();
+        allSchemes = null;
+    }
+
+    @Override
+    public void delete() throws Exception {
+        super.delete();
+        allSchemes = null;
+    }
 }

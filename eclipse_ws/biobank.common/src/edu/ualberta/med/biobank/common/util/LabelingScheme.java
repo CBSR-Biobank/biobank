@@ -1,12 +1,17 @@
 package edu.ualberta.med.biobank.common.util;
 
+import java.util.Map;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class LabelingScheme {
 
     public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHJ";
+    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHJKLMNPQR";
 
     /**
      * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
@@ -112,30 +117,47 @@ public class LabelingScheme {
     }
 
     /* Check labeling scheme limits for a given gridsize */
-    public static boolean checkBounds(Integer labelingScheme, int totalRows,
-        int totalCols) {
-        int lettersLength = 0;
+    public static boolean checkBounds(WritableApplicationService appService,
+        Integer labelingScheme, int totalRows, int totalCols) {
 
         if (totalRows <= 0 || totalCols <= 0) {
             return false;
         }
 
-        switch (labelingScheme) {
-        // FIXME: This is wrong.. but i dont understand limits for labels..
-        case 1:
-            lettersLength = SBS_ROW_LABELLING_PATTERN.length();
-            return (totalRows <= lettersLength && totalCols <= 12);
-        case 2:
-            lettersLength = CBSR_LABELLING_PATTERN.length();
-            return (totalRows * totalCols <= lettersLength * lettersLength);
-        case 3:
-            return (totalRows * totalCols <= 99);
-        case 4:
-            lettersLength = CBSR_LABELLING_PATTERN.length();
-            return (totalRows * totalCols <= lettersLength);
-        default:
-            return false;
+        Map<Integer, ContainerLabelingSchemeWrapper> schemeWrappersMap;
+        try {
+            schemeWrappersMap = ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemesMap(appService);
+        } catch (ApplicationException e) {
+            throw new RuntimeException(
+                "could not load container labeling schemes");
         }
+
+        ContainerLabelingSchemeWrapper schemeWrapper = schemeWrappersMap
+            .get(labelingScheme);
+        if (schemeWrapper != null) {
+            Integer maxRows = schemeWrapper.getMaxRows();
+            Integer maxCols = schemeWrapper.getMaxCols();
+            Integer maxCapacity = schemeWrapper.getMaxCapacity();
+
+            boolean isInBounds = true;
+
+            if (maxRows != null) {
+                isInBounds &= totalRows <= maxRows;
+            }
+
+            if (maxCols != null) {
+                isInBounds &= totalCols <= maxCols;
+            }
+
+            if (maxCapacity != null) {
+                isInBounds &= totalRows * totalCols <= maxCapacity;
+            }
+
+            return isInBounds;
+        }
+
+        return false;
     }
 
     /**
