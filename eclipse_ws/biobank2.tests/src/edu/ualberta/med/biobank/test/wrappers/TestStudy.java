@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
@@ -142,7 +142,7 @@ public class TestStudy extends TestDatabase {
         study.persist();
         study.reload();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
             patient);
         return PatientVisitHelper.addPatientVisits(patient, shipment);
 
@@ -779,11 +779,11 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site1, clinic1,
+        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site1, clinic1,
             patient1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site2, clinic2,
+        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site2, clinic2,
             patient1, patient2);
         // clinic 1 = 1 patient for study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
@@ -828,9 +828,9 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site1, clinic1,
+        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site1, clinic1,
             patient1, patient3);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site2, clinic2,
+        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site2, clinic2,
             patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
@@ -879,11 +879,11 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
+        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
+        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
         // clinic 1 = 1 patient for study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
@@ -925,9 +925,9 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
+        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1, patient3);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
+        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
@@ -981,9 +981,9 @@ public class TestStudy extends TestDatabase {
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
+        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1, patient2);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
+        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();

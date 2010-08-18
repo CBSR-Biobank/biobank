@@ -12,9 +12,9 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -474,16 +474,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
-        List<ShipmentWrapper> pvCollection = (List<ShipmentWrapper>) propertiesMap
+    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort) {
+        List<ClinicShipmentWrapper> pvCollection = (List<ClinicShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (pvCollection == null) {
-            Collection<Shipment> children = wrappedObject
+            Collection<ClinicShipment> children = wrappedObject
                 .getShipmentCollection();
             if (children != null) {
-                pvCollection = new ArrayList<ShipmentWrapper>();
-                for (Shipment pv : children) {
-                    pvCollection.add(new ShipmentWrapper(appService, pv));
+                pvCollection = new ArrayList<ClinicShipmentWrapper>();
+                for (ClinicShipment pv : children) {
+                    pvCollection.add(new ClinicShipmentWrapper(appService, pv));
                 }
                 propertiesMap.put("shipmentCollection", pvCollection);
             }
@@ -493,7 +493,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvCollection;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection() {
+    public List<ClinicShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(true);
     }
 
@@ -516,7 +516,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public Long getShipmentCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where clinic.site.id = ?",
+            + ClinicShipment.class.getName() + " where clinic.site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {

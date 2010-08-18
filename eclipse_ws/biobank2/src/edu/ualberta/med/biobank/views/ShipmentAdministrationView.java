@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -118,7 +118,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         if (radioWaybill.getSelection()) {
             // with waybill, should find only one corresponding shipment, or
             // mutliple shipments from different clinics
-            List<ShipmentWrapper> shipments = ShipmentWrapper
+            List<ClinicShipmentWrapper> shipments = ClinicShipmentWrapper
                 .getShipmentsInSite(SessionManager.getAppService(),
                     text.trim(), SessionManager.getInstance().getCurrentSite());
             if (shipments.size() > 1) {
@@ -135,7 +135,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             // can find more than one shipments
             Date date = dateReceivedWidget.getDate();
             if (date != null) {
-                return ShipmentWrapper.getShipmentsInSite(SessionManager
+                return ClinicShipmentWrapper.getShipmentsInSite(SessionManager
                     .getAppService(), date, SessionManager.getInstance()
                     .getCurrentSite());
             }
@@ -145,8 +145,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     @Override
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
-        if (wrapper instanceof ShipmentWrapper) {
-            ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
+        if (wrapper instanceof ClinicShipmentWrapper) {
+            ClinicShipmentWrapper shipment = (ClinicShipmentWrapper) wrapper;
 
             AdapterBase topNode = parentNode;
             if (parentNode.equals(searchedNode) && !radioWaybill.getSelection()) {
@@ -190,7 +190,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             boolean create = BioBankPlugin.openConfirm("Shipment not found",
                 "Do you want to create this shipment ?");
             if (create) {
-                ShipmentWrapper shipment = new ShipmentWrapper(
+                ClinicShipmentWrapper shipment = new ClinicShipmentWrapper(
                     SessionManager.getAppService());
                 if (radioWaybill.getSelection()) {
                     shipment.setWaybill(text);
@@ -217,7 +217,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         return new ShipmentSearchedNode(rootNode, 1);
     }
 
-    public static void showShipment(ShipmentWrapper shipment) {
+    public static void showShipment(ClinicShipmentWrapper shipment) {
         if (currentInstance != null) {
             currentInstance.showSearchedObjectsInTree(Arrays.asList(shipment),
                 false);

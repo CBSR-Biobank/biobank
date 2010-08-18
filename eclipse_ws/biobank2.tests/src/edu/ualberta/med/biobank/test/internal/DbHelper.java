@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -77,7 +77,7 @@ public class DbHelper {
         for (PatientWrapper patient : patients) {
             deletePatientVisits(patient.getPatientVisitCollection());
             patient.reload();
-            for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+            for (ClinicShipmentWrapper ship : patient.getShipmentCollection()) {
                 ship.reload();
                 ship.removePatients(Arrays.asList(patient));
                 if (ship.getPatientCollection().size() == 0) {

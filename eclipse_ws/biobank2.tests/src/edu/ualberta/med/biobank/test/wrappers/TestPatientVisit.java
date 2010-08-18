@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -65,7 +65,7 @@ public class TestPatientVisit extends TestDatabase {
 
     private ClinicWrapper clinic;
 
-    private ShipmentWrapper shipment;
+    private ClinicShipmentWrapper shipment;
 
     private PatientWrapper patient;
 
@@ -165,7 +165,7 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
             patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(

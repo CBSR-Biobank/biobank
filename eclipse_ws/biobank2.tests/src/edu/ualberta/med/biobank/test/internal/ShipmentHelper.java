@@ -6,7 +6,7 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
@@ -14,10 +14,10 @@ import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class ShipmentHelper extends DbHelper {
 
-    public static ShipmentWrapper newShipment(SiteWrapper site,
+    public static ClinicShipmentWrapper newShipment(SiteWrapper site,
         ClinicWrapper clinic, String waybill, Date dateReceived,
         PatientWrapper... patients) throws Exception {
-        ShipmentWrapper shipment = new ShipmentWrapper(appService);
+        ClinicShipmentWrapper shipment = new ClinicShipmentWrapper(appService);
         if (site != null) {
             shipment.setSite(site);
         }
@@ -34,28 +34,28 @@ public class ShipmentHelper extends DbHelper {
         return shipment;
     }
 
-    public static ShipmentWrapper newShipment(SiteWrapper site,
+    public static ClinicShipmentWrapper newShipment(SiteWrapper site,
         ClinicWrapper clinic) throws Exception {
         return newShipment(site, clinic, TestCommon.getNewWaybill(r),
             Utils.getRandomDate());
     }
 
-    public static ShipmentWrapper addShipment(SiteWrapper site,
+    public static ClinicShipmentWrapper addShipment(SiteWrapper site,
         ClinicWrapper clinic, PatientWrapper... patients) throws Exception {
         return addShipment(site, clinic, TestCommon.getNewWaybill(r), patients);
     }
 
-    public static ShipmentWrapper addShipment(SiteWrapper site,
+    public static ClinicShipmentWrapper addShipment(SiteWrapper site,
         ClinicWrapper clinic, String waybill, PatientWrapper... patients)
         throws Exception {
-        ShipmentWrapper shipment = newShipment(site, clinic, waybill,
+        ClinicShipmentWrapper shipment = newShipment(site, clinic, waybill,
             Utils.getRandomDate(), patients);
         shipment.persist();
         clinic.reload();
         return shipment;
     }
 
-    public static ShipmentWrapper addShipmentWithRandomPatient(
+    public static ClinicShipmentWrapper addShipmentWithRandomPatient(
         SiteWrapper site, ClinicWrapper clinic, String name) throws Exception {
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);

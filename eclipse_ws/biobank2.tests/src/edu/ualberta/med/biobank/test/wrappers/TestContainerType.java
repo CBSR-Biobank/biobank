@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -562,7 +562,7 @@ public class TestContainerType extends TestDatabase {
             "ContactClinic");
         study.addContacts(Arrays.asList(contact));
         study.persist();
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);

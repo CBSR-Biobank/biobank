@@ -13,9 +13,9 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -23,18 +23,18 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ShipmentWrapper extends ModelWrapper<Shipment> {
+public class ClinicShipmentWrapper extends ModelWrapper<ClinicShipment> {
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
     private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
     private ClinicWrapper clinic;
 
-    public ShipmentWrapper(WritableApplicationService appService) {
+    public ClinicShipmentWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
-    public ShipmentWrapper(WritableApplicationService appService,
-        Shipment wrappedObject) {
+    public ClinicShipmentWrapper(WritableApplicationService appService,
+        ClinicShipment wrappedObject) {
         super(appService, wrappedObject);
     }
 
@@ -59,8 +59,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    public Class<Shipment> getWrappedClass() {
-        return Shipment.class;
+    public Class<ClinicShipment> getWrappedClass() {
+        return ClinicShipment.class;
     }
 
     @Override
@@ -165,7 +165,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
             isSameShipment = " and id <> ?";
             params.add(getId());
         }
-        HQLCriteria c = new HQLCriteria("from " + Shipment.class.getName()
+        HQLCriteria c = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
             + " where clinic.id=? and waybill = ?" + isSameShipment, params);
 
         List<Object> results = appService.query(c);
@@ -173,8 +174,8 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<Shipment> wrapper) {
-        if (wrapper instanceof ShipmentWrapper) {
+    public int compareTo(ModelWrapper<ClinicShipment> wrapper) {
+        if (wrapper instanceof ClinicShipmentWrapper) {
             Date v1Date = wrappedObject.getDateShipped();
             Date v2Date = wrapper.wrappedObject.getDateShipped();
             if (v1Date != null && v2Date != null) {
@@ -445,17 +446,17 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     /**
      * Search for shipments in the site with the given waybill
      */
-    public static List<ShipmentWrapper> getShipmentsInSite(
+    public static List<ClinicShipmentWrapper> getShipmentsInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName()
+            + ClinicShipment.class.getName()
             + " where clinic.site.id = ? and waybill = ?",
             Arrays.asList(new Object[] { site.getId(), waybill }));
-        List<Shipment> shipments = appService.query(criteria);
-        List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
-        for (Shipment s : shipments) {
-            wrappers.add(new ShipmentWrapper(appService, s));
+        List<ClinicShipment> shipments = appService.query(criteria);
+        List<ClinicShipmentWrapper> wrappers = new ArrayList<ClinicShipmentWrapper>();
+        for (ClinicShipment s : shipments) {
+            wrappers.add(new ClinicShipmentWrapper(appService, s));
         }
         return wrappers;
     }
@@ -464,7 +465,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
      * Search for shipments in the site with the given date received. Don't use
      * hour and minute.
      */
-    public static List<ShipmentWrapper> getShipmentsInSite(
+    public static List<ClinicShipmentWrapper> getShipmentsInSite(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -480,13 +481,13 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
             "from "
-                + Shipment.class.getName()
+                + ClinicShipment.class.getName()
                 + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
-        List<Shipment> shipments = appService.query(criteria);
-        List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
-        for (Shipment s : shipments) {
-            wrappers.add(new ShipmentWrapper(appService, s));
+        List<ClinicShipment> shipments = appService.query(criteria);
+        List<ClinicShipmentWrapper> wrappers = new ArrayList<ClinicShipmentWrapper>();
+        for (ClinicShipment s : shipments) {
+            wrappers.add(new ClinicShipmentWrapper(appService, s));
         }
         return wrappers;
     }
@@ -508,7 +509,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         patientsRemoved.clear();
     }
 
-    public static List<ShipmentWrapper> getTodayShipments(
+    public static List<ClinicShipmentWrapper> getTodayShipments(
         WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -523,13 +524,13 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
             "from "
-                + Shipment.class.getName()
+                + ClinicShipment.class.getName()
                 + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
-        List<Shipment> res = appService.query(criteria);
-        List<ShipmentWrapper> ships = new ArrayList<ShipmentWrapper>();
-        for (Shipment s : res) {
-            ships.add(new ShipmentWrapper(appService, s));
+        List<ClinicShipment> res = appService.query(criteria);
+        List<ClinicShipmentWrapper> ships = new ArrayList<ClinicShipmentWrapper>();
+        for (ClinicShipment s : res) {
+            ships.add(new ClinicShipmentWrapper(appService, s));
         }
         return ships;
     }

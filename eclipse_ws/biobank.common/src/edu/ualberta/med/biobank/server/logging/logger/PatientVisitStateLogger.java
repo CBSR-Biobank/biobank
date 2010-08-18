@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
-import edu.ualberta.med.biobank.model.Shipment;
 
 public class PatientVisitStateLogger extends BiobankObjectStateLogger {
 
@@ -20,7 +20,8 @@ public class PatientVisitStateLogger extends BiobankObjectStateLogger {
     protected Log getLogObject(Object obj, Map<String, Object> statesMap) {
         if (obj instanceof PatientVisit) {
             Log log = new Log();
-            Shipment shipment = (Shipment) statesMap.get("shipment");
+            ClinicShipment shipment = (ClinicShipment) statesMap
+                .get("shipment");
             Patient patient = (Patient) statesMap.get("patient");
             log.setSite(shipment.getSite().getNameShort());
             log.setPatientNumber(patient.getPnumber());

@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -799,7 +799,7 @@ public class Importer {
             + Shipment.class.getName());
         List<Shipment> shipments = appService.query(criteria);
         for (Shipment shipment : shipments) {
-            ShipmentWrapper s = new ShipmentWrapper(appService, shipment);
+            ClinicShipmentWrapper s = new ClinicShipmentWrapper(appService, shipment);
             s.delete();
         }
     }
@@ -811,7 +811,7 @@ public class Importer {
         PatientWrapper patient;
         String dateReceivedStr;
         Date dateReceived;
-        ShipmentWrapper shipment;
+        ClinicShipmentWrapper shipment;
         BlowfishCipher cipher = new BlowfishCipher();
 
         ShippingMethodWrapper unknownShippingCompany = shippingCompanyMap
@@ -889,7 +889,7 @@ public class Importer {
                     + DateFormatter.formatAsDateTime(dateReceived) + " ("
                     + count + "/" + numShipments + ")");
 
-                shipment = new ShipmentWrapper(appService);
+                shipment = new ClinicShipmentWrapper(appService);
                 shipment.setClinic(clinic);
 
                 if (clinic.getSendsShipments()) {
@@ -941,7 +941,7 @@ public class Importer {
         String dateProcessedStr;
         Date dateProcessed;
         PatientWrapper patient;
-        ShipmentWrapper shipment;
+        ClinicShipmentWrapper shipment;
         PatientVisitWrapper pv;
 
         logger.info("importing patient visits ...");

@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 
 public class ShipmentSearchedNode extends AbstractSearchedNode {
 
@@ -25,8 +25,8 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
-        if (child instanceof ShipmentWrapper) {
-            return parent.equals(((ShipmentWrapper) child).getClinic());
+        if (child instanceof ClinicShipmentWrapper) {
+            return parent.equals(((ClinicShipmentWrapper) child).getClinic());
         }
         return false;
     }

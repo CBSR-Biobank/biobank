@@ -10,25 +10,25 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 
 public class ShipmentAdapter extends AdapterBase {
 
-    public ShipmentAdapter(AdapterBase parent, ShipmentWrapper shipment) {
+    public ShipmentAdapter(AdapterBase parent, ClinicShipmentWrapper shipment) {
         super(parent, shipment);
         setHasChildren(true);
     }
 
-    public ShipmentWrapper getWrapper() {
-        return (ShipmentWrapper) modelObject;
+    public ClinicShipmentWrapper getWrapper() {
+        return (ClinicShipmentWrapper) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        ShipmentWrapper shipment = getWrapper();
+        ClinicShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "shipment is null");
         String label = shipment.getFormattedDateReceived();
         if (shipment.getWaybill() != null) {
@@ -40,7 +40,7 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        ShipmentWrapper shipment = getWrapper();
+        ClinicShipmentWrapper shipment = getWrapper();
         ClinicWrapper clinic = shipment.getClinic();
         if (clinic != null) {
             SiteWrapper site = clinic.getSite();
