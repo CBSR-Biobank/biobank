@@ -87,8 +87,9 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             throw new BiobankCheckException("Labeling scheme should be set");
         } else {
             // should throw error if labeling scheme too small for container
-            if (!LabelingScheme.checkBounds(getChildLabelingScheme(),
-                getCapacity().getRowCapacity(), getCapacity().getColCapacity()))
+            if (!LabelingScheme.checkBounds(appService,
+                getChildLabelingScheme(), getCapacity().getRowCapacity(),
+                getCapacity().getColCapacity()))
                 throw new BiobankCheckException("Labeling scheme cannot label "
                     + getCapacity().getRowCapacity() + " rows and "
                     + getCapacity().getColCapacity() + " columns.");
@@ -684,12 +685,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         WritableApplicationService appService) throws RuntimeException {
         try {
             if (labelingSchemeMap == null) {
-                labelingSchemeMap = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
-                for (ContainerLabelingSchemeWrapper labeling : ContainerLabelingSchemeWrapper
-                    .getAllLabelingSchemes(appService)) {
-                    labelingSchemeMap.put(labeling.getId(), labeling);
-
-                }
+                labelingSchemeMap = ContainerLabelingSchemeWrapper
+                    .getAllLabelingSchemesMap(appService);
             }
             return labelingSchemeMap;
         } catch (ApplicationException e) {
