@@ -32,7 +32,7 @@
 
   ;General
   Name "BioBank ${VERSION_STR}"
-  OutFile "..\BioBankInstaller-${VERSION_STR}.exe"
+  OutFile "..\BioBank2Installer-${VERSION_STR}.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\BioBank2"
