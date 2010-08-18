@@ -4,8 +4,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -25,11 +25,11 @@ public class TestContainer extends SpeedTest {
 
     public void testHql() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
+            + StorageContainer.class.getName()
             + " where site.id = ? and containerType.topLevel = true",
             Arrays.asList(new Object[] { site.getId() }));
-        List<Container> containers = appService.query(criteria);
-        for (Container c : containers) {
+        List<StorageContainer> containers = appService.query(criteria);
+        for (StorageContainer c : containers) {
             logger.info(c.getLabel() + ": number of children: "
                 + c.getChildPositionCollection().size());
 
@@ -43,7 +43,7 @@ public class TestContainer extends SpeedTest {
             List<ContainerPosition> childrenPos = appService.query(criteria);
 
             for (ContainerPosition childPos : childrenPos) {
-                Container child = childPos.getContainer();
+                StorageContainer child = childPos.getContainer();
                 int count = child.getChildPositionCollection().size();
                 logger.debug(child.getLabel() + ": number of children: "
                     + count);
@@ -54,15 +54,15 @@ public class TestContainer extends SpeedTest {
 
     public void testNonWrapper() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
+            + StorageContainer.class.getName()
             + " where site.id = ? and containerType.topLevel = true",
             Arrays.asList(new Object[] { site.getId() }));
-        List<Container> containers = appService.query(criteria);
-        for (Container c : containers) {
+        List<StorageContainer> containers = appService.query(criteria);
+        for (StorageContainer c : containers) {
             logger.info(c.getLabel() + ": number of children: "
                 + c.getChildPositionCollection().size());
             for (ContainerPosition childPos : c.getChildPositionCollection()) {
-                Container child = childPos.getContainer();
+                StorageContainer child = childPos.getContainer();
                 int count = child.getChildPositionCollection().size();
                 logger.debug(child.getLabel() + ": number of children: "
                     + count);
@@ -90,10 +90,10 @@ public class TestContainer extends SpeedTest {
                 + AliquotPosition.class.getName() + " as ap "
                 + "join ap.container as c " + "where c.site.id = ?",
             Arrays.asList(new Object[] { site.getId() }));
-        List<Container> containers = appService.query(criteria);
+        List<StorageContainer> containers = appService.query(criteria);
 
         int count = 0;
-        for (Container c : containers) {
+        for (StorageContainer c : containers) {
             logger.info(c.getLabel() + ": number of aliquots: "
                 + c.getAliquotPositionCollection().size());
             ++count;

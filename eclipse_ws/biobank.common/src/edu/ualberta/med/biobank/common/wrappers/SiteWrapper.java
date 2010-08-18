@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -402,11 +402,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         List<ContainerWrapper> containerCollection = (List<ContainerWrapper>) propertiesMap
             .get("containerCollection");
         if (containerCollection == null) {
-            Collection<Container> children = wrappedObject
+            Collection<StorageContainer> children = wrappedObject
                 .getContainerCollection();
             if (children != null) {
                 containerCollection = new ArrayList<ContainerWrapper>();
-                for (Container container : children) {
+                for (StorageContainer container : children) {
                     containerCollection.add(new ContainerWrapper(appService,
                         container));
                 }
@@ -418,7 +418,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public void addContainers(List<ContainerWrapper> containers) {
         if (containers != null && containers.size() > 0) {
-            Collection<Container> allContainerObjects = new HashSet<Container>();
+            Collection<StorageContainer> allContainerObjects = new HashSet<StorageContainer>();
             List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
             // already added containers
             List<ContainerWrapper> currentList = getContainerCollection();
@@ -433,7 +433,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 allContainerObjects.add(container.getWrappedObject());
                 allContainerWrappers.add(container);
             }
-            Collection<Container> oldContainers = wrappedObject
+            Collection<StorageContainer> oldContainers = wrappedObject
                 .getContainerCollection();
             wrappedObject.setContainerCollection(allContainerObjects);
             propertyChangeSupport.firePropertyChange("containerCollection",
@@ -451,11 +451,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         if (topContainerCollection == null) {
             topContainerCollection = new ArrayList<ContainerWrapper>();
             HQLCriteria criteria = new HQLCriteria("from "
-                + Container.class.getName()
+                + StorageContainer.class.getName()
                 + " where site.id = ? and containerType.topLevel = true",
                 Arrays.asList(new Object[] { wrappedObject.getId() }));
-            List<Container> containers = appService.query(criteria);
-            for (Container c : containers) {
+            List<StorageContainer> containers = appService.query(criteria);
+            for (StorageContainer c : containers) {
                 topContainerCollection.add(new ContainerWrapper(appService, c));
             }
             if (sort)

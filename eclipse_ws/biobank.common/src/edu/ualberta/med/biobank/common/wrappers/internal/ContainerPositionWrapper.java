@@ -7,8 +7,8 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -42,12 +42,12 @@ public class ContainerPositionWrapper extends
         return ContainerPosition.class;
     }
 
-    public void setParentContainer(Container parentContainer) {
+    public void setParentContainer(StorageContainer parentContainer) {
         if (parentContainer == null)
             this.parent = null;
         else
             this.parent = new ContainerWrapper(appService, parentContainer);
-        Container oldParent = wrappedObject.getParentContainer();
+        StorageContainer oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
         propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
             parentContainer);
@@ -55,7 +55,7 @@ public class ContainerPositionWrapper extends
 
     private void setParentContainer(ContainerWrapper parentContainer) {
         if (parentContainer == null) {
-            setParentContainer((Container) null);
+            setParentContainer((StorageContainer) null);
         } else {
             setParentContainer(parentContainer.getWrappedObject());
         }
@@ -63,7 +63,7 @@ public class ContainerPositionWrapper extends
 
     private ContainerWrapper getParentContainer() {
         if (parent == null) {
-            Container c = wrappedObject.getParentContainer();
+            StorageContainer c = wrappedObject.getParentContainer();
             if (c == null)
                 return null;
             parent = new ContainerWrapper(appService, c);
@@ -73,7 +73,7 @@ public class ContainerPositionWrapper extends
 
     public ContainerWrapper getContainer() {
         if (container == null) {
-            Container c = wrappedObject.getContainer();
+            StorageContainer c = wrappedObject.getContainer();
             if (c == null)
                 return null;
             container = new ContainerWrapper(appService, c);
@@ -85,12 +85,12 @@ public class ContainerPositionWrapper extends
         setContainer(container.getWrappedObject());
     }
 
-    public void setContainer(Container container) {
+    public void setContainer(StorageContainer container) {
         if (container == null)
             this.container = null;
         else
             this.container = new ContainerWrapper(appService, container);
-        Container oldContainer = wrappedObject.getContainer();
+        StorageContainer oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);
@@ -133,10 +133,10 @@ public class ContainerPositionWrapper extends
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !
-            HQLCriteria criteria = new HQLCriteria("from "
-                + ContainerPosition.class.getName()
-                + " where parentContainer.id=? and row=? and col=?", Arrays
-                .asList(new Object[] { parent.getId(), getRow(), getCol() }));
+            HQLCriteria criteria = new HQLCriteria(
+                "from " + ContainerPosition.class.getName()
+                    + " where parentContainer.id=? and row=? and col=?",
+                Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
             List<ContainerPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
                 return;

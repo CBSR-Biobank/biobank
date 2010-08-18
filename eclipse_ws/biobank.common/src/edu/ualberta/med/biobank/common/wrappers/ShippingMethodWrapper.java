@@ -25,6 +25,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         super(appService, sc);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
@@ -79,7 +80,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return 0;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<AbstractShipmentWrapper> getShipmentCollection(boolean sort) {
         List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
@@ -89,8 +90,8 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
             if (children != null) {
                 shipmentCollection = new ArrayList<AbstractShipmentWrapper>();
                 for (AbstractShipment ship : children) {
-                    shipmentCollection.add(new AbstractShipmentWrapper(
-                        appService, ship));
+                    shipmentCollection.add(AbstractShipmentWrapper
+                        .createInstance(appService, ship));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             }
@@ -100,6 +101,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return shipmentCollection;
     }
 
+    @SuppressWarnings("rawtypes")
     public List<AbstractShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(false);
     }

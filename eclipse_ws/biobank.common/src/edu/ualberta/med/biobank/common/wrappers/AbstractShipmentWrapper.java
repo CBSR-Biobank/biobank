@@ -1,50 +1,31 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.AbstractShipment;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.DispatchShipment;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class AbstractShipmentWrapper extends ModelWrapper<AbstractShipment> {
+public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
+    extends ModelWrapper<E> {
 
     public AbstractShipmentWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
-    public AbstractShipmentWrapper(WritableApplicationService appService,
-        AbstractShipment ship) {
+    public AbstractShipmentWrapper(WritableApplicationService appService, E ship) {
         super(appService, ship);
     }
 
-    @Override
-    public int compareTo(ModelWrapper<AbstractShipment> o) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    protected String[] getPropertyChangeNames() {
-        // TODO Auto-generated method stub
+    public static AbstractShipmentWrapper<?> createInstance(
+        WritableApplicationService appService, AbstractShipment ship) {
+        if (ship instanceof DispatchShipment) {
+            return new DispatchShipmentWrapper(appService,
+                (DispatchShipment) ship);
+        }
+        if (ship instanceof ClinicShipment) {
+            return new ClinicShipmentWrapper(appService, (ClinicShipment) ship);
+        }
         return null;
-    }
-
-    @Override
-    public Class<AbstractShipment> getWrappedClass() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void deleteChecks() throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
 }

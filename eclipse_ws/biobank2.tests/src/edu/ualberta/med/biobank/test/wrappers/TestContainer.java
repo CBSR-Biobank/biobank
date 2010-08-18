@@ -21,17 +21,17 @@ import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -250,7 +250,8 @@ public class TestContainer extends TestDatabase {
     public void testGetWrappedClass() throws Exception {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
-        Assert.assertEquals(Container.class, container.getWrappedClass());
+        Assert
+            .assertEquals(StorageContainer.class, container.getWrappedClass());
     }
 
     @Test
@@ -260,8 +261,8 @@ public class TestContainer extends TestDatabase {
 
         Integer id = container.getId();
         Assert.assertNotNull(id);
-        Container containerInDB = ModelUtils.getObjectWithId(appService,
-            Container.class, id);
+        StorageContainer containerInDB = ModelUtils.getObjectWithId(appService,
+            StorageContainer.class, id);
         Assert.assertNotNull(containerInDB);
     }
 
@@ -860,7 +861,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site,
+            clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
         return pv;
@@ -926,7 +928,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site,
+            clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 

@@ -17,12 +17,12 @@ import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingScheme
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -214,7 +214,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankCheckException {
         String queryString = "select count(c) from "
-            + Container.class.getName() + " as c where c.containerType=?)";
+            + StorageContainer.class.getName()
+            + " as c where c.containerType=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
@@ -604,10 +605,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private void checkTopLevel(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        if ((getTopLevel() == null && oldObject.getTopLevel() != null)
-            || (getTopLevel() != null && oldObject.getTopLevel() == null)
-            || (getTopLevel() != null && oldObject.getTopLevel() != null && !getTopLevel()
-                .equals(oldObject.getTopLevel())) && existsContainersWithType) {
+        if (((getTopLevel() == null && oldObject.getTopLevel() != null)
+            || (getTopLevel() != null && oldObject.getTopLevel() == null) || (getTopLevel() != null
+            && oldObject.getTopLevel() != null && !getTopLevel().equals(
+            oldObject.getTopLevel())))
+            && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to change the \"Top Level\" property. A container "
                     + "requiring this property exists in storage. Remove all "
@@ -712,7 +714,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public long getContainersCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(*) from "
-            + Container.class.getName() + " where containerType.id=?",
+            + StorageContainer.class.getName() + " where containerType.id=?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {

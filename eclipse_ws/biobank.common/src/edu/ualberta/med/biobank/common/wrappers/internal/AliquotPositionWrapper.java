@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -75,12 +75,12 @@ public class AliquotPositionWrapper extends
         return aliquot;
     }
 
-    private void setContainer(Container container) {
+    private void setContainer(StorageContainer container) {
         if (container == null)
             this.container = null;
         else
             this.container = new ContainerWrapper(appService, container);
-        Container oldContainer = wrappedObject.getContainer();
+        StorageContainer oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);
@@ -88,7 +88,7 @@ public class AliquotPositionWrapper extends
 
     private void setContainer(ContainerWrapper container) {
         if (container == null) {
-            setContainer((Container) null);
+            setContainer((StorageContainer) null);
         } else {
             setContainer(container.getWrappedObject());
         }
@@ -96,7 +96,7 @@ public class AliquotPositionWrapper extends
 
     private ContainerWrapper getContainer() {
         if (container == null) {
-            Container c = wrappedObject.getContainer();
+            StorageContainer c = wrappedObject.getContainer();
             if (c == null) {
                 return null;
             }
@@ -127,10 +127,10 @@ public class AliquotPositionWrapper extends
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !
-            HQLCriteria criteria = new HQLCriteria("from "
-                + AliquotPosition.class.getName()
-                + " where container.id=? and row=? and col=?", Arrays
-                .asList(new Object[] { parent.getId(), getRow(), getCol() }));
+            HQLCriteria criteria = new HQLCriteria(
+                "from " + AliquotPosition.class.getName()
+                    + " where container.id=? and row=? and col=?",
+                Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
             List<AliquotPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
                 return;

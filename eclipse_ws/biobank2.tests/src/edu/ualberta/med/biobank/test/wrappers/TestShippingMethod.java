@@ -72,6 +72,7 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertEquals(2, method2.getShipmentCollection().size());
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testGetShipmentCollectionBoolean() throws Exception {
         String name = "testGetShipmentCollectionBoolean" + r.nextInt();

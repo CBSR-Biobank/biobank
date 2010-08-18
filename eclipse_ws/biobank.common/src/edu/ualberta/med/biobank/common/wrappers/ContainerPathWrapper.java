@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.StorageContainer;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -64,7 +64,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     public ContainerWrapper getContainer() {
         if (container == null) {
-            Container c = wrappedObject.getContainer();
+            StorageContainer c = wrappedObject.getContainer();
             if (c == null)
                 return null;
             container = new ContainerWrapper(appService, c);
@@ -72,12 +72,12 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         return container;
     }
 
-    protected void setContainer(Container container) {
+    protected void setContainer(StorageContainer container) {
         if (container == null)
             this.container = null;
         else
             this.container = new ContainerWrapper(appService, container);
-        Container oldContainer = wrappedObject.getContainer();
+        StorageContainer oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);
@@ -85,7 +85,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     public void setContainer(ContainerWrapper container) {
         if (container == null) {
-            setContainer((Container) null);
+            setContainer((StorageContainer) null);
         } else {
             setContainer(container.getWrappedObject());
         }
@@ -132,8 +132,8 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
             return null;
 
         HQLCriteria criteria = new HQLCriteria("from "
-            + ContainerPath.class.getName() + " where container.id = ?", Arrays
-            .asList(new Object[] { container.getId() }));
+            + ContainerPath.class.getName() + " where container.id = ?",
+            Arrays.asList(new Object[] { container.getId() }));
         List<ContainerPath> paths = appService.query(criteria);
         if (paths.size() > 1) {
             throw new BiobankCheckException("container should have only 1 path");

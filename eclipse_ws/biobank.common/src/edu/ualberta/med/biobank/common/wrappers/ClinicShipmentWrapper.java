@@ -23,7 +23,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicShipmentWrapper extends ModelWrapper<ClinicShipment> {
+public class ClinicShipmentWrapper extends
+    AbstractShipmentWrapper<ClinicShipment> {
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
     private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
@@ -176,8 +177,8 @@ public class ClinicShipmentWrapper extends ModelWrapper<ClinicShipment> {
     @Override
     public int compareTo(ModelWrapper<ClinicShipment> wrapper) {
         if (wrapper instanceof ClinicShipmentWrapper) {
-            Date v1Date = wrappedObject.getDateShipped();
-            Date v2Date = wrapper.wrappedObject.getDateShipped();
+            Date v1Date = wrappedObject.getDateReceived();
+            Date v2Date = wrapper.wrappedObject.getDateReceived();
             if (v1Date != null && v2Date != null) {
                 return v1Date.compareTo(v2Date);
             }
