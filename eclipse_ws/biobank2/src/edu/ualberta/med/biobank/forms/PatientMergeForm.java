@@ -167,9 +167,8 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     protected void populateFields(String pnumber) {
         try {
-            patient2Wrapper = PatientWrapper.getPatientInSite(SessionManager
-                .getAppService(), pnumber, SessionManager.getInstance()
-                .getCurrentSite());
+            patient2Wrapper = PatientWrapper.getPatient(
+                SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Error retrieving patient", e);
             return;

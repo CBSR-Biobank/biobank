@@ -1,9 +1,13 @@
 package edu.ualberta.med.biobank.treeview;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,21 +18,18 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 public class SessionAdapter extends AdapterBase {
+
+    private static final String ADDSITE_COMMAND_ID = "edu.ualberta.med.biobank.commands.siteAdd";
+
+    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
+
+    public static final int STUDIES_BASE_NODE_ID = -1;
 
     private WritableApplicationService appService;
 
     private String userName;
     private String serverName;
-
-    private static final String ADDSITE_COMMAND_ID = "edu.ualberta.med.biobank.commands.siteAdd";
-
-    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
 
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId,
@@ -43,6 +44,8 @@ public class SessionAdapter extends AdapterBase {
         }
         this.serverName = serverName;
         this.userName = userName;
+
+        addChild(new StudyGroup(this, STUDIES_BASE_NODE_ID));
     }
 
     @Override
@@ -58,6 +61,10 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         return "";
+    }
+
+    public AdapterBase getStudiesGroupNode() {
+        return children.get(STUDIES_BASE_NODE_ID);
     }
 
     @Override
@@ -119,8 +126,10 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof SiteWrapper);
-        return new SiteAdapter(this, (SiteWrapper) child);
+        if (child instanceof SiteWrapper) {
+            return new SiteAdapter(this, (SiteWrapper) child);
+        }
+        return null;
     }
 
     @Override
@@ -151,4 +160,14 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
+    @Override
+    public void rebuild() {
+        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
+            if (!(child instanceof StudyGroup)) {
+                removeChild(child);
+            }
+        }
+        notifyListeners();
+        loadChildren(false);
+    }
 }

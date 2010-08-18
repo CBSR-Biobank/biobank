@@ -73,9 +73,8 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addSampleType() {
-        SampleTypeWrapper newST = new SampleTypeWrapper(SessionManager
-            .getAppService());
-        newST.setSite(currentSite);
+        SampleTypeWrapper newST = new SampleTypeWrapper(
+            SessionManager.getAppService());
         addOrEditSampleType(true, newST, addMessage);
     }
 
@@ -181,7 +180,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                         .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
                         "That sample type has already been added.");
-            type.checkNameAndShortNameUniquesForSiteAndGlobal();
+            type.checkNameAndShortNameUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;
@@ -214,12 +213,6 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
 
     public SiteWrapper getCurrentSite() {
         return currentSite;
-    }
-
-    public void reload() {
-        if (currentSite != null) {
-            setLists(currentSite.getSampleTypeCollection(true));
-        }
     }
 
     @Override

@@ -57,8 +57,8 @@ public class TestPatient extends TestDatabase {
         super.setUp();
         site = SiteHelper.addSite("Site - Patient Test "
             + Utils.getRandomString(10));
-        study = StudyHelper.addStudy(site,
-            "Study - Patient Test " + Utils.getRandomString(10));
+        study = StudyHelper.addStudy("Study - Patient Test "
+            + Utils.getRandomString(10));
         containerMap = new HashMap<String, ContainerWrapper>();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
     }
@@ -77,7 +77,7 @@ public class TestPatient extends TestDatabase {
         ContainerTypeWrapper topType, childType;
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
@@ -170,7 +170,7 @@ public class TestPatient extends TestDatabase {
         addContainers();
         addClinic(patient);
         patient.persist();
-        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(site, clinic);
         shipment.addPatients(Arrays.asList(patient));
         shipment.persist();
         patient.reload();
@@ -190,7 +190,7 @@ public class TestPatient extends TestDatabase {
 
         visits = patient.getPatientVisitCollection();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         AliquotWrapper aliquot = AliquotHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), visits.get(0),
             0, 0);
@@ -266,7 +266,8 @@ public class TestPatient extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
 
         List<PatientVisitWrapper> visitsAdded = PatientVisitHelper
             .addPatientVisits(patient, shipment, 3);
@@ -311,7 +312,8 @@ public class TestPatient extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
         patient.reload();
 
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
@@ -330,20 +332,6 @@ public class TestPatient extends TestDatabase {
     }
 
     @Test
-    public void testGetPatientInSite() throws Exception {
-        String pnumber = Utils.getRandomNumericString(20);
-        PatientWrapper patient = PatientHelper.addPatient(pnumber, study);
-
-        PatientWrapper patient2 = PatientWrapper.getPatientInSite(appService,
-            pnumber, site);
-        Assert.assertEquals(patient, patient2);
-
-        PatientWrapper patient3 = PatientWrapper.getPatientInSite(appService,
-            Utils.getRandomNumericString(20), site);
-        Assert.assertNull(patient3);
-    }
-
-    @Test
     public void testGetPatientShipmentCollection() throws Exception {
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(20), study);
@@ -351,7 +339,7 @@ public class TestPatient extends TestDatabase {
 
         List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
         for (int i = 0, n = r.nextInt(10); i < n; ++i) {
-            ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
+            ShipmentWrapper ship = ShipmentHelper.newShipment(site, clinic);
             ship.addPatients(Arrays.asList(patient));
             ship.persist();
             shipments.add(ship);
@@ -377,8 +365,8 @@ public class TestPatient extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient1,
-            patient2);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient1, patient2);
 
         Date dateProcessed1 = Utils.getRandomDate();
         Date dateDrawn1 = Utils.getRandomDate();
@@ -432,8 +420,8 @@ public class TestPatient extends TestDatabase {
         addContainers();
         addClinic(patient1);
         patient1.persist();
-        ShipmentWrapper shipment = ShipmentHelper.newShipment(clinic);
-        shipment.addPatients(Arrays.asList(patient1, patient2));
+        ShipmentWrapper shipment = ShipmentHelper.newShipment(site, clinic);
+        shipment.addPatients(Arrays.asList(patient1));
         shipment.persist();
         patient1.reload();
         patient2.reload();
@@ -456,7 +444,7 @@ public class TestPatient extends TestDatabase {
         }
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
 
         int sampleTypeCount = allSampleTypes.size();
         List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>();
@@ -512,7 +500,7 @@ public class TestPatient extends TestDatabase {
         String name = "testTodayShipments_" + r.nextInt();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
         addClinic(patient1);
-        ShipmentWrapper ship = ShipmentHelper.newShipment(clinic);
+        ShipmentWrapper ship = ShipmentHelper.newShipment(site, clinic);
         ship.addPatients(Arrays.asList(patient1));
         ship.persist();
 
@@ -520,13 +508,13 @@ public class TestPatient extends TestDatabase {
         addClinic(patient2);
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study);
         addClinic(patient3);
-        ShipmentWrapper ship2 = ShipmentHelper.newShipment(clinic);
+        ShipmentWrapper ship2 = ShipmentHelper.newShipment(site, clinic);
         ship2.setDateReceived(new Date()); // today
         ship2.addPatients(Arrays.asList(patient2, patient3));
         ship2.persist();
 
         List<PatientWrapper> todayPatients = PatientWrapper
-            .getPatientsInTodayShipments(appService, study.getSite());
+            .getPatientsInTodayShipments(appService, site);
         Assert.assertEquals(2, todayPatients.size());
         Assert.assertTrue(todayPatients.contains(patient2));
         Assert.assertTrue(todayPatients.contains(patient3));
@@ -542,7 +530,8 @@ public class TestPatient extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -10); // 10 days ago

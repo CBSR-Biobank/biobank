@@ -70,12 +70,8 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
     }
 
     public void save() throws Exception {
-        for (ActivityStatusWrapper aws : addedOrModifiedStatuses) {
-            aws.persist();
-        }
-        for (ActivityStatusWrapper aws : deletedStatuses) {
-            aws.delete();
-        }
+        ActivityStatusWrapper.persistActivityStatuses(addedOrModifiedStatuses,
+            deletedStatuses);
     }
 
     // if add is false then we are editing

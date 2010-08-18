@@ -21,8 +21,6 @@ public class PatientViewForm extends BiobankViewForm {
 
     private PatientWrapper patient;
 
-    private BiobankText siteLabel;
-
     private BiobankText studyLabel;
 
     private BiobankText visitCountLabel;
@@ -70,7 +68,6 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Visits");
@@ -89,7 +86,6 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(siteLabel, patient.getStudy().getSite().getName());
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel, patient.getPatientVisitCollection()
             .size());

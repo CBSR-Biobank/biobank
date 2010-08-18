@@ -20,12 +20,11 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GlobalPvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -108,10 +107,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
-        setTextValue(siteLabel, study.getSite().getName());
-
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
             BeansObservables.observeValue(study, "name"),
@@ -157,7 +152,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
         sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
-            study.getSite(), study);
+            study);
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);
         sampleStorageEntryTable.addSelectionChangedListener(listener);
 
@@ -213,15 +208,16 @@ public class StudyEntryForm extends BiobankEntryForm {
         //
         // END KLUDGE
 
-        SiteWrapper site = study.getSite();
         List<String> studyPvInfoLabels = Arrays.asList(study
             .getStudyPvAttrLabels());
 
-        for (String label : site.getSitePvAttrLabels()) {
+        for (GlobalPvAttrWrapper pvAttr : GlobalPvAttrWrapper
+            .getAllGlobalPvAttrs(appService)) {
+            String label = pvAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(label);
-            studyPvAttrCustom.setType(site.getSitePvAttrTypeName(label));
+            studyPvAttrCustom.setType(pvAttr.getTypeName());
             if (studyPvInfoLabels.contains(label)) {
                 studyPvAttrCustom.setAllowedValues(study
                     .getStudyPvAttrPermissible(label));
@@ -271,11 +267,6 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getAddedOrModifiedSampleStorages());
         study.removeSampleStorages(sampleStorageEntryTable
             .getDeletedSampleStorages());
-
-        SiteAdapter siteAdapter = studyAdapter
-            .getParentFromClass(SiteAdapter.class);
-        study.setSite(siteAdapter.getWrapper());
-
         study.persist();
 
         studyAdapter.getParent().performExpand();

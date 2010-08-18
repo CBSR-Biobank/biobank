@@ -16,6 +16,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -23,6 +24,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.StudySiteInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudySourceVesselInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
@@ -32,7 +34,6 @@ public class StudyViewForm extends BiobankViewForm {
     private StudyAdapter studyAdapter;
     private StudyWrapper study;
 
-    private BiobankText siteLabel;
     private BiobankText nameLabel;
     private BiobankText nameShortLabel;
     private BiobankText activityStatusLabel;
@@ -40,6 +41,7 @@ public class StudyViewForm extends BiobankViewForm {
     private BiobankText patientTotal;
     private BiobankText visitTotal;
 
+    private StudySiteInfoTable sitesTable;
     private StudyContactInfoTable contactsTable;
     private SampleStorageInfoTable sampleStorageTable;
     private StudySourceVesselInfoTable studySourceVesselsTable;
@@ -82,8 +84,6 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Short Name");
@@ -96,12 +96,45 @@ public class StudyViewForm extends BiobankViewForm {
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patient Visits");
 
+        createSiteSection();
         createClinicSection();
         createSampleStorageSection();
         createSourceVesselSection();
         createPvCustomInfoSection();
         setStudySectionValues();
         setPvDataSectionValues();
+    }
+
+    private void createSiteSection() {
+        Composite client = createSectionWithClient("Site Information");
+
+        sitesTable = new StudySiteInfoTable(client, study);
+        sitesTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sitesTable);
+
+        sitesTable.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+                if (selection instanceof InfoTableSelection) {
+                    Object obj = ((InfoTableSelection) selection).getObject();
+                    if (obj instanceof SiteWrapper) {
+                        SiteWrapper site = (SiteWrapper) obj;
+                        DoubleClickEvent newEvent = new DoubleClickEvent(
+                            (Viewer) event.getSource(), new InfoTableSelection(
+                                site));
+                        collectionDoubleClickListener.doubleClick(newEvent);
+                    } else {
+                        Assert.isTrue(false,
+                            "invalid InfoTableSelection class:"
+                                + obj.getClass().getName());
+                    }
+                } else {
+                    Assert.isTrue(false, "invalid class for event selection:"
+                        + event.getClass().getName());
+                }
+            }
+        });
     }
 
     private void createClinicSection() {
@@ -137,7 +170,6 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void setStudySectionValues() throws Exception {
-        setTextValue(siteLabel, study.getSite().getName());
         setTextValue(nameLabel, study.getName());
         setTextValue(nameShortLabel, study.getNameShort());
         setTextValue(activityStatusLabel, study.getActivityStatus());

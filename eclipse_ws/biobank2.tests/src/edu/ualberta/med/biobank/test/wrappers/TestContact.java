@@ -28,7 +28,7 @@ public class TestContact extends TestDatabase {
         String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         study.addContacts(Arrays.asList(contact));
@@ -44,8 +44,8 @@ public class TestContact extends TestDatabase {
         String name = "testGetStudyCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        StudyWrapper study = StudyHelper.addStudy(site, "QWERTY" + name);
-        StudyWrapper study2 = StudyHelper.addStudy(site, "ASDFG" + name);
+        StudyWrapper study = StudyHelper.addStudy("QWERTY" + name);
+        StudyWrapper study2 = StudyHelper.addStudy("ASDFG" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         study.addContacts(Arrays.asList(contact));
@@ -148,7 +148,7 @@ public class TestContact extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         contact.reload();

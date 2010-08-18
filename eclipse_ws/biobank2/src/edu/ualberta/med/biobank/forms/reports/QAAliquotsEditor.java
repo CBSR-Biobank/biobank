@@ -70,8 +70,8 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     protected ComboViewer createSampleTypeComboOption(String labelText,
         Composite parent) throws ApplicationException {
-        Collection<SampleTypeWrapper> sampleTypeWrappers = SessionManager
-            .getInstance().getCurrentSite().getAllSampleTypeCollection(true);
+        Collection<SampleTypeWrapper> sampleTypeWrappers = SampleTypeWrapper
+            .getAllSampleTypes(SessionManager.getAppService(), true);
         ComboViewer widget = widgetCreator
             .createComboViewerWithNoSelectionValidator(parent, labelText,
                 sampleTypeWrappers, null, "No selection");

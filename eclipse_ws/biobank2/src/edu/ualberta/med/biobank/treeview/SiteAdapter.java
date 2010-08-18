@@ -17,7 +17,6 @@ public class SiteAdapter extends AdapterBase {
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
 
     public static final int CLINICS_BASE_NODE_ID = 0;
-    public static final int STUDIES_BASE_NODE_ID = 1;
     public static final int STORAGE_BASE_TYPES_NODE_ID = 2;
     public static final int STORAGE_BASE_CONTAINERS_NODE_ID = 3;
 
@@ -30,7 +29,6 @@ public class SiteAdapter extends AdapterBase {
         }
 
         addChild(new ClinicGroup(this, nodeIdOffset + CLINICS_BASE_NODE_ID));
-        addChild(new StudyGroup(this, nodeIdOffset + STUDIES_BASE_NODE_ID));
         addChild(new ContainerTypeGroup(this, nodeIdOffset
             + STORAGE_BASE_TYPES_NODE_ID));
         addChild(new ContainerGroup(this, nodeIdOffset
@@ -39,10 +37,6 @@ public class SiteAdapter extends AdapterBase {
 
     public SiteWrapper getWrapper() {
         return (SiteWrapper) modelObject;
-    }
-
-    public AdapterBase getStudiesGroupNode() {
-        return children.get(STUDIES_BASE_NODE_ID);
     }
 
     public AdapterBase getClinicGroupNode() {

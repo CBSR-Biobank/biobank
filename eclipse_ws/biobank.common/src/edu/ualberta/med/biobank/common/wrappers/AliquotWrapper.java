@@ -139,7 +139,7 @@ public class AliquotWrapper extends
     @Override
     public SiteWrapper getSite() {
         if (getPatientVisit() != null) {
-            return getPatientVisit().getPatient().getStudy().getSite();
+            return getPatientVisit().getShipment().getSite();
         }
         return null;
     }
@@ -363,10 +363,9 @@ public class AliquotWrapper extends
     public static List<AliquotWrapper> getAliquotsInSite(
         WritableApplicationService appService, String inventoryId,
         SiteWrapper site) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Aliquot.class.getName()
-                + " where inventoryId = ? and patientVisit.patient.study.site.id = ?",
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Aliquot.class.getName()
+            + " where inventoryId = ? and patientVisit.shipment.site.id = ?",
             Arrays.asList(new Object[] { inventoryId, site.getId() }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();

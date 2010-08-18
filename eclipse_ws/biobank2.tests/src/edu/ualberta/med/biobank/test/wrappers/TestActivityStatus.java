@@ -97,6 +97,42 @@ public class TestActivityStatus extends TestDatabase {
         int after = statuses.size();
         Assert.assertEquals(before + 1, after);
         Assert.assertTrue(statuses.contains(as));
+
+        // add 5 activity status that will eventually be deleted
+        before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        List<ActivityStatusWrapper> toDelete = new ArrayList<ActivityStatusWrapper>();
+        for (int i = 0; i < 5; ++i) {
+            name = "testPersist" + i + r.nextInt();
+            as = new ActivityStatusWrapper(appService);
+            as.setName(name);
+            as.persist();
+            as.reload();
+            toDelete.add(as);
+        }
+
+        statuses = ActivityStatusWrapper.getAllActivityStatuses(appService);
+        after = statuses.size();
+        Assert.assertEquals(before + 5, after);
+        Assert.assertTrue(statuses.containsAll(toDelete));
+
+        // create 3 new activity statuses
+        before = after;
+        List<ActivityStatusWrapper> toAdd = new ArrayList<ActivityStatusWrapper>();
+        for (int i = 0; i < 3; ++i) {
+            name = "testPersist" + i + r.nextInt();
+            as = new ActivityStatusWrapper(appService);
+            as.setName(name);
+            toAdd.add(as);
+        }
+
+        ActivityStatusWrapper.persistActivityStatuses(toAdd, toDelete);
+
+        // now delete the ones previously added and add the new ones
+        statuses = ActivityStatusWrapper.getAllActivityStatuses(appService);
+        after = statuses.size();
+        Assert.assertEquals(before - 5 + 3, after);
+        Assert.assertTrue(statuses.containsAll(toAdd));
     }
 
     @Test

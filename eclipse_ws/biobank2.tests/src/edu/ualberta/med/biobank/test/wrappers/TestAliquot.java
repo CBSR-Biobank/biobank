@@ -56,8 +56,8 @@ public class TestAliquot extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite("sitename" + r.nextInt());
         siteId = site.getId();
-        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper.addSampleType(
-            site, "sampletype" + r.nextInt());
+        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper
+            .addSampleType("sampletype" + r.nextInt());
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
@@ -75,8 +75,7 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, "2nd",
             topContainer, site, typeChild, 0, 0);
 
-        StudyWrapper study = StudyHelper.addStudy(site,
-            "studyname" + r.nextInt());
+        StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
         ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
@@ -84,7 +83,8 @@ public class TestAliquot extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
@@ -173,8 +173,8 @@ public class TestAliquot extends TestDatabase {
         throws BiobankCheckException, Exception {
         SampleTypeWrapper oldSampleType = aliquot.getSampleType();
 
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(
-            oldSampleType.getSite(), "sampletype_2");
+        SampleTypeWrapper type2 = SampleTypeHelper
+            .addSampleType("sampletype_2");
         aliquot.setSampleType(type2);
         try {
             aliquot.persist();
@@ -214,13 +214,13 @@ public class TestAliquot extends TestDatabase {
         Exception {
         String name = "testCheckParentFromSameSite" + r.nextInt();
         SiteWrapper newSite = SiteHelper.addSite(name);
-        StudyWrapper newStudy = StudyHelper.addStudy(newSite, name);
+        StudyWrapper newStudy = StudyHelper.addStudy(name);
         PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
         ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         newStudy.addContacts(Arrays.asList(contact));
         newStudy.persist();
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(clinic,
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(newSite, clinic,
             newPatient);
         PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
             newPatient, shipment, null, Utils.getRandomDate());
@@ -238,8 +238,8 @@ public class TestAliquot extends TestDatabase {
     public void testDelete() throws Exception {
         aliquot.persist();
         SampleTypeWrapper type1 = aliquot.getSampleType();
-        SampleTypeWrapper type2 = SampleTypeHelper.addSampleType(
-            aliquot.getSite(), "sampletype_2");
+        SampleTypeWrapper type2 = SampleTypeHelper
+            .addSampleType("sampletype_2");
         SampleTypeHelper.removeFromCreated(type2);
         type2.delete();
 
@@ -363,8 +363,7 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testGetSetSampleType() throws BiobankCheckException, Exception {
         SampleTypeWrapper stw = aliquot.getSampleType();
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(
-            aliquot.getSite(), "newStw");
+        SampleTypeWrapper newType = SampleTypeHelper.addSampleType("newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newType.getId());
         aliquot.setSampleType(newType);
@@ -382,16 +381,14 @@ public class TestAliquot extends TestDatabase {
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
-        ss1.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
-            "ss1"));
+        ss1.setSampleType(SampleTypeHelper.addSampleType("ss1"));
         ss1.setVolume(1.0);
         ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
         ss1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
-        ss2.setSampleType(SampleTypeHelper.addSampleType(aliquot.getSite(),
-            "ss2"));
+        ss2.setSampleType(SampleTypeHelper.addSampleType("ss2"));
         ss2.setVolume(2.0);
         ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
         ss2.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
@@ -441,14 +438,13 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsInSite() throws Exception {
         String name = "testGetAliquotsInSite" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
-            name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, site, name);
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(study
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, study
             .getClinicCollection().get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
@@ -476,14 +472,13 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsInSiteWithPositionLabel() throws Exception {
         String name = "testGetAliquotsInSiteWithPositionLabel" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
-            name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, site, name);
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(study
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, study
             .getClinicCollection().get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
@@ -541,14 +536,13 @@ public class TestAliquot extends TestDatabase {
     public void testDebugRandomMethods() throws Exception {
         String name = "testDebugRandomMethods" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(site,
-            name);
-        StudyWrapper study = StudyHelper.addStudy(site, name);
+        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
+        StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, name);
+        ContactHelper.addContactsToStudy(study, site, name);
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(study
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, study
             .getClinicCollection().get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());

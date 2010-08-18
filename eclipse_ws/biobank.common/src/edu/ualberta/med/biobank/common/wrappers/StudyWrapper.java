@@ -39,8 +39,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private ActivityStatusWrapper activityStatus;
 
-    private SiteWrapper site;
-
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -106,22 +104,76 @@ public class StudyWrapper extends ModelWrapper<Study> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
-    public SiteWrapper getSite() {
-        if (site == null) {
-            Site s = wrappedObject.getSite();
-            if (s == null)
-                return null;
-            site = new SiteWrapper(appService, s);
+    @SuppressWarnings("unchecked")
+    public List<SiteWrapper> getSiteCollection(boolean sort) {
+        List<SiteWrapper> siteCollection = (List<SiteWrapper>) propertiesMap
+            .get("siteCollection");
+        if (siteCollection == null) {
+            siteCollection = new ArrayList<SiteWrapper>();
+            Collection<Site> children = wrappedObject.getSiteCollection();
+            if (children != null) {
+                for (Site type : children) {
+                    siteCollection.add(new SiteWrapper(appService, type));
+                }
+                propertiesMap.put("siteCollection", siteCollection);
+            }
         }
-        return site;
+        if ((siteCollection != null) && sort)
+            Collections.sort(siteCollection);
+        return siteCollection;
     }
 
-    public void setSite(SiteWrapper site) {
-        this.site = site;
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = site.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+    public List<SiteWrapper> getSiteCollection() {
+        return getSiteCollection(false);
+    }
+
+    private void setSiteCollection(Collection<Site> allSiteObjects,
+        List<SiteWrapper> allSiteWrappers) {
+        Collection<Site> oldSites = wrappedObject.getSiteCollection();
+        wrappedObject.setSiteCollection(allSiteObjects);
+        propertyChangeSupport.firePropertyChange("siteCollection", oldSites,
+            allSiteObjects);
+        propertiesMap.put("siteCollection", allSiteWrappers);
+    }
+
+    public void addSites(List<SiteWrapper> newSites) {
+        if ((newSites == null) || (newSites.size() == 0))
+            return;
+
+        Collection<Site> allSiteObjects = new HashSet<Site>();
+        List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
+        // already added Sites
+        List<SiteWrapper> currentList = getSiteCollection();
+        if (currentList != null) {
+            for (SiteWrapper Site : currentList) {
+                allSiteObjects.add(Site.getWrappedObject());
+                allSiteWrappers.add(Site);
+            }
+        }
+        // new Sites added
+        for (SiteWrapper Site : newSites) {
+            allSiteObjects.add(Site.getWrappedObject());
+            allSiteWrappers.add(Site);
+        }
+        setSiteCollection(allSiteObjects, allSiteWrappers);
+    }
+
+    public void removeSites(List<SiteWrapper> SitesToRemove) {
+        if (SitesToRemove != null && SitesToRemove.size() > 0) {
+            Collection<Site> allSiteObjects = new HashSet<Site>();
+            List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
+            // already added Sites
+            List<SiteWrapper> currentList = getSiteCollection();
+            if (currentList != null) {
+                for (SiteWrapper Site : currentList) {
+                    if (!SitesToRemove.contains(Site)) {
+                        allSiteObjects.add(Site.getWrappedObject());
+                        allSiteWrappers.add(Site);
+                    }
+                }
+            }
+            setSiteCollection(allSiteObjects, allSiteWrappers);
+        }
     }
 
     @Override
@@ -136,7 +188,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "site", "contactCollection", "sampleStorageCollection",
+            "siteCollection", "contactCollection", "sampleStorageCollection",
             "sourceVesselCollection", "studyPvAttrCollection",
             "patientCollection" };
     }
@@ -150,31 +202,19 @@ public class StudyWrapper extends ModelWrapper<Study> {
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         checkNotEmpty(getName(), "Name");
-        checkNoDuplicatesInSite(Study.class, "name", getName(), getSite()
-            .getId(), "A study with name \"" + getName() + "\" already exists.");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicatesInSite(Study.class, "nameShort", getNameShort(),
-            getSite().getId(), "A study with short name \"" + getNameShort()
+        checkNoDuplicates(Study.class, "name", getName(),
+            "A study with name \"" + getName() + "\" already exists.");
+        checkNoDuplicates(Study.class, "nameShort", getNameShort(),
+            "A study with short name \"" + getNameShort()
                 + "\" already exists.");
         checkValidActivityStatus();
-        checkContactsFromSameSite();
     }
 
     private void checkValidActivityStatus() throws BiobankCheckException {
         if (getActivityStatus() == null) {
             throw new BiobankCheckException(
                 "the clinic does not have an activity status");
-        }
-    }
-
-    private void checkContactsFromSameSite() throws BiobankCheckException {
-        if (getContactCollection() != null) {
-            for (ContactWrapper contact : getContactCollection()) {
-                if (!contact.getClinic().getSite().equals(getSite())) {
-                    throw new BiobankCheckException(
-                        "Contact associated with this study should be from the same site.");
-                }
-            }
         }
     }
 
@@ -210,9 +250,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
             + Contact.class.getName()
             + " as contacts left join contacts.studyCollection as studies "
             + "where (studies.id <> ?  or studies is null)"
-            + "and contacts.clinic.site.id = ? "
-            + "order by contacts.clinic.name", Arrays.asList(new Object[] {
-            getId(), getSite().getId() }));
+            + "order by contacts.clinic.name",
+            Arrays.asList(new Object[] { getId() }));
         List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
         List<Contact> rawContacts = appService.query(criteria);
         for (Contact rawContact : rawContacts) {
@@ -544,8 +583,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public void setStudyPvAttr(String label, String type,
         String[] permissibleValues) throws Exception {
-        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = SiteWrapper
-            .getPvAttrTypeMap(appService);
+        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = PvAttrTypeWrapper
+            .getAllPvAttrTypesMap(appService);
         PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
         if (pvAttrType == null) {
             throw new Exception("the pv attribute type \"" + type
@@ -770,6 +809,39 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return 0;
     }
 
+    public long getPatientCountForSite(SiteWrapper site)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
+            + Site.class.getName() + " as site"
+            + " join site.shipmentCollection as shipments"
+            + " join shipments.patientVisitCollection as visits"
+            + " join visits.patient as patients"
+            + " where site.id=? and visits.patient.study.id=?",
+            Arrays.asList(new Object[] { site.getId(), getId() }));
+
+        List<Long> result = appService.query(c);
+        if (result.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return result.get(0);
+    }
+
+    public long getPatientVisitCountForSite(SiteWrapper site)
+        throws ApplicationException, BiobankCheckException {
+        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
+            + Site.class.getName() + " as site"
+            + " join site.shipmentCollection as shipments"
+            + " join shipments.patientVisitCollection as visits"
+            + " where site.id=? and visits.patient.study.id=?",
+            Arrays.asList(new Object[] { site.getId(), getId() }));
+
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0);
+    }
+
     public long getPatientCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
@@ -892,7 +964,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void reload() throws Exception {
         super.reload();
         activityStatus = null;
-        site = null;
     }
 
 }

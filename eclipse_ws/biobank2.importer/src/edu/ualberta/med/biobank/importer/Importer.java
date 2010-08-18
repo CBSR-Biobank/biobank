@@ -437,7 +437,7 @@ public class Importer {
         }
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         if ((allSampleTypes == null) || (allSampleTypes.size() == 0)) {
             throw new Exception("no global sample types found in the database");
         }
@@ -1292,8 +1292,8 @@ public class Importer {
             return null;
         }
 
-        PatientWrapper patient = PatientWrapper.getPatientInSite(appService,
-            patientNr, site);
+        PatientWrapper patient = PatientWrapper.getPatient(appService,
+            patientNr);
 
         if (patient == null) {
             logger.error("no patient with number " + patientNr);

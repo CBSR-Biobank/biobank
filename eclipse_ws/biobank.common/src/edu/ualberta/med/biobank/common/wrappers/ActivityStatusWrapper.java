@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -86,17 +84,14 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public static List<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
 
-        Map<String, ActivityStatusWrapper> activityStatusMap = new HashMap<String, ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>();
 
         HQLCriteria c = new HQLCriteria("from "
             + ActivityStatus.class.getName());
         List<ActivityStatus> result = appService.query(c);
         for (ActivityStatus ac : result) {
-            activityStatusMap.put(ac.getName(), new ActivityStatusWrapper(
-                appService, ac));
+            activities.add(new ActivityStatusWrapper(appService, ac));
         }
-        List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>(
-            activityStatusMap.values());
         Collections.sort(activities);
         return activities;
     }

@@ -1,25 +1,27 @@
-package edu.ualberta.med.biobank.common.wrappers.internal;
+package edu.ualberta.med.biobank.common.wrappers;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.GlobalPvAttr;
 import edu.ualberta.med.biobank.model.PvAttrType;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.SitePvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
+public class GlobalPvAttrWrapper extends ModelWrapper<GlobalPvAttr> {
 
     private PvAttrTypeWrapper pvAttrType;
-    private SiteWrapper site;
 
-    public SitePvAttrWrapper(WritableApplicationService appService,
-        SitePvAttr wrappedObject) {
+    public GlobalPvAttrWrapper(WritableApplicationService appService,
+        GlobalPvAttr wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SitePvAttrWrapper(WritableApplicationService appService) {
+    public GlobalPvAttrWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -29,8 +31,8 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
     }
 
     @Override
-    public Class<SitePvAttr> getWrappedClass() {
-        return SitePvAttr.class;
+    public Class<GlobalPvAttr> getWrappedClass() {
+        return GlobalPvAttr.class;
     }
 
     @Override
@@ -80,53 +82,40 @@ public class SitePvAttrWrapper extends ModelWrapper<SitePvAttr> {
         setPvAttrType(pvAttrType.getWrappedObject());
     }
 
-    public SiteWrapper getSite() {
-        if (site == null) {
-            Site s = wrappedObject.getSite();
-            if (s == null) {
-                return null;
-            }
-            site = new SiteWrapper(appService, s);
-        }
-        return site;
-    }
-
-    public void setSite(Site site) {
-        if (site == null)
-            this.site = null;
-        else
-            this.site = new SiteWrapper(appService, site);
-        Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
-    public void setSite(SiteWrapper site) {
-        if (site == null) {
-            setSite((Site) null);
-        } else {
-            setSite(site.getWrappedObject());
-        }
+    public String getTypeName() {
+        return wrappedObject.getPvAttrType().getName();
     }
 
     @Override
-    public int compareTo(ModelWrapper<SitePvAttr> o) {
+    public int compareTo(ModelWrapper<GlobalPvAttr> o) {
         return 0;
     }
 
     @Override
     public String toString() {
-        SiteWrapper site = getSite();
         return "" + getId() + ":" + getLabel() + ":"
-            + getPvAttrType().getName() + ":"
-            + ((site == null) ? "no site" : site);
+            + getPvAttrType().getName();
     }
 
     @Override
     public void reload() throws Exception {
         super.reload();
         pvAttrType = null;
-        site = null;
+    }
+
+    public static List<GlobalPvAttrWrapper> getAllGlobalPvAttrs(
+        WritableApplicationService appService) throws ApplicationException {
+
+        List<GlobalPvAttrWrapper> pvAttrs = new ArrayList<GlobalPvAttrWrapper>();
+
+        HQLCriteria c = new HQLCriteria("from " + GlobalPvAttr.class.getName());
+        List<GlobalPvAttr> result = appService.query(c);
+        for (GlobalPvAttr pvAttr : result) {
+            pvAttrs.add(new GlobalPvAttrWrapper(appService, pvAttr));
+        }
+
+        Collections.sort(pvAttrs);
+        return pvAttrs;
     }
 
 }

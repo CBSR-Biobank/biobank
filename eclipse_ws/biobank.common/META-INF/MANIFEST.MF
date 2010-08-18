@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Biobank Commons
 Bundle-SymbolicName: biobank.common
 Bundle-Version: 1.1.5
-Bundle-ClassPath: conf/,
- lib/client/acegi-security-1.0.4.jar,
+Bundle-ClassPath: lib/client/acegi-security-1.0.4.jar,
  lib/client/antlr-2.7.6.jar,
  lib/client/asm.jar,
  lib/client/axis.jar,

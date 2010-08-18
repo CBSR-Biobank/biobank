@@ -33,9 +33,8 @@ public class PatientAdministrationView extends AbstractAdministrationView {
     @Override
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
-        PatientWrapper patient = PatientWrapper.getPatientInSite(SessionManager
-            .getAppService(), text.trim(), SessionManager.getInstance()
-            .getCurrentSite());
+        PatientWrapper patient = PatientWrapper.getPatient(
+            SessionManager.getAppService(), text.trim());
         if (patient != null) {
             return Arrays.asList(patient);
         }

@@ -25,9 +25,8 @@ public class ContactHelper extends DbHelper {
         return contact;
     }
 
-    public static int addContactsToStudy(StudyWrapper study, String name)
-        throws Exception {
-        SiteWrapper site = study.getSite();
+    public static int addContactsToStudy(StudyWrapper study, SiteWrapper site,
+        String name) throws Exception {
         ClinicHelper.addClinics(site, name, r.nextInt(15) + 3, true);
         List<ClinicWrapper> clinics = site.getClinicCollection();
         int nber = r.nextInt(clinics.size() - 2) + 1;

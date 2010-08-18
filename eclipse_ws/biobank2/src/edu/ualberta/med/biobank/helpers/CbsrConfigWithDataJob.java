@@ -122,8 +122,8 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             patient = patients.get(r.nextInt(patients.size()));
 
             ShipmentWrapper shipment = new ShipmentWrapper(appService);
-            String dateStr = String.format("2009-%02d-%02d %02d:%02d", r
-                .nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
+            String dateStr = String.format("2009-%02d-%02d %02d:%02d",
+                r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
             shipment.setDateShipped(DateFormatter.parseToDateTime(dateStr));
             dateStr = String.format("2009-%02d-%02d %02d:%02d",
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));

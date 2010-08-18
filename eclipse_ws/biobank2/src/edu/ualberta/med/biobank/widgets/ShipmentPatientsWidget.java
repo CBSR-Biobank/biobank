@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -51,8 +50,6 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
     private BiobankText newPatientText;
 
-    private SiteWrapper currentSite;
-
     private boolean editable;
 
     private List<PatientAddListener> patientListeners;
@@ -63,12 +60,10 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         Boolean.class);
 
     public ShipmentPatientsWidget(Composite parent, int style,
-        ShipmentWrapper ship, final SiteWrapper site, FormToolkit toolkit,
-        boolean editable) {
+        ShipmentWrapper ship, FormToolkit toolkit, boolean editable) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         this.shipment = ship;
-        this.currentSite = site;
         this.editable = editable;
 
         setLayout(new GridLayout(2, false));
@@ -131,15 +126,15 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         String patientNumber = newPatientText.getText().trim();
         if (!patientNumber.isEmpty()) {
             try {
-                PatientWrapper patient = PatientWrapper.getPatientInSite(
-                    shipment.getAppService(), patientNumber, currentSite);
+                PatientWrapper patient = PatientWrapper.getPatient(
+                    shipment.getAppService(), patientNumber);
                 if (patient == null) {
                     boolean create = BioBankPlugin.openConfirm(
                         "Patient not found",
                         "Do you want to create this patient ?");
                     if (create) {
-                        patient = new PatientWrapper(SessionManager
-                            .getAppService());
+                        patient = new PatientWrapper(
+                            SessionManager.getAppService());
                         patient.setPnumber(patientNumber);
                         addPatientListener(patient);
                         PatientAdapter patientAdapter = new PatientAdapter(
@@ -171,9 +166,9 @@ public class ShipmentPatientsWidget extends BiobankWidget {
     private void addPatient(PatientWrapper patient) {
         List<PatientWrapper> patients = shipment.getPatientCollection();
         if (patients != null && patients.contains(patient)) {
-            BioBankPlugin.openAsyncError("Error", "Patient "
-                + patient.getPnumber()
-                + " has already been added to this shipment");
+            BioBankPlugin.openAsyncError("Error",
+                "Patient " + patient.getPnumber()
+                    + " has already been added to this shipment");
             return;
         }
         boolean canAdd = false;
@@ -189,9 +184,10 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             notifyListeners();
             patientsAdded.setValue(true);
         } else {
-            BioBankPlugin.openAsyncError("Error", "Patient "
-                + patient.getPnumber() + " can't be added to this shipment. "
-                + "Patient study is not linked to this shipment clinic.");
+            BioBankPlugin.openAsyncError("Error",
+                "Patient " + patient.getPnumber()
+                    + " can't be added to this shipment. "
+                    + "Patient study is not linked to this shipment clinic.");
         }
     }
 
@@ -204,8 +200,9 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             public void deleteItem(InfoTableEvent event) {
                 PatientWrapper patient = patientTable.getSelection();
                 if (patient != null) {
-                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
+                    if (!MessageDialog.openConfirm(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(),
                         "Delete Patient",
                         "Are you sure you want to remove patient \""
                             + patient.getPnumber() + "\" for this shipment ?")) {

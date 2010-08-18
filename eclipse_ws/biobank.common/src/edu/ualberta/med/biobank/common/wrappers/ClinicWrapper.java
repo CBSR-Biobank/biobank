@@ -135,10 +135,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public SiteWrapper getSite() {
         Site site = wrappedObject.getSite();
-        if (site == null) {
-            return null;
-        }
-        return new SiteWrapper(appService, site);
+        return (site != null) ? new SiteWrapper(appService, site) : null;
     }
 
     public void setSite(SiteWrapper siteWrapper) {

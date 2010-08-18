@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
@@ -80,7 +81,7 @@ public class TestPatientVisit extends TestDatabase {
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
         site = SiteHelper.addSite("Site - Patient Visit Test "
             + Utils.getRandomString(10));
-        study = StudyHelper.addStudy(site, "Study - Patient Visit Test "
+        study = StudyHelper.addStudy("Study - Patient Visit Test "
             + Utils.getRandomString(10));
         clinic = ClinicHelper.addClinic(site, "Clinic - Patient Visit Test "
             + Utils.getRandomString(10));
@@ -90,7 +91,7 @@ public class TestPatientVisit extends TestDatabase {
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ShipmentHelper.addShipment(clinic, patient);
+        shipment = ShipmentHelper.addShipment(site, clinic, patient);
     }
 
     private void addContainerTypes() throws Exception {
@@ -98,7 +99,7 @@ public class TestPatientVisit extends TestDatabase {
         ContainerTypeWrapper topType, childType;
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
@@ -129,7 +130,8 @@ public class TestPatientVisit extends TestDatabase {
 
     private void addPvAttrs() throws Exception {
         // add PvAtt to study
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
+        Collection<String> types = PvAttrTypeWrapper.getAllPvAttrTypesMap(
+            appService).keySet();
         Assert
             .assertTrue("PvAttrTypes not initialized", types.contains("text"));
         study.setStudyPvAttr("PMBC Count", "number");
@@ -163,7 +165,8 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic, patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime(), date);
@@ -207,7 +210,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         AliquotWrapper aliquot = AliquotHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), visit, 0, 0);
         visit.reload();
@@ -239,7 +242,7 @@ public class TestPatientVisit extends TestDatabase {
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         int allSampleTypesCount = allSampleTypes.size();
         ContainerWrapper container = containerMap.get("ChildL1");
 
@@ -671,7 +674,7 @@ public class TestPatientVisit extends TestDatabase {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
+        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageWrapper ss1 = SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));

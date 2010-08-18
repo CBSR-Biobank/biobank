@@ -13,7 +13,7 @@ public class PatientViewNodeSearchVisitor extends NodeSearchVisitor {
     @Override
     public AdapterBase visit(AbstractTodayNode todayNode) {
         if (wrapper instanceof StudyWrapper) {
-            return todayNode.getChild(wrapper.getId(), true);
+            return todayNode.getChild(wrapper, true);
         }
         return visitChildren(todayNode);
     }
@@ -21,7 +21,7 @@ public class PatientViewNodeSearchVisitor extends NodeSearchVisitor {
     @Override
     public AdapterBase visit(AbstractSearchedNode searchedNode) {
         if (wrapper instanceof StudyWrapper) {
-            return searchedNode.getChild(wrapper.getId(), true);
+            return searchedNode.getChild(wrapper, true);
         }
         return visitChildren(searchedNode);
     }
@@ -29,7 +29,7 @@ public class PatientViewNodeSearchVisitor extends NodeSearchVisitor {
     @Override
     public AdapterBase visit(StudyAdapter study) {
         if (wrapper instanceof PatientWrapper) {
-            return study.getChild(wrapper.getId(), true);
+            return study.getChild(wrapper, true);
         }
         return null;
     }

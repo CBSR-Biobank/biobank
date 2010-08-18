@@ -20,10 +20,8 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
-import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -32,7 +30,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -40,16 +37,33 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class TestSite extends TestDatabase {
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
     @Test
     public void testGettersAndSetters() throws Exception {
         SiteWrapper site = SiteHelper.addSite("testGettersAndSetters"
             + r.nextInt());
         testGettersAndSetters(site);
+    }
+
+    @Test
+    public void testAddress() throws Exception {
+        SiteWrapper site = new SiteWrapper(appService);
+        Assert.assertEquals(null, site.getStreet1());
+        Assert.assertEquals(null, site.getStreet2());
+        Assert.assertEquals(null, site.getCity());
+        Assert.assertEquals(null, site.getProvince());
+        Assert.assertEquals(null, site.getPostalCode());
+
+        site.setStreet1("testNullAddress1");
+        site.setStreet2("testNullAddress2");
+        site.setCity("testNullAddress3");
+        site.setProvince("testNullAddress4");
+        site.setPostalCode("testNullAddress5");
+
+        Assert.assertNotNull(site.getStreet1());
+        Assert.assertNotNull(site.getStreet2());
+        Assert.assertNotNull(site.getCity());
+        Assert.assertNotNull(site.getProvince());
+        Assert.assertNotNull(site.getPostalCode());
     }
 
     @Test
@@ -64,27 +78,44 @@ public class TestSite extends TestDatabase {
         String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
-        StudyHelper.addStudies(site, name, studiesNber);
+        StudyHelper.addStudies(name, studiesNber);
 
-        List<StudyWrapper> studies = site.getStudyCollection();
-        int sizeFound = studies.size();
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        site.addStudies(studies);
+        site.persist();
+        site.reload();
 
-        Assert.assertEquals(studiesNber, sizeFound);
+        List<StudyWrapper> siteStudies = site.getStudyCollection();
+
+        Assert.assertEquals(studies.size(), siteStudies.size());
+
+        // delete a study
+        StudyWrapper study = studies.get(r.nextInt(studies.size()));
+        studies.remove(study);
+        study.delete();
+        site.reload();
+        siteStudies = site.getStudyCollection();
+
+        Assert.assertEquals(studies.size(), siteStudies.size());
     }
 
     @Test
-    public void testGetStudyCollectionBoolean() throws Exception {
-        String name = "testGetStudyCollectionBoolean" + r.nextInt();
+    public void testGetStudyCollectionSorted() throws Exception {
+        String name = "testGetStudyCollectionSorted" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyHelper.addStudies(site, name, r.nextInt(15) + 5);
+        StudyHelper.addStudies(name, r.nextInt(15) + 5);
+
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        site.addStudies(studies);
+        site.persist();
+        site.reload();
 
         List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
-        if (studiesSorted.size() > 1) {
-            for (int i = 0; i < studiesSorted.size() - 1; i++) {
-                StudyWrapper study1 = studiesSorted.get(i);
-                StudyWrapper study2 = studiesSorted.get(i + 1);
-                Assert.assertTrue(study1.compareTo(study2) <= 0);
-            }
+        Assert.assertTrue(studiesSorted.size() > 1);
+        for (int i = 0, n = studiesSorted.size() - 1; i < n; i++) {
+            StudyWrapper study1 = studiesSorted.get(i);
+            StudyWrapper study2 = studiesSorted.get(i + 1);
+            Assert.assertTrue(study1.compareTo(study2) <= 0);
         }
     }
 
@@ -93,50 +124,21 @@ public class TestSite extends TestDatabase {
         String name = "testAddStudies" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int studiesNber = r.nextInt(15) + 1;
-        StudyHelper.addStudies(site, name, studiesNber);
+        StudyHelper.addStudies(name, studiesNber);
 
-        StudyWrapper study = StudyHelper.newStudy(site, name + "newStudy");
-        site.addStudies(Arrays.asList(study));
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        site.addStudies(studies);
         site.persist();
-
         site.reload();
-        // one study added
+
+        // add one more study
+        StudyHelper.addStudy(name + "newStudy");
+        studies = StudyWrapper.getAllStudies(appService);
+        site.addStudies(studies);
+        site.persist();
+        site.reload();
         Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
     }
-
-    // @Test
-    // public void testSetStudyCollectionRemove() throws Exception {
-    // String name = "testSetStudyCollectionRemove" + r.nextInt();
-    // SiteWrapper site = SiteHelper.addSite(name);
-    // int studiesNber = r.nextInt(15) + 1;
-    // StudyHelper.addStudies(site, name, studiesNber);
-    //
-    // List<StudyWrapper> studies = site.getStudyCollection();
-    // StudyWrapper study = DbHelper.chooseRandomlyInList(studies);
-    // int idStudy = study.getId();
-    // studies.remove(study);
-    // site.setStudyCollection(studies);
-    //
-    // try {
-    // site.persist();
-    // Assert.fail("a study is missing and is not deleted");
-    // } catch (BiobankCheckException bce) {
-    // Assert.assertTrue(true);
-    // }
-    //
-    // study.delete();
-    // site.persist();
-    //
-    // site.reload();
-    // // one study removed
-    // Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
-    //
-    // // study should not be anymore in the study collection (removed the
-    // // good one)
-    // for (StudyWrapper s : site.getStudyCollection()) {
-    // Assert.assertFalse(s.getId().equals(idStudy));
-    // }
-    // }
 
     @Test
     public void testGetClinicCollection() throws Exception {
@@ -152,8 +154,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetClinicCollectionBoolean() throws Exception {
-        String name = "testGetClinicCollectionBoolean" + r.nextInt();
+    public void testGetClinicCollectionSorted() throws Exception {
+        String name = "testGetClinicCollectionSorted" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         int nber = r.nextInt(15) + 5;
         ClinicHelper.addClinics(site, name, nber);
@@ -198,8 +200,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetContainerTypeCollectionBoolean() throws Exception {
-        String name = "testGetContainerTypeCollectionBoolean" + r.nextInt();
+    public void testGetContainerTypeCollectionSorted() throws Exception {
+        String name = "testGetContainerTypeCollectionSorted" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerTypeHelper.addContainerTypesRandom(site, name,
             r.nextInt(15) + 5);
@@ -266,105 +268,6 @@ public class TestSite extends TestDatabase {
         // one container added
         Assert.assertEquals(totalContainers + 1, site.getContainerCollection()
             .size());
-    }
-
-    @Test
-    public void testGetSampleTypeCollection() throws Exception {
-        String name = "testGetSampleTypeCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-
-        List<SampleTypeWrapper> types = site.getSampleTypeCollection();
-        int sizeFound = types.size();
-
-        Assert.assertEquals(nber, sizeFound);
-    }
-
-    @Test
-    public void testGetSampleTypeCollectionBoolean() throws Exception {
-        String name = "testGetSampleTypeCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleTypes(site, name);
-
-        List<SampleTypeWrapper> types = site.getSampleTypeCollection(true);
-        if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
-                SampleTypeWrapper type1 = types.get(i);
-                SampleTypeWrapper type2 = types.get(i + 1);
-                Assert.assertTrue(type1.compareTo(type2) <= 0);
-            }
-        }
-    }
-
-    @Test
-    public void testAddSampleTypes() throws Exception {
-        String name = "testAddSampleTypes" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-
-        SampleTypeWrapper type = SampleTypeHelper.newSampleType(site, name);
-        site.addSampleTypes(Arrays.asList(type));
-        site.persist();
-
-        site.reload();
-        // one container added
-        Assert.assertEquals(nber + 1, site.getSampleTypeCollection().size());
-    }
-
-    @Test
-    public void testRemoveSampleTypes() throws Exception {
-        String name = "testRemoveSampleTypes" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-
-        SampleTypeWrapper type = DbHelper.chooseRandomlyInList(site
-            .getSampleTypeCollection());
-        int idContainer = type.getId();
-        site.removeSampleTypes(Arrays.asList(type));
-        // don't need to delete the type, thanks to method
-        // deleteSampleTypeDifference of persistDependencies
-        SampleTypeHelper.removeFromCreated(type);
-        site.persist();
-
-        site.reload();
-        // one type removed
-        Assert.assertEquals(nber - 1, site.getSampleTypeCollection().size());
-
-        // type should not be anymore in the type collection
-        // (removed the good one)
-        for (SampleTypeWrapper t : site.getSampleTypeCollection()) {
-            Assert.assertFalse(t.getId().equals(idContainer));
-        }
-    }
-
-    @Test
-    public void testGetAllSampleTypeCollection() throws Exception {
-        String name = "testGetAllSampleTypeCollection" + r.nextInt();
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getGlobalSampleTypes(
-            appService, false);
-        SiteWrapper site = SiteHelper.addSite(name);
-        int nber = SampleTypeHelper.addSampleTypes(site, name);
-        site.persist();
-
-        site.reload();
-        List<SampleTypeWrapper> all = site.getAllSampleTypeCollection();
-        Assert.assertEquals(nber + types.size(), all.size());
-    }
-
-    @Test
-    public void testGetAllSampleTypeCollectionBoolean() throws Exception {
-        String name = "testGetAllSampleTypeCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeHelper.addSampleTypes(site, name);
-
-        List<SampleTypeWrapper> types = site.getAllSampleTypeCollection(true);
-        if (types.size() > 1) {
-            for (int i = 0; i < types.size() - 1; i++) {
-                SampleTypeWrapper type1 = types.get(i);
-                SampleTypeWrapper type2 = types.get(i + 1);
-                Assert.assertTrue(type1.compareTo(type2) <= 0);
-            }
-        }
     }
 
     @Test
@@ -465,28 +368,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testDeleteFailNoMoreStudy() throws Exception {
-        int oldTotal = SiteWrapper.getSites(appService).size();
-        String name = "testDeleteFailNoMoreStudy" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name, false);
-
-        StudyWrapper study = StudyHelper.addStudy(site, name);
-        site.reload();
-
-        try {
-            site.delete();
-            Assert.fail("Should not delete the site : a study is still there");
-        } catch (BiobankCheckException bce) {
-            Assert.assertEquals(oldTotal + 1, SiteWrapper.getSites(appService)
-                .size());
-        }
-        study.delete();
-        site.reload();
-        site.delete();
-        Assert.assertEquals(oldTotal, SiteWrapper.getSites(appService).size());
-    }
-
-    @Test
     public void testDeleteFailNoMoreClinic() throws Exception {
         int oldTotal = SiteWrapper.getSites(appService).size();
         String name = "testDeleteFailNoMoreClinic" + r.nextInt();
@@ -578,138 +459,6 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetSetSitePvAttr() throws Exception {
-        String name = "testGetSetSitePvAttr" + r.nextInt();
-
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        SiteWrapper site2 = SiteHelper.addSite(name + "_secondSite");
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
-        if (types.size() == 0) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-
-        String type = types.get(r.nextInt(types.size()));
-        site2.setSitePvAttr(name, type);
-        site2.persist();
-
-        site2.reload();
-        Assert.assertTrue(Arrays.asList(site2.getSitePvAttrLabels()).contains(
-            name));
-        Assert.assertEquals(type, site2.getSitePvAttrTypeName(name));
-        Assert.assertFalse(Arrays.asList(site.getSitePvAttrLabels()).contains(
-            name));
-
-        // set non existing type, expect exception
-        try {
-            site.setSitePvAttr(Utils.getRandomString(10, 15),
-                Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-
-        // delete non existing label, expect exception
-        try {
-            site.deleteSitePvAttr(Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testRemoveSitePvAttr() throws Exception {
-        String name = "testRemoveSitePvAttr" + r.nextInt();
-
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        int sizeOrig = site.getSitePvAttrLabels().length;
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
-        if (types.size() < 2) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-        site.setSitePvAttr(name, types.get(0));
-        site.setSitePvAttr(name + "_2", types.get(1));
-        site.persist();
-
-        site.reload();
-        Assert.assertEquals(sizeOrig + 2, site.getSitePvAttrLabels().length);
-        site.deleteSitePvAttr(name);
-        Assert.assertEquals(sizeOrig + 1, site.getSitePvAttrLabels().length);
-        site.persist();
-
-        site.reload();
-        Assert.assertEquals(sizeOrig + 1, site.getSitePvAttrLabels().length);
-    }
-
-    @Test
-    public void testGetSitePvAttrType() throws Exception {
-        String name = "testGetSitePvAttrType" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        List<PvAttrTypeWrapper> types = new ArrayList<PvAttrTypeWrapper>(
-            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService).values());
-        if (types.size() == 0) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-        PvAttrTypeWrapper type = types.get(0);
-        String label = "toto";
-        site.setSitePvAttr(label, type.getName());
-
-        // my guess would be that the sitePvAttr map inside the site should
-        // be updated in the setSitePvAttr method
-        Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
-
-        site.persist();
-        site.reload();
-        Assert.assertEquals(type.getId(), site.getSitePvAttrType(label));
-
-        // get type for non existing label, expect exception
-        try {
-            site.getSitePvAttrType(Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testGetSitePvAttrTypeName() throws Exception {
-        String name = "testGetSitePvAttrTypeName" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        List<PvAttrTypeWrapper> types = new ArrayList<PvAttrTypeWrapper>(
-            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService).values());
-        if (types.size() == 0) {
-            Assert.fail("Can't test without PvAttrTypes");
-        }
-        PvAttrTypeWrapper type = types.get(0);
-        String label = "toto";
-        site.setSitePvAttr(label, type.getName());
-
-        Assert.assertEquals(type.getName(), site.getSitePvAttrTypeName(label));
-
-        site.persist();
-        site.reload();
-        Assert.assertEquals(type.getName(), site.getSitePvAttrTypeName(label));
-    }
-
-    @Test
-    public void testSetSitePvAttrTypeNames() throws Exception {
-        String name = "testGetSitePvAttrTypeNames" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-
-        List<String> types = SiteWrapper.getPvAttrTypeNames(appService);
-        Assert.assertTrue("No PvAttrTypes", types.size() > 0);
-        int count = 1;
-        for (String type : types) {
-            site.setSitePvAttr(name + count, type);
-            ++count;
-        }
-    }
-
-    @Test
     public void testGetTopContainerCollection() throws Exception {
         String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
@@ -717,13 +466,16 @@ public class TestSite extends TestDatabase {
         ContainerHelper.addTopContainersWithChildren(site, name, topNber);
 
         List<ContainerWrapper> containers = site.getTopContainerCollection();
-        int sizeFound = containers.size();
+        Assert.assertEquals(topNber, containers.size());
 
-        Assert.assertEquals(topNber, sizeFound);
+        // clear the top containers and get again
+        site.clearTopContainerCollection();
+        containers = site.getTopContainerCollection();
+        Assert.assertEquals(topNber, containers.size());
     }
 
     @Test
-    public void testGetTopContainerCollectionBoolean() throws Exception {
+    public void testGetTopContainerCollectionSorted() throws Exception {
         String name = "testGetTopContainerCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ContainerHelper.addTopContainersWithChildren(site, name,
@@ -771,36 +523,143 @@ public class TestSite extends TestDatabase {
 
         Assert.assertTrue(site.compareTo(site2) > 0);
         Assert.assertTrue(site2.compareTo(site) < 0);
+        Assert.assertTrue(site.compareTo(site) == 0);
+    }
+
+    private void createShipments(SiteWrapper site,
+        List<ShipmentWrapper> shipments) throws Exception {
+        String name = site.getName();
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
+            clinic1, name + "Study1"));
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
+            clinic1, name + "Study2"));
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
+            clinic2, name + "Study3"));
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
+            clinic2, name + "Study4"));
+    }
+
+    @Test
+    public void testGetShipmentCollectionSorted() throws Exception {
+        List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
+        String name = "testGetShipmentCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        createShipments(site, shipments);
+
+        List<ShipmentWrapper> savedShipments = site.getShipmentCollection();
+        Assert.assertTrue(savedShipments.size() > 1);
+        Assert.assertEquals(shipments.size(), savedShipments.size());
+        for (int i = 0, n = savedShipments.size() - 1; i < n; i++) {
+            ShipmentWrapper s1 = savedShipments.get(i);
+            ShipmentWrapper s2 = savedShipments.get(i + 1);
+            Assert.assertTrue(s1.compareTo(s2) < 0);
+        }
+    }
+
+    @Test
+    public void testGetShipmentCollection() throws Exception {
+        List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
+        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        createShipments(site, shipments);
+
+        List<ShipmentWrapper> savedShipments = site
+            .getShipmentCollection(false);
+        Assert.assertTrue(savedShipments.containsAll(shipments));
+    }
+
+    @Test
+    public void testGetShipmentCountForSite() throws Exception {
+        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
+        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
+        study2.addContacts(Arrays.asList(contact2));
+        study2.persist();
+
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        PatientWrapper patient2 = PatientHelper
+            .addPatient(name + "_p2", study2);
+        PatientWrapper patient3 = PatientHelper
+            .addPatient(name + "_p3", study1);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
+            patient1, patient3);
+        ShipmentHelper.addShipment(site, clinic2, patient2, patient3);
+
+        site.reload();
+        Assert.assertEquals(2, site.getShipmentCount().longValue());
+
+        // delete shipment 1
+        shipment1.delete();
+        Assert.assertEquals(1, site.getShipmentCount().longValue());
+
+        // add shipment again
+        shipment1 = ShipmentHelper.addShipment(site, clinic1, patient3);
+
+        site.reload();
+        Assert.assertEquals(2, site.getShipmentCount().longValue());
     }
 
     @Test
     public void testGetPatientCountForSite() throws Exception {
-        String name = "testGetPatientCountForClinic" + r.nextInt();
+        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
-        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name + "CLINIC1");
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
+            + "CONTACT1");
+
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2");
+        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
+            + "CONTACT2");
+
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
+        study1.addContacts(Arrays.asList(contact1, contact2));
         study1.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
-            study1);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
-            study2);
-        PatientWrapper patient3 = PatientHelper.addPatient(name + "PATIENT3",
-            study2);
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
+        study2.addContacts(Arrays.asList(contact2));
+        study2.persist();
+
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
+        PatientWrapper patient2 = PatientHelper
+            .addPatient(name + "_p2", study2);
+        PatientWrapper patient3 = PatientHelper
+            .addPatient(name + "_p3", study1);
+
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
+            patient1, patient3);
+        ShipmentHelper.addShipment(site, clinic2, patient2, patient3);
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
 
-        // remove a patient
-        patient2.delete();
+        // delete patient 1
+        shipment1.delete();
+        patient1.reload();
+        patient1.delete();
+
+        shipment1 = ShipmentHelper.addShipment(site, clinic1, patient3);
+
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());
-
-        // remove all patients
-        patient1.delete();
-        patient3.delete();
-        site.reload();
-        Assert.assertEquals(0, site.getPatientCount().longValue());
     }
 
     @Test
@@ -816,11 +675,11 @@ public class TestSite extends TestDatabase {
         ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
             + "CONTACT2");
 
-        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addContacts(Arrays.asList(contact1, contact2));
         study1.persist();
 
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addContacts(Arrays.asList(contact2));
         study2.persist();
 
@@ -830,9 +689,9 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1, patient3);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
@@ -874,16 +733,16 @@ public class TestSite extends TestDatabase {
         ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
             + "CONTACT2");
 
-        StudyWrapper study1 = StudyHelper.addStudy(site, name + "STUDY1");
+        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addContacts(Arrays.asList(contact1, contact2));
         study1.persist();
 
-        StudyWrapper study2 = StudyHelper.addStudy(site, name + "STUDY2");
+        StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addContacts(Arrays.asList(contact2));
         study2.persist();
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
-            .getGlobalSampleTypes(appService, true);
+            .getAllSampleTypes(appService, true);
         ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
             "Pallet96", "P96", 2, 8, 12, true);
         ctype.addSampleTypes(allSampleTypes);
@@ -896,10 +755,10 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(clinic1,
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
             patient1);
 
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(clinic2,
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
             patient2);
 
         // shipment 1 has patient visits for patient1 and patient2

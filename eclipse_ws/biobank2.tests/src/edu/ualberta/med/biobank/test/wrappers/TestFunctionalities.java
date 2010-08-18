@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -627,7 +628,7 @@ public class TestFunctionalities extends TestDatabase {
     public void addStudy() throws Exception {
         Study study = new Study();
         study.setName("Toto");
-        study.setSite(getSite());
+        study.setSiteCollection(Arrays.asList(getSite()));
         study = (Study) appService.executeQuery(new InsertExampleQuery(study))
             .getObjectResult();
     }
