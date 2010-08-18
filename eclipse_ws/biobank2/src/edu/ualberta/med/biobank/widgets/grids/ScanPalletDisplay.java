@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.util.RowColPos;
-import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 /**
  * Specific widget to draw a 8*12 pallet for scan features

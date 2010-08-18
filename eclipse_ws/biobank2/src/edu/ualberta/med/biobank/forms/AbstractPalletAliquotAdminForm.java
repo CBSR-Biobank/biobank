@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.scanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {
@@ -70,9 +70,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     // the pallet container type name contains this text
     protected String palletNameContains = ""; //$NON-NLS-1$
-
-    private Button scanChoiceSimple;
-    private boolean isScanChoiceSimple;
 
     private boolean scanTubeAloneMode = false;
 
@@ -141,16 +138,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void createScanButton(Composite parent) {
         scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
-        if (BioBankPlugin.isRealScanEnabled()) {
-            toolkit.createLabel(parent, "Decode Type:");
-
-            Composite composite = toolkit.createComposite(parent);
-            composite.setLayout(new GridLayout(2, false));
-            scanChoiceSimple = toolkit.createButton(composite, "Single Scan",
-                SWT.RADIO);
-            scanChoiceSimple.setSelection(true);
-            toolkit.createButton(composite, "Multiple Scan", SWT.RADIO);
-        } else {
+        if (!BioBankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
         }
@@ -247,9 +235,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void saveUINeededInformation() {
         currentPlateToScan = plateToScanValue.getValue().toString();
-        if (scanChoiceSimple != null) {
-            isScanChoiceSimple = scanChoiceSimple.getSelection();
-        }
     }
 
     protected abstract void scanAndProcessResult(IProgressMonitor monitor)
@@ -276,12 +261,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             } else {
                 ScanCell[][] scanCells = null;
                 try {
-                    if (isScanChoiceSimple) {
-                        scanCells = ScannerConfigPlugin.scan(plateNum);
-                    } else {
-                        scanCells = ScannerConfigPlugin
-                            .scanMultipleDpi(plateNum);
-                    }
+                    scanCells = ScannerConfigPlugin.scan(plateNum);
                     cells = PalletCell.convertArray(scanCells);
                 } catch (Exception ex) {
                     BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$
