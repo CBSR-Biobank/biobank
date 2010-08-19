@@ -43,12 +43,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
-        studyPvAttrMap = null;
     }
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
-        studyPvAttrMap = null;
     }
 
     public String getName() {
@@ -615,7 +613,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr = new StudyPvAttrWrapper(appService);
             studyPvAttr.setLabel(label);
             studyPvAttr.setPvAttrType(pvAttrType);
-            studyPvAttr.setStudy(wrappedObject);
+            studyPvAttr.setStudy(this);
         }
         deletedStudyPvAttr.remove(studyPvAttr);
 

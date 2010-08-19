@@ -17,12 +17,12 @@ import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingScheme
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -214,8 +214,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankCheckException {
         String queryString = "select count(c) from "
-            + Container.class.getName()
-            + " as c where c.containerType=?)";
+            + Container.class.getName() + " as c where c.containerType=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
@@ -556,18 +555,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
-        if (scheme == null) {
-            setChildLabelingScheme((ContainerLabelingScheme) null);
-        } else {
-            setChildLabelingScheme(scheme.getWrappedObject());
-        }
-    }
-
-    private void setChildLabelingScheme(ContainerLabelingScheme scheme) {
         ContainerLabelingScheme oldLbl = wrappedObject.getChildLabelingScheme();
-        wrappedObject.setChildLabelingScheme(scheme);
+        ContainerLabelingScheme newLbl = null;
+        if (scheme != null) {
+            newLbl = scheme.getWrappedObject();
+        }
+        wrappedObject.setChildLabelingScheme(newLbl);
         propertyChangeSupport.firePropertyChange("childLabelingScheme", oldLbl,
-            scheme);
+            newLbl);
     }
 
     public Integer getChildLabelingScheme() {

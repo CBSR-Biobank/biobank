@@ -144,25 +144,16 @@ public class AliquotWrapper extends
         return null;
     }
 
-    protected void setPatientVisit(PatientVisit patientVisit) {
-        if (patientVisit == null)
-            this.patientVisit = null;
-        else
-            this.patientVisit = new PatientVisitWrapper(appService,
-                patientVisit);
+    public void setPatientVisit(PatientVisitWrapper patientVisit) {
+        this.patientVisit = patientVisit;
         PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
-        PatientVisit newPvRaw = patientVisit;
+        PatientVisit newPvRaw = null;
+        if (patientVisit != null) {
+            newPvRaw = patientVisit.getWrappedObject();
+        }
         wrappedObject.setPatientVisit(newPvRaw);
         propertyChangeSupport.firePropertyChange("patientVisit", oldPvRaw,
             newPvRaw);
-    }
-
-    public void setPatientVisit(PatientVisitWrapper patientVisit) {
-        if (patientVisit == null) {
-            setPatientVisit((PatientVisit) null);
-        } else {
-            setPatientVisit(patientVisit.getWrappedObject());
-        }
     }
 
     public PatientVisitWrapper getPatientVisit() {
@@ -209,24 +200,16 @@ public class AliquotWrapper extends
         return true;
     }
 
-    protected void setSampleType(SampleType type) {
-        if (type == null)
-            this.sampleType = null;
-        else
-            this.sampleType = new SampleTypeWrapper(appService, type);
+    public void setSampleType(SampleTypeWrapper type) {
+        this.sampleType = type;
         SampleType oldTypeRaw = wrappedObject.getSampleType();
-        SampleType newTypeRaw = type;
-        wrappedObject.setSampleType(type);
+        SampleType newTypeRaw = null;
+        if (type != null) {
+            newTypeRaw = type.getWrappedObject();
+        }
+        wrappedObject.setSampleType(newTypeRaw);
         propertyChangeSupport.firePropertyChange("sampleType", oldTypeRaw,
             newTypeRaw);
-    }
-
-    public void setSampleType(SampleTypeWrapper type) {
-        if (type == null) {
-            setSampleType((SampleType) null);
-        } else {
-            setSampleType(type.wrappedObject);
-        }
     }
 
     public SampleTypeWrapper getSampleType() {

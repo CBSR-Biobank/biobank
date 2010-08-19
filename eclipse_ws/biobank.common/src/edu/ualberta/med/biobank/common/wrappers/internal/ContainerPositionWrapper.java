@@ -43,23 +43,16 @@ public class ContainerPositionWrapper extends
         return ContainerPosition.class;
     }
 
-    public void setParentContainer(Container parentContainer) {
-        if (parentContainer == null)
-            this.parent = null;
-        else
-            this.parent = new ContainerWrapper(appService, parentContainer);
-        Container oldParent = wrappedObject.getParentContainer();
-        wrappedObject.setParentContainer(parentContainer);
-        propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
-            parentContainer);
-    }
-
     private void setParentContainer(ContainerWrapper parentContainer) {
-        if (parentContainer == null) {
-            setParentContainer((Container) null);
-        } else {
-            setParentContainer(parentContainer.getWrappedObject());
+        this.parent = parentContainer;
+        Container oldParent = wrappedObject.getParentContainer();
+        Container newParent = null;
+        if (parentContainer != null) {
+            newParent = parentContainer.getWrappedObject();
         }
+        wrappedObject.setParentContainer(newParent);
+        propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
+            newParent);
     }
 
     private ContainerWrapper getParentContainer() {
@@ -83,18 +76,15 @@ public class ContainerPositionWrapper extends
     }
 
     public void setContainer(ContainerWrapper container) {
-        setContainer(container.getWrappedObject());
-    }
-
-    public void setContainer(Container container) {
-        if (container == null)
-            this.container = null;
-        else
-            this.container = new ContainerWrapper(appService, container);
+        this.container = container;
         Container oldContainer = wrappedObject.getContainer();
-        wrappedObject.setContainer(container);
+        Container newContainer = null;
+        if (container != null) {
+            newContainer = container.getWrappedObject();
+        }
+        wrappedObject.setContainer(newContainer);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
-            container);
+            newContainer);
     }
 
     @Override

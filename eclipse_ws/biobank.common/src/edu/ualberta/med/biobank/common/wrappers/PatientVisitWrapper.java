@@ -41,8 +41,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
-        studyPvAttrMap = null;
-        pvAttrMap = null;
     }
 
     public PatientVisitWrapper(WritableApplicationService appService) {

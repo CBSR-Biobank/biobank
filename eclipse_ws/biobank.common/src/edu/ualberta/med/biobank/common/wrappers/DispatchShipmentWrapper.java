@@ -81,22 +81,16 @@ public class DispatchShipmentWrapper extends
         return sender;
     }
 
-    protected void setSender(Site sender) {
-        if (sender == null)
-            this.sender = null;
-        else
-            this.sender = new SiteWrapper(appService, sender);
-        Site oldSender = wrappedObject.getSender();
-        wrappedObject.setSender(sender);
-        propertyChangeSupport.firePropertyChange("sender", oldSender, sender);
-    }
-
     public void setSender(SiteWrapper sender) {
-        if (sender == null) {
-            setSender((Site) null);
-        } else {
-            setSender(sender.wrappedObject);
+        this.sender = sender;
+        Site oldSender = wrappedObject.getSender();
+        Site newSender = null;
+        if (sender != null) {
+            newSender = sender.getWrappedObject();
         }
+        wrappedObject.setSender(newSender);
+        propertyChangeSupport
+            .firePropertyChange("sender", oldSender, newSender);
     }
 
     public SiteWrapper getReceiver() {
@@ -109,23 +103,16 @@ public class DispatchShipmentWrapper extends
         return receiver;
     }
 
-    protected void setReceiver(Site receiver) {
-        if (receiver == null)
-            this.receiver = null;
-        else
-            this.receiver = new SiteWrapper(appService, receiver);
-        Site oldReceiver = wrappedObject.getReceiver();
-        wrappedObject.setReceiver(receiver);
-        propertyChangeSupport.firePropertyChange("receiver", oldReceiver,
-            receiver);
-    }
-
     public void setReceiver(SiteWrapper receiver) {
-        if (receiver == null) {
-            setReceiver((Site) null);
-        } else {
-            setReceiver(receiver.wrappedObject);
+        this.receiver = receiver;
+        Site oldReceiver = wrappedObject.getReceiver();
+        Site newReceiver = null;
+        if (receiver != null) {
+            newReceiver = receiver.getWrappedObject();
         }
+        wrappedObject.setReceiver(newReceiver);
+        propertyChangeSupport.firePropertyChange("receiver", oldReceiver,
+            newReceiver);
     }
 
     @SuppressWarnings("unchecked")

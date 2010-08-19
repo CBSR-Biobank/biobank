@@ -179,22 +179,16 @@ public class ClinicShipmentWrapper extends
         return clinic;
     }
 
-    protected void setClinic(Clinic clinic) {
-        if (clinic == null)
-            this.clinic = null;
-        else
-            this.clinic = new ClinicWrapper(appService, clinic);
-        Clinic oldClinic = wrappedObject.getClinic();
-        wrappedObject.setClinic(clinic);
-        propertyChangeSupport.firePropertyChange("clinic", oldClinic, clinic);
-    }
-
     public void setClinic(ClinicWrapper clinic) {
-        if (clinic == null) {
-            setClinic((Clinic) null);
-        } else {
-            setClinic(clinic.wrappedObject);
+        this.clinic = clinic;
+        Clinic oldClinic = wrappedObject.getClinic();
+        Clinic newClinic = null;
+        if (clinic != null) {
+            newClinic = clinic.getWrappedObject();
         }
+        wrappedObject.setClinic(newClinic);
+        propertyChangeSupport
+            .firePropertyChange("clinic", oldClinic, newClinic);
     }
 
     public SiteWrapper getSite() {
@@ -269,18 +263,14 @@ public class ClinicShipmentWrapper extends
         return new ShippingMethodWrapper(appService, sc);
     }
 
-    protected void setShippingMethod(ShippingMethod sc) {
-        ShippingMethod old = wrappedObject.getShippingMethod();
-        wrappedObject.setShippingMethod(sc);
-        propertyChangeSupport.firePropertyChange("shippingMethod", old, sc);
-    }
-
     public void setShippingMethod(ShippingMethodWrapper sc) {
-        if (sc == null) {
-            setShippingMethod((ShippingMethod) null);
-        } else {
-            setShippingMethod(sc.wrappedObject);
+        ShippingMethod old = wrappedObject.getShippingMethod();
+        ShippingMethod newSh = null;
+        if (sc != null) {
+            newSh = sc.getWrappedObject();
         }
+        wrappedObject.setShippingMethod(newSh);
+        propertyChangeSupport.firePropertyChange("shippingMethod", old, newSh);
     }
 
     @SuppressWarnings("unchecked")

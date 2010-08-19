@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -72,23 +72,16 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         return container;
     }
 
-    protected void setContainer(Container container) {
-        if (container == null)
-            this.container = null;
-        else
-            this.container = new ContainerWrapper(appService, container);
-        Container oldContainer = wrappedObject.getContainer();
-        wrappedObject.setContainer(container);
-        propertyChangeSupport.firePropertyChange("container", oldContainer,
-            container);
-    }
-
     public void setContainer(ContainerWrapper container) {
-        if (container == null) {
-            setContainer((Container) null);
-        } else {
-            setContainer(container.getWrappedObject());
+        this.container = container;
+        Container oldContainer = wrappedObject.getContainer();
+        Container newContainer = null;
+        if (container != null) {
+            newContainer = container.getWrappedObject();
         }
+        wrappedObject.setContainer(newContainer);
+        propertyChangeSupport.firePropertyChange("container", oldContainer,
+            newContainer);
     }
 
     @Override

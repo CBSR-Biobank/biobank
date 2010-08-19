@@ -125,14 +125,15 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         return new PvAttrTypeWrapper(appService, type);
     }
 
-    public void setPvAttrType(PvAttrType type) {
-        PvAttrType oldType = wrappedObject.getPvAttrType();
-        wrappedObject.setPvAttrType(type);
-        propertyChangeSupport.firePropertyChange("pvAttrType", oldType, type);
-    }
-
     public void setPvAttrType(PvAttrTypeWrapper type) {
-        setPvAttrType(type.getWrappedObject());
+        PvAttrType oldType = wrappedObject.getPvAttrType();
+        PvAttrType newType = null;
+        if (type != null) {
+            newType = type.getWrappedObject();
+        }
+        wrappedObject.setPvAttrType(newType);
+        propertyChangeSupport
+            .firePropertyChange("pvAttrType", oldType, newType);
     }
 
     public StudyWrapper getStudy() {
@@ -145,18 +146,15 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
         return study;
     }
 
-    public void setStudy(Study study) {
-        if (study == null)
-            this.study = null;
-        else
-            this.study = new StudyWrapper(appService, study);
-        Study oldStudy = wrappedObject.getStudy();
-        wrappedObject.setStudy(study);
-        propertyChangeSupport.firePropertyChange("study", oldStudy, study);
-    }
-
     public void setStudy(StudyWrapper study) {
-        setStudy(study.getWrappedObject());
+        this.study = study;
+        Study oldStudy = wrappedObject.getStudy();
+        Study newStudy = null;
+        if (study != null) {
+            newStudy = study.getWrappedObject();
+        }
+        wrappedObject.setStudy(newStudy);
+        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
     }
 
     @Override
