@@ -20,9 +20,9 @@ public class SessionAdapter extends AdapterBase {
 
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
 
-    public static final int SITES_NODE_ID = -1;
+    public static final int SITES_NODE_ID = 1;
 
-    public static final int STUDIES_NODE_ID = -2;
+    public static final int STUDIES_NODE_ID = 2;
 
     private WritableApplicationService appService;
 
@@ -63,13 +63,13 @@ public class SessionAdapter extends AdapterBase {
     }
 
     public AdapterBase getSitesGroupNode() {
-        AdapterBase adapter = children.get(SITES_NODE_ID);
+        AdapterBase adapter = getChild(SITES_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
 
     public AdapterBase getStudiesGroupNode() {
-        AdapterBase adapter = children.get(STUDIES_NODE_ID);
+        AdapterBase adapter = getChild(STUDIES_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }

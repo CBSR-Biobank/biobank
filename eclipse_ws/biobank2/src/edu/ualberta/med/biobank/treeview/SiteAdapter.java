@@ -40,19 +40,19 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public AdapterBase getClinicGroupNode() {
-        AdapterBase adapter = children.get(CLINICS_BASE_NODE_ID);
+        AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
 
     public AdapterBase getContainerTypesGroupNode() {
-        AdapterBase adapter = children.get(CONTAINER_TYPES_BASE_NODE_ID);
+        AdapterBase adapter = getChild(CONTAINER_TYPES_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
 
     public AdapterBase getContainersGroupNode() {
-        AdapterBase adapter = children.get(CONTAINERS_BASE_NODE_ID);
+        AdapterBase adapter = getChild(CONTAINERS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
