@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -1427,8 +1427,8 @@ public class Importer {
 
         System.out
             .println("CName        Type         CParent      pos1 pos2 SampleSize");
-        List<StorageContainer> containers = appService.query(c);
-        for (StorageContainer sc : containers) {
+        List<Container> containers = appService.query(c);
+        for (Container sc : containers) {
             printContainerPositions(sc.getChildPositionCollection());
         }
     }
@@ -1443,8 +1443,8 @@ public class Importer {
 
         System.out
             .println("CName        Type         CParent      pos1 pos2 SampleSize");
-        List<StorageContainer> containers = appService.query(c);
-        for (StorageContainer sc : containers) {
+        List<Container> containers = appService.query(c);
+        for (Container sc : containers) {
             printContainerPositions(sc.getChildPositionCollection());
         }
     }

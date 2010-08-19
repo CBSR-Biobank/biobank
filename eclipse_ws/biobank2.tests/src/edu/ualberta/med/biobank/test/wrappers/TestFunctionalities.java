@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -66,7 +66,7 @@ public class TestFunctionalities extends TestDatabase {
         // int aliquotPositionSize = appService.search(AliquotPosition.class,
         // new AliquotPosition()).size();
         //
-        // StorageContainer sc = getContainer();
+        // Container sc = getContainer();
         //
         // // 1st test = aliquot not used in another aliquot position
         // Aliquot aliquot = findNotUsedSampleInAliquotPosition();
@@ -103,7 +103,7 @@ public class TestFunctionalities extends TestDatabase {
     /**
      * Insert a new AliquotPosition
      */
-    private void tryAliquotPositionInsert(Aliquot aliquot, StorageContainer sc) {
+    private void tryAliquotPositionInsert(Aliquot aliquot, Container sc) {
         try {
             AliquotPosition aliquotPosition = new AliquotPosition();
             aliquotPosition.setRow(3);
@@ -131,7 +131,7 @@ public class TestFunctionalities extends TestDatabase {
         int aliquotPositionSize = appService.search(AliquotPosition.class,
             new AliquotPosition()).size();
 
-        StorageContainer sc = getContainer();
+        Container sc = getContainer();
 
         Aliquot aliquot = findNotUsedSampleInAliquotPosition();
         System.out.println("Not used aliquot = " + aliquot.getId());
@@ -364,9 +364,9 @@ public class TestFunctionalities extends TestDatabase {
     @Test
     public void testContainers() throws Exception {
         HQLCriteria criteria = new HQLCriteria("from "
-            + StorageContainer.class.getName()
+            + Container.class.getName()
             + " where locatedAtPosition.parentContainer is not null");
-        List<StorageContainer> list = appService.query(criteria);
+        List<Container> list = appService.query(criteria);
         System.out.println(list.size());
     }
 
@@ -488,8 +488,8 @@ public class TestFunctionalities extends TestDatabase {
         int containerPositionSize = appService.search(ContainerPosition.class,
             new ContainerPosition()).size();
 
-        StorageContainer sc = getContainer();
-        StorageContainer scParent = getAnotherContainer(sc.getId());
+        Container sc = getContainer();
+        Container scParent = getAnotherContainer(sc.getId());
 
         ContainerPosition containerPosition = new ContainerPosition();
         containerPosition.setRow(8);
@@ -522,7 +522,7 @@ public class TestFunctionalities extends TestDatabase {
     /**
      * Find a Container in the database
      */
-    private StorageContainer getContainer() throws Exception {
+    private Container getContainer() throws Exception {
         return getAnotherContainer(null);
     }
 
@@ -530,11 +530,11 @@ public class TestFunctionalities extends TestDatabase {
      * Find a Container with id different from param id (if null, take whichever
      * Container)
      */
-    private StorageContainer getAnotherContainer(Integer id) throws Exception {
-        List<StorageContainer> scs;
+    private Container getAnotherContainer(Integer id) throws Exception {
+        List<Container> scs;
         if (id == null) {
-            scs = appService.search(StorageContainer.class,
-                new StorageContainer());
+            scs = appService.search(Container.class,
+                new Container());
         } else {
             HQLCriteria c = new HQLCriteria(
                 "from edu.ualberta.med.biobank.model.Container where id <> "
@@ -558,12 +558,12 @@ public class TestFunctionalities extends TestDatabase {
             result = appService.executeQuery(new InsertExampleQuery(st));
             st = (ContainerType) result.getObjectResult();
 
-            StorageContainer sc = new StorageContainer();
+            Container sc = new Container();
             sc.setLabel("scTest");
             sc.setSite(site);
             sc.setContainerType(st);
             result = appService.executeQuery(new InsertExampleQuery(sc));
-            sc = (StorageContainer) result.getObjectResult();
+            sc = (Container) result.getObjectResult();
             return sc;
         }
         return scs.get(0);
@@ -576,8 +576,8 @@ public class TestFunctionalities extends TestDatabase {
     public void batchQueriesContainer() throws Exception {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
 
-        int containerSize = appService.search(StorageContainer.class,
-            new StorageContainer()).size();
+        int containerSize = appService.search(Container.class,
+            new Container()).size();
 
         Site site = getSite();
 
@@ -589,13 +589,13 @@ public class TestFunctionalities extends TestDatabase {
         ContainerType st = getContainerType();
         System.out.println("st=" + st.getId());
 
-        StorageContainer sc = new StorageContainer();
+        Container sc = new Container();
         sc.setLabel(String.format("%02d", r.nextInt()));
         sc.setSite(site);
         sc.setContainerType(st);
         queries.add(new InsertExampleQuery(sc));
 
-        sc = new StorageContainer();
+        sc = new Container();
         sc.setLabel(String.format("%02d", r.nextInt()));
         // no site !!
         queries.add(new InsertExampleQuery(sc));
@@ -605,8 +605,8 @@ public class TestFunctionalities extends TestDatabase {
             System.out.println("batchQueriesContainer:"
                 + ae.getCause().getMessage());
         } finally {
-            int containerSizeAfter = appService.search(StorageContainer.class,
-                new StorageContainer()).size();
+            int containerSizeAfter = appService.search(Container.class,
+                new Container()).size();
 
             Assert.assertEquals(containerSize, containerSizeAfter);
         }

@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -251,7 +251,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper container = ContainerHelper.addContainer(null, null,
             null, site, containerTypeMap.get("TopCT"));
         Assert
-            .assertEquals(StorageContainer.class, container.getWrappedClass());
+            .assertEquals(Container.class, container.getWrappedClass());
     }
 
     @Test
@@ -261,8 +261,8 @@ public class TestContainer extends TestDatabase {
 
         Integer id = container.getId();
         Assert.assertNotNull(id);
-        StorageContainer containerInDB = ModelUtils.getObjectWithId(appService,
-            StorageContainer.class, id);
+        Container containerInDB = ModelUtils.getObjectWithId(appService,
+            Container.class, id);
         Assert.assertNotNull(containerInDB);
     }
 

@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -42,12 +42,12 @@ public class ContainerPositionWrapper extends
         return ContainerPosition.class;
     }
 
-    public void setParentContainer(StorageContainer parentContainer) {
+    public void setParentContainer(Container parentContainer) {
         if (parentContainer == null)
             this.parent = null;
         else
             this.parent = new ContainerWrapper(appService, parentContainer);
-        StorageContainer oldParent = wrappedObject.getParentContainer();
+        Container oldParent = wrappedObject.getParentContainer();
         wrappedObject.setParentContainer(parentContainer);
         propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
             parentContainer);
@@ -55,7 +55,7 @@ public class ContainerPositionWrapper extends
 
     private void setParentContainer(ContainerWrapper parentContainer) {
         if (parentContainer == null) {
-            setParentContainer((StorageContainer) null);
+            setParentContainer((Container) null);
         } else {
             setParentContainer(parentContainer.getWrappedObject());
         }
@@ -63,7 +63,7 @@ public class ContainerPositionWrapper extends
 
     private ContainerWrapper getParentContainer() {
         if (parent == null) {
-            StorageContainer c = wrappedObject.getParentContainer();
+            Container c = wrappedObject.getParentContainer();
             if (c == null)
                 return null;
             parent = new ContainerWrapper(appService, c);
@@ -73,7 +73,7 @@ public class ContainerPositionWrapper extends
 
     public ContainerWrapper getContainer() {
         if (container == null) {
-            StorageContainer c = wrappedObject.getContainer();
+            Container c = wrappedObject.getContainer();
             if (c == null)
                 return null;
             container = new ContainerWrapper(appService, c);
@@ -85,12 +85,12 @@ public class ContainerPositionWrapper extends
         setContainer(container.getWrappedObject());
     }
 
-    public void setContainer(StorageContainer container) {
+    public void setContainer(Container container) {
         if (container == null)
             this.container = null;
         else
             this.container = new ContainerWrapper(appService, container);
-        StorageContainer oldContainer = wrappedObject.getContainer();
+        Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);

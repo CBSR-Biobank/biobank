@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -64,7 +64,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     public ContainerWrapper getContainer() {
         if (container == null) {
-            StorageContainer c = wrappedObject.getContainer();
+            Container c = wrappedObject.getContainer();
             if (c == null)
                 return null;
             container = new ContainerWrapper(appService, c);
@@ -72,12 +72,12 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         return container;
     }
 
-    protected void setContainer(StorageContainer container) {
+    protected void setContainer(Container container) {
         if (container == null)
             this.container = null;
         else
             this.container = new ContainerWrapper(appService, container);
-        StorageContainer oldContainer = wrappedObject.getContainer();
+        Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);
@@ -85,7 +85,7 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
     public void setContainer(ContainerWrapper container) {
         if (container == null) {
-            setContainer((StorageContainer) null);
+            setContainer((Container) null);
         } else {
             setContainer(container.getWrappedObject());
         }

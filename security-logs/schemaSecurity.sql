@@ -326,7 +326,7 @@ CREATE TABLE `csm_protection_element` (
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -352,7 +352,7 @@ INSERT INTO `csm_protection_element` VALUES (14,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (15,'edu.ualberta.med.biobank.model.AliquotPosition','edu.ualberta.med.biobank.model.AliquotPosition','edu.ualberta.med.biobank.model.AliquotPosition',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (16,'edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (18,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (19,'edu.ualberta.med.biobank.model.StorageContainer','edu.ualberta.med.biobank.model.StorageContainer','edu.ualberta.med.biobank.model.StorageContainer','','','',2,'2010-08-18');
+INSERT INTO `csm_protection_element` VALUES (19,'edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container','','','',2,'2010-08-19');
 INSERT INTO `csm_protection_element` VALUES (20,'edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (21,'edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (24,'edu.ualberta.med.biobank.model.SourceVessel','edu.ualberta.med.biobank.model.SourceVessel','edu.ualberta.med.biobank.model.SourceVessel','','','',2,'2009-07-23');
@@ -374,6 +374,8 @@ INSERT INTO `csm_protection_element` VALUES (62,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (63,'edu.ualberta.med.biobank.model.Notification','edu.ualberta.med.biobank.model.Notification','edu.ualberta.med.biobank.model.Notification','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (64,'edu.ualberta.med.biobank.model.DispatchInfo','edu.ualberta.med.biobank.model.DispatchInfo','edu.ualberta.med.biobank.model.DispatchInfo','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (65,'edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','','','',2,'2010-08-18');
+INSERT INTO `csm_protection_element` VALUES (144,'edu.ualberta.med.biobank.model.DispatchContainer','edu.ualberta.med.biobank.model.DispatchContainer','edu.ualberta.med.biobank.model.DispatchContainer','','','',2,'2010-08-19');
+INSERT INTO `csm_protection_element` VALUES (145,'edu.ualberta.med.biobank.model.DispatchPosition','edu.ualberta.med.biobank.model.DispatchPosition','edu.ualberta.med.biobank.model.DispatchPosition','','','',2,'2010-08-19');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -699,6 +701,23 @@ INSERT INTO `csm_user_pe` VALUES (3,28,6);
 /*!40000 ALTER TABLE `csm_user_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
+--
+-- Table structure for table `dispatch_info`
+--
+
+DROP TABLE IF EXISTS `dispatch_info`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dispatch_info` (
+  `ID` int(11) NOT NULL,
+  `STUDY_ID` int(11) NOT NULL,
+  `FROM_SITE_ID` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK3D4D9D53377D3CF0` (`FROM_SITE_ID`),
+  KEY `FK3D4D9D53F2A2464F` (`STUDY_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -710,4 +729,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-08-18 16:16:42
+-- Dump completed on 2010-08-19 11:43:27

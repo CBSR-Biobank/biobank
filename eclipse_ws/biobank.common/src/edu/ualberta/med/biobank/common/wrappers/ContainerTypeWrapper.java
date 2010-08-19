@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -214,7 +214,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankCheckException {
         String queryString = "select count(c) from "
-            + StorageContainer.class.getName()
+            + Container.class.getName()
             + " as c where c.containerType=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
@@ -714,7 +714,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public long getContainersCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria c = new HQLCriteria("select count(*) from "
-            + StorageContainer.class.getName() + " where containerType.id=?",
+            + Container.class.getName() + " where containerType.id=?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {

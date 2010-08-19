@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerEmptyLocationsImpl extends AbstractReport {
@@ -32,7 +32,7 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {
             ContainerWrapper container = new ContainerWrapper(appService,
-                (StorageContainer) c);
+                (Container) c);
             int rows = container.getRowCapacity();
             int cols = container.getColCapacity();
             for (int i = 0; i < rows; i++) {

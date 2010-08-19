@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.model.AbstractContainer;
 import edu.ualberta.med.biobank.model.AbstractPosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerWrapper<S extends AbstractContainer, P extends AbstractPosition>
@@ -19,9 +19,9 @@ public abstract class AbstractContainerWrapper<S extends AbstractContainer, P ex
 
     public static AbstractContainerWrapper<?, ?> createInstance(
         WritableApplicationService appService, AbstractContainer container) {
-        if (container instanceof StorageContainer) {
+        if (container instanceof Container) {
             return new ContainerWrapper(appService,
-                (StorageContainer) container);
+                (Container) container);
         }
         return null;
     }

@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -75,12 +75,12 @@ public class AliquotPositionWrapper extends
         return aliquot;
     }
 
-    private void setContainer(StorageContainer container) {
+    private void setContainer(Container container) {
         if (container == null)
             this.container = null;
         else
             this.container = new ContainerWrapper(appService, container);
-        StorageContainer oldContainer = wrappedObject.getContainer();
+        Container oldContainer = wrappedObject.getContainer();
         wrappedObject.setContainer(container);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             container);
@@ -88,7 +88,7 @@ public class AliquotPositionWrapper extends
 
     private void setContainer(ContainerWrapper container) {
         if (container == null) {
-            setContainer((StorageContainer) null);
+            setContainer((Container) null);
         } else {
             setContainer(container.getWrappedObject());
         }
@@ -96,7 +96,7 @@ public class AliquotPositionWrapper extends
 
     private ContainerWrapper getContainer() {
         if (container == null) {
-            StorageContainer c = wrappedObject.getContainer();
+            Container c = wrappedObject.getContainer();
             if (c == null) {
                 return null;
             }

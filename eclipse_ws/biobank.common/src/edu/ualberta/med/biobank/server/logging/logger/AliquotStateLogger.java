@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 
 public class AliquotStateLogger extends BiobankObjectStateLogger {
 
@@ -29,7 +29,7 @@ public class AliquotStateLogger extends BiobankObjectStateLogger {
             AliquotPosition pos = (AliquotPosition) statesMap
                 .get("aliquotPosition");
             if (pos != null) {
-                StorageContainer parent = pos.getContainer();
+                Container parent = pos.getContainer();
                 if (parent != null) {
                     ContainerType type = parent.getContainerType();
                     Capacity capacity = type.getCapacity();

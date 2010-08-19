@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.StorageContainer;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Study;
 
 public class SearchUtils {
@@ -26,7 +26,7 @@ public class SearchUtils {
             properties.put("Inventory Id", "aliquot.inventoryId");
             properties.put("Link Date", "aliquot.linkDate");
             properties.put("Sample Type", "aliquot.sampleType.name");
-        } else if (type == StorageContainer.class) {
+        } else if (type == Container.class) {
             properties.put("Label", "container.label");
             properties.put("Container Type", "container.containerType.name");
         } else if (type == Site.class) {
@@ -82,7 +82,7 @@ public class SearchUtils {
     public static List<Class<?>> getSearchableObjs() {
         ArrayList<Class<?>> objList = new ArrayList<Class<?>>();
         objList.add(Aliquot.class);
-        objList.add(StorageContainer.class);
+        objList.add(Container.class);
         objList.add(Site.class);
         objList.add(Clinic.class);
         objList.add(Study.class);
@@ -172,7 +172,7 @@ public class SearchUtils {
             add(searchableFields, path, "waybill", String.class);
             add(searchableFields, path, "boxNumber", String.class);
             add(searchableFields, path, "shippingMethod", String.class);
-        } else if (c == StorageContainer.class) {
+        } else if (c == Container.class) {
             if (collection)
                 path = path.replace('.', '_') + "containerCollection.";
             else
@@ -209,7 +209,7 @@ public class SearchUtils {
             add(searchableFields, path, "address", Address.class);
             add(searchableFields, path, "clinicCollection", Clinic.class);
             add(searchableFields, path, "containerCollection",
-                StorageContainer.class);
+                Container.class);
         } else if (c == Clinic.class) {
             if (collection)
                 path = path.replace('.', '_') + "clinicCollection.";
@@ -270,7 +270,7 @@ public class SearchUtils {
             add(searchableFields, path, "patientCollection", Patient.class);
             add(searchableFields, path, "patientVisitCollection",
                 PatientVisit.class);
-        } else if (c == StorageContainer.class) {
+        } else if (c == Container.class) {
             if (collection)
                 path = path.replace('.', '_') + "containerCollection.";
             else
@@ -304,7 +304,7 @@ public class SearchUtils {
         columnWidths.put(Clinic.class, new int[] { 100, 100 });
         columnWidths.put(Site.class, new int[] { 100, 100 });
         columnWidths.put(Aliquot.class, new int[] { 100, 100, 100 });
-        columnWidths.put(StorageContainer.class, new int[] { 100, 100 });
+        columnWidths.put(Container.class, new int[] { 100, 100 });
         columnWidths.put(Study.class, new int[] { 100, 100 });
         columnWidths.put(Patient.class, new int[] { 100, 100 });
         columnWidths.put(PatientVisit.class, new int[] { 100, 100 });
