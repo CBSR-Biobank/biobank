@@ -1,8 +1,9 @@
--- MySQL dump 10.13  Distrib 5.1.37, for debian-linux-gnu (x86_64)
+
+-- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: biobank2
 -- ------------------------------------------------------
--- Server version	5.1.37-1ubuntu5.1
+-- Server version	5.1.41-3ubuntu12.6
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -74,7 +75,7 @@ CREATE TABLE `csm_filter_clause` (
   PRIMARY KEY (`FILTER_CLAUSE_ID`),
   KEY `FK_APPLICATION_FILTER_CLAUSE` (`APPLICATION_ID`),
   CONSTRAINT `FK_APPLICATION_FILTER_CLAUSE` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -139,7 +140,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=551 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=562 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -261,11 +262,13 @@ INSERT INTO `csm_pg_pe` VALUES (541,1,4,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (542,1,13,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (543,1,3,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (544,1,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (546,18,33,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (547,18,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (548,20,24,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (549,20,10,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (550,20,13,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (545,11,52,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (556,20,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (557,20,10,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (558,20,13,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (559,18,33,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (560,18,11,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (561,11,53,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -323,7 +326,7 @@ CREATE TABLE `csm_protection_element` (
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -367,6 +370,8 @@ INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
 INSERT INTO `csm_protection_element` VALUES (47,'biobank.cbsr.container.administration','','biobank.cbsr.container.administration','','','',2,'2010-04-26');
 INSERT INTO `csm_protection_element` VALUES (51,'edu.ualberta.med.biobank.model.Log','','edu.ualberta.med.biobank.model.Log','','','',2,'2010-05-25');
+INSERT INTO `csm_protection_element` VALUES (52,'edu.ualberta.med.biobank.model.Site/ID=1/Name=CBSR','','edu.ualberta.med.biobank.model.Site','id','1','',2,'2010-05-27');
+INSERT INTO `csm_protection_element` VALUES (53,'edu.ualberta.med.biobank.model.Site/Calgary-F','Calgary-F','edu.ualberta.med.biobank.model.Site','id','2','',2,'2010-08-11');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -391,7 +396,7 @@ CREATE TABLE `csm_protection_group` (
   KEY `idx_PARENT_PROTECTION_GROUP_ID` (`PARENT_PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PG_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP` FOREIGN KEY (`PARENT_PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -512,54 +517,6 @@ INSERT INTO `csm_role_privilege` VALUES (14,5,6);
 UNLOCK TABLES;
 
 --
--- Table structure for table `csm_user`
---
-
-DROP TABLE IF EXISTS `csm_user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `csm_user` (
-  `USER_ID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `LOGIN_NAME` varchar(500) NOT NULL,
-  `MIGRATED_FLAG` tinyint(1) NOT NULL DEFAULT '0',
-  `FIRST_NAME` varchar(100) NOT NULL,
-  `LAST_NAME` varchar(100) NOT NULL,
-  `ORGANIZATION` varchar(100) DEFAULT NULL,
-  `DEPARTMENT` varchar(100) DEFAULT NULL,
-  `TITLE` varchar(100) DEFAULT NULL,
-  `PHONE_NUMBER` varchar(15) DEFAULT NULL,
-  `PASSWORD` varchar(100) DEFAULT NULL,
-  `EMAIL_ID` varchar(100) DEFAULT NULL,
-  `START_DATE` date DEFAULT NULL,
-  `END_DATE` date DEFAULT NULL,
-  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
-  `PREMGRT_LOGIN_NAME` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`USER_ID`),
-  UNIQUE KEY `UQ_LOGIN_NAME` (`LOGIN_NAME`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `csm_user`
---
-
-LOCK TABLES `csm_user` WRITE;
-/*!40000 ALTER TABLE `csm_user` DISABLE KEYS */;
-INSERT INTO `csm_user` VALUES (1,'administrator',0,'Administrator','NoName',NULL,NULL,NULL,NULL,'zJPWCwDeSgG8j2uyHEABIQ==',NULL,NULL,NULL,'2009-07-22',NULL);
-INSERT INTO `csm_user` VALUES (2,'bbadmin',0,'Biobank Administrator','NoName',NULL,NULL,NULL,NULL,'7Bg9siN5e7M=',NULL,NULL,NULL,'2009-07-22',NULL);
-INSERT INTO `csm_user` VALUES (3,'testuser',0,'TestUser','NoName','','','','','orDBlaojDQE=','',NULL,NULL,'2010-04-20','');
-INSERT INTO `csm_user` VALUES (6,'clmadmin',0,'clmadmin','clmadmin','','','','','tBGnppnJRZW8j2uyHEABIQ==','',NULL,NULL,'2009-07-27','');
-INSERT INTO `csm_user` VALUES (7,'clm',0,'clm','clm','','','','','nGNTxuVEogo=','',NULL,NULL,'2009-07-27','');
-INSERT INTO `csm_user` VALUES (8,'etaylor',0,'Elizabeth','Taylor','','','','','a54er9Cu3+K8j2uyHEABIQ==','',NULL,NULL,'2010-01-28','');
-INSERT INTO `csm_user` VALUES (9,'jminiaci',0,'Jessica','Miniaci','','','','','62Hts12YT6/ewXfEM4HTIg==','',NULL,NULL,'2010-01-28','');
-INSERT INTO `csm_user` VALUES (10,'apeck',0,'Aaron','Peck','','','','','O2HclZiz3BM=','',NULL,NULL,'2010-01-28','');
-INSERT INTO `csm_user` VALUES (11,'techCalgary',0,'Tech Calgary','Tech Calgary','','','','','nwU4sM0xSmdWOM7LVDXmjw==','',NULL,NULL,'2010-04-20','');
-INSERT INTO `csm_user` VALUES (12,'adminCalgary',0,'Admin Calgary','Admin Calgary','','','','','OvjcEEtkMDNQVuzRSs2obw==','',NULL,NULL,'2010-04-20','');
-INSERT INTO `csm_user` VALUES (13,'tech2',0,'tech2','tech2','','','','','Sav7otOWIVM=','',NULL,NULL,'2010-07-14','');
-/*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `csm_user_group`
 --
 
@@ -575,7 +532,7 @@ CREATE TABLE `csm_user_group` (
   KEY `idx_GROUP_ID` (`GROUP_ID`),
   CONSTRAINT `FK_UG_GROUP` FOREIGN KEY (`GROUP_ID`) REFERENCES `csm_group` (`GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -584,13 +541,17 @@ CREATE TABLE `csm_user_group` (
 
 LOCK TABLES `csm_user_group` WRITE;
 /*!40000 ALTER TABLE `csm_user_group` DISABLE KEYS */;
-INSERT INTO `csm_user_group` VALUES (19,10,7);
-INSERT INTO `csm_user_group` VALUES (20,3,5);
-INSERT INTO `csm_user_group` VALUES (22,12,9);
 INSERT INTO `csm_user_group` VALUES (23,9,5);
-INSERT INTO `csm_user_group` VALUES (24,11,7);
 INSERT INTO `csm_user_group` VALUES (26,8,5);
-INSERT INTO `csm_user_group` VALUES (27,13,7);
+INSERT INTO `csm_user_group` VALUES (27,13,5);
+INSERT INTO `csm_user_group` VALUES (28,17,7);
+INSERT INTO `csm_user_group` VALUES (29,11,7);
+INSERT INTO `csm_user_group` VALUES (32,15,5);
+INSERT INTO `csm_user_group` VALUES (33,18,5);
+INSERT INTO `csm_user_group` VALUES (35,10,5);
+INSERT INTO `csm_user_group` VALUES (36,12,6);
+INSERT INTO `csm_user_group` VALUES (42,20,6);
+INSERT INTO `csm_user_group` VALUES (43,19,6);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -626,7 +587,6 @@ CREATE TABLE `csm_user_group_role_pg` (
 
 LOCK TABLES `csm_user_group_role_pg` WRITE;
 /*!40000 ALTER TABLE `csm_user_group_role_pg` DISABLE KEYS */;
-INSERT INTO `csm_user_group_role_pg` VALUES (22,7,NULL,3,10,'2009-07-27');
 INSERT INTO `csm_user_group_role_pg` VALUES (32,NULL,5,2,1,'2010-01-28');
 INSERT INTO `csm_user_group_role_pg` VALUES (33,NULL,5,1,1,'2010-01-28');
 INSERT INTO `csm_user_group_role_pg` VALUES (34,NULL,5,2,11,'2010-01-28');
@@ -677,7 +637,7 @@ CREATE TABLE `csm_user_pe` (
   KEY `idx_PROTECTION_ELEMENT_ID` (`PROTECTION_ELEMENT_ID`),
   CONSTRAINT `FK_PE_USER` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_ELEMENT_USER` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -688,11 +648,8 @@ LOCK TABLES `csm_user_pe` WRITE;
 /*!40000 ALTER TABLE `csm_user_pe` DISABLE KEYS */;
 INSERT INTO `csm_user_pe` VALUES (1,1,1);
 INSERT INTO `csm_user_pe` VALUES (2,2,2);
-INSERT INTO `csm_user_pe` VALUES (3,28,6);
 /*!40000 ALTER TABLE `csm_user_pe` ENABLE KEYS */;
 UNLOCK TABLES;
-
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -703,5 +660,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-04-26 11:40:25
-
+-- Dump completed on 2010-08-19 14:20:53
