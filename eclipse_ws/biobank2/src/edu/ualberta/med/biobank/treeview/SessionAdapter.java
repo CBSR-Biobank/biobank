@@ -24,7 +24,9 @@ public class SessionAdapter extends AdapterBase {
 
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
 
-    public static final int STUDIES_BASE_NODE_ID = -1;
+    public static final int SITES_BASE_NODE_ID = 1;
+
+    public static final int STUDIES_BASE_NODE_ID = 2;
 
     private WritableApplicationService appService;
 
@@ -45,6 +47,7 @@ public class SessionAdapter extends AdapterBase {
         this.serverName = serverName;
         this.userName = userName;
 
+        addChild(new SiteGroup(this, SITES_BASE_NODE_ID));
         addChild(new StudyGroup(this, STUDIES_BASE_NODE_ID));
     }
 
