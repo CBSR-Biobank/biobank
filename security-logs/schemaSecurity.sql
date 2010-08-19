@@ -517,6 +517,57 @@ INSERT INTO `csm_role_privilege` VALUES (14,5,6);
 UNLOCK TABLES;
 
 --
+-- Table structure for table `csm_user`
+--
+
+DROP TABLE IF EXISTS `csm_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `csm_user` (
+  `USER_ID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `LOGIN_NAME` varchar(500) NOT NULL,
+  `MIGRATED_FLAG` tinyint(1) NOT NULL DEFAULT '0',
+  `FIRST_NAME` varchar(100) NOT NULL,
+  `LAST_NAME` varchar(100) NOT NULL,
+  `ORGANIZATION` varchar(100) DEFAULT NULL,
+  `DEPARTMENT` varchar(100) DEFAULT NULL,
+  `TITLE` varchar(100) DEFAULT NULL,
+  `PHONE_NUMBER` varchar(15) DEFAULT NULL,
+  `PASSWORD` varchar(100) DEFAULT NULL,
+  `EMAIL_ID` varchar(100) DEFAULT NULL,
+  `START_DATE` date DEFAULT NULL,
+  `END_DATE` date DEFAULT NULL,
+  `UPDATE_DATE` date NOT NULL DEFAULT '0000-00-00',
+  `PREMGRT_LOGIN_NAME` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`USER_ID`),
+  UNIQUE KEY `UQ_LOGIN_NAME` (`LOGIN_NAME`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `csm_user`
+--
+
+LOCK TABLES `csm_user` WRITE;
+/*!40000 ALTER TABLE `csm_user` DISABLE KEYS */;
+INSERT INTO `csm_user` VALUES (1,'administrator',0,'Administrator','NoName',NULL,NULL,NULL,NULL,'zJPWCwDeSgG8j2uyHEABIQ==',NULL,NULL,NULL,'2009-07-22',NULL);
+INSERT INTO `csm_user` VALUES (2,'bbadmin',0,'Biobank Administrator','NoName',NULL,NULL,NULL,NULL,'7Bg9siN5e7M=',NULL,NULL,NULL,'2009-07-22',NULL);
+INSERT INTO `csm_user` VALUES (8,'miniaci',0,'Jessica','Miniaci','Canadian Biosample Repository','','Laboratory Technician','780-919-6735','ACrDFGBVCHOq4RawigB4Ig==','jessica.miniaci@ualberta.ca',NULL,NULL,'2010-07-08','');
+INSERT INTO `csm_user` VALUES (9,'elizabeth',0,'Elizabeth','Taylor','','','','','Vzk3xic4SKi8j2uyHEABIQ==','',NULL,NULL,'2010-04-16','');
+INSERT INTO `csm_user` VALUES (10,'peck',0,'Aaron','Peck','Canadian Biosample Repository','','Lab Technician','','zs4yUro9LDo=','aaron.peck@ualberta.ca',NULL,NULL,'2010-07-08','');
+INSERT INTO `csm_user` VALUES (11,'holland',0,'Charity','Holland','Canadian Biosample Repository','','','','jgw6x+HUai0=','charity.holland@ualberta.ca',NULL,NULL,'2010-07-08','');
+INSERT INTO `csm_user` VALUES (12,'Meagen',0,'Meagen','LaFave','','','','','Z2+3QVFL27DxoZuHa6AoWA==','cbsr.financial@me.com',NULL,NULL,'2010-06-08','');
+INSERT INTO `csm_user` VALUES (13,'degrisda',0,'Delphine','Degris-Dard','','','','','CFu6ZPVAO+S8j2uyHEABIQ==','',NULL,NULL,'2010-06-30','');
+INSERT INTO `csm_user` VALUES (15,'loyola',0,'Nelson','Loyola','','','','','Um6QXDsC3vs=','loyola@ualberta.ca',NULL,NULL,'2010-07-14','');
+INSERT INTO `csm_user` VALUES (17,'tpolasek',0,'thomas','polasek','','','','','8y8jUYdY0sg=','',NULL,NULL,'2010-06-30','');
+INSERT INTO `csm_user` VALUES (18,'aaron_aicml',0,'Aaron','Young','','','','','','aaron.young@ualberta.ca',NULL,NULL,'2010-06-30','');
+INSERT INTO `csm_user` VALUES (19,'Andrijana',0,'Andrijana','Lawton','','','','','V4PzQj6by/Q=','',NULL,NULL,'2010-08-11','');
+INSERT INTO `csm_user` VALUES (20,'Virginia',0,'Virginia','Doe','','','','','tsjSShkZ7qC8j2uyHEABIQ==','',NULL,NULL,'2010-08-11','');
+INSERT INTO `csm_user` VALUES (21,'testuser',0,'testuser','testuser','','','','','orDBlaojDQE=','',NULL,NULL,'2010-08-19','');
+/*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `csm_user_group`
 --
 
@@ -532,7 +583,7 @@ CREATE TABLE `csm_user_group` (
   KEY `idx_GROUP_ID` (`GROUP_ID`),
   CONSTRAINT `FK_UG_GROUP` FOREIGN KEY (`GROUP_ID`) REFERENCES `csm_group` (`GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -552,6 +603,7 @@ INSERT INTO `csm_user_group` VALUES (35,10,5);
 INSERT INTO `csm_user_group` VALUES (36,12,6);
 INSERT INTO `csm_user_group` VALUES (42,20,6);
 INSERT INTO `csm_user_group` VALUES (43,19,6);
+INSERT INTO `csm_user_group` VALUES (44,21,5);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -660,4 +712,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-08-19 14:20:53
+-- Dump completed on 2010-08-19 15:08:40
