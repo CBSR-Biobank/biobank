@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.SiteGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
@@ -95,6 +96,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SESSIONS = "sessions";
     public static final String IMG_SHIPMENT = "shipment";
     public static final String IMG_SITE = "site";
+    public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
     public static final String IMG_STUDY = "study";
     public static final String IMG_USER_ADD = "userAdd";
@@ -117,6 +119,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_SESSIONS);
         classToImageKey
             .put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
+        classToImageKey.put(SiteGroup.class.getName(), BioBankPlugin.IMG_SITES);
         classToImageKey.put(ClinicGroup.class.getName(),
             BioBankPlugin.IMG_CLINICS);
         classToImageKey.put(StudyGroup.class.getName(),
@@ -233,6 +236,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SESSIONS, "sessions.png");
         registerImage(registry, IMG_SHIPMENT, "shipment.png");
         registerImage(registry, IMG_SITE, "site.png");
+        registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
         registerImage(registry, IMG_STUDY, "study.png");
         registerImage(registry, IMG_EMAIL, "email.png");

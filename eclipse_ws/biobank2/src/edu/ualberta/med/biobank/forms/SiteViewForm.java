@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -145,7 +146,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         addSectionToolbar(section, "Add Study", new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                StudyGroup.addStudy(siteAdapter, true);
+                StudyGroup.addStudy(((SessionAdapter) siteAdapter.getParent()
+                    .getParent()), true);
             }
         }, StudyWrapper.class);
 

@@ -13,13 +13,13 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
-public class StudyGroup extends AdapterBase {
+public class SiteGroup extends AdapterBase {
 
-    public StudyGroup(SessionAdapter parent, int id) {
-        super(parent, id, "Studies", true, true);
+    public SiteGroup(SessionAdapter parent, int id) {
+        super(parent, id, "Sites", true, true);
     }
 
     @Override
@@ -39,13 +39,13 @@ public class StudyGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(StudyWrapper.class)) {
+        if (SessionManager.canCreate(SiteWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Study");
+            mi.setText("Add Site");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addStudy(SessionManager.getInstance().getSession(), false);
+                    addSite(SessionManager.getInstance().getSession(), false);
                 }
             });
         }
@@ -63,19 +63,19 @@ public class StudyGroup extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return new StudyAdapter(this, null);
+        return new SiteAdapter(this, null);
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof StudyWrapper);
-        return new StudyAdapter(this, (StudyWrapper) child);
+        Assert.isTrue(child instanceof SiteWrapper);
+        return new SiteAdapter(this, (SiteWrapper) child);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return StudyWrapper.getAllStudies(getAppService());
+        return SiteWrapper.getSites(getAppService());
     }
 
     @Override
@@ -88,11 +88,11 @@ public class StudyGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addStudy(SessionAdapter sessionAdapter,
+    public static void addSite(SessionAdapter sessionAdapter,
         boolean hasPreviousForm) {
-        StudyWrapper study = new StudyWrapper(sessionAdapter.getAppService());
-        StudyAdapter adapter = new StudyAdapter(
-            sessionAdapter.getStudiesGroupNode(), study);
+        SiteWrapper site = new SiteWrapper(sessionAdapter.getAppService());
+        SiteAdapter adapter = new SiteAdapter(
+            sessionAdapter.getStudiesGroupNode(), site);
         adapter.openEntryForm(hasPreviousForm);
     }
 
