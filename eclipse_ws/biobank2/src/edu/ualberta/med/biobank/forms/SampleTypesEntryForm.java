@@ -73,7 +73,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        SampleTypeWrapper.persistGlobalSampleTypes(
+        SampleTypeWrapper.persistSampleTypes(
             sampleWidget.getAddedOrModifiedSampleTypes(),
             sampleWidget.getDeletedSampleTypes());
     }
