@@ -563,7 +563,6 @@ INSERT INTO `csm_user` VALUES (17,'tpolasek',0,'thomas','polasek','','','','','8
 INSERT INTO `csm_user` VALUES (18,'aaron_aicml',0,'Aaron','Young','','','','','','aaron.young@ualberta.ca',NULL,NULL,'2010-06-30','');
 INSERT INTO `csm_user` VALUES (19,'Andrijana',0,'Andrijana','Lawton','','','','','V4PzQj6by/Q=','',NULL,NULL,'2010-08-11','');
 INSERT INTO `csm_user` VALUES (20,'Virginia',0,'Virginia','Doe','','','','','tsjSShkZ7qC8j2uyHEABIQ==','',NULL,NULL,'2010-08-11','');
-INSERT INTO `csm_user` VALUES (21,'testuser',0,'testuser','testuser','','','','','orDBlaojDQE=','',NULL,NULL,'2010-08-19','');
 /*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -603,7 +602,6 @@ INSERT INTO `csm_user_group` VALUES (35,10,5);
 INSERT INTO `csm_user_group` VALUES (36,12,6);
 INSERT INTO `csm_user_group` VALUES (42,20,6);
 INSERT INTO `csm_user_group` VALUES (43,19,6);
-INSERT INTO `csm_user_group` VALUES (44,21,5);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -712,4 +710,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-08-19 15:08:40
+-- Dump completed on 2010-08-19 15:11:26
