@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ClinicGroup extends AdapterBase {
@@ -41,8 +40,9 @@ public class ClinicGroup extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addClinic(ClinicGroup.this
-                        .getParentFromClass(SiteAdapter.class), false);
+                    addClinic(
+                        ClinicGroup.this.getParentFromClass(SiteAdapter.class),
+                        false);
                 }
             });
         }
@@ -72,10 +72,7 @@ public class ClinicGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
-        Assert.isNotNull(currentSite, "null site");
-        currentSite.reload();
-        return currentSite.getClinicCollection();
+        return ClinicWrapper.getAllClinics(SessionManager.getAppService());
     }
 
     @Override
@@ -92,8 +89,8 @@ public class ClinicGroup extends AdapterBase {
         boolean hasPreviousForm) {
         ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
         clinic.setSite(siteAdapter.getWrapper());
-        ClinicAdapter adapter = new ClinicAdapter(siteAdapter
-            .getClinicGroupNode(), clinic);
+        ClinicAdapter adapter = new ClinicAdapter(
+            siteAdapter.getClinicGroupNode(), clinic);
         adapter.openEntryForm(hasPreviousForm);
     }
 

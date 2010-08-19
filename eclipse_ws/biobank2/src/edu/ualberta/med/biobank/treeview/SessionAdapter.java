@@ -1,13 +1,11 @@
 package edu.ualberta.med.biobank.treeview;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -20,11 +18,11 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 public class SessionAdapter extends AdapterBase {
 
-    private static final String ADDSITE_COMMAND_ID = "edu.ualberta.med.biobank.commands.siteAdd";
-
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
 
-    public static final int STUDIES_BASE_NODE_ID = -1;
+    public static final int SITES_NODE_ID = -1;
+
+    public static final int STUDIES_NODE_ID = -2;
 
     private WritableApplicationService appService;
 
@@ -45,7 +43,8 @@ public class SessionAdapter extends AdapterBase {
         this.serverName = serverName;
         this.userName = userName;
 
-        addChild(new StudyGroup(this, STUDIES_BASE_NODE_ID));
+        addChild(new SiteGroup(this, SITES_NODE_ID));
+        addChild(new StudyGroup(this, STUDIES_NODE_ID));
     }
 
     @Override
@@ -63,32 +62,20 @@ public class SessionAdapter extends AdapterBase {
         return "";
     }
 
+    public AdapterBase getSitesGroupNode() {
+        AdapterBase adapter = children.get(SITES_NODE_ID);
+        Assert.isNotNull(adapter);
+        return adapter;
+    }
+
     public AdapterBase getStudiesGroupNode() {
-        return children.get(STUDIES_BASE_NODE_ID);
+        AdapterBase adapter = children.get(STUDIES_NODE_ID);
+        Assert.isNotNull(adapter);
+        return adapter;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(SiteWrapper.class)) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Repository Site");
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    IHandlerService handlerService = (IHandlerService) PlatformUI
-                        .getWorkbench().getService(IHandlerService.class);
-
-                    try {
-                        handlerService.executeCommand(ADDSITE_COMMAND_ID, null);
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ADDSITE_COMMAND_ID
-                            + " not found");
-
-                    }
-                }
-            });
-        }
-
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
         mi.setText("Logout");
         mi.addSelectionListener(new SelectionAdapter() {
@@ -126,27 +113,16 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        if (child instanceof SiteWrapper) {
-            return new SiteAdapter(this, (SiteWrapper) child);
-        }
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
-        Integer siteId = null;
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            SiteWrapper currentSite = SessionManager.getInstance()
-                .getCurrentSite();
-            siteId = currentSite.getId();
-        }
-        return new ArrayList<SiteWrapper>(SiteWrapper.getSites(appService,
-            siteId));
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+        return null;
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
+    protected int getWrapperChildCount() {
         return 0;
     }
 
@@ -158,16 +134,5 @@ public class SessionAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return null;
-    }
-
-    @Override
-    public void rebuild() {
-        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
-            if (!(child instanceof StudyGroup)) {
-                removeChild(child);
-            }
-        }
-        notifyListeners();
-        loadChildren(false);
     }
 }

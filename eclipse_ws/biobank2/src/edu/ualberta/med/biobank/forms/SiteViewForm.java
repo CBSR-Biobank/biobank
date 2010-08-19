@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -145,7 +146,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         addSectionToolbar(section, "Add Study", new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                StudyGroup.addStudy(siteAdapter, true);
+                StudyGroup.addStudy(SessionManager.getInstance().getSession(),
+                    true);
             }
         }, StudyWrapper.class);
 

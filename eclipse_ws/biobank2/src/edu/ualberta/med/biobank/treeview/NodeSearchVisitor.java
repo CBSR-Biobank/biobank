@@ -46,6 +46,13 @@ public class NodeSearchVisitor {
         return visitChildren(site);
     }
 
+    public AdapterBase visit(SiteGroup sGroup) {
+        if (wrapper instanceof SiteWrapper) {
+            return sGroup.getChild(wrapper, true);
+        }
+        return null;
+    }
+
     public AdapterBase visit(StudyGroup sGroup) {
         if (wrapper instanceof StudyWrapper) {
             return sGroup.getChild(wrapper, true);

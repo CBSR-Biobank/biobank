@@ -27,6 +27,8 @@ public class ShipmentHelper extends DbHelper {
             shipment.setDateReceived(dateReceived);
         }
 
+        shipment.setDateShipped(Utils.getRandomDate());
+
         if (patients != null) {
             shipment.addPatients(Arrays.asList(patients));
         }

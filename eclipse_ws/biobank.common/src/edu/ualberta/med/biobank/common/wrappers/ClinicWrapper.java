@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -133,16 +132,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    @Deprecated
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
-        return (site != null) ? new SiteWrapper(appService, site) : null;
+        return null;
     }
 
+    @Deprecated
     public void setSite(SiteWrapper siteWrapper) {
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = siteWrapper.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     private AddressWrapper initAddress() {
@@ -241,16 +237,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException(
                 "the clinic does not have an activity status");
         }
-        if (getSite() == null) {
-            throw new BiobankCheckException("the clinic does not have a site");
-        }
         checkNotEmpty(getName(), "Name");
-        checkNoDuplicatesInSite(Clinic.class, "name", getName(), getSite()
-            .getId(), "A clinic with name \"" + getName()
-            + "\" already exists.");
+        checkNoDuplicates(Clinic.class, "name", getName(),
+            "A clinic with name \"" + getName() + "\" already exists.");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicatesInSite(Clinic.class, "nameShort", getNameShort(),
-            getSite().getId(), "A clinic with short name \"" + getNameShort()
+        checkNoDuplicates(Clinic.class, "nameShort", getNameShort(),
+            "A clinic with short name \"" + getNameShort()
                 + "\" already exists.");
     }
 
@@ -398,7 +390,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             if (children != null) {
                 shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
                 for (ClinicShipment s : children) {
-                    shipmentCollection.add(new ClinicShipmentWrapper(appService, s));
+                    shipmentCollection.add(new ClinicShipmentWrapper(
+                        appService, s));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             } else
@@ -454,7 +447,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * Search for a shipment in the clinic with the given date received and
      * patient number.
      */
-    public ClinicShipmentWrapper getShipment(Date dateReceived, String patientNumber) {
+    public ClinicShipmentWrapper getShipment(Date dateReceived,
+        String patientNumber) {
         List<ClinicShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null)
             for (ClinicShipmentWrapper ship : shipments)

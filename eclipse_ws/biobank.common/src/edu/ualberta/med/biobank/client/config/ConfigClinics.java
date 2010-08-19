@@ -31,7 +31,6 @@ public class ConfigClinics {
         String street1, String street2, String city, String province,
         String postalCode) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(site.getAppService());
-        clinic.setSite(site);
         clinic.setName(name);
         clinic.setNameShort(nameShort);
         clinic.setSendsShipments(sendsShipments);

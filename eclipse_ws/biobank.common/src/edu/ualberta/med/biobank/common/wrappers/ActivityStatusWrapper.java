@@ -7,6 +7,14 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyPvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -44,6 +52,37 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     @Override
     protected void deleteChecks() throws Exception {
+        if (isUsed()) {
+            throw new BiobankCheckException("Unable to delete activity status "
+                + getName()
+                + " since it is being used by other objects in the database.");
+        }
+    }
+
+    public boolean isUsed() throws ApplicationException, BiobankCheckException {
+        long usedCount = 0;
+
+        String[] classNames = new String[] { Aliquot.class.getName(),
+            Clinic.class.getName(), ClinicShipment.class.getName(),
+            ContainerType.class.getName(), SampleStorage.class.getName(),
+            Site.class.getName(), Study.class.getName(),
+            StudyPvAttr.class.getName(),
+
+        };
+
+        for (String className : classNames) {
+            HQLCriteria c = new HQLCriteria("select count(x) from " + className
+                + " as x where x.activityStatus=?)",
+                Arrays.asList(new Object[] { wrappedObject }));
+            List<Long> results = appService.query(c);
+            if (results.size() != 1) {
+                throw new BiobankCheckException(
+                    "Invalid size for HQL query result");
+            }
+            usedCount += results.get(0);
+        }
+
+        return usedCount > 0;
     }
 
     @Override

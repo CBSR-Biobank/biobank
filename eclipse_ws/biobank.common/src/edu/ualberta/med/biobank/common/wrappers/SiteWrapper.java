@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -236,9 +235,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if ((getClinicCollection() != null && getClinicCollection().size() > 0)
-            || (getContainerCollection() != null && getContainerCollection()
-                .size() > 0)
+        if ((getContainerCollection() != null && getContainerCollection()
+            .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
                 .size() > 0)) {
             throw new BiobankCheckException(
@@ -297,52 +295,18 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    @SuppressWarnings("unchecked")
+    @Deprecated
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
-        List<ClinicWrapper> clinicCollection = (List<ClinicWrapper>) propertiesMap
-            .get("clinicCollection");
-        if (clinicCollection == null) {
-            Collection<Clinic> children = wrappedObject.getClinicCollection();
-            if (children != null) {
-                clinicCollection = new ArrayList<ClinicWrapper>();
-                for (Clinic clinic : children) {
-                    clinicCollection.add(new ClinicWrapper(appService, clinic));
-                }
-                propertiesMap.put("clinicCollection", clinicCollection);
-            }
-        }
-        if ((clinicCollection != null) && sort)
-            Collections.sort(clinicCollection);
-        return clinicCollection;
+        return null;
     }
 
+    @Deprecated
     public List<ClinicWrapper> getClinicCollection() {
-        return getClinicCollection(true);
+        return null;
     }
 
+    @Deprecated
     public void addClinics(List<ClinicWrapper> clinics) {
-        if (clinics != null && clinics.size() > 0) {
-            Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
-            List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
-            // already added clinics
-            List<ClinicWrapper> currentList = getClinicCollection();
-            if (currentList != null) {
-                for (ClinicWrapper clinic : currentList) {
-                    allClinicObjects.add(clinic.getWrappedObject());
-                    allClinicWrappers.add(clinic);
-                }
-            }
-            // new clinics
-            for (ClinicWrapper clinic : clinics) {
-                allClinicObjects.add(clinic.getWrappedObject());
-                allClinicWrappers.add(clinic);
-            }
-            Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
-            wrappedObject.setClinicCollection(allClinicObjects);
-            propertyChangeSupport.firePropertyChange("clinicCollection",
-                oldClinics, allClinicObjects);
-            propertiesMap.put("clinicCollection", allClinicWrappers);
-        }
     }
 
     @SuppressWarnings("unchecked")

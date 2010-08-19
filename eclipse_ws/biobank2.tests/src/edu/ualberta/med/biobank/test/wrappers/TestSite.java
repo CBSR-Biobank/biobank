@@ -557,7 +557,8 @@ public class TestSite extends TestDatabase {
         for (int i = 0, n = savedShipments.size() - 1; i < n; i++) {
             ClinicShipmentWrapper s1 = savedShipments.get(i);
             ClinicShipmentWrapper s2 = savedShipments.get(i + 1);
-            Assert.assertTrue(s1.compareTo(s2) < 0);
+            Assert.assertTrue(s1.compareTo(s2) <= 0);
+            Assert.assertTrue(s2.compareTo(s1) >= 0);
         }
     }
 
