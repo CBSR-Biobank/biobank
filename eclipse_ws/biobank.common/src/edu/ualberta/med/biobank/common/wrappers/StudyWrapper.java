@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
@@ -933,11 +934,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         studyPvAttrMap = null;
         deletedSampleStorages.clear();
         deletedStudySourceVessels.clear();
         deletedStudyPvAttr.clear();
+        activityStatus = null;
     }
 
     public static List<StudyWrapper> getAllStudies(
@@ -960,10 +962,30 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getName();
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        activityStatus = null;
+    public List<SiteWrapper> getToSiteDispatchCollectionForSite(SiteWrapper site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.toSiteCollection from " + DispatchInfo.class.getName()
+                + " as info where info.study.id = ? and info.site.id=?",
+            Arrays.asList(new Object[] { getId(), site.getId() }));
+        List<Site> results = appService.query(criteria);
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        for (Site res : results) {
+            wrappers.add(new SiteWrapper(appService, res));
+        }
+        return wrappers;
     }
 
+    public List<SiteWrapper> getAllFromSites() throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.fromSite from " + DispatchInfo.class.getName()
+                + " as info where info.study.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Site> results = appService.query(criteria);
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        for (Site res : results) {
+            wrappers.add(new SiteWrapper(appService, res));
+        }
+        return wrappers;
+    }
 }

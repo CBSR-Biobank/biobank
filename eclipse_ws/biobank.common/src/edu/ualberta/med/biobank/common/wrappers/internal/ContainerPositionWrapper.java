@@ -5,10 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AbstractContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -122,8 +123,11 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    public void setParent(ContainerWrapper parent) {
-        setParentContainer(parent);
+    public void setParent(AbstractContainerWrapper<?, ?> parent) {
+        assert parent instanceof ContainerWrapper;
+        if (parent instanceof ContainerWrapper) {
+            setParentContainer((ContainerWrapper) parent);
+        }
     }
 
     @Override

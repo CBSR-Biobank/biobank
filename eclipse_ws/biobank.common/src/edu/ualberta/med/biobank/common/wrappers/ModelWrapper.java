@@ -121,7 +121,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             firePropertyChanges(oldValue, wrappedObject);
         }
         propertiesMap.clear();
-        resetInternalField();
+        resetInternalFields();
     }
 
     /**
@@ -199,7 +199,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         propertiesMap.clear();
-        resetInternalField();
+        resetInternalFields();
         notifyListeners(new WrapperEvent(eventType, this));
     }
 
@@ -288,7 +288,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             reload();
         }
         propertiesMap.clear();
-        resetInternalField();
+        resetInternalFields();
     }
 
     /**
@@ -412,7 +412,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * If we want to reset internal fields when reload or reset is called (even
      * if the object is new).
      */
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         // default do nothing
     }
 

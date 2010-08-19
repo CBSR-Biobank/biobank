@@ -14,12 +14,11 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -33,10 +32,6 @@ public class ContainerWrapper extends
 
     private SiteWrapper site;
 
-    private ContainerTypeWrapper containerType;
-
-    private ActivityStatusWrapper activityStatus;
-
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -48,10 +43,9 @@ public class ContainerWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "productBarcode", "position", "activityStatus",
-            "site", "label", "temperature", "comment",
-            "aliquotPositionCollection", "aliquots", "childPositionCollection",
-            "children", "containerType", "parent" };
+        return new String[] { "productBarcode", "position", "site", "label",
+            "temperature", "comment", "aliquotPositionCollection", "aliquots",
+            "childPositionCollection", "children", "parent" };
     }
 
     @Override
@@ -110,8 +104,7 @@ public class ContainerWrapper extends
     }
 
     @Override
-    protected void persistDependencies(Container origObject)
-        throws Exception {
+    protected void persistDependencies(Container origObject) throws Exception {
         ContainerWrapper parent = getParent();
         boolean labelChanged = false;
         if (parent == null) {
@@ -212,9 +205,8 @@ public class ContainerWrapper extends
             parameters.add(getId());
         }
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id=? and label=? " + "and containerType=?"
-            + notSameContainer, parameters);
+            + Container.class.getName() + " where site.id=? and label=? "
+            + "and containerType=?" + notSameContainer, parameters);
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
             throw new BiobankCheckException("A container with label \""
@@ -373,90 +365,15 @@ public class ContainerWrapper extends
         return rcp;
     }
 
-    public Integer getRowCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getRowCapacity();
-    }
-
-    public Integer getColCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getColCapacity();
-    }
-
-    public void setContainerType(ContainerTypeWrapper containerType) {
-        if (containerType == null) {
-            setContainerType((ContainerType) null);
-        } else {
-            setContainerType(containerType.getWrappedObject());
-        }
-    }
-
-    protected void setContainerType(ContainerType containerType) {
-        if (containerType == null)
-            this.containerType = null;
-        else
-            this.containerType = new ContainerTypeWrapper(appService,
-                containerType);
-        ContainerType oldType = wrappedObject.getContainerType();
-        wrappedObject.setContainerType(containerType);
-        propertyChangeSupport.firePropertyChange("containerType", oldType,
-            containerType);
-    }
-
-    public ContainerTypeWrapper getContainerType() {
-        if (containerType == null) {
-            ContainerType c = wrappedObject.getContainerType();
-            if (c == null)
-                return null;
-            containerType = new ContainerTypeWrapper(appService, c);
-        }
-        return containerType;
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-        }
-        return activityStatus;
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
-    }
-
-    protected void setSite(Site site) {
-        if (site == null)
-            this.site = null;
-        else
-            this.site = new SiteWrapper(appService, site);
+    public void setSite(SiteWrapper site) {
+        this.site = site;
         Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
-    public void setSite(SiteWrapper siteWrapper) {
-        if (siteWrapper == null) {
-            setSite((Site) null);
-        } else {
-            setSite(siteWrapper.getWrappedObject());
+        Site newSite = null;
+        if (site != null) {
+            newSite = site.getWrappedObject();
         }
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     public void setLabel(String label) {
@@ -882,9 +799,8 @@ public class ContainerWrapper extends
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String label) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id = ? and label = ?", Arrays.asList(new Object[] {
-            siteWrapper.getId(), label }));
+            + Container.class.getName() + " where site.id = ? and label = ?",
+            Arrays.asList(new Object[] { siteWrapper.getId(), label }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -956,8 +872,8 @@ public class ContainerWrapper extends
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
             ContainerWrapper newContainer = new ContainerWrapper(appService);
-            newContainer.setContainerType(type.getWrappedObject());
-            newContainer.setSite(getSite().getWrappedObject());
+            newContainer.setContainerType(type);
+            newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
             newContainer.setPosition(i, j);
             newContainer.setParent(this);
@@ -1046,25 +962,12 @@ public class ContainerWrapper extends
         return null;
     }
 
-    // /**
-    // * init this wrapper with the given containerWrapper.
-    // *
-    // * @throws WrapperException
-    // */
-    // public void initObjectWith(ContainerWrapper containerWrapper)
-    // throws WrapperException {
-    // if (containerWrapper == null) {
-    // throw new WrapperException(
-    // "Cannot init internal object with a null container");
-    // }
-    // setWrappedObject(containerWrapper.wrappedObject);
-    // }
-
     @Override
-    protected void resetInternalField() {
-        super.resetInternalField();
+    protected void resetInternalFields() {
+        super.resetInternalFields();
         addedChildren.clear();
         addedAliquots.clear();
+        site = null;
     }
 
     @Override
@@ -1073,16 +976,13 @@ public class ContainerWrapper extends
             && SecurityHelper.isContainerAdministrator(appService);
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        site = null;
-        containerType = null;
-        activityStatus = null;
-    }
-
     public boolean isContainerFull() {
         return (this.getChildCount() == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
+    }
+
+    @Override
+    public ContainerWrapper getParent() {
+        return (ContainerWrapper) super.getParent();
     }
 }

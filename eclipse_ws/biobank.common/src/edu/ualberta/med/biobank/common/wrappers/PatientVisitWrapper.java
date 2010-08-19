@@ -556,7 +556,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         pvAttrMap = null;
         studyPvAttrMap = null;
         deletedPvSourceVessels.clear();

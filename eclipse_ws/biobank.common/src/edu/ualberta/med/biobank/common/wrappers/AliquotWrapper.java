@@ -297,6 +297,11 @@ public class AliquotWrapper extends
         return wrappedObject.getComment();
     }
 
+    @Override
+    public ContainerWrapper getParent() {
+        return (ContainerWrapper) super.getParent();
+    }
+
     public String getPositionString() {
         return getPositionString(true, true);
     }

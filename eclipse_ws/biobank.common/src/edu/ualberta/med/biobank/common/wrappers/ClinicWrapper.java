@@ -528,7 +528,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         deletedContacts.clear();
     }
 

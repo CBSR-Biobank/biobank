@@ -75,7 +75,7 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         this.pv = null;
         this.ss = null;
     }

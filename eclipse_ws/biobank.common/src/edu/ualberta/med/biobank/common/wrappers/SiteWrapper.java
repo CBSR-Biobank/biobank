@@ -12,9 +12,10 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ClinicShipment;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.DispatchInfo;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -41,7 +42,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "address", "clinicCollection", "siteCollection",
             "containerCollection", "shipmentCollection",
             "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode" };
+            "postalCode", "toDispatchInfoCollection",
+            "fromDispatchInfoCollection" };
     }
 
     public String getName() {
@@ -295,7 +297,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    @Deprecated
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
         return null;
     }
@@ -581,11 +582,36 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalFields() {
         activityStatus = null;
         address = null;
+    }
 
+    public List<StudyWrapper> getDispatchStudies() throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("select info.study from "
+            + DispatchInfo.class.getName()
+            + " as info where info.fromSite.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Study> results = appService.query(criteria);
+        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
+        for (Study res : results) {
+            wrappers.add(new StudyWrapper(appService, res));
+        }
+        return wrappers;
+    }
+
+    public List<SiteWrapper> getToSitesDispatchForStudy(StudyWrapper study)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.toSiteCollection from " + DispatchInfo.class.getName()
+                + " as info where info.fromSite.id = ? and info.study.id=?",
+            Arrays.asList(new Object[] { getId(), study.getId() }));
+        List<Site> results = appService.query(criteria);
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        for (Site res : results) {
+            wrappers.add(new SiteWrapper(appService, res));
+        }
+        return wrappers;
     }
 
 }

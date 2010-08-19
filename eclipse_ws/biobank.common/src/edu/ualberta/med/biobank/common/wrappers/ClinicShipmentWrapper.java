@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Patient;
@@ -54,9 +53,11 @@ public class ClinicShipmentWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "dateShipped", "dateReceived", "clinic",
-            "comment", "patientVisitCollection", "waybill", "boxNumber",
-            "shippingMethod", "patientCollection" };
+        String[] properties = super.getPropertyChangeNames();
+        List<String> list = new ArrayList<String>(Arrays.asList(properties));
+        list.addAll(Arrays.asList("clinic", "patientVisitCollection",
+            "shippingMethod", "patientCollection"));
+        return (String[]) list.toArray();
     }
 
     @Override
@@ -65,14 +66,15 @@ public class ClinicShipmentWrapper extends
     }
 
     @Override
-    public void persist() throws Exception {
-        super.persist();
-        patientsAdded.clear();
-    }
-
-    @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
+        super.persistChecks();
+        if (getClinic() == null) {
+            throw new BiobankCheckException("A clinic should be set");
+        }
+        if (getSite() == null) {
+            throw new BiobankCheckException("A site should be set");
+        }
         if (getClinic() != null
             && Boolean.TRUE.equals(getClinic().getSendsShipments())) {
             if (getWaybill() == null || getWaybill().isEmpty()) {
@@ -93,7 +95,6 @@ public class ClinicShipmentWrapper extends
         checkAlLeastOnePatient();
         checkPatientsStudy();
         checkRemovedPatients();
-        checkDateReceivedNotNull();
     }
 
     private void checkRemovedPatients() throws BiobankCheckException {
@@ -102,12 +103,6 @@ public class ClinicShipmentWrapper extends
                 checkCanRemovePatient(patient);
             }
         }
-    }
-
-    private void checkDateReceivedNotNull() throws BiobankCheckException {
-        if (getDateReceived() == null)
-            throw new BiobankCheckException(
-                "'Date Received' is a required field. You must set this value before saving a shipment.");
     }
 
     public void checkCanRemovePatient(PatientWrapper patient)
@@ -172,46 +167,6 @@ public class ClinicShipmentWrapper extends
 
         List<Object> results = appService.query(c);
         return results.size() == 0;
-    }
-
-    @Override
-    public int compareTo(ModelWrapper<ClinicShipment> wrapper) {
-        if (wrapper instanceof ClinicShipmentWrapper) {
-            Date v1Date = wrappedObject.getDateReceived();
-            Date v2Date = wrapper.wrappedObject.getDateReceived();
-            if (v1Date != null && v2Date != null) {
-                return v1Date.compareTo(v2Date);
-            }
-        }
-        return 0;
-    }
-
-    public Date getDateShipped() {
-        return wrappedObject.getDateShipped();
-    }
-
-    public String getFormattedDateShipped() {
-        return DateFormatter.formatAsDateTime(getDateShipped());
-    }
-
-    public void setDateShipped(Date date) {
-        Date oldDate = getDateShipped();
-        wrappedObject.setDateShipped(date);
-        propertyChangeSupport.firePropertyChange("dateShipped", oldDate, date);
-    }
-
-    public Date getDateReceived() {
-        return wrappedObject.getDateReceived();
-    }
-
-    public String getFormattedDateReceived() {
-        return DateFormatter.formatAsDateTime(getDateReceived());
-    }
-
-    public void setDateReceived(Date date) {
-        Date oldDate = getDateReceived();
-        wrappedObject.setDateReceived(date);
-        propertyChangeSupport.firePropertyChange("dateReceived", oldDate, date);
     }
 
     public ClinicWrapper getClinic() {
@@ -304,37 +259,6 @@ public class ClinicShipmentWrapper extends
             }
             setPatientVisitCollection(allVisitObjects, allVisitWrappers);
         }
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setComment(String comment) {
-        String oldComment = getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
-    }
-
-    public String getWaybill() {
-        return wrappedObject.getWaybill();
-    }
-
-    public void setWaybill(String waybill) {
-        String old = getWaybill();
-        wrappedObject.setWaybill(waybill);
-        propertyChangeSupport.firePropertyChange("waybill", old, waybill);
-    }
-
-    public String getBoxNumber() {
-        return wrappedObject.getBoxNumber();
-    }
-
-    public void setBoxNumber(String boxNumber) {
-        String old = getBoxNumber();
-        wrappedObject.setBoxNumber(boxNumber);
-        propertyChangeSupport.firePropertyChange("boxNumber", old, boxNumber);
     }
 
     public ShippingMethodWrapper getShippingMethod() {
@@ -435,15 +359,6 @@ public class ClinicShipmentWrapper extends
         }
     }
 
-    @Override
-    public String toString() {
-        String s = getFormattedDateReceived();
-        if (getWaybill() != null) {
-            s += " (" + getWaybill() + ")";
-        }
-        return s;
-    }
-
     /**
      * Search for shipments in the site with the given waybill
      */
@@ -505,7 +420,7 @@ public class ClinicShipmentWrapper extends
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         patientsAdded.clear();
         patientsRemoved.clear();
     }
@@ -534,23 +449,6 @@ public class ClinicShipmentWrapper extends
             ships.add(new ClinicShipmentWrapper(appService, s));
         }
         return ships;
-    }
-
-    public boolean isReceivedToday() {
-        Calendar cal = Calendar.getInstance();
-        // yesterday midnight
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        Date startDate = cal.getTime();
-        // today midnight
-        cal.add(Calendar.DATE, 1);
-        Date endDate = cal.getTime();
-        Date dateReveived = getDateReceived();
-        return dateReveived.compareTo(startDate) >= 0
-            && dateReveived.compareTo(endDate) <= 0;
     }
 
     @Override

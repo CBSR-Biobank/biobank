@@ -16,7 +16,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     // used to allow position to be assigned to null
     protected boolean nullPositionSet;
 
-    private ContainerWrapper parent;
+    private AbstractContainerWrapper<?, ?> parent;
 
     public AbstractPositionHolder(WritableApplicationService appService,
         E wrappedObject) {
@@ -61,7 +61,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
     public abstract SiteWrapper getSite();
 
     @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         rowColPosition = null;
         positionWrapper = null;
         nullPositionSet = false;
@@ -92,7 +92,7 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         setPosition(new RowColPos(row, col));
     }
 
-    public ContainerWrapper getParent() {
+    public AbstractContainerWrapper<?, ?> getParent() {
         if (parent == null) {
             if (getPositionWrapper() != null)
                 parent = getPositionWrapper().getParent();
@@ -100,9 +100,9 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         return parent;
     }
 
-    public void setParent(ContainerWrapper container) {
+    public void setParent(AbstractContainerWrapper<?, ?> container) {
         this.parent = container;
-        ContainerWrapper oldValue = getParent();
+        AbstractContainerWrapper<?, ?> oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
         pos.setParent(container);
         propertyChangeSupport.firePropertyChange("parent", oldValue, container);

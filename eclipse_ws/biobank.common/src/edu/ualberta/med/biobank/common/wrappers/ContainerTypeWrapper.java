@@ -740,7 +740,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         deletedChildTypes.clear();
         deletedSampleTypes.clear();
     }
