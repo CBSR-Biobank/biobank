@@ -17,8 +17,8 @@ public class SiteAdapter extends AdapterBase {
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
 
     public static final int CLINICS_BASE_NODE_ID = 0;
-    public static final int STORAGE_BASE_TYPES_NODE_ID = 2;
-    public static final int STORAGE_BASE_CONTAINERS_NODE_ID = 3;
+    public static final int CONTAINER_TYPES_BASE_NODE_ID = 2;
+    public static final int CONTAINERS_BASE_NODE_ID = 3;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
@@ -30,9 +30,9 @@ public class SiteAdapter extends AdapterBase {
 
         addChild(new ClinicGroup(this, nodeIdOffset + CLINICS_BASE_NODE_ID));
         addChild(new ContainerTypeGroup(this, nodeIdOffset
-            + STORAGE_BASE_TYPES_NODE_ID));
+            + CONTAINER_TYPES_BASE_NODE_ID));
         addChild(new ContainerGroup(this, nodeIdOffset
-            + STORAGE_BASE_CONTAINERS_NODE_ID));
+            + CONTAINERS_BASE_NODE_ID));
     }
 
     public SiteWrapper getWrapper() {
@@ -40,15 +40,21 @@ public class SiteAdapter extends AdapterBase {
     }
 
     public AdapterBase getClinicGroupNode() {
-        return children.get(CLINICS_BASE_NODE_ID);
+        AdapterBase adapter = children.get(CLINICS_BASE_NODE_ID);
+        Assert.isNotNull(adapter);
+        return adapter;
     }
 
     public AdapterBase getContainerTypesGroupNode() {
-        return children.get(STORAGE_BASE_TYPES_NODE_ID);
+        AdapterBase adapter = children.get(CONTAINER_TYPES_BASE_NODE_ID);
+        Assert.isNotNull(adapter);
+        return adapter;
     }
 
     public AdapterBase getContainersGroupNode() {
-        return children.get(STORAGE_BASE_CONTAINERS_NODE_ID);
+        AdapterBase adapter = children.get(CONTAINERS_BASE_NODE_ID);
+        Assert.isNotNull(adapter);
+        return adapter;
     }
 
     @Override
@@ -96,13 +102,12 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
+    protected int getWrapperChildCount() {
         return 0;
     }
 
