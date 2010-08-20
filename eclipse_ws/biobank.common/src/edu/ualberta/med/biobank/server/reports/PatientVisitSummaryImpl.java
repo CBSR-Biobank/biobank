@@ -22,7 +22,10 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + "as study_name, c.name_short as clinic_name, p.pnumber as patient_number, count(pv.id) as pvCount "
         + "from patient_visit pv join patient p on pv.patient_id=p.id join study s on s.id = p.study_id "
         + "join shipment sh on sh.id=pv.shipment_id join clinic c on c.id=sh.clinic_id where pv.date_processed "
-        + "between ? and ? group by s.name_short, c.name_short, p.pnumber) as filteredPvs group by study_name, "
+        + "between ? and ? and sh.site_id "
+        + SITE_OPERATOR
+        + SITE_ID
+        + " group by s.name_short, c.name_short, p.pnumber) as filteredPvs group by study_name, "
         + "clinic_name";
 
     public PatientVisitSummaryImpl(BiobankReport report) {
@@ -38,6 +41,10 @@ public class PatientVisitSummaryImpl extends AbstractReport {
     @Override
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
+        queryString = queryString.replace(SITE_OPERATOR_SEARCH_STRING,
+            report.getOp());
+        queryString = queryString.replace(SITE_ID_SEARCH_STRING, report
+            .getSiteId().toString());
         return ((BiobankApplicationService) appService).query(
             new BiobankSQLCriteria(queryString), Site.class.getName());
     }
