@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -56,6 +57,7 @@ public class TestDatabase {
         try {
             SiteHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
+            ClinicHelper.deleteCreatedClinics();
             SampleTypeHelper.deleteCreatedSampleTypes();
             SourceVesselHelper.deleteCreatedSourceVessels();
             ShippingMethodHelper.deleteCreateShippingMethods();

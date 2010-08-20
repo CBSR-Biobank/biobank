@@ -300,7 +300,7 @@ public class TestClinic extends TestDatabase {
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
 
         // object is in database
         Clinic clinicInDB = ModelUtils.getObjectWithId(appService,
@@ -319,7 +319,7 @@ public class TestClinic extends TestDatabase {
     public void testDeleteWithContacts() throws Exception {
         String name = "testDeleteWithContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
         int contactId = ContactHelper.addContact(clinic, name).getId();
         Contact contactInDB = ModelUtils.getObjectWithId(appService,
             Contact.class, contactId);
@@ -360,7 +360,7 @@ public class TestClinic extends TestDatabase {
     public void testDeleteWithShipments() throws Exception {
         String name = "testDeleteWithShipments" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
         ContactHelper.addContact(clinic, name);
 
         ShipmentHelper.addShipmentWithRandomPatient(site, clinic, name);
