@@ -98,7 +98,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
         if (index - offset >= pageSize || index < offset) {
             if (index < loadedOffset + pageSize) {
                 // swap
-                if (loading) {
+                if (loading && listener != null) {
                     listener.showBusy();
                     while (loading) {
                         try {
@@ -109,12 +109,15 @@ public class BiobankListProxy implements List<Object>, Serializable {
                     }
                     listener.done();
                 }
-                List<Object> temp = listChunk;
-                listChunk = nextListChunk;
-                nextListChunk = temp;
-                int tempOffset = loadedOffset;
-                loadedOffset = offset;
-                offset = tempOffset;
+                if (nextListChunk != null) {
+                    List<Object> temp = listChunk;
+                    listChunk = nextListChunk;
+                    nextListChunk = temp;
+                    int tempOffset = loadedOffset;
+                    loadedOffset = offset;
+                    offset = tempOffset;
+                } else
+                    System.out.println(" null swap avoided");
             } else {
                 // user loading out of order, do a query on demand
                 try {
@@ -146,7 +149,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
                         nextListChunk = appService.query(criteria, nextOffset,
                             Site.class.getName());
                         if (nextListChunk.size() != 1000 && realSize == -1)
-                            realSize = nextOffset + listChunk.size();
+                            realSize = nextOffset + nextListChunk.size();
                         loading = false;
                     } catch (ApplicationException e) {
                         throw new RuntimeException(e);

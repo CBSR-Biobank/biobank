@@ -15,14 +15,12 @@ public class SampleTypeSUsageImpl extends AbstractReport {
 
     private final static String QUERY1 = "select ss.sampleType.nameShort, "
         + "ss.study.nameShort from " + SampleStorage.class.getName() + " ss "
-        + "where ss.study.site = " + SITE_ID + " OR " + SITE_ID
-        + "=-9999 ORDER BY ss.sampleType.nameShort";
+        + " ORDER BY ss.sampleType.nameShort";
 
     private final static String QUERY2 = "select st.nameShort from "
         + SampleType.class.getName()
         + " st where st not in (select ss.sampleType from "
-        + SampleStorage.class.getName() + " ss) and st.site = " + SITE_ID
-        + " OR " + SITE_ID + "=-9999";
+        + SampleStorage.class.getName() + " ss)";
 
     public SampleTypeSUsageImpl(BiobankReport report) {
         super("", report);

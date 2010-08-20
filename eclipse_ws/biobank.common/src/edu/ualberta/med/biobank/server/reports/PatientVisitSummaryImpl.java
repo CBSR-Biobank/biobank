@@ -23,8 +23,8 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + "from patient_visit pv join patient p on pv.patient_id=p.id join study s on s.id = p.study_id "
         + "join shipment sh on sh.id=pv.shipment_id join clinic c on c.id=sh.clinic_id where pv.date_processed "
         + "between ? and ? and sh.site_id "
-        + SITE_OPERATOR
-        + SITE_ID
+        + SITE_OPERATOR_SEARCH_STRING
+        + SITE_ID_SEARCH_STRING
         + " group by s.name_short, c.name_short, p.pnumber) as filteredPvs group by study_name, "
         + "clinic_name";
 
