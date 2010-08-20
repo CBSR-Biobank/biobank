@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.lang.reflect.Method;
@@ -55,7 +56,7 @@ public class TestDatabase {
     @After
     public void tearDown() throws Exception {
         try {
-            SiteHelper.deleteCreatedStudies();
+            StudyHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
             ClinicHelper.deleteCreatedClinics();
             SampleTypeHelper.deleteCreatedSampleTypes();

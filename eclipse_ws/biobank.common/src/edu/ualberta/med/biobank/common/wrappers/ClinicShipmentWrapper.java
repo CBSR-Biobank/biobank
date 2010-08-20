@@ -357,8 +357,8 @@ public class ClinicShipmentWrapper extends
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
             + ClinicShipment.class.getName()
-            + " where clinic.site.id = ? and waybill = ?",
-            Arrays.asList(new Object[] { site.getId(), waybill }));
+            + " where site.id = ? and waybill = ?", Arrays.asList(new Object[] {
+            site.getId(), waybill }));
         List<ClinicShipment> shipments = appService.query(criteria);
         List<ClinicShipmentWrapper> wrappers = new ArrayList<ClinicShipmentWrapper>();
         for (ClinicShipment s : shipments) {
@@ -385,10 +385,9 @@ public class ClinicShipmentWrapper extends
         // date at 0:0pm
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + ClinicShipment.class.getName()
-                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
+            + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<ClinicShipment> shipments = appService.query(criteria);
         List<ClinicShipmentWrapper> wrappers = new ArrayList<ClinicShipmentWrapper>();
@@ -428,10 +427,9 @@ public class ClinicShipmentWrapper extends
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + ClinicShipment.class.getName()
-                + " where clinic.site.id = ? and dateReceived >= ? and dateReceived <= ?",
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
+            + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<ClinicShipment> res = appService.query(criteria);
         List<ClinicShipmentWrapper> ships = new ArrayList<ClinicShipmentWrapper>();

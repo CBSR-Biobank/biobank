@@ -670,7 +670,7 @@ public class TestContainerType extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
         study.addContacts(Arrays.asList(contact));

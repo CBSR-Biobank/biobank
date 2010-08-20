@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -23,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -77,14 +77,14 @@ public class TestAliquot extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient("5684", study);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
-        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
-            patient);
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site,
+            clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
@@ -216,12 +216,12 @@ public class TestAliquot extends TestDatabase {
         SiteWrapper newSite = SiteHelper.addSite(name);
         StudyWrapper newStudy = StudyHelper.addStudy(name);
         PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
-        ClinicWrapper clinic = ClinicHelper.addClinic(newSite, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         newStudy.addContacts(Arrays.asList(contact));
         newStudy.persist();
-        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(newSite, clinic,
-            newPatient);
+        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(newSite,
+            clinic, newPatient);
         PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
             newPatient, shipment, null, Utils.getRandomDate());
 

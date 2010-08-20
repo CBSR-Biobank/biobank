@@ -6,7 +6,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Arrays;
@@ -54,16 +53,6 @@ public class DbHelper {
             }
             container.reload();
             container.delete();
-        }
-    }
-
-    public static void deleteCreatedStudies() throws Exception {
-        Assert.assertNotNull("appService is null", appService);
-        for (StudyWrapper study : StudyWrapper.getAllStudies(appService)) {
-            deletePatients(study.getPatientCollection());
-            deleteFromList(study.getSampleStorageCollection());
-            study.reload();
-            study.delete();
         }
     }
 

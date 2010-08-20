@@ -11,8 +11,13 @@ public class ClinicHelper extends DbHelper {
 
     public static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
 
+    @Deprecated
     public static ClinicWrapper newClinic(SiteWrapper site, String name)
         throws Exception {
+        return null;
+    }
+
+    public static ClinicWrapper newClinic(String name) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         if (name != null) {
@@ -23,7 +28,6 @@ public class ClinicHelper extends DbHelper {
             }
         }
         clinic.setCity("");
-        clinic.setSite(site);
         clinic.setSendsShipments(true);
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
@@ -31,9 +35,15 @@ public class ClinicHelper extends DbHelper {
         return clinic;
     }
 
+    @Deprecated
     public static ClinicWrapper addClinic(SiteWrapper site, String name,
         boolean addContacts, boolean addToCreatedList) throws Exception {
-        ClinicWrapper clinic = newClinic(site, name);
+        return null;
+    }
+
+    public static ClinicWrapper addClinic(String name, boolean addContacts,
+        boolean addToCreatedList) throws Exception {
+        ClinicWrapper clinic = newClinic(name);
         clinic.persist();
         if (addContacts) {
             ContactHelper.addContactsToClinic(clinic, name);
@@ -41,31 +51,50 @@ public class ClinicHelper extends DbHelper {
         if (addToCreatedList) {
             createdClinics.add(clinic);
         }
-        site.reload();
         return clinic;
     }
 
+    @Deprecated
     public static ClinicWrapper addClinic(SiteWrapper site, String name,
         boolean addContacts) throws Exception {
-        return addClinic(site, name, addContacts, true);
+        return null;
     }
 
+    public static ClinicWrapper addClinic(String name, boolean addContacts)
+        throws Exception {
+        return addClinic(name, addContacts, true);
+    }
+
+    @Deprecated
     public static ClinicWrapper addClinic(SiteWrapper site, String name)
         throws Exception {
-        return addClinic(site, name, false);
+        return null;
+
     }
 
+    public static ClinicWrapper addClinic(String name) throws Exception {
+        return addClinic(name, false);
+    }
+
+    @Deprecated
     public static void addClinics(SiteWrapper site, String name, int count,
         boolean addContacts) throws Exception {
-        for (int i = 0; i < count; i++) {
-            addClinic(site, name + i, addContacts);
-        }
-        site.reload();
+
     }
 
-    public static void addClinics(SiteWrapper site, String name, int count)
+    public static void addClinics(String name, int count, boolean addContacts)
         throws Exception {
-        addClinics(site, name, count, false);
+        for (int i = 0; i < count; i++) {
+            addClinic(name + i, addContacts);
+        }
+    }
+
+    @Deprecated
+    public static void addClinics(SiteWrapper site, String name, int count) {
+    }
+
+    public static void addClinics(String name, int count) throws Exception {
+        addClinics(name, count, false);
     }
 
     public static void deleteCreatedClinics() throws Exception {

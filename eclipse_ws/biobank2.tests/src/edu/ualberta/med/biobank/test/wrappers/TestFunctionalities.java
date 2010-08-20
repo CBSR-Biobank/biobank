@@ -15,12 +15,12 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -61,43 +61,33 @@ public class TestFunctionalities extends TestDatabase {
      */
     @Test
     public void addAliquotPosition() throws Exception {
-        // int abstractPositionSize = appService.search(AbstractPosition.class,
-        // new AbstractPosition()).size();
-        // int aliquotPositionSize = appService.search(AliquotPosition.class,
-        // new AliquotPosition()).size();
-        //
-        // Container sc = getContainer();
-        //
-        // // 1st test = aliquot not used in another aliquot position
-        // Aliquot aliquot = findNotUsedSampleInAliquotPosition();
-        //
-        // tryAliquotPositionInsert(aliquot, sc);
-        //
-        // int abstractPositionSizeAfterTest1 = appService.search(
-        // AbstractPosition.class, new AbstractPosition()).size();
-        // int aliquotPositionSizeAfterTest1 = appService.search(
-        // AliquotPosition.class, new AliquotPosition()).size();
-        //
-        // // insertion should be ok
-        // Assert.assertEquals(abstractPositionSize + 1,
-        // abstractPositionSizeAfterTest1);
-        // Assert.assertEquals(aliquotPositionSize + 1,
-        // aliquotPositionSizeAfterTest1);
-        //
-        // // 2nd test = aliquot already used - can't work
-        // aliquot = findUsedSampleInAliquotPosition();
-        //
-        // tryAliquotPositionInsert(aliquot, sc);
-        //
-        // int abstractPositionSizeAfterTest2 = appService.search(
-        // AbstractPosition.class, new AbstractPosition()).size();
-        // int aliquotPositionSizeAfterTest2 = appService.search(
-        // AliquotPosition.class, new AliquotPosition()).size();
-        // // insertion should not be done
-        // Assert.assertEquals(abstractPositionSizeAfterTest1,
-        // abstractPositionSizeAfterTest2);
-        // Assert.assertEquals(aliquotPositionSizeAfterTest1,
-        // aliquotPositionSizeAfterTest2);
+        int aliquotPositionSize = appService.search(AliquotPosition.class,
+            new AliquotPosition()).size();
+
+        Container sc = getContainer();
+
+        // 1st test = aliquot not used in another aliquot position
+        Aliquot aliquot = findNotUsedSampleInAliquotPosition();
+
+        tryAliquotPositionInsert(aliquot, sc);
+
+        int aliquotPositionSizeAfterTest1 = appService.search(
+            AliquotPosition.class, new AliquotPosition()).size();
+
+        // insertion should be ok
+        Assert.assertEquals(aliquotPositionSize + 1,
+            aliquotPositionSizeAfterTest1);
+
+        // 2nd test = aliquot already used - can't work
+        aliquot = findUsedSampleInAliquotPosition();
+
+        tryAliquotPositionInsert(aliquot, sc);
+
+        int aliquotPositionSizeAfterTest2 = appService.search(
+            AliquotPosition.class, new AliquotPosition()).size();
+        // insertion should not be done
+        Assert.assertEquals(aliquotPositionSizeAfterTest1,
+            aliquotPositionSizeAfterTest2);
     }
 
     /**
@@ -533,8 +523,7 @@ public class TestFunctionalities extends TestDatabase {
     private Container getAnotherContainer(Integer id) throws Exception {
         List<Container> scs;
         if (id == null) {
-            scs = appService.search(Container.class,
-                new Container());
+            scs = appService.search(Container.class, new Container());
         } else {
             HQLCriteria c = new HQLCriteria(
                 "from edu.ualberta.med.biobank.model.Container where id <> "
@@ -576,8 +565,8 @@ public class TestFunctionalities extends TestDatabase {
     public void batchQueriesContainer() throws Exception {
         List<SDKQuery> queries = new ArrayList<SDKQuery>();
 
-        int containerSize = appService.search(Container.class,
-            new Container()).size();
+        int containerSize = appService.search(Container.class, new Container())
+            .size();
 
         Site site = getSite();
 

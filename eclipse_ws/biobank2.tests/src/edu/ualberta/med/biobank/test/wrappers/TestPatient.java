@@ -64,8 +64,8 @@ public class TestPatient extends TestDatabase {
     }
 
     private void addClinic(PatientWrapper patient) throws Exception {
-        clinic = ClinicHelper.addClinic(site,
-            "Clinic - Patient Test " + Utils.getRandomString(10));
+        clinic = ClinicHelper.addClinic("Clinic - Patient Test "
+            + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
         study.addContacts(Arrays.asList(contact));
@@ -260,8 +260,8 @@ public class TestPatient extends TestDatabase {
         List<PatientVisitWrapper> list = patient.getPatientVisitCollection();
         Assert.assertEquals(null, list);
 
-        ClinicWrapper clinic = ClinicHelper.addClinic(site,
-            "Clinic - Patient Test " + Utils.getRandomString(10));
+        ClinicWrapper clinic = ClinicHelper.addClinic("Clinic - Patient Test "
+            + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
         study.addContacts(Arrays.asList(contact));
@@ -308,8 +308,8 @@ public class TestPatient extends TestDatabase {
     public void testAddPatientVisits() throws Exception {
         String name = "testAddPatientVisits" + r.nextInt();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site,
-            name + Utils.getRandomString(10));
+        ClinicWrapper clinic = ClinicHelper.addClinic(name
+            + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
@@ -362,7 +362,7 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
 
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
@@ -528,7 +528,7 @@ public class TestPatient extends TestDatabase {
         String name = "testGetLastWeekPatientVisits" + r.nextInt();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
 
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();

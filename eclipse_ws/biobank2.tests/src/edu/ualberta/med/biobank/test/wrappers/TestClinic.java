@@ -36,34 +36,14 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
         String name = "testGettersAndSetters" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         testGettersAndSetters(clinic);
-    }
-
-    @Test
-    public void testGetSetSite() throws Exception {
-        String name = "testGetSite" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
-        SiteWrapper site2 = SiteHelper.addSite(name + "SITE2");
-
-        clinic.setSite(site2);
-        clinic.persist();
-
-        clinic.reload();
-
-        Assert.assertFalse(site.equals(clinic.getSite()));
-
-        Assert.assertEquals(site2, clinic.getSite());
     }
 
     @Test
     public void testGetContactCollection() throws Exception {
         String name = "testGetContactCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         int nber = r.nextInt(5) + 1;
         for (int i = 0; i < nber; i++) {
             ContactHelper.addContact(clinic, name + i);
@@ -78,8 +58,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetContactCollectionBoolean() throws Exception {
         String name = "testGetContactCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, true);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name, true);
 
         List<ContactWrapper> contacts = clinic.getContactCollection(true);
         if (contacts.size() > 1) {
@@ -94,8 +73,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testAddContacts() throws Exception {
         String name = "testAddContacts" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         int nber = r.nextInt(5) + 1;
         for (int i = 0; i < nber; i++) {
             ContactHelper.addContact(clinic, name + i);
@@ -113,8 +91,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testRemoveContacts() throws Exception {
         String name = "testRemoveContacts" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         int nber = r.nextInt(5) + 1;
         for (int i = 0; i < nber; i++) {
             ContactHelper.addContact(clinic, name + i);
@@ -133,15 +110,13 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetStudyCollection() throws Exception {
         String name = "testGetStudyCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, true);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name, true);
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addContacts(Arrays.asList(DbHelper.chooseRandomlyInList(clinic
             .getContactCollection())));
         study1.persist();
 
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "CLINIC2",
-            true);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2", true);
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addContacts(Arrays.asList(
             DbHelper.chooseRandomlyInList(clinic.getContactCollection()),
@@ -157,8 +132,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetStudyCollectionBoolean() throws Exception {
         String name = "testGetStudyCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, true);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name, true);
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addContacts(Arrays.asList(DbHelper.chooseRandomlyInList(clinic
             .getContactCollection())));
@@ -184,8 +158,7 @@ public class TestClinic extends TestDatabase {
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
         int oldTotal = appService.search(Clinic.class, new Clinic()).size();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicHelper.addClinic(site, name);
+        ClinicHelper.addClinic(name);
 
         int newTotal = appService.search(Clinic.class, new Clinic()).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
@@ -194,14 +167,12 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testPersistFailAddressNotNull() throws Exception {
         String name = "testPersistFailAddressNotNul" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicHelper.addClinic(site, name + "_1");
-        int oldTotal = site.getClinicCollection().size();
+        ClinicHelper.addClinic(name + "_1");
+        int oldTotal = ClinicWrapper.getAllClinics(appService).size();
 
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setNameShort(name);
-        clinic.setSite(site);
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         try {
@@ -213,38 +184,15 @@ public class TestClinic extends TestDatabase {
 
         clinic.setCity("Vesoul");
         clinic.persist();
-        site.reload();
-        int newTotal = site.getClinicCollection().size();
+        ClinicHelper.createdClinics.add(clinic);
+        int newTotal = ClinicWrapper.getAllClinics(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
 
     @Test
-    public void testPersistFailSiteNotNull() throws Exception {
-        String name = "testPersistFailSiteNotNul" + r.nextInt();
-        ClinicWrapper clinic = new ClinicWrapper(appService);
-        clinic.setName(name);
-        clinic.setNameShort(name);
-        clinic.setCity("Rupt");
-        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
-
-        try {
-            clinic.persist();
-            Assert.fail("Should not insert the clinic : no site");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-        SiteWrapper site = SiteHelper.addSite(name);
-        clinic.setSite(site);
-        clinic.persist();
-    }
-
-    @Test
     public void testPersistFailActivityStatusNull() throws Exception {
-        String name = "testPersistFailSiteNotNul" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
+        String name = "testPersistFailActivityStatusNull" + r.nextInt();
         ClinicWrapper clinic = new ClinicWrapper(appService);
-        clinic.setSite(site);
         clinic.setName(name);
         clinic.setNameShort(name);
         clinic.setCity("Rupt");
@@ -258,16 +206,16 @@ public class TestClinic extends TestDatabase {
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
         clinic.persist();
+        ClinicHelper.createdClinics.add(clinic);
     }
 
     @Test
     public void testPersistFailNameUnique() throws Exception {
         String name = "testPersistFailNameUnique" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicHelper.addClinic(site, name);
-        int oldTotal = site.getClinicCollection().size();
+        ClinicHelper.addClinic(name);
+        int oldTotal = ClinicWrapper.getAllClinics(appService).size();
 
-        ClinicWrapper clinic = ClinicHelper.newClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.newClinic(name);
         clinic.setNameShort(name + "_NS");
         try {
             clinic.persist();
@@ -278,29 +226,15 @@ public class TestClinic extends TestDatabase {
         }
         clinic.setName(name + "_otherName");
         clinic.persist();
-        site.reload();
-        int newTotal = site.getClinicCollection().size();
+        ClinicHelper.createdClinics.add(clinic);
+        int newTotal = ClinicWrapper.getAllClinics(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
-
-        SiteWrapper site2 = SiteHelper.addSite(name + "SITE2");
-        ClinicHelper.addClinic(site2, name + "_site2");
-        int oldTotalSite2 = site2.getClinicCollection().size();
-        // can insert same name in different site
-        clinic = ClinicHelper.newClinic(site2, name);
-        clinic.persist();
-        site.reload();
-        site2.reload();
-        // only one clinic added
-        Assert.assertEquals(oldTotal + 1, site.getClinicCollection().size());
-        Assert.assertEquals(oldTotalSite2 + 1, site2.getClinicCollection()
-            .size());
     }
 
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name, false, false);
 
         // object is in database
         Clinic clinicInDB = ModelUtils.getObjectWithId(appService,
@@ -318,8 +252,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testDeleteWithContacts() throws Exception {
         String name = "testDeleteWithContacts" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name, false, false);
         int contactId = ContactHelper.addContact(clinic, name).getId();
         Contact contactInDB = ModelUtils.getObjectWithId(appService,
             Contact.class, contactId);
@@ -336,8 +269,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testDeleteWithContactsLinkedToStudy() throws Exception {
         String name = "testDeleteWithContacts" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -360,7 +292,7 @@ public class TestClinic extends TestDatabase {
     public void testDeleteWithShipments() throws Exception {
         String name = "testDeleteWithShipments" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactHelper.addContact(clinic, name);
 
         ShipmentHelper.addShipmentWithRandomPatient(site, clinic, name);
@@ -377,8 +309,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         clinic.reload();
         String oldName = clinic.getName();
         clinic.setName("toto");
@@ -389,8 +320,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.newClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.newClinic(name);
         clinic.reset();
         Assert.assertEquals(null, clinic.getName());
     }
@@ -399,7 +329,7 @@ public class TestClinic extends TestDatabase {
     public void testGetShipmentCollection() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -426,7 +356,7 @@ public class TestClinic extends TestDatabase {
     public void testAddShipments() throws Exception {
         String name = "testAddShipments" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -458,7 +388,7 @@ public class TestClinic extends TestDatabase {
     public void testGetShipmentCount() throws Exception {
         String name = "testGetShipmentCount" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -492,7 +422,7 @@ public class TestClinic extends TestDatabase {
     public void testGetPatientVisitCollection() throws Exception {
         String name = "testGetPatientVisitCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -523,9 +453,8 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, "QWERTY" + name);
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, "ASDFG" + name);
+        ClinicWrapper clinic1 = ClinicHelper.addClinic("QWERTY" + name);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic("ASDFG" + name);
 
         Assert.assertTrue(clinic1.compareTo(clinic2) > 0);
         Assert.assertTrue(clinic2.compareTo(clinic1) < 0);
@@ -534,8 +463,7 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetContact() throws Exception {
         String name = "testGetContact" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact1 = ContactHelper.addContact(clinic, name);
         String name1 = contact1.getName();
         ContactWrapper contact2 = ContactHelper.addContact(clinic, name);
@@ -551,7 +479,7 @@ public class TestClinic extends TestDatabase {
     public void testGetShipmentWithDate() throws Exception {
         String name = "testGetShipmentWithDate" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -589,7 +517,7 @@ public class TestClinic extends TestDatabase {
     public void testGetShipmentWithDateAndPatient() throws Exception {
         String name = "testGetShipmentWithDateAndPatient" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -635,9 +563,9 @@ public class TestClinic extends TestDatabase {
     public void testGetPatientCount() throws Exception {
         String name = "testGetPatientCount" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
         ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "_2");
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
         ContactWrapper contact2 = ContactHelper
             .addContact(clinic2, name + "_2");
 

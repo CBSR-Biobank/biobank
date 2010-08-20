@@ -41,7 +41,7 @@ public class TestShippingMethod extends TestDatabase {
     public void testGetShipmentCollection() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -77,7 +77,7 @@ public class TestShippingMethod extends TestDatabase {
     public void testGetShipmentCollectionBoolean() throws Exception {
         String name = "testGetShipmentCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -209,7 +209,7 @@ public class TestShippingMethod extends TestDatabase {
             name, false);
 
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -287,7 +287,7 @@ public class TestShippingMethod extends TestDatabase {
 
         String name = "testIsUsed" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));

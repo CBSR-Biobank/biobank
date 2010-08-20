@@ -10,13 +10,11 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -26,8 +24,7 @@ public class TestContact extends TestDatabase {
     public void testGetStudyCollection() throws BiobankCheckException,
         Exception {
         String name = "testGetStudyCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
@@ -42,8 +39,7 @@ public class TestContact extends TestDatabase {
     public void testGetStudyCollectionBoolean() throws BiobankCheckException,
         Exception {
         String name = "testGetStudyCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy("QWERTY" + name);
         StudyWrapper study2 = StudyHelper.addStudy("ASDFG" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
@@ -68,11 +64,10 @@ public class TestContact extends TestDatabase {
     public void testGetSetClinicWrapper() throws BiobankCheckException,
         Exception {
         String name = "testGetSetClinicWrapper" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(site, name + "_2");
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
         contact.setClinic(clinic2);
         contact.persist();
 
@@ -110,8 +105,7 @@ public class TestContact extends TestDatabase {
     public void testBasicGettersAndSetters() throws BiobankCheckException,
         Exception {
         String name = "testBasicGettersAndSetters" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         testGettersAndSetters(contact);
     }
@@ -119,8 +113,7 @@ public class TestContact extends TestDatabase {
     @Test
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
 
         ContactWrapper cw = ContactHelper.newContact(clinic, name);
         cw.persist();
@@ -129,8 +122,7 @@ public class TestContact extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         contact.delete();
@@ -144,8 +136,7 @@ public class TestContact extends TestDatabase {
     @Test
     public void testDeleteFailNoMoreStudies() throws Exception {
         String name = "testDeleteFailNoMoreStudies" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
@@ -174,8 +165,7 @@ public class TestContact extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         String oldName = contact.getName();
         contact.setName("toto");
@@ -186,8 +176,7 @@ public class TestContact extends TestDatabase {
     @Test
     public void testResetNew() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.newContact(clinic, name);
         contact.setName("titi");
         contact.reset();

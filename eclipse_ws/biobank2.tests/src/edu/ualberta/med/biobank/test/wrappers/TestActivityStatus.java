@@ -80,8 +80,8 @@ public class TestActivityStatus extends TestDatabase {
 
         // should not be allowed to remove an activity status that is used
         SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name, false, false);
+        StudyWrapper study = StudyHelper.addStudy(name, false);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name, false, false);
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
@@ -229,13 +229,15 @@ public class TestActivityStatus extends TestDatabase {
             toAdd.add(as);
         }
 
+        // now delete the ones previously added and add the new ones
         ActivityStatusWrapper.persistActivityStatuses(toAdd, toDelete);
 
-        // now delete the ones previously added and add the new ones
         statuses = ActivityStatusWrapper.getAllActivityStatuses(appService);
         after = statuses.size();
         Assert.assertEquals(before - 5 + 3, after);
         Assert.assertTrue(statuses.containsAll(toAdd));
+
+        addedstatus.addAll(toAdd);
     }
 
     @Test
