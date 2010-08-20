@@ -140,6 +140,9 @@ UPDATE container_labeling_scheme set max_capacity=576 where id=2;
 UPDATE container_labeling_scheme set max_capacity=99 where id=3;
 UPDATE container_labeling_scheme set max_rows=2,max_cols=2,max_capacity=4 where id=4;
 
+
+DROP TABLE IF EXISTS  abstract_container;
+
 CREATE TABLE abstract_container (
     ID int(11) NOT NULL DEFAULT 0 COMMENT '',
     DISCRIMINATOR varchar(255) NOT NULL DEFAULT '' COMMENT '' COLLATE latin1_swedish_ci,
@@ -160,6 +163,9 @@ CREATE TABLE abstract_container (
     INDEX FK4ED1F484B3E77A12 (CONTAINER_TYPE_ID),
     INDEX FK4ED1F4843F52C885 (SITE_ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+
+DROP TABLE IF EXISTS  abstract_shipment;
 
 CREATE TABLE abstract_shipment (
     ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -184,6 +190,18 @@ CREATE TABLE abstract_shipment (
     INDEX WAYBILL_IDX (WAYBILL)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+INSERT INTO abstract_shipment (ID, DATE_RECEIVED, COMMENT, WAYBILL, DATE_SHIPPED,
+BOX_NUMBER, SHIPPING_METHOD_ID, CLINIC_ID, SITE_ID)
+SELECT ID, DATE_RECEIVED, COMMENT, WAYBILL, DATE_SHIPPED,
+BOX_NUMBER, SHIPPING_METHOD_ID, CLINIC_ID,
+(SELECT clinic.SITE_ID FROM clinic WHERE clinic.id=shipment.clinic_id)
+FROM shipment;
+
+UPDATE abstract_shipment, clinic SET abstract_shipment.SITE_ID=clinic.SITE_ID
+WHERE abstract_shipment.CLINIC_ID=clinic.ID
+
+DROP TABLE IF EXISTS  clinic_shipment_patient;
+
 CREATE TABLE clinic_shipment_patient (
     PATIENT_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
     CLINIC_SHIPMENT_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -191,6 +209,8 @@ CREATE TABLE clinic_shipment_patient (
     INDEX FKF4B18BB7E5B2B216 (CLINIC_SHIPMENT_ID),
     INDEX FKF4B18BB7B563F38F (PATIENT_ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+DROP TABLE IF EXISTS  dispatch_info;
 
 CREATE TABLE dispatch_info (
     ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -201,6 +221,8 @@ CREATE TABLE dispatch_info (
     INDEX FK3D4D9D53F2A2464F (STUDY_ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+DROP TABLE IF EXISTS  dispatch_info_site;
+
 CREATE TABLE dispatch_info_site (
     SITE_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
     DISPATCH_INFO_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -208,6 +230,8 @@ CREATE TABLE dispatch_info_site (
     INDEX FK86B04EB33F52C885 (SITE_ID),
     INDEX FK86B04EB3A927DCFA (DISPATCH_INFO_ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+DROP TABLE IF EXISTS  dispatch_position;
 
 CREATE TABLE dispatch_position (
     ABSTRACT_POSITION_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -218,6 +242,8 @@ CREATE TABLE dispatch_position (
     INDEX FK99D8EF4E898584F (ALIQUOT_ID),
     INDEX FK99D8EF4E68F34875 (CONTAINER_ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+DROP TABLE IF EXISTS  notification;
 
 CREATE TABLE notification (
     ID int(11) NOT NULL DEFAULT 0 COMMENT '',
@@ -235,12 +261,6 @@ ALTER TABLE clinic
 
 
 DROP TABLE container;
-
-ALTER TABLE container_labeling_scheme
-    ADD MAX_ROWS int(11) NULL DEFAULT NULL COMMENT '' AFTER NAME,
-    ADD MAX_COLS int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_ROWS,
-    ADD MAX_CAPACITY int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_COLS;
-
 
 ALTER TABLE container_path
     DROP INDEX PATH_IDC,
