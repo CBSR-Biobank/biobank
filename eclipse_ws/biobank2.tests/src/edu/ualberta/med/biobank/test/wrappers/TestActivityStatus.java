@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,10 +9,33 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.ContactHelper;
+import edu.ualberta.med.biobank.test.internal.ContainerHelper;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestActivityStatus extends TestDatabase {
 
@@ -53,25 +77,104 @@ public class TestActivityStatus extends TestDatabase {
     @Test
     public void testDeleteFail() throws Exception {
         String name = "testDeleteFail" + r.nextInt();
-        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
-            .size();
+
+        // should not be allowed to remove an activity status that is used
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
+            site, name, 2, 2);
+        ContainerTypeWrapper topContainerType = topContainer.getContainerType();
+        topContainerType.addSampleTypes(SampleTypeWrapper.getAllSampleTypes(
+            appService, false));
+        topContainerType.persist();
+
+        study.setStudyPvAttr("worksheet", "text");
+        study.persist();
+
+        StudyPvAttrWrapper spa = StudyPvAttrWrapper.getStudyPvAttrCollection(
+            study).get(0);
+
+        SampleTypeWrapper sampleType = SampleTypeWrapper.getAllSampleTypes(
+            appService, false).get(0);
+
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+        study.reload();
+
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            patient);
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
+
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType,
+            topContainer, visit, 0, 0);
+
+        ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { aliquot, spa,
+            topContainer, topContainerType };
+
+        for (ModelWrapper<?> wrapper : wrappers) {
+            testDeleteFail(wrapper,
+                name + ClassUtils.getClassName(wrapper.getClass()), null);
+        }
+
+        // , clinic, study, site
+        testDeleteFail(clinic,
+            name + ClassUtils.getClassName(clinic.getClass()),
+            new ModelWrapper<?>[] { visit, shipment, patient, study, contact });
+    }
+
+    private void testDeleteFail(ModelWrapper<?> wrapper, String asName,
+        ModelWrapper<?>[] deleteWrappers) throws Exception {
         ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
-        as.setName(name);
+        as.setName(asName);
         as.persist();
-        addedstatus.add(as);
-        int after = ActivityStatusWrapper.getAllActivityStatuses(appService)
-            .size();
-        Assert.assertEquals(before + 1, after);
+        as.reload();
 
-        ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, name);
+        if (wrapper instanceof AliquotWrapper) {
+            ((AliquotWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof StudyPvAttrWrapper) {
+            ((StudyPvAttrWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof ContainerWrapper) {
+            ((ContainerWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof ContainerTypeWrapper) {
+            ((ContainerTypeWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof ClinicWrapper) {
+            ((ClinicWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof StudyWrapper) {
+            ((StudyWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof SiteWrapper) {
+            ((SiteWrapper) wrapper).setActivityStatus(as);
+        } else {
+            Assert.fail("invalid wrapper class: "
+                + wrapper.getClass().getName());
+        }
 
-        // FIXME delete should test we can't remove a used activity status ?
+        wrapper.persist();
+        wrapper.reload();
+
         try {
-            activeAs.delete();
+            as.delete();
             Assert.fail("should not be allowed to delete activity status");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
+        }
+
+        if (deleteWrappers != null) {
+            for (ModelWrapper<?> delWrapper : deleteWrappers) {
+                delWrapper.delete();
+            }
+        }
+
+        wrapper.delete();
+
+        try {
+            as.delete();
+        } catch (Exception e) {
+            Assert
+                .fail("object deleted, should be allowed to delete activity status");
         }
     }
 
@@ -181,7 +284,7 @@ public class TestActivityStatus extends TestDatabase {
     public void testGetAllActivityStatuses() throws Exception {
         Collection<ActivityStatusWrapper> list = ActivityStatusWrapper
             .getAllActivityStatuses(appService);
-        Assert.assertTrue(list.size() == 4);
+        Assert.assertTrue(list.size() >= 4);
 
         List<String> names = new ArrayList<String>();
         for (ActivityStatusWrapper as : list) {
