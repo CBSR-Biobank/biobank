@@ -67,16 +67,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
             Site.class, Study.class, StudyPvAttr.class };
 
         for (Class<?> clazz : classes) {
-            Class<?> realClass = abstractClassesWithDiscriminators.get(clazz);
-            String discriminatorString = "";
-            if (realClass != null) {
-                discriminatorString = " and x.class='" + clazz.getSimpleName()
-                    + "'";
-                clazz = realClass;
-            }
             HQLCriteria c = new HQLCriteria("select count(x) from "
-                + clazz.getName() + " as x where x.activityStatus=? "
-                + discriminatorString,
+                + clazz.getName() + " as x where x.activityStatus=?",
                 Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {
@@ -139,7 +131,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return activities;
     }
 
-    // TODO test getActivityStatus
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name) throws Exception {
 

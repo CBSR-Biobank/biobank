@@ -6,12 +6,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
-import edu.ualberta.med.biobank.model.AbstractContainer;
-import edu.ualberta.med.biobank.model.AbstractShipment;
-import edu.ualberta.med.biobank.model.ClinicShipment;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.DispatchContainer;
-import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -32,7 +26,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -51,20 +44,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         .getName());
 
     private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
-
-    public static final Map<Class<?>, Class<?>> abstractClassesWithDiscriminators;
-
-    static {
-        abstractClassesWithDiscriminators = new HashMap<Class<?>, Class<?>>();
-        abstractClassesWithDiscriminators.put(Container.class,
-            AbstractContainer.class);
-        abstractClassesWithDiscriminators.put(DispatchContainer.class,
-            AbstractContainer.class);
-        abstractClassesWithDiscriminators.put(ClinicShipment.class,
-            AbstractShipment.class);
-        abstractClassesWithDiscriminators.put(DispatchShipment.class,
-            AbstractShipment.class);
-    }
 
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;

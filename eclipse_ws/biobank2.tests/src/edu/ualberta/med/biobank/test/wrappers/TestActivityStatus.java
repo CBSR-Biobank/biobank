@@ -312,4 +312,15 @@ public class TestActivityStatus extends TestDatabase {
             Assert.assertTrue(true);
         }
     }
+
+    @Test
+    public void testIsActive() throws Exception {
+        ActivityStatusWrapper active = ActivityStatusWrapper.getActivityStatus(
+            appService, "Active");
+        Assert.assertTrue(active.isActive());
+
+        ActivityStatusWrapper closed = ActivityStatusWrapper.getActivityStatus(
+            appService, "Closed");
+        Assert.assertFalse(closed.isActive());
+    }
 }
