@@ -22,7 +22,7 @@ OPTIONS
 MYSQL=/usr/bin/mysql
 MYSQLDUMP=/usr/bin/mysqldump
 SED=/bin/sed
-HOST="localhost"
+DBHOST="localhost"
 DBNAME=biobank2
 
 function in_array () {
@@ -63,13 +63,16 @@ if [ -z "$DBPWD" ]; then
 fi
 
 for table in `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME -BNe "show tables"` ; do
-#    echo "\"$table\""
+  # echo "  table: \"$table\""
     if [[ $table =~ ^csm_ ]]; then
-        CSM_TABLES=(${CSM_TABLES[@]} $table )
+        in_array "${exclude[@]}" $table
+        if [ $? -eq 0 ]; then
+            CSM_TABLES="$CSM_TABLES $table"
+        fi
     fi
 done
 
-if [ "${#CSM_TABLES[@]}" == "0" ]; then
+if [ -z "${#CSM_TABLES}" ]; then
     echo "ERROR: database does not contain any CSM tables"
 fi
 
@@ -77,17 +80,11 @@ if [ -n "$OUTFILE" ]; then
     echo "" > $OUTFILE
 fi
 
-for table in "${CSM_TABLES[@]}"
-do
-    in_array "${exclude[@]}" $table
-    if [ $? -eq 0 ]; then
-        if [ -z "$OUTFILE" ]; then
-            $MYSQLDUMP -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $table
-        else
-            $MYSQLDUMP -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $table >> $OUTFILE
-        fi
-    fi
-done
+if [ -z "$OUTFILE" ]; then
+    $MYSQLDUMP --skip-extended-insert -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $CSM_TABLES
+else
+    $MYSQLDUMP --skip-extended-insert -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $CSM_TABLES >> $OUTFILE
+fi
 
 if [ -n "$OUTFILE" ]; then
     echo "tables dumped to $OUTFILE"

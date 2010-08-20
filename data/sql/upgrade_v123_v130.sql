@@ -6,6 +6,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS  site_pv_attr;
 
+DROP TABLE IF EXISTS  global_pv_attr;
+
 CREATE TABLE `global_pv_attr` (
   `ID` int(11) NOT NULL,
   `LABEL` varchar(50) DEFAULT NULL,
@@ -24,6 +26,8 @@ INSERT INTO `global_pv_attr` (ID, LABEL, PV_ATTR_TYPE_ID) VALUES
 
 ALTER TABLE study_pv_attr
       ADD `REQUIRED` bit(1) NULL DEFAULT NULL COMMENT '' AFTER PERMISSIBLE;
+
+DROP TABLE IF EXISTS  site_study;
 
 CREATE TABLE site_study (
     STUDY_ID int(11) NOT NULL DEFAULT 0 COMMENT '',

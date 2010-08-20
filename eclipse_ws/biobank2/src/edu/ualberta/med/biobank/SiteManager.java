@@ -174,7 +174,7 @@ public class SiteManager {
                         currentSite = siteWrapper;
                         setCurrentSite(currentSite);
                         closeAllSitesEditor();
-                        SessionManager.getInstance().rebuildSession();
+                        // SessionManager.getInstance().rebuildSession();
                     }
                 });
         }
