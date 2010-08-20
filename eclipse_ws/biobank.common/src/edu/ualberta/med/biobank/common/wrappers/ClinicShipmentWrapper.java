@@ -57,7 +57,7 @@ public class ClinicShipmentWrapper extends
         List<String> list = new ArrayList<String>(Arrays.asList(properties));
         list.addAll(Arrays.asList("clinic", "patientVisitCollection",
             "shippingMethod", "patientCollection"));
-        return (String[]) list.toArray();
+        return list.toArray(new String[list.size()]);
     }
 
     @Override

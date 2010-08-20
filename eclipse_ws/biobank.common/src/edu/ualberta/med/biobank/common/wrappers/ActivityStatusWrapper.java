@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
@@ -62,17 +62,21 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public boolean isUsed() throws ApplicationException, BiobankCheckException {
         long usedCount = 0;
 
-        String[] classNames = new String[] { Aliquot.class.getName(),
-            Clinic.class.getName(), ClinicShipment.class.getName(),
-            ContainerType.class.getName(), SampleStorage.class.getName(),
-            Site.class.getName(), Study.class.getName(),
-            StudyPvAttr.class.getName(),
+        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
+            Container.class, ContainerType.class, SampleStorage.class,
+            Site.class, Study.class, StudyPvAttr.class };
 
-        };
-
-        for (String className : classNames) {
-            HQLCriteria c = new HQLCriteria("select count(x) from " + className
-                + " as x where x.activityStatus=?)",
+        for (Class<?> clazz : classes) {
+            Class<?> realClass = abstractClassesWithDiscriminators.get(clazz);
+            String discriminatorString = "";
+            if (realClass != null) {
+                discriminatorString = " and x.class='" + clazz.getSimpleName()
+                    + "'";
+                clazz = realClass;
+            }
+            HQLCriteria c = new HQLCriteria("select count(x) from "
+                + clazz.getName() + " as x where x.activityStatus=? "
+                + discriminatorString,
                 Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {

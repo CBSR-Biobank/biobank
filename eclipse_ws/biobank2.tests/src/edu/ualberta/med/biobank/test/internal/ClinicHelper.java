@@ -1,10 +1,15 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 
 public class ClinicHelper extends DbHelper {
+
+    public static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
 
     public static ClinicWrapper newClinic(SiteWrapper site, String name)
         throws Exception {
@@ -27,14 +32,22 @@ public class ClinicHelper extends DbHelper {
     }
 
     public static ClinicWrapper addClinic(SiteWrapper site, String name,
-        boolean addContacts) throws Exception {
+        boolean addContacts, boolean addToCreatedList) throws Exception {
         ClinicWrapper clinic = newClinic(site, name);
         clinic.persist();
         if (addContacts) {
             ContactHelper.addContactsToClinic(clinic, name);
         }
+        if (addToCreatedList) {
+            createdClinics.add(clinic);
+        }
         site.reload();
         return clinic;
+    }
+
+    public static ClinicWrapper addClinic(SiteWrapper site, String name,
+        boolean addContacts) throws Exception {
+        return addClinic(site, name, addContacts, true);
     }
 
     public static ClinicWrapper addClinic(SiteWrapper site, String name)
@@ -53,6 +66,11 @@ public class ClinicHelper extends DbHelper {
     public static void addClinics(SiteWrapper site, String name, int count)
         throws Exception {
         addClinics(site, name, count, false);
+    }
+
+    public static void deleteCreatedClinics() throws Exception {
+        deleteClinics(createdClinics);
+        createdClinics.clear();
     }
 
 }
