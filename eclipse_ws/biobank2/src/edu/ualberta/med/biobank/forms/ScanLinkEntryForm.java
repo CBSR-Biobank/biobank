@@ -12,11 +12,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -87,6 +89,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private boolean isFakeScanRandom;
 
+    private ScrolledComposite containersScroll;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -126,14 +130,22 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
      * Pallet visualisation
      */
     private void createPalletSection() {
-        Composite client = toolkit.createComposite(page);
+        containersScroll = new ScrolledComposite(page, SWT.H_SCROLL);
+        containersScroll.setExpandHorizontal(true);
+        containersScroll.setExpandVertical(true);
+        containersScroll.setLayout(new FillLayout());
+        GridData scrollData = new GridData();
+        scrollData.horizontalAlignment = SWT.FILL;
+        scrollData.grabExcessHorizontalSpace = true;
+        containersScroll.setLayoutData(scrollData);
+        Composite client = toolkit.createComposite(containersScroll);
         GridLayout layout = new GridLayout(2, false);
         client.setLayout(layout);
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.CENTER;
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
-
+        containersScroll.setContent(client);
         spw = new ScanLinkPalletWidget(client);
         spw.setVisible(true);
         toolkit.adapt(spw);
@@ -152,6 +164,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 scanTubeAlone(e);
             }
         });
+
+        containersScroll.setMinSize(client
+            .computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
         createScanTubeAloneButton(client);
     }
 

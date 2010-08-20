@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -26,6 +27,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -79,6 +81,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     // for debugging only (fake scan) :
     private Button fakeScanLinkedOnlyButton;
 
+    private ScrolledComposite containersScroll;
     private Composite containersComposite;
 
     // pallet found with given product barcode
@@ -136,7 +139,13 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected void createFormContent() throws Exception {
         form.setText(Messages.getString("ScanAssign.formTitle")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(2, false);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.verticalAlignment = SWT.FILL;
         page.setLayout(layout);
+        page.setLayoutData(gd);
 
         createFieldsSection();
 
@@ -357,15 +366,27 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void createContainersVisualisationSection() {
-        containersComposite = toolkit.createComposite(page);
+        containersScroll = new ScrolledComposite(page, SWT.H_SCROLL);
+        containersScroll.setExpandHorizontal(true);
+        containersScroll.setExpandVertical(true);
+        containersScroll.setLayout(new FillLayout());
+        GridData scrollData = new GridData();
+        scrollData.horizontalAlignment = SWT.FILL;
+        scrollData.grabExcessHorizontalSpace = true;
+        containersScroll.setLayoutData(scrollData);
+        containersComposite = toolkit.createComposite(containersScroll);
         GridLayout layout = getNeutralGridLayout();
         layout.numColumns = 3;
         containersComposite.setLayout(layout);
         GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.verticalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
         containersComposite.setLayoutData(gd);
         toolkit.paintBordersFor(containersComposite);
+
+        containersScroll.setContent(containersComposite);
 
         Composite freezerComposite = toolkit
             .createComposite(containersComposite);
@@ -406,6 +427,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         });
         showOnlyPallet(true);
 
+        containersScroll.setMinSize(containersComposite.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT));
         createScanTubeAloneButton(containersComposite);
     }
 
@@ -503,12 +526,14 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                System.out.println(page.getSize());
                 cancelConfirmWidget.setFocus();
                 displayPalletPositions();
                 palletWidget.setCells(cells);
                 setDirty(true);
                 setRescanMode();
                 page.layout(true, true);
+                form.reflow(true);
             }
         });
     }

@@ -32,7 +32,8 @@ Bundle-ClassPath: lib/client/acegi-security-1.0.4.jar,
  lib/server/csmapi-4.1.jar,
  lib/server/sdk-core.jar,
  lib/server/sdk-writable-core.jar,
- .
+ .,
+ conf/
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,

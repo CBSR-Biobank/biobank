@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -125,6 +127,11 @@ public class GridContainerDisplay extends AbstractGridDisplay {
 
     public void setDefaultStatus(ContainerStatus status) {
         this.defaultStatus = status;
+    }
+
+    @Override
+    public Point getSizeToApply() {
+        return this.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
     }
 
 }
