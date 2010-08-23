@@ -45,13 +45,17 @@ public class DispatchShipmentWrapper extends
         List<String> list = new ArrayList<String>(Arrays.asList(properties));
         list.addAll(Arrays.asList("sender", "receiver",
             "sentContainerCollection"));
-        return (String[]) list.toArray();
+        return list.toArray(new String[] {});
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        checkWaybillUniqueForSender();
+        if (!checkWaybillUniqueForSender()) {
+            throw new BiobankCheckException("A dispatch shipment with waybill "
+                + getWaybill() + " already exist for sending site "
+                + getSender().getNameShort());
+        }
     }
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException {
@@ -95,10 +99,10 @@ public class DispatchShipmentWrapper extends
 
     public SiteWrapper getReceiver() {
         if (receiver == null) {
-            Site s = wrappedObject.getReceiver();
-            if (s == null)
+            Site r = wrappedObject.getReceiver();
+            if (r == null)
                 return null;
-            receiver = new SiteWrapper(appService, s);
+            receiver = new SiteWrapper(appService, r);
         }
         return receiver;
     }

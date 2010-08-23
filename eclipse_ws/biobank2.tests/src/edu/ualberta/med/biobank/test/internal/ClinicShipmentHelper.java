@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
-public class ShipmentHelper extends DbHelper {
+public class ClinicShipmentHelper extends DbHelper {
 
     public static ClinicShipmentWrapper newShipment(SiteWrapper site,
         ClinicWrapper clinic, String waybill, Date dateReceived,

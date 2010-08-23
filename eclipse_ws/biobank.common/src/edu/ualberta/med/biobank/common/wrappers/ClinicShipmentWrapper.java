@@ -82,9 +82,10 @@ public class ClinicShipmentWrapper extends
                     "A waybill should be set on this shipment");
             }
             if (!checkWaybillUniqueForClinic()) {
-                throw new BiobankCheckException("A shipment with waybill "
-                    + getWaybill() + " already exist in clinic "
-                    + getClinic().getName() + ".");
+                throw new BiobankCheckException(
+                    "A clinic shipment with waybill " + getWaybill()
+                        + " already exist in clinic "
+                        + getClinic().getNameShort());
             }
         } else {
             if (getWaybill() != null) {
