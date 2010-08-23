@@ -55,8 +55,8 @@ public class DispatchShipmentWrapper extends
             throw new BiobankCheckException("A dispatch shipment with waybill "
                 + getWaybill() + " already exist for sending site "
                 + getSender().getNameShort());
+        }
 
-        checkWaybillUniqueForSender();
         if (getSender() == null) {
             throw new BiobankCheckException("Sender should be set");
         }
