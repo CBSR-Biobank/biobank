@@ -764,10 +764,23 @@ public class ContainerWrapper extends
         return transformToWrapperList(appService, containers);
     }
 
+    /**
+     * Retrieve a list of empty containers in a specific site. These containers
+     * should be able to hold aliquots of type sampleTypes and should have a row
+     * capacity equals or greater than minRwCapacity and a column capacity equal
+     * or greater than minColCapacity.
+     * 
+     * @param appService
+     * @param siteWrapper
+     * @param sampleTypes list of sample types the container should be able to
+     *            contain
+     * @param minRowCapacity min row capacity
+     * @param minColCapacity min col capacity
+     */
     public static List<ContainerWrapper> getEmptyContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
-        List<SampleTypeWrapper> sampleTypes, Integer rowCapacity,
-        Integer colCapacity) throws ApplicationException {
+        List<SampleTypeWrapper> sampleTypes, Integer minRowCapacity,
+        Integer minColCapacity) throws ApplicationException {
         String typesIds = "(";
         for (int i = 0; i < sampleTypes.size(); i++) {
             SampleTypeWrapper st = sampleTypes.get(i);
@@ -786,8 +799,8 @@ public class ContainerWrapper extends
             + ContainerType.class.getName() + " as ct"
             + " left join ct.sampleTypeCollection as sampleType"
             + " where sampleType.id in " + typesIds + ")",
-            Arrays.asList(new Object[] { siteWrapper.getId(), rowCapacity,
-                colCapacity }));
+            Arrays.asList(new Object[] { siteWrapper.getId(), minRowCapacity,
+                minColCapacity }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -976,6 +989,9 @@ public class ContainerWrapper extends
             && SecurityHelper.isContainerAdministrator(appService);
     }
 
+    /**
+     * @return true if there is no free position for a new child container
+     */
     public boolean isContainerFull() {
         return (this.getChildCount() == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
