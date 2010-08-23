@@ -161,7 +161,7 @@ public class TestAliquot extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        duplicate.setPosition(2, 3);
+        duplicate.setPosition(new RowColPos(2, 3));
         duplicate.persist();
 
         duplicate.setInventoryId(Utils.getRandomString(5));
@@ -524,11 +524,11 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         AliquotWrapper sample2 = new AliquotWrapper(appService);
-        sample2.setPosition(3, 3);
+        sample2.setPosition(new RowColPos(3, 3));
 
         Assert.assertFalse(sample2.isPositionFree(aliquot.getParent()));
 
-        sample2.setPosition(2, 3);
+        sample2.setPosition(new RowColPos(2, 3));
         Assert.assertTrue(sample2.isPositionFree(aliquot.getParent()));
     }
 

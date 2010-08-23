@@ -21,8 +21,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class AliquotWrapper extends
-    AbstractPositionHolder<Aliquot, AliquotPosition> {
+public class AliquotWrapper extends ModelWrapper<Aliquot> {
+
+    private AbstractObjectWithPositionManagement<AliquotPosition> objectWithPositionManagement;
 
     private PatientVisitWrapper patientVisit;
     private SampleTypeWrapper sampleType;
@@ -31,10 +32,52 @@ public class AliquotWrapper extends
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
         super(appService, wrappedObject);
+        initManagement();
     }
 
     public AliquotWrapper(WritableApplicationService appService) {
         super(appService);
+        initManagement();
+    }
+
+    private void initManagement() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<AliquotPosition>() {
+
+            @Override
+            protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
+                boolean initIfNoPosition) {
+                if (nullPositionSet) {
+                    if (rowColPosition != null) {
+                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                            appService);
+                        posWrapper.setRow(rowColPosition.row);
+                        posWrapper.setCol(rowColPosition.col);
+                        posWrapper.setAliquot(AliquotWrapper.this);
+                        wrappedObject.setAliquotPosition(posWrapper
+                            .getWrappedObject());
+                        return posWrapper;
+                    }
+                } else {
+                    AliquotPosition pos = wrappedObject.getAliquotPosition();
+                    if (pos != null) {
+                        return new AliquotPositionWrapper(appService, pos);
+                    } else if (initIfNoPosition) {
+                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                            appService);
+                        posWrapper.setAliquot(AliquotWrapper.this);
+                        wrappedObject.setAliquotPosition(posWrapper
+                            .getWrappedObject());
+                        return posWrapper;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public SiteWrapper getSite() {
+                return AliquotWrapper.this.getSite();
+            }
+        };
     }
 
     @Override
@@ -61,6 +104,7 @@ public class AliquotWrapper extends
             }
             wrappedObject.setAliquotPosition(null);
         }
+        objectWithPositionManagement.persist();
         super.persist();
     }
 
@@ -74,7 +118,7 @@ public class AliquotWrapper extends
         checkPatientVisitNotNull();
         checkInventoryIdUnique();
         checkParentAcceptSampleType();
-        super.persistChecks();
+        objectWithPositionManagement.persistChecks();
     }
 
     private void checkPatientVisitNotNull() throws BiobankCheckException {
@@ -136,7 +180,6 @@ public class AliquotWrapper extends
         }
     }
 
-    @Override
     public SiteWrapper getSite() {
         if (getPatientVisit() != null) {
             return getPatientVisit().getShipment().getSite();
@@ -280,9 +323,24 @@ public class AliquotWrapper extends
         return wrappedObject.getComment();
     }
 
-    @Override
     public ContainerWrapper getParent() {
-        return (ContainerWrapper) super.getParent();
+        return (ContainerWrapper) objectWithPositionManagement.getParent();
+    }
+
+    public void setParent(AbstractContainerWrapper<?> container) {
+        objectWithPositionManagement.setParent(container);
+    }
+
+    public boolean hasParent() {
+        return objectWithPositionManagement.hasParent();
+    }
+
+    public RowColPos getPosition() {
+        return objectWithPositionManagement.getPosition();
+    }
+
+    public void setPosition(RowColPos rcp) {
+        objectWithPositionManagement.setPosition(rcp);
     }
 
     public String getPositionString() {
@@ -441,34 +499,6 @@ public class AliquotWrapper extends
                 ((AliquotWrapper) o).getInventoryId());
         }
         return 0;
-    }
-
-    @Override
-    protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
-        boolean initIfNoPosition) {
-        if (nullPositionSet) {
-            if (rowColPosition != null) {
-                AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                    appService);
-                posWrapper.setRow(rowColPosition.row);
-                posWrapper.setCol(rowColPosition.col);
-                posWrapper.setAliquot(this);
-                wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        } else {
-            AliquotPosition pos = wrappedObject.getAliquotPosition();
-            if (pos != null) {
-                return new AliquotPositionWrapper(appService, pos);
-            } else if (initIfNoPosition) {
-                AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                    appService);
-                posWrapper.setAliquot(this);
-                wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        }
-        return null;
     }
 
     @Override

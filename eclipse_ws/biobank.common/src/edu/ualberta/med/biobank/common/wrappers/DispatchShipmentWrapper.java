@@ -52,6 +52,12 @@ public class DispatchShipmentWrapper extends
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
         checkWaybillUniqueForSender();
+        if (getSender() == null) {
+            throw new BiobankCheckException("Sender should be set");
+        }
+        if (getReceiver() == null) {
+            throw new BiobankCheckException("Receiver should be set");
+        }
     }
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException {
