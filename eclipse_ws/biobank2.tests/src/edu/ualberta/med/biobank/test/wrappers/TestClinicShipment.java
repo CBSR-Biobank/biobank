@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
-public class TestShipment extends TestDatabase {
+public class TestClinicShipment extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws Exception {
@@ -71,6 +71,12 @@ public class TestShipment extends TestDatabase {
         Assert.assertTrue(clinic2.getShipmentCollection().contains(shipment));
 
         Assert.assertFalse(clinic.getShipmentCollection().contains(shipment));
+
+        shipment = ShipmentHelper.newShipment(site, null, name,
+            Utils.getRandomDate(), (PatientWrapper[]) null);
+
+        Assert.assertNull(shipment.getClinic());
+
     }
 
     @Test
@@ -158,6 +164,8 @@ public class TestShipment extends TestDatabase {
             .addShippingMethod(name);
         ClinicShipmentWrapper shipment = ShipmentHelper
             .addShipmentWithRandomPatient(site, clinic, name);
+
+        Assert.assertNull(shipment.getShippingMethod());
 
         shipment.setShippingMethod(company);
         shipment.persist();
@@ -288,12 +296,38 @@ public class TestShipment extends TestDatabase {
 
         PatientWrapper patient = DbHelper.chooseRandomlyInList(shipment
             .getPatientCollection());
+
+        try {
+            shipment.checkCanRemovePatient(patient);
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException e) {
+            Assert
+                .fail("should be allowed to remove patient since since it has no patient visits");
+        }
+
+        Assert.assertFalse(shipment.hasVisitForPatient(patient));
+
         shipment.removePatients(Arrays.asList(patient));
         shipment.persist();
 
         shipment.reload();
         // one patient removed
         Assert.assertEquals(1, shipment.getPatientCollection().size());
+
+        PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study);
+        shipment.addPatients(Arrays.asList(patient3));
+
+        PatientVisitHelper.addPatientVisits(patient3, shipment, 3);
+        patient3.reload();
+
+        try {
+            shipment.checkCanRemovePatient(patient3);
+            Assert.fail("should not be allowed to remove patient");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        Assert.assertTrue(shipment.hasVisitForPatient(patient3));
     }
 
     @Test
@@ -327,6 +361,11 @@ public class TestShipment extends TestDatabase {
 
         Assert.assertEquals(1, shipsFound.size());
         Assert.assertEquals(shipmentWithDate, shipsFound.get(0));
+
+        ClinicShipmentWrapper shipment = ShipmentHelper.newShipment(null,
+            clinic, name, Utils.getRandomDate(), (PatientWrapper[]) null);
+
+        Assert.assertNull(shipment.getSite());
     }
 
     @Test
@@ -380,6 +419,26 @@ public class TestShipment extends TestDatabase {
             clinic, name, Utils.getRandomDate(), patient);
 
         shipment.persist();
+
+        shipment = ShipmentHelper.newShipment(site, null, name,
+            Utils.getRandomDate(), patient);
+
+        try {
+            shipment.persist();
+            Assert.fail("shipment does not have a clinic");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        shipment = ShipmentHelper.newShipment(null, clinic, name,
+            Utils.getRandomDate(), patient);
+
+        try {
+            shipment.persist();
+            Assert.fail("shipment does not have a site");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
