@@ -204,8 +204,4 @@ public class TestModelWrapper extends TestDatabase {
         site.reset();
     }
 
-    @Test
-    public void testGetAllObjects() throws Exception {
-
-    }
 }

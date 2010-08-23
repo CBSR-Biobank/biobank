@@ -60,7 +60,9 @@ public class AliquotHelper extends DbHelper {
     public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        return addAliquot(sampleType, "Active", container, pv, row, col);
+        AliquotWrapper aliquot = addAliquot(sampleType, "Active", container,
+            pv, row, col);
+        container.reload();
+        return aliquot;
     }
-
 }

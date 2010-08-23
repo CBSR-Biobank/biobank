@@ -235,8 +235,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             if (children != null) {
                 shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
                 for (ClinicShipment ship : children) {
-                    shipmentCollection
-                        .add(new ClinicShipmentWrapper(appService, ship));
+                    shipmentCollection.add(new ClinicShipmentWrapper(
+                        appService, ship));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             }
