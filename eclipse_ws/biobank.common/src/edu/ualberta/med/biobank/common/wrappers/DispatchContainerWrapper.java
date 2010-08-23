@@ -1,15 +1,17 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.model.DispatchContainer;
-import edu.ualberta.med.biobank.model.DispatchPosition;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchContainerWrapper extends
-    AbstractContainerWrapper<DispatchContainer, DispatchPosition> {
+    AbstractContainerWrapper<DispatchContainer> {
 
     private DispatchShipmentWrapper shipment;
 
@@ -30,10 +32,9 @@ public class DispatchContainerWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        // FIXME test shipment not null
-        // FIXME test sender not null
-        // FIXME test receiver not null
-        super.persistChecks();
+        if (getShipment() == null) {
+            throw new BiobankCheckException("Shipment cannot be null");
+        }
     }
 
     @Override
@@ -42,7 +43,10 @@ public class DispatchContainerWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "shipment" };
+        String[] names = super.getPropertyChangeNames();
+        List<String> namesList = new ArrayList<String>(Arrays.asList(names));
+        namesList.addAll(Arrays.asList("shipment"));
+        return namesList.toArray(new String[namesList.size()]);
     }
 
     @Override
@@ -71,14 +75,9 @@ public class DispatchContainerWrapper extends
 
     @Override
     public SiteWrapper getSite() {
-        // FIXME need to check this !
-        return null;
-    }
-
-    @Override
-    protected AbstractPositionWrapper<DispatchPosition> getSpecificPositionWrapper(
-        boolean initIfNoPosition) {
-        // TODO Auto-generated method stub
+        if (getShipment() != null) {
+            getShipment().getSender();
+        }
         return null;
     }
 

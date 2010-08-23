@@ -113,7 +113,7 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    public void setParent(AbstractContainerWrapper<?, ?> parent) {
+    public void setParent(AbstractContainerWrapper<?> parent) {
         assert parent instanceof ContainerWrapper;
         if (parent instanceof ContainerWrapper) {
             setParentContainer((ContainerWrapper) parent);

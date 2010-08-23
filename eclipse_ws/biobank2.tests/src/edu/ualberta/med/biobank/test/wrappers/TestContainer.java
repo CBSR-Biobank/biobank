@@ -373,7 +373,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), null, site, type);
-        container.setPosition(0, 0);
+        container.setPosition(new RowColPos(0, 0));
 
         // should have a parent
         try {
@@ -406,7 +406,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), parent, site, type);
-        container.setPosition(10, 10);
+        container.setPosition(new RowColPos(10, 10));
         try {
             container.persist();
             Assert.fail("position not ok in parent container");
@@ -414,12 +414,12 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setPosition(0, 0);
+        container.setPosition(new RowColPos(0, 0));
         container.persist();
 
         ContainerWrapper container2 = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), null, site, type);
-        container2.setPosition(0, 0);
+        container2.setPosition(new RowColPos(0, 0));
         container2.setParent(parent);
         container2.setContainerType(type);
         try {
@@ -515,7 +515,8 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPosition(top.getRowCapacity() + 1, top.getColCapacity() + 1);
+        child.setPosition(new RowColPos(top.getRowCapacity() + 1, top
+            .getColCapacity() + 1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
@@ -523,7 +524,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPosition(-1, -1);
+        child.setPosition(new RowColPos(-1, -1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");

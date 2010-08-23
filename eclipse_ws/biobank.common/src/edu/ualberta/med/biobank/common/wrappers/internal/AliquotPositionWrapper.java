@@ -102,12 +102,12 @@ public class AliquotPositionWrapper extends
     }
 
     @Override
-    public AbstractContainerWrapper<?, ?> getParent() {
+    public AbstractContainerWrapper<?> getParent() {
         return getContainer();
     }
 
     @Override
-    public void setParent(AbstractContainerWrapper<?, ?> parent) {
+    public void setParent(AbstractContainerWrapper<?> parent) {
         assert parent instanceof ContainerWrapper;
         if (parent instanceof ContainerWrapper) {
             setContainer((ContainerWrapper) parent);
@@ -117,7 +117,7 @@ public class AliquotPositionWrapper extends
     @Override
     protected void checkObjectAtPosition() throws BiobankCheckException,
         ApplicationException {
-        AbstractContainerWrapper<?, ?> parent = getParent();
+        AbstractContainerWrapper<?> parent = getParent();
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !

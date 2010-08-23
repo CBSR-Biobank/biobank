@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrSite;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -59,7 +60,7 @@ public class ConfigContainers {
         container.setSite(site);
         container.setContainerType(type);
         container.setActivityStatus(CbsrSite.getActiveActivityStatus());
-        container.setPosition(row, col);
+        container.setPosition(new RowColPos(row, col));
         container.setParent(parent);
         container.setTemperature(type.getDefaultTemperature());
         container.persist();

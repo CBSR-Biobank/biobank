@@ -44,14 +44,14 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         return wrappedObject.getCol();
     }
 
-    public abstract AbstractContainerWrapper<?, ?> getParent();
+    public abstract AbstractContainerWrapper<?> getParent();
 
-    public abstract void setParent(AbstractContainerWrapper<?, ?> parent);
+    public abstract void setParent(AbstractContainerWrapper<?> parent);
 
     @Override
     public void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        AbstractContainerWrapper<?, ?> parent = getParent();
+        AbstractContainerWrapper<?> parent = getParent();
         if (parent != null) {
             checkPositionValid(parent);
             checkObjectAtPosition();
@@ -61,7 +61,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         }
     }
 
-    public void checkPositionValid(AbstractContainerWrapper<?, ?> parent)
+    public void checkPositionValid(AbstractContainerWrapper<?> parent)
         throws BiobankCheckException {
         if (getRow() == null) {
             throw new BiobankCheckException("Position row can't be null");
