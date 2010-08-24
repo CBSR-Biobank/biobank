@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.AbstractContainer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractContainerWrapper<S extends AbstractContainer>
@@ -33,6 +35,22 @@ public abstract class AbstractContainerWrapper<S extends AbstractContainer>
             return new ContainerWrapper(appService, (Container) container);
         }
         return null;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the container does not have an activity status");
+        }
+        checkContainerTypeNotNull();
+    }
+
+    private void checkContainerTypeNotNull() throws BiobankCheckException {
+        if (getContainerType() == null) {
+            throw new BiobankCheckException("This container type should be set");
+        }
     }
 
     public Integer getRowCapacity() {
@@ -119,7 +137,6 @@ public abstract class AbstractContainerWrapper<S extends AbstractContainer>
 
     @Override
     protected void resetInternalFields() {
-        super.resetInternalFields();
         containerType = null;
         activityStatus = null;
     }

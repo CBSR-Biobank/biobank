@@ -97,12 +97,8 @@ public class ContainerWrapper extends AbstractContainerWrapper<Container> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container does not have an activity status");
-        }
+        super.persistChecks();
         checkSiteNotNull();
-        checkContainerTypeNotNull();
         checkLabelUniqueForType();
         checkNoDuplicatesInSite(Container.class, "productBarcode",
             getProductBarcode(), getSite().getId(),
@@ -286,12 +282,6 @@ public class ContainerWrapper extends AbstractContainerWrapper<Container> {
         if (getSite() == null) {
             throw new BiobankCheckException(
                 "This container should be associate to a site");
-        }
-    }
-
-    private void checkContainerTypeNotNull() throws BiobankCheckException {
-        if (getContainerType() == null) {
-            throw new BiobankCheckException("This container type should be set");
         }
     }
 
