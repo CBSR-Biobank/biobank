@@ -15,6 +15,8 @@ import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.DispatchInfo;
+import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Notification;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -43,7 +45,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "containerCollection", "shipmentCollection",
             "sitePvAttrCollection", "street1", "street2", "city", "province",
             "postalCode", "toDispatchInfoCollection",
-            "fromDispatchInfoCollection" };
+            "fromDispatchInfoCollection", "receivedDispatchShipmentCollection",
+            "sentDispatchShipmentCollection", "notificationCollection" };
     }
 
     public String getName() {
@@ -614,4 +617,62 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return wrappers;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getReceivedDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("receivedDispatchShipmentCollection");
+        if (shipCollection == null) {
+            Collection<DispatchShipment> children = wrappedObject
+                .getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipment ship : children) {
+                    shipCollection.add(new DispatchShipmentWrapper(appService,
+                        ship));
+                }
+                propertiesMap.put("receivedDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getSentDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("sentDispatchShipmentCollection");
+        if (shipCollection == null) {
+            Collection<DispatchShipment> children = wrappedObject
+                .getSentDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipment ship : children) {
+                    shipCollection.add(new DispatchShipmentWrapper(appService,
+                        ship));
+                }
+                propertiesMap.put("sentDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<NotificationWrapper> getNotificationCollection() {
+        List<NotificationWrapper> notifCollection = (List<NotificationWrapper>) propertiesMap
+            .get("notificationCollection");
+        if (notifCollection == null) {
+            Collection<Notification> children = wrappedObject
+                .getNotificationCollection();
+            if (children != null) {
+                notifCollection = new ArrayList<NotificationWrapper>();
+                for (Notification notif : children) {
+                    notifCollection.add(new NotificationWrapper(appService,
+                        notif));
+                }
+                propertiesMap.put("notificationCollection", notifCollection);
+            }
+        }
+        return notifCollection;
+    }
 }
