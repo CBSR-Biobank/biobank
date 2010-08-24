@@ -63,6 +63,20 @@ public class DispatchShipmentWrapper extends
         if (getReceiver() == null) {
             throw new BiobankCheckException("Receiver should be set");
         }
+        checkSenderCanSendToReceiver();
+    }
+
+    private void checkSenderCanSendToReceiver() throws BiobankCheckException,
+        ApplicationException {
+        if (getSender() != null && getReceiver() != null) {
+            List<SiteWrapper> possibleReceivers = getSender()
+                .getToSitesDispatchForStudy(null);
+            if (!possibleReceivers.contains(getReceiver())) {
+                throw new BiobankCheckException(getSender().getNameShort()
+                    + " cannot dispatch aliquots to "
+                    + getReceiver().getNameShort());
+            }
+        }
     }
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException {

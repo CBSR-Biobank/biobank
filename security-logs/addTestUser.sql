@@ -1,3 +1,7 @@
-INSERT INTO `csm_user` VALUES (22,'testuser',0,'testuser','testuser','','','','','orDBlaojDQE=','',NULL,NULL,'2010-08-20','');
-INSERT INTO `csm_user_group` VALUES (45,22,5);
+INSERT INTO csm_user (LOGIN_NAME, MIGRATED_FLAG, FIRST_NAME, LAST_NAME, PASSWORD, UPDATE_DATE)
+VALUES ('testuser',0,'testuser','testuser','orDBlaojDQE=',sysdate());
+
+
+INSERT INTO csm_user_group (USER_ID, GROUP_ID) 
+select USER_ID ,5 from csm_user where LOGIN_NAME="testuser"
 

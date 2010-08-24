@@ -603,12 +603,22 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return wrappers;
     }
 
+    /**
+     * if study == null, will get all sites to which can dispatch, for whatever
+     * study
+     */
     public List<SiteWrapper> getToSitesDispatchForStudy(StudyWrapper study)
         throws ApplicationException {
+        String studyString = "";
+        List<Object> params = new ArrayList<Object>();
+        params.add(getId());
+        if (study != null) {
+            studyString = " and info.study.id=?";
+            params.add(study.getId());
+        }
         HQLCriteria criteria = new HQLCriteria(
             "select info.toSiteCollection from " + DispatchInfo.class.getName()
-                + " as info where info.fromSite.id = ? and info.study.id=?",
-            Arrays.asList(new Object[] { getId(), study.getId() }));
+                + " as info where info.fromSite.id = ?" + studyString, params);
         List<Site> results = appService.query(criteria);
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site res : results) {
