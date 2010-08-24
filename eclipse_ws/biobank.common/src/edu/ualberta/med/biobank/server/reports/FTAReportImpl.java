@@ -25,7 +25,7 @@ public class FTAReportImpl extends AbstractReport {
     }
 
     @Override
-    protected List<Object> postProcess(WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         // get the info

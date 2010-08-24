@@ -32,7 +32,7 @@ public class QAAliquotsImpl extends AbstractReport {
     }
 
     @Override
-    protected List<Object> postProcess(WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         results = results.subList(0, numResults);
         List<Object> modifiedResults = new ArrayList<Object>();

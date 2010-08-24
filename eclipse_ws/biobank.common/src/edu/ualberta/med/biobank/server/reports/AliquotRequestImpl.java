@@ -101,7 +101,7 @@ public class AliquotRequestImpl extends AbstractReport {
 
     // Database calls are made so can't use RowPostProcess
     @Override
-    protected List<Object> postProcess(WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {
