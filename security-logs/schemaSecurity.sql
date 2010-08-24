@@ -1,4 +1,3 @@
-
 -- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: biobank2
@@ -262,13 +261,11 @@ INSERT INTO `csm_pg_pe` VALUES (541,1,4,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (542,1,13,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (543,1,3,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (544,1,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (545,11,52,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (556,20,24,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (557,20,10,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (558,20,13,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (559,18,33,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (560,18,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (561,11,53,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -370,8 +367,6 @@ INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
 INSERT INTO `csm_protection_element` VALUES (47,'biobank.cbsr.container.administration','','biobank.cbsr.container.administration','','','',2,'2010-04-26');
 INSERT INTO `csm_protection_element` VALUES (51,'edu.ualberta.med.biobank.model.Log','','edu.ualberta.med.biobank.model.Log','','','',2,'2010-05-25');
-INSERT INTO `csm_protection_element` VALUES (52,'edu.ualberta.med.biobank.model.Site/ID=1/Name=CBSR','','edu.ualberta.med.biobank.model.Site','id','1','',2,'2010-05-27');
-INSERT INTO `csm_protection_element` VALUES (53,'edu.ualberta.med.biobank.model.Site/Calgary-F','Calgary-F','edu.ualberta.med.biobank.model.Site','id','2','',2,'2010-08-11');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -710,4 +705,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-08-19 15:11:26
+-- Dump completed on 2010-08-24 12:28:35
