@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.client.config;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -11,7 +12,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -124,7 +124,7 @@ public class ConfigSite {
         for (PatientVisitWrapper visit : visits) {
             patientVisitDeleteSubObjects(visit);
         }
-        for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+        for (ClinicShipmentWrapper ship : patient.getShipmentCollection()) {
             ship.removePatients(Arrays.asList(patient));
             if (ship.getPatientCollection().size() == 0) {
                 ship.delete();
@@ -166,9 +166,9 @@ public class ConfigSite {
             }
             clinic.reload();
         }
-        List<ShipmentWrapper> shipments = clinic.getShipmentCollection();
+        List<ClinicShipmentWrapper> shipments = clinic.getShipmentCollection();
         if (shipments != null) {
-            for (ShipmentWrapper contact : shipments) {
+            for (ClinicShipmentWrapper contact : shipments) {
                 contact.delete();
             }
             clinic.reload();

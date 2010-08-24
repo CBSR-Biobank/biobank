@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -28,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -48,7 +48,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -65,7 +65,7 @@ public class TestPatientVisit extends TestDatabase {
 
     private ClinicWrapper clinic;
 
-    private ShipmentWrapper shipment;
+    private ClinicShipmentWrapper shipment;
 
     private PatientWrapper patient;
 
@@ -83,7 +83,7 @@ public class TestPatientVisit extends TestDatabase {
             + Utils.getRandomString(10));
         study = StudyHelper.addStudy("Study - Patient Visit Test "
             + Utils.getRandomString(10));
-        clinic = ClinicHelper.addClinic(site, "Clinic - Patient Visit Test "
+        clinic = ClinicHelper.addClinic("Clinic - Patient Visit Test "
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Visit Test");
@@ -91,7 +91,7 @@ public class TestPatientVisit extends TestDatabase {
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        shipment = ClinicShipmentHelper.addShipment(site, clinic, patient);
     }
 
     private void addContainerTypes() throws Exception {
@@ -165,8 +165,8 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
-            patient);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime(), date);

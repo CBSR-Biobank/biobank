@@ -9,13 +9,13 @@ import java.util.Map;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleStorage;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Study;
 
 public class SearchUtils {
@@ -161,7 +161,7 @@ public class SearchUtils {
             add(searchableFields, path, "officeNumber", String.class);
             add(searchableFields, path, "faxNumber", String.class);
             add(searchableFields, path, "emailAddress", String.class);
-        } else if (c == Shipment.class) {
+        } else if (c == ClinicShipment.class) {
             if (collection)
                 path = path.replace('.', '_') + "shipmentCollection.";
             else
@@ -208,7 +208,8 @@ public class SearchUtils {
                 path = path + "site.";
             add(searchableFields, path, "address", Address.class);
             add(searchableFields, path, "clinicCollection", Clinic.class);
-            add(searchableFields, path, "containerCollection", Container.class);
+            add(searchableFields, path, "containerCollection",
+                Container.class);
         } else if (c == Clinic.class) {
             if (collection)
                 path = path.replace('.', '_') + "clinicCollection.";
@@ -217,7 +218,8 @@ public class SearchUtils {
             add(searchableFields, path, "address", Address.class);
             add(searchableFields, path, "site", Site.class);
             add(searchableFields, path, "contactCollection", Contact.class);
-            add(searchableFields, path, "shipmentCollection", Shipment.class);
+            add(searchableFields, path, "shipmentCollection",
+                ClinicShipment.class);
         } else if (c == Aliquot.class) {
             if (collection)
                 path = path.replace('.', '_') + "aliquotCollection.";
@@ -232,7 +234,8 @@ public class SearchUtils {
             add(searchableFields, path, "study", Study.class);
             add(searchableFields, path, "patientVisitCollection",
                 PatientVisit.class);
-            add(searchableFields, path, "shipmentCollection", Shipment.class);
+            add(searchableFields, path, "shipmentCollection",
+                ClinicShipment.class);
         } else if (c == Study.class) {
             if (collection)
                 path = path.replace('.', '_') + "studyCollection.";
@@ -250,7 +253,7 @@ public class SearchUtils {
                 path = path + "patientVisit.";
             add(searchableFields, path, "patient", Patient.class);
             add(searchableFields, path, "aliquotCollection", Aliquot.class);
-            add(searchableFields, path, "shipment", Shipment.class);
+            add(searchableFields, path, "shipment", ClinicShipment.class);
         } else if (c == Contact.class) {
             if (collection)
                 path = path.replace('.', '_') + "contactCollection.";
@@ -258,7 +261,7 @@ public class SearchUtils {
                 path = path + "contact.";
             add(searchableFields, path, "clinic", Clinic.class);
             add(searchableFields, path, "studyCollection", Study.class);
-        } else if (c == Shipment.class) {
+        } else if (c == ClinicShipment.class) {
             if (collection)
                 path = path.replace('.', '_') + "shipmentCollection.";
             else

@@ -9,10 +9,11 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AbstractShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -21,7 +22,7 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -40,7 +41,7 @@ public class TestShippingMethod extends TestDatabase {
     public void testGetShipmentCollection() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -52,16 +53,16 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment1.setShippingMethod(method1);
         shipment1.persist();
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment2.setShippingMethod(method2);
         shipment2.persist();
-        ShipmentWrapper shipment3 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment3.setShippingMethod(method2);
         shipment3.persist();
 
@@ -71,11 +72,12 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertEquals(2, method2.getShipmentCollection().size());
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testGetShipmentCollectionBoolean() throws Exception {
         String name = "testGetShipmentCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -85,28 +87,31 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment1.setShippingMethod(method);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment2.setShippingMethod(method);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
-        ShipmentWrapper shipment3 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment3.setShippingMethod(method);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
         method.reload();
-        List<ShipmentWrapper> shipments = method.getShipmentCollection(true);
+        // FIXME we should have a method in ShippingMethodWrapper to retrieve
+        // shipments of type ClinicShipment and not all of them
+        List<AbstractShipmentWrapper> shipments = method
+            .getShipmentCollection(true);
         if (shipments.size() > 1) {
             for (int i = 0; i < shipments.size() - 1; i++) {
-                ShipmentWrapper s1 = shipments.get(i);
-                ShipmentWrapper s2 = shipments.get(i + 1);
+                AbstractShipmentWrapper s1 = shipments.get(i);
+                AbstractShipmentWrapper s2 = shipments.get(i + 1);
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
             }
         }
@@ -204,14 +209,14 @@ public class TestShippingMethod extends TestDatabase {
             name, false);
 
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment1.setShippingMethod(method);
         shipment1.persist();
         method.reload();
@@ -282,15 +287,15 @@ public class TestShippingMethod extends TestDatabase {
 
         String name = "testIsUsed" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment1.setShippingMethod(methods[0]);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
@@ -298,8 +303,8 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertTrue(methods[0].isUsed());
         Assert.assertFalse(methods[1].isUsed());
 
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
-            patient1);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
+            clinic, patient1);
         shipment2.setShippingMethod(methods[1]);
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();

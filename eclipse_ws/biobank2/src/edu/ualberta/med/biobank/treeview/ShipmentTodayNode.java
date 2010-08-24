@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode {
@@ -31,7 +31,7 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return ShipmentWrapper.getTodayShipments(
+        return ClinicShipmentWrapper.getTodayShipments(
             SessionManager.getAppService(), SessionManager.getInstance()
                 .getCurrentSite());
 
@@ -39,8 +39,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
 
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
-        if (child instanceof ShipmentWrapper) {
-            return parent.equals(((ShipmentWrapper) child).getClinic());
+        if (child instanceof ClinicShipmentWrapper) {
+            return parent.equals(((ClinicShipmentWrapper) child).getClinic());
         }
         return false;
     }

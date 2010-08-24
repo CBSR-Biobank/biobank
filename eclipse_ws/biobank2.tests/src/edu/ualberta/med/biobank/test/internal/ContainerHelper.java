@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Arrays;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -65,7 +66,7 @@ public class ContainerHelper extends DbHelper {
         Integer row, Integer col) throws Exception {
         ContainerWrapper container = newContainer(label, barcode, parent, site,
             type);
-        container.setPosition(row, col);
+        container.setPosition(new RowColPos(row, col));
         return container;
     }
 
@@ -132,7 +133,7 @@ public class ContainerHelper extends DbHelper {
         ContainerWrapper container = addContainer(label, name, null, site, type);
         if (label == null) {
             container.setParent(parent);
-            container.setPosition(0, 0);
+            container.setPosition(new RowColPos(0, 0));
         }
         container.persist();
         return container;

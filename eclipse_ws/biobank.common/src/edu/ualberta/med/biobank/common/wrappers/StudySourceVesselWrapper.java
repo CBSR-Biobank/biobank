@@ -80,22 +80,15 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
         return ss;
     }
 
-    protected void setSourceVessel(SourceVessel ss) {
-        if (ss == null)
-            this.ss = null;
-        else
-            this.ss = new SourceVesselWrapper(appService, ss);
-        SourceVessel oldSs = wrappedObject.getSourceVessel();
-        wrappedObject.setSourceVessel(ss);
-        propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, ss);
-    }
-
     public void setSourceVessel(SourceVesselWrapper ss) {
-        if (ss == null) {
-            setSourceVessel((SourceVessel) null);
-        } else {
-            setSourceVessel(ss.getWrappedObject());
+        this.ss = ss;
+        SourceVessel oldSs = wrappedObject.getSourceVessel();
+        SourceVessel newSs = null;
+        if (ss != null) {
+            newSs = ss.getWrappedObject();
         }
+        wrappedObject.setSourceVessel(newSs);
+        propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, newSs);
     }
 
     public void setNeedTimeDrawn(Boolean needTimeDrawn) {

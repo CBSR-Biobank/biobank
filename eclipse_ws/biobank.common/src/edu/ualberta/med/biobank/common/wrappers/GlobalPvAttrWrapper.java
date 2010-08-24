@@ -67,19 +67,16 @@ public class GlobalPvAttrWrapper extends ModelWrapper<GlobalPvAttr> {
         return pvAttrType;
     }
 
-    public void setPvAttrType(PvAttrType pvAttrType) {
-        if (pvAttrType == null)
-            this.pvAttrType = null;
-        else
-            this.pvAttrType = new PvAttrTypeWrapper(appService, pvAttrType);
-        PvAttrType oldPvInfo = wrappedObject.getPvAttrType();
-        wrappedObject.setPvAttrType(pvAttrType);
-        propertyChangeSupport.firePropertyChange("pvAttrType", oldPvInfo,
-            pvAttrType);
-    }
-
     public void setPvAttrType(PvAttrTypeWrapper pvAttrType) {
-        setPvAttrType(pvAttrType.getWrappedObject());
+        this.pvAttrType = pvAttrType;
+        PvAttrType oldPvInfo = wrappedObject.getPvAttrType();
+        PvAttrType newPvInfo = null;
+        if (pvAttrType != null) {
+            newPvInfo = pvAttrType.getWrappedObject();
+        }
+        wrappedObject.setPvAttrType(newPvInfo);
+        propertyChangeSupport.firePropertyChange("pvAttrType", oldPvInfo,
+            newPvInfo);
     }
 
     public String getTypeName() {

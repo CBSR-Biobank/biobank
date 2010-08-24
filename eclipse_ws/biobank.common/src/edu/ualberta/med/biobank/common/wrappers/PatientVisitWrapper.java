@@ -16,11 +16,11 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,13 +36,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private PatientWrapper patient = null;
 
-    private ShipmentWrapper shipment;
+    private ClinicShipmentWrapper shipment;
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
-        studyPvAttrMap = null;
-        pvAttrMap = null;
     }
 
     public PatientVisitWrapper(WritableApplicationService appService) {
@@ -392,20 +390,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public ShipmentWrapper getShipment() {
+    public ClinicShipmentWrapper getShipment() {
         if (shipment == null) {
-            Shipment s = wrappedObject.getShipment();
+            ClinicShipment s = wrappedObject.getShipment();
             if (s == null)
                 return null;
-            shipment = new ShipmentWrapper(appService, s);
+            shipment = new ClinicShipmentWrapper(appService, s);
         }
         return shipment;
     }
 
-    public void setShipment(ShipmentWrapper s) {
+    public void setShipment(ClinicShipmentWrapper s) {
         this.shipment = s;
-        Shipment oldShipment = wrappedObject.getShipment();
-        Shipment newShipment = s.getWrappedObject();
+        ClinicShipment oldShipment = wrappedObject.getShipment();
+        ClinicShipment newShipment = s.getWrappedObject();
         wrappedObject.setShipment(newShipment);
         propertyChangeSupport.firePropertyChange("shipment", oldShipment,
             newShipment);
@@ -556,7 +554,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         pvAttrMap = null;
         studyPvAttrMap = null;
         deletedPvSourceVessels.clear();

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AbstractContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -50,19 +51,16 @@ public class AliquotPositionWrapper extends
         return AliquotPosition.class;
     }
 
-    public void setAliquot(Aliquot aliquot) {
-        if (aliquot == null)
-            this.aliquot = null;
-        else
-            this.aliquot = new AliquotWrapper(appService, aliquot);
-        Aliquot oldAliquot = wrappedObject.getAliquot();
-        wrappedObject.setAliquot(aliquot);
-        propertyChangeSupport
-            .firePropertyChange("aliquot", oldAliquot, aliquot);
-    }
-
     public void setAliquot(AliquotWrapper aliquot) {
-        setAliquot(aliquot.getWrappedObject());
+        this.aliquot = aliquot;
+        Aliquot oldAliquot = wrappedObject.getAliquot();
+        Aliquot newAliquot = null;
+        if (aliquot != null) {
+            newAliquot = aliquot.getWrappedObject();
+        }
+        wrappedObject.setAliquot(newAliquot);
+        propertyChangeSupport.firePropertyChange("aliquot", oldAliquot,
+            newAliquot);
     }
 
     public AliquotWrapper getAliquot() {
@@ -75,23 +73,16 @@ public class AliquotPositionWrapper extends
         return aliquot;
     }
 
-    private void setContainer(Container container) {
-        if (container == null)
-            this.container = null;
-        else
-            this.container = new ContainerWrapper(appService, container);
-        Container oldContainer = wrappedObject.getContainer();
-        wrappedObject.setContainer(container);
-        propertyChangeSupport.firePropertyChange("container", oldContainer,
-            container);
-    }
-
     private void setContainer(ContainerWrapper container) {
-        if (container == null) {
-            setContainer((Container) null);
-        } else {
-            setContainer(container.getWrappedObject());
+        this.container = container;
+        Container oldContainer = wrappedObject.getContainer();
+        Container newContainer = null;
+        if (container != null) {
+            newContainer = container.getWrappedObject();
         }
+        wrappedObject.setContainer(newContainer);
+        propertyChangeSupport.firePropertyChange("container", oldContainer,
+            newContainer);
     }
 
     private ContainerWrapper getContainer() {
@@ -111,26 +102,29 @@ public class AliquotPositionWrapper extends
     }
 
     @Override
-    public ContainerWrapper getParent() {
+    public AbstractContainerWrapper<?> getParent() {
         return getContainer();
     }
 
     @Override
-    public void setParent(ContainerWrapper parent) {
-        setContainer(parent);
+    public void setParent(AbstractContainerWrapper<?> parent) {
+        assert parent instanceof ContainerWrapper;
+        if (parent instanceof ContainerWrapper) {
+            setContainer((ContainerWrapper) parent);
+        }
     }
 
     @Override
     protected void checkObjectAtPosition() throws BiobankCheckException,
         ApplicationException {
-        ContainerWrapper parent = getParent();
+        AbstractContainerWrapper<?> parent = getParent();
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !
-            HQLCriteria criteria = new HQLCriteria("from "
-                + AliquotPosition.class.getName()
-                + " where container.id=? and row=? and col=?", Arrays
-                .asList(new Object[] { parent.getId(), getRow(), getCol() }));
+            HQLCriteria criteria = new HQLCriteria(
+                "from " + AliquotPosition.class.getName()
+                    + " where container.id=? and row=? and col=?",
+                Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
             List<AliquotPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
                 return;
@@ -143,12 +137,10 @@ public class AliquotPositionWrapper extends
                     + " is not available.");
             }
         }
-
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalFields() {
         aliquot = null;
         container = null;
     }

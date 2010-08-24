@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -24,8 +23,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerWrapper extends
-    AbstractPositionHolder<Container, ContainerPosition> {
+public class ContainerWrapper extends AbstractContainerWrapper<Container> {
+
+    private AbstractObjectWithPositionManagement<ContainerPosition> objectWithPositionManagement;
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
@@ -33,36 +33,72 @@ public class ContainerWrapper extends
 
     private SiteWrapper site;
 
-    private ContainerTypeWrapper containerType;
-
-    private ActivityStatusWrapper activityStatus;
-
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
+        initManagement();
     }
 
     public ContainerWrapper(WritableApplicationService appService) {
         super(appService);
+        initManagement();
+    }
+
+    private void initManagement() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<ContainerPosition>() {
+
+            @Override
+            protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
+                boolean initIfNoPosition) {
+                if (nullPositionSet) {
+                    if (rowColPosition != null) {
+                        ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                            appService);
+                        posWrapper.setRow(rowColPosition.row);
+                        posWrapper.setCol(rowColPosition.col);
+                        posWrapper.setContainer(ContainerWrapper.this);
+                        wrappedObject
+                            .setPosition(posWrapper.getWrappedObject());
+                        return posWrapper;
+                    }
+                } else {
+                    ContainerPosition pos = wrappedObject.getPosition();
+                    if (pos != null) {
+                        return new ContainerPositionWrapper(appService, pos);
+                    } else if (initIfNoPosition) {
+                        ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                            appService);
+                        posWrapper.setContainer(ContainerWrapper.this);
+                        wrappedObject
+                            .setPosition(posWrapper.getWrappedObject());
+                        return posWrapper;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public SiteWrapper getSite() {
+                return ContainerWrapper.this.getSite();
+            }
+        };
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "productBarcode", "position", "activityStatus",
-            "site", "label", "temperature", "comment",
-            "aliquotPositionCollection", "aliquots", "childPositionCollection",
-            "children", "containerType", "parent" };
+        String[] names = super.getPropertyChangeNames();
+        List<String> namesList = new ArrayList<String>(Arrays.asList(names));
+        namesList.addAll(Arrays.asList("position", "site", "label",
+            "temperature", "aliquotPositionCollection", "aliquots",
+            "childPositionCollection", "children", "parent"));
+        return namesList.toArray(new String[namesList.size()]);
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container does not have an activity status");
-        }
+        super.persistChecks();
         checkSiteNotNull();
-        checkContainerTypeNotNull();
         checkLabelUniqueForType();
         checkNoDuplicatesInSite(Container.class, "productBarcode",
             getProductBarcode(), getSite().getId(),
@@ -72,12 +108,12 @@ public class ContainerWrapper extends
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
         checkHasPosition();
-        super.persistChecks();
+        objectWithPositionManagement.persistChecks();
     }
 
     private void checkHasPosition() throws BiobankCheckException {
         if ((getContainerType() != null)
-            && !getContainerType().getTopLevel().booleanValue()
+            && !Boolean.TRUE.equals(getContainerType().getTopLevel())
             && (getPosition() == null)) {
             throw new BiobankCheckException(
                 "A child container must have a position");
@@ -89,7 +125,7 @@ public class ContainerWrapper extends
      */
     private void checkTopAndParent() throws BiobankCheckException {
         if ((getParent() != null) && (getContainerType() != null)
-            && getContainerType().getTopLevel().booleanValue()) {
+            && Boolean.TRUE.equals(getContainerType().getTopLevel())) {
             throw new BiobankCheckException(
                 "A top level container can't have a parent");
         }
@@ -105,6 +141,7 @@ public class ContainerWrapper extends
 
     @Override
     public void persist() throws Exception {
+        objectWithPositionManagement.persist();
         super.persist();
         persistPath();
     }
@@ -154,6 +191,10 @@ public class ContainerWrapper extends
         persistAliquots();
     }
 
+    public RowColPos getPosition() {
+        return objectWithPositionManagement.getPosition();
+    }
+
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
@@ -163,6 +204,22 @@ public class ContainerWrapper extends
             }
         }
         return null;
+    }
+
+    public void setPosition(RowColPos rcp) {
+        objectWithPositionManagement.setPosition(rcp);
+    }
+
+    public ContainerWrapper getParent() {
+        return (ContainerWrapper) objectWithPositionManagement.getParent();
+    }
+
+    public void setParent(AbstractContainerWrapper<?> container) {
+        objectWithPositionManagement.setParent(container);
+    }
+
+    public boolean hasParent() {
+        return objectWithPositionManagement.hasParent();
     }
 
     private void persistAliquots() throws Exception {
@@ -228,12 +285,6 @@ public class ContainerWrapper extends
         }
     }
 
-    private void checkContainerTypeNotNull() throws BiobankCheckException {
-        if (getContainerType() == null) {
-            throw new BiobankCheckException("This container type should be set");
-        }
-    }
-
     @Override
     public Class<Container> getWrappedClass() {
         return Container.class;
@@ -252,17 +303,6 @@ public class ContainerWrapper extends
 
     public String getLabel() {
         return wrappedObject.getLabel();
-    }
-
-    public String getProductBarcode() {
-        return wrappedObject.getProductBarcode();
-    }
-
-    public void setProductBarcode(String barcode) {
-        String oldBarcode = getProductBarcode();
-        wrappedObject.setProductBarcode(barcode);
-        propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
-            barcode);
     }
 
     private ContainerPathWrapper getContainerPath() throws Exception {
@@ -371,90 +411,15 @@ public class ContainerWrapper extends
         return rcp;
     }
 
-    public Integer getRowCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getRowCapacity();
-    }
-
-    public Integer getColCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getColCapacity();
-    }
-
-    public void setContainerType(ContainerTypeWrapper containerType) {
-        if (containerType == null) {
-            setContainerType((ContainerType) null);
-        } else {
-            setContainerType(containerType.getWrappedObject());
-        }
-    }
-
-    protected void setContainerType(ContainerType containerType) {
-        if (containerType == null)
-            this.containerType = null;
-        else
-            this.containerType = new ContainerTypeWrapper(appService,
-                containerType);
-        ContainerType oldType = wrappedObject.getContainerType();
-        wrappedObject.setContainerType(containerType);
-        propertyChangeSupport.firePropertyChange("containerType", oldType,
-            containerType);
-    }
-
-    public ContainerTypeWrapper getContainerType() {
-        if (containerType == null) {
-            ContainerType c = wrappedObject.getContainerType();
-            if (c == null)
-                return null;
-            containerType = new ContainerTypeWrapper(appService, c);
-        }
-        return containerType;
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-        }
-        return activityStatus;
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
-    }
-
-    protected void setSite(Site site) {
-        if (site == null)
-            this.site = null;
-        else
-            this.site = new SiteWrapper(appService, site);
+    public void setSite(SiteWrapper site) {
+        this.site = site;
         Site oldSite = wrappedObject.getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("site", oldSite, site);
-    }
-
-    public void setSite(SiteWrapper siteWrapper) {
-        if (siteWrapper == null) {
-            setSite((Site) null);
-        } else {
-            setSite(siteWrapper.getWrappedObject());
+        Site newSite = null;
+        if (site != null) {
+            newSite = site.getWrappedObject();
         }
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
     public void setLabel(String label) {
@@ -534,7 +499,7 @@ public class ContainerWrapper extends
                     + row + ":" + col + ")");
             }
         }
-        aliquot.setPosition(row, col);
+        aliquot.setPosition(new RowColPos(row, col));
         aliquot.setParent(this);
         aliquots.put(new RowColPos(row, col), aliquot);
         addedAliquots.add(aliquot);
@@ -694,7 +659,7 @@ public class ContainerWrapper extends
                     + ")");
             }
         }
-        child.setPosition(row, col);
+        child.setPosition(new RowColPos(row, col));
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
         addedChildren.add(child);
@@ -724,17 +689,6 @@ public class ContainerWrapper extends
             throw new WrapperException("sample type is null");
         }
         return getContainerType().getSampleTypeCollection().contains(type);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setComment(String comment) {
-        String oldComment = wrappedObject.getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
     }
 
     public void moveAliquots(ContainerWrapper destination) throws Exception {
@@ -845,10 +799,23 @@ public class ContainerWrapper extends
         return transformToWrapperList(appService, containers);
     }
 
+    /**
+     * Retrieve a list of empty containers in a specific site. These containers
+     * should be able to hold aliquots of type sampleTypes and should have a row
+     * capacity equals or greater than minRwCapacity and a column capacity equal
+     * or greater than minColCapacity.
+     * 
+     * @param appService
+     * @param siteWrapper
+     * @param sampleTypes list of sample types the container should be able to
+     *            contain
+     * @param minRowCapacity min row capacity
+     * @param minColCapacity min col capacity
+     */
     public static List<ContainerWrapper> getEmptyContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
-        List<SampleTypeWrapper> sampleTypes, Integer rowCapacity,
-        Integer colCapacity) throws ApplicationException {
+        List<SampleTypeWrapper> sampleTypes, Integer minRowCapacity,
+        Integer minColCapacity) throws ApplicationException {
         String typesIds = "(";
         for (int i = 0; i < sampleTypes.size(); i++) {
             SampleTypeWrapper st = sampleTypes.get(i);
@@ -867,8 +834,8 @@ public class ContainerWrapper extends
             + ContainerType.class.getName() + " as ct"
             + " left join ct.sampleTypeCollection as sampleType"
             + " where sampleType.id in " + typesIds + ")",
-            Arrays.asList(new Object[] { siteWrapper.getId(), rowCapacity,
-                colCapacity }));
+            Arrays.asList(new Object[] { siteWrapper.getId(), minRowCapacity,
+                minColCapacity }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }
@@ -953,10 +920,10 @@ public class ContainerWrapper extends
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
             ContainerWrapper newContainer = new ContainerWrapper(appService);
-            newContainer.setContainerType(type.getWrappedObject());
-            newContainer.setSite(getSite().getWrappedObject());
+            newContainer.setContainerType(type);
+            newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
-            newContainer.setPosition(i, j);
+            newContainer.setPosition(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
@@ -1016,52 +983,11 @@ public class ContainerWrapper extends
     }
 
     @Override
-    protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
-        boolean initIfNoPosition) {
-        if (nullPositionSet) {
-            if (rowColPosition != null) {
-                ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
-                    appService);
-                posWrapper.setRow(rowColPosition.row);
-                posWrapper.setCol(rowColPosition.col);
-                posWrapper.setContainer(this);
-                wrappedObject.setPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        } else {
-            ContainerPosition pos = wrappedObject.getPosition();
-            if (pos != null) {
-                return new ContainerPositionWrapper(appService, pos);
-            } else if (initIfNoPosition) {
-                ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
-                    appService);
-                posWrapper.setContainer(this);
-                wrappedObject.setPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        }
-        return null;
-    }
-
-    // /**
-    // * init this wrapper with the given containerWrapper.
-    // *
-    // * @throws WrapperException
-    // */
-    // public void initObjectWith(ContainerWrapper containerWrapper)
-    // throws WrapperException {
-    // if (containerWrapper == null) {
-    // throw new WrapperException(
-    // "Cannot init internal object with a null container");
-    // }
-    // setWrappedObject(containerWrapper.wrappedObject);
-    // }
-
-    @Override
-    protected void resetInternalField() {
-        super.resetInternalField();
+    protected void resetInternalFields() {
+        super.resetInternalFields();
         addedChildren.clear();
         addedAliquots.clear();
+        site = null;
     }
 
     @Override
@@ -1070,16 +996,12 @@ public class ContainerWrapper extends
             && SecurityHelper.isContainerAdministrator(appService);
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        site = null;
-        containerType = null;
-        activityStatus = null;
-    }
-
+    /**
+     * @return true if there is no free position for a new child container
+     */
     public boolean isContainerFull() {
         return (this.getChildCount() == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
     }
+
 }

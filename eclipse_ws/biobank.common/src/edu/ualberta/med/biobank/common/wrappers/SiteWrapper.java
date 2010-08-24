@@ -11,10 +11,12 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.DispatchInfo;
+import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Notification;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -42,7 +44,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "address", "clinicCollection", "siteCollection",
             "containerCollection", "shipmentCollection",
             "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode" };
+            "postalCode", "toDispatchInfoCollection",
+            "fromDispatchInfoCollection", "receivedDispatchShipmentCollection",
+            "sentDispatchShipmentCollection", "notificationCollection" };
     }
 
     public String getName() {
@@ -236,9 +240,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if ((getClinicCollection() != null && getClinicCollection().size() > 0)
-            || (getContainerCollection() != null && getContainerCollection()
-                .size() > 0)
+        if ((getContainerCollection() != null && getContainerCollection()
+            .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
                 .size() > 0)) {
             throw new BiobankCheckException(
@@ -297,52 +300,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
-        List<ClinicWrapper> clinicCollection = (List<ClinicWrapper>) propertiesMap
-            .get("clinicCollection");
-        if (clinicCollection == null) {
-            Collection<Clinic> children = wrappedObject.getClinicCollection();
-            if (children != null) {
-                clinicCollection = new ArrayList<ClinicWrapper>();
-                for (Clinic clinic : children) {
-                    clinicCollection.add(new ClinicWrapper(appService, clinic));
-                }
-                propertiesMap.put("clinicCollection", clinicCollection);
-            }
-        }
-        if ((clinicCollection != null) && sort)
-            Collections.sort(clinicCollection);
-        return clinicCollection;
+        return null;
     }
 
+    @Deprecated
     public List<ClinicWrapper> getClinicCollection() {
-        return getClinicCollection(true);
+        return null;
     }
 
+    @Deprecated
     public void addClinics(List<ClinicWrapper> clinics) {
-        if (clinics != null && clinics.size() > 0) {
-            Collection<Clinic> allClinicObjects = new HashSet<Clinic>();
-            List<ClinicWrapper> allClinicWrappers = new ArrayList<ClinicWrapper>();
-            // already added clinics
-            List<ClinicWrapper> currentList = getClinicCollection();
-            if (currentList != null) {
-                for (ClinicWrapper clinic : currentList) {
-                    allClinicObjects.add(clinic.getWrappedObject());
-                    allClinicWrappers.add(clinic);
-                }
-            }
-            // new clinics
-            for (ClinicWrapper clinic : clinics) {
-                allClinicObjects.add(clinic.getWrappedObject());
-                allClinicWrappers.add(clinic);
-            }
-            Collection<Clinic> oldClinics = wrappedObject.getClinicCollection();
-            wrappedObject.setClinicCollection(allClinicObjects);
-            propertyChangeSupport.firePropertyChange("clinicCollection",
-                oldClinics, allClinicObjects);
-            propertiesMap.put("clinicCollection", allClinicWrappers);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -474,16 +442,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
-        List<ShipmentWrapper> pvCollection = (List<ShipmentWrapper>) propertiesMap
+    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort) {
+        List<ClinicShipmentWrapper> pvCollection = (List<ClinicShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (pvCollection == null) {
-            Collection<Shipment> children = wrappedObject
+            Collection<ClinicShipment> children = wrappedObject
                 .getShipmentCollection();
             if (children != null) {
-                pvCollection = new ArrayList<ShipmentWrapper>();
-                for (Shipment pv : children) {
-                    pvCollection.add(new ShipmentWrapper(appService, pv));
+                pvCollection = new ArrayList<ClinicShipmentWrapper>();
+                for (ClinicShipment pv : children) {
+                    pvCollection.add(new ClinicShipmentWrapper(appService, pv));
                 }
                 propertiesMap.put("shipmentCollection", pvCollection);
             }
@@ -493,7 +461,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvCollection;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection() {
+    public List<ClinicShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(true);
     }
 
@@ -516,7 +484,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public Long getShipmentCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where clinic.site.id = ?",
+            + ClinicShipment.class.getName() + " where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -617,11 +585,94 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    public void reload() throws Exception {
-        super.reload();
+    public void resetInternalFields() {
         activityStatus = null;
         address = null;
-
     }
 
+    public List<StudyWrapper> getDispatchStudies() throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("select info.study from "
+            + DispatchInfo.class.getName()
+            + " as info where info.fromSite.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Study> results = appService.query(criteria);
+        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
+        for (Study res : results) {
+            wrappers.add(new StudyWrapper(appService, res));
+        }
+        return wrappers;
+    }
+
+    public List<SiteWrapper> getToSitesDispatchForStudy(StudyWrapper study)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.toSiteCollection from " + DispatchInfo.class.getName()
+                + " as info where info.fromSite.id = ? and info.study.id=?",
+            Arrays.asList(new Object[] { getId(), study.getId() }));
+        List<Site> results = appService.query(criteria);
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        for (Site res : results) {
+            wrappers.add(new SiteWrapper(appService, res));
+        }
+        return wrappers;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getReceivedDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("receivedDispatchShipmentCollection");
+        if (shipCollection == null) {
+            Collection<DispatchShipment> children = wrappedObject
+                .getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipment ship : children) {
+                    shipCollection.add(new DispatchShipmentWrapper(appService,
+                        ship));
+                }
+                propertiesMap.put("receivedDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getSentDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("sentDispatchShipmentCollection");
+        if (shipCollection == null) {
+            Collection<DispatchShipment> children = wrappedObject
+                .getSentDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipment ship : children) {
+                    shipCollection.add(new DispatchShipmentWrapper(appService,
+                        ship));
+                }
+                propertiesMap.put("sentDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<NotificationWrapper> getNotificationCollection() {
+        List<NotificationWrapper> notifCollection = (List<NotificationWrapper>) propertiesMap
+            .get("notificationCollection");
+        if (notifCollection == null) {
+            Collection<Notification> children = wrappedObject
+                .getNotificationCollection();
+            if (children != null) {
+                notifCollection = new ArrayList<NotificationWrapper>();
+                for (Notification notif : children) {
+                    notifCollection.add(new NotificationWrapper(appService,
+                        notif));
+                }
+                propertiesMap.put("notificationCollection", notifCollection);
+            }
+        }
+        return notifCollection;
+    }
 }

@@ -21,13 +21,13 @@ import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
@@ -40,7 +40,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -373,7 +373,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), null, site, type);
-        container.setPosition(0, 0);
+        container.setPosition(new RowColPos(0, 0));
 
         // should have a parent
         try {
@@ -406,7 +406,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), parent, site, type);
-        container.setPosition(10, 10);
+        container.setPosition(new RowColPos(10, 10));
         try {
             container.persist();
             Assert.fail("position not ok in parent container");
@@ -414,12 +414,12 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setPosition(0, 0);
+        container.setPosition(new RowColPos(0, 0));
         container.persist();
 
         ContainerWrapper container2 = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), null, site, type);
-        container2.setPosition(0, 0);
+        container2.setPosition(new RowColPos(0, 0));
         container2.setParent(parent);
         container2.setContainerType(type);
         try {
@@ -515,7 +515,8 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPosition(top.getRowCapacity() + 1, top.getColCapacity() + 1);
+        child.setPosition(new RowColPos(top.getRowCapacity() + 1, top
+            .getColCapacity() + 1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
@@ -523,7 +524,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPosition(-1, -1);
+        child.setPosition(new RowColPos(-1, -1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
@@ -860,7 +861,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
+            clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
         return pv;
@@ -905,7 +907,7 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testGetSamples() throws Exception {
+    public void testGetAliquots() throws Exception {
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getAllSampleTypes(appService, true);
         List<SampleTypeWrapper> selectedSampleTypes = TestCommon
@@ -926,7 +928,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
+            clinic, patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
@@ -1656,4 +1659,148 @@ public class TestContainer extends TestDatabase {
 
         container.initObjectWith(containerMap.get("Top"));
     }
+
+    @Test
+    public void testGetChildCount() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        ContainerWrapper child = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site,
+            containerTypeMap.get("ChildCtL1"));
+        top.addChild(0, 0, child);
+        ContainerWrapper child2 = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site,
+            containerTypeMap.get("ChildCtL1"));
+        top.addChild(0, 1, child2);
+        top.persist();
+        top.reload();
+        Assert.assertEquals(2, top.getChildCount());
+    }
+
+    @Test
+    public void testMoveAliquots() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
+            site, "Aliquot Container Type", "ACT", 1, 4, 9, false);
+        childType.addSampleTypes(SampleTypeWrapper.getAllSampleTypes(
+            appService, false));
+        childType.persist();
+        top.getContainerType().addChildContainerTypes(Arrays.asList(childType));
+        top.getContainerType().persist();
+
+        ContainerWrapper child = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType);
+        top.addChild(0, 0, child);
+        ContainerWrapper child2 = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType);
+        top.addChild(0, 1, child2);
+        top.persist();
+
+        Assert.assertEquals(0, child.getAliquots() == null ? 0 : child
+            .getAliquots().size());
+        Assert.assertEquals(0, child2.getAliquots() == null ? 0 : child2
+            .getAliquots().size());
+
+        StudyWrapper study = StudyHelper.addStudy("Study1");
+        ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
+        ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
+        PatientWrapper patient = PatientHelper.addPatient("1000", study);
+        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
+            clinic, patient);
+        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
+
+        SampleTypeWrapper st = SampleTypeWrapper.getAllSampleTypes(appService,
+            false).get(0);
+        AliquotHelper.addAliquot(st, child, pv, 0, 0);
+        AliquotHelper.addAliquot(st, child, pv, 0, 1);
+        AliquotHelper.addAliquot(st, child, pv, 0, 2);
+
+        Assert.assertEquals(3, child.getAliquots() == null ? 0 : child
+            .getAliquots().size());
+        Assert.assertEquals(0, child2.getAliquots() == null ? 0 : child2
+            .getAliquots().size());
+
+        child.moveAliquots(child2);
+        child.reload();
+        child2.reload();
+
+        Assert.assertEquals(0, child.getAliquots() == null ? 0 : child
+            .getAliquots().size());
+        Assert.assertEquals(3, child2.getAliquots() == null ? 0 : child2
+            .getAliquots().size());
+    }
+
+    @Test
+    public void testGetEmptyContainersHoldingSampleType() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+            .getAllSampleTypes(appService, false);
+
+        ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
+            site, "Aliquot Container Type", "ACT", 1, 4, 9, false);
+        childType.addSampleTypes(Arrays.asList(allSampleTypes.get(0)));
+        childType.persist();
+        ContainerTypeWrapper childType2 = ContainerTypeHelper.addContainerType(
+            site, "Aliquot Container Type2", "ACT2", 1, 4, 9, false);
+        childType2.addSampleTypes(Arrays.asList(allSampleTypes.get(1)));
+        childType2.persist();
+        top.getContainerType().addChildContainerTypes(
+            Arrays.asList(childType, childType2));
+        top.getContainerType().persist();
+
+        ContainerWrapper child = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType);
+        top.addChild(0, 0, child);
+        ContainerWrapper child2 = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType);
+        top.addChild(0, 1, child2);
+        ContainerWrapper child3 = ContainerHelper.newContainer(null,
+            TestCommon.getNewBarcode(r), top, site, childType2);
+        top.addChild(0, 2, child3);
+        top.persist();
+
+        List<ContainerWrapper> emptyContainers = ContainerWrapper
+            .getEmptyContainersHoldingSampleType(appService, site,
+                Arrays.asList(allSampleTypes.get(0)), 2, 2);
+        Assert.assertEquals(2, emptyContainers.size());
+        Assert.assertTrue(emptyContainers.contains(child));
+        Assert.assertTrue(emptyContainers.contains(child2));
+
+        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSampleType(
+            appService, site, Arrays.asList(allSampleTypes.get(1)), 2, 2);
+        Assert.assertEquals(1, emptyContainers.size());
+        Assert.assertTrue(emptyContainers.contains(child3));
+
+        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSampleType(
+            appService, site, Arrays.asList(allSampleTypes.get(0)), 5, 2);
+        Assert.assertEquals(0, emptyContainers.size());
+
+        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSampleType(
+            appService, site, Arrays.asList(allSampleTypes.get(1)), 2, 10);
+        Assert.assertEquals(0, emptyContainers.size());
+    }
+
+    @Test
+    public void testIsContainerFull() throws Exception {
+        ContainerWrapper top = containerMap.get("Top");
+
+        Assert.assertFalse(top.isContainerFull());
+
+        for (int row = 0; row < CONTAINER_TOP_ROWS; row++) {
+            for (int col = 0; col < CONTAINER_TOP_COLS; col++) {
+                ContainerWrapper child = ContainerHelper.newContainer(null,
+                    TestCommon.getNewBarcode(r), top, site,
+                    containerTypeMap.get("ChildCtL1"));
+                top.addChild(row, col, child);
+            }
+        }
+        top.persist();
+        top.reload();
+
+        Assert.assertTrue(top.isContainerFull());
+    }
+
 }

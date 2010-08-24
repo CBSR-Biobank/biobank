@@ -45,9 +45,7 @@ public class StudyGroup extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addStudy(
-                        StudyGroup.this.getParentFromClass(SiteAdapter.class),
-                        false);
+                    addStudy(SessionManager.getInstance().getSession(), false);
                 }
             });
         }
@@ -90,10 +88,11 @@ public class StudyGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addStudy(SiteAdapter siteAdapter, boolean hasPreviousForm) {
-        StudyWrapper study = new StudyWrapper(siteAdapter.getAppService());
-        StudyAdapter adapter = new StudyAdapter(SessionManager.getInstance()
-            .getSession().getStudiesGroupNode(), study);
+    public static void addStudy(SessionAdapter sessionAdapter,
+        boolean hasPreviousForm) {
+        StudyWrapper study = new StudyWrapper(sessionAdapter.getAppService());
+        StudyAdapter adapter = new StudyAdapter(
+            sessionAdapter.getStudiesGroupNode(), study);
         adapter.openEntryForm(hasPreviousForm);
     }
 

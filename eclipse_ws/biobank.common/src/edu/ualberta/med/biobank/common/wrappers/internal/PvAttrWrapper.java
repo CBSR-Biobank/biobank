@@ -53,19 +53,16 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
         return studyPvAttr;
     }
 
-    public void setStudyPvAttr(StudyPvAttr studyPvAttr) {
-        if (studyPvAttr == null)
-            this.studyPvAttr = null;
-        else
-            this.studyPvAttr = new StudyPvAttrWrapper(appService, studyPvAttr);
-        StudyPvAttr oldInfo = wrappedObject.getStudyPvAttr();
-        wrappedObject.setStudyPvAttr(studyPvAttr);
-        propertyChangeSupport.firePropertyChange("studyPvAttr", oldInfo,
-            studyPvAttr);
-    }
-
     public void setStudyPvAttr(StudyPvAttrWrapper studyPvAttr) {
-        setStudyPvAttr(studyPvAttr.getWrappedObject());
+        this.studyPvAttr = studyPvAttr;
+        StudyPvAttr oldPvAttr = wrappedObject.getStudyPvAttr();
+        StudyPvAttr newPvAttr = null;
+        if (studyPvAttr != null) {
+            newPvAttr = studyPvAttr.getWrappedObject();
+        }
+        wrappedObject.setStudyPvAttr(newPvAttr);
+        propertyChangeSupport.firePropertyChange("studyPvAttr", oldPvAttr,
+            newPvAttr);
     }
 
     public void setValue(String value) {
@@ -88,18 +85,15 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
         return pv;
     }
 
-    public void setPatientVisit(PatientVisit pv) {
-        if (pv == null)
-            this.pv = null;
-        else
-            this.pv = new PatientVisitWrapper(appService, pv);
-        PatientVisit oldPv = wrappedObject.getPatientVisit();
-        wrappedObject.setPatientVisit(pv);
-        propertyChangeSupport.firePropertyChange("patientVisit", oldPv, pv);
-    }
-
     public void setPatientVisit(PatientVisitWrapper pv) {
-        setPatientVisit(pv.getWrappedObject());
+        this.pv = pv;
+        PatientVisit oldPv = wrappedObject.getPatientVisit();
+        PatientVisit newPv = null;
+        if (pv != null) {
+            newPv = pv.getWrappedObject();
+        }
+        wrappedObject.setPatientVisit(newPv);
+        propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
     }
 
     @Override

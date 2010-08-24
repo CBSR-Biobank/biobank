@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Random;
 
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -37,7 +38,7 @@ public class AliquotHelper extends DbHelper {
         }
         aliquot.setPatientVisit(pv);
         if ((row != null) && (col != null)) {
-            aliquot.setPosition(row, col);
+            aliquot.setPosition(new RowColPos(row, col));
         }
         return aliquot;
     }
@@ -60,7 +61,10 @@ public class AliquotHelper extends DbHelper {
     public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        return addAliquot(sampleType, "Active", container, pv, row, col);
+        AliquotWrapper aliquot = addAliquot(sampleType, "Active", container,
+            pv, row, col);
+        if (container != null)
+            container.reload();
+        return aliquot;
     }
-
 }

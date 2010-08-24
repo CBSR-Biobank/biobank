@@ -11,7 +11,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
@@ -62,8 +61,6 @@ public class TestFunctionalities extends TestDatabase {
      */
     @Test
     public void addAliquotPosition() throws Exception {
-        int abstractPositionSize = appService.search(AbstractPosition.class,
-            new AbstractPosition()).size();
         int aliquotPositionSize = appService.search(AliquotPosition.class,
             new AliquotPosition()).size();
 
@@ -74,14 +71,10 @@ public class TestFunctionalities extends TestDatabase {
 
         tryAliquotPositionInsert(aliquot, sc);
 
-        int abstractPositionSizeAfterTest1 = appService.search(
-            AbstractPosition.class, new AbstractPosition()).size();
         int aliquotPositionSizeAfterTest1 = appService.search(
             AliquotPosition.class, new AliquotPosition()).size();
 
         // insertion should be ok
-        Assert.assertEquals(abstractPositionSize + 1,
-            abstractPositionSizeAfterTest1);
         Assert.assertEquals(aliquotPositionSize + 1,
             aliquotPositionSizeAfterTest1);
 
@@ -90,13 +83,9 @@ public class TestFunctionalities extends TestDatabase {
 
         tryAliquotPositionInsert(aliquot, sc);
 
-        int abstractPositionSizeAfterTest2 = appService.search(
-            AbstractPosition.class, new AbstractPosition()).size();
         int aliquotPositionSizeAfterTest2 = appService.search(
             AliquotPosition.class, new AliquotPosition()).size();
         // insertion should not be done
-        Assert.assertEquals(abstractPositionSizeAfterTest1,
-            abstractPositionSizeAfterTest2);
         Assert.assertEquals(aliquotPositionSizeAfterTest1,
             aliquotPositionSizeAfterTest2);
     }
