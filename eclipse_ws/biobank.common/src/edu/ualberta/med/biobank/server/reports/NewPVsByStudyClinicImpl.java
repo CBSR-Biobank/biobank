@@ -12,7 +12,7 @@ public class NewPVsByStudyClinicImpl extends AbstractReport {
         + GROUPBY_DATE
         + "(Alias.dateProcessed), count(*) from "
         + PatientVisit.class.getName()
-        + " as Alias where Alias.dateProcessed between ? and ? and Alias.patient.study.site "
+        + " as Alias where Alias.dateProcessed between ? and ? and Alias.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.name, "

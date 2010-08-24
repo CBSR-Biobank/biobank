@@ -18,7 +18,7 @@ public class AliquotRequestImpl extends AbstractReport {
 
     private static final String QUERY = "select p.aliquot from "
         + AliquotPosition.class.getName()
-        + " p where p.aliquot.patientVisit.patient.study.site " + SITE_OPERATOR
+        + " p where p.aliquot.patientVisit.shipment.site " + SITE_OPERATOR
         + SITE_ID + " and p.container.label not like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "' and p.aliquot.patientVisit.patient.pnumber like ? and"

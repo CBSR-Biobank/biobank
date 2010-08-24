@@ -19,7 +19,7 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         + " c, "
         + ContainerPath.class.getName()
         + " top where locate(top.path || '/', c.path) !=0 and top.container.label = ? and top.container.containerType.nameShort = ? "
-        + "and c.container.containerType.sampleTypeCollection.size > 0 and c.container.site "
+        + "and c.container.containerType.sampleTypeCollection.size > 0 and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.aliquotPositionCollection.size and c.container.site "
         + SITE_OPERATOR + SITE_ID;
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {
