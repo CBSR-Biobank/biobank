@@ -4,8 +4,6 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -79,13 +77,6 @@ public class ConfigSite {
             }
             site.reload();
         }
-        List<ClinicWrapper> clinics = site.getClinicCollection(false);
-        if (clinics != null) {
-            for (ClinicWrapper clinic : clinics) {
-                clinicDeleteSubObjects(clinic);
-            }
-            site.reload();
-        }
         List<ContainerWrapper> containers = site.getTopContainerCollection();
         if (containers != null) {
             for (ContainerWrapper container : containers) {
@@ -155,25 +146,6 @@ public class ConfigSite {
         }
         visit.reload();
         visit.delete();
-    }
-
-    private static void clinicDeleteSubObjects(ClinicWrapper clinic)
-        throws Exception {
-        List<ContactWrapper> contacts = clinic.getContactCollection();
-        if (contacts != null) {
-            for (ContactWrapper contact : contacts) {
-                contact.delete();
-            }
-            clinic.reload();
-        }
-        List<ClinicShipmentWrapper> shipments = clinic.getShipmentCollection();
-        if (shipments != null) {
-            for (ClinicShipmentWrapper contact : shipments) {
-                contact.delete();
-            }
-            clinic.reload();
-        }
-        clinic.delete();
     }
 
     private static void containerDeleteSubObjects(ContainerWrapper container)

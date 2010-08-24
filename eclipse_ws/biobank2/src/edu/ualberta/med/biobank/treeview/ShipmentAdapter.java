@@ -7,11 +7,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 
@@ -43,9 +42,7 @@ public class ShipmentAdapter extends AdapterBase {
         ClinicShipmentWrapper shipment = getWrapper();
         ClinicWrapper clinic = shipment.getClinic();
         if (clinic != null) {
-            SiteWrapper site = clinic.getSite();
-            return site.getNameShort() + " - " + clinic.getName() + " - "
-                + getTooltipText("Shipment");
+            return clinic.getName() + " - " + getTooltipText("Shipment");
         }
         return getTooltipText("Shipment");
     }

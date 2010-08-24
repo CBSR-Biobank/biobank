@@ -297,19 +297,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    public List<ClinicWrapper> getClinicCollection(boolean sort) {
-        return null;
-    }
-
-    @Deprecated
-    public List<ClinicWrapper> getClinicCollection() {
-        return null;
-    }
-
-    @Deprecated
-    public void addClinics(List<ClinicWrapper> clinics) {
-    }
-
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
         List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap

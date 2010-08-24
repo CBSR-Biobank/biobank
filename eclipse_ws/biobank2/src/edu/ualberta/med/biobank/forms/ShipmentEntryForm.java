@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -123,7 +123,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         if (shipmentWrapper.isNew()) {
             // choose clinic for new shipment
-            List<ClinicWrapper> siteClinics = site.getClinicCollection(true);
+            List<ClinicWrapper> siteClinics = SessionManager.getInstance()
+                .getSession().getClinicCollection(true);
             ClinicWrapper selectedClinic = shipmentWrapper.getClinic();
             if (siteClinics.size() == 1) {
                 selectedClinic = siteClinics.get(0);

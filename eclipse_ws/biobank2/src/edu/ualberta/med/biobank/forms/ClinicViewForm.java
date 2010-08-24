@@ -27,8 +27,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private ClinicStudyInfoTable studiesTable;
 
-    private BiobankText siteLabel;
-
     private BiobankText nameLabel;
 
     private BiobankText nameShortLabel;
@@ -81,8 +79,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.READ_ONLY,
-            "Repository Site");
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Short Name");
@@ -105,7 +101,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
     private void setClinicValues() throws Exception {
         setTextValue(nameLabel, clinic.getName());
         setTextValue(nameShortLabel, clinic.getNameShort());
-        setTextValue(siteLabel, clinic.getSite().getName());
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());

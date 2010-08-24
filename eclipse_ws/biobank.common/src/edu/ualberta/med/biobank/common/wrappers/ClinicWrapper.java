@@ -137,10 +137,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return null;
     }
 
-    @Deprecated
-    public void setSite(SiteWrapper siteWrapper) {
-    }
-
     private AddressWrapper initAddress() {
         setAddress(new Address());
         return getAddress();

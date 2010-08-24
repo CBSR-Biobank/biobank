@@ -10,19 +10,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.treeview.ClinicGroup;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.StudyGroup;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.ClinicInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
@@ -35,15 +32,12 @@ public class SiteViewForm extends AddressViewFormCommon {
     private SiteWrapper site;
 
     private StudyInfoTable studiesTable;
-    private ClinicInfoTable clinicsTable;
     private ContainerTypeInfoTable containerTypesTable;
     private ContainerInfoTable topContainersTable;
 
     private BiobankText nameLabel;
 
     private BiobankText nameShortLabel;
-
-    private BiobankText clinicCountLabel;
 
     private BiobankText studyCountLabel;
 
@@ -87,7 +81,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         createSiteSection();
         createAddressSection(site);
         createStudySection();
-        createClinicSection();
         createContainerTypesSection();
         createContainerSection();
     }
@@ -101,8 +94,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Short Name");
-        clinicCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Clinics");
         studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Studies");
         containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -127,7 +118,6 @@ public class SiteViewForm extends AddressViewFormCommon {
     private void setSiteSectionValues() throws Exception {
         setTextValue(nameLabel, site.getName());
         setTextValue(nameShortLabel, site.getNameShort());
-        setTextValue(clinicCountLabel, site.getClinicCollection().size());
         setTextValue(studyCountLabel, site.getStudyCollection().size());
         setTextValue(containerTypeCountLabel, site.getContainerTypeCollection()
             .size());
@@ -155,22 +145,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addDoubleClickListener(collectionDoubleClickListener);
         section.setClient(studiesTable);
-    }
-
-    private void createClinicSection() {
-        Section section = createSection("Clinics");
-        addSectionToolbar(section, "Add Clinic", new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                ClinicGroup.addClinic(siteAdapter, true);
-            }
-        }, ClinicWrapper.class);
-
-        clinicsTable = new ClinicInfoTable(section,
-            site.getClinicCollection(true));
-        clinicsTable.adaptToToolkit(toolkit, true);
-        clinicsTable.addDoubleClickListener(collectionDoubleClickListener);
-        section.setClient(clinicsTable);
     }
 
     private void createContainerTypesSection() {
@@ -219,7 +193,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         setSiteSectionValues();
         setAdressValues(site);
         studiesTable.setCollection(site.getStudyCollection());
-        clinicsTable.setCollection(site.getClinicCollection(true));
         containerTypesTable
             .setCollection(site.getContainerTypeCollection(true));
         topContainersTable.setCollection(site.getTopContainerCollection());

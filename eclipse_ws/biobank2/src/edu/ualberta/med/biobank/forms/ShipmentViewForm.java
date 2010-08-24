@@ -119,7 +119,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void setShipmentValues() {
-        setTextValue(siteLabel, shipment.getClinic().getSite().getName());
+        setTextValue(siteLabel, shipment.getSite().getName());
         setTextValue(waybillLabel, shipment.getWaybill());
         setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment
             .getClinic().getName());

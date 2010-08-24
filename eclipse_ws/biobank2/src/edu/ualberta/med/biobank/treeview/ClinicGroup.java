@@ -18,8 +18,8 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ClinicGroup extends AdapterBase {
 
-    public ClinicGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Clinics", true, true);
+    public ClinicGroup(SessionAdapter sessionAdapter, int id) {
+        super(sessionAdapter, id, "Clinics", true, true);
     }
 
     @Override
@@ -40,9 +40,7 @@ public class ClinicGroup extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addClinic(
-                        ClinicGroup.this.getParentFromClass(SiteAdapter.class),
-                        false);
+                    addClinic(SessionManager.getInstance().getSession(), false);
                 }
             });
         }
@@ -85,12 +83,11 @@ public class ClinicGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addClinic(SiteAdapter siteAdapter,
+    public static void addClinic(SessionAdapter sessAdapter,
         boolean hasPreviousForm) {
-        ClinicWrapper clinic = new ClinicWrapper(siteAdapter.getAppService());
-        clinic.setSite(siteAdapter.getWrapper());
+        ClinicWrapper clinic = new ClinicWrapper(sessAdapter.getAppService());
         ClinicAdapter adapter = new ClinicAdapter(
-            siteAdapter.getClinicGroupNode(), clinic);
+            sessAdapter.getClinicGroupNode(), clinic);
         adapter.openEntryForm(hasPreviousForm);
     }
 

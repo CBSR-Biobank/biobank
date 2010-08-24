@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
@@ -82,8 +81,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     protected void createFormContent() throws ApplicationException {
         form.setText("Clinic Information");
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_CLINIC));
+        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_CLINIC));
 
         toolkit
             .createLabel(
@@ -105,28 +104,27 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Repository Site", clinic
-            .getSite().getName());
-
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, BeansObservables.observeValue(clinic,
-                "name"), new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
+            SWT.NONE, "Name", null,
+            BeansObservables.observeValue(clinic, "name"),
+            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, BeansObservables.observeValue(clinic,
-                "nameShort"), new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
+            "Short Name", null,
+            BeansObservables.observeValue(clinic, "nameShort"),
+            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
         if (clinic.getSendsShipments() == null) {
             clinic.setSendsShipments(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Sends Shipments", null, BeansObservables.observeValue(clinic,
-                "sendsShipments"), null);
+            "Sends Shipments", null,
+            BeansObservables.observeValue(clinic, "sendsShipments"), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status", ActivityStatusWrapper
-                .getAllActivityStatuses(appService),
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
             clinic.getActivityStatus(), "Clinic must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
@@ -161,9 +159,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        SiteAdapter siteAdapter = clinicAdapter
-            .getParentFromClass(SiteAdapter.class);
-        clinic.setSite(siteAdapter.getWrapper());
         clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
         ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
             .getSelection()).getFirstElement();

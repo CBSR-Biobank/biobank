@@ -1,9 +1,13 @@
 package edu.ualberta.med.biobank.treeview;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -19,6 +23,8 @@ import org.eclipse.ui.handlers.IHandlerService;
 public class SessionAdapter extends AdapterBase {
 
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
+
+    public static final int CLINICS_BASE_NODE_ID = 0;
 
     public static final int SITES_NODE_ID = 1;
 
@@ -45,6 +51,7 @@ public class SessionAdapter extends AdapterBase {
 
         addChild(new SiteGroup(this, SITES_NODE_ID));
         addChild(new StudyGroup(this, STUDIES_NODE_ID));
+        addChild(new ClinicGroup(this, CLINICS_BASE_NODE_ID));
     }
 
     @Override
@@ -70,6 +77,12 @@ public class SessionAdapter extends AdapterBase {
 
     public AdapterBase getStudiesGroupNode() {
         AdapterBase adapter = getChild(STUDIES_NODE_ID);
+        Assert.isNotNull(adapter);
+        return adapter;
+    }
+
+    public AdapterBase getClinicGroupNode() {
+        AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
@@ -133,6 +146,16 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     public String getViewFormId() {
+        return null;
+    }
+
+    public List<ClinicWrapper> getClinicCollection(boolean sort) {
+        try {
+            return ClinicWrapper.getAllClinics(appService);
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError(
+                "Unable to load clinics from database", e);
+        }
         return null;
     }
 }
