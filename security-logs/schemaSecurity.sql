@@ -235,9 +235,6 @@ INSERT INTO `csm_pg_pe` VALUES (547,18,11,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (548,20,24,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (549,20,10,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (550,20,13,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (672,11,147,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (673,11,148,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (674,11,149,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (675,1,18,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (676,1,10,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (677,1,7,'0000-00-00');
@@ -381,9 +378,6 @@ INSERT INTO `csm_protection_element` VALUES (64,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (65,'edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (144,'edu.ualberta.med.biobank.model.DispatchContainer','edu.ualberta.med.biobank.model.DispatchContainer','edu.ualberta.med.biobank.model.DispatchContainer','','','',2,'2010-08-19');
 INSERT INTO `csm_protection_element` VALUES (145,'edu.ualberta.med.biobank.model.DispatchPosition','edu.ualberta.med.biobank.model.DispatchPosition','edu.ualberta.med.biobank.model.DispatchPosition','','','',2,'2010-08-19');
-INSERT INTO `csm_protection_element` VALUES (147,'edu.ualberta.med.biobank.model.Site/testTest315179060','testTest315179060','edu.ualberta.med.biobank.model.Site','id','2','',2,'2010-08-23');
-INSERT INTO `csm_protection_element` VALUES (148,'edu.ualberta.med.biobank.model.Site/sender','sender','edu.ualberta.med.biobank.model.Site','id','3','',2,'2010-08-24');
-INSERT INTO `csm_protection_element` VALUES (149,'edu.ualberta.med.biobank.model.Site/receiver','receiver','edu.ualberta.med.biobank.model.Site','id','4','',2,'2010-08-24');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -724,4 +718,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-08-24 10:52:59
+-- Dump completed on 2010-08-24 12:23:59
