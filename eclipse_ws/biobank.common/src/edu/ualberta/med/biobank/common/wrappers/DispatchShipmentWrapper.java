@@ -53,7 +53,7 @@ public class DispatchShipmentWrapper extends
         ApplicationException, WrapperException {
         if (!checkWaybillUniqueForSender()) {
             throw new BiobankCheckException("A dispatch shipment with waybill "
-                + getWaybill() + " already exist for sending site "
+                + getWaybill() + " already exists for sending site "
                 + getSender().getNameShort());
         }
 
