@@ -51,24 +51,28 @@ public class DispatchShipmentWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (!checkWaybillUniqueForSender()) {
-            throw new BiobankCheckException("A dispatch shipment with waybill "
-                + getWaybill() + " already exists for sending site "
-                + getSender().getNameShort());
-        }
-
         if (getSender() == null) {
             throw new BiobankCheckException("Sender should be set");
         }
         if (getReceiver() == null) {
             throw new BiobankCheckException("Receiver should be set");
         }
+        if (!checkWaybillUniqueForSender()) {
+            throw new BiobankCheckException("A dispatch shipment with waybill "
+                + getWaybill() + " already exists for sending site "
+                + getSender().getNameShort());
+        }
     }
 
-    private boolean checkWaybillUniqueForSender() throws ApplicationException {
+    private boolean checkWaybillUniqueForSender() throws ApplicationException,
+        BiobankCheckException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
-        params.add(getSender().getId());
+        SiteWrapper sender = getSender();
+        if (sender == null) {
+            throw new BiobankCheckException("sender site cannot be null");
+        }
+        params.add(sender.getId());
         params.add(getWaybill());
         if (!isNew()) {
             isSameShipment = " and id <> ?";

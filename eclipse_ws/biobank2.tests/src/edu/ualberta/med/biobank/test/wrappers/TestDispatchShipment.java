@@ -1,15 +1,20 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.DispatchContainerHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 
@@ -125,6 +130,29 @@ public class TestDispatchShipment extends TestDatabase {
             Assert
                 .fail("should be allowed to persist a dispatch shipment with a unique waybill");
         }
+
+        // test no sender
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
+            null, receiverSite, TestCommon.getNewWaybill(r),
+            Utils.getRandomDate());
+        try {
+            shipment.persist();
+            Assert
+                .fail("should be allowed to persist a dispatch shipment without a sender");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // test no receiver
+        shipment = DispatchShipmentHelper.newShipment(senderSite, null,
+            TestCommon.getNewWaybill(r), Utils.getRandomDate());
+        try {
+            shipment.persist();
+            Assert
+                .fail("should be allowed to persist a dispatch shipment without a receiver");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -212,6 +240,30 @@ public class TestDispatchShipment extends TestDatabase {
 
         Assert.assertEquals(countBefore - 1, countAfter);
 
+    }
+
+    @Test
+    public void testGetSetContainerCollection() throws Exception {
+        String name = "testGetSetContainerCollection" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite);
+
+        List<DispatchContainerWrapper> containers = new ArrayList<DispatchContainerWrapper>();
+        for (int i = 0; i < r.nextInt(); ++i) {
+            containers.add(DispatchContainerHelper.newContainerRandom(
+                senderSite, name));
+        }
+
+        shipment.addSentContainers(containers);
+        shipment.persist();
+        shipment.reload();
+
+        List<DispatchContainerWrapper> dispatchContainers = shipment
+            .getSentContainerCollection();
+        Assert.assertEquals(containers.size(), dispatchContainers.size());
+        Assert.assertTrue(dispatchContainers.containsAll(containers));
     }
 
 }

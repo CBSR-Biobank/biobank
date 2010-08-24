@@ -20,6 +20,14 @@ public class DispatchContainerHelper extends DbHelper {
         return container;
     }
 
+    public static DispatchContainerWrapper newContainerRandom(SiteWrapper site,
+        String name) throws Exception {
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
+            site, name, false);
+        return newContainer(name, type);
+
+    }
+
     public static DispatchContainerWrapper addContainer(String barcode,
         ContainerTypeWrapper type) throws Exception {
         DispatchContainerWrapper container = newContainer(barcode, type);
@@ -29,9 +37,7 @@ public class DispatchContainerHelper extends DbHelper {
 
     public static DispatchContainerWrapper addContainerRandom(SiteWrapper site,
         String name) throws Exception {
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
-            site, name, false);
-        DispatchContainerWrapper container = addContainer(name, type);
+        DispatchContainerWrapper container = newContainerRandom(site, name);
         container.persist();
         return container;
     }

@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
@@ -53,7 +55,7 @@ public class DispatchShipmentHelper extends DbHelper {
         SiteWrapper receiver, String waybill, Date dateReceived,
         DispatchContainerWrapper... containers) throws Exception {
         DispatchShipmentWrapper shipment = newShipment(sender, receiver,
-            waybill, Utils.getRandomDate(), containers);
+            waybill, dateReceived, containers);
         shipment.persist();
         return shipment;
     }
@@ -62,7 +64,7 @@ public class DispatchShipmentHelper extends DbHelper {
         SiteWrapper receiver, String waybill, Date dateReceived)
         throws Exception {
         DispatchShipmentWrapper shipment = newShipment(sender, receiver,
-            waybill, Utils.getRandomDate());
+            waybill, dateReceived);
         shipment.persist();
         return shipment;
     }
@@ -75,18 +77,27 @@ public class DispatchShipmentHelper extends DbHelper {
     }
 
     public static DispatchShipmentWrapper addShipmentRandomContainers(
-        SiteWrapper sender, SiteWrapper receiver, String name, int numContainers)
-        throws Exception {
+        SiteWrapper sender, SiteWrapper receiver, String waybill,
+        Date dateReceived, String name, int numContainers) throws Exception {
         DispatchShipmentWrapper shipment = newShipment(sender, receiver);
         shipment.persist();
 
-        DispatchContainerWrapper container;
+        List<DispatchContainerWrapper> containers = new ArrayList<DispatchContainerWrapper>();
         for (int i = 0; i < numContainers; ++i) {
-            container = DispatchContainerHelper
-                .addContainerRandom(sender, name);
+            containers.add(DispatchContainerHelper.addContainerRandom(sender,
+                name));
         }
 
+        shipment.addSentContainers(containers);
         return shipment;
+    }
+
+    public static DispatchShipmentWrapper addShipmentRandomContainers(
+        SiteWrapper sender, SiteWrapper receiver, String name, int numContainers)
+        throws Exception {
+        return addShipmentRandomContainers(sender, receiver,
+            TestCommon.getNewWaybill(r), Utils.getRandomDate(), name,
+            numContainers);
     }
 
 }
