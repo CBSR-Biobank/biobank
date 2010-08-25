@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.DispatchContainer;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -522,8 +523,19 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         activityStatus = null;
     }
 
-    public List<DispatchContainerWrapper> getDispatchContainerCollection() {
-        return null;
+    public List<DispatchContainerWrapper> getDispatchContainerCollection()
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("select cont from "
+            + DispatchContainer.class.getName()
+            + " where cont.positionCollection.aliquot.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+
+        List<DispatchContainer> conts = appService.query(criteria);
+        List<DispatchContainerWrapper> contWrappers = new ArrayList<DispatchContainerWrapper>();
+        for (DispatchContainer cont : conts) {
+            contWrappers.add(new DispatchContainerWrapper(appService, cont));
+        }
+        return contWrappers;
     }
 
     public List<DispatchShipmentWrapper> getDispatchShipments()

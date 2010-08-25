@@ -64,6 +64,7 @@ public class DbHelper {
 
         // visites liees au ship avec patient de la visit non lie au shipment
         for (PatientWrapper patient : patients) {
+            patient.reload();
             deletePatientVisits(patient.getPatientVisitCollection());
             patient.reload();
             for (ClinicShipmentWrapper ship : patient.getShipmentCollection()) {
