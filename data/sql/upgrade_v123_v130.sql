@@ -1,3 +1,6 @@
+# use following command to run this script:
+#    mysql --safe-updates=0 -uuser -ppwd biobank2
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 #
@@ -275,17 +278,44 @@ ALTER TABLE clinic
     DROP SITE_ID,
     DROP INDEX FK76A608E83F52C885;
 
-
 ALTER TABLE container_path
     DROP INDEX PATH_IDC,
     ADD INDEX PATH_IDX (PATH);
-
 
 ALTER TABLE patient_visit
     CHANGE COLUMN SHIPMENT_ID CLINIC_SHIPMENT_ID int(11) NOT NULL DEFAULT 0 COMMENT '' AFTER PATIENT_ID,
     DROP INDEX FKA09CAF51B1D3625,
     ADD INDEX FKA09CAF51E5B2B216 (CLINIC_SHIPMENT_ID);
 
+ALTER TABLE abstract_position
+      ADD COLUMN DISCRIMINATOR VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '' AFTER ID,
+      ADD COLUMN PARENT_CONTAINER_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN CONTAINER_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN ALIQUOT_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN DISPATCH_ALIQUOT_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN DISPATCH_CONTAINER_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD INDEX FKBC4AE0A6847A041A (DISPATCH_CONTAINER_ID),
+      ADD INDEX FKBC4AE0A6898584F (ALIQUOT_ID),
+      ADD INDEX FKBC4AE0A69BFD88CF (CONTAINER_ID),
+      ADD INDEX FKBC4AE0A67366CE44 (PARENT_CONTAINER_ID),
+      ADD INDEX FKBC4AE0A6ED73B934 (DISPATCH_ALIQUOT_ID);
+
+UPDATE abstract_position,aliquot_position
+       SET abstract_position.aliquot_id=aliquot_position.aliquot_id,
+       abstract_position.container_id=aliquot_position.container_id,
+       abstract_position.discriminator='AliquotPosition'
+       WHERE abstract_position.id=aliquot_position.abstract_position_id;
+
+UPDATE abstract_position,container_position
+       SET abstract_position.parent_container_id=container_position.parent_container_id,
+       abstract_position.discriminator='ContainerPosition'
+       WHERE abstract_position.id = container_position.abstract_position_id;
+
+DROP TABLE abstract_position;
+
+DROP TABLE container_position;
+
+DROP TABLE IF EXISTS dispatch_position;
 
 #
 # DDL END

@@ -60,7 +60,7 @@ public class DispatchShipmentWrapper extends
         if (!checkWaybillUniqueForSender()) {
             throw new BiobankCheckException("A dispatch shipment with waybill "
                 + getWaybill() + " already exists for sending site "
-                + getSender().getNameShort()); 
+                + getSender().getNameShort());
         }
         checkSenderCanSendToReceiver();
     }
