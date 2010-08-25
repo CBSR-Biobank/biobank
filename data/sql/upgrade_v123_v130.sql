@@ -297,6 +297,7 @@ ALTER TABLE abstract_position
       ADD INDEX FKBC4AE0A6847A041A (DISPATCH_CONTAINER_ID),
       ADD INDEX FKBC4AE0A6898584F (ALIQUOT_ID),
       ADD INDEX FKBC4AE0A69BFD88CF (CONTAINER_ID),
+      ADD CONSTRAINT ALIQUOT_ID UNIQUE KEY(ALIQUOT_ID),
       ADD INDEX FKBC4AE0A67366CE44 (PARENT_CONTAINER_ID),
       ADD INDEX FKBC4AE0A6ED73B934 (DISPATCH_ALIQUOT_ID);
 
@@ -311,7 +312,7 @@ UPDATE abstract_position,container_position
        abstract_position.discriminator='ContainerPosition'
        WHERE abstract_position.id = container_position.abstract_position_id;
 
-DROP TABLE abstract_position;
+DROP TABLE aliquot_position;
 
 DROP TABLE container_position;
 

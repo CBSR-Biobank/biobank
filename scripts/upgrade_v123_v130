@@ -54,6 +54,8 @@ DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 ant dbcreate
 scripts/dump_csm_schema.sh -ecsm_user -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2
+#mysql --safe-updates=0 -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < $DUMPFILE
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/schemaLog.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/addCBSRSiteSecurity.sql
