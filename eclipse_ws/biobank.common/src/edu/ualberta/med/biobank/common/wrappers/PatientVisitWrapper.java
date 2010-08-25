@@ -17,11 +17,11 @@ import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -563,6 +563,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         pvAttrMap = null;
         studyPvAttrMap = null;
         deletedPvSourceVessels.clear();
+        patient = null;
+        shipment = null;
     }
 
     @Override
@@ -571,27 +573,31 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void log(String action, String site, String details)
-        throws Exception {
-        String worksheet = "";
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        log.setAction(action);
+        ClinicShipmentWrapper shipment = getShipment();
+        PatientWrapper patient = getPatient();
+        if (site == null) {
+            log.setSite(shipment.getSite().getNameShort());
+        } else {
+            log.setSite(site);
+        }
+        log.setPatientNumber(patient.getPnumber());
+        Date dateProcesssed = getDateProcessed();
+        if (dateProcesssed != null) {
+            details += " Date Processed: " + getFormattedDateProcessed();
+        }
         try {
-            String attr = getPvAttrValue("Worksheet");
-            if (attr != null) {
-                worksheet = " - Worksheet: " + attr;
+            String worksheet = getPvAttrValue("Worksheet");
+            if (worksheet != null) {
+                details += " - Worksheet: " + worksheet;
             }
         } catch (Exception e) {
         }
-        ((BiobankApplicationService) appService).logActivity(action, site,
-            getPatient().getPnumber(), null, null, "visit " + details
-                + " (Date Processed:" + getFormattedDateProcessed() + worksheet
-                + ")", "Visit");
-    }
-
-    @Override
-    public void reload() throws Exception {
-        patient = null;
-        shipment = null;
-        super.reload();
+        log.setDetails(details);
+        log.setType("Visit");
+        return log;
     }
 
     public static List<PatientVisitWrapper> getPatientVisitsWithWorksheet(

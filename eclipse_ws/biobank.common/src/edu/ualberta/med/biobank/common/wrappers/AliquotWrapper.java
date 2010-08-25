@@ -16,9 +16,9 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.DispatchContainer;
 import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -509,14 +509,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected void log(String action, String site, String details)
-        throws Exception {
-        ((BiobankApplicationService) appService).logActivity(action, site,
-            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
-            getPositionString(true, false), "aliquot " + details, "Aliquot");
-    }
-
-    @Override
     public void resetInternalFields() {
         patientVisit = null;
         sampleType = null;
@@ -552,5 +544,23 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             shipWrappers.add(new DispatchShipmentWrapper(appService, ship));
         }
         return shipWrappers;
+    }
+
+    @Override
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        PatientVisitWrapper visit = getPatientVisit();
+        log.setAction(action);
+        if (site == null) {
+            log.setSite(visit.getShipment().getSite().getNameShort());
+        } else {
+            log.setSite(site);
+        }
+        log.setPatientNumber(visit.getPatient().getPnumber());
+        log.setInventoryId(getInventoryId());
+        log.setLocationLabel(getPositionString(true, true));
+        log.setDetails(details);
+        log.setType("Aliquot");
+        return log;
     }
 }

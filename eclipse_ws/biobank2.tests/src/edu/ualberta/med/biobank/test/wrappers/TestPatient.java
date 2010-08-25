@@ -30,12 +30,12 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -503,7 +503,8 @@ public class TestPatient extends TestDatabase {
         String name = "testTodayShipments_" + r.nextInt();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "_1", study);
         addClinic(patient1);
-        ClinicShipmentWrapper ship = ClinicShipmentHelper.newShipment(site, clinic);
+        ClinicShipmentWrapper ship = ClinicShipmentHelper.newShipment(site,
+            clinic);
         ship.addPatients(Arrays.asList(patient1));
         ship.persist();
 
@@ -511,7 +512,8 @@ public class TestPatient extends TestDatabase {
         addClinic(patient2);
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study);
         addClinic(patient3);
-        ClinicShipmentWrapper ship2 = ClinicShipmentHelper.newShipment(site, clinic);
+        ClinicShipmentWrapper ship2 = ClinicShipmentHelper.newShipment(site,
+            clinic);
         ship2.setDateReceived(new Date()); // today
         ship2.addPatients(Arrays.asList(patient2, patient3));
         ship2.persist();
