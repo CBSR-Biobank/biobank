@@ -69,7 +69,7 @@ public class DispatchShipmentWrapper extends
         ApplicationException {
         if (getSender() != null && getReceiver() != null) {
             List<SiteWrapper> possibleReceivers = getSender()
-                .getToSitesDispatchForStudy(null);
+                .getStudyDispachSite(null);
             if (!possibleReceivers.contains(getReceiver())) {
                 throw new BiobankCheckException(getSender().getNameShort()
                     + " cannot dispatch aliquots to "

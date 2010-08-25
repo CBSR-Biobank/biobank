@@ -77,7 +77,7 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
 
     public SiteWrapper getFromSite() {
         if (fromSite == null) {
-            Site s = wrappedObject.getFromSite();
+            Site s = wrappedObject.getSrcSite();
             if (s == null)
                 return null;
             fromSite = new SiteWrapper(appService, s);
@@ -87,9 +87,9 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
 
     public void setFromSite(SiteWrapper fromSite) {
         this.fromSite = fromSite;
-        Site oldSiteRaw = wrappedObject.getFromSite();
+        Site oldSiteRaw = wrappedObject.getSrcSite();
         Site newSiteRaw = fromSite.getWrappedObject();
-        wrappedObject.setFromSite(newSiteRaw);
+        wrappedObject.setSrcSite(newSiteRaw);
         propertyChangeSupport.firePropertyChange("fromSite", oldSiteRaw,
             newSiteRaw);
     }
@@ -99,7 +99,7 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
         List<SiteWrapper> toSiteCollection = (List<SiteWrapper>) propertiesMap
             .get("toSiteCollection");
         if (toSiteCollection == null) {
-            Collection<Site> children = wrappedObject.getToSiteCollection();
+            Collection<Site> children = wrappedObject.getDestSiteCollection();
             if (children != null) {
                 toSiteCollection = new ArrayList<SiteWrapper>();
                 for (Site s : children) {
@@ -152,8 +152,8 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
 
     private void setToSites(Collection<Site> allSiteObjects,
         List<SiteWrapper> allSiteWrappers) {
-        Collection<Site> oldCollection = wrappedObject.getToSiteCollection();
-        wrappedObject.setToSiteCollection(allSiteObjects);
+        Collection<Site> oldCollection = wrappedObject.getDestSiteCollection();
+        wrappedObject.setDestSiteCollection(allSiteObjects);
         propertyChangeSupport.firePropertyChange("toSiteCollection",
             oldCollection, allSiteObjects);
         propertiesMap.put("toSiteCollection", allSiteWrappers);
