@@ -766,8 +766,7 @@ public class ReportsEditor extends BiobankFormBase {
             for (ContainerWrapper c : containers) {
                 for (int i = 0; i < (label.length() / 2) - 1; i++)
                     c = c.getParent();
-                if (c.getContainerType().getNameShort().startsWith("F"))
-                    topContainerTypes.add(c.getContainerType().getNameShort());
+                topContainerTypes.add(c.getContainerType().getNameShort());
             }
         } catch (Exception e) {
             enable = false;
