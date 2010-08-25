@@ -58,7 +58,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -452,11 +451,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                     try {
                         if (exportCSV) {
                             exportCSV(columnInfo, printParams, path, monitor);
-                            ((BiobankApplicationService) SessionManager
-                                .getAppService()).logActivity("exportCSV",
-                                SessionManager.getInstance().getCurrentSite()
-                                    .getNameShort(), null, null, null,
-                                report.getName(), "report");
+                            SessionManager.log("exportCSV", report.getName(),
+                                "report");
                         } else {
                             for (Object object : reportData) {
                                 if (monitor.isCanceled()) {
@@ -496,10 +492,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                 return;
             }
             try {
-                ((BiobankApplicationService) SessionManager.getAppService())
-                    .logActivity("exportPDF", SessionManager.getInstance()
-                        .getCurrentSite().getNameShort(), null, null, null,
-                        report.getName(), "report");
+                SessionManager.log("exportPDF", report.getName(), "report");
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Error logging export", e);
             }
@@ -512,10 +505,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                 return;
             }
             try {
-                ((BiobankApplicationService) SessionManager.getAppService())
-                    .logActivity("print", SessionManager.getInstance()
-                        .getCurrentSite().getNameShort(), null, null, null,
-                        report.getName(), "report");
+                SessionManager.log("print", report.getName(), "report");
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Error logging print", e);
             }

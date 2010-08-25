@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
@@ -108,9 +107,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             if (i > 0) {
                 printName = printName.substring(0, i);
             }
-            ((BiobankApplicationService) appService).logActivity("print",
-                SessionManager.getInstance().getCurrentSite().getNameShort(),
-                null, null, null, null, printName);
+            SessionManager.log("print", null, printName);
             return true;
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Print error", e);

@@ -421,7 +421,7 @@ public class TestPatient extends TestDatabase {
         addClinic(patient1);
         patient1.persist();
         ShipmentWrapper shipment = ShipmentHelper.newShipment(site, clinic);
-        shipment.addPatients(Arrays.asList(patient1));
+        shipment.addPatients(Arrays.asList(patient1, patient2));
         shipment.persist();
         patient1.reload();
         patient2.reload();

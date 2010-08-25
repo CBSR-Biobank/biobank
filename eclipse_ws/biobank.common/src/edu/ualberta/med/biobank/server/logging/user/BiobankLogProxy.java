@@ -5,6 +5,11 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.log4j.Logger;
 
+/**
+ * this is call before any call into the ApplicationService instance.
+ * 
+ * See use application-config.xml.
+ */
 public class BiobankLogProxy implements MethodInterceptor {
 
     private static Logger log = Logger.getLogger(BiobankLogProxy.class

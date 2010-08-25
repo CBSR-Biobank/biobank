@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.client.ApplicationServiceProvider;
@@ -28,7 +29,9 @@ public class ServiceConnection {
             appService = (BiobankApplicationService) ApplicationServiceProvider
                 .getApplicationServiceFromUrl(serverUrl, userName, password);
         }
-        appService.logActivity("login", null, null, null, null, null, null);
+        Log logMessage = new Log();
+        logMessage.action = "login";
+        appService.logActivity(logMessage);
         return appService;
     }
 
@@ -56,7 +59,8 @@ public class ServiceConnection {
 
     public static void logout(WritableApplicationService appService)
         throws Exception {
-        ((BiobankApplicationService) appService).logActivity("logout", null,
-            null, null, null, null, null);
+        Log logMessage = new Log();
+        logMessage.action = "logout";
+        ((BiobankApplicationService) appService).logActivity(logMessage);
     }
 }

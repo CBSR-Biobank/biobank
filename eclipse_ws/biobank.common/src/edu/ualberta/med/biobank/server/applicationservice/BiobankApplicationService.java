@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.server.applicationservice;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -47,9 +48,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
 
-    public void logActivity(String action, String site, String patientNumber,
-        String inventoryID, String locationLabel, String details, String type)
-        throws Exception;
+    public void logActivity(Log log) throws Exception;
 
     public List<Object> launchReport(BiobankReport report)
         throws ApplicationException;

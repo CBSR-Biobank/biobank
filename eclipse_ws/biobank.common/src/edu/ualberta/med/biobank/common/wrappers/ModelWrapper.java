@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -198,6 +199,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         SDKQueryResult result = ((BiobankApplicationService) appService)
             .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
+        Log logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
+        if (logMessage != null) {
+            ((BiobankApplicationService) appService).logActivity(logMessage);
+        }
         propertiesMap.clear();
         resetInternalField();
         notifyListeners(new WrapperEvent(eventType, this));
@@ -270,7 +275,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         reload();
         deleteChecks();
         deleteDependencies();
+        Log logMessage = getLogMessage("delete", null, "");
         appService.executeQuery(new DeleteExampleQuery(wrappedObject));
+        if (logMessage != null) {
+            ((BiobankApplicationService) appService).logActivity(logMessage);
+        }
         notifyListeners(new WrapperEvent(WrapperEventType.DELETE, this));
     }
 
@@ -514,18 +523,20 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void logLookup(String site) throws Exception {
-        log("select", site, "LOOKUP");
+        ((BiobankApplicationService) appService).logActivity(getLogMessage(
+            "select", site, getWrappedClass().getSimpleName() + " LOOKUP"));
     }
 
     public void logEdit(String site) throws Exception {
         if (!isNew()) {
-            log("edit", site, "EDIT");
+            ((BiobankApplicationService) appService).logActivity(getLogMessage(
+                "edit", site, getWrappedClass().getSimpleName() + " EDIT"));
         }
     }
 
-    @SuppressWarnings("unused")
-    protected void log(String action, String site, String details)
-        throws Exception {
-
+    protected Log getLogMessage(@SuppressWarnings("unused") String action,
+        @SuppressWarnings("unused") String site,
+        @SuppressWarnings("unused") String details) {
+        return null;
     }
 }

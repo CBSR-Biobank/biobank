@@ -14,9 +14,9 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -489,18 +489,44 @@ public class AliquotWrapper extends
     }
 
     @Override
-    protected void log(String action, String site, String details)
-        throws Exception {
-        ((BiobankApplicationService) appService).logActivity(action, site,
-            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
-            getPositionString(true, false), "aliquot " + details, "Aliquot");
-    }
-
-    @Override
     public void reload() throws Exception {
         patientVisit = null;
         sampleType = null;
         activityStatus = null;
         super.reload();
+    }
+
+    @Override
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        PatientVisitWrapper visit = getPatientVisit();
+        log.setAction(action);
+        if (site == null) {
+            log.setSite(visit.getShipment().getSite().getNameShort());
+        } else {
+            log.setSite(site);
+        }
+        log.setPatientNumber(visit.getPatient().getPnumber());
+        log.setInventoryId(getInventoryId());
+        // FIXME true/true or true/false ?
+        log.setLocationLabel(getPositionString(true, true));
+        // AliquotPosition pos = get
+        // .get("aliquotPosition");
+        // if (pos != null) {
+        // Container parent = pos.getContainer();
+        // if (parent != null) {
+        // ContainerType type = parent.getContainerType();
+        // Capacity capacity = type.getCapacity();
+        // log.setLocationLabel(parent.getLabel()
+        // + LabelingScheme.getPositionString(
+        // new RowColPos(pos.getRow(), pos.getCol()), type
+        // .getChildLabelingScheme().getId(), capacity
+        // .getRowCapacity(), capacity.getColCapacity())
+        // + " (" + type.getNameShort() + ")");
+        // }
+        // }
+        log.setDetails(details);
+        log.setType("Aliquot");
+        return log;
     }
 }

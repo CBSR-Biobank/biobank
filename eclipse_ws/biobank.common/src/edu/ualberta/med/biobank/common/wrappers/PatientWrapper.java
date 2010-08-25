@@ -12,11 +12,11 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -398,16 +398,22 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void log(String action, String site, String details)
-        throws Exception {
-        ((BiobankApplicationService) appService).logActivity(action, site,
-            getPnumber(), null, null, "patient " + details, "Patient");
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        log.setAction(action);
+        // FIXME site == null when persist and delete
+        // don't know the site: patient belong to a study, that doesn't depend
+        // on a site
+        log.setSite(site);
+        log.setPatientNumber(getPnumber());
+        log.setDetails(details);
+        log.setType("Patient");
+        return log;
     }
 
     @Override
-    public void reload() throws Exception {
+    public void resetInternalField() {
         study = null;
-        super.reload();
     }
 
     public void setPatientVisitCollection(List<PatientVisitWrapper> pvws) {

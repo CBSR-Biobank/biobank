@@ -13,12 +13,12 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -506,6 +506,7 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     public void resetInternalField() {
         patientsAdded.clear();
         patientsRemoved.clear();
+        clinic = null;
     }
 
     public static List<ShipmentWrapper> getTodayShipments(
@@ -552,21 +553,23 @@ public class ShipmentWrapper extends ModelWrapper<Shipment> {
     }
 
     @Override
-    protected void log(String action, String site, String details)
-        throws Exception {
-        String fullDetails = "shipment " + details + " - Received:"
-            + getFormattedDateReceived();
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        log.setAction(action);
+        ClinicWrapper clinic = getClinic();
+        if (site == null) {
+            log.setSite(clinic.getSite().getNameShort());
+        } else {
+            log.setSite(site);
+        }
+        details += "Received:" + getFormattedDateReceived();
         String waybill = getWaybill();
         if (waybill != null) {
-            fullDetails += " - Waybill:" + waybill;
+            details += " - Waybill:" + waybill;
         }
-        ((BiobankApplicationService) appService).logActivity(action, site,
-            null, null, null, fullDetails, "Shipment");
+        log.setDetails(details);
+        log.setType("Shipment");
+        return log;
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        clinic = null;
-    }
 }
