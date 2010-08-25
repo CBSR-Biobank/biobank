@@ -14,7 +14,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
-import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -290,12 +289,8 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        LogWrapper log = new LogWrapper(getAppService());
-        log.setAction(action);
-        log.setSite(getInstance().getCurrentSite().getNameShort());
-        log.setDetails(details);
-        log.setType(type);
-        ((BiobankApplicationService) getAppService()).logActivity(log
-            .getWrappedObject());
+        ((BiobankApplicationService) getAppService()).logActivity(action,
+            getInstance().getCurrentSite().getNameShort(), null, null, null,
+            details, type);
     }
 }
