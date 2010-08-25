@@ -607,7 +607,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * if study == null, will get all sites to which can dispatch, for whatever
      * study
      */
-    public List<SiteWrapper> getToSitesDispatchForStudy(StudyWrapper study)
+    public List<SiteWrapper> getStudyDispachSite(StudyWrapper study)
         throws ApplicationException {
         String studyString = "";
         List<Object> params = new ArrayList<Object>();
