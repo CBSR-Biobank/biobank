@@ -364,8 +364,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     private void checkPatientInShipment() throws BiobankCheckException {
-        List<PatientWrapper> shipmentPatients = getShipment()
-            .getPatientCollection();
+        ClinicShipmentWrapper ship = getShipment();
+        try {
+            ship.reload();
+        } catch (Exception e) {
+            throw new BiobankCheckException(e);
+        }
+        List<PatientWrapper> shipmentPatients = ship.getPatientCollection();
         if (shipmentPatients == null
             || !shipmentPatients.contains(getPatient())) {
             throw new BiobankCheckException(
