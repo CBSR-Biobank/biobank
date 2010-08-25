@@ -316,6 +316,7 @@ public class TestClinicShipment extends TestDatabase {
 
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study);
         shipment.addPatients(Arrays.asList(patient3));
+        shipment.persist();
 
         PatientVisitHelper.addPatientVisits(patient3, shipment, 3);
         patient3.reload();
