@@ -1,3 +1,6 @@
+# use following command to run this script:
+#    mysql --safe-updates=0 -uuser -ppwd biobank2
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 #
@@ -297,10 +300,22 @@ ALTER TABLE abstract_position
       ADD INDEX FKBC4AE0A67366CE44 (PARENT_CONTAINER_ID),
       ADD INDEX FKBC4AE0A6ED73B934 (DISPATCH_ALIQUOT_ID);
 
-UPDATE abstract_position,container_position SET
-       abstract_position.parent_container_id=container_position.parent_container_id,
+UPDATE abstract_position,aliquot_position
+       SET abstract_position.aliquot_id=aliquot_position.aliquot_id,
+       abstract_position.container_id=aliquot_position.container_id,
+       abstract_position.discriminator='AliquotPosition'
+       WHERE abstract_position.id=aliquot_position.abstract_position_id;
+
+UPDATE abstract_position,container_position
+       SET abstract_position.parent_container_id=container_position.parent_container_id,
        abstract_position.discriminator='ContainerPosition'
-       WHERE abstract_position.id=container_position.abstract_position_id;
+       WHERE abstract_position.id = container_position.abstract_position_id;
+
+DROP TABLE abstract_position;
+
+DROP TABLE container_position;
+
+DROP TABLE IF EXISTS dispatch_position;
 
 #
 # DDL END
