@@ -311,6 +311,7 @@ public class ReportsEditor extends BiobankFormBase {
                         String regex = "\"([^\"]*)\"|([A-Za-z0-9-]+[,]{0,1})";
                         Matcher m = Pattern.compile(regex).matcher(
                             stnewline.nextToken());
+                        int found = 0;
                         while (m.find()) {
                             String param = m.group().replaceAll("\"", "");
                             if (param.charAt(param.length() - 1) == ',')
@@ -318,15 +319,12 @@ public class ReportsEditor extends BiobankFormBase {
                                     param.length() - 1));
                             else
                                 params.add(param);
+                            found++;
                         }
-                        System.out.println(params);
-                        /*
-                         * if (m.groupCount() != 4) throw new
-                         * Exception("Failed to parse CSV: Line " + lines +
-                         * " \n4 Columns Required: " + m.groupCount() +
-                         * " found."); else { while (m.find()) {
-                         * params.add(m.group()); } }
-                         */
+                        if (found != 4)
+                            throw new Exception("Failed to parse CSV: Line "
+                                + lines + " \n4 Columns Required: " + found
+                                + " found.");
                     }
                 }
             }
