@@ -182,7 +182,7 @@ public class TestSampleType extends TestDatabase {
 
     @Test
     public void testPersistFailNoName() throws Exception {
-        String name = "testPersist" + r.nextInt();
+        String name = "testPersistFailNoName" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         type.setName(null);
         try {
@@ -194,11 +194,12 @@ public class TestSampleType extends TestDatabase {
 
         type.setName(name);
         type.persist();
+        SampleTypeHelper.createdSampleTypes.add(type);
     }
 
     @Test
     public void testPersistFailNoNameShort() throws Exception {
-        String name = "testPersist" + r.nextInt();
+        String name = "testPersistFailNoNameShort" + r.nextInt();
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
         type.setNameShort(null);
         try {
@@ -210,11 +211,12 @@ public class TestSampleType extends TestDatabase {
 
         type.setNameShort(name);
         type.persist();
+        SampleTypeHelper.createdSampleTypes.add(type);
     }
 
     @Test
     public void testPersistFailNameUnique() throws Exception {
-        String name = "testPersist" + r.nextInt();
+        String name = "testPersistFailNameUnique" + r.nextInt();
         SampleTypeHelper.addSampleType(name);
 
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(name + "_2");
@@ -228,11 +230,12 @@ public class TestSampleType extends TestDatabase {
 
         type.setName(name + "_2");
         type.persist();
+        SampleTypeHelper.createdSampleTypes.add(type);
     }
 
     @Test
     public void testPersistFailNameShortUnique() throws Exception {
-        String name = "testPersist" + r.nextInt();
+        String name = "testPersistFailNameShortUnique" + r.nextInt();
         SampleTypeHelper.addSampleType(name);
 
         SampleTypeWrapper type = SampleTypeHelper.newSampleType(name);
@@ -246,6 +249,7 @@ public class TestSampleType extends TestDatabase {
 
         type.setNameShort(name + "_2");
         type.persist();
+        SampleTypeHelper.createdSampleTypes.add(type);
     }
 
     @Test
