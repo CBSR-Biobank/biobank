@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -305,17 +307,26 @@ public class ReportsEditor extends BiobankFormBase {
                     StringTokenizer stnewline = new StringTokenizer(csv, "\n");
                     int lines = 0;
                     while (stnewline.hasMoreTokens()) {
-                        StringTokenizer stseparator = new StringTokenizer(
-                            stnewline.nextToken(), ",\" ");
                         lines++;
-                        if (stseparator.countTokens() != 4)
-                            throw new Exception("Failed to parse CSV: Line "
-                                + lines + " \n4 Columns Required: "
-                                + stseparator.countTokens() + " found.");
-                        else {
-                            while (stseparator.hasMoreTokens())
-                                params.add(stseparator.nextToken());
+                        String regex = "\"([^\"]*)\"|([A-Za-z0-9-]+[,]{0,1})";
+                        Matcher m = Pattern.compile(regex).matcher(
+                            stnewline.nextToken());
+                        while (m.find()) {
+                            String param = m.group().replaceAll("\"", "");
+                            if (param.charAt(param.length() - 1) == ',')
+                                params.add(param.substring(0,
+                                    param.length() - 1));
+                            else
+                                params.add(param);
                         }
+                        System.out.println(params);
+                        /*
+                         * if (m.groupCount() != 4) throw new
+                         * Exception("Failed to parse CSV: Line " + lines +
+                         * " \n4 Columns Required: " + m.groupCount() +
+                         * " found."); else { while (m.find()) {
+                         * params.add(m.group()); } }
+                         */
                     }
                 }
             }
