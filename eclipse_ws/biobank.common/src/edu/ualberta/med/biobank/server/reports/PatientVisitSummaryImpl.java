@@ -32,9 +32,11 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         super(QUERY_STRING, report);
         List<Object> parameters = report.getParams();
         this.queryString = queryString.replaceFirst("\\?",
-            "'" + DateFormatter.formatAsDate((Date) parameters.get(0)) + "'");
+            "'" + DateFormatter.formatAsDateTime((Date) parameters.get(0))
+                + "'");
         this.queryString = queryString.replaceFirst("\\?",
-            "'" + DateFormatter.formatAsDate((Date) parameters.get(1)) + "'");
+            "'" + DateFormatter.formatAsDateTime((Date) parameters.get(1))
+                + "'");
         report.setParams(parameters);
     }
 

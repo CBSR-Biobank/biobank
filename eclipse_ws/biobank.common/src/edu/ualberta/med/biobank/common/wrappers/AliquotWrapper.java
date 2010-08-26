@@ -385,7 +385,7 @@ public class AliquotWrapper extends
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " where patientVisit.patient.study.site.id = ? and activityStatus != ?",
+                + " where patientVisit.shipment.site.id = ? and activityStatus != ?",
             Arrays.asList(new Object[] { site.getId(),
                 activeStatus.getWrappedObject() }));
         List<Aliquot> aliquots = appService.query(criteria);
