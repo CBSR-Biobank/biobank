@@ -195,8 +195,9 @@ public class DispatchShipmentWrapper extends
                     allContainersWrappers.add(container);
                 }
             }
-            // new patients
+            // new containers
             for (DispatchContainerWrapper container : newContainers) {
+                container.setShipment(this);
                 sentContainersAdded.add(container);
                 sentContainersRemoved.remove(container);
                 allContainersObjects.add(container.getWrappedObject());
@@ -209,24 +210,24 @@ public class DispatchShipmentWrapper extends
 
     public void removeSentContainers(
         List<DispatchContainerWrapper> containersToRemove) {
-        if (containersToRemove != null && containersToRemove.size() > 0) {
-            sentContainersAdded.removeAll(containersToRemove);
-            sentContainersRemoved.addAll(containersToRemove);
-            Collection<DispatchContainer> allContainerObjects = new HashSet<DispatchContainer>();
-            List<DispatchContainerWrapper> allContainerWrappers = new ArrayList<DispatchContainerWrapper>();
-            // already in list
-            List<DispatchContainerWrapper> containersList = getSentContainerCollection();
-            if (containersList != null) {
-                for (DispatchContainerWrapper container : containersList) {
-                    if (!containersToRemove.contains(container)) {
-                        allContainerObjects.add(container.getWrappedObject());
-                        allContainerWrappers.add(container);
-                    }
+        if ((containersToRemove == null) || (containersToRemove.size() == 0))
+            return;
+
+        sentContainersAdded.removeAll(containersToRemove);
+        sentContainersRemoved.addAll(containersToRemove);
+        Collection<DispatchContainer> allContainerObjects = new HashSet<DispatchContainer>();
+        List<DispatchContainerWrapper> allContainerWrappers = new ArrayList<DispatchContainerWrapper>();
+        // already in list
+        List<DispatchContainerWrapper> containersList = getSentContainerCollection();
+        if (containersList != null) {
+            for (DispatchContainerWrapper container : containersList) {
+                if (!containersToRemove.contains(container)) {
+                    allContainerObjects.add(container.getWrappedObject());
+                    allContainerWrappers.add(container);
                 }
             }
-            setSentContainerCollection(allContainerObjects,
-                allContainerWrappers);
         }
+        setSentContainerCollection(allContainerObjects, allContainerWrappers);
     }
 
     @Override

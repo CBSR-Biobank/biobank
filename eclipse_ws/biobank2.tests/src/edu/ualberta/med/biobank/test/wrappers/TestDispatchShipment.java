@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -15,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchContainerHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchInfoHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
@@ -287,10 +289,13 @@ public class TestDispatchShipment extends TestDatabase {
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite);
 
+        ContainerTypeWrapper containerType = ContainerTypeHelper
+            .addContainerTypeRandom(senderSite, name, false);
+
         List<DispatchContainerWrapper> containerSet1 = new ArrayList<DispatchContainerWrapper>();
-        for (int i = 0; i < r.nextInt(); ++i) {
-            containerSet1.add(DispatchContainerHelper.newContainerRandom(
-                senderSite, name));
+        for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
+            containerSet1.add(DispatchContainerHelper.newContainer(name
+                + "_s1_" + i, containerType));
         }
 
         shipment.addSentContainers(containerSet1);
@@ -300,13 +305,14 @@ public class TestDispatchShipment extends TestDatabase {
         List<DispatchContainerWrapper> dispatchContainers = shipment
             .getSentContainerCollection();
         Assert.assertEquals(containerSet1.size(), dispatchContainers.size());
-        Assert.assertTrue(dispatchContainers.containsAll(containerSet1));
+
+        containerSet1 = dispatchContainers; // persisted copy
 
         // add more containers
         List<DispatchContainerWrapper> containerSet2 = new ArrayList<DispatchContainerWrapper>();
-        for (int i = 0; i < r.nextInt(); ++i) {
-            containerSet2.add(DispatchContainerHelper.newContainerRandom(
-                senderSite, name));
+        for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
+            containerSet2.add(DispatchContainerHelper.newContainer(name
+                + "_s2_" + i, containerType));
         }
 
         shipment.addSentContainers(containerSet2);
@@ -316,7 +322,6 @@ public class TestDispatchShipment extends TestDatabase {
         dispatchContainers = shipment.getSentContainerCollection();
         Assert.assertEquals(containerSet1.size() + containerSet2.size(),
             dispatchContainers.size());
-        Assert.assertTrue(dispatchContainers.containsAll(containerSet2));
 
         shipment.removeSentContainers(containerSet1);
         shipment.persist();
@@ -324,7 +329,5 @@ public class TestDispatchShipment extends TestDatabase {
 
         dispatchContainers = shipment.getSentContainerCollection();
         Assert.assertEquals(containerSet2.size(), dispatchContainers.size());
-        Assert.assertTrue(dispatchContainers.containsAll(containerSet2));
     }
-
 }

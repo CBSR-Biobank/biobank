@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.test.internal;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -53,6 +55,40 @@ public class DbHelper {
             }
             container.reload();
             container.delete();
+        }
+    }
+
+    public static void deleteDispatchContainers(
+        Collection<DispatchContainerWrapper> containers) throws Exception {
+        Assert.assertNotNull("appService is null", appService);
+        if ((containers == null) || (containers.size() == 0))
+            return;
+
+        for (DispatchContainerWrapper container : containers) {
+            container.reload();
+            if (container.hasAliquots()) {
+                deleteFromList(container.getAliquots().values());
+            }
+            container.reload();
+            container.delete();
+        }
+    }
+
+    public static void deleteDispatchShipments(
+        Collection<DispatchShipmentWrapper> shipments) throws Exception {
+        Assert.assertNotNull("appService is null", appService);
+        if ((shipments == null) || (shipments.size() == 0))
+            return;
+
+        for (DispatchShipmentWrapper shipment : shipments) {
+            shipment.reload();
+            List<DispatchContainerWrapper> containers = shipment
+                .getSentContainerCollection();
+            if (containers != null) {
+                deleteDispatchContainers(containers);
+            }
+            shipment.reload();
+            shipment.delete();
         }
     }
 

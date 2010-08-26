@@ -12,8 +12,7 @@ public class DispatchContainerHelper extends DbHelper {
         DispatchContainerWrapper container;
 
         container = new DispatchContainerWrapper(appService);
-        // FIXME setProductBarcode needs to be implemented
-        // container.setProductBarcode(barcode);
+        container.setProductBarcode(barcode);
         container.setContainerType(type);
         container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, "Active"));
