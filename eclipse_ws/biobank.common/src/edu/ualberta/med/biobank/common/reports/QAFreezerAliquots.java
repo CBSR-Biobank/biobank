@@ -3,11 +3,6 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.ContainerPath;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 public class QAFreezerAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquot QA";
@@ -20,7 +15,7 @@ public class QAFreezerAliquots extends QueryObject {
                 + "aliquot.patientVisit.patient.pnumber, aliquot.patientVisit.id, "
                 + "aliquot.patientVisit.dateProcessed, aliquot.sampleType.nameShort from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.aliquotPosition not in (from "
+                + " as aliquot where aliquot.aliquotPosition.id not in (from "
                 + AliquotPosition.class.getName()
                 + " a where a.container.label like 'SS%') and aliquot.patientVisit.dateProcessed "
                 + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"

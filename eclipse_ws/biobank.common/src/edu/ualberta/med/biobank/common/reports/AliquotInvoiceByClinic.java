@@ -4,9 +4,6 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
-
 public class AliquotInvoiceByClinic extends QueryObject {
 
     protected static final String NAME = "Aliquots per Clinic by Date";
@@ -15,7 +12,7 @@ public class AliquotInvoiceByClinic extends QueryObject {
         + "Alias.patientVisit.patient.pnumber, "
         + "Alias.linkDate, Alias.sampleType.name  from "
         + Aliquot.class.getName()
-        + " as Alias where Alias.aliquotPosition not in (from "
+        + " as Alias where Alias.aliquotPosition.id not in (from "
         + AliquotPosition.class.getName()
         + " a where a.container.label like ?) and Alias.linkDate > ? and Alias.linkDate < ? and "
         + "Alias.patientVisit.patient.study.site.id {1} {0,number,#} ORDER BY "

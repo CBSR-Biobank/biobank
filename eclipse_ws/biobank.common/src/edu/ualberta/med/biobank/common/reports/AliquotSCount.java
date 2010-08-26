@@ -2,9 +2,6 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
-
 public class AliquotSCount extends QueryObject {
 
     protected static final String NAME = "Sample Types by Study";
@@ -14,7 +11,7 @@ public class AliquotSCount extends QueryObject {
             "Lists the total number of each aliquot sample type by study, within a give date range.",
             "Select Alias.patientVisit.patient.study.nameShort, Alias.sampleType.name, count(*) from "
                 + Aliquot.class.getName()
-                + " as Alias where Alias.aliquotPosition not in (from "
+                + " as Alias where Alias.aliquotPosition.id not in (from "
                 + AliquotPosition.class.getName()
                 + " a where a.container.label like 'SS%') and Alias.linkDate between ? and ? and Alias.patientVisit.patient.study.site "
                 + op

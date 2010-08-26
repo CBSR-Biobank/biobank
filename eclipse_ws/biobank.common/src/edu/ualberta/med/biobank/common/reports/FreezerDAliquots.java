@@ -4,18 +4,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.ContainerPath;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 public class FreezerDAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";
 
     protected static final String query = "select aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.name , year(aliquot.linkDate), {2}(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
-        + " as aliquot where aliquot.aliquotPosition not in (from "
+        + " as aliquot where aliquot.aliquotPosition.id not in (from "
         + AliquotPosition.class.getName()
         + " a where a.container.label like ?) and aliquot.aliquotPosition.container.id in (select path1.container.id from "
         + ContainerPath.class.getName()

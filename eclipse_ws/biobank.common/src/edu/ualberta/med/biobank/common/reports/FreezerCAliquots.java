@@ -2,10 +2,6 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.ContainerPath;
-
 public class FreezerCAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study per Clinic";
@@ -16,7 +12,7 @@ public class FreezerCAliquots extends QueryObject {
             "select aliquot.patientVisit.patient.study.nameShort, "
                 + "aliquot.patientVisit.shipment.clinic.name, count(*) from "
                 + Aliquot.class.getName()
-                + " as aliquot where aliquot.aliquotPosition not in (from "
+                + " as aliquot where aliquot.aliquotPosition.id not in (from "
                 + AliquotPosition.class.getName()
                 + " a where a.container.label like 'SS%') and aliquot.aliquotPosition.container.id "
                 + "in (select path1.container.id from "
