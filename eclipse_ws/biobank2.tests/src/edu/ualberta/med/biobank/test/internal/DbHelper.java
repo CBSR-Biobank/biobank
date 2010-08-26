@@ -98,9 +98,6 @@ public class DbHelper {
         throws Exception {
         Assert.assertNotNull("appService is null", appService);
         for (ClinicWrapper clinic : clinics) {
-            clinic.reload();
-            deleteFromList(clinic.getShipmentCollection());
-            clinic.reload();
             clinic.delete();
         }
     }

@@ -243,12 +243,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
         if ((getContainerCollection() != null && getContainerCollection()
             .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
+                .size() > 0)
+            || (getShipmentCollection() != null && getShipmentCollection()
                 .size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
-                    + ". All defined children (studies, clinics, container types, and containers) must be removed first.");
+                    + ". All defined children (shipments, container types, and containers) must be removed first.");
         }
+
     }
 
     public void addStudies(List<StudyWrapper> studies) {

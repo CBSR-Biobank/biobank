@@ -66,6 +66,7 @@ public class SiteHelper extends DbHelper {
         site.reload();
         deleteContainers(site.getContainerCollection());
         deleteFromList(site.getContainerTypeCollection());
+        deleteFromList(site.getShipmentCollection());
         site.reload();
         // deleteDispatchShipments(site.getXXXXXXX())
         site.delete();

@@ -28,13 +28,13 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -236,33 +236,36 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study1 = StudyHelper.addStudy(name);
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
 
+        int totalBefore = ContactWrapper.getAllContacts(appService).size();
         ClinicWrapper clinic = ClinicHelper.addClinic("CL1");
-        int contactCount = ContactHelper.addContactsToClinic(clinic, "CL1-CT",
-            5, 10);
+        int newContactsCount = ContactHelper.addContactsToClinic(clinic,
+            "CL1-CT", 5, 10);
+        int totalContacts = totalBefore + newContactsCount;
 
-        Assert.assertEquals(contactCount, study1.getContactsNotAssoc().size());
+        Assert.assertEquals(totalContacts, study1.getContactsNotAssoc().size());
 
         List<ContactWrapper> contacts = clinic.getContactCollection();
         Assert.assertNotNull(contacts);
 
         // associate all contacts with study1
-        for (int i = 0; i < contactCount; ++i) {
+        for (int i = 0; i < newContactsCount; ++i) {
             study1.addContacts(Arrays.asList(contacts.get(i)));
             study1.persist();
             study1.reload();
-            Assert.assertEquals(contactCount - i - 1, study1
+            Assert.assertEquals(totalContacts - i - 1, study1
                 .getContactsNotAssoc().size());
         }
 
         // move all contacts to study2
-        for (int i = 0; i < contactCount; ++i) {
+        for (int i = 0; i < newContactsCount; ++i) {
             study1.removeContacts(Arrays.asList(contacts.get(i)));
             study1.persist();
             study1.reload();
             study2.addContacts(Arrays.asList(contacts.get(i)));
             study2.persist();
             study2.reload();
-            Assert.assertEquals(i + 1, study1.getContactsNotAssoc().size());
+            Assert.assertEquals(totalBefore + i + 1, study1
+                .getContactsNotAssoc().size());
         }
 
         // remove contacts one by one
@@ -274,8 +277,8 @@ public class TestStudy extends TestDatabase {
             study2.reload();
             contact.delete();
             contacts.remove(0);
-            Assert.assertEquals(contacts.size(), study1.getContactsNotAssoc()
-                .size());
+            Assert.assertEquals(totalBefore + contacts.size(), study1
+                .getContactsNotAssoc().size());
             contacts = clinic.getContactCollection();
         }
     }
@@ -778,12 +781,12 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site1,
-            clinic1, patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site1, clinic1, patient1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site2,
-            clinic2, patient1, patient2);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site2, clinic2, patient1, patient2);
         // clinic 1 = 1 patient for study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
         PatientVisitHelper.addPatientVisits(patient1, shipment2);
@@ -827,10 +830,10 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site1,
-            clinic1, patient1, patient3);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site2,
-            clinic2, patient1, patient2);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site1, clinic1, patient1, patient3);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site2, clinic2, patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
         long nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
@@ -878,12 +881,12 @@ public class TestStudy extends TestDatabase {
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, patient1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
-            clinic2, patient1, patient2);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic2, patient1, patient2);
         // clinic 1 = 1 patient for study 1
         PatientVisitHelper.addPatientVisits(patient1, shipment1);
         PatientVisitHelper.addPatientVisits(patient1, shipment2);
@@ -924,10 +927,10 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1, patient3);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
-            clinic2, patient1, patient2);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, patient1, patient3);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic2, patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
@@ -980,10 +983,10 @@ public class TestStudy extends TestDatabase {
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1, patient2);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
-            clinic2, patient1, patient2);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, patient1, patient2);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic2, patient1, patient2);
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
             .size();
         int nber2 = PatientVisitHelper.addPatientVisits(patient1, shipment2)

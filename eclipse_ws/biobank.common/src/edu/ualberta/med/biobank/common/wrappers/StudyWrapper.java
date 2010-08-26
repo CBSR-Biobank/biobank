@@ -941,15 +941,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public static List<StudyWrapper> getAllStudies(
-        WritableApplicationService appService) {
+        WritableApplicationService appService) throws ApplicationException {
         List<Study> studies = new ArrayList<Study>();
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria("from " + Study.class.getName());
-        try {
-            studies = appService.query(c);
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        studies = appService.query(c);
         for (Study study : studies)
             wrappers.add(new StudyWrapper(appService, study));
         return wrappers;
