@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -144,20 +145,35 @@ public class PatientVisitSummaryTest {
         return report;
     }
 
-    private void checkReport(Date after, Date before)
+    private Collection<Object> checkReport(Date after, Date before)
         throws ApplicationException {
-        TestReports.getInstance().checkReport(getReport(after, before),
+        return TestReports.getInstance().checkReport(getReport(after, before),
             getExpectedResults(after, before));
     }
 
     @Test
     public void testResults() throws Exception {
-        checkReport(new Date(0), new Date());
+        Collection<Object> results = checkReport(new Date(0), new Date());
+        Assert.assertTrue(results.size() > 0);
     }
 
     @Test
     public void testEmptyDateRange() throws Exception {
-        checkReport(new Date(), new Date(0));
+        Collection<Object> results = checkReport(new Date(), new Date(0));
+        Assert.assertTrue(results.size() == 0);
+    }
+
+    @Test
+    public void testSmallDatePoint() throws Exception {
+        List<PatientVisitWrapper> patientVisits = TestReports.getInstance()
+            .getPatientVisits();
+        Assert.assertTrue(patientVisits.size() > 0);
+
+        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+            .size() / 2);
+
+        checkReport(patientVisit.getDateProcessed(),
+            patientVisit.getDateProcessed());
     }
 
     @Test
@@ -168,7 +184,11 @@ public class PatientVisitSummaryTest {
 
         PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
             .size() / 2);
-        checkReport(patientVisit.getDateProcessed(),
-            patientVisit.getDateProcessed());
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(patientVisit.getDateProcessed());
+        calendar.add(Calendar.HOUR_OF_DAY, 24);
+
+        checkReport(patientVisit.getDateProcessed(), calendar.getTime());
     }
 }

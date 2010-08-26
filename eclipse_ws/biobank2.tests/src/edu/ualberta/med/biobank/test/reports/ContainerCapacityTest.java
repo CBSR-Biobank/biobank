@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
@@ -76,7 +78,7 @@ public class ContainerCapacityTest {
         Collection<ContainerWrapper> containers) {
 
         Collection<ContainerWrapper> filteredContainers = PredicateUtil.filter(
-            containers, TestReports.CAN_STORE_SAMPLES_PREDICATE);
+            containers, TestReports.CONTAINER_CAN_STORE_SAMPLES_PREDICATE);
 
         List<Object> expectedResults = new ArrayList<Object>();
 
@@ -104,8 +106,10 @@ public class ContainerCapacityTest {
 
     @Test
     public void testResults() throws Exception {
-        TestReports.getInstance().checkReport(getReport(),
+        Collection<Object> results = TestReports.getInstance().checkReport(
+            getReport(),
             getExpectedResults(TestReports.getInstance().getContainers()));
+        Assert.assertTrue(results.size() > 0);
     }
 
     // TODO: test getRowPostProcess(). Test the implementations of

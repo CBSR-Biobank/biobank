@@ -2,62 +2,55 @@ package edu.ualberta.med.biobank.test.reports;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.util.Mapper;
-import edu.ualberta.med.biobank.common.util.MapperUtil;
-import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class AliquotCountTest {
-    private static final Predicate<AliquotWrapper> NOT_SAMPLE_STORAGE_PREDICATE = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
-            return (aliquot.getParent() == null)
-                || !aliquot.getParent().getLabel().startsWith("SS");
-        }
-    };
-    private static final Mapper<AliquotWrapper, String, Long> SAMPLE_TYPE_NAME_MAPPER = new Mapper<AliquotWrapper, String, Long>() {
-        public String getKey(AliquotWrapper aliquot) {
-            return aliquot.getSampleType().getName();
+public class AliquotInvoiceByPatientTest {
+    private static final Comparator<AliquotWrapper> ORDER_BY_ALIQUOT_PATIENT_NUMBER = new Comparator<AliquotWrapper>() {
+        public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
+            return lhs.getPatientVisit().getPatient().getPnumber()
+                .compareTo(rhs.getPatientVisit().getPatient().getPnumber());
         }
 
-        public Long getValue(AliquotWrapper type, Long oldValue) {
-            return oldValue != null ? new Long(oldValue + 1) : new Long(1);
-        }
     };
 
     private List<Object> getExpectedResults(final Date after, final Date before) {
         Collection<AliquotWrapper> allAliquots = TestReports.getInstance()
             .getAliquots();
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
-            allAliquots, PredicateUtil.andPredicate(
+        List<AliquotWrapper> filteredAliquots = new ArrayList<AliquotWrapper>(
+            PredicateUtil.filter(allAliquots, PredicateUtil.andPredicate(
                 TestReports.aliquotLinkedBetween(after, before),
-                NOT_SAMPLE_STORAGE_PREDICATE));
+                TestReports.ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER)));
+
+        Collections.sort(filteredAliquots, ORDER_BY_ALIQUOT_PATIENT_NUMBER);
 
         List<Object> expectedResults = new ArrayList<Object>();
 
-        for (Map.Entry<String, Long> entry : MapperUtil.map(filteredAliquots,
-            SAMPLE_TYPE_NAME_MAPPER).entrySet()) {
-            expectedResults
-                .add(new Object[] { entry.getKey(), entry.getValue() });
+        for (AliquotWrapper aliquot : filteredAliquots) {
+            expectedResults.add(new Object[] { aliquot.getInventoryId(),
+                aliquot.getPatientVisit().getPatient().getPnumber(),
+                aliquot.getPatientVisit().getShipment().getClinic().getName(),
+                aliquot.getLinkDate(), aliquot.getSampleType().getName() });
         }
 
         return expectedResults;
     }
 
     private BiobankReport getReport(Date after, Date before) {
-        BiobankReport report = BiobankReport.getReportByName("AliquotCount");
+        BiobankReport report = BiobankReport
+            .getReportByName("AliquotInvoiceByPatient");
         report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
             .getId());
         report.setContainerList("");
@@ -72,7 +65,7 @@ public class AliquotCountTest {
     private Collection<Object> checkReport(Date after, Date before)
         throws ApplicationException {
         return TestReports.getInstance().checkReport(getReport(after, before),
-            getExpectedResults(after, before));
+            getExpectedResults(after, before), true);
     }
 
     @Test
@@ -102,11 +95,6 @@ public class AliquotCountTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(aliquot.getLinkDate());
-        calendar.add(Calendar.HOUR_OF_DAY, 24);
-
-        checkReport(aliquot.getLinkDate(), calendar.getTime());
+        checkReport(aliquot.getLinkDate(), aliquot.getLinkDate());
     }
 }

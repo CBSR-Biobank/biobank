@@ -13,7 +13,7 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + " pv.dateDrawn,  Alias.sampleType.name, count(*) from "
         + PatientVisit.class.getName()
         + " as pv join pv.aliquotCollection as Alias where pv.patient.study.nameShort LIKE ? "
-        + " and Alias.aliquotPosition not in (from "
+        + " and Alias.aliquotPosition.id not in (from "
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME

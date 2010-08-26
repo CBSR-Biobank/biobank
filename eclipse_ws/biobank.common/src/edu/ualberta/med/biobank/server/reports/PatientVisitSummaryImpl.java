@@ -26,15 +26,17 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + SITE_OPERATOR_SEARCH_STRING
         + SITE_ID_SEARCH_STRING
         + " group by s.name_short, c.name_short, p.pnumber) as filteredPvs group by study_name, "
-        + "clinic_name";
+        + "clinic_name order by study_name, clinic_name";
 
     public PatientVisitSummaryImpl(BiobankReport report) {
         super(QUERY_STRING, report);
         List<Object> parameters = report.getParams();
         this.queryString = queryString.replaceFirst("\\?",
-            "'" + DateFormatter.formatAsDate((Date) parameters.get(0)) + "'");
+            "'" + DateFormatter.formatAsDateTime((Date) parameters.get(0))
+                + "'");
         this.queryString = queryString.replaceFirst("\\?",
-            "'" + DateFormatter.formatAsDate((Date) parameters.get(1)) + "'");
+            "'" + DateFormatter.formatAsDateTime((Date) parameters.get(1))
+                + "'");
         report.setParams(parameters);
     }
 

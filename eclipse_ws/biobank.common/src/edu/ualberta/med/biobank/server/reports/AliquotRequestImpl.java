@@ -22,7 +22,7 @@ public class AliquotRequestImpl extends AbstractReport {
         + SITE_ID + " and p.container.label not like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "' and p.aliquot.patientVisit.patient.pnumber like ? and"
-        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) between 0 and 1  and"
+        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
         + " p.aliquot.sampleType.nameShort like ? ORDER BY RAND()";
 
     public AliquotRequestImpl(BiobankReport report) {

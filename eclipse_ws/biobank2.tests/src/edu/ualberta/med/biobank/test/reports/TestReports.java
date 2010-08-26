@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.reports;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -50,13 +51,21 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
 @SuiteClasses({ AliquotCountTest.class, ContainerCapacityTest.class,
-    ContainerEmptyLocationsTest.class, PatientVisitSummaryTest.class })
+    ContainerEmptyLocationsTest.class, PatientVisitSummaryTest.class,
+    AliquotInvoiceByClinicTest.class, AliquotInvoiceByPatientTest.class,
+    AliquotRequestTest.class })
 public final class TestReports {
-    public static final Predicate<ContainerWrapper> CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
+    public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
             return (container.getContainerType().getSampleTypeCollection() != null)
                 && (container.getContainerType().getSampleTypeCollection()
                     .size() > 0);
+        }
+    };
+    public static final Predicate<AliquotWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<AliquotWrapper>() {
+        public boolean evaluate(AliquotWrapper aliquot) {
+            return (aliquot.getParent() == null)
+                || !aliquot.getParent().getLabel().startsWith("SS");
         }
     };
 
@@ -115,6 +124,33 @@ public final class TestReports {
         return INSTANCE;
     }
 
+    public static Predicate<AliquotWrapper> aliquotLinkedBetween(
+        final Date after, final Date before) {
+        return new Predicate<AliquotWrapper>() {
+            public boolean evaluate(AliquotWrapper aliquot) {
+                return (aliquot.getLinkDate().after(after) || aliquot
+                    .getLinkDate().equals(after))
+                    && (aliquot.getLinkDate().before(before) || aliquot
+                        .getLinkDate().equals(before));
+            }
+        };
+    }
+
+    public static Predicate<AliquotWrapper> aliquotDrawnSameDay(final Date date) {
+        final Calendar dateOfInterest = Calendar.getInstance();
+        return new Predicate<AliquotWrapper>() {
+            private Calendar drawn = Calendar.getInstance();
+
+            public boolean evaluate(AliquotWrapper aliquot) {
+                drawn.setTime(aliquot.getPatientVisit().getDateDrawn());
+                return (drawn.get(Calendar.DAY_OF_YEAR) == dateOfInterest
+                    .get(Calendar.DAY_OF_YEAR))
+                    && (drawn.get(Calendar.YEAR) == dateOfInterest
+                        .get(Calendar.YEAR));
+            }
+        };
+    }
+
     @BeforeClass
     public static void setUp() throws Exception {
         // generate sites
@@ -122,6 +158,8 @@ public final class TestReports {
             getInstance().sites.add(SiteHelper.addSite(getInstance()
                 .getRandString()));
         }
+
+        Calendar calendar = Calendar.getInstance();
 
         for (int siteIndex = 0, numSites = getInstance().sites.size(); siteIndex < numSites; siteIndex++) {
             SiteWrapper site = getInstance().sites.get(siteIndex);
@@ -263,7 +301,7 @@ public final class TestReports {
 
                         // note: remember to use seconds since the database
                         // will only support that resolution
-                        millisecondsPastEpoch += 1000;
+                        millisecondsPastEpoch += 2 * 60 * 60 * 1000;
                     }
 
                     shipment.persist();
@@ -279,6 +317,7 @@ public final class TestReports {
             }
 
             // populate the containers with aliquots
+            int aliquotNumber = 0;
             for (int containerIndex = 0, numContainers = getInstance().containers
                 .size(); containerIndex < numContainers; containerIndex++) {
                 container = getInstance().containers.get(containerIndex);
@@ -288,9 +327,7 @@ public final class TestReports {
                         .size() > 0)) {
                     for (int row = 0, numRows = container.getRowCapacity(); row < numRows; row++) {
                         for (int col = 0, numCols = container.getColCapacity(); col < numCols; col++) {
-                            int aliquotNumber = (siteIndex * numSites)
-                                + (containerIndex * numContainers)
-                                + (row * numRows) + col;
+                            aliquotNumber++;
 
                             // cycle through sample types
                             sampleType = getInstance().sampleTypes
@@ -312,10 +349,10 @@ public final class TestReports {
 
                             // base the link date on the date the patient visit
                             // is processed
-                            aliquot
-                                .setLinkDate(new Date(
-                                    (patientVisit.getDateProcessed()
-                                        .getSeconds() + 10 * 60) * 1000));
+                            calendar.setTime(patientVisit.getDateProcessed());
+                            calendar.add(Calendar.MINUTE, 10);
+
+                            aliquot.setLinkDate(calendar.getTime());
                             aliquot.persist();
 
                             getInstance().aliquots.add(aliquot);
@@ -390,8 +427,14 @@ public final class TestReports {
         return patients;
     }
 
-    public List<Object> checkReport(BiobankReport report,
+    public Collection<Object> checkReport(BiobankReport report,
         Collection<Object> expectedResults) throws ApplicationException {
+        return checkReport(report, expectedResults, false);
+    }
+
+    public Collection<Object> checkReport(BiobankReport report,
+        Collection<Object> expectedResults, boolean isOrdered)
+        throws ApplicationException {
         List<Object> actualResults = report.generate(getAppService());
 
         int actualResultsSize = actualResults.size();
@@ -409,7 +452,7 @@ public final class TestReports {
             Assert.fail();
         }
 
-        // order independent comparison of results
+        int rowIndex = 0;
         for (Object expectedRow : postProcessedExpectedResults) {
             Object postProcessedExpectedRow = expectedRow;
             if (abstractReport.getRowPostProcess() != null) {
@@ -418,11 +461,18 @@ public final class TestReports {
             }
 
             boolean isFound = false;
-            for (Object actualRow : actualResults) {
+            if (isOrdered) {
                 if (Arrays.equals((Object[]) postProcessedExpectedRow,
-                    (Object[]) actualRow)) {
+                    (Object[]) actualResults.get(rowIndex))) {
                     isFound = true;
-                    break;
+                }
+            } else {
+                for (Object actualRow : actualResults) {
+                    if (Arrays.equals((Object[]) postProcessedExpectedRow,
+                        (Object[]) actualRow)) {
+                        isFound = true;
+                        break;
+                    }
                 }
             }
             if (!isFound) {
@@ -432,8 +482,10 @@ public final class TestReports {
                 System.out.println("Found: "
                     + Arrays.toString((Object[]) postProcessedExpectedRow));
             }
+
+            rowIndex++;
         }
 
-        return actualResults;
+        return postProcessedExpectedResults;
     }
 }

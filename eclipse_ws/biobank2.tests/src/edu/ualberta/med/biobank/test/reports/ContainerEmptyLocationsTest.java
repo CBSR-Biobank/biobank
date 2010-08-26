@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
@@ -35,7 +37,7 @@ public class ContainerEmptyLocationsTest {
                 specificContainerType));
 
         Collection<ContainerWrapper> otherContainers = PredicateUtil.filter(
-            allContainers, TestReports.CAN_STORE_SAMPLES_PREDICATE);
+            allContainers, TestReports.CONTAINER_CAN_STORE_SAMPLES_PREDICATE);
 
         List<Object> expectedResults = new ArrayList<Object>();
 
@@ -69,26 +71,29 @@ public class ContainerEmptyLocationsTest {
         return report;
     }
 
-    private void checkReport(String containerLabel,
+    private Collection<Object> checkReport(String containerLabel,
         String topContainerTypeShortName) throws ApplicationException {
-        TestReports.getInstance().checkReport(
+        return TestReports.getInstance().checkReport(
             getReport(containerLabel, topContainerTypeShortName),
             getExpectedResults(containerLabel, topContainerTypeShortName));
     }
 
     @Test
     public void testResults() throws Exception {
+        Collection<Object> results;
         for (ContainerWrapper container : TestReports.getInstance()
             .getContainers()) {
             checkReport(container.getLabel(), container.getContainerType()
                 .getNameShort());
-            checkReport(container.getLabel(), "");
+            results = checkReport(container.getLabel(), "");
+            Assert.assertTrue(results.size() == 0);
         }
     }
 
     @Test
     public void testEmpty() throws ApplicationException {
-        checkReport("", "");
+        Collection<Object> results = checkReport("", "");
+        Assert.assertTrue(results.size() == 0);
     }
 
     // TODO: test postProcess()
