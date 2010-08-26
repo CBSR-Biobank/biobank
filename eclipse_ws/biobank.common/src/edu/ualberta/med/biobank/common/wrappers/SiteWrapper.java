@@ -617,8 +617,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             params.add(study.getId());
         }
         HQLCriteria criteria = new HQLCriteria(
-            "select info.toSiteCollection from " + DispatchInfo.class.getName()
-                + " as info where info.fromSite.id = ?" + studyString, params);
+            "select info.destSiteCollection from "
+                + DispatchInfo.class.getName()
+                + " as info where info.srcSite.id = ?" + studyString, params);
         List<Site> results = appService.query(criteria);
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site res : results) {
