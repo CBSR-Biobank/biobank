@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -162,6 +163,9 @@ public class DispatchContainerWrapper extends
         aliquotPosition.setContainer(this);
         Collection<DispatchPosition> positions = wrappedObject
             .getPositionCollection();
+        if (positions == null) {
+            positions = new HashSet<DispatchPosition>();
+        }
         positions.add(aliquotPosition.getWrappedObject());
         wrappedObject.setPositionCollection(positions);
         aliquots.put(new RowColPos(row, col), aliquot);

@@ -68,6 +68,7 @@ public class DispatchShipmentWrapper extends
     private void checkSenderCanSendToReceiver() throws BiobankCheckException,
         ApplicationException {
         if (getSender() != null && getReceiver() != null) {
+            // FIXME should know for which study...
             List<SiteWrapper> possibleReceivers = getSender()
                 .getStudyDispachSite(null);
             if (!possibleReceivers.contains(getReceiver())) {

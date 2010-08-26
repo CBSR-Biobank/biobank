@@ -689,4 +689,33 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         return notifCollection;
     }
+
+    public void addStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> sites) {
+        // FIXME to finish
+        // if ((studies == null) || (studies.size() == 0))
+        // return;
+        //
+        // Collection<Study> allStudyObjects = new HashSet<Study>();
+        // List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+        // // already added studies
+        // List<StudyWrapper> currentList = getStudyCollection();
+        // if (currentList != null) {
+        // for (StudyWrapper study : currentList) {
+        // allStudyObjects.add(study.getWrappedObject());
+        // allStudyWrappers.add(study);
+        // }
+        // }
+        // // new studies added
+        // for (StudyWrapper study : studies) {
+        // allStudyObjects.add(study.getWrappedObject());
+        // allStudyWrappers.add(study);
+        // }
+        // Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        // wrappedObject.setStudyCollection(allStudyObjects);
+        // propertyChangeSupport.firePropertyChange("studyCollection",
+        // oldStudies,
+        // allStudyObjects);
+        // propertiesMap.put("studyCollection", allStudyWrappers);
+    }
 }
