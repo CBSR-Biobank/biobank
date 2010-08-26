@@ -20,18 +20,138 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchContainerHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchInfoHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestDispatchContainer extends TestDatabase {
+
+    @Test
+    public void testGettersAndSetters() throws Exception {
+        String name = "testGettersAndSetters" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite);
+        ContainerTypeWrapper containerType = ContainerTypeHelper
+            .addContainerTypeRandom(senderSite, name, false);
+        DispatchContainerWrapper container = DispatchContainerHelper
+            .addContainer(name, shipment, containerType);
+
+        testGettersAndSetters(container);
+    }
+
+    @Test
+    public void testCompatreTo() throws Exception {
+        String name = "testCompareTo" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite);
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
+            senderSite, name, false);
+
+        DispatchContainerWrapper container1 = DispatchContainerHelper
+            .addContainer(name + "_c1", shipment, type);
+
+        DispatchContainerWrapper container2 = DispatchContainerHelper
+            .addContainer(name + "_c2", shipment, type);
+
+        Assert.assertTrue(container1.compareTo(container2) > 0);
+        Assert.assertTrue(container2.compareTo(container1) < 0);
+
+        Assert.assertTrue(container1.compareTo(null) == 0);
+        Assert.assertTrue(container2.compareTo(null) == 0);
+    }
+
+    // FIXME copied from dispatch container
+    @Test
+    public void testReset() throws Exception {
+        String name = "testReset" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+
+        // test reset for a new object
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
+            senderSite, receiverSite, name, Utils.getRandomDate());
+
+        shipment.reset();
+        Assert.assertEquals(null, shipment.getWaybill());
+
+        // test reset for an object already in database
+        shipment = DispatchShipmentHelper.addShipment(senderSite, receiverSite,
+            name, Utils.getRandomDate());
+        shipment.setWaybill("QQQQ");
+        shipment.reset();
+        Assert.assertEquals(name, shipment.getWaybill());
+    }
+
+    // FIXME copied from dispatch container
+    @Test
+    public void testReload() throws Exception {
+        String name = "testReload" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite, name, Utils.getRandomDate());
+
+        try {
+            shipment.reload();
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.fail("cannot reload shipment");
+        }
+    }
+
+    // FIXME copied from dispatch container
+    @Test
+    public void testGetWrappedClass() throws Exception {
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
+            null, null);
+        Assert.assertEquals(DispatchShipment.class, shipment.getWrappedClass());
+    }
+
+    // FIXME copied from dispatch container
+    @Test
+    public void testDetlete() throws Exception {
+        String name = "testDelete" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite, name, Utils.getRandomDate());
+
+        int countBefore = appService.search(DispatchShipment.class,
+            new DispatchShipment()).size();
+
+        shipment.delete();
+
+        int countAfter = appService.search(DispatchShipment.class,
+            new DispatchShipment()).size();
+
+        Assert.assertEquals(countBefore - 1, countAfter);
+
+    }
 
     @Test
     public void testDispatchContainerCascade() throws Exception {

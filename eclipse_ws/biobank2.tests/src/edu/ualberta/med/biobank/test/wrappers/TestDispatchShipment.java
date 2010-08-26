@@ -295,7 +295,7 @@ public class TestDispatchShipment extends TestDatabase {
         List<DispatchContainerWrapper> containerSet1 = new ArrayList<DispatchContainerWrapper>();
         for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
             containerSet1.add(DispatchContainerHelper.newContainer(name
-                + "_s1_" + i, containerType));
+                + "_s1_" + i, null, containerType));
         }
 
         shipment.addSentContainers(containerSet1);
@@ -312,7 +312,7 @@ public class TestDispatchShipment extends TestDatabase {
         List<DispatchContainerWrapper> containerSet2 = new ArrayList<DispatchContainerWrapper>();
         for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
             containerSet2.add(DispatchContainerHelper.newContainer(name
-                + "_s2_" + i, containerType));
+                + "_s2_" + i, null, containerType));
         }
 
         shipment.addSentContainers(containerSet2);

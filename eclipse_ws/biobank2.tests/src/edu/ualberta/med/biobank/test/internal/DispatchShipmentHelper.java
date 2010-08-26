@@ -85,7 +85,7 @@ public class DispatchShipmentHelper extends DbHelper {
         List<DispatchContainerWrapper> containers = new ArrayList<DispatchContainerWrapper>();
         for (int i = 0; i < numContainers; ++i) {
             containers.add(DispatchContainerHelper.addContainerRandom(sender,
-                name));
+                shipment, name));
         }
 
         shipment.addSentContainers(containers);
