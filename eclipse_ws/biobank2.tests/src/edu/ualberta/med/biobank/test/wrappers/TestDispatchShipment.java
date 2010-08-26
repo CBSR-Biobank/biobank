@@ -11,12 +11,15 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.DispatchContainerHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchInfoHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestDispatchShipment extends TestDatabase {
 
@@ -25,6 +28,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite);
@@ -44,6 +49,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testGetSetSender" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
             null, receiverSite);
@@ -66,6 +73,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testGetSetReceiver" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
             senderSite, null);
@@ -89,6 +98,13 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite2 = SiteHelper.addSite(name + "_sender2");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         SiteWrapper receiverSite2 = SiteHelper.addSite(name + "_receiver2");
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_study2");
+
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite,
+            receiverSite2);
+        DispatchInfoHelper.addInfo(study2, senderSite2, receiverSite2);
 
         DispatchShipmentHelper.addShipment(senderSite, receiverSite, name,
             Utils.getRandomDate());
@@ -149,7 +165,18 @@ public class TestDispatchShipment extends TestDatabase {
         try {
             shipment.persist();
             Assert
-                .fail("should be allowed to persist a dispatch shipment without a receiver");
+                .fail("should not be allowed to persist a dispatch shipment without a receiver");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // test sender can send to receiver
+        shipment = DispatchShipmentHelper.newShipment(senderSite2,
+            receiverSite, TestCommon.getNewWaybill(r), Utils.getRandomDate());
+        try {
+            shipment.persist();
+            Assert
+                .fail("should not be allowed to persist a dispatch shipment where sender and receiver are not associated");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
@@ -160,6 +187,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testCompareTo" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment1 = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite);
@@ -183,6 +212,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testReset" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         // test reset for a new object
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
@@ -204,6 +235,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testReload" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite, name, Utils.getRandomDate());
 
@@ -227,6 +260,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testDelete" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite, name, Utils.getRandomDate());
 
@@ -247,6 +282,8 @@ public class TestDispatchShipment extends TestDatabase {
         String name = "testGetSetContainerCollection" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite);
 

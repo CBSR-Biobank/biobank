@@ -85,7 +85,7 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
         return fromSite;
     }
 
-    public void setFromSite(SiteWrapper fromSite) {
+    public void setSrcSite(SiteWrapper fromSite) {
         this.fromSite = fromSite;
         Site oldSiteRaw = wrappedObject.getSrcSite();
         Site newSiteRaw = fromSite.getWrappedObject();
@@ -111,7 +111,7 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
         return toSiteCollection;
     }
 
-    public void addToSites(Collection<SiteWrapper> newToSites) {
+    public void addDestSites(Collection<SiteWrapper> newToSites) {
         if (newToSites != null && newToSites.size() > 0) {
             Collection<Site> allSiteObjects = new HashSet<Site>();
             List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
