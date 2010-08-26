@@ -165,7 +165,18 @@ public class TestDispatchShipment extends TestDatabase {
         try {
             shipment.persist();
             Assert
-                .fail("should be allowed to persist a dispatch shipment without a receiver");
+                .fail("should not be allowed to persist a dispatch shipment without a receiver");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // test sender can send to receiver
+        shipment = DispatchShipmentHelper.newShipment(senderSite2,
+            receiverSite, TestCommon.getNewWaybill(r), Utils.getRandomDate());
+        try {
+            shipment.persist();
+            Assert
+                .fail("should not be allowed to persist a dispatch shipment where sender and receiver are not associated");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
