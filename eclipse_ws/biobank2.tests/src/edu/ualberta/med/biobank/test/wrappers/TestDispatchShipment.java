@@ -287,20 +287,44 @@ public class TestDispatchShipment extends TestDatabase {
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite);
 
-        List<DispatchContainerWrapper> containers = new ArrayList<DispatchContainerWrapper>();
+        List<DispatchContainerWrapper> containerSet1 = new ArrayList<DispatchContainerWrapper>();
         for (int i = 0; i < r.nextInt(); ++i) {
-            containers.add(DispatchContainerHelper.newContainerRandom(
+            containerSet1.add(DispatchContainerHelper.newContainerRandom(
                 senderSite, name));
         }
 
-        shipment.addSentContainers(containers);
+        shipment.addSentContainers(containerSet1);
         shipment.persist();
         shipment.reload();
 
         List<DispatchContainerWrapper> dispatchContainers = shipment
             .getSentContainerCollection();
-        Assert.assertEquals(containers.size(), dispatchContainers.size());
-        Assert.assertTrue(dispatchContainers.containsAll(containers));
+        Assert.assertEquals(containerSet1.size(), dispatchContainers.size());
+        Assert.assertTrue(dispatchContainers.containsAll(containerSet1));
+
+        // add more containers
+        List<DispatchContainerWrapper> containerSet2 = new ArrayList<DispatchContainerWrapper>();
+        for (int i = 0; i < r.nextInt(); ++i) {
+            containerSet2.add(DispatchContainerHelper.newContainerRandom(
+                senderSite, name));
+        }
+
+        shipment.addSentContainers(containerSet2);
+        shipment.persist();
+        shipment.reload();
+
+        dispatchContainers = shipment.getSentContainerCollection();
+        Assert.assertEquals(containerSet1.size() + containerSet2.size(),
+            dispatchContainers.size());
+        Assert.assertTrue(dispatchContainers.containsAll(containerSet2));
+
+        shipment.removeSentContainers(containerSet1);
+        shipment.persist();
+        shipment.reload();
+
+        dispatchContainers = shipment.getSentContainerCollection();
+        Assert.assertEquals(containerSet2.size(), dispatchContainers.size());
+        Assert.assertTrue(dispatchContainers.containsAll(containerSet2));
     }
 
 }
