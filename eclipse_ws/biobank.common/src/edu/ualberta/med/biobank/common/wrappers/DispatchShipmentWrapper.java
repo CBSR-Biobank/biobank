@@ -70,7 +70,7 @@ public class DispatchShipmentWrapper extends
         if (getSender() != null && getReceiver() != null) {
             // FIXME should know for which study...
             List<SiteWrapper> possibleReceivers = getSender()
-                .getStudyDispachSite(null);
+                .getStudyDispachSites(null);
             if (!possibleReceivers.contains(getReceiver())) {
                 throw new BiobankCheckException(getSender().getNameShort()
                     + " cannot dispatch aliquots to "

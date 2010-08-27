@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ClinicShipment;
@@ -44,9 +47,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "address", "clinicCollection", "siteCollection",
             "containerCollection", "shipmentCollection",
             "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode", "toDispatchInfoCollection",
-            "fromDispatchInfoCollection", "receivedDispatchShipmentCollection",
-            "sentDispatchShipmentCollection", "notificationCollection" };
+            "postalCode", "sentDispatchShipmentCollection",
+            "sentDispatchShipmentCollection", "notificationCollection",
+            "srcDispatchInfoCollection" };
     }
 
     public String getName() {
@@ -610,8 +613,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * if study == null, will get all sites to which can dispatch, for whatever
      * study
      */
-    public List<SiteWrapper> getStudyDispachSite(StudyWrapper study)
+    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
         throws ApplicationException {
+        // FIXME use the infos maps instead and do not manage null study
         String studyString = "";
         List<Object> params = new ArrayList<Object>();
         params.add(getId());
@@ -692,30 +696,48 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public void addStudyDispatchSites(StudyWrapper study,
         List<SiteWrapper> sites) {
-        // FIXME to finish
-        // if ((studies == null) || (studies.size() == 0))
-        // return;
-        //
-        // Collection<Study> allStudyObjects = new HashSet<Study>();
-        // List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-        // // already added studies
-        // List<StudyWrapper> currentList = getStudyCollection();
-        // if (currentList != null) {
-        // for (StudyWrapper study : currentList) {
-        // allStudyObjects.add(study.getWrappedObject());
-        // allStudyWrappers.add(study);
-        // }
-        // }
-        // // new studies added
-        // for (StudyWrapper study : studies) {
-        // allStudyObjects.add(study.getWrappedObject());
-        // allStudyWrappers.add(study);
-        // }
-        // Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-        // wrappedObject.setStudyCollection(allStudyObjects);
-        // propertyChangeSupport.firePropertyChange("studyCollection",
-        // oldStudies,
-        // allStudyObjects);
-        // propertiesMap.put("studyCollection", allStudyWrappers);
+        // FIXME need to be tested
+        if ((sites == null) || (sites.size() == 0))
+            return;
+        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
+        if (infos == null) {
+            infos = new HashMap<Integer, DispatchInfoWrapper>();
+        }
+        DispatchInfoWrapper diw = infos.get(study.getId());
+        if (diw == null) {
+            diw = new DispatchInfoWrapper(appService);
+            diw.setStudy(study);
+            diw.setSrcSite(this);
+            infos.put(study.getId(), diw);
+            Collection<DispatchInfo> allsInfoObjects = wrappedObject
+                .getSrcDispatchInfoCollection();
+            allsInfoObjects.add(diw.wrappedObject);
+            wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
+        }
+        diw.addDestSites(sites);
+    }
+
+    /**
+     * For one study, this site has one source dispatch info associated.
+     * 
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Integer, DispatchInfoWrapper> getSrcDispatchInfoCollection() {
+        Map<Integer, DispatchInfoWrapper> infos = (Map<Integer, DispatchInfoWrapper>) propertiesMap
+            .get("srcDispatchInfoCollection");
+        if (infos == null) {
+            Collection<DispatchInfo> children = wrappedObject
+                .getSrcDispatchInfoCollection();
+            if (children != null) {
+                infos = new HashMap<Integer, DispatchInfoWrapper>();
+                for (DispatchInfo di : children) {
+                    Integer studyId = di.getStudy().getId();
+                    infos.put(studyId, new DispatchInfoWrapper(appService, di));
+                }
+                propertiesMap.put("srcDispatchInfoCollection", infos);
+            }
+        }
+        return infos;
     }
 }
