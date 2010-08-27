@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
@@ -47,6 +50,21 @@ public class DispatchContainerHelper extends DbHelper {
             name);
         container.persist();
         return container;
+    }
+
+    public static void addAliquots(DispatchContainerWrapper container,
+        List<AliquotWrapper> aliquots, int startRow, int startCol)
+        throws Exception {
+
+        int maxCols = container.getContainerType().getColCapacity();
+        int count = 0;
+        for (AliquotWrapper aliquot : aliquots) {
+            container.addAliquot(startRow + count / maxCols, startCol + count
+                % maxCols, aliquot);
+            count++;
+        }
+        container.persist();
+        container.reload();
     }
 
 }
