@@ -61,7 +61,12 @@ public class DispatchContainerWrapper extends
     }
 
     @Override
-    public int compareTo(ModelWrapper<DispatchContainer> o) {
+    public int compareTo(ModelWrapper<DispatchContainer> wrapper) {
+        if (wrapper instanceof DispatchContainerWrapper) {
+            String c1Barcode = wrappedObject.getProductBarcode();
+            String c2Barcode = wrapper.wrappedObject.getProductBarcode();
+            return c1Barcode.compareTo(c2Barcode);
+        }
         return 0;
     }
 
