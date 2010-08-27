@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -104,7 +104,7 @@ public class TestActivityStatus extends TestDatabase {
         study.reload();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        ClinicShipmentWrapper shipment = ShipmentHelper.addShipment(site,
+        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
             clinic, patient);
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());

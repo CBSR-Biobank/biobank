@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.logging;
 
+import edu.ualberta.med.biobank.model.Log;
+
 public class MessageGenerator {
 
     public static String generateStringMessage(String action, String site,
@@ -14,6 +16,20 @@ public class MessageGenerator {
         append(sb, LogProperty.LOCATION_LABEL.getPropertyName(), locationLabel);
         append(sb, LogProperty.DETAILS.getPropertyName(), details);
         append(sb, LogProperty.TYPE.getPropertyName(), type);
+        return sb.toString();
+    }
+
+    public static String generateStringMessage(Log log) {
+        StringBuffer sb = new StringBuffer();
+        append(sb, LogProperty.ACTION.getPropertyName(), log.action);
+        append(sb, LogProperty.SITE.getPropertyName(), log.site);
+        append(sb, LogProperty.PATIENT_NUMBER.getPropertyName(),
+            log.patientNumber);
+        append(sb, LogProperty.INVENTORY_ID.getPropertyName(), log.inventoryId);
+        append(sb, LogProperty.LOCATION_LABEL.getPropertyName(),
+            log.locationLabel);
+        append(sb, LogProperty.DETAILS.getPropertyName(), log.details);
+        append(sb, LogProperty.TYPE.getPropertyName(), log.type);
         return sb.toString();
     }
 

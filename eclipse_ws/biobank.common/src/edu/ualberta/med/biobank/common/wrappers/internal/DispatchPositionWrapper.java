@@ -70,7 +70,7 @@ public class DispatchPositionWrapper extends
     }
 
     @Override
-    public void setParent(AbstractContainerWrapper<?, ?> parent) {
+    public void setParent(AbstractContainerWrapper<?> parent) {
         assert parent instanceof DispatchContainerWrapper;
         if (parent instanceof DispatchContainerWrapper) {
             setContainer((DispatchContainerWrapper) parent);
@@ -80,7 +80,7 @@ public class DispatchPositionWrapper extends
     @Override
     protected void checkObjectAtPosition() throws BiobankCheckException,
         ApplicationException {
-        AbstractContainerWrapper<?, ?> parent = getParent();
+        AbstractContainerWrapper<?> parent = getParent();
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !

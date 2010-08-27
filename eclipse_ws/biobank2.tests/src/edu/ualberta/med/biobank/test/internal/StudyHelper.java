@@ -56,6 +56,7 @@ public class StudyHelper extends DbHelper {
             study.reload();
             // FIXME patient is part of a shipment that is part of a site:
             // should not be able to remove the site first !
+            deleteFromList(study.getDispatchInfoCollection());
             deletePatients(study.getPatientCollection());
             deleteFromList(study.getSampleStorageCollection());
             study.reload();

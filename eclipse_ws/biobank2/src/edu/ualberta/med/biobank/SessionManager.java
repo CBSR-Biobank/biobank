@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -284,5 +285,12 @@ public class SessionManager {
 
     public boolean isConnected() {
         return sessionAdapter != null;
+    }
+
+    public static void log(String action, String details, String type)
+        throws Exception {
+        ((BiobankApplicationService) getAppService()).logActivity(action,
+            getInstance().getCurrentSite().getNameShort(), null, null, null,
+            details, type);
     }
 }

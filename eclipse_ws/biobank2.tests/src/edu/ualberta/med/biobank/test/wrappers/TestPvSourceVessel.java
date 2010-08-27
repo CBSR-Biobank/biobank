@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 
@@ -38,7 +38,7 @@ public class TestPvSourceVessel extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite("SiteName");
         ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
-        ClinicShipmentWrapper shipment = ShipmentHelper
+        ClinicShipmentWrapper shipment = ClinicShipmentHelper
             .addShipmentWithRandomPatient(site, clinic,
                 Utils.getRandomString(10));
         PatientWrapper patient = shipment.getPatientCollection().get(0);

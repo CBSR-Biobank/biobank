@@ -23,8 +23,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerWrapper extends
-    AbstractContainerWrapper<Container, ContainerPosition> {
+public class ContainerWrapper extends AbstractContainerWrapper<Container> {
+
+    private AbstractObjectWithPositionManagement<ContainerPosition> objectWithPositionManagement;
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
@@ -35,28 +36,69 @@ public class ContainerWrapper extends
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
+        initManagement();
     }
 
     public ContainerWrapper(WritableApplicationService appService) {
         super(appService);
+        initManagement();
+    }
+
+    private void initManagement() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<ContainerPosition>() {
+
+            @Override
+            protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
+                boolean initIfNoPosition) {
+                if (nullPositionSet) {
+                    if (rowColPosition != null) {
+                        ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                            appService);
+                        posWrapper.setRow(rowColPosition.row);
+                        posWrapper.setCol(rowColPosition.col);
+                        posWrapper.setContainer(ContainerWrapper.this);
+                        wrappedObject
+                            .setPosition(posWrapper.getWrappedObject());
+                        return posWrapper;
+                    }
+                } else {
+                    ContainerPosition pos = wrappedObject.getPosition();
+                    if (pos != null) {
+                        return new ContainerPositionWrapper(appService, pos);
+                    } else if (initIfNoPosition) {
+                        ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
+                            appService);
+                        posWrapper.setContainer(ContainerWrapper.this);
+                        wrappedObject
+                            .setPosition(posWrapper.getWrappedObject());
+                        return posWrapper;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public SiteWrapper getSite() {
+                return ContainerWrapper.this.getSite();
+            }
+        };
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "productBarcode", "position", "site", "label",
-            "temperature", "comment", "aliquotPositionCollection", "aliquots",
-            "childPositionCollection", "children", "parent" };
+        String[] names = super.getPropertyChangeNames();
+        List<String> namesList = new ArrayList<String>(Arrays.asList(names));
+        namesList.addAll(Arrays.asList("position", "site", "label",
+            "temperature", "aliquotPositionCollection", "aliquots",
+            "childPositionCollection", "children", "parent"));
+        return namesList.toArray(new String[namesList.size()]);
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container does not have an activity status");
-        }
+        super.persistChecks();
         checkSiteNotNull();
-        checkContainerTypeNotNull();
         checkLabelUniqueForType();
         checkNoDuplicatesInSite(Container.class, "productBarcode",
             getProductBarcode(), getSite().getId(),
@@ -66,7 +108,7 @@ public class ContainerWrapper extends
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
         checkHasPosition();
-        super.persistChecks();
+        objectWithPositionManagement.persistChecks();
     }
 
     private void checkHasPosition() throws BiobankCheckException {
@@ -99,6 +141,7 @@ public class ContainerWrapper extends
 
     @Override
     public void persist() throws Exception {
+        objectWithPositionManagement.persist();
         super.persist();
         persistPath();
     }
@@ -148,6 +191,10 @@ public class ContainerWrapper extends
         persistAliquots();
     }
 
+    public RowColPos getPosition() {
+        return objectWithPositionManagement.getPosition();
+    }
+
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
@@ -157,6 +204,22 @@ public class ContainerWrapper extends
             }
         }
         return null;
+    }
+
+    public void setPosition(RowColPos rcp) {
+        objectWithPositionManagement.setPosition(rcp);
+    }
+
+    public ContainerWrapper getParent() {
+        return (ContainerWrapper) objectWithPositionManagement.getParent();
+    }
+
+    public void setParent(AbstractContainerWrapper<?> container) {
+        objectWithPositionManagement.setParent(container);
+    }
+
+    public boolean hasParent() {
+        return objectWithPositionManagement.hasParent();
     }
 
     private void persistAliquots() throws Exception {
@@ -222,12 +285,6 @@ public class ContainerWrapper extends
         }
     }
 
-    private void checkContainerTypeNotNull() throws BiobankCheckException {
-        if (getContainerType() == null) {
-            throw new BiobankCheckException("This container type should be set");
-        }
-    }
-
     @Override
     public Class<Container> getWrappedClass() {
         return Container.class;
@@ -246,17 +303,6 @@ public class ContainerWrapper extends
 
     public String getLabel() {
         return wrappedObject.getLabel();
-    }
-
-    public String getProductBarcode() {
-        return wrappedObject.getProductBarcode();
-    }
-
-    public void setProductBarcode(String barcode) {
-        String oldBarcode = getProductBarcode();
-        wrappedObject.setProductBarcode(barcode);
-        propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
-            barcode);
     }
 
     private ContainerPathWrapper getContainerPath() throws Exception {
@@ -453,7 +499,7 @@ public class ContainerWrapper extends
                     + row + ":" + col + ")");
             }
         }
-        aliquot.setPosition(row, col);
+        aliquot.setPosition(new RowColPos(row, col));
         aliquot.setParent(this);
         aliquots.put(new RowColPos(row, col), aliquot);
         addedAliquots.add(aliquot);
@@ -613,7 +659,7 @@ public class ContainerWrapper extends
                     + ")");
             }
         }
-        child.setPosition(row, col);
+        child.setPosition(new RowColPos(row, col));
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
         addedChildren.add(child);
@@ -643,17 +689,6 @@ public class ContainerWrapper extends
             throw new WrapperException("sample type is null");
         }
         return getContainerType().getSampleTypeCollection().contains(type);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setComment(String comment) {
-        String oldComment = wrappedObject.getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
     }
 
     public void moveAliquots(ContainerWrapper destination) throws Exception {
@@ -888,7 +923,7 @@ public class ContainerWrapper extends
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
-            newContainer.setPosition(i, j);
+            newContainer.setPosition(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
@@ -948,34 +983,6 @@ public class ContainerWrapper extends
     }
 
     @Override
-    protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
-        boolean initIfNoPosition) {
-        if (nullPositionSet) {
-            if (rowColPosition != null) {
-                ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
-                    appService);
-                posWrapper.setRow(rowColPosition.row);
-                posWrapper.setCol(rowColPosition.col);
-                posWrapper.setContainer(this);
-                wrappedObject.setPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        } else {
-            ContainerPosition pos = wrappedObject.getPosition();
-            if (pos != null) {
-                return new ContainerPositionWrapper(appService, pos);
-            } else if (initIfNoPosition) {
-                ContainerPositionWrapper posWrapper = new ContainerPositionWrapper(
-                    appService);
-                posWrapper.setContainer(this);
-                wrappedObject.setPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        }
-        return null;
-    }
-
-    @Override
     protected void resetInternalFields() {
         super.resetInternalFields();
         addedChildren.clear();
@@ -997,8 +1004,4 @@ public class ContainerWrapper extends
             .getRowCapacity() * this.getContainerType().getColCapacity());
     }
 
-    @Override
-    public ContainerWrapper getParent() {
-        return (ContainerWrapper) super.getParent();
-    }
 }

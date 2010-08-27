@@ -1,7 +1,16 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.internal.DispatchPositionWrapper;
 import edu.ualberta.med.biobank.model.DispatchContainer;
 import edu.ualberta.med.biobank.model.DispatchPosition;
 import edu.ualberta.med.biobank.model.DispatchShipment;
@@ -9,7 +18,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchContainerWrapper extends
-    AbstractContainerWrapper<DispatchContainer, DispatchPosition> {
+    AbstractContainerWrapper<DispatchContainer> {
 
     private DispatchShipmentWrapper shipment;
 
@@ -30,9 +39,12 @@ public class DispatchContainerWrapper extends
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        // FIXME test shipment not null
-        // FIXME test sender not null
-        // FIXME test receiver not null
+        if (getShipment() == null) {
+            throw new BiobankCheckException("Shipment cannot be null");
+        }
+        if (getProductBarcode() == null) {
+            throw new BiobankCheckException("Barcode should not be null");
+        }
         super.persistChecks();
     }
 
@@ -42,11 +54,19 @@ public class DispatchContainerWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "shipment" };
+        String[] names = super.getPropertyChangeNames();
+        List<String> namesList = new ArrayList<String>(Arrays.asList(names));
+        namesList.addAll(Arrays.asList("shipment"));
+        return namesList.toArray(new String[namesList.size()]);
     }
 
     @Override
-    public int compareTo(ModelWrapper<DispatchContainer> o) {
+    public int compareTo(ModelWrapper<DispatchContainer> wrapper) {
+        if (wrapper instanceof DispatchContainerWrapper) {
+            String c1Barcode = wrappedObject.getProductBarcode();
+            String c2Barcode = wrapper.wrappedObject.getProductBarcode();
+            return c1Barcode.compareTo(c2Barcode);
+        }
         return 0;
     }
 
@@ -71,15 +91,88 @@ public class DispatchContainerWrapper extends
 
     @Override
     public SiteWrapper getSite() {
-        // FIXME need to check this !
+        if (getShipment() != null) {
+            getShipment().getSender();
+        }
         return null;
     }
 
-    @Override
-    protected AbstractPositionWrapper<DispatchPosition> getSpecificPositionWrapper(
-        boolean initIfNoPosition) {
-        // TODO Auto-generated method stub
-        return null;
+    @SuppressWarnings("unchecked")
+    public Map<RowColPos, AliquotWrapper> getAliquots() {
+        Map<RowColPos, AliquotWrapper> aliquots = (Map<RowColPos, AliquotWrapper>) propertiesMap
+            .get("aliquots");
+        if (aliquots == null) {
+            Collection<DispatchPosition> positions = wrappedObject
+                .getPositionCollection();
+            if (positions != null) {
+                aliquots = new TreeMap<RowColPos, AliquotWrapper>();
+                for (DispatchPosition position : positions) {
+                    AliquotWrapper aliquot = new AliquotWrapper(appService,
+                        position.getAliquot());
+                    try {
+                        aliquot.reload();
+                    } catch (Exception e) {
+                    }
+                    aliquots.put(
+                        new RowColPos(position.getRow(), position.getCol()),
+                        aliquot);
+                }
+                propertiesMap.put("aliquots", aliquots);
+            }
+        }
+        return aliquots;
     }
 
+    public boolean hasAliquots() {
+        Collection<DispatchPosition> positions = wrappedObject
+            .getPositionCollection();
+        return ((positions != null) && (positions.size() > 0));
+    }
+
+    public AliquotWrapper getAliquot(Integer row, Integer col)
+        throws BiobankCheckException {
+        DispatchPositionWrapper position = new DispatchPositionWrapper(
+            appService);
+        position.setRow(row);
+        position.setCol(col);
+        position.checkPositionValid(this);
+        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
+        if (aliquots == null) {
+            return null;
+        }
+        return aliquots.get(new RowColPos(row, col));
+    }
+
+    public void addAliquot(Integer row, Integer col, AliquotWrapper aliquot)
+        throws Exception {
+        DispatchPositionWrapper aliquotPosition = new DispatchPositionWrapper(
+            appService);
+        aliquotPosition.setRow(row);
+        aliquotPosition.setCol(col);
+        aliquotPosition.checkPositionValid(this);
+        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
+        if (aliquots == null) {
+            aliquots = new TreeMap<RowColPos, AliquotWrapper>();
+            propertiesMap.put("aliquots", aliquots);
+        } else {
+            AliquotWrapper sampleAtPosition = getAliquot(row, col);
+            if (sampleAtPosition != null) {
+                throw new BiobankCheckException("Container "
+                    + getProductBarcode()
+                    + " is already holding an aliquot at position "
+                    + sampleAtPosition.getPositionString(false, false) + " ("
+                    + row + ":" + col + ")");
+            }
+        }
+        aliquotPosition.setAliquot(aliquot);
+        aliquotPosition.setContainer(this);
+        Collection<DispatchPosition> positions = wrappedObject
+            .getPositionCollection();
+        if (positions == null) {
+            positions = new HashSet<DispatchPosition>();
+        }
+        positions.add(aliquotPosition.getWrappedObject());
+        wrappedObject.setPositionCollection(positions);
+        aliquots.put(new RowColPos(row, col), aliquot);
+    }
 }

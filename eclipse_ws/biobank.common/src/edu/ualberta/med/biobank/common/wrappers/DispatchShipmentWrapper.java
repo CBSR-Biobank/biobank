@@ -45,19 +45,49 @@ public class DispatchShipmentWrapper extends
         List<String> list = new ArrayList<String>(Arrays.asList(properties));
         list.addAll(Arrays.asList("sender", "receiver",
             "sentContainerCollection"));
-        return (String[]) list.toArray();
+        return list.toArray(new String[] {});
     }
 
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        checkWaybillUniqueForSender();
+        if (getSender() == null) {
+            throw new BiobankCheckException("Sender should be set");
+        }
+        if (getReceiver() == null) {
+            throw new BiobankCheckException("Receiver should be set");
+        }
+        if (!checkWaybillUniqueForSender()) {
+            throw new BiobankCheckException("A dispatch shipment with waybill "
+                + getWaybill() + " already exists for sending site "
+                + getSender().getNameShort());
+        }
+        checkSenderCanSendToReceiver();
     }
 
-    private boolean checkWaybillUniqueForSender() throws ApplicationException {
+    private void checkSenderCanSendToReceiver() throws BiobankCheckException,
+        ApplicationException {
+        if (getSender() != null && getReceiver() != null) {
+            // FIXME should know for which study...
+            List<SiteWrapper> possibleReceivers = getSender()
+                .getStudyDispachSites(null);
+            if (!possibleReceivers.contains(getReceiver())) {
+                throw new BiobankCheckException(getSender().getNameShort()
+                    + " cannot dispatch aliquots to "
+                    + getReceiver().getNameShort());
+            }
+        }
+    }
+
+    private boolean checkWaybillUniqueForSender() throws ApplicationException,
+        BiobankCheckException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
-        params.add(getSender().getId());
+        SiteWrapper sender = getSender();
+        if (sender == null) {
+            throw new BiobankCheckException("sender site cannot be null");
+        }
+        params.add(sender.getId());
         params.add(getWaybill());
         if (!isNew()) {
             isSameShipment = " and id <> ?";
@@ -95,10 +125,10 @@ public class DispatchShipmentWrapper extends
 
     public SiteWrapper getReceiver() {
         if (receiver == null) {
-            Site s = wrappedObject.getReceiver();
-            if (s == null)
+            Site r = wrappedObject.getReceiver();
+            if (r == null)
                 return null;
-            receiver = new SiteWrapper(appService, s);
+            receiver = new SiteWrapper(appService, r);
         }
         return receiver;
     }
@@ -165,8 +195,9 @@ public class DispatchShipmentWrapper extends
                     allContainersWrappers.add(container);
                 }
             }
-            // new patients
+            // new containers
             for (DispatchContainerWrapper container : newContainers) {
+                container.setShipment(this);
                 sentContainersAdded.add(container);
                 sentContainersRemoved.remove(container);
                 allContainersObjects.add(container.getWrappedObject());
@@ -179,24 +210,24 @@ public class DispatchShipmentWrapper extends
 
     public void removeSentContainers(
         List<DispatchContainerWrapper> containersToRemove) {
-        if (containersToRemove != null && containersToRemove.size() > 0) {
-            sentContainersAdded.removeAll(containersToRemove);
-            sentContainersRemoved.addAll(containersToRemove);
-            Collection<DispatchContainer> allContainerObjects = new HashSet<DispatchContainer>();
-            List<DispatchContainerWrapper> allContainerWrappers = new ArrayList<DispatchContainerWrapper>();
-            // already in list
-            List<DispatchContainerWrapper> containersList = getSentContainerCollection();
-            if (containersList != null) {
-                for (DispatchContainerWrapper container : containersList) {
-                    if (!containersToRemove.contains(container)) {
-                        allContainerObjects.add(container.getWrappedObject());
-                        allContainerWrappers.add(container);
-                    }
+        if ((containersToRemove == null) || (containersToRemove.size() == 0))
+            return;
+
+        sentContainersAdded.removeAll(containersToRemove);
+        sentContainersRemoved.addAll(containersToRemove);
+        Collection<DispatchContainer> allContainerObjects = new HashSet<DispatchContainer>();
+        List<DispatchContainerWrapper> allContainerWrappers = new ArrayList<DispatchContainerWrapper>();
+        // already in list
+        List<DispatchContainerWrapper> containersList = getSentContainerCollection();
+        if (containersList != null) {
+            for (DispatchContainerWrapper container : containersList) {
+                if (!containersToRemove.contains(container)) {
+                    allContainerObjects.add(container.getWrappedObject());
+                    allContainerWrappers.add(container);
                 }
             }
-            setSentContainerCollection(allContainerObjects,
-                allContainerWrappers);
         }
+        setSentContainerCollection(allContainerObjects, allContainerWrappers);
     }
 
     @Override

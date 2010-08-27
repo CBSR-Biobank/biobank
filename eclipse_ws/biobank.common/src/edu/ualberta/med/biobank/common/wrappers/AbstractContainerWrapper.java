@@ -1,14 +1,15 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.AbstractContainer;
-import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public abstract class AbstractContainerWrapper<S extends AbstractContainer, P extends AbstractPosition>
-    extends AbstractPositionHolder<S, P> {
+public abstract class AbstractContainerWrapper<S extends AbstractContainer>
+    extends ModelWrapper<S> {
 
     private ContainerTypeWrapper containerType;
     private ActivityStatusWrapper activityStatus;
@@ -24,15 +25,32 @@ public abstract class AbstractContainerWrapper<S extends AbstractContainer, P ex
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "activityStatus", "containerType", "parent" };
+        return new String[] { "activityStatus", "containerType", "parent",
+            "productBarcode", "comment" };
     }
 
-    public static AbstractContainerWrapper<?, ?> createInstance(
+    public static AbstractContainerWrapper<?> createInstance(
         WritableApplicationService appService, AbstractContainer container) {
         if (container instanceof Container) {
             return new ContainerWrapper(appService, (Container) container);
         }
         return null;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException {
+        if (getActivityStatus() == null) {
+            throw new BiobankCheckException(
+                "the container does not have an activity status");
+        }
+        checkContainerTypeNotNull();
+    }
+
+    private void checkContainerTypeNotNull() throws BiobankCheckException {
+        if (getContainerType() == null) {
+            throw new BiobankCheckException("This container type should be set");
+        }
     }
 
     public Integer getRowCapacity() {
@@ -95,11 +113,34 @@ public abstract class AbstractContainerWrapper<S extends AbstractContainer, P ex
             oldActivityStatus, activityStatus);
     }
 
+    public String getComment() {
+        return wrappedObject.getComment();
+    }
+
+    public void setComment(String comment) {
+        String oldComment = wrappedObject.getComment();
+        wrappedObject.setComment(comment);
+        propertyChangeSupport
+            .firePropertyChange("comment", oldComment, comment);
+    }
+
+    public String getProductBarcode() {
+        return wrappedObject.getProductBarcode();
+    }
+
+    public void setProductBarcode(String barcode) {
+        String oldBarcode = getProductBarcode();
+        wrappedObject.setProductBarcode(barcode);
+        propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
+            barcode);
+    }
+
     @Override
     protected void resetInternalFields() {
-        super.resetInternalFields();
         containerType = null;
         activityStatus = null;
     }
+
+    public abstract SiteWrapper getSite();
 
 }

@@ -32,9 +32,7 @@
   <property name="schema.dir" location="schema" />
   <property name="security.dir" location="security" />
   <property name="secu-log.dir" location="security-logs" />
-  <property name="mysql.driver.string" value="com.mysql.jdbc.Driver" />
   <property name="database.host" value="localhost" />
-  <property name="database.port" value="3306" />
   <property name="database.name" value="biobank2" />
   <property name="database.username" value="dummy" />
   <property name="database.password" value="ozzy498" />
@@ -344,11 +342,12 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate" depends="strfields" description="creates the default tables">
-    <sql driver="${mysql.driver.string}"
-         url="jdbc:mysql://${database.host}:${database.port}/"
-         userid="${database.username}" password="${database.password}">
-      <transaction src="${data.sql.dir}/createdatabase.sql" />
+  <target name="dbcreate-add-tables" depends="strfields">
+    <sql driver="${DB_DRIVER}"
+         url="${DB_CONNECTION_URL}"
+         userid="${DB_USERNAME}" password="${DB_PASSWORD}">
+      DROP DATABASE IF EXISTS ${PROJECT_NAME};
+      CREATE DATABASE ${PROJECT_NAME};
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
           <include name="*.jar" />
@@ -356,9 +355,9 @@
       </classpath>
     </sql>
     <antcall target="schema" />
-    <sql driver="${mysql.driver.string}"
-         url="jdbc:mysql://${database.host}:${database.port}/${database.name}"
-         userid="${database.username}" password="${database.password}">
+    <sql driver="${DB_DRIVER}"
+         url="${DB_CONNECTION_URL}"
+         userid="${DB_USERNAME}" password="${DB_PASSWORD}">
       <transaction src="${data.sql.dir}/createIndices.sql" />
       <transaction src="${data.sql.dir}/activityStatus.sql" />
       <transaction src="${data.sql.dir}/globalPvAttr.sql" />
@@ -376,6 +375,21 @@
         </fileset>
       </classpath>
     </sql>
+  </target>
+  <target name="dbcreate-add-testuser" if="debug">
+    <sql driver="${DB_DRIVER}"
+         url="${DB_CONNECTION_URL}"
+         userid="${DB_USERNAME}" password="${DB_PASSWORD}">
+      <transaction src="${secu-log.dir}/addTestUser.sql" />
+      <classpath>
+        <fileset dir="${cacore.sdk.dir}/system/lib">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+    </sql>
+  </target>
+  <target name="dbcreate" depends="dbcreate-add-tables,dbcreate-add-testuser"
+         description="creates the default tables">
   </target>
   <target name="dbbackup"
           description="makes a copy of the current biobank2 database">

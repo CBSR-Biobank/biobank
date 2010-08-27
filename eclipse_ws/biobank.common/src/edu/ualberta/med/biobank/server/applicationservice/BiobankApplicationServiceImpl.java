@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -250,10 +251,22 @@ public class BiobankApplicationServiceImpl extends
     public void logActivity(String action, String site, String patientNumber,
         String inventoryID, String locationLabel, String details, String type)
         throws Exception {
+        Log log = new Log();
+        log.setAction(action);
+        log.setSite(site);
+        log.setPatientNumber(patientNumber);
+        log.setInventoryId(inventoryID);
+        log.setLocationLabel(locationLabel);
+        log.setDetails(details);
+        log.setType(type);
+        logActivity(log);
+    }
+
+    @Override
+    public void logActivity(Log log) throws Exception {
         Logger logger = Logger.getLogger("Biobank.Activity");
-        logger.log(Level.toLevel("INFO"), MessageGenerator
-            .generateStringMessage(action, site, patientNumber, inventoryID,
-                locationLabel, details, type));
+        logger.log(Level.toLevel("INFO"),
+            MessageGenerator.generateStringMessage(log));
     }
 
     @Override

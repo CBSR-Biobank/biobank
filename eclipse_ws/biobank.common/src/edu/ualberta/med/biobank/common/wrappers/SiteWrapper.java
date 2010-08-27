@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.DispatchInfo;
+import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Notification;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -42,8 +47,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "address", "clinicCollection", "siteCollection",
             "containerCollection", "shipmentCollection",
             "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode", "toDispatchInfoCollection",
-            "fromDispatchInfoCollection" };
+            "postalCode", "sentDispatchShipmentCollection",
+            "sentDispatchShipmentCollection", "notificationCollection",
+            "srcDispatchInfoCollection" };
     }
 
     public String getName() {
@@ -240,12 +246,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
         if ((getContainerCollection() != null && getContainerCollection()
             .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
+                .size() > 0)
+            || (getShipmentCollection() != null && getShipmentCollection()
                 .size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
-                    + ". All defined children (studies, clinics, container types, and containers) must be removed first.");
+                    + ". All defined children (shipments, container types, and containers) must be removed first.");
         }
+
     }
 
     public void addStudies(List<StudyWrapper> studies) {
@@ -587,12 +596,24 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return wrappers;
     }
 
-    public List<SiteWrapper> getToSitesDispatchForStudy(StudyWrapper study)
+    /**
+     * if study == null, will get all sites to which can dispatch, for whatever
+     * study
+     */
+    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
         throws ApplicationException {
+        // FIXME use the infos maps instead and do not manage null study
+        String studyString = "";
+        List<Object> params = new ArrayList<Object>();
+        params.add(getId());
+        if (study != null) {
+            studyString = " and info.study.id=?";
+            params.add(study.getId());
+        }
         HQLCriteria criteria = new HQLCriteria(
-            "select info.toSiteCollection from " + DispatchInfo.class.getName()
-                + " as info where info.fromSite.id = ? and info.study.id=?",
-            Arrays.asList(new Object[] { getId(), study.getId() }));
+            "select info.destSiteCollection from "
+                + DispatchInfo.class.getName()
+                + " as info where info.srcSite.id = ?" + studyString, params);
         List<Site> results = appService.query(criteria);
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site res : results) {
@@ -638,4 +659,109 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getReceivedDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("receivedDispatchShipmentCollection");
+        if (shipCollection == null) {
+            Collection<DispatchShipment> children = wrappedObject
+                .getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipment ship : children) {
+                    shipCollection.add(new DispatchShipmentWrapper(appService,
+                        ship));
+                }
+                propertiesMap.put("receivedDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getSentDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("sentDispatchShipmentCollection");
+        if (shipCollection == null) {
+            Collection<DispatchShipment> children = wrappedObject
+                .getSentDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipment ship : children) {
+                    shipCollection.add(new DispatchShipmentWrapper(appService,
+                        ship));
+                }
+                propertiesMap.put("sentDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<NotificationWrapper> getNotificationCollection() {
+        List<NotificationWrapper> notifCollection = (List<NotificationWrapper>) propertiesMap
+            .get("notificationCollection");
+        if (notifCollection == null) {
+            Collection<Notification> children = wrappedObject
+                .getNotificationCollection();
+            if (children != null) {
+                notifCollection = new ArrayList<NotificationWrapper>();
+                for (Notification notif : children) {
+                    notifCollection.add(new NotificationWrapper(appService,
+                        notif));
+                }
+                propertiesMap.put("notificationCollection", notifCollection);
+            }
+        }
+        return notifCollection;
+    }
+
+    public void addStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> sites) {
+        // FIXME need to be tested
+        if ((sites == null) || (sites.size() == 0))
+            return;
+        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
+        if (infos == null) {
+            infos = new HashMap<Integer, DispatchInfoWrapper>();
+        }
+        DispatchInfoWrapper diw = infos.get(study.getId());
+        if (diw == null) {
+            diw = new DispatchInfoWrapper(appService);
+            diw.setStudy(study);
+            diw.setSrcSite(this);
+            infos.put(study.getId(), diw);
+            Collection<DispatchInfo> allsInfoObjects = wrappedObject
+                .getSrcDispatchInfoCollection();
+            allsInfoObjects.add(diw.wrappedObject);
+            wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
+        }
+        diw.addDestSites(sites);
+    }
+
+    /**
+     * For one study, this site has one source dispatch info associated.
+     * 
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Integer, DispatchInfoWrapper> getSrcDispatchInfoCollection() {
+        Map<Integer, DispatchInfoWrapper> infos = (Map<Integer, DispatchInfoWrapper>) propertiesMap
+            .get("srcDispatchInfoCollection");
+        if (infos == null) {
+            Collection<DispatchInfo> children = wrappedObject
+                .getSrcDispatchInfoCollection();
+            if (children != null) {
+                infos = new HashMap<Integer, DispatchInfoWrapper>();
+                for (DispatchInfo di : children) {
+                    Integer studyId = di.getStudy().getId();
+                    infos.put(studyId, new DispatchInfoWrapper(appService, di));
+                }
+                propertiesMap.put("srcDispatchInfoCollection", infos);
+            }
+        }
+        return infos;
+    }
 }

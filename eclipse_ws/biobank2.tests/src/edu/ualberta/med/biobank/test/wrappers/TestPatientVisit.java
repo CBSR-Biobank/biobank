@@ -48,7 +48,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -91,7 +91,7 @@ public class TestPatientVisit extends TestDatabase {
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ShipmentHelper.addShipment(site, clinic, patient);
+        shipment = ClinicShipmentHelper.addShipment(site, clinic, patient);
     }
 
     private void addContainerTypes() throws Exception {
@@ -165,7 +165,7 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site,
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
             clinic, patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(

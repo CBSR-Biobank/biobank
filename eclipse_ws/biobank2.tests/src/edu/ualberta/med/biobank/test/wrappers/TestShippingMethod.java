@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -53,16 +53,16 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment1.setShippingMethod(method1);
         shipment1.persist();
-        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment2.setShippingMethod(method2);
         shipment2.persist();
-        ClinicShipmentWrapper shipment3 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment3.setShippingMethod(method2);
         shipment3.persist();
 
@@ -87,18 +87,18 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
 
-        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment1.setShippingMethod(method);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
-        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment2.setShippingMethod(method);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
-        ClinicShipmentWrapper shipment3 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment3.setShippingMethod(method);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
@@ -138,7 +138,7 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodHelper
             .newShippingMethod(name);
         method.persist();
-        ShippingMethodHelper.createdCompanies.add(method);
+        ShippingMethodHelper.createdShipMethods.add(method);
 
         ShippingMethod shipComp = new ShippingMethod();
         shipComp.setId(method.getId());
@@ -160,11 +160,11 @@ public class TestShippingMethod extends TestDatabase {
             toDelete.add(sm);
         }
 
-        List<ShippingMethodWrapper> statuses = ShippingMethodWrapper
+        List<ShippingMethodWrapper> shipMethods = ShippingMethodWrapper
             .getShippingMethods(appService);
-        int after = statuses.size();
+        int after = shipMethods.size();
         Assert.assertEquals(before + 5, after);
-        Assert.assertTrue(statuses.containsAll(toDelete));
+        Assert.assertTrue(shipMethods.containsAll(toDelete));
 
         // create 3 new shipping methods
         before = after;
@@ -175,14 +175,15 @@ public class TestShippingMethod extends TestDatabase {
             sm.setName(name);
             toAdd.add(sm);
         }
-
-        ShippingMethodWrapper.persistShippingMethods(toAdd, toDelete);
+        ShippingMethodHelper.createdShipMethods.addAll(toAdd);
 
         // now delete the ones previously added and add the new ones
-        statuses = ShippingMethodWrapper.getShippingMethods(appService);
-        after = statuses.size();
+        ShippingMethodWrapper.persistShippingMethods(toAdd, toDelete);
+
+        shipMethods = ShippingMethodWrapper.getShippingMethods(appService);
+        after = shipMethods.size();
         Assert.assertEquals(before - 5 + 3, after);
-        Assert.assertTrue(statuses.containsAll(toAdd));
+        Assert.assertTrue(shipMethods.containsAll(toAdd));
     }
 
     @Test
@@ -215,8 +216,8 @@ public class TestShippingMethod extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment1.setShippingMethod(method);
         shipment1.persist();
         method.reload();
@@ -294,8 +295,8 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ClinicShipmentWrapper shipment1 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment1.setShippingMethod(methods[0]);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
@@ -303,8 +304,8 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertTrue(methods[0].isUsed());
         Assert.assertFalse(methods[1].isUsed());
 
-        ClinicShipmentWrapper shipment2 = ShipmentHelper.addShipment(site,
-            clinic, patient1);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic, patient1);
         shipment2.setShippingMethod(methods[1]);
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();

@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class PatientVisitHelper extends DbHelper {
@@ -59,21 +59,21 @@ public class PatientVisitHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ClinicShipmentWrapper shipment, int minimumNumber,
-        int maxNumber) throws ParseException, Exception {
+        PatientWrapper patient, ClinicShipmentWrapper shipment,
+        int minimumNumber, int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (int i = 0; i < count; i++) {
-            visits.add(addPatientVisit(patient, shipment, TestCommon
-                .getUniqueDate(r), TestCommon.getUniqueDate(r)));
+            visits.add(addPatientVisit(patient, shipment,
+                TestCommon.getUniqueDate(r), TestCommon.getUniqueDate(r)));
         }
         return visits;
     }
 
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ClinicShipmentWrapper shipment, int minimumNumber)
-        throws ParseException, Exception {
-        return addPatientVisits(patient, shipment, 1, 15);
+        PatientWrapper patient, ClinicShipmentWrapper shipment,
+        int minimumNumber) throws ParseException, Exception {
+        return addPatientVisits(patient, shipment, minimumNumber, 15);
     }
 
     public static List<PatientVisitWrapper> addPatientVisits(

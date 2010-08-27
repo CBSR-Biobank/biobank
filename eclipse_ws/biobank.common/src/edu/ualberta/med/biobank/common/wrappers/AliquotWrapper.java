@@ -14,15 +14,18 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.DispatchContainer;
+import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class AliquotWrapper extends
-    AbstractPositionHolder<Aliquot, AliquotPosition> {
+public class AliquotWrapper extends ModelWrapper<Aliquot> {
+
+    private AbstractObjectWithPositionManagement<AliquotPosition> objectWithPositionManagement;
 
     private PatientVisitWrapper patientVisit;
     private SampleTypeWrapper sampleType;
@@ -31,10 +34,52 @@ public class AliquotWrapper extends
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
         super(appService, wrappedObject);
+        initManagement();
     }
 
     public AliquotWrapper(WritableApplicationService appService) {
         super(appService);
+        initManagement();
+    }
+
+    private void initManagement() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<AliquotPosition>() {
+
+            @Override
+            protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
+                boolean initIfNoPosition) {
+                if (nullPositionSet) {
+                    if (rowColPosition != null) {
+                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                            appService);
+                        posWrapper.setRow(rowColPosition.row);
+                        posWrapper.setCol(rowColPosition.col);
+                        posWrapper.setAliquot(AliquotWrapper.this);
+                        wrappedObject.setAliquotPosition(posWrapper
+                            .getWrappedObject());
+                        return posWrapper;
+                    }
+                } else {
+                    AliquotPosition pos = wrappedObject.getAliquotPosition();
+                    if (pos != null) {
+                        return new AliquotPositionWrapper(appService, pos);
+                    } else if (initIfNoPosition) {
+                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                            appService);
+                        posWrapper.setAliquot(AliquotWrapper.this);
+                        wrappedObject.setAliquotPosition(posWrapper
+                            .getWrappedObject());
+                        return posWrapper;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public SiteWrapper getSite() {
+                return AliquotWrapper.this.getSite();
+            }
+        };
     }
 
     @Override
@@ -61,6 +106,7 @@ public class AliquotWrapper extends
             }
             wrappedObject.setAliquotPosition(null);
         }
+        objectWithPositionManagement.persist();
         super.persist();
     }
 
@@ -74,7 +120,7 @@ public class AliquotWrapper extends
         checkPatientVisitNotNull();
         checkInventoryIdUnique();
         checkParentAcceptSampleType();
-        super.persistChecks();
+        objectWithPositionManagement.persistChecks();
     }
 
     private void checkPatientVisitNotNull() throws BiobankCheckException {
@@ -136,7 +182,6 @@ public class AliquotWrapper extends
         }
     }
 
-    @Override
     public SiteWrapper getSite() {
         if (getPatientVisit() != null) {
             return getPatientVisit().getShipment().getSite();
@@ -280,9 +325,24 @@ public class AliquotWrapper extends
         return wrappedObject.getComment();
     }
 
-    @Override
     public ContainerWrapper getParent() {
-        return (ContainerWrapper) super.getParent();
+        return (ContainerWrapper) objectWithPositionManagement.getParent();
+    }
+
+    public void setParent(AbstractContainerWrapper<?> container) {
+        objectWithPositionManagement.setParent(container);
+    }
+
+    public boolean hasParent() {
+        return objectWithPositionManagement.hasParent();
+    }
+
+    public RowColPos getPosition() {
+        return objectWithPositionManagement.getPosition();
+    }
+
+    public void setPosition(RowColPos rcp) {
+        objectWithPositionManagement.setPosition(rcp);
     }
 
     public String getPositionString() {
@@ -444,51 +504,63 @@ public class AliquotWrapper extends
     }
 
     @Override
-    protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
-        boolean initIfNoPosition) {
-        if (nullPositionSet) {
-            if (rowColPosition != null) {
-                AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                    appService);
-                posWrapper.setRow(rowColPosition.row);
-                posWrapper.setCol(rowColPosition.col);
-                posWrapper.setAliquot(this);
-                wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        } else {
-            AliquotPosition pos = wrappedObject.getAliquotPosition();
-            if (pos != null) {
-                return new AliquotPositionWrapper(appService, pos);
-            } else if (initIfNoPosition) {
-                AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                    appService);
-                posWrapper.setAliquot(this);
-                wrappedObject.setAliquotPosition(posWrapper.getWrappedObject());
-                return posWrapper;
-            }
-        }
-        return null;
-    }
-
-    @Override
     public String toString() {
         return getInventoryId();
     }
 
     @Override
-    protected void log(String action, String site, String details)
-        throws Exception {
-        ((BiobankApplicationService) appService).logActivity(action, site,
-            getPatientVisit().getPatient().getPnumber(), getInventoryId(),
-            getPositionString(true, false), "aliquot " + details, "Aliquot");
-    }
-
-    @Override
-    public void reload() throws Exception {
+    public void resetInternalFields() {
         patientVisit = null;
         sampleType = null;
         activityStatus = null;
-        super.reload();
+    }
+
+    public List<DispatchContainerWrapper> getDispatchContainerCollection()
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("select cont from "
+            + DispatchContainer.class.getName()
+            + " where cont.positionCollection.aliquot.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+
+        List<DispatchContainer> conts = appService.query(criteria);
+        List<DispatchContainerWrapper> contWrappers = new ArrayList<DispatchContainerWrapper>();
+        for (DispatchContainer cont : conts) {
+            contWrappers.add(new DispatchContainerWrapper(appService, cont));
+        }
+        return contWrappers;
+    }
+
+    public List<DispatchShipmentWrapper> getDispatchShipments()
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select ship from "
+                + DispatchShipment.class.getName()
+                + " where ship.sentContainerCollection.positionCollection.aliquot.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+
+        List<DispatchShipment> ships = appService.query(criteria);
+        List<DispatchShipmentWrapper> shipWrappers = new ArrayList<DispatchShipmentWrapper>();
+        for (DispatchShipment ship : ships) {
+            shipWrappers.add(new DispatchShipmentWrapper(appService, ship));
+        }
+        return shipWrappers;
+    }
+
+    @Override
+    protected Log getLogMessage(String action, String site, String details) {
+        Log log = new Log();
+        PatientVisitWrapper visit = getPatientVisit();
+        log.setAction(action);
+        if (site == null) {
+            log.setSite(visit.getShipment().getSite().getNameShort());
+        } else {
+            log.setSite(site);
+        }
+        log.setPatientNumber(visit.getPatient().getPnumber());
+        log.setInventoryId(getInventoryId());
+        log.setLocationLabel(getPositionString(true, true));
+        log.setDetails(details);
+        log.setType("Aliquot");
+        return log;
     }
 }
