@@ -1,12 +1,16 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
@@ -165,6 +169,200 @@ public class TestDispatchContainer extends TestDatabase {
 
         Assert.assertEquals(countBefore - 1, countAfter);
 
+    }
+
+    @Test
+    public void testPersist() throws Exception {
+        String name = "testGetSetShipment" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite, name, Utils.getRandomDate());
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
+            senderSite, name, false);
+
+        // don't add a shipment yet
+        DispatchContainerWrapper container = DispatchContainerHelper
+            .newContainer(name, null, type);
+
+        try {
+            container.persist();
+            Assert
+                .fail("should not be allowed to persist a dispatch container without a shipment: ");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        container = DispatchContainerHelper.newContainer(null, shipment, type);
+
+        try {
+            container.persist();
+            Assert
+                .fail("should not be allowed to persist a dispatch container without a product barcode: ");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+    }
+
+    @Test
+    public void testGetSetShipment() throws Exception {
+        String name = "testGetSetShipment" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite, name, Utils.getRandomDate());
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
+            senderSite, name, false);
+
+        // don't add a shipment yet
+        DispatchContainerWrapper container = DispatchContainerHelper
+            .newContainer(name, null, type);
+
+        Assert.assertNull(container.getShipment());
+
+        // add the shipment
+        container.setShipment(shipment);
+        container.persist();
+        container.reload();
+
+        Assert.assertEquals(shipment, container.getShipment());
+
+        DispatchContainer rawContainer = new DispatchContainer();
+        rawContainer.setId(container.getId());
+        container = new DispatchContainerWrapper(appService,
+            (DispatchContainer) appService.search(DispatchContainer.class,
+                rawContainer).get(0));
+
+        Assert.assertEquals(shipment, container.getShipment());
+
+        // delete the shipment
+        shipment.delete();
+        container.reload();
+
+        Assert.assertNull(container.getShipment());
+    }
+
+    @Test
+    public void testGetSetSite() throws Exception {
+        String name = "testGetSetShipment" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite, name, Utils.getRandomDate());
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
+            senderSite, name, false);
+
+        // test with null shipment
+        DispatchContainerWrapper container = DispatchContainerHelper
+            .newContainer(name, null, type);
+
+        Assert.assertNull(container.getSite());
+
+        // test with shipment
+        container = DispatchContainerHelper.addContainer(name, shipment, type);
+
+        Assert.assertEquals(senderSite, container.getSite());
+    }
+
+    private List<AliquotWrapper> addRandomAliquots(String name,
+        PatientVisitWrapper pv, int num) throws Exception {
+        AliquotWrapper aliquot;
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        for (int i = 0; i < num; ++i) {
+
+            aliquot = new AliquotWrapper(appService);
+            aliquot.setSampleType(SampleTypeWrapper.getAllSampleTypes(
+                appService, false).get(0));
+            // aliquot.setInventoryId(name + "_a" + i);
+            aliquot.setPatientVisit(pv);
+            aliquot.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+            aliquot.persist();
+            aliquots.add(aliquot);
+        }
+        return aliquots;
+    }
+
+    @Test
+    public void testGetAddAliquots() throws Exception {
+        String name = "testGetSetAliquots" + r.nextInt();
+
+        SiteWrapper sender = SiteHelper.addSite(name + "_SENDER");
+        SiteWrapper receiver = SiteHelper.addSite(name + "_RECEIVER");
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+
+        DispatchInfoHelper.addInfo(study, sender, receiver);
+
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+
+        ClinicShipmentWrapper clinicShipment = ClinicShipmentHelper
+            .newShipment(sender, clinic);
+        clinicShipment.addPatients(Arrays.asList(patient));
+        clinicShipment.persist();
+
+        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+            clinicShipment, new Date(), new Date());
+
+        List<AliquotWrapper> aliquotSet1 = addRandomAliquots(name, pv,
+            r.nextInt(10) + 1);
+        List<AliquotWrapper> aliquotSet2 = addRandomAliquots(name, pv,
+            r.nextInt(10) + 1);
+
+        DispatchShipmentWrapper dispShipment = DispatchShipmentHelper
+            .addShipment(sender, receiver, name, Utils.getRandomDate());
+
+        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
+            sender, name, name, 1, 8, 12, false);
+
+        DispatchContainerWrapper dispContainer = DispatchContainerHelper
+            .newContainer(name, dispShipment, type);
+        DispatchContainerHelper.addAliquots(dispContainer, aliquotSet1, 0, 0);
+
+        // add aliquots at non empty positions
+        try {
+            DispatchContainerHelper.addAliquots(dispContainer, aliquotSet1, 0,
+                0);
+            Assert.fail("failed adding aliquots in non empty positions");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+        Collection<AliquotWrapper> dispContainerAliquots = dispContainer
+            .getAliquots().values();
+        Assert.assertEquals(aliquotSet1.size(), dispContainerAliquots.size());
+        Assert.assertTrue(dispContainerAliquots.containsAll(aliquotSet1));
+
+        DispatchContainerHelper.addAliquots(dispContainer, aliquotSet2, 3, 0);
+
+        Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
+            dispContainer.getAliquots().size());
+        Assert.assertTrue(dispContainerAliquots.containsAll(aliquotSet2));
+
+        for (AliquotWrapper aliquot : aliquotSet1) {
+            aliquot.delete();
+        }
+
+        // make sure first aliquot not there anymore
+        Assert.assertNull(dispContainer.getAliquot(0, 0));
+
+        Assert.assertEquals(aliquotSet2.size(), dispContainer.getAliquots()
+            .size());
+        Assert.assertTrue(dispContainerAliquots.containsAll(aliquotSet2));
     }
 
     @Test

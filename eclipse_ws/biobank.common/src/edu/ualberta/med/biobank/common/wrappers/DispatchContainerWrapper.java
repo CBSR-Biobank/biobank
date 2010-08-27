@@ -92,7 +92,7 @@ public class DispatchContainerWrapper extends
     @Override
     public SiteWrapper getSite() {
         if (getShipment() != null) {
-            getShipment().getSender();
+            return getShipment().getSender();
         }
         return null;
     }
