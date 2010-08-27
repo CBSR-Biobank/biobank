@@ -24,11 +24,12 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -372,10 +373,11 @@ public class Importer {
         return null;
     }
 
-    private static void initClinicsMap() {
+    private static void initClinicsMap() throws ApplicationException {
         clinicsMap = new HashMap<String, ClinicWrapper>();
-        for (ClinicWrapper clinic : cbsrSite.getClinicCollection()) {
-            clinicsMap.put(clinic.getNameShort(), clinic);
+        for (Object clinic : appService.search(Clinic.class, null)) {
+            ClinicWrapper c = new ClinicWrapper(appService, (Clinic) clinic);
+            clinicsMap.put(c.getNameShort(), c);
         }
     }
 

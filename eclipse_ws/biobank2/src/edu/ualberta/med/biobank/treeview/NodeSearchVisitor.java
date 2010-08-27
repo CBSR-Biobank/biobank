@@ -36,9 +36,6 @@ public class NodeSearchVisitor {
     }
 
     public AdapterBase visit(SessionAdapter session) {
-        if (wrapper instanceof SiteWrapper) {
-            return session.getChild(wrapper, true);
-        }
         return visitChildren(session);
     }
 

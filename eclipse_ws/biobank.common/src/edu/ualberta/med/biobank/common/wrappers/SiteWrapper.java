@@ -306,19 +306,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getStudyCollection(true);
     }
 
-    public List<ClinicWrapper> getClinicCollection(boolean sort) {
-        return null;
-    }
-
-    @Deprecated
-    public List<ClinicWrapper> getClinicCollection() {
-        return null;
-    }
-
-    @Deprecated
-    public void addClinics(List<ClinicWrapper> clinics) {
-    }
-
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
         List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
@@ -633,6 +620,43 @@ public class SiteWrapper extends ModelWrapper<Site> {
             wrappers.add(new SiteWrapper(appService, res));
         }
         return wrappers;
+    }
+
+    public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
+        List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
+        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+            + " s where " + getId() + " not in elements(s.siteCollection)");
+        List<Study> results = appService.query(c);
+        for (Study res : results) {
+            studyWrappers.add(new StudyWrapper(appService, res));
+        }
+        return studyWrappers;
+    }
+
+    public void removeStudies(List<StudyWrapper> studies) {
+        if ((studies == null) || (studies.size() == 0))
+            return;
+
+        Collection<Study> allStudyObjects = new HashSet<Study>();
+        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+        // already added studies
+        List<StudyWrapper> currentList = getStudyCollection();
+        if (currentList != null) {
+            for (StudyWrapper study : currentList) {
+                allStudyObjects.add(study.getWrappedObject());
+                allStudyWrappers.add(study);
+            }
+        }
+        // new studies added
+        for (StudyWrapper study : studies) {
+            allStudyObjects.remove(study.getWrappedObject());
+            allStudyWrappers.remove(study);
+        }
+        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(allStudyObjects);
+        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
+            allStudyObjects);
+        propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")

@@ -262,22 +262,47 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     containerAdapter.getParent().performExpand();
                 } catch (final RemoteConnectFailureException exp) {
                     BioBankPlugin.openRemoteConnectErrorMessage();
-                    setDirty(true);
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            setDirty(true);
+                        }
+                    });
                     monitor.setCanceled(true);
                 } catch (final RemoteAccessException exp) {
                     BioBankPlugin.openRemoteAccessErrorMessage();
-                    setDirty(true);
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            setDirty(true);
+                        }
+                    });
                     monitor.setCanceled(true);
                 } catch (final AccessDeniedException ade) {
                     BioBankPlugin.openAccessDeniedErrorMessage();
-                    setDirty(true);
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            setDirty(true);
+                        }
+                    });
                     monitor.setCanceled(true);
                 } catch (BiobankCheckException bce) {
-                    setDirty(true);
-                    monitor.setCanceled(true);
                     BioBankPlugin.openAsyncError("Save error", bce);
+                    monitor.setCanceled(true);
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            setDirty(true);
+                        }
+                    });
                 } catch (Exception e) {
-                    setDirty(true);
+                    Display.getDefault().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            setDirty(true);
+                        }
+                    });
                     throw new RuntimeException(e);
                 }
                 monitor.done();
