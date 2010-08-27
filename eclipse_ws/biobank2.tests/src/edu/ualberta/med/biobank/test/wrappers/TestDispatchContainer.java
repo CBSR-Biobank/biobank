@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.DispatchContainer;
-import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -73,8 +72,8 @@ public class TestDispatchContainer extends TestDatabase {
         DispatchContainerWrapper container2 = DispatchContainerHelper
             .addContainer(name + "_c2", shipment, type);
 
-        Assert.assertTrue(container1.compareTo(container2) > 0);
-        Assert.assertTrue(container2.compareTo(container1) < 0);
+        Assert.assertTrue(container1.compareTo(container2) < 0);
+        Assert.assertTrue(container2.compareTo(container1) > 0);
 
         Assert.assertTrue(container1.compareTo(null) == 0);
         Assert.assertTrue(container2.compareTo(null) == 0);
@@ -142,7 +141,6 @@ public class TestDispatchContainer extends TestDatabase {
             container.getWrappedClass());
     }
 
-    // FIXME copied from dispatch container
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
@@ -162,8 +160,8 @@ public class TestDispatchContainer extends TestDatabase {
 
         container.delete();
 
-        int countAfter = appService.search(DispatchShipment.class,
-            new DispatchShipment()).size();
+        int countAfter = appService.search(DispatchContainer.class,
+            new DispatchContainer()).size();
 
         Assert.assertEquals(countBefore - 1, countAfter);
 
