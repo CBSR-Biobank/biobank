@@ -604,7 +604,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
         List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " s where " + getId() + " not in s.siteCollection");
+            + " s where " + getId() + " not in elements(s.siteCollection)");
         List<Study> results = appService.query(c);
         for (Study res : results) {
             studyWrappers.add(new StudyWrapper(appService, res));

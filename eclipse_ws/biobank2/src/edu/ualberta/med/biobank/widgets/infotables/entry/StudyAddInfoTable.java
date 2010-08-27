@@ -8,10 +8,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
+import edu.ualberta.med.biobank.dialogs.SelectStudyDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
@@ -37,9 +37,10 @@ public class StudyAddInfoTable extends StudyInfoTable {
     }
 
     public void createStudyDlg() {
-        SelectClinicContactDialog dlg;
+        SelectStudyDialog dlg;
         try {
-            List<StudyWrapper> availableStudies = site.getStudiesNotAssoc();
+            List<StudyWrapper> availableStudies = StudyWrapper
+                .getAllStudies(SessionManager.getAppService());
             availableStudies.removeAll(site.getStudyCollection(true));
             dlg = new SelectStudyDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), availableStudies);
@@ -88,12 +89,12 @@ public class StudyAddInfoTable extends StudyInfoTable {
         });
     }
 
-    public void setContacts(List<ContactWrapper> contacts) {
-        setCollection(contacts);
+    public void setStudies(List<StudyWrapper> studies) {
+        setCollection(studies);
     }
 
     public void reload() {
-        setCollection(study.getContactCollection(true));
+        setCollection(site.getStudyCollection(true));
     }
 
 }

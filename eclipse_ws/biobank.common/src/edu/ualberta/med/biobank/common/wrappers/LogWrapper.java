@@ -230,7 +230,7 @@ public class LogWrapper extends ModelWrapper<Log> {
     public static List<String> getPossibleSites(
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria("select distinct(site) from "
-            + Log.class.getName()));
+            + Log.class.getName() + " where site !=''"));
     }
 
     public static List<String> getPossibleUsernames(
@@ -248,7 +248,7 @@ public class LogWrapper extends ModelWrapper<Log> {
     public static List<String> getPossibleTypes(
         WritableApplicationService appService) throws ApplicationException {
         return appService.query(new HQLCriteria("select distinct(type) from "
-            + Log.class.getName()));
+            + Log.class.getName() + " where type !=''"));
     }
 
     @Override
