@@ -400,7 +400,7 @@ public abstract class AdapterBase {
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
+            BioBankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
             if (modelObject != null) {
@@ -469,7 +469,7 @@ public abstract class AdapterBase {
                             });
                         }
                     } catch (final RemoteAccessException exp) {
-                        BioBankPlugin.openRemoteAccessErrorMessage();
+                        BioBankPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
                         String modelString = "'unknown'";
                         if (modelObject != null) {

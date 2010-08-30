@@ -664,7 +664,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     }
                     setDirty(true);
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (BiobankCheckException bce) {
                     BioBankPlugin.openAsyncError(
                         "Error while checking position", bce); //$NON-NLS-1$

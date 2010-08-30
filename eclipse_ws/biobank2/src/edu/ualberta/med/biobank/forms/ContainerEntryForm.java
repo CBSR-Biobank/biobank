@@ -261,7 +261,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                     containerAdapter.getParent().performExpand();
                 } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
                     Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {
@@ -270,7 +270,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     });
                     monitor.setCanceled(true);
                 } catch (final RemoteAccessException exp) {
-                    BioBankPlugin.openRemoteAccessErrorMessage();
+                    BioBankPlugin.openRemoteAccessErrorMessage(exp);
                     Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {
@@ -279,7 +279,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     });
                     monitor.setCanceled(true);
                 } catch (final AccessDeniedException ade) {
-                    BioBankPlugin.openAccessDeniedErrorMessage();
+                    BioBankPlugin.openAccessDeniedErrorMessage(ade);
                     Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {

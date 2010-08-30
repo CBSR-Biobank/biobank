@@ -73,8 +73,8 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addShippingMethod() {
-        ShippingMethodWrapper newST = new ShippingMethodWrapper(SessionManager
-            .getAppService());
+        ShippingMethodWrapper newST = new ShippingMethodWrapper(
+            SessionManager.getAppService());
         addOrEditShippingMethod(true, newST, addMessage);
     }
 
@@ -151,7 +151,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         deletedShippingMethods.add(shippingMethod);
                         notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage();
+                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);

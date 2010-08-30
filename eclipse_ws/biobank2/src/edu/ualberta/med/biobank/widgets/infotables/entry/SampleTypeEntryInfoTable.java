@@ -155,7 +155,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                             deletedSampleTypes.add(sampleType);
                             notifyListeners();
                         } catch (final RemoteConnectFailureException exp) {
-                            BioBankPlugin.openRemoteConnectErrorMessage();
+                            BioBankPlugin.openRemoteConnectErrorMessage(exp);
                         } catch (Exception e) {
                             logger.error(
                                 "BioBankFormBase.createPartControl Error", e);

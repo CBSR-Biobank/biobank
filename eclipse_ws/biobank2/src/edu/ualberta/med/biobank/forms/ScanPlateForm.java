@@ -152,7 +152,7 @@ public class ScanPlateForm extends PlateForm {
                 try {
                     launchScan(monitor);
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BioBankPlugin.openAsyncError(
                         Messages.getString("ScanPlate.dialog.scanError.title"), //$NON-NLS-1$

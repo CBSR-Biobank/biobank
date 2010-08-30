@@ -162,7 +162,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                         reloadCollection(localActivityStatuses);
                         notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage();
+                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);

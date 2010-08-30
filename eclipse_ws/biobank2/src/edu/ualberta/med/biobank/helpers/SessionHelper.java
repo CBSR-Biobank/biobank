@@ -67,7 +67,7 @@ public class SessionHelper implements Runnable {
                     .getMessage());
                 return;
             }
-            BioBankPlugin.openRemoteConnectErrorMessage();
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (RemoteAccessException exp) {
             BioBankPlugin.openAsyncError(
                 "Login Failed - Remote Access Exception", exp);
