@@ -718,6 +718,33 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return notifCollection;
     }
 
+    public void addNotification(List<NotificationWrapper> notifications) {
+        if (notifications == null || notifications.size() == 0)
+            return;
+
+        Collection<Notification> allNotifObjects = new HashSet<Notification>();
+        List<NotificationWrapper> allNotifWrappers = new ArrayList<NotificationWrapper>();
+        // already added notifs
+        List<NotificationWrapper> currentList = getNotificationCollection();
+        if (currentList != null) {
+            for (NotificationWrapper notif : currentList) {
+                allNotifObjects.add(notif.getWrappedObject());
+                allNotifWrappers.add(notif);
+            }
+        }
+        // new notifs added
+        for (NotificationWrapper study : notifications) {
+            allNotifObjects.add(study.getWrappedObject());
+            allNotifWrappers.add(study);
+        }
+        Collection<Notification> oldNotifs = wrappedObject
+            .getNotificationCollection();
+        wrappedObject.setNotificationCollection(allNotifObjects);
+        propertyChangeSupport.firePropertyChange("notificationCollection",
+            oldNotifs, allNotifObjects);
+        propertiesMap.put("notificationCollection", allNotifWrappers);
+    }
+
     public void addStudyDispatchSites(StudyWrapper study,
         List<SiteWrapper> sites) {
         // FIXME need to be tested
