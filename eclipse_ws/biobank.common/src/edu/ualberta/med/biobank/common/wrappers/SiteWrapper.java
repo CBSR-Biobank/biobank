@@ -733,9 +733,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             }
         }
         // new notifs added
-        for (NotificationWrapper study : notifications) {
-            allNotifObjects.add(study.getWrappedObject());
-            allNotifWrappers.add(study);
+        for (NotificationWrapper notif : notifications) {
+            notif.setSite(this);
+            allNotifObjects.add(notif.getWrappedObject());
+            allNotifWrappers.add(notif);
         }
         Collection<Notification> oldNotifs = wrappedObject
             .getNotificationCollection();

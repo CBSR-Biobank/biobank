@@ -4,6 +4,7 @@ import java.util.Date;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Notification;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -75,6 +76,18 @@ public class NotificationWrapper extends ModelWrapper<Notification> {
         Boolean oldRead = hasBeenRead();
         wrappedObject.setHasRead(hasRead);
         propertyChangeSupport.firePropertyChange("hasRead", oldRead, hasRead);
+    }
+
+    public SiteWrapper getSite() {
+        Site site = wrappedObject.getSite();
+        return (site != null) ? new SiteWrapper(appService, site) : null;
+    }
+
+    public void setSite(SiteWrapper siteWrapper) {
+        Site oldSite = wrappedObject.getSite();
+        Site newSite = siteWrapper.getWrappedObject();
+        wrappedObject.setSite(newSite);
+        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
 }
