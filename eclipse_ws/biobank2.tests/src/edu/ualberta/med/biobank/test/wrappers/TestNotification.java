@@ -6,6 +6,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.NotificationWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Notification;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.NotificationHelper;
@@ -43,30 +44,64 @@ public class TestNotification extends TestDatabase {
     @Test
     public void testReset() throws Exception {
         String name = "testReset" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
 
+        // test reset for a new object
+        NotificationWrapper notification = NotificationHelper.newNotification(
+            site, Utils.getRandomDate(), name);
+        notification.reset();
+        Assert.assertEquals(null, notification.getDateSent());
+
+        // test reset for an object already in database
+        notification = NotificationHelper.addNotification(site,
+            Utils.getRandomDate(), name);
+        notification.reset();
+        notification.setMessage(Utils.getRandomString(32));
+        Assert.assertEquals(name, notification.getMessage());
     }
 
     @Test
     public void testReload() throws Exception {
         String name = "testReload" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        NotificationWrapper notification = NotificationHelper.addNotification(
+            site, Utils.getRandomDate(), name);
 
+        try {
+            notification.reload();
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.fail("cannot reload notification wrapper");
+        }
     }
 
     @Test
     public void testGetWrappedClass() throws Exception {
-        String name = "testGetWrappedClass" + r.nextInt();
-
+        NotificationWrapper notification = NotificationHelper.newNotification(
+            null, null, null);
+        Assert.assertEquals(Notification.class, notification.getWrappedClass());
     }
 
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        NotificationWrapper notification = NotificationHelper.addNotification(
+            site, Utils.getRandomDate(), name);
 
+        int countBefore = appService.search(Notification.class,
+            new Notification()).size();
+
+        notification.delete();
+
+        int countAfter = appService.search(Notification.class,
+            new Notification()).size();
+
+        Assert.assertEquals(countBefore - 1, countAfter);
     }
 
     @Test
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
-
     }
 }

@@ -276,7 +276,6 @@ public class TestDispatchShipment extends TestDatabase {
             new DispatchShipment()).size();
 
         Assert.assertEquals(countBefore - 1, countAfter);
-
     }
 
     @Test
