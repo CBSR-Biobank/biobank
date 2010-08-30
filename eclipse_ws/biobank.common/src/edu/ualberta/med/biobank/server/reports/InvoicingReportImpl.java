@@ -18,11 +18,11 @@ public class InvoicingReportImpl extends AbstractReport {
         + " pv where pv.shipment.clinic = Alias.patientVisit.shipment.clinic and pv.patient.study = Alias.patientVisit.patient.study and pv.dateProcessed between ? and ?),"
         + " Alias.sampleType.nameShort, count(*) from "
         + Aliquot.class.getName()
-        + " as Alias where Alias.aliquotPosition.id not in (from "
+        + " as Alias left join Alias.aliquotPosition p where (p is null or p not in (from "
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
-        + "') and Alias.linkDate between ? and ? and Alias.patientVisit.shipment.site "
+        + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
         + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.patientVisit.shipment.clinic, Alias.sampleType.nameShort";

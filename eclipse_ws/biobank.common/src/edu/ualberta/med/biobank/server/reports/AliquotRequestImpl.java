@@ -92,11 +92,17 @@ public class AliquotRequestImpl extends AbstractReport {
                     results.add(queried.get(j));
             }
             if (queried.size() < maxResults)
-                results.add(new Object[] { pnumber, "",
-                    DateFormatter.formatAsDate(dateDrawn), typeName,
-                    "NOT FOUND (" + (maxResults - queried.size()) + ")" });
+                results.add(getNotFoundRow(pnumber, dateDrawn, typeName,
+                    maxResults, queried.size()));
         }
         return results;
+    }
+
+    public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
+        String typeName, Integer maxResults, Integer numResultsFound) {
+        return new Object[] { pnumber, "",
+            DateFormatter.formatAsDate(dateDrawn), typeName,
+            "NOT FOUND (" + (maxResults - numResultsFound) + ")" };
     }
 
     // Database calls are made so can't use RowPostProcess
