@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.DispatchShipment;
-import edu.ualberta.med.biobank.model.Notification;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -697,53 +696,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
             }
         }
         return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<NotificationWrapper> getNotificationCollection() {
-        List<NotificationWrapper> notifCollection = (List<NotificationWrapper>) propertiesMap
-            .get("notificationCollection");
-        if (notifCollection == null) {
-            Collection<Notification> children = wrappedObject
-                .getNotificationCollection();
-            if (children != null) {
-                notifCollection = new ArrayList<NotificationWrapper>();
-                for (Notification notif : children) {
-                    notifCollection.add(new NotificationWrapper(appService,
-                        notif));
-                }
-                propertiesMap.put("notificationCollection", notifCollection);
-            }
-        }
-        return notifCollection;
-    }
-
-    public void addNotification(List<NotificationWrapper> notifications) {
-        if (notifications == null || notifications.size() == 0)
-            return;
-
-        Collection<Notification> allNotifObjects = new HashSet<Notification>();
-        List<NotificationWrapper> allNotifWrappers = new ArrayList<NotificationWrapper>();
-        // already added notifs
-        List<NotificationWrapper> currentList = getNotificationCollection();
-        if (currentList != null) {
-            for (NotificationWrapper notif : currentList) {
-                allNotifObjects.add(notif.getWrappedObject());
-                allNotifWrappers.add(notif);
-            }
-        }
-        // new notifs added
-        for (NotificationWrapper notif : notifications) {
-            notif.setSite(this);
-            allNotifObjects.add(notif.getWrappedObject());
-            allNotifWrappers.add(notif);
-        }
-        Collection<Notification> oldNotifs = wrappedObject
-            .getNotificationCollection();
-        wrappedObject.setNotificationCollection(allNotifObjects);
-        propertyChangeSupport.firePropertyChange("notificationCollection",
-            oldNotifs, allNotifObjects);
-        propertiesMap.put("notificationCollection", allNotifWrappers);
     }
 
     public void addStudyDispatchSites(StudyWrapper study,

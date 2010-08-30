@@ -70,6 +70,7 @@ public class SiteHelper extends DbHelper {
         site.reload();
         deleteDispatchShipments(site.getSentDispatchShipmentCollection());
         deleteDispatchShipments(site.getReceivedDispatchShipmentCollection());
+        site.reload();
         site.delete();
     }
 
