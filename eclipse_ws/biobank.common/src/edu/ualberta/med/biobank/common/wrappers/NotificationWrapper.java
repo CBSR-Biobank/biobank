@@ -10,6 +10,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class NotificationWrapper extends ModelWrapper<Notification> {
 
+    private SiteWrapper site;
+
     public NotificationWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -20,13 +22,20 @@ public class NotificationWrapper extends ModelWrapper<Notification> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<Notification> o) {
+    public int compareTo(ModelWrapper<Notification> wrapper) {
+        if (wrapper instanceof NotificationWrapper) {
+            Date v1Date = wrappedObject.getDateSent();
+            Date v2Date = wrapper.wrappedObject.getDateSent();
+            if (v1Date != null && v2Date != null) {
+                return v1Date.compareTo(v2Date);
+            }
+        }
         return 0;
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "dateSent", "message", "hasRead" };
+        return new String[] { "dateSent", "message", "hasRead", "site" };
     }
 
     @Override
@@ -79,13 +88,22 @@ public class NotificationWrapper extends ModelWrapper<Notification> {
     }
 
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
-        return (site != null) ? new SiteWrapper(appService, site) : null;
+        if (site == null) {
+            Site s = wrappedObject.getSite();
+            if (s == null)
+                return null;
+            site = new SiteWrapper(appService, s);
+        }
+        return site;
     }
 
-    public void setSite(SiteWrapper siteWrapper) {
+    public void setSite(SiteWrapper site) {
+        this.site = site;
         Site oldSite = wrappedObject.getSite();
-        Site newSite = siteWrapper.getWrappedObject();
+        Site newSite = null;
+        if (site != null) {
+            newSite = site.getWrappedObject();
+        }
         wrappedObject.setSite(newSite);
         propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
