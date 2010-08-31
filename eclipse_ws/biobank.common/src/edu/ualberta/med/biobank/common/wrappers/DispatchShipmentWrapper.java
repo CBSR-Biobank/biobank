@@ -241,5 +241,4 @@ public class DispatchShipmentWrapper extends
         sentContainersRemoved.clear();
         sender = null;
     }
-
 }
