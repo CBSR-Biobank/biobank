@@ -65,4 +65,13 @@ public class StudyHelper extends DbHelper {
         createdStudies.clear();
     }
 
+    public static void deleteCreatedStudy(StudyWrapper study) throws Exception {
+        if (!createdStudies.contains(study)) {
+            throw new Exception("Study " + study.getNameShort()
+                + " was not created by this helper");
+        }
+        createdStudies.remove(study);
+        study.delete();
+    }
+
 }

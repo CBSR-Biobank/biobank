@@ -270,42 +270,50 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addContacts(List<ContactWrapper> newContacts) {
-        if (newContacts != null && newContacts.size() > 0) {
-            Collection<Contact> allContactObjects = new HashSet<Contact>();
-            List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-            // already added contacts
-            List<ContactWrapper> currentList = getContactCollection();
-            if (currentList != null) {
-                for (ContactWrapper contact : currentList) {
+        if ((newContacts == null) || (newContacts.size() == 0))
+            return;
+
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                allContactObjects.add(contact.getWrappedObject());
+                allContactWrappers.add(contact);
+            }
+        }
+        // new contacts added
+        for (ContactWrapper contact : newContacts) {
+            allContactObjects.add(contact.getWrappedObject());
+            allContactWrappers.add(contact);
+        }
+        setContactCollection(allContactObjects, allContactWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToRemove)
+        throws BiobankCheckException {
+        if ((contactsToRemove == null) || (contactsToRemove.size() == 0))
+            return;
+
+        List<ContactWrapper> currentList = getContactCollection();
+        if (!currentList.containsAll(contactsToRemove)) {
+            throw new BiobankCheckException(
+                "studies are not associated with study " + getNameShort());
+        }
+
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                if (!contactsToRemove.contains(contact)) {
                     allContactObjects.add(contact.getWrappedObject());
                     allContactWrappers.add(contact);
                 }
             }
-            // new contacts added
-            for (ContactWrapper contact : newContacts) {
-                allContactObjects.add(contact.getWrappedObject());
-                allContactWrappers.add(contact);
-            }
-            setContactCollection(allContactObjects, allContactWrappers);
         }
-    }
-
-    public void removeContacts(List<ContactWrapper> contactsToRemove) {
-        if (contactsToRemove != null && contactsToRemove.size() > 0) {
-            Collection<Contact> allContactObjects = new HashSet<Contact>();
-            List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-            // already added contacts
-            List<ContactWrapper> currentList = getContactCollection();
-            if (currentList != null) {
-                for (ContactWrapper contact : currentList) {
-                    if (!contactsToRemove.contains(contact)) {
-                        allContactObjects.add(contact.getWrappedObject());
-                        allContactWrappers.add(contact);
-                    }
-                }
-            }
-            setContactCollection(allContactObjects, allContactWrappers);
-        }
+        setContactCollection(allContactObjects, allContactWrappers);
     }
 
     @SuppressWarnings("unchecked")
