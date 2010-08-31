@@ -814,11 +814,30 @@ public class TestSite extends TestDatabase {
     public void testAddDispatchSites() throws Exception {
         String name = "testAddDispatchSites" + r.nextInt();
         SiteWrapper srcSite = SiteHelper.addSite(name);
-        List<SiteWrapper> destSites = SiteHelper.addSites(name,
+        List<SiteWrapper> destSitesSet1 = SiteHelper.addSites(name + "_s1_",
             r.nextInt(5) + 1);
+        List<SiteWrapper> destSitesSet2 = SiteHelper.addSites(name + "_s2_",
+            r.nextInt(5) + 1);
+
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        srcSite.addStudyDispatchSites(study, destSites);
+        // add dest site set 1
+        srcSite.addStudyDispatchSites(study, destSitesSet1);
+        List<SiteWrapper> srcSiteDispatchSites = srcSite
+            .getStudyDispachSites(study);
+
+        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+
+        // add dest site set 2
+        srcSite.addStudyDispatchSites(study, destSitesSet2);
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertEquals(destSitesSet1.size() + destSitesSet2.size(),
+            srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+
+        // remove set 1
     }
 
 }
