@@ -152,7 +152,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
             allSampleTypes = SampleTypeWrapper.getAllSampleTypes(
                 SessionManager.getAppService(), true);
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
             logger.error("getSampleTypes", e);
         }

@@ -15,9 +15,9 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
@@ -71,11 +71,11 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 // add searched objects is not yet there
                 for (ModelWrapper<?> wrapper : searchedObjects) {
                     assert wrapper instanceof PatientWrapper
-                        || wrapper instanceof ShipmentWrapper;
+                        || wrapper instanceof ClinicShipmentWrapper;
                     if (wrapper instanceof PatientWrapper) {
                         PatientAdministrationView.getCurrent().addToNode(this,
                             wrapper);
-                    } else if (wrapper instanceof ShipmentWrapper) {
+                    } else if (wrapper instanceof ClinicShipmentWrapper) {
                         ShipmentAdministrationView.getCurrent().addToNode(this,
                             wrapper);
                     }
@@ -90,7 +90,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                     }
                 }
             } catch (final RemoteAccessException exp) {
-                BioBankPlugin.openRemoteAccessErrorMessage();
+                BioBankPlugin.openRemoteAccessErrorMessage(exp);
             } catch (Exception e) {
                 logger.error("Error while refreshing searched elements", e);
             }

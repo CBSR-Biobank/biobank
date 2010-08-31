@@ -16,12 +16,12 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
-import edu.ualberta.med.biobank.model.Shipment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -36,13 +36,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private PatientWrapper patient = null;
 
-    private ShipmentWrapper shipment;
+    private ClinicShipmentWrapper shipment;
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
-        studyPvAttrMap = null;
-        pvAttrMap = null;
     }
 
     public PatientVisitWrapper(WritableApplicationService appService) {
@@ -366,8 +364,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     private void checkPatientInShipment() throws BiobankCheckException {
-        List<PatientWrapper> shipmentPatients = getShipment()
-            .getPatientCollection();
+        ClinicShipmentWrapper ship = getShipment();
+        try {
+            ship.reload();
+        } catch (Exception e) {
+            throw new BiobankCheckException(e);
+        }
+        List<PatientWrapper> shipmentPatients = ship.getPatientCollection();
         if (shipmentPatients == null
             || !shipmentPatients.contains(getPatient())) {
             throw new BiobankCheckException(
@@ -392,20 +395,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public ShipmentWrapper getShipment() {
+    public ClinicShipmentWrapper getShipment() {
         if (shipment == null) {
-            Shipment s = wrappedObject.getShipment();
+            ClinicShipment s = wrappedObject.getShipment();
             if (s == null)
                 return null;
-            shipment = new ShipmentWrapper(appService, s);
+            shipment = new ClinicShipmentWrapper(appService, s);
         }
         return shipment;
     }
 
-    public void setShipment(ShipmentWrapper s) {
+    public void setShipment(ClinicShipmentWrapper s) {
         this.shipment = s;
-        Shipment oldShipment = wrappedObject.getShipment();
-        Shipment newShipment = s.getWrappedObject();
+        ClinicShipment oldShipment = wrappedObject.getShipment();
+        ClinicShipment newShipment = s.getWrappedObject();
         wrappedObject.setShipment(newShipment);
         propertyChangeSupport.firePropertyChange("shipment", oldShipment,
             newShipment);
@@ -556,10 +559,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         pvAttrMap = null;
         studyPvAttrMap = null;
         deletedPvSourceVessels.clear();
+        patient = null;
+        shipment = null;
     }
 
     @Override
@@ -571,7 +576,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        ShipmentWrapper shipment = getShipment();
+        ClinicShipmentWrapper shipment = getShipment();
         PatientWrapper patient = getPatient();
         if (site == null) {
             log.setSite(shipment.getSite().getNameShort());
@@ -593,13 +598,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         log.setDetails(details);
         log.setType("Visit");
         return log;
-    }
-
-    @Override
-    public void reload() throws Exception {
-        patient = null;
-        shipment = null;
-        super.reload();
     }
 
     public static List<PatientVisitWrapper> getPatientVisitsWithWorksheet(

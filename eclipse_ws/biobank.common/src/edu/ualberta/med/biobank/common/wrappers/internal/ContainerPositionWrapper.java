@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.AbstractContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Container;
@@ -42,23 +43,16 @@ public class ContainerPositionWrapper extends
         return ContainerPosition.class;
     }
 
-    public void setParentContainer(Container parentContainer) {
-        if (parentContainer == null)
-            this.parent = null;
-        else
-            this.parent = new ContainerWrapper(appService, parentContainer);
-        Container oldParent = wrappedObject.getParentContainer();
-        wrappedObject.setParentContainer(parentContainer);
-        propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
-            parentContainer);
-    }
-
     private void setParentContainer(ContainerWrapper parentContainer) {
-        if (parentContainer == null) {
-            setParentContainer((Container) null);
-        } else {
-            setParentContainer(parentContainer.getWrappedObject());
+        this.parent = parentContainer;
+        Container oldParent = wrappedObject.getParentContainer();
+        Container newParent = null;
+        if (parentContainer != null) {
+            newParent = parentContainer.getWrappedObject();
         }
+        wrappedObject.setParentContainer(newParent);
+        propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
+            newParent);
     }
 
     private ContainerWrapper getParentContainer() {
@@ -82,18 +76,15 @@ public class ContainerPositionWrapper extends
     }
 
     public void setContainer(ContainerWrapper container) {
-        setContainer(container.getWrappedObject());
-    }
-
-    public void setContainer(Container container) {
-        if (container == null)
-            this.container = null;
-        else
-            this.container = new ContainerWrapper(appService, container);
+        this.container = container;
         Container oldContainer = wrappedObject.getContainer();
-        wrappedObject.setContainer(container);
+        Container newContainer = null;
+        if (container != null) {
+            newContainer = container.getWrappedObject();
+        }
+        wrappedObject.setContainer(newContainer);
         propertyChangeSupport.firePropertyChange("container", oldContainer,
-            container);
+            newContainer);
     }
 
     @Override
@@ -122,8 +113,11 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    public void setParent(ContainerWrapper parent) {
-        setParentContainer(parent);
+    public void setParent(AbstractContainerWrapper<?> parent) {
+        assert parent instanceof ContainerWrapper;
+        if (parent instanceof ContainerWrapper) {
+            setParentContainer((ContainerWrapper) parent);
+        }
     }
 
     @Override
@@ -133,10 +127,10 @@ public class ContainerPositionWrapper extends
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !
-            HQLCriteria criteria = new HQLCriteria("from "
-                + ContainerPosition.class.getName()
-                + " where parentContainer.id=? and row=? and col=?", Arrays
-                .asList(new Object[] { parent.getId(), getRow(), getCol() }));
+            HQLCriteria criteria = new HQLCriteria(
+                "from " + ContainerPosition.class.getName()
+                    + " where parentContainer.id=? and row=? and col=?",
+                Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
             List<ContainerPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
                 return;

@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 
@@ -37,9 +37,10 @@ public class TestPvSourceVessel extends TestDatabase {
         super.setUp();
 
         SiteWrapper site = SiteHelper.addSite("SiteName");
-        ClinicWrapper clinic = ClinicHelper.addClinic(site, "clinicname");
-        ShipmentWrapper shipment = ShipmentHelper.addShipmentWithRandomPatient(
-            site, clinic, Utils.getRandomString(10));
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
+        ClinicShipmentWrapper shipment = ClinicShipmentHelper
+            .addShipmentWithRandomPatient(site, clinic,
+                Utils.getRandomString(10));
         PatientWrapper patient = shipment.getPatientCollection().get(0);
         PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());

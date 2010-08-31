@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -199,9 +199,9 @@ public class PatientMergeForm extends BiobankEntryForm {
                 patient2Wrapper.getPatientVisitCollection());
             patient2Wrapper
                 .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
-            List<ShipmentWrapper> shipments = patient2Wrapper
+            List<ClinicShipmentWrapper> shipments = patient2Wrapper
                 .getShipmentCollection();
-            for (ShipmentWrapper shipment : shipments) {
+            for (ClinicShipmentWrapper shipment : shipments) {
                 List<PatientWrapper> patients = shipment.getPatientCollection();
                 for (PatientWrapper p : patients)
                     if (p.equals(patient2Wrapper)) {

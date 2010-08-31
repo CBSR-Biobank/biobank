@@ -56,11 +56,11 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         try {
             createDialogAreaInternal(parentComposite);
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage();
+            BioBankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage();
+            BioBankPlugin.openAccessDeniedErrorMessage(ade);
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Save error", bce);
         } catch (Exception e) {

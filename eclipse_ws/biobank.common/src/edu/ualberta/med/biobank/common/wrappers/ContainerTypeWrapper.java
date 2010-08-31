@@ -555,18 +555,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
-        if (scheme == null) {
-            setChildLabelingScheme((ContainerLabelingScheme) null);
-        } else {
-            setChildLabelingScheme(scheme.getWrappedObject());
-        }
-    }
-
-    private void setChildLabelingScheme(ContainerLabelingScheme scheme) {
         ContainerLabelingScheme oldLbl = wrappedObject.getChildLabelingScheme();
-        wrappedObject.setChildLabelingScheme(scheme);
+        ContainerLabelingScheme newLbl = null;
+        if (scheme != null) {
+            newLbl = scheme.getWrappedObject();
+        }
+        wrappedObject.setChildLabelingScheme(newLbl);
         propertyChangeSupport.firePropertyChange("childLabelingScheme", oldLbl,
-            scheme);
+            newLbl);
     }
 
     public Integer getChildLabelingScheme() {
@@ -604,10 +600,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private void checkTopLevel(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        if ((getTopLevel() == null && oldObject.getTopLevel() != null)
-            || (getTopLevel() != null && oldObject.getTopLevel() == null)
-            || (getTopLevel() != null && oldObject.getTopLevel() != null && !getTopLevel()
-                .equals(oldObject.getTopLevel())) && existsContainersWithType) {
+        if (((getTopLevel() == null && oldObject.getTopLevel() != null)
+            || (getTopLevel() != null && oldObject.getTopLevel() == null) || (getTopLevel() != null
+            && oldObject.getTopLevel() != null && !getTopLevel().equals(
+            oldObject.getTopLevel())))
+            && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to change the \"Top Level\" property. A container "
                     + "requiring this property exists in storage. Remove all "
@@ -738,7 +735,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         deletedChildTypes.clear();
         deletedSampleTypes.clear();
     }

@@ -169,7 +169,7 @@ public abstract class BiobankFormBase extends EditorPart {
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }
@@ -220,7 +220,7 @@ public abstract class BiobankFormBase extends EditorPart {
                     createFormContent();
                     form.reflow(true);
                 } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BioBankPlugin.openError(
                         "BioBankFormBase.createPartControl Error", e);

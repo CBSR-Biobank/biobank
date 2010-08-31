@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class FTAReportEditor extends ReportsEditor {
 
@@ -28,7 +29,7 @@ public class FTAReportEditor extends ReportsEditor {
     }
 
     @Override
-    protected void createOptionSection(Composite parent) {
+    protected void createOptionSection(Composite parent) throws Exception {
         studyCombo = createStudyComboOption("Study", parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
             "After Date (Processed)", null, null, null, SWT.DATE);
@@ -44,7 +45,7 @@ public class FTAReportEditor extends ReportsEditor {
     }
 
     protected ComboViewer createStudyComboOption(String labelText,
-        Composite parent) {
+        Composite parent) throws ApplicationException {
         Collection<StudyWrapper> studyWrappers;
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (site.getName().compareTo("All Sites") != 0)

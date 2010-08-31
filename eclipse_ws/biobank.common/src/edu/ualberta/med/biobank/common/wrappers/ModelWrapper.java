@@ -122,7 +122,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             firePropertyChanges(oldValue, wrappedObject);
         }
         propertiesMap.clear();
-        resetInternalField();
+        resetInternalFields();
     }
 
     /**
@@ -199,12 +199,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         SDKQueryResult result = ((BiobankApplicationService) appService)
             .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
-        Log logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
+        Log logMessage = null;
+        try {
+            logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
+        } catch (Exception ex) {
+            // Don't want the logs to affect persist
+            // FIXME save somewhere this information
+            ex.printStackTrace();
+        }
         if (logMessage != null) {
             ((BiobankApplicationService) appService).logActivity(logMessage);
         }
         propertiesMap.clear();
-        resetInternalField();
+        resetInternalFields();
         notifyListeners(new WrapperEvent(eventType, this));
     }
 
@@ -275,7 +282,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         reload();
         deleteChecks();
         deleteDependencies();
-        Log logMessage = getLogMessage("delete", null, "");
+        Log logMessage = null;
+        try {
+            logMessage = getLogMessage("delete", null, "");
+        } catch (Exception ex) {
+            // Don't want the logs to affect delete
+            // FIXME save somewhere this information
+            ex.printStackTrace();
+        }
         appService.executeQuery(new DeleteExampleQuery(wrappedObject));
         if (logMessage != null) {
             ((BiobankApplicationService) appService).logActivity(logMessage);
@@ -297,7 +311,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             reload();
         }
         propertiesMap.clear();
-        resetInternalField();
+        resetInternalFields();
     }
 
     /**
@@ -421,7 +435,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * If we want to reset internal fields when reload or reset is called (even
      * if the object is new).
      */
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         // default do nothing
     }
 
@@ -539,4 +553,5 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         @SuppressWarnings("unused") String details) {
         return null;
     }
+
 }

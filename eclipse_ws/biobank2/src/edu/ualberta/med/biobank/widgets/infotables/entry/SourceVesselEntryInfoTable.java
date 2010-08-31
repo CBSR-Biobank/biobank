@@ -73,8 +73,8 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addSourceVessel() {
-        SourceVesselWrapper newST = new SourceVesselWrapper(SessionManager
-            .getAppService());
+        SourceVesselWrapper newST = new SourceVesselWrapper(
+            SessionManager.getAppService());
         addOrEditSourceVessel(true, newST, addMessage);
     }
 
@@ -151,7 +151,7 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
                         deletedSourceVessels.add(sourceVessel);
                         notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage();
+                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);

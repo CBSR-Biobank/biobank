@@ -212,7 +212,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 try {
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
                     setScanValid(false);
                 } catch (Exception e) {
                     BioBankPlugin

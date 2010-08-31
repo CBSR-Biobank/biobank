@@ -27,8 +27,8 @@ public class ContactHelper extends DbHelper {
 
     public static int addContactsToStudy(StudyWrapper study, SiteWrapper site,
         String name) throws Exception {
-        ClinicHelper.addClinics(site, name, r.nextInt(15) + 3, true);
-        List<ClinicWrapper> clinics = site.getClinicCollection();
+        ClinicHelper.addClinics(name, r.nextInt(15) + 3, true);
+        List<ClinicWrapper> clinics = ClinicWrapper.getAllClinics(appService);
         int nber = r.nextInt(clinics.size() - 2) + 1;
         List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
         for (int i = 0; i < nber; i++) {

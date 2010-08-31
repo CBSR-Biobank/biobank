@@ -374,26 +374,39 @@ public class BioBankPlugin extends AbstractUIPlugin {
     /**
      * Display remote access error message
      */
-    public static void openRemoteAccessErrorMessage() {
+    public static void openRemoteAccessErrorMessage(Throwable ex) {
         openAsyncError(
             "Connection Attempt Failed",
             "Could not perform database operation. Make sure server is running correct version.");
+        if (ex != null) {
+            logger.error("Connection Attempt Failed", ex);
+        }
     }
 
     /**
      * Display remote connect error message
      */
-    public static void openRemoteConnectErrorMessage() {
+    public static void openRemoteConnectErrorMessage(Throwable ex) {
         openAsyncError("Connection Attempt Failed",
             "Could not connect to server. Make sure server is running.");
+        if (ex != null) {
+            logger.error("Connection Attempt Failed", ex);
+        }
+    }
+
+    public static void openAccessDeniedErrorMessage() {
+        openAccessDeniedErrorMessage(null);
     }
 
     /**
      * Display remote access error message
      */
-    public static void openAccessDeniedErrorMessage() {
+    public static void openAccessDeniedErrorMessage(Throwable ex) {
         openAsyncError("Access Denied",
             "You don't have rights to do this action.");
+        if (ex != null) {
+            logger.error("Connection Attempt Failed", ex);
+        }
     }
 
     public boolean isCancelBarcode(String code) {

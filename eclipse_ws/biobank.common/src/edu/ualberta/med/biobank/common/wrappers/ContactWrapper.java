@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContactWrapper extends ModelWrapper<Contact> {
 
@@ -200,4 +201,15 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         clinic = null;
     }
 
+    public static List<ContactWrapper> getAllContacts(
+        WritableApplicationService appService) throws ApplicationException {
+        List<Contact> contacts = new ArrayList<Contact>();
+        List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
+        HQLCriteria c = new HQLCriteria("from " + Contact.class.getName());
+        contacts = appService.query(c);
+        for (Contact contact : contacts) {
+            wrappers.add(new ContactWrapper(appService, contact));
+        }
+        return wrappers;
+    }
 }

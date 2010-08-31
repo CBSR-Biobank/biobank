@@ -1,12 +1,13 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Arrays;
@@ -57,13 +58,37 @@ public class DbHelper {
         }
     }
 
-    public static void deleteCreatedStudies() throws Exception {
+    public static void deleteDispatchContainers(
+        Collection<DispatchContainerWrapper> containers) throws Exception {
         Assert.assertNotNull("appService is null", appService);
-        for (StudyWrapper study : StudyWrapper.getAllStudies(appService)) {
-            deletePatients(study.getPatientCollection());
-            deleteFromList(study.getSampleStorageCollection());
-            study.reload();
-            study.delete();
+        if ((containers == null) || (containers.size() == 0))
+            return;
+
+        for (DispatchContainerWrapper container : containers) {
+            container.reload();
+            if (container.hasAliquots()) {
+                deleteFromList(container.getAliquots().values());
+            }
+            container.reload();
+            container.delete();
+        }
+    }
+
+    public static void deleteDispatchShipments(
+        Collection<DispatchShipmentWrapper> shipments) throws Exception {
+        Assert.assertNotNull("appService is null", appService);
+        if ((shipments == null) || (shipments.size() == 0))
+            return;
+
+        for (DispatchShipmentWrapper shipment : shipments) {
+            shipment.reload();
+            List<DispatchContainerWrapper> containers = shipment
+                .getSentContainerCollection();
+            if (containers != null) {
+                deleteDispatchContainers(containers);
+            }
+            shipment.reload();
+            shipment.delete();
         }
     }
 
@@ -75,9 +100,10 @@ public class DbHelper {
 
         // visites liees au ship avec patient de la visit non lie au shipment
         for (PatientWrapper patient : patients) {
+            patient.reload();
             deletePatientVisits(patient.getPatientVisitCollection());
             patient.reload();
-            for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+            for (ClinicShipmentWrapper ship : patient.getShipmentCollection()) {
                 ship.reload();
                 ship.removePatients(Arrays.asList(patient));
                 if (ship.getPatientCollection().size() == 0) {
@@ -108,9 +134,6 @@ public class DbHelper {
         throws Exception {
         Assert.assertNotNull("appService is null", appService);
         for (ClinicWrapper clinic : clinics) {
-            clinic.reload();
-            deleteFromList(clinic.getShipmentCollection());
-            clinic.reload();
             clinic.delete();
         }
     }

@@ -8,14 +8,14 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
+public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
 
     private class TableRowData {
-        ShipmentWrapper shipment;
+        ClinicShipmentWrapper shipment;
         String dateReceived;
         String waybill;
         String shippingCompany;
@@ -70,7 +70,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
      * shipment.
      */
     @Override
-    public Object getCollectionModelObject(ShipmentWrapper shipment)
+    public Object getCollectionModelObject(ClinicShipmentWrapper shipment)
         throws Exception {
         TableRowData info = new TableRowData();
         info.shipment = shipment;
@@ -99,7 +99,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
     }
 
     @Override
-    public ShipmentWrapper getSelection() {
+    public ClinicShipmentWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

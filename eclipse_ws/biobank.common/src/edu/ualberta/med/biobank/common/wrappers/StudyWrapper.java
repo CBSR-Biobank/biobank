@@ -13,10 +13,12 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
@@ -42,12 +44,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
-        studyPvAttrMap = null;
     }
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
-        studyPvAttrMap = null;
     }
 
     public String getName() {
@@ -190,7 +190,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
             "siteCollection", "contactCollection", "sampleStorageCollection",
             "sourceVesselCollection", "studyPvAttrCollection",
-            "patientCollection" };
+            "patientCollection", "dispatchInfoCollection" };
     }
 
     @Override
@@ -614,7 +614,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr = new StudyPvAttrWrapper(appService);
             studyPvAttr.setLabel(label);
             studyPvAttr.setPvAttrType(pvAttrType);
-            studyPvAttr.setStudy(wrappedObject);
+            studyPvAttr.setStudy(this);
         }
         deletedStudyPvAttr.remove(studyPvAttr);
 
@@ -788,6 +788,25 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DispatchInfoWrapper> getDispatchInfoCollection() {
+        List<DispatchInfoWrapper> infoCollection = (List<DispatchInfoWrapper>) propertiesMap
+            .get("dispatchInfoCollection");
+        if (infoCollection == null) {
+            Collection<DispatchInfo> children = wrappedObject
+                .getDispatchInfoCollection();
+            if (children != null) {
+                infoCollection = new ArrayList<DispatchInfoWrapper>();
+                for (DispatchInfo info : children) {
+                    infoCollection
+                        .add(new DispatchInfoWrapper(appService, info));
+                }
+                propertiesMap.put("dispatchInfoCollection", infoCollection);
+            }
+        }
+        return infoCollection;
+    }
+
     @Override
     public int compareTo(ModelWrapper<Study> wrapper) {
         if (wrapper instanceof StudyWrapper) {
@@ -933,23 +952,20 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         studyPvAttrMap = null;
         deletedSampleStorages.clear();
         deletedStudySourceVessels.clear();
         deletedStudyPvAttr.clear();
+        activityStatus = null;
     }
 
     public static List<StudyWrapper> getAllStudies(
-        WritableApplicationService appService) {
+        WritableApplicationService appService) throws ApplicationException {
         List<Study> studies = new ArrayList<Study>();
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria("from " + Study.class.getName());
-        try {
-            studies = appService.query(c);
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
+        studies = appService.query(c);
         for (Study study : studies)
             wrappers.add(new StudyWrapper(appService, study));
         return wrappers;
@@ -960,10 +976,32 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getName();
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        activityStatus = null;
+    public List<SiteWrapper> getDispatchDestSiteCollection(SiteWrapper site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.destSiteCollection from "
+                + DispatchInfo.class.getName()
+                + " as info where info.study.id = ? and info.site.id=?",
+            Arrays.asList(new Object[] { getId(), site.getId() }));
+        List<Site> results = appService.query(criteria);
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        for (Site res : results) {
+            wrappers.add(new SiteWrapper(appService, res));
+        }
+        return wrappers;
     }
 
+    public List<SiteWrapper> getDispatchAllSrcSites()
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.srcSite from " + DispatchInfo.class.getName()
+                + " as info where info.study.id = ?",
+            Arrays.asList(new Object[] { getId() }));
+        List<Site> results = appService.query(criteria);
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        for (Site res : results) {
+            wrappers.add(new SiteWrapper(appService, res));
+        }
+        return wrappers;
+    }
 }

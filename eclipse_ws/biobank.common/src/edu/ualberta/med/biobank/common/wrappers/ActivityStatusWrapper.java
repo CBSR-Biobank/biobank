@@ -62,17 +62,13 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public boolean isUsed() throws ApplicationException, BiobankCheckException {
         long usedCount = 0;
 
-        String[] classNames = new String[] { Aliquot.class.getName(),
-            Clinic.class.getName(), Container.class.getName(),
-            ContainerType.class.getName(), SampleStorage.class.getName(),
-            Site.class.getName(), Study.class.getName(),
-            StudyPvAttr.class.getName(),
+        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
+            Container.class, ContainerType.class, SampleStorage.class,
+            Site.class, Study.class, StudyPvAttr.class };
 
-        };
-
-        for (String className : classNames) {
-            HQLCriteria c = new HQLCriteria("select count(x) from " + className
-                + " as x where x.activityStatus=?)",
+        for (Class<?> clazz : classes) {
+            HQLCriteria c = new HQLCriteria("select count(x) from "
+                + clazz.getName() + " as x where x.activityStatus=?",
                 Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {
@@ -135,7 +131,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return activities;
     }
 
-    // TODO test getActivityStatus
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name) throws Exception {
 

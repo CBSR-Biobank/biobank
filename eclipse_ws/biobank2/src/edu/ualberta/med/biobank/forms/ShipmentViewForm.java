@@ -7,7 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -20,7 +20,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
     private ShipmentAdapter shipmentAdapter;
-    private ShipmentWrapper shipment;
+    private ClinicShipmentWrapper shipment;
 
     private BiobankText siteLabel;
 
@@ -119,7 +119,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void setShipmentValues() {
-        setTextValue(siteLabel, shipment.getClinic().getSite().getName());
+        setTextValue(siteLabel, shipment.getSite().getName());
         setTextValue(waybillLabel, shipment.getWaybill());
         setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment
             .getClinic().getName());

@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 
 public class ShippingMethodHelper extends DbHelper {
 
-    public static List<ShippingMethodWrapper> createdCompanies = new ArrayList<ShippingMethodWrapper>();
+    public static List<ShippingMethodWrapper> createdShipMethods = new ArrayList<ShippingMethodWrapper>();
 
     public static ShippingMethodWrapper newShippingMethod(String name) {
         ShippingMethodWrapper company = new ShippingMethodWrapper(appService);
@@ -20,7 +20,7 @@ public class ShippingMethodHelper extends DbHelper {
         ShippingMethodWrapper company = newShippingMethod(name);
         company.persist();
         if (addToCreatedList) {
-            createdCompanies.add(company);
+            createdShipMethods.add(company);
         }
         return company;
     }
@@ -31,11 +31,11 @@ public class ShippingMethodHelper extends DbHelper {
     }
 
     public static void deleteCreateShippingMethods() throws Exception {
-        for (ShippingMethodWrapper company : createdCompanies) {
+        for (ShippingMethodWrapper company : createdShipMethods) {
             company.reload();
             company.delete();
         }
-        createdCompanies.clear();
+        createdShipMethods.clear();
     }
 
 }

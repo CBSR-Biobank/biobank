@@ -5,42 +5,25 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
-    extends ModelWrapper<E> {
-
+public abstract class AbstractObjectWithPositionManagement<T extends AbstractPosition> {
     protected RowColPos rowColPosition;
     private AbstractPositionWrapper<T> positionWrapper;
 
     // used to allow position to be assigned to null
-    protected boolean nullPositionSet;
+    protected boolean nullPositionSet = false;
 
-    private ContainerWrapper parent;
+    private AbstractContainerWrapper<?> parent;
 
-    public AbstractPositionHolder(WritableApplicationService appService,
-        E wrappedObject) {
-        super(appService, wrappedObject);
-
-        nullPositionSet = false;
-    }
-
-    public AbstractPositionHolder(WritableApplicationService appService) {
-        super(appService);
-    }
-
-    @Override
-    public void persist() throws Exception {
+    protected void persist() {
         boolean origPositionSet = (!nullPositionSet && (rowColPosition != null));
         AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
         if ((posWrapper != null) && origPositionSet) {
             posWrapper.setRow(rowColPosition.row);
             posWrapper.setCol(rowColPosition.col);
         }
-        super.persist();
     }
 
-    @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         boolean origPositionSet = (!nullPositionSet && rowColPosition != null);
@@ -60,13 +43,16 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
 
     public abstract SiteWrapper getSite();
 
-    @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         rowColPosition = null;
         positionWrapper = null;
         nullPositionSet = false;
+        parent = null;
     }
 
+    /**
+     * @return the position of this object
+     */
     public RowColPos getPosition() {
         if (!nullPositionSet && (rowColPosition == null)) {
             AbstractPositionWrapper<T> pos = getPositionWrapper();
@@ -77,22 +63,24 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         return rowColPosition;
     }
 
+    /**
+     * Set the position of this object
+     */
     public void setPosition(RowColPos position) {
-        RowColPos oldPosition = getPosition();
+        // RowColPos oldPosition = getPosition();
         this.rowColPosition = position;
-        propertyChangeSupport.firePropertyChange("position", oldPosition,
-            position);
+        // propertyChangeSupport.firePropertyChange("position", oldPosition,
+        // position);
         if (position == null) {
             positionWrapper = null;
             nullPositionSet = true;
         }
     }
 
-    public void setPosition(Integer row, Integer col) {
-        setPosition(new RowColPos(row, col));
-    }
-
-    public ContainerWrapper getParent() {
+    /**
+     * @return the parent of this object
+     */
+    public AbstractContainerWrapper<?> getParent() {
         if (parent == null) {
             if (getPositionWrapper() != null)
                 parent = getPositionWrapper().getParent();
@@ -100,12 +88,16 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         return parent;
     }
 
-    public void setParent(ContainerWrapper container) {
+    /**
+     * Set the parent of this object
+     */
+    public void setParent(AbstractContainerWrapper<?> container) {
         this.parent = container;
-        ContainerWrapper oldValue = getParent();
+        // AbstractContainerWrapper<?, ?> oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
         pos.setParent(container);
-        propertyChangeSupport.firePropertyChange("parent", oldValue, container);
+        // propertyChangeSupport.firePropertyChange("parent", oldValue,
+        // container);
     }
 
     public boolean hasParent() {
@@ -126,11 +118,4 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
 
     protected abstract AbstractPositionWrapper<T> getSpecificPositionWrapper(
         boolean initIfNoPosition);
-
-    @Override
-    public void reload() throws Exception {
-        parent = null;
-        super.reload();
-    }
-
 }

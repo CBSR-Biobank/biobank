@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SampleTypePvCountEditor extends ReportsEditor {
 
@@ -25,7 +26,7 @@ public class SampleTypePvCountEditor extends ReportsEditor {
     }
 
     @Override
-    protected void createOptionSection(Composite parent) {
+    protected void createOptionSection(Composite parent) throws Exception {
         studyCombo = createStudyComboOption("Study", parent);
     }
 
@@ -38,7 +39,7 @@ public class SampleTypePvCountEditor extends ReportsEditor {
     }
 
     protected ComboViewer createStudyComboOption(String labelText,
-        Composite parent) {
+        Composite parent) throws ApplicationException {
         Collection<StudyWrapper> studyWrappers;
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (site.getName().compareTo("All Sites") != 0)

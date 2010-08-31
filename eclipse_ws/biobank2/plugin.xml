@@ -92,7 +92,7 @@
       <perspective
             class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.shipments"
-            icon="icons/shipmentPerspective.png"
+            icon="icons/clinicShipmentPerspective.png"
             name="Shipment View">
       </perspective>
       <perspective
@@ -287,6 +287,10 @@
             id="edu.ualberta.med.biobank.commands.changePassword"
             name="Change Password">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
+            name="Dispatch Shipment administration">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -396,9 +400,6 @@
                </reference>
                <reference
                      definitionId="biobank2.mainPerspectiveSelected">
-               </reference>
-               <reference
-                    definitionId="biobank2.siteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -1021,6 +1022,7 @@
                label="Administration">
                <command
                      commandId="edu.ualberta.med.biobank.commands.siteAdd"
+                     icon="icons/sites_add.png"
                      id="edu.ualberta.med.biobank.menu.siteAdd"
                      label="Add Repository Site"
                      style="push">
@@ -1173,7 +1175,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/shipmentPerspective.png"
+                  icon="icons/clinicShipmentPerspective.png"
                   label="Shipment View"
                   style="push">
             </command>
@@ -1313,8 +1315,14 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/shipmentPerspective.png"
+                  icon="icons/clinicShipmentPerspective.png"
                   label="Shipment View"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
+                  icon="icons/dispatchShipmentPerspective.png"
+                  label="Dispatch Shipment View"
                   style="push">
             </command>
             <command
@@ -2361,7 +2369,7 @@
       </view>
       <view
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
-            icon="icons/shipmentPerspective.png"
+            icon="icons/clinicShipmentPerspective.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
             name="Shipment Administration"
             restorable="true">

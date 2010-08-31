@@ -165,7 +165,7 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
                 }
             }
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
             logger.error("initAllSourceVessel", e);
         }

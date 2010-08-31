@@ -15,10 +15,9 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -133,16 +132,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    @Deprecated
     public SiteWrapper getSite() {
-        Site site = wrappedObject.getSite();
-        return (site != null) ? new SiteWrapper(appService, site) : null;
-    }
-
-    public void setSite(SiteWrapper siteWrapper) {
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = siteWrapper.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+        return null;
     }
 
     private AddressWrapper initAddress() {
@@ -241,16 +233,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException(
                 "the clinic does not have an activity status");
         }
-        if (getSite() == null) {
-            throw new BiobankCheckException("the clinic does not have a site");
-        }
         checkNotEmpty(getName(), "Name");
-        checkNoDuplicatesInSite(Clinic.class, "name", getName(), getSite()
-            .getId(), "A clinic with name \"" + getName()
-            + "\" already exists.");
+        checkNoDuplicates(Clinic.class, "name", getName(),
+            "A clinic with name \"" + getName() + "\" already exists.");
         checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicatesInSite(Clinic.class, "nameShort", getNameShort(),
-            getSite().getId(), "A clinic with short name \"" + getNameShort()
+        checkNoDuplicates(Clinic.class, "nameShort", getNameShort(),
+            "A clinic with short name \"" + getNameShort()
                 + "\" already exists.");
     }
 
@@ -389,20 +377,21 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection() {
-        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
+    public List<ClinicShipmentWrapper> getShipmentCollection() {
+        List<ClinicShipmentWrapper> shipmentCollection = (List<ClinicShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (shipmentCollection == null) {
-            Collection<Shipment> children = wrappedObject
+            Collection<ClinicShipment> children = wrappedObject
                 .getShipmentCollection();
             if (children != null) {
-                shipmentCollection = new ArrayList<ShipmentWrapper>();
-                for (Shipment s : children) {
-                    shipmentCollection.add(new ShipmentWrapper(appService, s));
+                shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
+                for (ClinicShipment s : children) {
+                    shipmentCollection.add(new ClinicShipmentWrapper(
+                        appService, s));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             } else
-                return new ArrayList<ShipmentWrapper>();
+                return new ArrayList<ClinicShipmentWrapper>();
         }
         return shipmentCollection;
     }
@@ -411,23 +400,23 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getShipmentCollection().size();
     }
 
-    public void addShipments(Collection<ShipmentWrapper> newShipments) {
+    public void addShipments(Collection<ClinicShipmentWrapper> newShipments) {
         if (newShipments != null && newShipments.size() > 0) {
-            Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
-            List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
+            Collection<ClinicShipment> allShipmentObjects = new HashSet<ClinicShipment>();
+            List<ClinicShipmentWrapper> allShipmentWrappers = new ArrayList<ClinicShipmentWrapper>();
             // already added shipments
-            List<ShipmentWrapper> currentList = getShipmentCollection();
+            List<ClinicShipmentWrapper> currentList = getShipmentCollection();
             if (currentList != null) {
-                for (ShipmentWrapper ship : currentList) {
+                for (ClinicShipmentWrapper ship : currentList) {
                     allShipmentObjects.add(ship.getWrappedObject());
                     allShipmentWrappers.add(ship);
                 }
             }
-            for (ShipmentWrapper ship : newShipments) {
+            for (ClinicShipmentWrapper ship : newShipments) {
                 allShipmentObjects.add(ship.getWrappedObject());
                 allShipmentWrappers.add(ship);
             }
-            Collection<Shipment> oldCollection = wrappedObject
+            Collection<ClinicShipment> oldCollection = wrappedObject
                 .getShipmentCollection();
             wrappedObject.setShipmentCollection(allShipmentObjects);
             propertyChangeSupport.firePropertyChange("shipmentCollection",
@@ -439,10 +428,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     /**
      * Search for a shipment in the clinic with the given date received
      */
-    public ShipmentWrapper getShipment(Date dateReceived) {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
+    public ClinicShipmentWrapper getShipment(Date dateReceived) {
+        List<ClinicShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null) {
-            for (ShipmentWrapper ship : shipments) {
+            for (ClinicShipmentWrapper ship : shipments) {
                 if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0)
                     return ship;
             }
@@ -454,10 +443,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * Search for a shipment in the clinic with the given date received and
      * patient number.
      */
-    public ShipmentWrapper getShipment(Date dateReceived, String patientNumber) {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
+    public ClinicShipmentWrapper getShipment(Date dateReceived,
+        String patientNumber) {
+        List<ClinicShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null)
-            for (ShipmentWrapper ship : shipments)
+            for (ClinicShipmentWrapper ship : shipments)
                 if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0) {
                     List<PatientWrapper> patients = ship.getPatientCollection();
                     for (PatientWrapper p : patients)
@@ -485,9 +475,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public long getPatientCount() {
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
-        List<ShipmentWrapper> ships = getShipmentCollection();
+        List<ClinicShipmentWrapper> ships = getShipmentCollection();
         if (ships != null)
-            for (ShipmentWrapper ship : ships) {
+            for (ClinicShipmentWrapper ship : ships) {
                 if (ship.getPatientCollection() != null)
                     uniquePatients.addAll(ship.getPatientCollection());
             }
@@ -534,7 +524,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void resetInternalField() {
+    protected void resetInternalFields() {
         deletedContacts.clear();
     }
 

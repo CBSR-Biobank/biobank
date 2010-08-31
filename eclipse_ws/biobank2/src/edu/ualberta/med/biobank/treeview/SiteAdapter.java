@@ -15,20 +15,17 @@ import edu.ualberta.med.biobank.forms.SiteViewForm;
 public class SiteAdapter extends AdapterBase {
 
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
-
-    public static final int CLINICS_BASE_NODE_ID = 0;
+    private int nodeIdOffset = 100;
     public static final int CONTAINER_TYPES_BASE_NODE_ID = 2;
     public static final int CONTAINERS_BASE_NODE_ID = 3;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
 
-        int nodeIdOffset = 100;
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
         }
 
-        addChild(new ClinicGroup(this, nodeIdOffset + CLINICS_BASE_NODE_ID));
         addChild(new ContainerTypeGroup(this, nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID));
         addChild(new ContainerGroup(this, nodeIdOffset
@@ -39,20 +36,15 @@ public class SiteAdapter extends AdapterBase {
         return (SiteWrapper) modelObject;
     }
 
-    public AdapterBase getClinicGroupNode() {
-        AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
-        Assert.isNotNull(adapter);
-        return adapter;
-    }
-
     public AdapterBase getContainerTypesGroupNode() {
-        AdapterBase adapter = getChild(CONTAINER_TYPES_BASE_NODE_ID);
+        AdapterBase adapter = getChild(nodeIdOffset
+            + CONTAINER_TYPES_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }
 
     public AdapterBase getContainersGroupNode() {
-        AdapterBase adapter = getChild(CONTAINERS_BASE_NODE_ID);
+        AdapterBase adapter = getChild(nodeIdOffset + CONTAINERS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return adapter;
     }

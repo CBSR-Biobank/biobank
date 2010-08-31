@@ -4,7 +4,7 @@ import java.util.Date;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 
 public class ShipmentViewNodeSearchVisitor extends NodeSearchVisitor {
 
@@ -46,7 +46,7 @@ public class ShipmentViewNodeSearchVisitor extends NodeSearchVisitor {
 
     @Override
     public AdapterBase visit(ClinicAdapter clinicAdapter) {
-        if (wrapper instanceof ShipmentWrapper) {
+        if (wrapper instanceof ClinicShipmentWrapper) {
             return clinicAdapter.getChild(wrapper, true);
         }
         return null;

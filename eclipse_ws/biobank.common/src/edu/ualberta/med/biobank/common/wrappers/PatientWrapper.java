@@ -12,10 +12,10 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
+import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -104,7 +104,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
+        List<ClinicShipmentWrapper> shipments = getShipmentCollection();
         List<PatientVisitWrapper> visits = getPatientVisitCollection();
         if (visits != null && visits.size() > 0) {
             if (shipments == null || shipments.size() == 0) {
@@ -225,18 +225,18 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * Shipment.setPatientCollection method
      */
     @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
+    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort,
         final boolean ascending) {
-        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
+        List<ClinicShipmentWrapper> shipmentCollection = (List<ClinicShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (shipmentCollection == null) {
-            Collection<Shipment> children = wrappedObject
+            Collection<ClinicShipment> children = wrappedObject
                 .getShipmentCollection();
             if (children != null) {
-                shipmentCollection = new ArrayList<ShipmentWrapper>();
-                for (Shipment ship : children) {
-                    shipmentCollection
-                        .add(new ShipmentWrapper(appService, ship));
+                shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
+                for (ClinicShipment ship : children) {
+                    shipmentCollection.add(new ClinicShipmentWrapper(
+                        appService, ship));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             }
@@ -244,10 +244,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
         if (sort && shipmentCollection != null) {
             Collections.sort(shipmentCollection,
-                new Comparator<ShipmentWrapper>() {
+                new Comparator<ClinicShipmentWrapper>() {
                     @Override
-                    public int compare(ShipmentWrapper ship1,
-                        ShipmentWrapper ship2) {
+                    public int compare(ClinicShipmentWrapper ship1,
+                        ClinicShipmentWrapper ship2) {
                         int res = ship1.compareTo(ship2);
                         if (ascending) {
                             return res;
@@ -259,7 +259,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return shipmentCollection;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection() {
+    public List<ClinicShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(false, true);
     }
 
@@ -335,7 +335,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return getPnumber();
     }
 
-    public boolean canBeAddedToShipment(ShipmentWrapper shipment)
+    public boolean canBeAddedToShipment(ClinicShipmentWrapper shipment)
         throws ApplicationException, BiobankCheckException {
         if (shipment.getClinic() == null) {
             return true;
@@ -412,7 +412,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    public void resetInternalField() {
+    public void resetInternalFields() {
         study = null;
     }
 

@@ -35,7 +35,7 @@ public class BiobankLogger {
         error(message, null);
     }
 
-    public void error(String message, Exception e) {
+    public void error(String message, Throwable e) {
         addRcpLogStatus(IStatus.ERROR, message, e);
     }
 
@@ -43,11 +43,11 @@ public class BiobankLogger {
         debug(message, null);
     }
 
-    public void debug(String message, Exception e) {
+    public void debug(String message, Throwable e) {
         addRcpLogStatus(IStatus.INFO, message, e);
     }
 
-    public void addRcpLogStatus(int severity, String message, Exception e) {
+    public void addRcpLogStatus(int severity, String message, Throwable e) {
         ILog rcpLogger = BioBankPlugin.getDefault().getLog();
         IStatus status = new Status(severity, BioBankPlugin.PLUGIN_ID, name
             + ": " + message, e);

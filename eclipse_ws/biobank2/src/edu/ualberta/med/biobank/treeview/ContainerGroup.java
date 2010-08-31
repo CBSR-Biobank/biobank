@@ -114,15 +114,15 @@ public class ContainerGroup extends AdapterBase {
                         "Unable to create container",
                         "You must define a top-level container type before initializing storage.");
             } else {
-                ContainerWrapper c = new ContainerWrapper(SessionManager
-                    .getAppService());
+                ContainerWrapper c = new ContainerWrapper(
+                    SessionManager.getAppService());
                 c.setSite(siteAdapter.getWrapper());
-                ContainerAdapter adapter = new ContainerAdapter(siteAdapter
-                    .getContainersGroupNode(), c);
+                ContainerAdapter adapter = new ContainerAdapter(
+                    siteAdapter.getContainersGroupNode(), c);
                 adapter.openEntryForm(hasPreviousForm);
             }
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage();
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }

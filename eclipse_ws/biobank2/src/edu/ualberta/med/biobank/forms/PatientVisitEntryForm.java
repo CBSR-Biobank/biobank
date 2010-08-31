@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -82,9 +82,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     };
 
-    private List<ShipmentWrapper> allShipments;
+    private List<ClinicShipmentWrapper> allShipments;
 
-    private ArrayList<ShipmentWrapper> recentShipments;
+    private ArrayList<ClinicShipmentWrapper> recentShipments;
 
     @Override
     public void init() {
@@ -176,7 +176,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private void createShipmentsCombo(Composite client) throws Exception {
-        ShipmentWrapper selectedShip = initShipmentsCollections();
+        ClinicShipmentWrapper selectedShip = initShipmentsCollections();
 
         Label label = widgetCreator.createLabel(client, "Shipment");
 
@@ -219,18 +219,18 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
 
-    private ShipmentWrapper initShipmentsCollections() {
+    private ClinicShipmentWrapper initShipmentsCollections() {
         allShipments = patient.getShipmentCollection(true, false);
-        recentShipments = new ArrayList<ShipmentWrapper>();
+        recentShipments = new ArrayList<ClinicShipmentWrapper>();
         // filter for last 7 days
         Calendar c = Calendar.getInstance();
-        for (ShipmentWrapper shipment : allShipments) {
+        for (ClinicShipmentWrapper shipment : allShipments) {
             c.setTime(shipment.getDateReceived());
             c.add(Calendar.DAY_OF_MONTH, 7);
             if (c.getTime().after(new Date()))
                 recentShipments.add(shipment);
         }
-        ShipmentWrapper selectedShip = null;
+        ClinicShipmentWrapper selectedShip = null;
         if (!patientVisit.isNew()) {
             selectedShip = patientVisit.getShipment();
             // need to add into the list, to be able to see it.
@@ -338,10 +338,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         IStructuredSelection shipSelection = (IStructuredSelection) shipmentsComboViewer
             .getSelection();
         if ((shipSelection != null) && (shipSelection.size() > 0)) {
-            patientVisit.setShipment((ShipmentWrapper) shipSelection
+            patientVisit.setShipment((ClinicShipmentWrapper) shipSelection
                 .getFirstElement());
         } else {
-            patientVisit.setShipment((ShipmentWrapper) null);
+            patientVisit.setShipment((ClinicShipmentWrapper) null);
         }
 
         patientVisit.addPvSourceVessels(pvSourceVesseltable

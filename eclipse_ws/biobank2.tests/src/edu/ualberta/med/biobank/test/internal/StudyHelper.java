@@ -1,9 +1,16 @@
 package edu.ualberta.med.biobank.test.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Assert;
+
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class StudyHelper extends DbHelper {
+
+    public static List<StudyWrapper> createdStudies = new ArrayList<StudyWrapper>();
 
     public static StudyWrapper newStudy(String name) throws Exception {
         StudyWrapper study = new StudyWrapper(appService);
@@ -20,16 +27,42 @@ public class StudyHelper extends DbHelper {
         return study;
     }
 
-    public static StudyWrapper addStudy(String name) throws Exception {
+    public static StudyWrapper addStudy(String name, boolean addToCreatedList)
+        throws Exception {
         StudyWrapper study = newStudy(name);
         study.persist();
+        if (addToCreatedList) {
+            createdStudies.add(study);
+        }
         return study;
     }
 
-    public static void addStudies(String name, int count) throws Exception {
+    public static StudyWrapper addStudy(String name) throws Exception {
+        return addStudy(name, true);
+    }
+
+    public static List<StudyWrapper> addStudies(String name, int count)
+        throws Exception {
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
         for (int i = 0; i < count; i++) {
-            addStudy(name + i);
+            studies.add(addStudy(name + i, true));
         }
+        return studies;
+    }
+
+    public static void deleteCreatedStudies() throws Exception {
+        Assert.assertNotNull("appService is null", appService);
+        for (StudyWrapper study : createdStudies) {
+            study.reload();
+            // FIXME patient is part of a shipment that is part of a site:
+            // should not be able to remove the site first !
+            deleteFromList(study.getDispatchInfoCollection());
+            deletePatients(study.getPatientCollection());
+            deleteFromList(study.getSampleStorageCollection());
+            study.reload();
+            study.delete();
+        }
+        createdStudies.clear();
     }
 
 }

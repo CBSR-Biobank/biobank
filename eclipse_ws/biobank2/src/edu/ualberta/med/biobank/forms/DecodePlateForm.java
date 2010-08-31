@@ -105,7 +105,7 @@ public class DecodePlateForm extends PlateForm {
                 try {
                     scanAndProcessResult(monitor);
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage();
+                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BioBankPlugin.openAsyncError(Messages
                         .getString("DecodePlate.dialog.scanError.title"), //$NON-NLS-1$
