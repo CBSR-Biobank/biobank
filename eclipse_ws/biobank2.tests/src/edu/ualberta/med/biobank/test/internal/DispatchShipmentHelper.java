@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
@@ -14,8 +16,9 @@ import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 public class DispatchShipmentHelper extends DbHelper {
 
     public static DispatchShipmentWrapper newShipment(SiteWrapper sender,
-        SiteWrapper receiver, String waybill, Date dateReceived,
-        DispatchContainerWrapper... containers) throws Exception {
+        SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
+        Date dateReceived, DispatchContainerWrapper... containers)
+        throws Exception {
         DispatchShipmentWrapper shipment = new DispatchShipmentWrapper(
             appService);
         if (sender != null) {
@@ -24,6 +27,9 @@ public class DispatchShipmentHelper extends DbHelper {
         if (receiver != null) {
             shipment.setReceiver(receiver);
         }
+        shipment.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
+        shipment.setShippingMethod(method);
         shipment.setWaybill(waybill);
         if (dateReceived != null) {
             shipment.setDateReceived(dateReceived);
@@ -39,47 +45,49 @@ public class DispatchShipmentHelper extends DbHelper {
     }
 
     public static DispatchShipmentWrapper newShipment(SiteWrapper sender,
-        SiteWrapper receiver, String waybill, Date dateReceived)
-        throws Exception {
-        return newShipment(sender, receiver, waybill, dateReceived,
+        SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
+        Date dateReceived) throws Exception {
+        return newShipment(sender, receiver, method, waybill, dateReceived,
             (DispatchContainerWrapper[]) null);
     }
 
     public static DispatchShipmentWrapper newShipment(SiteWrapper sender,
-        SiteWrapper receiver) throws Exception {
-        return newShipment(sender, receiver, TestCommon.getNewWaybill(r),
-            Utils.getRandomDate());
+        SiteWrapper receiver, ShippingMethodWrapper method) throws Exception {
+        return newShipment(sender, receiver, method,
+            TestCommon.getNewWaybill(r), Utils.getRandomDate());
     }
 
     public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
-        SiteWrapper receiver, String waybill, Date dateReceived,
-        DispatchContainerWrapper... containers) throws Exception {
-        DispatchShipmentWrapper shipment = newShipment(sender, receiver,
-            waybill, dateReceived, containers);
-        shipment.persist();
-        return shipment;
-    }
-
-    public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
-        SiteWrapper receiver, String waybill, Date dateReceived)
+        SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
+        Date dateReceived, DispatchContainerWrapper... containers)
         throws Exception {
         DispatchShipmentWrapper shipment = newShipment(sender, receiver,
-            waybill, dateReceived);
+            method, waybill, dateReceived, containers);
         shipment.persist();
         return shipment;
     }
 
     public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
-        SiteWrapper receiver) throws Exception {
-        DispatchShipmentWrapper shipment = newShipment(sender, receiver);
+        SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
+        Date dateReceived) throws Exception {
+        DispatchShipmentWrapper shipment = newShipment(sender, receiver,
+            method, waybill, dateReceived);
+        shipment.persist();
+        return shipment;
+    }
+
+    public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
+        SiteWrapper receiver, ShippingMethodWrapper method) throws Exception {
+        DispatchShipmentWrapper shipment = newShipment(sender, receiver, method);
         shipment.persist();
         return shipment;
     }
 
     public static DispatchShipmentWrapper addShipmentRandomContainers(
-        SiteWrapper sender, SiteWrapper receiver, String waybill,
-        Date dateReceived, String name, int numContainers) throws Exception {
-        DispatchShipmentWrapper shipment = newShipment(sender, receiver);
+        SiteWrapper sender, SiteWrapper receiver, ShippingMethodWrapper method,
+        String waybill, Date dateReceived, String name, int numContainers)
+        throws Exception {
+        DispatchShipmentWrapper shipment = newShipment(sender, receiver, method);
         shipment.persist();
 
         List<DispatchContainerWrapper> containers = new ArrayList<DispatchContainerWrapper>();
@@ -93,9 +101,9 @@ public class DispatchShipmentHelper extends DbHelper {
     }
 
     public static DispatchShipmentWrapper addShipmentRandomContainers(
-        SiteWrapper sender, SiteWrapper receiver, String name, int numContainers)
-        throws Exception {
-        return addShipmentRandomContainers(sender, receiver,
+        SiteWrapper sender, SiteWrapper receiver, ShippingMethodWrapper method,
+        String name, int numContainers) throws Exception {
+        return addShipmentRandomContainers(sender, receiver, method,
             TestCommon.getNewWaybill(r), Utils.getRandomDate(), name,
             numContainers);
     }

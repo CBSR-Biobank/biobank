@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.DispatchShipment;
@@ -34,7 +35,8 @@ public class TestDispatchShipment extends TestDatabase {
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
         testGettersAndSetters(shipment);
     }
 
@@ -55,7 +57,8 @@ public class TestDispatchShipment extends TestDatabase {
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
-            null, receiverSite);
+            null, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
         Assert.assertNull(shipment.getSender());
 
         shipment.setSender(senderSite);
@@ -79,7 +82,8 @@ public class TestDispatchShipment extends TestDatabase {
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
-            senderSite, null);
+            senderSite, null,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
         Assert.assertNull(shipment.getReceiver());
 
         shipment.setReceiver(receiverSite);
@@ -108,12 +112,14 @@ public class TestDispatchShipment extends TestDatabase {
             receiverSite2);
         DispatchInfoHelper.addInfo(study2, senderSite2, receiverSite2);
 
-        DispatchShipmentHelper.addShipment(senderSite, receiverSite, name,
-            Utils.getRandomDate());
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        DispatchShipmentHelper.addShipment(senderSite, receiverSite, method,
+            name, Utils.getRandomDate());
 
         // set waybill not unique for a shipment not yet database
         DispatchShipmentWrapper shipment2 = DispatchShipmentHelper.newShipment(
-            senderSite, receiverSite2, name, Utils.getRandomDate());
+            senderSite, receiverSite2, method, name, Utils.getRandomDate());
 
         try {
             shipment2.persist();
@@ -140,7 +146,7 @@ public class TestDispatchShipment extends TestDatabase {
 
         // set waybill to same for 2 different sending sites
         shipment2 = DispatchShipmentHelper.newShipment(senderSite2,
-            receiverSite2, name, Utils.getRandomDate());
+            receiverSite2, method, name, Utils.getRandomDate());
         try {
             shipment2.persist();
             Assert.assertTrue(true);
@@ -151,7 +157,7 @@ public class TestDispatchShipment extends TestDatabase {
 
         // test no sender
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
-            null, receiverSite, TestCommon.getNewWaybill(r),
+            null, receiverSite, method, TestCommon.getNewWaybill(r),
             Utils.getRandomDate());
         try {
             shipment.persist();
@@ -162,7 +168,7 @@ public class TestDispatchShipment extends TestDatabase {
         }
 
         // test no receiver
-        shipment = DispatchShipmentHelper.newShipment(senderSite, null,
+        shipment = DispatchShipmentHelper.newShipment(senderSite, null, method,
             TestCommon.getNewWaybill(r), Utils.getRandomDate());
         try {
             shipment.persist();
@@ -174,7 +180,8 @@ public class TestDispatchShipment extends TestDatabase {
 
         // test sender can send to receiver
         shipment = DispatchShipmentHelper.newShipment(senderSite2,
-            receiverSite, TestCommon.getNewWaybill(r), Utils.getRandomDate());
+            receiverSite, method, TestCommon.getNewWaybill(r),
+            Utils.getRandomDate());
         try {
             shipment.persist();
             Assert
@@ -192,13 +199,16 @@ public class TestDispatchShipment extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+
         DispatchShipmentWrapper shipment1 = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite, method);
         shipment1.setDateReceived(DateFormatter.dateFormatter
             .parse("2010-02-01 23:00"));
 
         DispatchShipmentWrapper shipment2 = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite, method);
         shipment2.setDateReceived(DateFormatter.dateFormatter
             .parse("2009-12-01 23:00"));
 
@@ -217,16 +227,19 @@ public class TestDispatchShipment extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+
         // test reset for a new object
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite, method, name, Utils.getRandomDate());
 
         shipment.reset();
         Assert.assertEquals(null, shipment.getWaybill());
 
         // test reset for an object already in database
         shipment = DispatchShipmentHelper.addShipment(senderSite, receiverSite,
-            name, Utils.getRandomDate());
+            method, name, Utils.getRandomDate());
         shipment.setWaybill("QQQQ");
         shipment.reset();
         Assert.assertEquals(name, shipment.getWaybill());
@@ -240,7 +253,9 @@ public class TestDispatchShipment extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
 
         try {
             shipment.reload();
@@ -253,7 +268,8 @@ public class TestDispatchShipment extends TestDatabase {
     @Test
     public void testGetWrappedClass() throws Exception {
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
-            null, null);
+            null, null, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
         Assert.assertEquals(DispatchShipment.class, shipment.getWrappedClass());
     }
 
@@ -265,7 +281,9 @@ public class TestDispatchShipment extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
 
         int countBefore = appService.search(DispatchShipment.class,
             new DispatchShipment()).size();
@@ -286,7 +304,8 @@ public class TestDispatchShipment extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
 
         ContainerTypeWrapper containerType = ContainerTypeHelper
             .addContainerTypeRandom(senderSite, name, false);
