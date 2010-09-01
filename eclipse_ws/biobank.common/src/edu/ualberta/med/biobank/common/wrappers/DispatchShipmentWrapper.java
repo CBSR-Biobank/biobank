@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.model.DispatchContainer;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -19,11 +20,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class DispatchShipmentWrapper extends
     AbstractShipmentWrapper<DispatchShipment> {
 
-    private SiteWrapper sender;
-    private SiteWrapper receiver;
-
-    private Set<DispatchContainerWrapper> sentContainersAdded = new HashSet<DispatchContainerWrapper>();
-    private Set<DispatchContainerWrapper> sentContainersRemoved = new HashSet<DispatchContainerWrapper>();
+    private Set<AliquotWrapper> aliquotsAdded = new HashSet<AliquotWrapper>();
+    private Set<AliquotWrapper> aliquotsRemoved = new HashSet<AliquotWrapper>();
 
     public DispatchShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -43,8 +41,8 @@ public class DispatchShipmentWrapper extends
     protected String[] getPropertyChangeNames() {
         String[] properties = super.getPropertyChangeNames();
         List<String> list = new ArrayList<String>(Arrays.asList(properties));
-        list.addAll(Arrays.asList("sender", "receiver",
-            "sentContainerCollection"));
+        list.addAll(Arrays.asList("sender", "receiver", "aliquotCollection",
+            "study"));
         return list.toArray(new String[] {});
     }
 
@@ -57,6 +55,9 @@ public class DispatchShipmentWrapper extends
         if (getReceiver() == null) {
             throw new BiobankCheckException("Receiver should be set");
         }
+        if (getStudy() == null) {
+            throw new BiobankCheckException("Study should be set");
+        }
         if (!checkWaybillUniqueForSender()) {
             throw new BiobankCheckException("A dispatch shipment with waybill "
                 + getWaybill() + " already exists for sending site "
@@ -67,14 +68,14 @@ public class DispatchShipmentWrapper extends
 
     private void checkSenderCanSendToReceiver() throws BiobankCheckException,
         ApplicationException {
-        if (getSender() != null && getReceiver() != null) {
-            // FIXME should know for which study...
+        if (getSender() != null && getReceiver() != null && getStudy() != null) {
             List<SiteWrapper> possibleReceivers = getSender()
-                .getStudyDispachSites(null);
+                .getStudyDispachSites(getStudy());
             if (!possibleReceivers.contains(getReceiver())) {
                 throw new BiobankCheckException(getSender().getNameShort()
                     + " cannot dispatch aliquots to "
-                    + getReceiver().getNameShort());
+                    + getReceiver().getNameShort() + " for study "
+                    + getStudy().getNameShort());
             }
         }
     }
@@ -102,17 +103,19 @@ public class DispatchShipmentWrapper extends
     }
 
     public SiteWrapper getSender() {
+        SiteWrapper sender = (SiteWrapper) propertiesMap.get("sender");
         if (sender == null) {
             Site s = wrappedObject.getSender();
             if (s == null)
                 return null;
             sender = new SiteWrapper(appService, s);
+            propertiesMap.put("sender", sender);
         }
         return sender;
     }
 
     public void setSender(SiteWrapper sender) {
-        this.sender = sender;
+        propertiesMap.put("sender", sender);
         Site oldSender = wrappedObject.getSender();
         Site newSender = null;
         if (sender != null) {
@@ -124,17 +127,19 @@ public class DispatchShipmentWrapper extends
     }
 
     public SiteWrapper getReceiver() {
+        SiteWrapper receiver = (SiteWrapper) propertiesMap.get("receiver");
         if (receiver == null) {
             Site r = wrappedObject.getReceiver();
             if (r == null)
                 return null;
             receiver = new SiteWrapper(appService, r);
+            propertiesMap.put("receiver", receiver);
         }
         return receiver;
     }
 
     public void setReceiver(SiteWrapper receiver) {
-        this.receiver = receiver;
+        propertiesMap.put("receiver", receiver);
         Site oldReceiver = wrappedObject.getReceiver();
         Site newReceiver = null;
         if (receiver != null) {
@@ -145,89 +150,103 @@ public class DispatchShipmentWrapper extends
             newReceiver);
     }
 
+    public StudyWrapper getStudy() {
+        StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
+        if (study == null) {
+            Study s = wrappedObject.getStudy();
+            if (s == null)
+                return null;
+            study = new StudyWrapper(appService, s);
+            propertiesMap.put("study", study);
+        }
+        return study;
+    }
+
+    public void setStudy(StudyWrapper study) {
+        propertiesMap.put("study", study);
+        Study oldStudy = wrappedObject.getStudy();
+        Study newStudy = null;
+        if (study != null) {
+            newStudy = study.getWrappedObject();
+        }
+        wrappedObject.setStudy(newStudy);
+        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
+    }
+
     @SuppressWarnings("unchecked")
-    public List<DispatchContainerWrapper> getSentContainerCollection(
-        boolean sort) {
-        List<DispatchContainerWrapper> sentContainerCollection = (List<DispatchContainerWrapper>) propertiesMap
-            .get("sentContainerCollection");
-        if (sentContainerCollection == null) {
-            Collection<DispatchContainer> children = wrappedObject
-                .getSentContainerCollection();
+    public List<AliquotWrapper> getAliquotCollection(boolean sort) {
+        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
+            .get("aliquotCollection");
+        if (aliquotCollection == null) {
+            Collection<Aliquot> children = wrappedObject.getAliquotCollection();
             if (children != null) {
-                sentContainerCollection = new ArrayList<DispatchContainerWrapper>();
-                for (DispatchContainer container : children) {
-                    sentContainerCollection.add(new DispatchContainerWrapper(
-                        appService, container));
+                aliquotCollection = new ArrayList<AliquotWrapper>();
+                for (Aliquot aliquot : children) {
+                    aliquotCollection.add(new AliquotWrapper(appService,
+                        aliquot));
                 }
-                propertiesMap.put("sentContainerCollection",
-                    sentContainerCollection);
+                propertiesMap.put("aliquotCollection", aliquotCollection);
             }
         }
-        if ((sentContainerCollection != null) && sort)
-            Collections.sort(sentContainerCollection);
-        return sentContainerCollection;
+        if ((aliquotCollection != null) && sort)
+            Collections.sort(aliquotCollection);
+        return aliquotCollection;
     }
 
-    public List<DispatchContainerWrapper> getSentContainerCollection() {
-        return getSentContainerCollection(true);
+    public List<AliquotWrapper> getAliquotCollection() {
+        return getAliquotCollection(true);
     }
 
-    private void setSentContainerCollection(
-        Collection<DispatchContainer> allSentContainerObjects,
-        List<DispatchContainerWrapper> allSentContainerWrappers) {
-        Collection<DispatchContainer> oldContainers = wrappedObject
-            .getSentContainerCollection();
-        wrappedObject.setSentContainerCollection(allSentContainerObjects);
-        propertyChangeSupport.firePropertyChange("sentContainerCollection",
-            oldContainers, allSentContainerObjects);
-        propertiesMap.put("sentContainerCollection", allSentContainerWrappers);
+    private void setAliquotCollection(Collection<Aliquot> allAliquotObjects,
+        List<AliquotWrapper> allAliquotWrappers) {
+        Collection<Aliquot> oldContainers = wrappedObject
+            .getAliquotCollection();
+        wrappedObject.setAliquotCollection(allAliquotObjects);
+        propertyChangeSupport.firePropertyChange("aliquotCollection",
+            oldContainers, allAliquotObjects);
+        propertiesMap.put("aliquotCollection", allAliquotWrappers);
     }
 
-    public void addSentContainers(List<DispatchContainerWrapper> newContainers) {
-        if (newContainers != null && newContainers.size() > 0) {
-            Collection<DispatchContainer> allContainersObjects = new HashSet<DispatchContainer>();
-            List<DispatchContainerWrapper> allContainersWrappers = new ArrayList<DispatchContainerWrapper>();
-            // already in list
-            List<DispatchContainerWrapper> containersList = getSentContainerCollection();
-            if (containersList != null) {
-                for (DispatchContainerWrapper container : containersList) {
-                    allContainersObjects.add(container.getWrappedObject());
-                    allContainersWrappers.add(container);
-                }
-            }
-            // new containers
-            for (DispatchContainerWrapper container : newContainers) {
-                container.setShipment(this);
-                sentContainersAdded.add(container);
-                sentContainersRemoved.remove(container);
-                allContainersObjects.add(container.getWrappedObject());
-                allContainersWrappers.add(container);
-            }
-            setSentContainerCollection(allContainersObjects,
-                allContainersWrappers);
-        }
-    }
-
-    public void removeSentContainers(
-        List<DispatchContainerWrapper> containersToRemove) {
-        if ((containersToRemove == null) || (containersToRemove.size() == 0))
+    public void addAliquots(List<AliquotWrapper> newAliquots) {
+        if ((newAliquots == null) || (newAliquots.size() == 0))
             return;
 
-        sentContainersAdded.removeAll(containersToRemove);
-        sentContainersRemoved.addAll(containersToRemove);
-        Collection<DispatchContainer> allContainerObjects = new HashSet<DispatchContainer>();
-        List<DispatchContainerWrapper> allContainerWrappers = new ArrayList<DispatchContainerWrapper>();
-        // already in list
-        List<DispatchContainerWrapper> containersList = getSentContainerCollection();
-        if (containersList != null) {
-            for (DispatchContainerWrapper container : containersList) {
-                if (!containersToRemove.contains(container)) {
-                    allContainerObjects.add(container.getWrappedObject());
-                    allContainerWrappers.add(container);
+        Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
+        List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
+        // already added aliquots
+        List<AliquotWrapper> currentList = getAliquotCollection();
+        if (currentList != null) {
+            for (AliquotWrapper aliquot : currentList) {
+                allAliquotObjects.add(aliquot.getWrappedObject());
+                allAliquotWrappers.add(aliquot);
+            }
+        }
+        // new aliquots added
+        for (AliquotWrapper aliquot : newAliquots) {
+            allAliquotObjects.add(aliquot.getWrappedObject());
+            allAliquotWrappers.add(aliquot);
+            aliquotsRemoved.remove(aliquot);
+        }
+        setAliquotCollection(allAliquotObjects, allAliquotWrappers);
+    }
+
+    public void removeAliquots(List<AliquotWrapper> aliquotsToRemove) {
+        if ((aliquotsToRemove == null) || (aliquotsToRemove.size() == 0))
+            return;
+
+        Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
+        List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
+        // already added aliquots
+        List<AliquotWrapper> currentList = getAliquotCollection();
+        if (currentList != null) {
+            for (AliquotWrapper aliquot : currentList) {
+                if (!aliquotsRemoved.contains(aliquot)) {
+                    allAliquotObjects.add(aliquot.getWrappedObject());
+                    allAliquotWrappers.add(aliquot);
                 }
             }
         }
-        setSentContainerCollection(allContainerObjects, allContainerWrappers);
+        setAliquotCollection(allAliquotObjects, allAliquotWrappers);
     }
 
     @Override
@@ -237,8 +256,7 @@ public class DispatchShipmentWrapper extends
 
     @Override
     public void resetInternalFields() {
-        sentContainersAdded.clear();
-        sentContainersRemoved.clear();
-        sender = null;
+        aliquotsAdded.clear();
+        aliquotsRemoved.clear();
     }
 }

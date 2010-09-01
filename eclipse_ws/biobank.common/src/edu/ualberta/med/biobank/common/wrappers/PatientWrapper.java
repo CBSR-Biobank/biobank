@@ -401,9 +401,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        // FIXME site == null when persist and delete
-        // don't know the site: patient belong to a study, that doesn't depend
-        // on a site
         log.setSite(site);
         log.setPatientNumber(getPnumber());
         log.setDetails(details);

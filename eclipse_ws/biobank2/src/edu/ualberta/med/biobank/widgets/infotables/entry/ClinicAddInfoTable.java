@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -8,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectClinicContactDialog;
@@ -78,11 +80,14 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                             + contact.getName() + "\"")) {
                         return;
                     }
-                    List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
-                    dummyList.add(contact);
-                    study.removeContacts(dummyList);
-                    setCollection(study.getContactCollection(true));
-                    notifyListeners();
+
+                    try {
+                        study.removeContacts(Arrays.asList(contact));
+                        setCollection(study.getContactCollection(true));
+                        notifyListeners();
+                    } catch (BiobankCheckException e) {
+                        BioBankPlugin.openAsyncError("Delete failed", e);
+                    }
                 }
             }
         });

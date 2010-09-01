@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 
 public class ShipmentAddHandler extends AbstractHandler {
 
@@ -19,7 +19,7 @@ public class ShipmentAddHandler extends AbstractHandler {
         Assert.isNotNull(sessionAdapter);
         ClinicShipmentWrapper shipment = new ClinicShipmentWrapper(SessionManager
             .getAppService());
-        ShipmentAdapter shipNode = new ShipmentAdapter(sessionAdapter, shipment);
+        ClinicShipmentAdapter shipNode = new ClinicShipmentAdapter(sessionAdapter, shipment);
         shipNode.openEntryForm();
         return null;
     }

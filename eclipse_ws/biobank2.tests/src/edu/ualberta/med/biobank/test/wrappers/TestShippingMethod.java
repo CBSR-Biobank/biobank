@@ -53,18 +53,9 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment1.setShippingMethod(method1);
-        shipment1.persist();
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment2.setShippingMethod(method2);
-        shipment2.persist();
-        ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment3.setShippingMethod(method2);
-        shipment3.persist();
+        ClinicShipmentHelper.addShipment(site, clinic, method1, patient1);
+        ClinicShipmentHelper.addShipment(site, clinic, method2, patient1);
+        ClinicShipmentHelper.addShipment(site, clinic, method2, patient1);
 
         method1.reload();
         method2.reload();
@@ -88,24 +79,19 @@ public class TestShippingMethod extends TestDatabase {
             .addShippingMethod(name);
 
         ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment1.setShippingMethod(method);
+            site, clinic, method, patient1);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
         ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment2.setShippingMethod(method);
+            site, clinic, method, patient1);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
         ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment3.setShippingMethod(method);
+            site, clinic, method, patient1);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
         method.reload();
-        // FIXME we should have a method in ShippingMethodWrapper to retrieve
-        // shipments of type ClinicShipment and not all of them
         List<AbstractShipmentWrapper> shipments = method
             .getShipmentCollection(true);
         if (shipments.size() > 1) {
@@ -217,8 +203,7 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment1.setShippingMethod(method);
+            site, clinic, method, patient1);
         shipment1.persist();
         method.reload();
 
@@ -229,7 +214,8 @@ public class TestShippingMethod extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        shipment1.setShippingMethod(null);
+        shipment1.setShippingMethod(ShippingMethodWrapper.getShippingMethods(
+            appService).get(0));
         shipment1.persist();
         method.reload();
         method.delete();
@@ -296,8 +282,7 @@ public class TestShippingMethod extends TestDatabase {
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
         ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment1.setShippingMethod(methods[0]);
+            site, clinic, methods[0], patient1);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
 
@@ -305,8 +290,7 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertFalse(methods[1].isUsed());
 
         ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
-            site, clinic, patient1);
-        shipment2.setShippingMethod(methods[1]);
+            site, clinic, methods[1], patient1);
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();
 

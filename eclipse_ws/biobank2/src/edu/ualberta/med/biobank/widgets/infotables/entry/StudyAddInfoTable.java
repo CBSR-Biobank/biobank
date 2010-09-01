@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -9,6 +10,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectStudyDialog;
@@ -71,19 +73,23 @@ public class StudyAddInfoTable extends StudyInfoTable {
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                StudyWrapper contact = getSelection();
-                if (contact != null) {
-                    if (!BioBankPlugin.openConfirm(
-                        "Remove Study",
-                        "Are you sure you want to remove study \""
-                            + contact.getName() + "\"")) {
-                        return;
-                    }
-                    List<StudyWrapper> dummyList = new ArrayList<StudyWrapper>();
-                    dummyList.add(contact);
-                    site.removeStudies(dummyList);
+                StudyWrapper study = getSelection();
+                if (study == null)
+                    return;
+
+                if (!BioBankPlugin.openConfirm(
+                    "Remove Study",
+                    "Are you sure you want to remove study \""
+                        + study.getName() + "\"")) {
+                    return;
+                }
+
+                try {
+                    site.removeStudies(Arrays.asList(study));
                     setCollection(site.getStudyCollection(true));
                     notifyListeners();
+                } catch (BiobankCheckException e) {
+                    BioBankPlugin.openAsyncError("Delete failed", e);
                 }
             }
         });

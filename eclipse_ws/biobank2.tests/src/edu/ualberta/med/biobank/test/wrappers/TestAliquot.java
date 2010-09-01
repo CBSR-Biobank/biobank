@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -85,7 +86,9 @@ public class TestAliquot extends TestDatabase {
         study.persist();
 
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            clinic, patient);
+            clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
@@ -222,7 +225,9 @@ public class TestAliquot extends TestDatabase {
         newStudy.addContacts(Arrays.asList(contact));
         newStudy.persist();
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(
-            newSite, clinic, newPatient);
+            newSite, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            newPatient);
         PatientVisitWrapper newVisit = PatientVisitHelper.addPatientVisit(
             newPatient, shipment, null, Utils.getRandomDate());
 
@@ -446,7 +451,8 @@ public class TestAliquot extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, name);
 
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            study.getClinicCollection().get(0), patient);
+            study.getClinicCollection().get(0), ShippingMethodWrapper
+                .getShippingMethods(appService).get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
@@ -480,7 +486,8 @@ public class TestAliquot extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, name);
 
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            study.getClinicCollection().get(0), patient);
+            study.getClinicCollection().get(0), ShippingMethodWrapper
+                .getShippingMethods(appService).get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
@@ -544,7 +551,8 @@ public class TestAliquot extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, name);
 
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            study.getClinicCollection().get(0), patient);
+            study.getClinicCollection().get(0), ShippingMethodWrapper
+                .getShippingMethods(appService).get(0), patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 

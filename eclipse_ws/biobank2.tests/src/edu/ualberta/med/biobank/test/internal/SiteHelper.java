@@ -42,10 +42,13 @@ public class SiteHelper extends DbHelper {
         return addSite(name, true);
     }
 
-    public static void addSites(String basename, int count) throws Exception {
+    public static List<SiteWrapper> addSites(String basename, int count)
+        throws Exception {
+        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
         for (int i = 0; i < count; i++) {
-            addSite(basename + i);
+            sites.add(addSite(basename + i));
         }
+        return sites;
     }
 
     public static void deleteSite(SiteWrapper site) throws Exception {
@@ -70,6 +73,7 @@ public class SiteHelper extends DbHelper {
         site.reload();
         deleteDispatchShipments(site.getSentDispatchShipmentCollection());
         deleteDispatchShipments(site.getReceivedDispatchShipmentCollection());
+        site.reload();
         site.delete();
     }
 

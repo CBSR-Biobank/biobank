@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.AbstractContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -102,22 +101,19 @@ public class AliquotPositionWrapper extends
     }
 
     @Override
-    public AbstractContainerWrapper<?> getParent() {
+    public ContainerWrapper getParent() {
         return getContainer();
     }
 
     @Override
-    public void setParent(AbstractContainerWrapper<?> parent) {
-        assert parent instanceof ContainerWrapper;
-        if (parent instanceof ContainerWrapper) {
-            setContainer((ContainerWrapper) parent);
-        }
+    public void setParent(ContainerWrapper parent) {
+        setContainer(parent);
     }
 
     @Override
     protected void checkObjectAtPosition() throws BiobankCheckException,
         ApplicationException {
-        AbstractContainerWrapper<?> parent = getParent();
+        ContainerWrapper parent = getParent();
         if (parent != null) {
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !

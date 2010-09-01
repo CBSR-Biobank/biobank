@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -136,7 +136,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_PATIENT);
         classToImageKey.put(PatientVisitAdapter.class.getName(),
             BioBankPlugin.IMG_PATIENT_VISIT);
-        classToImageKey.put(ShipmentAdapter.class.getName(),
+        classToImageKey.put(ClinicShipmentAdapter.class.getName(),
             BioBankPlugin.IMG_SHIPMENT);
         classToImageKey.put(PatientSearchedNode.class.getName(),
             BioBankPlugin.IMG_SEARCH);

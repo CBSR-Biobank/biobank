@@ -49,17 +49,19 @@ public class SessionAdapter extends AdapterBase {
         this.serverName = serverName;
         this.userName = userName;
 
-        addChild(new SiteGroup(this, SITES_NODE_ID));
-        addChild(new StudyGroup(this, STUDIES_NODE_ID));
+        addGroupNodes();
+    }
+
+    private void addGroupNodes() {
         addChild(new ClinicGroup(this, CLINICS_BASE_NODE_ID));
+        addChild(new StudyGroup(this, STUDIES_NODE_ID));
+        addChild(new SiteGroup(this, SITES_NODE_ID));
     }
 
     @Override
     public void rebuild() {
         removeAll();
-        addChild(new SiteGroup(this, SITES_NODE_ID));
-        addChild(new StudyGroup(this, STUDIES_NODE_ID));
-        addChild(new ClinicGroup(this, CLINICS_BASE_NODE_ID));
+        addGroupNodes();
     }
 
     @Override

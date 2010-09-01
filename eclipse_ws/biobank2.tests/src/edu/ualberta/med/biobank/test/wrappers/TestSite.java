@@ -18,19 +18,20 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -77,28 +78,95 @@ public class TestSite extends TestDatabase {
     public void testGetStudyCollection() throws Exception {
         String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int studiesNber = r.nextInt(15) + 1;
-        List<StudyWrapper> newStudies = StudyHelper.addStudies(name,
-            studiesNber);
 
-        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
+        try {
+            site.removeStudies(new ArrayList<StudyWrapper>());
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException e) {
+            Assert.fail("cannot call removeStudies with empty list");
+        }
+
+        List<StudyWrapper> studySet1 = StudyHelper.addStudies(name + "_s1_",
+            r.nextInt(10) + 1);
+        site.addStudies(studySet1);
         site.persist();
         site.reload();
-
         List<StudyWrapper> siteStudies = site.getStudyCollection();
 
-        Assert.assertEquals(studies.size(), siteStudies.size());
+        Assert.assertEquals(studySet1.size(), siteStudies.size());
 
-        // delete a study
-        StudyWrapper study = newStudies.get(r.nextInt(newStudies.size()));
-        studies.remove(study);
-        study.delete();
-        StudyHelper.createdStudies.remove(study);
+        // add another set
+        List<StudyWrapper> studySet2 = StudyHelper.addStudies(name + "_s2_",
+            r.nextInt(10) + 1);
+        site.addStudies(studySet2);
+        site.persist();
         site.reload();
         siteStudies = site.getStudyCollection();
 
-        Assert.assertEquals(studies.size(), siteStudies.size());
+        Assert.assertEquals(studySet1.size() + studySet2.size(),
+            siteStudies.size());
+
+        // remove studies
+        site.removeStudies(studySet1);
+        site.persist();
+        site.reload();
+        siteStudies = site.getStudyCollection();
+
+        Assert.assertEquals(studySet2.size(), siteStudies.size());
+        Assert.assertTrue(siteStudies.containsAll(studySet2));
+
+        // try and remove studies that were already removed
+        try {
+            site.removeStudies(studySet1);
+            Assert
+                .fail("should not be allowed to remove a study that is not associated with site");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testNonAssocStudies() throws Exception {
+        String name = "testGetStudyCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        try {
+            site.removeStudies(new ArrayList<StudyWrapper>());
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException e) {
+            Assert.fail("cannot call removeStudies with empty list");
+        }
+
+        // create 2 sets
+        List<StudyWrapper> studySet1 = StudyHelper.addStudies(name + "_s1_",
+            r.nextInt(10) + 1);
+        List<StudyWrapper> studySet2 = StudyHelper.addStudies(name + "_s2_",
+            r.nextInt(10) + 1);
+
+        // add set 1
+        site.addStudies(studySet1);
+        site.persist();
+        site.reload();
+        List<StudyWrapper> siteNonAssocStudies = site.getStudiesNotAssoc();
+
+        Assert.assertEquals(studySet2.size(), siteNonAssocStudies.size());
+
+        // remove set 1 and add set 2
+        site.removeStudies(studySet1);
+        site.addStudies(studySet2);
+        site.persist();
+        site.reload();
+        siteNonAssocStudies = site.getStudiesNotAssoc();
+
+        Assert.assertEquals(studySet1.size(), siteNonAssocStudies.size());
+
+        // add set 1 again
+        site.addStudies(studySet1);
+        site.persist();
+        site.reload();
+        siteNonAssocStudies = site.getStudiesNotAssoc();
+
+        Assert.assertEquals(0, siteNonAssocStudies.size());
     }
 
     @Test
@@ -537,9 +605,12 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1, patient3);
-        ClinicShipmentHelper.addShipment(site, clinic2, patient2, patient3);
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, method, patient1, patient3);
+        ClinicShipmentHelper.addShipment(site, clinic2, method, patient2,
+            patient3);
 
         site.reload();
         Assert.assertEquals(2, site.getShipmentCount().longValue());
@@ -549,7 +620,8 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(1, site.getShipmentCount().longValue());
 
         // add shipment again
-        shipment1 = ClinicShipmentHelper.addShipment(site, clinic1, patient3);
+        shipment1 = ClinicShipmentHelper.addShipment(site, clinic1, method,
+            patient3);
 
         site.reload();
         Assert.assertEquals(2, site.getShipmentCount().longValue());
@@ -582,9 +654,12 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1, patient3);
-        ClinicShipmentHelper.addShipment(site, clinic2, patient2, patient3);
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, method, patient1, patient3);
+        ClinicShipmentHelper.addShipment(site, clinic2, method, patient2,
+            patient3);
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
@@ -594,7 +669,8 @@ public class TestSite extends TestDatabase {
         patient1.reload();
         patient1.delete();
 
-        shipment1 = ClinicShipmentHelper.addShipment(site, clinic1, patient3);
+        shipment1 = ClinicShipmentHelper.addShipment(site, clinic1, method,
+            patient3);
 
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());
@@ -627,10 +703,12 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1, patient3);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
-            clinic2, patient1, patient2);
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, method, patient1, patient3);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic2, method, patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
@@ -693,11 +771,13 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(site,
-            clinic1, patient1);
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+            site, clinic1, method, patient1);
 
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(site,
-            clinic2, patient2);
+        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+            site, clinic2, method, patient2);
 
         // shipment 1 has patient visits for patient1 and patient2
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1, 10,
@@ -741,6 +821,47 @@ public class TestSite extends TestDatabase {
 
         site.reload();
         Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
+    }
+
+    @Test
+    public void testAddDispatchSites() throws Exception {
+        String name = "testAddDispatchSites" + r.nextInt();
+        SiteWrapper srcSite = SiteHelper.addSite(name);
+        List<SiteWrapper> destSitesSet1 = SiteHelper.addSites(name + "_s1_",
+            r.nextInt(5) + 1);
+        List<SiteWrapper> destSitesSet2 = SiteHelper.addSites(name + "_s2_",
+            r.nextInt(5) + 1);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+
+        // add dest site set 1
+        srcSite.addStudyDispatchSites(study, destSitesSet1);
+
+        // test before persist.
+        List<SiteWrapper> srcSiteDispatchSites = srcSite
+            .getStudyDispachSites(study);
+        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+
+        // do persit
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+
+        // add dest site set 2
+        srcSite.addStudyDispatchSites(study, destSitesSet2);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertEquals(destSitesSet1.size() + destSitesSet2.size(),
+            srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+
+        // remove set 1
     }
 
 }
