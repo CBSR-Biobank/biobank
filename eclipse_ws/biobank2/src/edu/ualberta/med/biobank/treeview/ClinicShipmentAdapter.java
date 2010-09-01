@@ -14,9 +14,9 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 
-public class ShipmentAdapter extends AdapterBase {
+public class ClinicShipmentAdapter extends AdapterBase {
 
-    public ShipmentAdapter(AdapterBase parent, ClinicShipmentWrapper shipment) {
+    public ClinicShipmentAdapter(AdapterBase parent, ClinicShipmentWrapper shipment) {
         super(parent, shipment);
         setHasChildren(true);
     }

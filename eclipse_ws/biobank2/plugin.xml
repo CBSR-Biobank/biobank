@@ -633,7 +633,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.ShipmentAdapter">
+                           value="edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter">
                      </instanceof>
                   </iterate>
                </with>

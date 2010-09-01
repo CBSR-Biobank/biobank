@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 
@@ -19,7 +19,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         .getLogger(ShipmentViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
-    private ShipmentAdapter shipmentAdapter;
+    private ClinicShipmentAdapter shipmentAdapter;
     private ClinicShipmentWrapper shipment;
 
     private BiobankText siteLabel;
@@ -44,11 +44,11 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     @Override
     protected void init() throws Exception {
-        Assert.isTrue((adapter instanceof ShipmentAdapter),
+        Assert.isTrue((adapter instanceof ClinicShipmentAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        shipmentAdapter = (ShipmentAdapter) adapter;
+        shipmentAdapter = (ClinicShipmentAdapter) adapter;
         shipment = shipmentAdapter.getWrapper();
         retrieveShipment();
 

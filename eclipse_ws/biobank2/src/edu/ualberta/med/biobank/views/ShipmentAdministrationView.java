@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.ShipmentViewNodeSearchVisitor;
@@ -168,10 +168,10 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 clinicAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(clinicAdapter);
             }
-            ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
+            ClinicShipmentAdapter shipmentAdapter = (ClinicShipmentAdapter) clinicAdapter
                 .accept(new ShipmentViewNodeSearchVisitor(shipment));
             if (shipmentAdapter == null) {
-                shipmentAdapter = new ShipmentAdapter(clinicAdapter, shipment);
+                shipmentAdapter = new ClinicShipmentAdapter(clinicAdapter, shipment);
                 clinicAdapter.addChild(shipmentAdapter);
             }
             return shipmentAdapter;
@@ -195,7 +195,7 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 if (radioWaybill.getSelection()) {
                     shipment.setWaybill(text);
                 }
-                ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
+                ClinicShipmentAdapter adapter = new ClinicShipmentAdapter(searchedNode,
                     shipment);
                 adapter.openEntryForm();
             }
@@ -228,10 +228,10 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
         return currentInstance;
     }
 
-    public static ShipmentAdapter getCurrentShipment() {
+    public static ClinicShipmentAdapter getCurrentShipment() {
         AdapterBase selectedNode = currentInstance.getSelectedNode();
-        if (selectedNode != null && selectedNode instanceof ShipmentAdapter) {
-            return (ShipmentAdapter) selectedNode;
+        if (selectedNode != null && selectedNode instanceof ClinicShipmentAdapter) {
+            return (ClinicShipmentAdapter) selectedNode;
         }
         return null;
     }

@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
@@ -48,7 +48,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     public static final String MSG_SHIPMENT_OK = "Editing an existing shipment record.";
 
-    private ShipmentAdapter shipmentAdapter;
+    private ClinicShipmentAdapter shipmentAdapter;
 
     private ClinicShipmentWrapper shipmentWrapper;
 
@@ -76,11 +76,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
-        Assert.isTrue(adapter instanceof ShipmentAdapter,
+        Assert.isTrue(adapter instanceof ClinicShipmentAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        shipmentAdapter = (ShipmentAdapter) adapter;
+        shipmentAdapter = (ClinicShipmentAdapter) adapter;
         shipmentWrapper = shipmentAdapter.getWrapper();
         site = SessionManager.getInstance().getCurrentSite();
         try {
