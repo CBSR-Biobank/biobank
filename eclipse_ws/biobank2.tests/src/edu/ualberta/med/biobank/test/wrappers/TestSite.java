@@ -703,19 +703,12 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-<<<<<<< HEAD
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
-            site, clinic1, patient1, patient3);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
-            site, clinic2, patient1, patient2);
-=======
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
             site, clinic1, method, patient1, patient3);
         ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
             site, clinic2, method, patient1, patient2);
->>>>>>> 151a8a68c407d7ff5a3a0f0ed0d76f8bfd230d25
 
         // shipment1 has patient visits for patient1 and patient3
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
@@ -778,13 +771,6 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-<<<<<<< HEAD
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
-            site, clinic1, patient1);
-
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
-            site, clinic2, patient2);
-=======
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
@@ -792,7 +778,6 @@ public class TestSite extends TestDatabase {
 
         ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
             site, clinic2, method, patient2);
->>>>>>> 151a8a68c407d7ff5a3a0f0ed0d76f8bfd230d25
 
         // shipment 1 has patient visits for patient1 and patient2
         int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1, 10,
