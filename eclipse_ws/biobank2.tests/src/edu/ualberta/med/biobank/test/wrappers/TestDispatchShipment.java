@@ -291,58 +291,60 @@ public class TestDispatchShipment extends TestDatabase {
         Assert.assertEquals(countBefore - 1, countAfter);
     }
 
-    // @Test
-    // public void testGetSetContainerCollection() throws Exception {
-    // String name = "testGetSetContainerCollection" + r.nextInt();
-    // SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
-    // SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-    // StudyWrapper study = StudyHelper.addStudy(name);
-    // DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
-    // DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-    // senderSite, receiverSite,
-    // ShippingMethodWrapper.getShippingMethods(appService).get(0));
-    //
-    // ContainerTypeWrapper containerType = ContainerTypeHelper
-    // .addContainerTypeRandom(senderSite, name, false);
-    //
-    // List<DispatchContainerWrapper> containerSet1 = new
-    // ArrayList<DispatchContainerWrapper>();
-    // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
-    // containerSet1.add(DispatchContainerHelper.newContainer(name
-    // + "_s1_" + i, null, containerType));
-    // }
-    //
-    // shipment.addSentContainers(containerSet1);
-    // shipment.persist();
-    // shipment.reload();
-    //
-    // List<DispatchContainerWrapper> dispatchContainers = shipment
-    // .getSentContainerCollection();
-    // Assert.assertEquals(containerSet1.size(), dispatchContainers.size());
-    //
-    // containerSet1 = dispatchContainers; // persisted copy
-    //
-    // // add more containers
-    // List<DispatchContainerWrapper> containerSet2 = new
-    // ArrayList<DispatchContainerWrapper>();
-    // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
-    // containerSet2.add(DispatchContainerHelper.newContainer(name
-    // + "_s2_" + i, null, containerType));
-    // }
-    //
-    // shipment.addSentContainers(containerSet2);
-    // shipment.persist();
-    // shipment.reload();
-    //
-    // dispatchContainers = shipment.getSentContainerCollection();
-    // Assert.assertEquals(containerSet1.size() + containerSet2.size(),
-    // dispatchContainers.size());
-    //
-    // shipment.removeSentContainers(containerSet1);
-    // shipment.persist();
-    // shipment.reload();
-    //
-    // dispatchContainers = shipment.getSentContainerCollection();
-    // Assert.assertEquals(containerSet2.size(), dispatchContainers.size());
-    // }
+    @Test
+    public void testGetSetAliquotCollection() throws Exception {
+        Assert.fail("need to implement this test");
+        // String name = "testGetSetContainerCollection" + r.nextInt();
+        // SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        // SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        // StudyWrapper study = StudyHelper.addStudy(name);
+        // DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        // DispatchShipmentWrapper shipment =
+        // DispatchShipmentHelper.addShipment(
+        // senderSite, receiverSite,
+        // ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        //
+        // ContainerTypeWrapper containerType = ContainerTypeHelper
+        // .addContainerTypeRandom(senderSite, name, false);
+        //
+        // List<DispatchContainerWrapper> containerSet1 = new
+        // ArrayList<DispatchContainerWrapper>();
+        // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
+        // containerSet1.add(DispatchContainerHelper.newContainer(name
+        // + "_s1_" + i, null, containerType));
+        // }
+        //
+        // shipment.addSentContainers(containerSet1);
+        // shipment.persist();
+        // shipment.reload();
+        //
+        // List<DispatchContainerWrapper> dispatchContainers = shipment
+        // .getSentContainerCollection();
+        // Assert.assertEquals(containerSet1.size(), dispatchContainers.size());
+        //
+        // containerSet1 = dispatchContainers; // persisted copy
+        //
+        // // add more containers
+        // List<DispatchContainerWrapper> containerSet2 = new
+        // ArrayList<DispatchContainerWrapper>();
+        // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
+        // containerSet2.add(DispatchContainerHelper.newContainer(name
+        // + "_s2_" + i, null, containerType));
+        // }
+        //
+        // shipment.addSentContainers(containerSet2);
+        // shipment.persist();
+        // shipment.reload();
+        //
+        // dispatchContainers = shipment.getSentContainerCollection();
+        // Assert.assertEquals(containerSet1.size() + containerSet2.size(),
+        // dispatchContainers.size());
+        //
+        // shipment.removeSentContainers(containerSet1);
+        // shipment.persist();
+        // shipment.reload();
+        //
+        // dispatchContainers = shipment.getSentContainerCollection();
+        // Assert.assertEquals(containerSet2.size(), dispatchContainers.size());
+    }
 }
