@@ -53,6 +53,7 @@ public class ScanLinkPalletWidget extends ScanPalletWidget {
                     pCell.setStatus(AliquotCellStatus.MISSING);
                 i++;
             }
+
             // TODO make cells change color
         }
 
