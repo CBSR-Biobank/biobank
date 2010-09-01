@@ -66,12 +66,12 @@ public class DispatchShipmentWrapper extends
         checkSenderCanSendToReceiver();
     }
 
-    private void checkSenderCanSendToReceiver() throws BiobankCheckException,
-        ApplicationException {
+    private void checkSenderCanSendToReceiver() throws BiobankCheckException {
         if (getSender() != null && getReceiver() != null && getStudy() != null) {
             List<SiteWrapper> possibleReceivers = getSender()
                 .getStudyDispachSites(getStudy());
-            if (!possibleReceivers.contains(getReceiver())) {
+            if (possibleReceivers == null
+                || !possibleReceivers.contains(getReceiver())) {
                 throw new BiobankCheckException(getSender().getNameShort()
                     + " cannot dispatch aliquots to "
                     + getReceiver().getNameShort() + " for study "
