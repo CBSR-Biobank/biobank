@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchContainer;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -326,10 +325,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public ContainerWrapper getParent() {
-        return (ContainerWrapper) objectWithPositionManagement.getParent();
+        return objectWithPositionManagement.getParent();
     }
 
-    public void setParent(AbstractContainerWrapper<?> container) {
+    public void setParent(ContainerWrapper container) {
         objectWithPositionManagement.setParent(container);
     }
 
@@ -515,23 +514,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         activityStatus = null;
     }
 
-    public List<DispatchContainerWrapper> getDispatchContainerCollection()
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select cont from "
-            + DispatchContainer.class.getName()
-            + " where cont.positionCollection.aliquot.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-
-        List<DispatchContainer> conts = appService.query(criteria);
-        List<DispatchContainerWrapper> contWrappers = new ArrayList<DispatchContainerWrapper>();
-        for (DispatchContainer cont : conts) {
-            contWrappers.add(new DispatchContainerWrapper(appService, cont));
-        }
-        return contWrappers;
-    }
-
     public List<DispatchShipmentWrapper> getDispatchShipments()
         throws ApplicationException {
+        // FIXME to modify with new model
         HQLCriteria criteria = new HQLCriteria(
             "select ship from "
                 + DispatchShipment.class.getName()

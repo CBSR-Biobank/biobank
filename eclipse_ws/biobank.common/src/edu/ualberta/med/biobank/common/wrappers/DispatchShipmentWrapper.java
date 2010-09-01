@@ -3,13 +3,12 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.model.DispatchContainer;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -22,8 +21,8 @@ public class DispatchShipmentWrapper extends
     private SiteWrapper sender;
     private SiteWrapper receiver;
 
-    private Set<DispatchContainerWrapper> sentContainersAdded = new HashSet<DispatchContainerWrapper>();
-    private Set<DispatchContainerWrapper> sentContainersRemoved = new HashSet<DispatchContainerWrapper>();
+    private Set<AliquotWrapper> aliquotsAdded = new HashSet<AliquotWrapper>();
+    private Set<AliquotWrapper> aliquotsRemoved = new HashSet<AliquotWrapper>();
 
     public DispatchShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -146,88 +145,97 @@ public class DispatchShipmentWrapper extends
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchContainerWrapper> getSentContainerCollection(
-        boolean sort) {
-        List<DispatchContainerWrapper> sentContainerCollection = (List<DispatchContainerWrapper>) propertiesMap
-            .get("sentContainerCollection");
-        if (sentContainerCollection == null) {
-            Collection<DispatchContainer> children = wrappedObject
-                .getSentContainerCollection();
-            if (children != null) {
-                sentContainerCollection = new ArrayList<DispatchContainerWrapper>();
-                for (DispatchContainer container : children) {
-                    sentContainerCollection.add(new DispatchContainerWrapper(
-                        appService, container));
-                }
-                propertiesMap.put("sentContainerCollection",
-                    sentContainerCollection);
-            }
-        }
-        if ((sentContainerCollection != null) && sort)
-            Collections.sort(sentContainerCollection);
-        return sentContainerCollection;
+    public List<AliquotWrapper> getAliquotCollection(boolean sort) {
+        // List<DispatchContainerWrapper> sentContainerCollection =
+        // (List<DispatchContainerWrapper>) propertiesMap
+        // .get("sentContainerCollection");
+        // if (sentContainerCollection == null) {
+        // Collection<DispatchContainer> children = wrappedObject
+        // .getSentContainerCollection();
+        // if (children != null) {
+        // sentContainerCollection = new ArrayList<DispatchContainerWrapper>();
+        // for (DispatchContainer container : children) {
+        // sentContainerCollection.add(new DispatchContainerWrapper(
+        // appService, container));
+        // }
+        // propertiesMap.put("sentContainerCollection",
+        // sentContainerCollection);
+        // }
+        // }
+        // if ((sentContainerCollection != null) && sort)
+        // Collections.sort(sentContainerCollection);
+        // return sentContainerCollection;
+        // FIXME add with new model
+        return null;
     }
 
-    public List<DispatchContainerWrapper> getSentContainerCollection() {
-        return getSentContainerCollection(true);
+    public List<AliquotWrapper> getAliquotCollection() {
+        return getAliquotCollection(true);
     }
 
-    private void setSentContainerCollection(
-        Collection<DispatchContainer> allSentContainerObjects,
-        List<DispatchContainerWrapper> allSentContainerWrappers) {
-        Collection<DispatchContainer> oldContainers = wrappedObject
-            .getSentContainerCollection();
-        wrappedObject.setSentContainerCollection(allSentContainerObjects);
-        propertyChangeSupport.firePropertyChange("sentContainerCollection",
-            oldContainers, allSentContainerObjects);
-        propertiesMap.put("sentContainerCollection", allSentContainerWrappers);
+    private void setAliquotCollection(
+        Collection<Aliquot> allSentContainerObjects,
+        List<AliquotWrapper> allSentContainerWrappers) {
+        // Collection<DispatchContainer> oldContainers = wrappedObject
+        // .getSentContainerCollection();
+        // wrappedObject.setSentContainerCollection(allSentContainerObjects);
+        // propertyChangeSupport.firePropertyChange("sentContainerCollection",
+        // oldContainers, allSentContainerObjects);
+        // propertiesMap.put("sentContainerCollection",
+        // allSentContainerWrappers);
     }
 
-    public void addSentContainers(List<DispatchContainerWrapper> newContainers) {
-        if (newContainers != null && newContainers.size() > 0) {
-            Collection<DispatchContainer> allContainersObjects = new HashSet<DispatchContainer>();
-            List<DispatchContainerWrapper> allContainersWrappers = new ArrayList<DispatchContainerWrapper>();
-            // already in list
-            List<DispatchContainerWrapper> containersList = getSentContainerCollection();
-            if (containersList != null) {
-                for (DispatchContainerWrapper container : containersList) {
-                    allContainersObjects.add(container.getWrappedObject());
-                    allContainersWrappers.add(container);
-                }
-            }
-            // new containers
-            for (DispatchContainerWrapper container : newContainers) {
-                container.setShipment(this);
-                sentContainersAdded.add(container);
-                sentContainersRemoved.remove(container);
-                allContainersObjects.add(container.getWrappedObject());
-                allContainersWrappers.add(container);
-            }
-            setSentContainerCollection(allContainersObjects,
-                allContainersWrappers);
-        }
+    public void addAliquots(List<AliquotWrapper> newContainers) {
+        // if (newContainers != null && newContainers.size() > 0) {
+        // Collection<DispatchContainer> allContainersObjects = new
+        // HashSet<DispatchContainer>();
+        // List<DispatchContainerWrapper> allContainersWrappers = new
+        // ArrayList<DispatchContainerWrapper>();
+        // // already in list
+        // List<DispatchContainerWrapper> containersList =
+        // getSentContainerCollection();
+        // if (containersList != null) {
+        // for (DispatchContainerWrapper container : containersList) {
+        // allContainersObjects.add(container.getWrappedObject());
+        // allContainersWrappers.add(container);
+        // }
+        // }
+        // // new containers
+        // for (DispatchContainerWrapper container : newContainers) {
+        // container.setShipment(this);
+        // sentContainersAdded.add(container);
+        // sentContainersRemoved.remove(container);
+        // allContainersObjects.add(container.getWrappedObject());
+        // allContainersWrappers.add(container);
+        // }
+        // setSentContainerCollection(allContainersObjects,
+        // allContainersWrappers);
+        // }
     }
 
-    public void removeSentContainers(
-        List<DispatchContainerWrapper> containersToRemove) {
+    public void removeAliquots(List<AliquotWrapper> containersToRemove) {
         if ((containersToRemove == null) || (containersToRemove.size() == 0))
             return;
 
-        sentContainersAdded.removeAll(containersToRemove);
-        sentContainersRemoved.addAll(containersToRemove);
-        Collection<DispatchContainer> allContainerObjects = new HashSet<DispatchContainer>();
-        List<DispatchContainerWrapper> allContainerWrappers = new ArrayList<DispatchContainerWrapper>();
-        // already in list
-        List<DispatchContainerWrapper> containersList = getSentContainerCollection();
-        if (containersList != null) {
-            for (DispatchContainerWrapper container : containersList) {
-                if (!containersToRemove.contains(container)) {
-                    allContainerObjects.add(container.getWrappedObject());
-                    allContainerWrappers.add(container);
-                }
-            }
-        }
-        setSentContainerCollection(allContainerObjects, allContainerWrappers);
+        // sentContainersAdded.removeAll(containersToRemove);
+        // sentContainersRemoved.addAll(containersToRemove);
+        // Collection<DispatchContainer> allContainerObjects = new
+        // HashSet<DispatchContainer>();
+        // List<DispatchContainerWrapper> allContainerWrappers = new
+        // ArrayList<DispatchContainerWrapper>();
+        // // already in list
+        // List<DispatchContainerWrapper> containersList =
+        // getSentContainerCollection();
+        // if (containersList != null) {
+        // for (DispatchContainerWrapper container : containersList) {
+        // if (!containersToRemove.contains(container)) {
+        // allContainerObjects.add(container.getWrappedObject());
+        // allContainerWrappers.add(container);
+        // }
+        // }
+        // }
+        // setSentContainerCollection(allContainerObjects,
+        // allContainerWrappers);
     }
 
     @Override
@@ -237,8 +245,8 @@ public class DispatchShipmentWrapper extends
 
     @Override
     public void resetInternalFields() {
-        sentContainersAdded.clear();
-        sentContainersRemoved.clear();
+        aliquotsAdded.clear();
+        aliquotsRemoved.clear();
         sender = null;
     }
 

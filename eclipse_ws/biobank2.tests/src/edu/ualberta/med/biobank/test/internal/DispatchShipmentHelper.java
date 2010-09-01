@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -17,8 +17,7 @@ public class DispatchShipmentHelper extends DbHelper {
 
     public static DispatchShipmentWrapper newShipment(SiteWrapper sender,
         SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
-        Date dateReceived, DispatchContainerWrapper... containers)
-        throws Exception {
+        Date dateReceived, AliquotWrapper... aliquots) throws Exception {
         DispatchShipmentWrapper shipment = new DispatchShipmentWrapper(
             appService);
         if (sender != null) {
@@ -37,8 +36,8 @@ public class DispatchShipmentHelper extends DbHelper {
 
         shipment.setDateShipped(Utils.getRandomDate());
 
-        if (containers != null) {
-            shipment.addSentContainers(Arrays.asList(containers));
+        if (aliquots != null) {
+            shipment.addAliquots(Arrays.asList(aliquots));
         }
 
         return shipment;
@@ -47,8 +46,7 @@ public class DispatchShipmentHelper extends DbHelper {
     public static DispatchShipmentWrapper newShipment(SiteWrapper sender,
         SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
         Date dateReceived) throws Exception {
-        return newShipment(sender, receiver, method, waybill, dateReceived,
-            (DispatchContainerWrapper[]) null);
+        return newShipment(sender, receiver, method, waybill, dateReceived);
     }
 
     public static DispatchShipmentWrapper newShipment(SiteWrapper sender,
@@ -59,8 +57,7 @@ public class DispatchShipmentHelper extends DbHelper {
 
     public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
         SiteWrapper receiver, ShippingMethodWrapper method, String waybill,
-        Date dateReceived, DispatchContainerWrapper... containers)
-        throws Exception {
+        Date dateReceived, AliquotWrapper... containers) throws Exception {
         DispatchShipmentWrapper shipment = newShipment(sender, receiver,
             method, waybill, dateReceived, containers);
         shipment.persist();
@@ -83,27 +80,28 @@ public class DispatchShipmentHelper extends DbHelper {
         return shipment;
     }
 
-    public static DispatchShipmentWrapper addShipmentRandomContainers(
+    public static DispatchShipmentWrapper addShipmentRandomAliquots(
         SiteWrapper sender, SiteWrapper receiver, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, String name, int numContainers)
+        String waybill, Date dateReceived, String name, int numAliquots)
         throws Exception {
         DispatchShipmentWrapper shipment = newShipment(sender, receiver, method);
         shipment.persist();
 
-        List<DispatchContainerWrapper> containers = new ArrayList<DispatchContainerWrapper>();
-        for (int i = 0; i < numContainers; ++i) {
-            containers.add(DispatchContainerHelper.addContainerRandom(sender,
-                shipment, name));
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        for (int i = 0; i < numAliquots; ++i) {
+            // aliquots.add(DispatchContainerHelper.addContainerRandom(sender,
+            // shipment, name));
+            // FIXME need to add aliquots with position
         }
 
-        shipment.addSentContainers(containers);
+        shipment.addAliquots(aliquots);
         return shipment;
     }
 
     public static DispatchShipmentWrapper addShipmentRandomContainers(
         SiteWrapper sender, SiteWrapper receiver, ShippingMethodWrapper method,
         String name, int numContainers) throws Exception {
-        return addShipmentRandomContainers(sender, receiver, method,
+        return addShipmentRandomAliquots(sender, receiver, method,
             TestCommon.getNewWaybill(r), Utils.getRandomDate(), name,
             numContainers);
     }

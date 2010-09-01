@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.AbstractContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -44,14 +44,14 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         return wrappedObject.getCol();
     }
 
-    public abstract AbstractContainerWrapper<?> getParent();
+    public abstract ContainerWrapper getParent();
 
-    public abstract void setParent(AbstractContainerWrapper<?> parent);
+    public abstract void setParent(ContainerWrapper parent);
 
     @Override
     public void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        AbstractContainerWrapper<?> parent = getParent();
+        ContainerWrapper parent = getParent();
         if (parent != null) {
             checkPositionValid(parent);
             checkObjectAtPosition();
@@ -61,7 +61,7 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         }
     }
 
-    public void checkPositionValid(AbstractContainerWrapper<?> parent)
+    public void checkPositionValid(ContainerWrapper parent)
         throws BiobankCheckException {
         if (getRow() == null) {
             throw new BiobankCheckException("Position row can't be null");

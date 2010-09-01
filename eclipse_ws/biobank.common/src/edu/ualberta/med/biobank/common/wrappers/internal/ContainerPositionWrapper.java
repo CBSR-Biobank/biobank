@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.AbstractContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Container;
@@ -113,11 +112,8 @@ public class ContainerPositionWrapper extends
     }
 
     @Override
-    public void setParent(AbstractContainerWrapper<?> parent) {
-        assert parent instanceof ContainerWrapper;
-        if (parent instanceof ContainerWrapper) {
-            setParentContainer((ContainerWrapper) parent);
-        }
+    public void setParent(ContainerWrapper parent) {
+        setParentContainer(parent);
     }
 
     @Override
