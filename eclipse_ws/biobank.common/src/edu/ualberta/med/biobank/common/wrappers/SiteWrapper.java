@@ -639,35 +639,18 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return wrappers;
     }
 
-    /**
-     * if study == null, will get all sites to which can dispatch, for whatever
-     * study
-     */
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
-        throws ApplicationException {
-        // FIXME use the infos maps instead and do not manage null study
-        String studyString = "";
-        List<Object> params = new ArrayList<Object>();
-        params.add(getId());
-        if (study != null) {
-            studyString = " and info.study.id=?";
-            params.add(study.getId());
-        }
-        HQLCriteria criteria = new HQLCriteria(
-            "select info.destSiteCollection from "
-                + DispatchInfo.class.getName()
-                + " as info where info.srcSite.id = ?" + studyString, params);
-        List<Site> results = appService.query(criteria);
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site res : results) {
-            wrappers.add(new SiteWrapper(appService, res));
-        }
-        return wrappers;
+    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
+        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
+        if (srcMap == null)
+            return null;
+        DispatchInfoWrapper info = srcMap.get(study.getId());
+        if (info == null)
+            return null;
+        return info.getToSiteCollection();
     }
 
     public void addStudyDispatchSites(StudyWrapper study,
         List<SiteWrapper> sites) {
-        // FIXME need to be tested
         if ((sites == null) || (sites.size() == 0))
             return;
         Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();

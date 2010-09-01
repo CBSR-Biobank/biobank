@@ -836,14 +836,25 @@ public class TestSite extends TestDatabase {
 
         // add dest site set 1
         srcSite.addStudyDispatchSites(study, destSitesSet1);
+
+        // test before persist.
         List<SiteWrapper> srcSiteDispatchSites = srcSite
             .getStudyDispachSites(study);
+        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
 
+        // do persit
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+        Assert.assertNotNull(srcSiteDispatchSites);
         Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
         Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
 
         // add dest site set 2
         srcSite.addStudyDispatchSites(study, destSitesSet2);
+        srcSite.persist();
+        srcSite.reload();
         srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
 
         Assert.assertEquals(destSitesSet1.size() + destSitesSet2.size(),
