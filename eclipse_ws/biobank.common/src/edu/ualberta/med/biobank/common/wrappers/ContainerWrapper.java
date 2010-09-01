@@ -643,7 +643,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         if (types == null || !types.contains(getContainerType())) {
             throw new BiobankCheckException("Container "
                 + getParent().getFullInfoLabel()
-                + " does not allow inserts of type "
+                + " does not allow inserts of container type "
                 + getContainerType().getName() + ".");
         }
     }
