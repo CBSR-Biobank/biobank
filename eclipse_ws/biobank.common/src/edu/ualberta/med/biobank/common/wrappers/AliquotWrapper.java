@@ -26,10 +26,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     private AbstractObjectWithPositionManagement<AliquotPosition> objectWithPositionManagement;
 
-    private PatientVisitWrapper patientVisit;
-    private SampleTypeWrapper sampleType;
-    private ActivityStatusWrapper activityStatus;
-
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
         super(appService, wrappedObject);
@@ -189,7 +185,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
-        this.patientVisit = patientVisit;
+        propertiesMap.put("patientVisit", patientVisit);
         PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
         PatientVisit newPvRaw = null;
         if (patientVisit != null) {
@@ -201,11 +197,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
+        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         if (patientVisit == null) {
             PatientVisit pv = wrappedObject.getPatientVisit();
             if (pv == null)
                 return null;
-            this.patientVisit = new PatientVisitWrapper(appService, pv);
+            patientVisit = new PatientVisitWrapper(appService, pv);
+            propertiesMap.put("patientVisit", patientVisit);
         }
         return patientVisit;
     }
@@ -245,7 +244,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setSampleType(SampleTypeWrapper type) {
-        this.sampleType = type;
+        propertiesMap.put("sampleType", type);
         SampleType oldTypeRaw = wrappedObject.getSampleType();
         SampleType newTypeRaw = null;
         if (type != null) {
@@ -257,11 +256,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SampleTypeWrapper getSampleType() {
+        SampleTypeWrapper sampleType = (SampleTypeWrapper) propertiesMap
+            .get("sampleType");
         if (sampleType == null) {
             SampleType s = wrappedObject.getSampleType();
             if (s == null)
                 return null;
-            this.sampleType = new SampleTypeWrapper(appService, s);
+            sampleType = new SampleTypeWrapper(appService, s);
+            propertiesMap.put("sampleType", sampleType);
         }
         return sampleType;
     }
@@ -292,17 +294,20 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null) {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
+        if (activity == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
-            this.activityStatus = new ActivityStatusWrapper(appService, a);
+            activity = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activity);
         }
-        return activityStatus;
+        return activity;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -381,6 +386,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setQuantityFromType() {
+        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         StudyWrapper study = patientVisit.getPatient().getStudy();
         Double volume = null;
         Collection<SampleStorageWrapper> sampleStorageCollection = study
@@ -505,13 +512,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     @Override
     public String toString() {
         return getInventoryId();
-    }
-
-    @Override
-    public void resetInternalFields() {
-        patientVisit = null;
-        sampleType = null;
-        activityStatus = null;
     }
 
     public List<DispatchShipmentWrapper> getDispatchShipments()

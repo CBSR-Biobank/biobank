@@ -12,8 +12,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
-    private ContainerWrapper container;
-
     public ContainerPathWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -63,17 +61,20 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     }
 
     public ContainerWrapper getContainer() {
+        ContainerWrapper container = (ContainerWrapper) propertiesMap
+            .get("container");
         if (container == null) {
             Container c = wrappedObject.getContainer();
             if (c == null)
                 return null;
             container = new ContainerWrapper(appService, c);
+            propertiesMap.put("container", container);
         }
         return container;
     }
 
     public void setContainer(ContainerWrapper container) {
-        this.container = container;
+        propertiesMap.put("container", container);
         Container oldContainer = wrappedObject.getContainer();
         Container newContainer = null;
         if (container != null) {
@@ -134,12 +135,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
             return null;
         }
         return new ContainerPathWrapper(appService, paths.get(0));
-    }
-
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        container = null;
     }
 
 }

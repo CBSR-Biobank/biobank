@@ -39,8 +39,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
-    private ActivityStatusWrapper activityStatus;
-
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -72,17 +70,20 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -965,7 +966,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         deletedSampleStorages.clear();
         deletedStudySourceVessels.clear();
         deletedStudyPvAttr.clear();
-        activityStatus = null;
     }
 
     public static List<StudyWrapper> getAllStudies(

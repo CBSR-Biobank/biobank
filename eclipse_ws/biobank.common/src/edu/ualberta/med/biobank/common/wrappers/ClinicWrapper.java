@@ -27,7 +27,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
     private AddressWrapper address;
-    private ActivityStatusWrapper activityStatus;
 
     public ClinicWrapper(WritableApplicationService appService) {
         super(appService);
@@ -100,17 +99,20 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -532,7 +534,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public void reload() throws Exception {
         super.reload();
         address = null;
-        activityStatus = null;
     }
 
 }

@@ -23,8 +23,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends ModelWrapper<Patient> {
 
-    private StudyWrapper study = null;
-
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
     }
@@ -44,17 +42,19 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public StudyWrapper getStudy() {
+        StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
         if (study == null) {
             Study s = wrappedObject.getStudy();
             if (s == null)
                 return null;
             study = new StudyWrapper(appService, s);
+            propertiesMap.put("study", study);
         }
         return study;
     }
 
     public void setStudy(StudyWrapper study) {
-        this.study = study;
+        propertiesMap.put("study", study);
         Study oldStudyRaw = wrappedObject.getStudy();
         Study newStudyRaw = study.wrappedObject;
         wrappedObject.setStudy(newStudyRaw);
@@ -406,11 +406,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         log.setDetails(details);
         log.setType("Patient");
         return log;
-    }
-
-    @Override
-    public void resetInternalFields() {
-        study = null;
     }
 
     public void setPatientVisitCollection(List<PatientVisitWrapper> pvws) {

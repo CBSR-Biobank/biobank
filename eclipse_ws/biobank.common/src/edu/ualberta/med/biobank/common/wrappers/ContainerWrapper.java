@@ -32,10 +32,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     private List<AliquotWrapper> addedAliquots = new ArrayList<AliquotWrapper>();
 
-    private SiteWrapper site;
-    private ContainerTypeWrapper containerType;
-    private ActivityStatusWrapper activityStatus;
-
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
         super(appService, wrappedObject);
@@ -302,11 +298,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public SiteWrapper getSite() {
+        SiteWrapper site = (SiteWrapper) propertiesMap.get("site");
         if (site == null) {
             Site s = wrappedObject.getSite();
             if (s == null)
                 return null;
             site = new SiteWrapper(appService, s);
+            propertiesMap.put("site", site);
         }
         return site;
     }
@@ -422,7 +420,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public void setSite(SiteWrapper site) {
-        this.site = site;
+        propertiesMap.put("site", site);
         Site oldSite = wrappedObject.getSite();
         Site newSite = null;
         if (site != null) {
@@ -997,9 +995,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         super.resetInternalFields();
         addedChildren.clear();
         addedAliquots.clear();
-        site = null;
-        containerType = null;
-        activityStatus = null;
     }
 
     @Override
@@ -1033,7 +1028,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public void setContainerType(ContainerTypeWrapper containerType) {
-        this.containerType = containerType;
+        propertiesMap.put("containerType", containerType);
         ContainerType oldType = wrappedObject.getContainerType();
         ContainerType newType = null;
         if (containerType != null) {
@@ -1045,27 +1040,33 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     public ContainerTypeWrapper getContainerType() {
+        ContainerTypeWrapper containerType = (ContainerTypeWrapper) propertiesMap
+            .get("containerType");
         if (containerType == null) {
             ContainerType c = wrappedObject.getContainerType();
             if (c == null)
                 return null;
             containerType = new ContainerTypeWrapper(appService, c);
+            propertiesMap.put("containerType", containerType);
         }
         return containerType;
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {

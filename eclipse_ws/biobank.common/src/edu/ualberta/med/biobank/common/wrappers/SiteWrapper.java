@@ -30,8 +30,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private AddressWrapper address;
 
-    private ActivityStatusWrapper activityStatus;
-
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
     }
@@ -73,17 +71,20 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -618,7 +619,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     public void resetInternalFields() {
-        activityStatus = null;
         address = null;
     }
 

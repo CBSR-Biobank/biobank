@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -19,9 +18,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchShipmentWrapper extends
     AbstractShipmentWrapper<DispatchShipment> {
-
-    private Set<AliquotWrapper> aliquotsAdded = new HashSet<AliquotWrapper>();
-    private Set<AliquotWrapper> aliquotsRemoved = new HashSet<AliquotWrapper>();
 
     public DispatchShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -225,7 +221,6 @@ public class DispatchShipmentWrapper extends
         for (AliquotWrapper aliquot : newAliquots) {
             allAliquotObjects.add(aliquot.getWrappedObject());
             allAliquotWrappers.add(aliquot);
-            aliquotsRemoved.remove(aliquot);
         }
         setAliquotCollection(allAliquotObjects, allAliquotWrappers);
     }
@@ -240,7 +235,7 @@ public class DispatchShipmentWrapper extends
         List<AliquotWrapper> currentList = getAliquotCollection();
         if (currentList != null) {
             for (AliquotWrapper aliquot : currentList) {
-                if (!aliquotsRemoved.contains(aliquot)) {
+                if (!aliquotsToRemove.contains(aliquot)) {
                     allAliquotObjects.add(aliquot.getWrappedObject());
                     allAliquotWrappers.add(aliquot);
                 }
@@ -254,9 +249,4 @@ public class DispatchShipmentWrapper extends
 
     }
 
-    @Override
-    public void resetInternalFields() {
-        aliquotsAdded.clear();
-        aliquotsRemoved.clear();
-    }
 }

@@ -9,9 +9,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
 
-    private StudyWrapper study;
-    private SourceVesselWrapper ss;
-
     public StudySourceVesselWrapper(WritableApplicationService appService,
         StudySourceVessel wrappedObject) {
         super(appService, wrappedObject);
@@ -51,17 +48,19 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     public StudyWrapper getStudy() {
+        StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
         if (study == null) {
             Study s = wrappedObject.getStudy();
             if (s == null)
                 return null;
             study = new StudyWrapper(appService, s);
+            propertiesMap.put("study", study);
         }
         return study;
     }
 
     public void setStudy(StudyWrapper study) {
-        this.study = study;
+        propertiesMap.put("study", study);
         Study oldStudy = wrappedObject.getStudy();
         Study newStudy = study.wrappedObject;
         wrappedObject.setStudy(newStudy);
@@ -69,19 +68,22 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     public SourceVesselWrapper getSourceVessel() {
+        SourceVesselWrapper ss = (SourceVesselWrapper) propertiesMap
+            .get("sourceVessel");
         if (ss == null) {
             SourceVessel s = wrappedObject.getSourceVessel();
             if (s == null) {
                 return null;
             }
             ss = new SourceVesselWrapper(appService, s);
+            propertiesMap.put("sourceVessel", ss);
         }
 
         return ss;
     }
 
     public void setSourceVessel(SourceVesselWrapper ss) {
-        this.ss = ss;
+        propertiesMap.put("sourceVessel", ss);
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         SourceVessel newSs = null;
         if (ss != null) {
