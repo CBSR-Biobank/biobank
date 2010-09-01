@@ -166,7 +166,7 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public AdapterBase visit(ShipmentAdapter shipment) {
+    public AdapterBase visit(ClinicShipmentAdapter shipment) {
         if (wrapper instanceof PatientVisitWrapper) {
             return shipment.getChild(wrapper, true);
         }

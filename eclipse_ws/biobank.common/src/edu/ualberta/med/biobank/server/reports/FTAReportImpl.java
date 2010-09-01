@@ -7,18 +7,18 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FTAReportImpl extends AbstractReport {
 
-    private static final String QUERY = "select a from "
-        + Aliquot.class.getName()
-        + " a where a.sampleType.nameShort ="
+    private static final String QUERY = "aliquots from "
+        + PatientVisit.class.getName()
+        + " pv join pv.aliquotCollection as aliquots where aliquots.sampleType.nameShort ="
         + FTA_CARD_SAMPLE_TYPE_NAME
         + " and a.patientVisit.patient.study.nameShort = ? and a.patientVisit.patient.study.site "
-        + SITE_OPERATOR
-        + SITE_ID
-        + " group by a.patientVisit.patient.pnumber having min(a.patientVisit.dateProcessed) > ? order by a.patientVisit.patient.pnumber";
+        + SITE_OPERATOR + SITE_ID
+        + " group by pv having min(aliquots.dateProcessed) > ?";
 
     public FTAReportImpl(BiobankReport report) {
         super(QUERY, report);

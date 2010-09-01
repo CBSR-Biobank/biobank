@@ -259,5 +259,4 @@ public class DispatchShipmentWrapper extends
         aliquotsAdded.clear();
         aliquotsRemoved.clear();
     }
-
 }

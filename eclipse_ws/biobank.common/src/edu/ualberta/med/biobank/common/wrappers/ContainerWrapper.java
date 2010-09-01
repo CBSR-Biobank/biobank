@@ -292,7 +292,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     private void checkSiteNotNull() throws BiobankCheckException {
         if (getSite() == null) {
             throw new BiobankCheckException(
-                "This container should be associate to a site");
+                "This container should be associated to a site");
         }
     }
 
