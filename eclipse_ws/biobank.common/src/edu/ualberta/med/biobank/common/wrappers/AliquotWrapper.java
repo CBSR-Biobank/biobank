@@ -516,13 +516,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public List<DispatchShipmentWrapper> getDispatchShipments()
         throws ApplicationException {
-        // FIXME to modify with new model
-        HQLCriteria criteria = new HQLCriteria(
-            "select ship from "
-                + DispatchShipment.class.getName()
-                + " where ship.sentContainerCollection.positionCollection.aliquot.id = ?",
+        HQLCriteria criteria = new HQLCriteria("select ship from "
+            + DispatchShipment.class.getName()
+            + " where ship.aliquotCollection.id = ?",
             Arrays.asList(new Object[] { getId() }));
-
         List<DispatchShipment> ships = appService.query(criteria);
         List<DispatchShipmentWrapper> shipWrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment ship : ships) {

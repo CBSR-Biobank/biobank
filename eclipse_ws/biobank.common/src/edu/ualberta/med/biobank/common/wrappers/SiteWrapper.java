@@ -682,6 +682,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             infos.put(study.getId(), diw);
             Collection<DispatchInfo> allsInfoObjects = wrappedObject
                 .getSrcDispatchInfoCollection();
+            if (allsInfoObjects == null) {
+                allsInfoObjects = new HashSet<DispatchInfo>();
+            }
             allsInfoObjects.add(diw.wrappedObject);
             wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
         }
