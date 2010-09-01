@@ -97,8 +97,8 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective"
-            icon="icons/dispatchShipmentPerspective.png"
             id="edu.ualberta.med.biobank.perspective.dispatchShipments"
+            icon="icons/dispatchShipmentPerspective.png"
             name="Dispatch View">
       </perspective>
       <perspective
@@ -295,7 +295,7 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
-            name="Dispatch Shipment administration">
+            name="Dispatch Shipment Administration">
       </command>
    </extension>
    <extension

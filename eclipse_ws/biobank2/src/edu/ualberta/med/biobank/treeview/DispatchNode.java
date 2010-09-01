@@ -12,20 +12,13 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public class DispatchNode<DispatchWrapper> extends AdapterBase {
 
-    private String label;
-
     public DispatchNode(AdapterBase parent, ModelWrapper<?> object) {
         super(parent, object);
     }
 
     public DispatchNode(AdapterBase parent, String label) {
         super(parent, null);
-        this.label = label;
-    }
-
-    @Override
-    protected String getLabelInternal() {
-        return label;
+        this.setName(label);
     }
 
     @Override
@@ -74,10 +67,16 @@ public class DispatchNode<DispatchWrapper> extends AdapterBase {
     }
 
     public void addChildren(List<DispatchShipmentWrapper> list) {
-        for (DispatchShipmentWrapper child : list) {
-            DispatchNode<DispatchShipmentWrapper> node = new DispatchNode<DispatchShipmentWrapper>(
-                this, child);
-            this.addChild(node);
-        }
+        if (list != null)
+            for (DispatchShipmentWrapper child : list) {
+                DispatchNode<DispatchShipmentWrapper> node = new DispatchNode<DispatchShipmentWrapper>(
+                    this, child);
+                this.addChild(node);
+            }
+    }
+
+    @Override
+    protected String getLabelInternal() {
+        return null;
     }
 }
