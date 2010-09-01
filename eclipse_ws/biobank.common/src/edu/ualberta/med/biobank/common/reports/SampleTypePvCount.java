@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.reports;
 
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.PatientVisit;
 
 public class SampleTypePvCount extends QueryObject {
 

@@ -3,6 +3,11 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.ContainerPath;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 public class QAFreezerAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquot QA";

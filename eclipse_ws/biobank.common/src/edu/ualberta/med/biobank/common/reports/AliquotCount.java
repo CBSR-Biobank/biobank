@@ -2,6 +2,9 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.Date;
 
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+
 public class AliquotCount extends QueryObject {
 
     protected static final String NAME = "Sample Type Totals";

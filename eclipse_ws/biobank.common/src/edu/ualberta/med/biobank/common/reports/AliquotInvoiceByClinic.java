@@ -4,6 +4,9 @@ import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+
 public class AliquotInvoiceByClinic extends QueryObject {
 
     protected static final String NAME = "Aliquots per Clinic by Date";

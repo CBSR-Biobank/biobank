@@ -4,6 +4,11 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.ContainerPath;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 public class FreezerDAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study per Clinic by Date";

@@ -2,6 +2,10 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.ContainerPath;
+
 public class FreezerSAliquots extends QueryObject {
 
     protected static final String NAME = "Freezer Aliquots per Study";

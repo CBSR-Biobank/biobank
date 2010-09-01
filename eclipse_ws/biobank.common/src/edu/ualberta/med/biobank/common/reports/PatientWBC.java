@@ -2,6 +2,10 @@ package edu.ualberta.med.biobank.common.reports;
 
 import java.util.List;
 
+import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.PatientVisit;
+
 public class PatientWBC extends QueryObject {
 
     protected static final String NAME = "Patient WBC Aliquots";
