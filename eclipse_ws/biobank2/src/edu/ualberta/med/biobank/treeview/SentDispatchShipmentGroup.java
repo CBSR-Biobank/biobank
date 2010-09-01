@@ -18,7 +18,8 @@ public class SentDispatchShipmentGroup extends AbstractDispatchShipmentGroup {
         throws Exception {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
-            site.getSentDispatchShipmentCollection();
+            // FIXME want to see only pending shipment
+            return site.getSentDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
     }

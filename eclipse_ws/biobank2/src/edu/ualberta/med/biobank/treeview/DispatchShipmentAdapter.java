@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
-import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.forms.DispatchShipmentViewForm;
 
 public class DispatchShipmentAdapter extends AdapterBase {
 
@@ -22,14 +23,28 @@ public class DispatchShipmentAdapter extends AdapterBase {
         super(parent, ship);
     }
 
+    public DispatchShipmentWrapper getWrapper() {
+        return (DispatchShipmentWrapper) modelObject;
+    }
+
+    @Override
+    protected String getLabelInternal() {
+        DispatchShipmentWrapper shipment = getWrapper();
+        Assert.isNotNull(shipment, "shipment is null");
+        String label = shipment.getStudy().getNameShort() + " - "
+            + shipment.getFormattedDateShipped();
+        return label;
+
+    }
+
     @Override
     protected void executeDoubleClick() {
-        performExpand();
+        openViewForm();
     }
 
     @Override
     public String getTooltipText() {
-        return null;
+        return getTooltipText("Dispatch Shipment");
     }
 
     @Override
@@ -88,7 +103,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
 
     @Override
     public String getViewFormId() {
-        return null;
+        return DispatchShipmentViewForm.ID;
     }
 
     @Override
@@ -101,17 +116,4 @@ public class DispatchShipmentAdapter extends AdapterBase {
         return null;
     }
 
-    public void addChildren(List<DispatchShipmentWrapper> list) {
-        if (list != null)
-            for (DispatchShipmentWrapper child : list) {
-                DispatchShipmentAdapter node = new DispatchShipmentAdapter(
-                    this, child);
-                this.addChild(node);
-            }
-    }
-
-    @Override
-    protected String getLabelInternal() {
-        return null;
-    }
 }

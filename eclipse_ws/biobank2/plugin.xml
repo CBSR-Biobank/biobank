@@ -2210,6 +2210,13 @@
       id="edu.ualberta.med.biobank.editors.InvoicingReportEditor"
       name="Invoicing Report">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      default="false"
+      icon="icons/shipment.png"
+      id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      name="Dispatch Shipment View">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
