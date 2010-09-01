@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.DispatchContainer;
@@ -49,7 +50,8 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
         ContainerTypeWrapper containerType = ContainerTypeHelper
             .addContainerTypeRandom(senderSite, name, false);
         DispatchContainerWrapper container = DispatchContainerHelper
@@ -66,7 +68,8 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
 
@@ -91,7 +94,8 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite);
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
 
@@ -113,7 +117,9 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
 
@@ -136,7 +142,9 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
         DispatchContainerWrapper container = DispatchContainerHelper
@@ -153,7 +161,9 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
         DispatchContainerWrapper container = DispatchContainerHelper
@@ -179,7 +189,9 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
 
@@ -215,7 +227,9 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
 
@@ -255,7 +269,9 @@ public class TestDispatchContainer extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
-            senderSite, receiverSite, name, Utils.getRandomDate());
+            senderSite, receiverSite,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
+            Utils.getRandomDate());
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             senderSite, name, false);
 
@@ -311,7 +327,8 @@ public class TestDispatchContainer extends TestDatabase {
         study.persist();
 
         ClinicShipmentWrapper clinicShipment = ClinicShipmentHelper
-            .newShipment(sender, clinic);
+            .newShipment(sender, clinic, ShippingMethodWrapper
+                .getShippingMethods(appService).get(0));
         clinicShipment.addPatients(Arrays.asList(patient));
         clinicShipment.persist();
 
@@ -324,7 +341,9 @@ public class TestDispatchContainer extends TestDatabase {
             r.nextInt(10) + 1);
 
         DispatchShipmentWrapper dispShipment = DispatchShipmentHelper
-            .addShipment(sender, receiver, name, Utils.getRandomDate());
+            .addShipment(sender, receiver, ShippingMethodWrapper
+                .getShippingMethods(appService).get(0), name, Utils
+                .getRandomDate());
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
             sender, name, name, 1, 8, 12, false);
@@ -386,7 +405,8 @@ public class TestDispatchContainer extends TestDatabase {
         study.persist();
 
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.newShipment(
-            sender, clinic);
+            sender, clinic, ShippingMethodWrapper
+                .getShippingMethods(appService).get(0));
         shipment.addPatients(Arrays.asList(patient));
         shipment.persist();
 

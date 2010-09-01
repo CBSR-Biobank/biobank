@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -56,7 +55,7 @@ public class ClinicShipmentWrapper extends
         String[] properties = super.getPropertyChangeNames();
         List<String> list = new ArrayList<String>(Arrays.asList(properties));
         list.addAll(Arrays.asList("clinic", "patientVisitCollection",
-            "shippingMethod", "patientCollection"));
+            "patientCollection"));
         return list.toArray(new String[list.size()]);
     }
 
@@ -254,24 +253,6 @@ public class ClinicShipmentWrapper extends
             }
             setPatientVisitCollection(allVisitObjects, allVisitWrappers);
         }
-    }
-
-    public ShippingMethodWrapper getShippingMethod() {
-        ShippingMethod sc = wrappedObject.getShippingMethod();
-        if (sc == null) {
-            return null;
-        }
-        return new ShippingMethodWrapper(appService, sc);
-    }
-
-    public void setShippingMethod(ShippingMethodWrapper sc) {
-        ShippingMethod old = wrappedObject.getShippingMethod();
-        ShippingMethod newSh = null;
-        if (sc != null) {
-            newSh = sc.getWrappedObject();
-        }
-        wrappedObject.setShippingMethod(newSh);
-        propertyChangeSupport.firePropertyChange("shippingMethod", old, newSh);
     }
 
     @SuppressWarnings("unchecked")

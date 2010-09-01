@@ -6,8 +6,10 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.AbstractShipment;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -25,7 +27,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateReceived", "comment", "waybill",
-            "dateShipped", "boxNumber" };
+            "dateShipped", "boxNumber", "shippingMethod" };
     }
 
     @Override
@@ -135,6 +137,48 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
         Date dateReveived = getDateReceived();
         return dateReveived.compareTo(startDate) >= 0
             && dateReveived.compareTo(endDate) <= 0;
+    }
+
+    public ShippingMethodWrapper getShippingMethod() {
+        ShippingMethod sc = wrappedObject.getShippingMethod();
+        if (sc == null) {
+            return null;
+        }
+        return new ShippingMethodWrapper(appService, sc);
+    }
+
+    public void setShippingMethod(ShippingMethodWrapper sc) {
+        ShippingMethod old = wrappedObject.getShippingMethod();
+        ShippingMethod newSh = null;
+        if (sc != null) {
+            newSh = sc.getWrappedObject();
+        }
+        wrappedObject.setShippingMethod(newSh);
+        propertyChangeSupport.firePropertyChange("shippingMethod", old, newSh);
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
+        if (activity == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activity = new ActivityStatusWrapper(appService, a);
+        }
+        return activity;
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        propertiesMap.put("activityStatus", activityStatus);
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
     }
 
     public static AbstractShipmentWrapper<?> createInstance(
