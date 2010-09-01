@@ -201,13 +201,36 @@ public class TestSite extends TestDatabase {
         site.persist();
         site.reload();
 
+        Assert.assertEquals(studiesNber, site.getStudyCollection().size());
+
         // add one more study
-        StudyHelper.addStudy(name + "newStudy");
-        studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
+        StudyWrapper newStudy = StudyHelper.addStudy(name + "newStudy");
+        site.addStudies(Arrays.asList(newStudy));
         site.persist();
         site.reload();
         Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
+    }
+
+    @Test
+    public void testRemoveStudies() throws Exception {
+        String name = "testRemoveStudies" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudies(name, r.nextInt(15) + 1);
+
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        int studiesNber = studies.size();
+        site.addStudies(studies);
+        site.persist();
+        site.reload();
+
+        Assert.assertEquals(studiesNber, site.getStudyCollection().size());
+
+        // remove one study
+        StudyWrapper newStudy = studies.get(0);
+        site.removeStudies(Arrays.asList(newStudy));
+        site.persist();
+        site.reload();
+        Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
     }
 
     @Test

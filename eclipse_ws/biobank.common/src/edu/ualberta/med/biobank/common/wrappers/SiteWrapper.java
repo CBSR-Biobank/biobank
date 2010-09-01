@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -28,8 +27,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
-
-    private Set<StudyWrapper> deletedStudies = new HashSet<StudyWrapper>();
 
     private AddressWrapper address;
 
@@ -319,7 +316,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         for (StudyWrapper study : studies) {
             allStudyObjects.add(study.getWrappedObject());
             allStudyWrappers.add(study);
-            deletedStudies.remove(study);
         }
         setStudyCollection(allStudyObjects, allStudyWrappers);
     }
@@ -738,20 +734,4 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return infos;
     }
 
-    @Override
-    protected void persistDependencies(Site origObject) throws Exception {
-        deleteStudyAssoc();
-    }
-
-    /**
-     * Removes the sample storage objects that are not contained in the
-     * collection.
-     */
-    private void deleteStudyAssoc() throws Exception {
-        for (StudyWrapper study : deletedStudies) {
-            if (!study.isNew()) {
-                study.delete();
-            }
-        }
-    }
 }
