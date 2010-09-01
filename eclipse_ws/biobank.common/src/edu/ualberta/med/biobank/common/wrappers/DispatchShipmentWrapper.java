@@ -74,7 +74,8 @@ public class DispatchShipmentWrapper extends
             if (!possibleReceivers.contains(getReceiver())) {
                 throw new BiobankCheckException(getSender().getNameShort()
                     + " cannot dispatch aliquots to "
-                    + getReceiver().getNameShort());
+                    + getReceiver().getNameShort() + " for study "
+                    + getStudy().getNameShort());
             }
         }
     }
