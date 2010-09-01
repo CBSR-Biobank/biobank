@@ -1,19 +1,40 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ContactHelper;
+import edu.ualberta.med.biobank.test.internal.ContainerHelper;
+import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchInfoHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -291,60 +312,89 @@ public class TestDispatchShipment extends TestDatabase {
         Assert.assertEquals(countBefore - 1, countAfter);
     }
 
+    private List<AliquotWrapper> addAliquotsToContainerRow(
+        PatientVisitWrapper visit, ContainerWrapper container, int row,
+        List<SampleTypeWrapper> sampleTypes) throws Exception {
+        int numSampletypes = sampleTypes.size();
+        int colCapacity = container.getColCapacity();
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        for (int i = 0; i < colCapacity; ++i) {
+            aliquots.add(AliquotHelper.addAliquot(
+                sampleTypes.get(r.nextInt(numSampletypes)), "Active",
+                container, visit, row, i));
+        }
+        container.reload();
+        visit.reload();
+        return aliquots;
+    }
+
     @Test
     public void testGetSetAliquotCollection() throws Exception {
-        Assert.fail("need to implement this test");
-        // String name = "testGetSetContainerCollection" + r.nextInt();
-        // SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
-        // SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        // StudyWrapper study = StudyHelper.addStudy(name);
-        // DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
-        // DispatchShipmentWrapper shipment =
-        // DispatchShipmentHelper.addShipment(
-        // senderSite, receiverSite,
-        // ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        //
-        // ContainerTypeWrapper containerType = ContainerTypeHelper
-        // .addContainerTypeRandom(senderSite, name, false);
-        //
-        // List<DispatchContainerWrapper> containerSet1 = new
-        // ArrayList<DispatchContainerWrapper>();
-        // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
-        // containerSet1.add(DispatchContainerHelper.newContainer(name
-        // + "_s1_" + i, null, containerType));
-        // }
-        //
-        // shipment.addSentContainers(containerSet1);
-        // shipment.persist();
-        // shipment.reload();
-        //
-        // List<DispatchContainerWrapper> dispatchContainers = shipment
-        // .getSentContainerCollection();
-        // Assert.assertEquals(containerSet1.size(), dispatchContainers.size());
-        //
-        // containerSet1 = dispatchContainers; // persisted copy
-        //
-        // // add more containers
-        // List<DispatchContainerWrapper> containerSet2 = new
-        // ArrayList<DispatchContainerWrapper>();
-        // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
-        // containerSet2.add(DispatchContainerHelper.newContainer(name
-        // + "_s2_" + i, null, containerType));
-        // }
-        //
-        // shipment.addSentContainers(containerSet2);
-        // shipment.persist();
-        // shipment.reload();
-        //
-        // dispatchContainers = shipment.getSentContainerCollection();
-        // Assert.assertEquals(containerSet1.size() + containerSet2.size(),
-        // dispatchContainers.size());
-        //
-        // shipment.removeSentContainers(containerSet1);
-        // shipment.persist();
-        // shipment.reload();
-        //
-        // dispatchContainers = shipment.getSentContainerCollection();
-        // Assert.assertEquals(containerSet2.size(), dispatchContainers.size());
+        String name = "testGetSetAliquotCollection" + r.nextInt();
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        StudyWrapper study = StudyHelper.addStudy(name);
+        senderSite.addStudyDispatchSites(study, Arrays.asList(receiverSite));
+        senderSite.persist();
+        senderSite.reload();
+        DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
+            senderSite, receiverSite, study, ShippingMethodWrapper
+                .getShippingMethods(appService).get(0));
+        List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
+            .getAllSampleTypes(appService, false);
+        ContainerTypeWrapper containerType = ContainerTypeHelper
+            .addContainerType(senderSite, name, name, 1, 8, 12, false);
+        containerType.addSampleTypes(sampleTypes);
+        containerType.persist();
+        containerType.reload();
+        ContainerTypeWrapper topContainerType = ContainerTypeHelper
+            .addContainerTypeRandom(senderSite, name + "top", true);
+        topContainerType.addChildContainerTypes(Arrays.asList(containerType));
+        topContainerType.persist();
+        topContainerType.reload();
+        ContainerWrapper topContainer = ContainerHelper.addContainer(null, name
+            + "top", null, senderSite, topContainerType);
+        ContainerWrapper container = ContainerHelper.addContainer(null, name,
+            topContainer, senderSite, containerType, 0, 0);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+        study.reload();
+        ClinicShipmentWrapper clinicShipment = ClinicShipmentHelper
+            .addShipment(senderSite, clinic, ShippingMethodWrapper
+                .getShippingMethods(appService).get(0), patient);
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            clinicShipment, Utils.getRandomDate(), Utils.getRandomDate());
+
+        List<AliquotWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
+            container, 0, sampleTypes);
+        List<AliquotWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
+            container, 1, sampleTypes);
+
+        shipment.addAliquots(aliquotSet1);
+        shipment.persist();
+        shipment.reload();
+
+        List<AliquotWrapper> shipmentAliquots = shipment.getAliquotCollection();
+        Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
+
+        // add more aliquots to row 2
+
+        shipment.addAliquots(aliquotSet2);
+        shipment.persist();
+        shipment.reload();
+
+        shipmentAliquots = shipment.getAliquotCollection();
+        Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
+            shipmentAliquots.size());
+
+        shipment.removeAliquots(aliquotSet1);
+        shipment.persist();
+        shipment.reload();
+
+        shipmentAliquots = shipment.getAliquotCollection();
+        Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
     }
 }
