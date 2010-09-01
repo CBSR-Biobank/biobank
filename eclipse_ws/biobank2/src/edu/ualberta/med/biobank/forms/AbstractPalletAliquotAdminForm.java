@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -43,6 +46,7 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
 
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {
@@ -74,6 +78,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private boolean scanTubeAloneMode = false;
 
     private Label scanTubeAloneSwitch;
+
+    protected ComboViewer profilesCombo;
+    private String selectedProfile;
 
     IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -166,6 +173,45 @@ public abstract class AbstractPalletAliquotAdminForm extends
             Messages.getString("linkAssign.scanValidValidationMsg")); //$NON-NLS-1$
     }
 
+    protected String getProfile() {
+        if (profilesCombo == null
+            || profilesCombo.getCombo().getItemCount() <= 0
+            || profilesCombo.getCombo().getSelectionIndex() < 0)
+            return "All";
+        else
+            return profilesCombo.getCombo().getItem(
+                profilesCombo.getCombo().getSelectionIndex());
+    }
+
+    protected void createProfileComboBox(Composite fieldsComposite) {
+
+        Label lbl = widgetCreator.createLabel(fieldsComposite, "Profile");
+        profilesCombo = widgetCreator
+            .createComboViewerWithNoSelectionValidator(fieldsComposite, lbl,
+                null, null, "Invalid profile selected", false, null); //$NON-NLS-1$
+
+        GridData gridData = new GridData();
+        gridData.grabExcessHorizontalSpace = true;
+        gridData.horizontalAlignment = SWT.FILL;
+        profilesCombo.getCombo().setLayoutData(gridData);
+        loadProfileCombo();
+    }
+
+    private void loadProfileCombo() {
+        profilesCombo.getCombo().removeAll();
+
+        ArrayList<String> profileList = new ArrayList<String>();
+        for (String element : ProfileManager.instance().getProfiles().keySet()) {
+            profileList.add(element);
+
+        }
+        Collections.sort(profileList); // Alphabetic sort
+        for (String element : profileList) {
+            profilesCombo.add(element);
+        }
+        profilesCombo.getCombo().select(0);
+    }
+
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite, BiobankText.class, SWT.NONE,
@@ -200,6 +246,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void internalScanAndProcessResult() {
         saveUINeededInformation();
+        selectedProfile = this.getProfile();
+
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
@@ -261,7 +309,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
             } else {
                 ScanCell[][] scanCells = null;
                 try {
-                    scanCells = ScannerConfigPlugin.scan(plateNum);
+                    scanCells = ScannerConfigPlugin.scan(plateNum,
+                        selectedProfile);
                     cells = PalletCell.convertArray(scanCells);
                 } catch (Exception ex) {
                     BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$

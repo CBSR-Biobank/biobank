@@ -163,7 +163,7 @@ public class DecodePlateForm extends PlateForm {
         monitor.subTask("Launching scan");
 
         ScanCell[][] decodedCells = null;
-        decodedCells = ScannerConfigPlugin.scan(plateToScan);
+        decodedCells = ScannerConfigPlugin.scan(plateToScan, "All");
         cells = PalletCell.convertArray(decodedCells);
     }
 

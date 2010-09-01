@@ -61,12 +61,12 @@ public class LinkFormPatientManagement {
     }
 
     protected void createPatientNumberText(Composite parent) {
-        patientLabel = widgetCreator.createLabel(parent, Messages
-            .getString("ScanLink.patientNumber.label"));
+        patientLabel = widgetCreator.createLabel(parent,
+            Messages.getString("ScanLink.patientNumber.label"));
         patientLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        patientValidator = new NonEmptyStringValidator(Messages
-            .getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
+        patientValidator = new NonEmptyStringValidator(
+            Messages.getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
         patientNumberText = (BiobankText) widgetCreator.createBoundWidget(
             parent, BiobankText.class, SWT.NONE, patientLabel, new String[0],
             new WritableValue("", String.class), patientValidator);
@@ -109,11 +109,11 @@ public class LinkFormPatientManagement {
     }
 
     protected void createVisitCombo(Composite compositeFields) {
-        visitComboLabel = widgetCreator.createLabel(compositeFields, Messages
-            .getString("ScanLink.visit.label"));
+        visitComboLabel = widgetCreator.createLabel(compositeFields,
+            Messages.getString("ScanLink.visit.label"));
         viewerVisits = widgetCreator.createComboViewerWithNoSelectionValidator(
-            compositeFields, visitComboLabel, null, null, Messages
-                .getString("ScanLink.visit.validationMsg"), false, null); //$NON-NLS-1$
+            compositeFields, visitComboLabel, null, null,
+            Messages.getString("ScanLink.visit.validationMsg"), false, null); //$NON-NLS-1$
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -146,8 +146,8 @@ public class LinkFormPatientManagement {
      * Specific to Cabinet move mode
      */
     protected void createVisitText(Composite compositeFields) {
-        visitTextLabel = widgetCreator.createLabel(compositeFields, Messages
-            .getString("ScanLink.visit.label"));
+        visitTextLabel = widgetCreator.createLabel(compositeFields,
+            Messages.getString("ScanLink.visit.label"));
         visitTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         visitText = (BiobankText) widgetCreator.createWidget(compositeFields,
@@ -179,8 +179,8 @@ public class LinkFormPatientManagement {
                     currentPatient.getPnumber());
             }
         } catch (ApplicationException e) {
-            BioBankPlugin.openError(Messages
-                .getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$
+            BioBankPlugin.openError(
+                Messages.getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$
         }
         setVisitsList();
     }

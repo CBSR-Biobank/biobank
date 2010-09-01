@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.widgets.grids;
 
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.preferences.profiles.TriIntC;
 
 /**
  * Widget to draw a pallet for scan link screen. Can do selections inside the
@@ -37,6 +40,22 @@ public class ScanLinkPalletWidget extends ScanPalletWidget {
             return true;
         }
         return false;
+    }
+
+    public void loadProfile(String profile) {
+        TriIntC profileData = ProfileManager.instance().getProfile(profile);
+
+        if (cells != null) {
+            int i = 0;
+            for (Cell cell : cells.values()) {
+                PalletCell pCell = (PalletCell) cell;
+                if (profileData.isSetBit(i))
+                    pCell.setStatus(AliquotCellStatus.MISSING);
+                i++;
+            }
+            // TODO make cells change color
+        }
+
     }
     //
     // @Override

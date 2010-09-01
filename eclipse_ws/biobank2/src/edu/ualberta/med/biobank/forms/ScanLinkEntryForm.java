@@ -17,6 +17,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -152,6 +153,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 scanTubeAlone(e);
             }
         });
+
         createScanTubeAloneButton(client);
     }
 
@@ -363,6 +365,23 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
 
         linkFormPatientManagement.createVisitCombo(fieldsComposite);
+
+        createProfileComboBox(fieldsComposite);
+        new Label(fieldsComposite, SWT.NONE);
+        /* expects 3 controls per line */
+        profilesCombo.getCombo().addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                spw.loadProfile(profilesCombo.getCombo().getText());
+
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+
+            }
+        });
 
         createPlateToScanField(fieldsComposite);
 
