@@ -17,23 +17,24 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.ShipmentViewNodeSearchVisitor;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
-public class ShipmentAdministrationView extends AbstractAdministrationView {
+public class ShipmentAdministrationView extends
+    AbstractTodaySearchAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.ShipmentAdminView";
 
@@ -171,7 +172,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
             ClinicShipmentAdapter shipmentAdapter = (ClinicShipmentAdapter) clinicAdapter
                 .accept(new ShipmentViewNodeSearchVisitor(shipment));
             if (shipmentAdapter == null) {
-                shipmentAdapter = new ClinicShipmentAdapter(clinicAdapter, shipment);
+                shipmentAdapter = new ClinicShipmentAdapter(clinicAdapter,
+                    shipment);
                 clinicAdapter.addChild(shipmentAdapter);
             }
             return shipmentAdapter;
@@ -195,8 +197,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
                 if (radioWaybill.getSelection()) {
                     shipment.setWaybill(text);
                 }
-                ClinicShipmentAdapter adapter = new ClinicShipmentAdapter(searchedNode,
-                    shipment);
+                ClinicShipmentAdapter adapter = new ClinicShipmentAdapter(
+                    searchedNode, shipment);
                 adapter.openEntryForm();
             }
         } else {
@@ -230,7 +232,8 @@ public class ShipmentAdministrationView extends AbstractAdministrationView {
 
     public static ClinicShipmentAdapter getCurrentShipment() {
         AdapterBase selectedNode = currentInstance.getSelectedNode();
-        if (selectedNode != null && selectedNode instanceof ClinicShipmentAdapter) {
+        if (selectedNode != null
+            && selectedNode instanceof ClinicShipmentAdapter) {
             return (ClinicShipmentAdapter) selectedNode;
         }
         return null;

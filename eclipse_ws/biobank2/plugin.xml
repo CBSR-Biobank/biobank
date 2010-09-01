@@ -1802,6 +1802,17 @@
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.dispatchShipments">
          <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
                minimized="false"
@@ -1812,6 +1823,18 @@
                showTitle="false"
                standalone="false"
                visible="true">
+         </view>
+         <view
+               closeable="true"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               ratio="0.85"
+               relationship="bottom"
+               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
+               showTitle="true"
+               standalone="false"
+               visible="false">
          </view>
       </perspectiveExtension>
       </extension>
@@ -2186,6 +2209,13 @@
       icon="icons/reportsPerspective.png"
       id="edu.ualberta.med.biobank.editors.InvoicingReportEditor"
       name="Invoicing Report">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      default="false"
+      icon="icons/shipment.png"
+      id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      name="Dispatch Shipment View">
 </editor>
    </extension>
    <extension

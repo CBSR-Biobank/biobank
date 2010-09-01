@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicGroup;
+import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
@@ -33,8 +34,9 @@ import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -53,8 +55,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMAGE_ID = "biobank2.image";
 
     public static final String IMG_ADD = "add";
-    public static final String IMG_ARROW_UP = "arrow_up";
-    public static final String IMG_ARROW_DOWN = "arrow_down";
     public static final String IMG_ARROW_LEFT = "arrow_left";
     public static final String IMG_ARROW_LEFT2 = "arrow_left2";
     public static final String IMG_ARROW_RIGHT = "arrow_right";
@@ -108,6 +108,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_BULLET = "bullet";
     public static final String IMG_SCAN_EDIT = "scanEdit";
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
+    public static final String IMG_RECEIVED = "received";
+    public static final String IMG_SENT = "sent";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -148,6 +150,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_TODAY);
         classToImageKey.put(DateNode.class.getName(),
             BioBankPlugin.IMG_CALENDAR);
+        classToImageKey.put(SentDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_SENT);
+        classToImageKey.put(ReceivedDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_RECEIVED);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
@@ -188,8 +194,6 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
         registerImage(registry, IMG_ADD, "add.png");
-        registerImage(registry, IMG_ARROW_UP, "arrow_up.png");
-        registerImage(registry, IMG_ARROW_DOWN, "arrow_down.png");
         registerImage(registry, IMG_ARROW_LEFT, "arrow_left.png");
         registerImage(registry, IMG_ARROW_LEFT2, "arrow_left2.png");
         registerImage(registry, IMG_ARROW_RIGHT, "arrow_right.png");
@@ -243,6 +247,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_EMAIL_BANNER, "email_banner.png");
         registerImage(registry, IMG_SEARCH, "search.png");
         registerImage(registry, IMG_TODAY, "today.png");
+        registerImage(registry, IMG_RECEIVED, "received.png");
+        registerImage(registry, IMG_SENT, "sent.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
