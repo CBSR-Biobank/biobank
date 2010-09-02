@@ -847,6 +847,30 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
+    public void testGetDispatchStudies() throws Exception {
+        String name = "testGetDispatchStudies" + r.nextInt();
+        SiteWrapper srcSite = SiteHelper.addSite(name);
+        List<SiteWrapper> destSites = SiteHelper.addSites(name + "_dest_",
+            r.nextInt(5) + 1);
+        List<StudyWrapper> studies = StudyHelper.addStudies(name,
+            r.nextInt(5) + 1);
+
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+        }
+        srcSite.persist();
+        srcSite.reload();
+
+        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudies();
+        Assert.assertNotNull(siteDispatchStudies);
+        Assert.assertEquals(studies.size(), siteDispatchStudies.size());
+        Assert.assertTrue(siteDispatchStudies.containsAll(studies));
+
+        // FIXME need test for removal of studies
+        Assert.fail("need test for removal of studies");
+    }
+
+    @Test
     public void testAddDispatchSites() throws Exception {
         String name = "testAddDispatchSites" + r.nextInt();
         SiteWrapper srcSite = SiteHelper.addSite(name);
@@ -859,14 +883,8 @@ public class TestSite extends TestDatabase {
 
         // add dest site set 1
         srcSite.addStudyDispatchSites(study, destSitesSet1);
-
-        // test before persist.
         List<SiteWrapper> srcSiteDispatchSites = srcSite
             .getStudyDispachSites(study);
-        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
-        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
-
-        // do persit
         srcSite.persist();
         srcSite.reload();
         srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
@@ -885,6 +903,8 @@ public class TestSite extends TestDatabase {
         Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
 
         // remove set 1
+        // FIXME need test for removal of dest sites
+        Assert.fail("need test for removal of dest sites");
     }
 
 }
