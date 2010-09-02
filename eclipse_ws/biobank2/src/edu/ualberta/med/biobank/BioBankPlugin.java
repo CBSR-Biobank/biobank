@@ -500,6 +500,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
     }
 
+    public static ImageDescriptor getImageDescriptor(String key) {
+        return BioBankPlugin.getDefault().getImageRegistry().getDescriptor(key);
+    }
+
     public Image getIconForTypeName(String typeName) {
         if (typeName == null) {
             return null;

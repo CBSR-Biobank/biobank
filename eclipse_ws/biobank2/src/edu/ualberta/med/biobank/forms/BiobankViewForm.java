@@ -5,7 +5,6 @@ import java.util.Map;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -35,14 +34,6 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         .getLogger(BiobankViewForm.class.getName());
 
     protected String sessionName;
-
-    private static ImageDescriptor reloadActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RELOAD_FORM));
-
-    private static ImageDescriptor editActionImage = ImageDescriptor
-        .createFromImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_EDIT_FORM));
 
     private AdapterChangedListener adapterChangedListener;
 
@@ -109,6 +100,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     protected void addToolbarButtons() {
         addReloadAction();
         addEditAction();
+        form.updateToolBar();
     }
 
     public void edit() {
@@ -121,8 +113,8 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(), "Edit",
                 "edu.ualberta.med.biobank.commands.edit", null,
-                editActionImage, null, null, "Edit", "Edit", "Edit", SWT.NONE,
-                "Edit", true));
+                BioBankPlugin.getImageDescriptor(BioBankPlugin.IMG_EDIT_FORM),
+                null, null, "Edit", "Edit", "Edit", SWT.NONE, "Edit", true));
         form.getToolBarManager().add(edit);
     }
 
@@ -130,9 +122,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         CommandContributionItem reload = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(), "Reload",
-                "edu.ualberta.med.biobank.commands.reload", null,
-                reloadActionImage, null, null, "Reload", "Reload", "Reload",
-                SWT.NONE, "Reload", true));
+                "edu.ualberta.med.biobank.commands.reload", null, BioBankPlugin
+                    .getImageDescriptor(BioBankPlugin.IMG_RELOAD_FORM), null,
+                null, "Reload", "Reload", "Reload", SWT.NONE, "Reload", true));
         form.getToolBarManager().add(reload);
     }
 
