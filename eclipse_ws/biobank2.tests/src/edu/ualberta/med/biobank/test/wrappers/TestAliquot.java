@@ -154,14 +154,16 @@ public class TestAliquot extends TestDatabase {
     public void testPersistPositionAlreadyUsed() throws BiobankCheckException,
         Exception {
         aliquot.persist();
+        RowColPos pos = aliquot.getPosition();
 
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), 3, 3);
+            aliquot.getPatientVisit(), pos.row, pos.col);
 
         try {
             duplicate.persist();
-            Assert.fail("Position in used !");
+            Assert
+                .fail("should not be allowed to add an aliquot in a position that is not empty");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
@@ -549,14 +551,15 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testCheckPosition() throws BiobankCheckException, Exception {
         aliquot.persist();
+        ContainerWrapper container = aliquot.getParent();
 
-        AliquotWrapper sample2 = new AliquotWrapper(appService);
-        sample2.setPosition(new RowColPos(3, 3));
+        AliquotWrapper aliquot2 = new AliquotWrapper(appService);
+        aliquot2.setPosition(aliquot.getPosition());
 
-        Assert.assertFalse(sample2.isPositionFree(aliquot.getParent()));
+        Assert.assertFalse(aliquot2.isPositionFree(container));
 
-        sample2.setPosition(new RowColPos(2, 3));
-        Assert.assertTrue(sample2.isPositionFree(aliquot.getParent()));
+        aliquot2.setPosition(new RowColPos(2, 3));
+        Assert.assertTrue(aliquot2.isPositionFree(container));
     }
 
     @Test
@@ -594,9 +597,8 @@ public class TestAliquot extends TestDatabase {
             site, destSite, study, method);
 
         // add an aliquot that has not been persisted
-        dShipment.addAliquots(Arrays.asList(aliquot));
         try {
-            dShipment.persist();
+            dShipment.addAliquots(Arrays.asList(aliquot));
             Assert.fail("Should not be allowed to add aliquots not yet in DB");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
