@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicGroup;
+import edu.ualberta.med.biobank.treeview.ClinicMasterGroup;
 import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
@@ -40,9 +40,11 @@ import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.SiteClinicGroup;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
+import edu.ualberta.med.biobank.treeview.SiteStudyGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.treeview.StudyGroup;
+import edu.ualberta.med.biobank.treeview.StudyMasterGroup;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -122,9 +124,13 @@ public class BioBankPlugin extends AbstractUIPlugin {
         classToImageKey
             .put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
         classToImageKey.put(SiteGroup.class.getName(), BioBankPlugin.IMG_SITES);
-        classToImageKey.put(ClinicGroup.class.getName(),
+        classToImageKey.put(ClinicMasterGroup.class.getName(),
             BioBankPlugin.IMG_CLINICS);
-        classToImageKey.put(StudyGroup.class.getName(),
+        classToImageKey.put(SiteClinicGroup.class.getName(),
+            BioBankPlugin.IMG_CLINICS);
+        classToImageKey.put(StudyMasterGroup.class.getName(),
+            BioBankPlugin.IMG_STUDIES);
+        classToImageKey.put(SiteStudyGroup.class.getName(),
             BioBankPlugin.IMG_STUDIES);
         classToImageKey.put(ContainerTypeGroup.class.getName(),
             BioBankPlugin.IMG_CONTAINER_TYPES);

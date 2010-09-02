@@ -109,13 +109,16 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     }
 
     protected void addEditAction() {
-        CommandContributionItem edit = new CommandContributionItem(
-            new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Edit",
-                "edu.ualberta.med.biobank.commands.edit", null,
-                BioBankPlugin.getImageDescriptor(BioBankPlugin.IMG_EDIT_FORM),
-                null, null, "Edit", "Edit", "Edit", SWT.NONE, "Edit", true));
-        form.getToolBarManager().add(edit);
+        if (adapter.isEditable()) {
+            CommandContributionItem edit = new CommandContributionItem(
+                new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow(), "Edit",
+                    "edu.ualberta.med.biobank.commands.edit", null,
+                    BioBankPlugin
+                        .getImageDescriptor(BioBankPlugin.IMG_EDIT_FORM), null,
+                    null, "Edit", "Edit", "Edit", SWT.NONE, "Edit", true));
+            form.getToolBarManager().add(edit);
+        }
     }
 
     protected void addReloadAction() {
