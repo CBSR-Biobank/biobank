@@ -58,8 +58,7 @@ public class SampleStorageDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
+    protected String getDialogShellTitle() {
         String title = new String();
 
         if (origSampleStorage.getSampleType() == null) {
@@ -68,7 +67,7 @@ public class SampleStorageDialog extends BiobankDialog {
             title = "Edit ";
         }
         title += TITLE;
-        shell.setText(title);
+        return title;
     }
 
     @Override

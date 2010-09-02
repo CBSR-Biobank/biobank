@@ -23,10 +23,8 @@ public class SaveReportDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        String title = "Save";
-        shell.setText(title);
+    protected String getDialogShellTitle() {
+        return "Save";
     }
 
     @Override

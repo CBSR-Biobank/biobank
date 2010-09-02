@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class NewServerDialog extends BiobankDialog {
 
+    private static final String TITLE = "New Server";
     protected BiobankText textBox;
     protected IObservableValue text = new WritableValue("", String.class);
 
@@ -22,7 +23,7 @@ public class NewServerDialog extends BiobankDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        setTitle("New Server");
+        setTitle(TITLE);
         setMessage("Enter the domain-name or IP address of the server:");
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
@@ -38,6 +39,11 @@ public class NewServerDialog extends BiobankDialog {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         textBox.setLayoutData(gd);
+    }
+
+    @Override
+    protected String getDialogShellTitle() {
+        return TITLE;
     }
 
     @Override

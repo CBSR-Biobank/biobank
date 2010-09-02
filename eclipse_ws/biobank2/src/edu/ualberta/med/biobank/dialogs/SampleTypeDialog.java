@@ -42,10 +42,8 @@ public class SampleTypeDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText(((origSampleType.getName() == null) ? "Add " : "Edit ")
-            + TITLE);
+    protected String getDialogShellTitle() {
+        return ((origSampleType.getName() == null) ? "Add " : "Edit ") + TITLE;
     }
 
     @Override
@@ -71,8 +69,9 @@ public class SampleTypeDialog extends BiobankDialog {
             new NonEmptyStringValidator(MSG_NO_ST_NAME));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Short Name", null, PojoObservables.observeValue(sampleType,
-                "nameShort"), new NonEmptyStringValidator(MSG_NO_ST_SNAME));
+            "Short Name", null,
+            PojoObservables.observeValue(sampleType, "nameShort"),
+            new NonEmptyStringValidator(MSG_NO_ST_SNAME));
     }
 
     @Override

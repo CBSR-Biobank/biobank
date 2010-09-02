@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 
 /**
  * Allows the user to choose the clinic from which the shipment comes from
@@ -37,9 +37,8 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText("Shipment Select");
+    protected String getDialogShellTitle() {
+        return "Shipment Select";
     }
 
     @Override
@@ -67,7 +66,8 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ClinicWrapper clinic = ((ClinicShipmentWrapper) element).getClinic();
+                ClinicWrapper clinic = ((ClinicShipmentWrapper) element)
+                    .getClinic();
                 return clinic.getName();
             }
         });

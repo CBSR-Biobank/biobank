@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SiteDispatchAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -47,6 +48,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private ComboViewer activityStatusComboViewer;
 
     private StudyAddInfoTable studiesTable;
+
+    private SiteDispatchAddInfoTable dispatchTable;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -86,6 +89,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         createSiteSection();
         createAddressArea(site);
         createStudySection();
+        createDispatchSection();
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
@@ -105,6 +109,22 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         studiesTable.addDoubleClickListener(collectionDoubleClickListener);
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
+    }
+
+    private void createDispatchSection() throws ApplicationException {
+        Section section = createSection("Dispatch");
+        addSectionToolbar(section, "Add Dispatch Relation",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    dispatchTable.createDispatchDialog();
+                }
+            }, ContactWrapper.class);
+        dispatchTable = new SiteDispatchAddInfoTable(section, site);
+        dispatchTable.adaptToToolkit(toolkit, true);
+        dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
+        dispatchTable.addSelectionChangedListener(listener);
+        section.setClient(dispatchTable);
     }
 
     private void createSiteSection() throws ApplicationException {

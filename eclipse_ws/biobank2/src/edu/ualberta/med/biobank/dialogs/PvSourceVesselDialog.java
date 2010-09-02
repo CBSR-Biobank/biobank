@@ -93,8 +93,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
+    protected String getDialogShellTitle() {
         String title = new String();
         if (addMode) {
             title = "Add ";
@@ -102,7 +101,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
             title = "Edit ";
         }
         title += TITLE;
-        shell.setText(title);
+        return title;
     }
 
     @Override

@@ -41,6 +41,14 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     }
 
     @Override
+    protected void configureShell(Shell shell) {
+        super.configureShell(shell);
+        shell.setText(getDialogShellTitle());
+    }
+
+    protected abstract String getDialogShellTitle();
+
+    @Override
     protected Control createButtonBar(Composite parent) {
         Control contents = super.createButtonBar(parent);
         if (okButtonEnabled != null) {

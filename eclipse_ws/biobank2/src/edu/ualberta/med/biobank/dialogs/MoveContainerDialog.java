@@ -33,10 +33,8 @@ public class MoveContainerDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        String title = "Move Container";
-        shell.setText(title);
+    protected String getDialogShellTitle() {
+        return "Move Container";
     }
 
     @Override

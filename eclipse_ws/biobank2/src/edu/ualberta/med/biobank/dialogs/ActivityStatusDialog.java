@@ -28,10 +28,8 @@ public class ActivityStatusDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText((activityStatus.getName() == null ? "Add " : "Edit ")
-            + TITLE);
+    protected String getDialogShellTitle() {
+        return (activityStatus.getName() == null ? "Add " : "Edit ") + TITLE;
     }
 
     @Override

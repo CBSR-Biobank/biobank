@@ -35,17 +35,15 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        String title = "Select Parent Container";
-        shell.setText(title);
+    protected String getDialogShellTitle() {
+        return "Select Parent Container";
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY));
         setTitle("Multiple Parents are Possible");
         setMessage("Select the appropriate parent container");
         return contents;

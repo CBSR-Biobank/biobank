@@ -40,10 +40,8 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        String title = "Move aliquots from one container to another";
-        shell.setText(title);
+    protected String getDialogShellTitle() {
+        return "Move aliquots from one container to another";
     }
 
     @Override

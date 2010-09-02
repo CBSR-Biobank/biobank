@@ -51,8 +51,7 @@ public class StudySourceVesselDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
+    protected String getDialogShellTitle() {
         String title = new String();
 
         if (origStudySourceVessel.getSourceVessel() == null) {
@@ -60,15 +59,14 @@ public class StudySourceVesselDialog extends BiobankDialog {
         } else {
             title = "Edit ";
         }
-        title += TITLE;
-        shell.setText(title);
+        return title + TITLE;
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY));
         if (origStudySourceVessel.getSourceVessel() == null) {
             setTitle("Add Study Source Vessel");
             setMessage("Add source vessel to this study");
@@ -103,12 +101,14 @@ public class StudySourceVesselDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Time Drawn", new String[0], PojoObservables.observeValue(
-                studySourceVessel, "needTimeDrawn"), null);
+            "Need Time Drawn", new String[0],
+            PojoObservables.observeValue(studySourceVessel, "needTimeDrawn"),
+            null);
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Original Volume", new String[0], PojoObservables
-                .observeValue(studySourceVessel, "needOriginalVolume"), null);
+            "Need Original Volume", new String[0],
+            PojoObservables.observeValue(studySourceVessel,
+                "needOriginalVolume"), null);
     }
 
     @Override

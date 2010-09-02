@@ -37,15 +37,14 @@ public class SourceVesselDialog extends BiobankDialog {
         this.sourceVessel = new SourceVesselWrapper(null);
         this.sourceVessel.setName(sourceVessel.getName());
         this.message = message;
-        oldSourceVessel = new SourceVesselWrapper(SessionManager
-            .getAppService());
+        oldSourceVessel = new SourceVesselWrapper(
+            SessionManager.getAppService());
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText(((origSourceVessel.getName() == null) ? "Add " : "Edit ")
-            + TITLE);
+    protected String getDialogShellTitle() {
+        return ((origSourceVessel.getName() == null) ? "Add " : "Edit ")
+            + TITLE;
     }
 
     @Override

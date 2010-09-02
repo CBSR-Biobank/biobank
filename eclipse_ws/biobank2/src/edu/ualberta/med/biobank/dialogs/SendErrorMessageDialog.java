@@ -51,6 +51,8 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class SendErrorMessageDialog extends BiobankDialog {
 
+    private static final String SEND_ERROR_TITLE = "Send Error EMail";
+
     private EMailDescriptor email;
 
     private List<AttachmentComposite> attachments;
@@ -66,9 +68,9 @@ public class SendErrorMessageDialog extends BiobankDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle("Send Error EMail");
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_EMAIL_BANNER));
+        setTitle(SEND_ERROR_TITLE);
+        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_EMAIL_BANNER));
         setMessage(
             "Please describe steps to reproduce the problem. A log file of the application will be attached to the email.",
             IMessageProvider.INFORMATION);
@@ -82,9 +84,9 @@ public class SendErrorMessageDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
-            "Title", new String[0], PojoObservables
-                .observeValue(email, "title"), new NonEmptyStringValidator(
-                "Please enter a title"));
+            "Title", new String[0],
+            PojoObservables.observeValue(email, "title"),
+            new NonEmptyStringValidator("Please enter a title"));
 
         BiobankText descText = (BiobankText) createBoundWidgetWithLabel(
             contents, BiobankText.class, SWT.MULTI, "Description",
@@ -109,8 +111,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         attachmentsComposite.setLayoutData(gd);
 
         Button addButton = new Button(contents, SWT.PUSH);
-        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_ADD));
+        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_ADD));
         addButton.setToolTipText("Add attachment");
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -124,6 +126,11 @@ public class SendErrorMessageDialog extends BiobankDialog {
                 attachments.add(attachmentComposite);
             }
         });
+    }
+
+    @Override
+    protected String getDialogShellTitle() {
+        return SEND_ERROR_TITLE;
     }
 
     // private int createAttachmentChooser(Composite parent,
@@ -214,8 +221,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     props.setProperty("mail.host", email.getSmtpServer());
                     props.put("mail.smtp.auth", "true");
                     props.put("mail.smtp.port", email.getServerPort());
-                    props.put("mail.smtp.socketFactory.port", email
-                        .getServerPort());
+                    props.put("mail.smtp.socketFactory.port",
+                        email.getServerPort());
                     props.put("mail.smtp.socketFactory.class",
                         "javax.net.ssl.SSLSocketFactory");
                     props.put("mail.smtp.socketFactory.fallback", "false");
@@ -269,7 +276,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     Transport.send(message);
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
-                    BioBankPlugin.openAsyncError("Authentification Error",
+                    BioBankPlugin.openAsyncError(
+                        "Authentification Error",
                         "Wrong authentification for "
                             + email.getServerUsername());
                     monitor.setCanceled(true);

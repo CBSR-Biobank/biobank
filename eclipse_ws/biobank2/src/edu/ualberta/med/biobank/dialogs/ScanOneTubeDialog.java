@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ScanOneTubeDialog extends BiobankDialog {
 
+    private static final String PALLET_TUBE_SCAN = "Pallet tube scan";
     private String scannedValue;
     private BiobankText valueText;
     private RowColPos position;
@@ -30,7 +31,7 @@ public class ScanOneTubeDialog extends BiobankDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        setTitle("Pallet tube scan");
+        setTitle(PALLET_TUBE_SCAN);
         setMessage("Scan the missing tube for position "
             + LabelingScheme.rowColToSbs(position));
         Composite area = new Composite(parent, SWT.NONE);
@@ -41,6 +42,11 @@ public class ScanOneTubeDialog extends BiobankDialog {
 
         widgetCreator.createLabel(area, "Barcode");
         valueText = widgetCreator.createText(area, SWT.NONE, null, null);
+    }
+
+    @Override
+    protected String getDialogShellTitle() {
+        return PALLET_TUBE_SCAN;
     }
 
     @Override

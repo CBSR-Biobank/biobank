@@ -28,6 +28,11 @@ public class AliquotStatusDialog extends BiobankDialog {
     }
 
     @Override
+    protected String getDialogShellTitle() {
+        return "Activity Status";
+    }
+
+    @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         setTitle("Aliquot Activity Status");
         setMessage("Select an activity status:");

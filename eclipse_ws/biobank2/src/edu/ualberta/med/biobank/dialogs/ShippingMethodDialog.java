@@ -37,16 +37,14 @@ public class ShippingMethodDialog extends BiobankDialog {
         this.shippingMethod = new ShippingMethodWrapper(null);
         this.shippingMethod.setName(shippingMethod.getName());
         this.message = message;
-        oldShippingMethod = new ShippingMethodWrapper(SessionManager
-            .getAppService());
+        oldShippingMethod = new ShippingMethodWrapper(
+            SessionManager.getAppService());
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText(((origShippingMethod.getName() == null) ? "Add "
-            : "Edit ")
-            + TITLE);
+    protected String getDialogShellTitle() {
+        return ((origShippingMethod.getName() == null) ? "Add " : "Edit ")
+            + TITLE;
     }
 
     @Override
