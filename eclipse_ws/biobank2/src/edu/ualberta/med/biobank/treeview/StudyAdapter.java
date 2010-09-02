@@ -17,6 +17,7 @@ public class StudyAdapter extends AdapterBase {
 
     public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper) {
         super(parent, studyWrapper);
+        setEditable(parent instanceof StudyMasterGroup || parent == null);
     }
 
     public StudyWrapper getWrapper() {

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -732,6 +733,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
             }
         }
         return infos;
+    }
+
+    public Set<ClinicWrapper> getStudyClinics() {
+        List<StudyWrapper> studies = getStudyCollection();
+        Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
+        for (StudyWrapper study : studies) {
+            clinics.addAll(study.getClinicCollection());
+        }
+        return clinics;
     }
 
 }

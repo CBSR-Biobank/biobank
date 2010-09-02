@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,22 +13,11 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
-public class ClinicGroup extends AdapterBase {
+public class ClinicMasterGroup extends AbstractClinicGroup {
 
-    public ClinicGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, "Clinics", true, true);
-    }
-
-    @Override
-    public void executeDoubleClick() {
-        performExpand();
-    }
-
-    @Override
-    protected String getLabelInternal() {
-        return null;
+    public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
+        super(sessionAdapter, id, "Clinics Master");
     }
 
     @Override
@@ -47,40 +35,9 @@ public class ClinicGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
-        return null;
-    }
-
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
-    protected AdapterBase createChildNode() {
-        return new ClinicAdapter(this, null);
-    }
-
-    @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof ClinicWrapper);
-        return new ClinicAdapter(this, (ClinicWrapper) child);
-    }
-
-    @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return ClinicWrapper.getAllClinics(SessionManager.getAppService());
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
-    }
-
-    @Override
-    public void notifyListeners(AdapterChangedEvent event) {
-        getParent().notifyListeners(event);
     }
 
     public static void addClinic(SessionAdapter sessAdapter,
@@ -89,16 +46,6 @@ public class ClinicGroup extends AdapterBase {
         ClinicAdapter adapter = new ClinicAdapter(
             sessAdapter.getClinicGroupNode(), clinic);
         adapter.openEntryForm(hasPreviousForm);
-    }
-
-    @Override
-    public String getEntryFormId() {
-        return null;
-    }
-
-    @Override
-    public String getViewFormId() {
-        return null;
     }
 
 }
