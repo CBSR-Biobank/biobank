@@ -43,29 +43,19 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             @Override
             protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
                 boolean initIfNoPosition) {
-                if (nullPositionSet) {
-                    if (rowColPosition != null) {
-                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                            appService);
-                        posWrapper.setRow(rowColPosition.row);
-                        posWrapper.setCol(rowColPosition.col);
-                        posWrapper.setAliquot(AliquotWrapper.this);
-                        wrappedObject.setAliquotPosition(posWrapper
-                            .getWrappedObject());
-                        return posWrapper;
-                    }
-                } else {
-                    AliquotPosition pos = wrappedObject.getAliquotPosition();
-                    if (pos != null) {
-                        return new AliquotPositionWrapper(appService, pos);
-                    } else if (initIfNoPosition) {
-                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                            appService);
-                        posWrapper.setAliquot(AliquotWrapper.this);
-                        wrappedObject.setAliquotPosition(posWrapper
-                            .getWrappedObject());
-                        return posWrapper;
-                    }
+                if (nullPositionSet)
+                    return null;
+
+                AliquotPosition pos = wrappedObject.getAliquotPosition();
+                if (pos != null) {
+                    return new AliquotPositionWrapper(appService, pos);
+                } else if (initIfNoPosition) {
+                    AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                        appService);
+                    posWrapper.setAliquot(AliquotWrapper.this);
+                    wrappedObject.setAliquotPosition(posWrapper
+                        .getWrappedObject());
+                    return posWrapper;
                 }
                 return null;
             }
@@ -346,6 +336,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setPosition(RowColPos rcp) {
+        if (rcp == null) {
+            setParent(null);
+        }
         objectWithPositionManagement.setPosition(rcp);
     }
 
@@ -439,7 +432,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " where patientVisit.patient.study.site.id = ? and activityStatus != ?",
+                + " a where a.patientVisit.shipment.site.id = ? and activityStatus != ?",
             Arrays.asList(new Object[] { site.getId(),
                 activeStatus.getWrappedObject() }));
         List<Aliquot> aliquots = appService.query(criteria);
@@ -518,7 +511,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select ship from "
             + DispatchShipment.class.getName()
-            + " where ship.aliquotCollection.id = ?",
+            + " ship where ship.aliquotCollection.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<DispatchShipment> ships = appService.query(criteria);
         List<DispatchShipmentWrapper> shipWrappers = new ArrayList<DispatchShipmentWrapper>();

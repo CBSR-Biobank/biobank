@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -36,6 +38,7 @@ import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
@@ -46,7 +49,7 @@ public class TestAliquot extends TestDatabase {
 
     private AliquotWrapper aliquot;
 
-    private Integer siteId;
+    private SiteWrapper site;
 
     private ContainerWrapper topContainer;
 
@@ -55,14 +58,13 @@ public class TestAliquot extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
 
-        SiteWrapper site = SiteHelper.addSite("sitename" + r.nextInt());
-        siteId = site.getId();
-        SampleTypeWrapper sampleTypeWrapper = SampleTypeHelper
+        site = SiteHelper.addSite("sitename" + r.nextInt());
+        SampleTypeWrapper sampleType = SampleTypeHelper
             .addSampleType("sampletype" + r.nextInt());
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
-        typeChild.addSampleTypes(Arrays.asList(sampleTypeWrapper));
+        typeChild.addSampleTypes(Arrays.asList(sampleType));
         typeChild.persist();
 
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
@@ -91,8 +93,7 @@ public class TestAliquot extends TestDatabase {
             patient);
         PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
-        aliquot = AliquotHelper.newAliquot(sampleTypeWrapper, container, pv, 3,
-            3);
+        aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 0);
         container.reload();
     }
 
@@ -294,7 +295,7 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testGetSite() {
-        Assert.assertEquals(siteId, aliquot.getSite().getId());
+        Assert.assertEquals(site.getId(), aliquot.getSite().getId());
 
         AliquotWrapper sample1 = new AliquotWrapper(appService);
         Assert.assertNull(sample1.getSite());
@@ -310,7 +311,6 @@ public class TestAliquot extends TestDatabase {
         Assert.assertTrue(aliquot.getPositionString().equals(
             parentLabel + "A1 ("
                 + topContainer.getContainerType().getNameShort() + ")"));
-
     }
 
     @Test
@@ -334,12 +334,13 @@ public class TestAliquot extends TestDatabase {
         aliquot.setPosition(null);
         aliquot.persist();
         aliquot.reload();
-        newPosition = aliquot.getPosition();
-        Assert.assertEquals(null, newPosition);
+        Assert.assertEquals(null, aliquot.getPosition());
+        Assert.assertEquals(null, aliquot.getParent());
     }
 
     @Test
     public void testGetSetParent() throws Exception {
+        Assert.assertTrue(aliquot.hasParent());
         ContainerWrapper oldParent = aliquot.getParent();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(
             aliquot.getSite(), "newCtType", "ctNew", 1, 4, 5, true);
@@ -364,6 +365,10 @@ public class TestAliquot extends TestDatabase {
                 found = true;
         }
         Assert.assertTrue(found);
+
+        // test for no parent
+        AliquotWrapper aliquot2 = new AliquotWrapper(appService);
+        Assert.assertFalse(aliquot2.hasParent());
     }
 
     @Test
@@ -442,67 +447,81 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testGetAliquotsInSite() throws Exception {
-        String name = "testGetAliquotsInSite" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        PatientWrapper patient = PatientHelper.addPatient(
-            Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, site, name);
-
-        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            study.getClinicCollection().get(0), ShippingMethodWrapper
-                .getShippingMethods(appService).get(0), patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
-
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            name, name, 1, 4, 5, true);
-        type.addSampleTypes(Arrays.asList(sampleType));
-        type.persist();
-        ContainerWrapper container = ContainerHelper.addContainer(name, name,
-            null, site, type);
-        AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
-            container, pv, 2, 3);
+        ContainerWrapper container = aliquot.getParent();
+        ContainerTypeWrapper containerType = container.getContainerType();
+        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
+            .get(0);
+        Assert.assertNotNull(sampleType);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
 
-        List<AliquotWrapper> samples = AliquotWrapper.getAliquotsInSite(
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
             appService, aliquot.getInventoryId(), site);
-        Assert.assertEquals(1, samples.size());
-        Assert.assertEquals(samples.get(0), aliquot);
+        Assert.assertEquals(1, aliquots.size());
+        Assert.assertEquals(aliquots.get(0), aliquot);
+    }
+
+    @Test
+    public void testGetAliquotsNonActive() throws Exception {
+        ContainerWrapper container = aliquot.getParent();
+        ContainerTypeWrapper containerType = container.getContainerType();
+        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
+            .get(0);
+        Assert.assertNotNull(sampleType);
+
+        ActivityStatusWrapper activityStatusActive = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
+        ActivityStatusWrapper activityStatusNonActive = null;
+        for (ActivityStatusWrapper a : ActivityStatusWrapper
+            .getAllActivityStatuses(appService)) {
+            if (!a.equals(activityStatusActive)) {
+                activityStatusNonActive = a;
+                break;
+            }
+        }
+
+        List<AliquotWrapper> activeAliquots = new ArrayList<AliquotWrapper>();
+        List<AliquotWrapper> nonActiveAliquots = new ArrayList<AliquotWrapper>();
+
+        activeAliquots.add(aliquot);
+        for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
+            activeAliquots.add(AliquotHelper.addAliquot(sampleType, container,
+                pv, 0, i));
+
+            AliquotWrapper a = AliquotHelper.newAliquot(sampleType, container,
+                pv, 1, i);
+            a.setActivityStatus(activityStatusNonActive);
+            a.persist();
+            a.reload();
+            nonActiveAliquots.add(a);
+        }
+
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsNonActive(
+            appService, site);
+        Assert.assertEquals(nonActiveAliquots.size(), aliquots.size());
+        Assert.assertTrue(aliquots.containsAll(nonActiveAliquots));
+        Assert.assertFalse(aliquots.containsAll(activeAliquots));
     }
 
     @Test
     public void testGetAliquotsInSiteWithPositionLabel() throws Exception {
-        String name = "testGetAliquotsInSiteWithPositionLabel" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        PatientWrapper patient = PatientHelper.addPatient(
-            Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, site, name);
-
-        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            study.getClinicCollection().get(0), ShippingMethodWrapper
-                .getShippingMethods(appService).get(0), patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
-
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            name, name, 1, 4, 5, true);
-        type.addSampleTypes(Arrays.asList(sampleType));
-        type.persist();
-        ContainerWrapper container = ContainerHelper.addContainer(name, name,
-            null, site, type);
-        AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
-            container, pv, 2, 3);
+        ContainerWrapper container = aliquot.getParent();
+        ContainerTypeWrapper containerType = container.getContainerType();
+        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
+            .get(0);
+        Assert.assertNotNull(sampleType);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
-        AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
+
+        AliquotHelper.addAliquot(sampleType, container, pv, 0, 1);
+        AliquotHelper.addAliquot(sampleType, container, pv, 1, 0);
+        aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 2);
+        aliquot.setInventoryId(Utils.getRandomString(5));
+        aliquot.persist();
 
         List<AliquotWrapper> aliquots = AliquotWrapper
             .getAliquotsInSiteWithPositionLabel(appService, site,
@@ -542,26 +561,13 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testDebugRandomMethods() throws Exception {
-        String name = "testDebugRandomMethods" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        SampleTypeWrapper sampleType = SampleTypeHelper.addSampleType(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        PatientWrapper patient = PatientHelper.addPatient(
-            Utils.getRandomNumericString(5), study);
-        ContactHelper.addContactsToStudy(study, site, name);
+        ContainerWrapper container = aliquot.getParent();
+        ContainerTypeWrapper containerType = container.getContainerType();
+        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
+            .get(0);
+        Assert.assertNotNull(sampleType);
 
-        ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
-            study.getClinicCollection().get(0), ShippingMethodWrapper
-                .getShippingMethods(appService).get(0), patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
-
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            name, name, 1, 4, 5, true);
-        type.addSampleTypes(Arrays.asList(sampleType));
-        type.persist();
-        ContainerWrapper container = ContainerHelper.addContainer(name, name,
-            null, site, type);
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
         AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
             container, pv, 2, 3);
@@ -569,8 +575,58 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, null, pv, null, null);
 
-        DebugUtil.getRandomAliquotsAlreadyLinked(appService, siteId);
-        DebugUtil.getRandomAliquotsAlreadyAssigned(appService, siteId);
-        DebugUtil.getRandomAliquotsNotAssigned(appService, siteId);
+        DebugUtil.getRandomAliquotsAlreadyLinked(appService, site.getId());
+        DebugUtil.getRandomAliquotsAlreadyAssigned(appService, site.getId());
+        DebugUtil.getRandomAliquotsNotAssigned(appService, site.getId());
+    }
+
+    @Test
+    public void testGetDispatchShipments() throws Exception {
+        String name = "testGetDispatchShipments" + r.nextInt();
+        SiteWrapper destSite = SiteHelper.addSite(name);
+        StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
+        site.addStudyDispatchSites(study, Arrays.asList(destSite));
+        site.persist();
+        site.reload();
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        DispatchShipmentWrapper dShipment = DispatchShipmentHelper.newShipment(
+            site, destSite, study, method);
+
+        // add an aliquot that has not been persisted
+        dShipment.addAliquots(Arrays.asList(aliquot));
+        try {
+            dShipment.persist();
+            Assert.fail("Should not be allowed to add aliquots not yet in DB");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        aliquot.persist();
+        aliquot.reload();
+
+        dShipment = DispatchShipmentHelper.newShipment(site, destSite, study,
+            method);
+        dShipment.addAliquots(Arrays.asList(aliquot));
+        dShipment.persist();
+        aliquot.reload();
+
+        List<DispatchShipmentWrapper> aliquotDispatchShipments = aliquot
+            .getDispatchShipments();
+        Assert.assertEquals(1, aliquotDispatchShipments.size());
+        Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
+
+        // dispatch aliquot to second site
+        SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
+        DispatchShipmentWrapper dShipment2 = DispatchShipmentHelper
+            .newShipment(destSite, destSite2, study, method);
+        dShipment.addAliquots(Arrays.asList(aliquot));
+        dShipment.persist();
+
+        aliquot.reload();
+        aliquotDispatchShipments = aliquot.getDispatchShipments();
+        Assert.assertEquals(2, aliquotDispatchShipments.size());
+        Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
+        Assert.assertTrue(aliquotDispatchShipments.contains(dShipment2));
     }
 }
