@@ -210,6 +210,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             profilesCombo.add(element);
         }
         profilesCombo.getCombo().select(0);
+
     }
 
     protected void createPlateToScanField(Composite fieldsComposite) {

@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -153,6 +154,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 scanTubeAlone(e);
             }
         });
+        spw.loadProfile(profilesCombo.getCombo().getText());
 
         createScanTubeAloneButton(client);
     }
@@ -382,6 +384,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
             }
         });
+
+        profilesCombo.getCombo().notifyListeners(666, new Event());
 
         createPlateToScanField(fieldsComposite);
 
