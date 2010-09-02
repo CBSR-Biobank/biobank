@@ -203,7 +203,8 @@ public class DispatchShipmentWrapper extends
         propertiesMap.put("aliquotCollection", allAliquotWrappers);
     }
 
-    public void addAliquots(List<AliquotWrapper> newAliquots) {
+    public void addAliquots(List<AliquotWrapper> newAliquots)
+        throws BiobankCheckException {
         if ((newAliquots == null) || (newAliquots.size() == 0))
             return;
 
@@ -219,6 +220,10 @@ public class DispatchShipmentWrapper extends
         }
         // new aliquots added
         for (AliquotWrapper aliquot : newAliquots) {
+            if (aliquot.isNew()) {
+                throw new BiobankCheckException(
+                    "Cannot add aliquot that are not already saved");
+            }
             allAliquotObjects.add(aliquot.getWrappedObject());
             allAliquotWrappers.add(aliquot);
         }
