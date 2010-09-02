@@ -43,7 +43,11 @@ public class StudyAddInfoTable extends StudyInfoTable {
         try {
             List<StudyWrapper> availableStudies = StudyWrapper
                 .getAllStudies(SessionManager.getAppService());
-            availableStudies.removeAll(site.getStudyCollection(true));
+            List<StudyWrapper> alreadyAddedStudies = site
+                .getStudyCollection(false);
+            if (alreadyAddedStudies != null) {
+                availableStudies.removeAll(alreadyAddedStudies);
+            }
             dlg = new SelectStudyDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), availableStudies);
             if (dlg.open() == Dialog.OK) {

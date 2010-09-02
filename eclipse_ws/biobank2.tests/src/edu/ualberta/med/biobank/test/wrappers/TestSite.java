@@ -854,7 +854,7 @@ public class TestSite extends TestDatabase {
             r.nextInt(5) + 1);
         List<StudyWrapper> studies = StudyHelper.addStudies(name,
             r.nextInt(5) + 1);
-
+        srcSite.reload();
         for (StudyWrapper study : studies) {
             srcSite.addStudyDispatchSites(study, destSites);
         }
@@ -868,6 +868,7 @@ public class TestSite extends TestDatabase {
 
         // FIXME need test for removal of studies
         Assert.fail("need test for removal of studies");
+
     }
 
     @Test

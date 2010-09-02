@@ -626,7 +626,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public List<StudyWrapper> getDispatchStudies() throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select info.study from "
             + DispatchInfo.class.getName()
-            + " as info where info.fromSite.id = ?",
+            + " as info where info.srcSite.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Study> results = appService.query(criteria);
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
@@ -643,7 +643,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         DispatchInfoWrapper info = srcMap.get(study.getId());
         if (info == null)
             return null;
-        return info.getToSiteCollection();
+        return info.getDestSiteCollection();
     }
 
     public void addStudyDispatchSites(StudyWrapper study,
@@ -669,6 +669,26 @@ public class SiteWrapper extends ModelWrapper<Site> {
             wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
         }
         diw.addDestSites(sites);
+    }
+
+    public void removeStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> sites) {
+        if ((sites == null) || (sites.size() == 0))
+            return;
+        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
+        if (infos != null) {
+            DispatchInfoWrapper diw = infos.get(study.getId());
+            if (diw != null) {
+                diw.removeDestSites(sites);
+                if (diw.getDestSiteCollection().size() == 0) {
+                    infos.remove(study.getId());
+                    Collection<DispatchInfo> diList = wrappedObject
+                        .getSrcDispatchInfoCollection();
+                    diList.remove(diw.getWrappedObject());
+                    wrappedObject.setSrcDispatchInfoCollection(diList);
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
