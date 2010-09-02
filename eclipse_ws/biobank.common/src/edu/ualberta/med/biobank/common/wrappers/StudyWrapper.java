@@ -128,55 +128,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getSiteCollection(false);
     }
 
-    private void setSiteCollection(Collection<Site> allSiteObjects,
-        List<SiteWrapper> allSiteWrappers) {
-        Collection<Site> oldSites = wrappedObject.getSiteCollection();
-        wrappedObject.setSiteCollection(allSiteObjects);
-        propertyChangeSupport.firePropertyChange("siteCollection", oldSites,
-            allSiteObjects);
-        propertiesMap.put("siteCollection", allSiteWrappers);
-    }
-
-    public void addSites(List<SiteWrapper> newSites) {
-        if ((newSites == null) || (newSites.size() == 0))
-            return;
-
-        Collection<Site> allSiteObjects = new HashSet<Site>();
-        List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
-        // already added Sites
-        List<SiteWrapper> currentList = getSiteCollection();
-        if (currentList != null) {
-            for (SiteWrapper Site : currentList) {
-                allSiteObjects.add(Site.getWrappedObject());
-                allSiteWrappers.add(Site);
-            }
-        }
-        // new Sites added
-        for (SiteWrapper Site : newSites) {
-            allSiteObjects.add(Site.getWrappedObject());
-            allSiteWrappers.add(Site);
-        }
-        setSiteCollection(allSiteObjects, allSiteWrappers);
-    }
-
-    public void removeSites(List<SiteWrapper> SitesToRemove) {
-        if (SitesToRemove != null && SitesToRemove.size() > 0) {
-            Collection<Site> allSiteObjects = new HashSet<Site>();
-            List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
-            // already added Sites
-            List<SiteWrapper> currentList = getSiteCollection();
-            if (currentList != null) {
-                for (SiteWrapper Site : currentList) {
-                    if (!SitesToRemove.contains(Site)) {
-                        allSiteObjects.add(Site.getWrappedObject());
-                        allSiteWrappers.add(Site);
-                    }
-                }
-            }
-            setSiteCollection(allSiteObjects, allSiteWrappers);
-        }
-    }
-
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
@@ -189,7 +140,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "siteCollection", "contactCollection", "sampleStorageCollection",
+            "contactCollection", "sampleStorageCollection",
             "sourceVesselCollection", "studyPvAttrCollection",
             "patientCollection", "dispatchInfoCollection" };
     }
