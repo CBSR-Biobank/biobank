@@ -9,10 +9,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -40,13 +40,19 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY));
-        setTitle("Multiple Parents are Possible");
-        setMessage("Select the appropriate parent container");
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "Select the appropriate parent container";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return "Multiple Parents are Possible";
+    }
+
+    @Override
+    protected Image getTitleAreaImage() {
+        return BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

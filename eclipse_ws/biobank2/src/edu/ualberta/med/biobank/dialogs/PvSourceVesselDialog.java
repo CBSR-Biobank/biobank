@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -105,18 +106,27 @@ public class PvSourceVesselDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY));
+    protected String getTitleAreaMessage() {
         if (addMode) {
-            setTitle("Add Source Vessel");
-            setMessage("Add a source vessel to a patient visit");
+            return "Add a source vessel to a patient visit";
         } else {
-            setTitle("Edit Source Vessel");
-            setMessage("Edit a source vessel in a patient visit");
+            return "Edit a source vessel in a patient visit";
         }
-        return contents;
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        if (addMode) {
+            return "Add Source Vessel";
+        } else {
+            return "Edit Source Vessel";
+        }
+    }
+
+    @Override
+    protected Image getTitleAreaImage() {
+        return BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

@@ -10,10 +10,10 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -39,6 +39,8 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private ComboViewer activityStatusComboViewer;
 
+    private String currentTitle;
+
     public SampleStorageDialog(Shell parent,
         SampleStorageWrapper sampleStorage,
         Collection<SampleTypeWrapper> sampleTypes) {
@@ -55,32 +57,32 @@ public class SampleStorageDialog extends BiobankDialog {
         for (SampleTypeWrapper st : sampleTypes) {
             sampleTypeMap.put(st.getName(), st);
         }
+        if (origSampleStorage.getSampleType() == null) {
+            currentTitle = "Add " + TITLE;
+        } else {
+            currentTitle = "Edit " + TITLE;
+        }
     }
 
     @Override
     protected String getDialogShellTitle() {
-        String title = new String();
-
-        if (origSampleStorage.getSampleType() == null) {
-            title = "Add ";
-        } else {
-            title = "Edit ";
-        }
-        title += TITLE;
-        return title;
+        return currentTitle;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY));
-        if (origSampleStorage.getSampleType() == null) {
-            setTitle("New Sample Storage");
-        } else {
-            setTitle("Edit Sample Storage");
-        }
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return currentTitle;
+    }
+
+    @Override
+    protected Image getTitleAreaImage() {
+        return BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

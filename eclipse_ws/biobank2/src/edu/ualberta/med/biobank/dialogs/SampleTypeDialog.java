@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -29,6 +28,8 @@ public class SampleTypeDialog extends BiobankDialog {
 
     private String message;
 
+    private String currentTitle;
+
     public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType,
         String message) {
         super(parent);
@@ -39,23 +40,23 @@ public class SampleTypeDialog extends BiobankDialog {
         this.sampleType.setNameShort(sampleType.getNameShort());
         this.message = message;
         oldSampleType = new SampleTypeWrapper(SessionManager.getAppService());
+        currentTitle = ((origSampleType.getName() == null) ? "Add " : "Edit ")
+            + TITLE;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return ((origSampleType.getName() == null) ? "Add " : "Edit ") + TITLE;
+        return currentTitle;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        if (origSampleType.getName() == null) {
-            setTitle("Add Sample Type");
-        } else {
-            setTitle("Edit Sample Type");
-        }
-        setMessage(message);
-        return contents;
+    protected String getTitleAreaMessage() {
+        return message;
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return currentTitle;
     }
 
     @Override

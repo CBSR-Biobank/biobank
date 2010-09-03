@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -29,6 +28,8 @@ public class SourceVesselDialog extends BiobankDialog {
 
     private SourceVesselWrapper oldSourceVessel;
 
+    private String currentTitle;
+
     public SourceVesselDialog(Shell parent, SourceVesselWrapper sourceVessel,
         String message) {
         super(parent);
@@ -39,24 +40,23 @@ public class SourceVesselDialog extends BiobankDialog {
         this.message = message;
         oldSourceVessel = new SourceVesselWrapper(
             SessionManager.getAppService());
-    }
-
-    @Override
-    protected String getDialogShellTitle() {
-        return ((origSourceVessel.getName() == null) ? "Add " : "Edit ")
+        currentTitle = ((origSourceVessel.getName() == null) ? "Add " : "Edit ")
             + TITLE;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        if (origSourceVessel.getName() == null) {
-            setTitle("Add Source Vessel");
-        } else {
-            setTitle("Edit Source Vessel");
-        }
-        setMessage(message);
-        return contents;
+    protected String getDialogShellTitle() {
+        return currentTitle;
+    }
+
+    @Override
+    protected String getTitleAreaMessage() {
+        return message;
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return currentTitle;
     }
 
     @Override

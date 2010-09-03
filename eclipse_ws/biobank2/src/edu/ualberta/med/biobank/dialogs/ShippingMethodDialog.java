@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -29,6 +28,8 @@ public class ShippingMethodDialog extends BiobankDialog {
 
     private ShippingMethodWrapper oldShippingMethod;
 
+    private String currentTitle;
+
     public ShippingMethodDialog(Shell parent,
         ShippingMethodWrapper shippingMethod, String message) {
         super(parent);
@@ -39,24 +40,23 @@ public class ShippingMethodDialog extends BiobankDialog {
         this.message = message;
         oldShippingMethod = new ShippingMethodWrapper(
             SessionManager.getAppService());
+        currentTitle = ((origShippingMethod.getName() == null) ? "Add "
+            : "Edit ") + TITLE;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return ((origShippingMethod.getName() == null) ? "Add " : "Edit ")
-            + TITLE;
+        return currentTitle;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        if (origShippingMethod.getName() == null) {
-            setTitle("Add Shipping Method");
-        } else {
-            setTitle("Edit Shipping Method");
-        }
-        setMessage(message);
-        return contents;
+    protected String getTitleAreaMessage() {
+        return message;
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return currentTitle;
     }
 
     @Override

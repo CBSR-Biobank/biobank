@@ -13,7 +13,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -45,12 +44,14 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle("Move aliquots from container " + oldContainer.getLabel()
-            + " to another");
-        setMessage("Select the new container that can hold the aliquots.");
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "Select the new container that can hold the aliquots.";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return "Move aliquots from container " + oldContainer.getLabel()
+            + " to another";
     }
 
     @Override

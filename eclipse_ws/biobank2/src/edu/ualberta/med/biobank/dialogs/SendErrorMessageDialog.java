@@ -30,12 +30,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -66,15 +66,24 @@ public class SendErrorMessageDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle(SEND_ERROR_TITLE);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_EMAIL_BANNER));
-        setMessage(
-            "Please describe steps to reproduce the problem. A log file of the application will be attached to the email.",
-            IMessageProvider.INFORMATION);
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "Please describe steps to reproduce the problem. A log file of the application will be attached to the email.";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return SEND_ERROR_TITLE;
+    }
+
+    @Override
+    protected Image getTitleAreaImage() {
+        return BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_EMAIL_BANNER);
+    }
+
+    @Override
+    protected int getTitleAreaMessageType() {
+        return IMessageProvider.INFORMATION;
     }
 
     @Override

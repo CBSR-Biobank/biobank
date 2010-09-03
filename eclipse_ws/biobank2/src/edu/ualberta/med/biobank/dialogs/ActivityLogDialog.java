@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs;
 import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -20,7 +19,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
-public class ActivityLogDialog extends TitleAreaDialog {
+public class ActivityLogDialog extends BiobankDialog {
 
     private Text activityLogDirText;
     private Button browseBtn;
@@ -38,21 +37,22 @@ public class ActivityLogDialog extends TitleAreaDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle("Where to save activity logs?");
-        setMessage("Please select a file to save your activity log data into.");
-        return contents;
+    protected String getDialogShellTitle() {
+        return "Activity Log Location";
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText("Activity Log Location");
+    protected String getTitleAreaMessage() {
+        return "Please select a file to save your activity log data into.";
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
+    protected String getTitleAreaTitle() {
+        return "Where to save activity logs?";
+    }
+
+    @Override
+    protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
         layout.marginTop = 5;
@@ -79,8 +79,6 @@ public class ActivityLogDialog extends TitleAreaDialog {
             }
         });
         createFileLocationSelector(contents, "&Log path");
-
-        return contents;
     }
 
     private void createFileLocationSelector(final Composite parent,
@@ -193,4 +191,5 @@ public class ActivityLogDialog extends TitleAreaDialog {
         this.getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
         return contents;
     }
+
 }

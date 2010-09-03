@@ -6,7 +6,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -28,11 +27,13 @@ public class SaveReportDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle("Enter Name");
-        setMessage("Please enter a name for this report.");
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "Please enter a name for this report.";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return "Enter Name";
     }
 
     @Override

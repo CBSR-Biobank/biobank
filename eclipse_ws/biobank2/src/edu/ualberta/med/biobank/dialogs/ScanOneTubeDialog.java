@@ -31,9 +31,6 @@ public class ScanOneTubeDialog extends BiobankDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        setTitle(PALLET_TUBE_SCAN);
-        setMessage("Scan the missing tube for position "
-            + LabelingScheme.rowColToSbs(position));
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -42,6 +39,17 @@ public class ScanOneTubeDialog extends BiobankDialog {
 
         widgetCreator.createLabel(area, "Barcode");
         valueText = widgetCreator.createText(area, SWT.NONE, null, null);
+    }
+
+    @Override
+    protected String getTitleAreaMessage() {
+        return "Scan the missing tube for position "
+            + LabelingScheme.rowColToSbs(position);
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return PALLET_TUBE_SCAN;
     }
 
     @Override

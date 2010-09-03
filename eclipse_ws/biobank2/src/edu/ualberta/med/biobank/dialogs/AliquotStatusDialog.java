@@ -33,9 +33,17 @@ public class AliquotStatusDialog extends BiobankDialog {
     }
 
     @Override
+    protected String getTitleAreaMessage() {
+        return "Select an activity status:";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return "Aliquot Activity Status";
+    }
+
+    @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        setTitle("Aliquot Activity Status");
-        setMessage("Select an activity status:");
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 10;

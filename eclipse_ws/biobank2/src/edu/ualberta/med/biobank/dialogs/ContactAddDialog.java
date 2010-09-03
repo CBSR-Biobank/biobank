@@ -42,16 +42,20 @@ public class ContactAddDialog extends BiobankDialog {
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
+    protected String getTitleAreaMessage() {
+        if (contactWrapper.getName() == null)
+            return "Add a contact person to this clinic";
+        else
+            return "Edit contact person for this clinic";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
         if (contactWrapper.getName() == null) {
-            setTitle("Add Contact");
-            setMessage("Add a contact person to this clinic");
+            return "Add Contact";
         } else {
-            setTitle("Edit Contact");
-            setMessage("Edit contact person for this clinic");
+            return "Edit Contact";
         }
-        return contents;
     }
 
     @Override

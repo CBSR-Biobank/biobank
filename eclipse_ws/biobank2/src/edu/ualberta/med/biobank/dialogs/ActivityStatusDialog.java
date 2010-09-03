@@ -5,7 +5,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -18,6 +17,7 @@ public class ActivityStatusDialog extends BiobankDialog {
     private static final String MSG_NO_ST_NAME = "Activity status must have a name.";
     private String message;
     private ActivityStatusWrapper activityStatus;
+    private String currentTitle;
 
     public ActivityStatusDialog(Shell parent,
         ActivityStatusWrapper activityStatus, String message) {
@@ -25,23 +25,23 @@ public class ActivityStatusDialog extends BiobankDialog {
         this.activityStatus = new ActivityStatusWrapper(null);
         this.activityStatus.setName(activityStatus.getName());
         this.message = message;
+        currentTitle = (activityStatus.getName() == null ? "Add " : "Edit ")
+            + TITLE;
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return (activityStatus.getName() == null ? "Add " : "Edit ") + TITLE;
+        return currentTitle;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        if (activityStatus.getName() == null)
-            setTitle("Add Activity Status");
-        else
-            setTitle("Edit Activity Status");
+    protected String getTitleAreaMessage() {
+        return message;
+    }
 
-        setMessage(message);
-        return contents;
+    @Override
+    protected String getTitleAreaTitle() {
+        return currentTitle;
     }
 
     @Override

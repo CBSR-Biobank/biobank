@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,8 +61,9 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     public void rebuild() {
-        removeAll();
-        addGroupNodes();
+        for (AdapterBase child : new ArrayList<AdapterBase>(getChildren())) {
+            child.rebuild();
+        }
     }
 
     @Override

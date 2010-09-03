@@ -9,11 +9,11 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -32,6 +32,10 @@ public class StudySourceVesselDialog extends BiobankDialog {
 
     private ComboViewer sourceVesselComboViewer;
 
+    private String currentTitle;
+
+    private String message;
+
     public StudySourceVesselDialog(Shell parent,
         StudySourceVesselWrapper studySourceVessel,
         List<SourceVesselWrapper> sourceVessels) {
@@ -48,33 +52,35 @@ public class StudySourceVesselDialog extends BiobankDialog {
         this.studySourceVessel.setNeedOriginalVolume(studySourceVessel
             .getNeedOriginalVolume());
         allSourceVesselsMap = sourceVessels;
+        message = "source vessel to this study";
+        if (origStudySourceVessel.getSourceVessel() == null) {
+            currentTitle = "Add " + TITLE;
+            message = "Add " + message;
+        } else {
+            currentTitle = "Edit " + TITLE;
+            message = "Edit " + message;
+        }
     }
 
     @Override
     protected String getDialogShellTitle() {
-        String title = new String();
-
-        if (origStudySourceVessel.getSourceVessel() == null) {
-            title = "Add";
-        } else {
-            title = "Edit ";
-        }
-        return title + TITLE;
+        return currentTitle;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY));
-        if (origStudySourceVessel.getSourceVessel() == null) {
-            setTitle("Add Study Source Vessel");
-            setMessage("Add source vessel to this study");
-        } else {
-            setTitle("Edit Study Source Vessel");
-            setMessage("Edit source vessel for this study");
-        }
-        return contents;
+    protected String getTitleAreaMessage() {
+        return message;
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return currentTitle;
+    }
+
+    @Override
+    protected Image getTitleAreaImage() {
+        return BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

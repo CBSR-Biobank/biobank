@@ -22,9 +22,17 @@ public class NewServerDialog extends BiobankDialog {
     }
 
     @Override
+    protected String getTitleAreaMessage() {
+        return "Enter the domain-name or IP address of the server:";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return TITLE;
+    }
+
+    @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        setTitle(TITLE);
-        setMessage("Enter the domain-name or IP address of the server:");
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 10;
