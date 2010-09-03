@@ -35,10 +35,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
 
-    private ActivityStatusWrapper activityStatus;
-
-    private SiteWrapper site;
-
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
         super(appService, wrappedObject);
@@ -290,17 +286,20 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -464,7 +463,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setSite(SiteWrapper site) {
-        this.site = site;
+        propertiesMap.put("site", site);
         Site oldSite = wrappedObject.getSite();
         Site newSite = site.getWrappedObject();
         wrappedObject.setSite(newSite);
@@ -472,11 +471,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public SiteWrapper getSite() {
+        SiteWrapper site = (SiteWrapper) propertiesMap.get("site");
         if (site == null) {
             Site s = wrappedObject.getSite();
             if (s == null)
                 return null;
             site = new SiteWrapper(appService, s);
+            propertiesMap.put("site", site);
         }
         return site;
     }
@@ -751,10 +752,4 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             getChildLabelingScheme(), getRowCapacity(), getColCapacity());
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        activityStatus = null;
-        site = null;
-    }
 }

@@ -568,6 +568,12 @@
     <mkdir dir="${dest.dir.results.raw}" />
   </target>
   <target name="common-compile" depends="tests-clean,prepare,deploy-eclipse">
+    <copy includeemptydirs="false" todir="${dest.dir.classes}">
+      <fileset dir="${eclipse.proj.dir.common}/src">
+  	<exclude name="**/*.launch" />
+  	<exclude name="**/*.java" />
+      </fileset>
+    </copy>
     <javac srcdir="${eclipse.proj.dir.common}/src"
            destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
       <classpath refid="common.lib.class.path" />
@@ -582,8 +588,6 @@
   </target>
   <target name="test" depends="tests-compile"
           description="executes test cases">
-    <copy file="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/reports/reports.properties"
-          tofile="${dest.dir.classes}/edu/ualberta/med/biobank/common/reports/reports.properties" />
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="junit.class.path" />
       <classpath refid="application.config.class.path" />

@@ -24,6 +24,7 @@ public class DispatchInfoHelper extends DbHelper {
         SiteWrapper srcSite, SiteWrapper... destSites) throws Exception {
         DispatchInfoWrapper info = newInfo(study, srcSite, destSites);
         info.persist();
+        srcSite.reload();
         return info;
     }
 

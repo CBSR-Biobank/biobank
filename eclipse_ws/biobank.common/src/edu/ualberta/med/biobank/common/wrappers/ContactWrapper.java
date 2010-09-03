@@ -15,8 +15,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContactWrapper extends ModelWrapper<Contact> {
 
-    private ClinicWrapper clinic;
-
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
         super(appService, wrappedObject);
@@ -102,17 +100,19 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     public ClinicWrapper getClinic() {
+        ClinicWrapper clinic = (ClinicWrapper) propertiesMap.get("clinic");
         if (clinic == null) {
             Clinic c = wrappedObject.getClinic();
             if (c == null)
                 return null;
             clinic = new ClinicWrapper(appService, c);
+            propertiesMap.put("clinic", clinic);
         }
         return clinic;
     }
 
     public void setClinic(ClinicWrapper clinic) {
-        this.clinic = clinic;
+        propertiesMap.put("clinic", clinic);
         Clinic oldClinic = wrappedObject.getClinic();
         Clinic newClinic = clinic.getWrappedObject();
         wrappedObject.setClinic(newClinic);
@@ -193,12 +193,6 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     @Override
     public String toString() {
         return getName() + " (" + getMobileNumber() + ")";
-    }
-
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        clinic = null;
     }
 
     public static List<ContactWrapper> getAllContacts(

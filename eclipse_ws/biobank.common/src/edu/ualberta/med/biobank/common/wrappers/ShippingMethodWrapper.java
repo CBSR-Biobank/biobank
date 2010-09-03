@@ -106,6 +106,23 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return getShipmentCollection(false);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<AbstractShipmentWrapper> getClinicShipmentCollection(
+        boolean sort) {
+        List<AbstractShipmentWrapper> clinicShipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
+            .get("clinicShipmentCollection");
+        if (clinicShipmentCollection == null) {
+            List<AbstractShipmentWrapper> shipmentCollection = getShipmentCollection(sort);
+            clinicShipmentCollection = new ArrayList<AbstractShipmentWrapper>();
+            for (AbstractShipmentWrapper ship : shipmentCollection) {
+                if (ship instanceof ClinicShipmentWrapper) {
+                    clinicShipmentCollection.add(ship);
+                }
+            }
+        }
+        return clinicShipmentCollection;
+    }
+
     public static List<ShippingMethodWrapper> getShippingMethods(
         WritableApplicationService appService) throws ApplicationException {
         List<ShippingMethod> objects = appService.search(ShippingMethod.class,

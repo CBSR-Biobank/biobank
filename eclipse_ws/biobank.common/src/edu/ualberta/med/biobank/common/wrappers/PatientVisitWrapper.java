@@ -34,10 +34,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private Set<PvSourceVesselWrapper> deletedPvSourceVessels = new HashSet<PvSourceVesselWrapper>();
 
-    private PatientWrapper patient = null;
-
-    private ClinicShipmentWrapper shipment;
-
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
@@ -75,19 +71,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public PatientWrapper getPatient() {
+        PatientWrapper patient = (PatientWrapper) propertiesMap.get("patient");
         if (patient != null)
             return patient;
-
         Patient patientRaw = wrappedObject.getPatient();
         if (patientRaw == null) {
             return null;
         }
         patient = new PatientWrapper(appService, patientRaw);
+        propertiesMap.put("patient", patient);
         return patient;
     }
 
     public void setPatient(PatientWrapper patient) {
-        this.patient = patient;
+        propertiesMap.put("patient", patient);
         Patient oldPatientRaw = wrappedObject.getPatient();
         Patient newPatientRaw = patient.getWrappedObject();
         wrappedObject.setPatient(newPatientRaw);
@@ -396,17 +393,20 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public ClinicShipmentWrapper getShipment() {
+        ClinicShipmentWrapper shipment = (ClinicShipmentWrapper) propertiesMap
+            .get("shipment");
         if (shipment == null) {
             ClinicShipment s = wrappedObject.getShipment();
             if (s == null)
                 return null;
             shipment = new ClinicShipmentWrapper(appService, s);
+            propertiesMap.put("shipment", shipment);
         }
         return shipment;
     }
 
     public void setShipment(ClinicShipmentWrapper s) {
-        this.shipment = s;
+        propertiesMap.put("shipment", s);
         ClinicShipment oldShipment = wrappedObject.getShipment();
         ClinicShipment newShipment = s.getWrappedObject();
         wrappedObject.setShipment(newShipment);
@@ -563,8 +563,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         pvAttrMap = null;
         studyPvAttrMap = null;
         deletedPvSourceVessels.clear();
-        patient = null;
-        shipment = null;
     }
 
     @Override

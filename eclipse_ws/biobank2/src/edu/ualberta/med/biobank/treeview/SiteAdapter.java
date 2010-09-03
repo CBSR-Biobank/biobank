@@ -16,6 +16,8 @@ public class SiteAdapter extends AdapterBase {
 
     private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
     private int nodeIdOffset = 100;
+    public static final int STUDIES_BASE_NODE_ID = 0;
+    public static final int CLINICS_BASE_ID = 1;
     public static final int CONTAINER_TYPES_BASE_NODE_ID = 2;
     public static final int CONTAINERS_BASE_NODE_ID = 3;
 
@@ -26,6 +28,8 @@ public class SiteAdapter extends AdapterBase {
             nodeIdOffset *= site.getId();
         }
 
+        addChild(new SiteStudyGroup(this, nodeIdOffset + STUDIES_BASE_NODE_ID));
+        addChild(new SiteClinicGroup(this, nodeIdOffset + CLINICS_BASE_ID));
         addChild(new ContainerTypeGroup(this, nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID));
         addChild(new ContainerGroup(this, nodeIdOffset

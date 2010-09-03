@@ -96,6 +96,12 @@
             name="Shipment View">
       </perspective>
       <perspective
+            class="edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective"
+            id="edu.ualberta.med.biobank.perspective.dispatchShipments"
+            icon="icons/dispatchShipmentPerspective.png"
+            name="Dispatch View">
+      </perspective>
+      <perspective
             class="edu.ualberta.med.biobank.rcp.LoggingPerspective"
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.perspective.logging"
@@ -289,7 +295,7 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
-            name="Dispatch Shipment administration">
+            name="Dispatch Shipment Administration">
       </command>
    </extension>
    <extension
@@ -633,7 +639,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.ShipmentAdapter">
+                           value="edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter">
                      </instanceof>
                   </iterate>
                </with>
@@ -983,6 +989,27 @@
                </reference>
             </and>
          </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.DispatchShipmentAdministrationHandler"
+            commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin">
+         <enabledWhen>
+            <and>
+               <not>
+                  <or>
+                     <reference
+                           definitionId="biobank2.dispatchPerspectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.sampleManagementPerspectiveSelected">
+                     </reference>
+                  </or>
+               </not>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -1772,6 +1799,44 @@
                visible="true">
          </view>
       </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.dispatchShipments">
+         <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="true"
+               id="edu.ualberta.med.biobank.views.SearchView"
+               minimized="false"
+               moveable="true"
+               ratio="0.85"
+               relationship="bottom"
+               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+      </perspectiveExtension>
       </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -2145,6 +2210,13 @@
       id="edu.ualberta.med.biobank.editors.InvoicingReportEditor"
       name="Invoicing Report">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      default="false"
+      icon="icons/shipment.png"
+      id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      name="Dispatch Shipment View">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -2375,6 +2447,13 @@
             restorable="true">
       </view>
       <view
+            class="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
+            icon="icons/dispatchShipmentPerspective.png"
+            id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
+            name="Dispatch Administration"
+            restorable="true">
+      </view>
+      <view
             class="edu.ualberta.med.biobank.views.SearchView"
             icon="icons/search.png"
             id="edu.ualberta.med.biobank.views.SearchView"
@@ -2536,6 +2615,15 @@
                variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
             <equals
                   value="confirmEnabled">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.dispatchPerspectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <equals
+                  value="edu.ualberta.med.biobank.perspective.dispatchShipments">
             </equals>
          </with>
       </definition>

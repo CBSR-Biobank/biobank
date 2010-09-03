@@ -19,7 +19,8 @@ import edu.ualberta.med.biobank.treeview.PatientTodayNode;
 import edu.ualberta.med.biobank.treeview.PatientViewNodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
-public class PatientAdministrationView extends AbstractAdministrationView {
+public class PatientAdministrationView extends
+    AbstractTodaySearchAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.PatientsAdminView";
 

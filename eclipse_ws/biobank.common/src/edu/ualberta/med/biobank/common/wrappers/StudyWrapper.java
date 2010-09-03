@@ -39,8 +39,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
-    private ActivityStatusWrapper activityStatus;
-
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
         super(appService, wrappedObject);
@@ -72,17 +70,20 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -127,55 +128,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getSiteCollection(false);
     }
 
-    private void setSiteCollection(Collection<Site> allSiteObjects,
-        List<SiteWrapper> allSiteWrappers) {
-        Collection<Site> oldSites = wrappedObject.getSiteCollection();
-        wrappedObject.setSiteCollection(allSiteObjects);
-        propertyChangeSupport.firePropertyChange("siteCollection", oldSites,
-            allSiteObjects);
-        propertiesMap.put("siteCollection", allSiteWrappers);
-    }
-
-    public void addSites(List<SiteWrapper> newSites) {
-        if ((newSites == null) || (newSites.size() == 0))
-            return;
-
-        Collection<Site> allSiteObjects = new HashSet<Site>();
-        List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
-        // already added Sites
-        List<SiteWrapper> currentList = getSiteCollection();
-        if (currentList != null) {
-            for (SiteWrapper Site : currentList) {
-                allSiteObjects.add(Site.getWrappedObject());
-                allSiteWrappers.add(Site);
-            }
-        }
-        // new Sites added
-        for (SiteWrapper Site : newSites) {
-            allSiteObjects.add(Site.getWrappedObject());
-            allSiteWrappers.add(Site);
-        }
-        setSiteCollection(allSiteObjects, allSiteWrappers);
-    }
-
-    public void removeSites(List<SiteWrapper> SitesToRemove) {
-        if (SitesToRemove != null && SitesToRemove.size() > 0) {
-            Collection<Site> allSiteObjects = new HashSet<Site>();
-            List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
-            // already added Sites
-            List<SiteWrapper> currentList = getSiteCollection();
-            if (currentList != null) {
-                for (SiteWrapper Site : currentList) {
-                    if (!SitesToRemove.contains(Site)) {
-                        allSiteObjects.add(Site.getWrappedObject());
-                        allSiteWrappers.add(Site);
-                    }
-                }
-            }
-            setSiteCollection(allSiteObjects, allSiteWrappers);
-        }
-    }
-
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
@@ -188,7 +140,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "siteCollection", "contactCollection", "sampleStorageCollection",
+            "contactCollection", "sampleStorageCollection",
             "sourceVesselCollection", "studyPvAttrCollection",
             "patientCollection", "dispatchInfoCollection" };
     }
@@ -270,42 +222,50 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addContacts(List<ContactWrapper> newContacts) {
-        if (newContacts != null && newContacts.size() > 0) {
-            Collection<Contact> allContactObjects = new HashSet<Contact>();
-            List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-            // already added contacts
-            List<ContactWrapper> currentList = getContactCollection();
-            if (currentList != null) {
-                for (ContactWrapper contact : currentList) {
+        if ((newContacts == null) || (newContacts.size() == 0))
+            return;
+
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        List<ContactWrapper> currentList = getContactCollection();
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                allContactObjects.add(contact.getWrappedObject());
+                allContactWrappers.add(contact);
+            }
+        }
+        // new contacts added
+        for (ContactWrapper contact : newContacts) {
+            allContactObjects.add(contact.getWrappedObject());
+            allContactWrappers.add(contact);
+        }
+        setContactCollection(allContactObjects, allContactWrappers);
+    }
+
+    public void removeContacts(List<ContactWrapper> contactsToRemove)
+        throws BiobankCheckException {
+        if ((contactsToRemove == null) || (contactsToRemove.size() == 0))
+            return;
+
+        List<ContactWrapper> currentList = getContactCollection();
+        if (!currentList.containsAll(contactsToRemove)) {
+            throw new BiobankCheckException(
+                "studies are not associated with study " + getNameShort());
+        }
+
+        Collection<Contact> allContactObjects = new HashSet<Contact>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
+        // already added contacts
+        if (currentList != null) {
+            for (ContactWrapper contact : currentList) {
+                if (!contactsToRemove.contains(contact)) {
                     allContactObjects.add(contact.getWrappedObject());
                     allContactWrappers.add(contact);
                 }
             }
-            // new contacts added
-            for (ContactWrapper contact : newContacts) {
-                allContactObjects.add(contact.getWrappedObject());
-                allContactWrappers.add(contact);
-            }
-            setContactCollection(allContactObjects, allContactWrappers);
         }
-    }
-
-    public void removeContacts(List<ContactWrapper> contactsToRemove) {
-        if (contactsToRemove != null && contactsToRemove.size() > 0) {
-            Collection<Contact> allContactObjects = new HashSet<Contact>();
-            List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-            // already added contacts
-            List<ContactWrapper> currentList = getContactCollection();
-            if (currentList != null) {
-                for (ContactWrapper contact : currentList) {
-                    if (!contactsToRemove.contains(contact)) {
-                        allContactObjects.add(contact.getWrappedObject());
-                        allContactWrappers.add(contact);
-                    }
-                }
-            }
-            setContactCollection(allContactObjects, allContactWrappers);
-        }
+        setContactCollection(allContactObjects, allContactWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -957,7 +917,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         deletedSampleStorages.clear();
         deletedStudySourceVessels.clear();
         deletedStudyPvAttr.clear();
-        activityStatus = null;
     }
 
     public static List<StudyWrapper> getAllStudies(
