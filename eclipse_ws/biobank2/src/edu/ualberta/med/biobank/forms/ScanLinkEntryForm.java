@@ -17,12 +17,14 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -152,6 +154,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 scanTubeAlone(e);
             }
         });
+        spw.loadProfile(profilesCombo.getCombo().getText());
+
         createScanTubeAloneButton(client);
     }
 
@@ -363,6 +367,25 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
 
         linkFormPatientManagement.createVisitCombo(fieldsComposite);
+
+        createProfileComboBox(fieldsComposite);
+        new Label(fieldsComposite, SWT.NONE);
+        /* expects 3 controls per line */
+        profilesCombo.getCombo().addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                spw.loadProfile(profilesCombo.getCombo().getText());
+
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+
+            }
+        });
+
+        profilesCombo.getCombo().notifyListeners(666, new Event());
 
         createPlateToScanField(fieldsComposite);
 

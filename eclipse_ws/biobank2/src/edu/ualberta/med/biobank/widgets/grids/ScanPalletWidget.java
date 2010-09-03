@@ -28,6 +28,7 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
     public RowColPos getPositionAtCoordinates(int x, int y) {
         return ((ScanPalletDisplay) containerDisplay).getPositionAtCoordinates(
             x, y);
+
     }
 
 }
