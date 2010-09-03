@@ -257,6 +257,7 @@
     </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib/client">
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
+      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" />
       <filelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
       <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
