@@ -114,9 +114,8 @@ public class FTAReportTest extends AbstractReportTest {
 
         for (StudyWrapper study : TestReports.getInstance().getStudies()) {
             for (PatientWrapper patient : study.getPatientCollection()) {
-                patientVisits = patient.getPatientVisitCollection();
+                patientVisits = patient.getPatientVisitCollection(true, true);
                 if (patientVisits.size() > 0) {
-
                     // check before, on, and after each patient's first patient
                     // visit
                     calendar.setTime(patientVisits.get(0).getDateProcessed());

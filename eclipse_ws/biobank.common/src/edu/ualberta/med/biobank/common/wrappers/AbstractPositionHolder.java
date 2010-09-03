@@ -100,6 +100,21 @@ public abstract class AbstractPositionHolder<E, T extends AbstractPosition>
         return parent;
     }
 
+    public ContainerWrapper getTop() {
+        ContainerWrapper top;
+
+        if (this instanceof ContainerWrapper) {
+            top = (ContainerWrapper) this;
+        } else {
+            top = getParent();
+        }
+
+        while (top != null && top.getParent() != null) {
+            top = top.getParent();
+        }
+        return top;
+    }
+
     public void setParent(ContainerWrapper container) {
         this.parent = container;
         ContainerWrapper oldValue = getParent();

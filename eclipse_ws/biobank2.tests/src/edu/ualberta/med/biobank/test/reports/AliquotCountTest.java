@@ -15,18 +15,11 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
-import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotCountTest {
-    private static final Predicate<AliquotWrapper> NOT_SAMPLE_STORAGE_PREDICATE = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
-            return (aliquot.getParent() == null)
-                || !aliquot.getParent().getLabel().startsWith("SS");
-        }
-    };
     private static final Mapper<AliquotWrapper, String, Long> SAMPLE_TYPE_NAME_MAPPER = new Mapper<AliquotWrapper, String, Long>() {
         public String getKey(AliquotWrapper aliquot) {
             return aliquot.getSampleType().getName();
@@ -43,7 +36,7 @@ public class AliquotCountTest {
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 TestReports.aliquotLinkedBetween(after, before),
-                NOT_SAMPLE_STORAGE_PREDICATE));
+                TestReports.ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER));
 
         List<Object> expectedResults = new ArrayList<Object>();
 

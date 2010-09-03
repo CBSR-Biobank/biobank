@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -17,8 +19,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.Predicate;
+import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -50,11 +53,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
-@SuiteClasses({ AliquotCountTest.class, ContainerCapacityTest.class,
-    ContainerEmptyLocationsTest.class, PatientVisitSummaryTest.class,
-    AliquotInvoiceByClinicTest.class, AliquotInvoiceByPatientTest.class,
-    AliquotRequestTest.class })
-public final class TestReports {
+@SuiteClasses({ AliquotCountTest.class, AliquotInvoiceByClinicTest.class,
+    AliquotInvoiceByPatientTest.class, AliquotRequestTest.class,
+    AliquotsByPalletTest.class, AliquotSCountTest.class, CAliquotsTest.class,
+    ContainerCapacityTest.class, ContainerEmptyLocationsTest.class,
+    DAliquotsTest.class, FTAReportTest.class, FvLPatientVisitsTest.class,
+    InvoicingReportTest.class, NewPsByStudyClinicTest.class,
+    NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class })
+public final class TestReports implements ReportDataSource {
     public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
             return (container.getContainerType().getSampleTypeCollection() != null)
@@ -66,6 +72,11 @@ public final class TestReports {
         public boolean evaluate(AliquotWrapper aliquot) {
             return (aliquot.getParent() == null)
                 || !aliquot.getParent().getLabel().startsWith("SS");
+        }
+    };
+    public static final Predicate<AliquotWrapper> ALIQUOT_HAS_POSITION = new Predicate<AliquotWrapper>() {
+        public boolean evaluate(AliquotWrapper aliquot) {
+            return aliquot.getParent() != null;
         }
     };
 
@@ -137,33 +148,77 @@ public final class TestReports {
     }
 
     public static Predicate<AliquotWrapper> aliquotDrawnSameDay(final Date date) {
-        final Calendar dateOfInterest = Calendar.getInstance();
+        final Calendar wanted = Calendar.getInstance();
+        wanted.setTime(date);
+
         return new Predicate<AliquotWrapper>() {
             private Calendar drawn = Calendar.getInstance();
 
             public boolean evaluate(AliquotWrapper aliquot) {
                 drawn.setTime(aliquot.getPatientVisit().getDateDrawn());
-                return (drawn.get(Calendar.DAY_OF_YEAR) == dateOfInterest
-                    .get(Calendar.DAY_OF_YEAR))
-                    && (drawn.get(Calendar.YEAR) == dateOfInterest
-                        .get(Calendar.YEAR));
+                int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
+                int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
+                int drawnYear = drawn.get(Calendar.YEAR);
+                int wantedYear = wanted.get(Calendar.YEAR);
+                return (drawnDayOfYear == wantedDayOfYear)
+                    && (drawnYear == wantedYear);
             }
         };
     }
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        // generate sites
+    public static void generateSites() throws Exception {
         for (int i = 0; i < NUM_SITES; i++) {
             getInstance().sites.add(SiteHelper.addSite(getInstance()
                 .getRandString()));
         }
+    }
+
+    public static void generateSampleTypes() throws Exception {
+        SampleTypeWrapper sampleType;
+        for (int i = 0; i < NUM_SAMPLE_TYPES; i++) {
+            sampleType = SampleTypeHelper.addSampleType(getInstance()
+                .getRandString());
+            getInstance().sampleTypes.add(sampleType);
+        }
+
+        try {
+            // add a sample type with the name
+            // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME" as some reports query
+            // for this specific sample type; however, this sample type may
+            // already exist
+            SampleTypeHelper
+                .addSampleType(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
+        } catch (Exception e) {
+        }
+
+        for (SampleTypeWrapper s : SampleTypeWrapper.getAllSampleTypes(
+            getInstance().getAppService(), true)) {
+            if (s.getName().equals(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME)) {
+                getInstance().sampleTypes.add(s);
+            }
+        }
+
+        // ensure there is one sample type named
+        // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME"
+        Assert.assertTrue(PredicateUtil.filter(getInstance().sampleTypes,
+            new Predicate<SampleTypeWrapper>() {
+                public boolean evaluate(SampleTypeWrapper sampleType) {
+                    return sampleType.getName().equals(
+                        AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
+                }
+
+            }).size() == 1);
+    }
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        generateSites();
+        generateSampleTypes();
 
         Calendar calendar = Calendar.getInstance();
 
         for (int siteIndex = 0, numSites = getInstance().sites.size(); siteIndex < numSites; siteIndex++) {
             SiteWrapper site = getInstance().sites.get(siteIndex);
-            SampleTypeWrapper sampleType;
 
             // TODO: vary container types?
             ContainerTypeWrapper topContainerType = ContainerTypeHelper
@@ -179,12 +234,9 @@ public final class TestReports {
                 .asList(containerType));
             containerType.addChildContainerTypes(Arrays.asList(containerType));
 
-            // generate sample types
-            for (int i = 0; i < NUM_SAMPLE_TYPES; i++) {
-                sampleType = SampleTypeHelper.addSampleType(getInstance()
-                    .getRandString());
+            // TODO: don't add every sample type to every container type?
+            for (SampleTypeWrapper sampleType : getInstance().getSampleTypes()) {
                 containerType.addSampleTypes(Arrays.asList(sampleType));
-                getInstance().sampleTypes.add(sampleType);
             }
             topContainerType.persist();
             containerType.persist();
@@ -273,7 +325,8 @@ public final class TestReports {
             }
 
             // generate shipments with associated patient visits
-            int millisecondsPastEpoch = 0;
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date(0));
             for (int i = 0; i < SHIPMENTS_PER_SITE; i++) {
                 ClinicWrapper clinic = getInstance().clinics.get(i
                     % getInstance().clinics.size());
@@ -292,16 +345,16 @@ public final class TestReports {
                         }
 
                         // TODO: appropriate dates
+                        Date drawn = c.getTime();
+                        c.add(Calendar.DAY_OF_YEAR, 1);
+                        Date processed = c.getTime();
+
                         patientVisit = PatientVisitHelper.addPatientVisit(
-                            patient, shipment, new Date(millisecondsPastEpoch),
-                            new Date(millisecondsPastEpoch
-                                + (60 * 60 * 24 * 1000)));
+                            patient, shipment, drawn, processed);
 
                         getInstance().patientVisits.add(patientVisit);
 
-                        // note: remember to use seconds since the database
-                        // will only support that resolution
-                        millisecondsPastEpoch += 2 * 60 * 60 * 1000;
+                        c.add(Calendar.HOUR_OF_DAY, 2);
                     }
 
                     shipment.persist();
@@ -330,22 +383,26 @@ public final class TestReports {
                             aliquotNumber++;
 
                             // cycle through sample types
-                            sampleType = getInstance().sampleTypes
+                            SampleTypeWrapper sampleType = getInstance().sampleTypes
                                 .get(aliquotNumber
                                     % getInstance().sampleTypes.size());
-
-                            // do not add aliquots all the time
-                            if (aliquotNumber % SKIP_ALIQUOT == 0) {
-                                break;
-                            }
 
                             // cycle through patient visits
                             patientVisit = getInstance().patientVisits
                                 .get(aliquotNumber
                                     % getInstance().patientVisits.size());
+                            AliquotWrapper aliquot = AliquotHelper
+                                .newAliquot(sampleType);
 
-                            AliquotWrapper aliquot = AliquotHelper.addAliquot(
-                                sampleType, container, patientVisit, row, col);
+                            // leave some aliquots without a parent container
+                            if (aliquotNumber % SKIP_ALIQUOT != 0) {
+                                aliquot.setParent(container);
+                                aliquot.setPosition(row, col);
+                            }
+
+                            aliquot.setPatientVisit(patientVisit);
+                            aliquot.setInventoryId(getInstance()
+                                .getRandString());
 
                             // base the link date on the date the patient visit
                             // is processed
@@ -429,61 +486,96 @@ public final class TestReports {
 
     public Collection<Object> checkReport(BiobankReport report,
         Collection<Object> expectedResults) throws ApplicationException {
-        return checkReport(report, expectedResults, false);
+        return checkReport(report, expectedResults,
+            EnumSet.of(CompareResult.Size));
     }
 
+    public static enum CompareResult {
+        Order, Size
+    };
+
     public Collection<Object> checkReport(BiobankReport report,
-        Collection<Object> expectedResults, boolean isOrdered)
+        Collection<Object> expectedResults, EnumSet<CompareResult> cmpOptions)
         throws ApplicationException {
         List<Object> actualResults = report.generate(getAppService());
 
-        int actualResultsSize = actualResults.size();
-        if (actualResults instanceof BiobankListProxy) {
-            actualResultsSize = ((BiobankListProxy) actualResults)
-                .getRealSize();
-        }
-
+        // post process individual rows BEFORE post processing the entire
+        // collection, if necessary
+        List<Object> postProcessedExpectedResults = new ArrayList<Object>(
+            expectedResults);
         AbstractReport abstractReport = ReportFactory.createReport(report);
-        Collection<Object> postProcessedExpectedResults = abstractReport
-            .postProcess(getAppService(),
-                new ArrayList<Object>(expectedResults));
+        AbstractRowPostProcess rowPostProcessor = abstractReport
+            .getRowPostProcess();
 
-        if (actualResultsSize != postProcessedExpectedResults.size()) {
-            Assert.fail();
+        if (rowPostProcessor != null) {
+            Object processedRow;
+            for (int i = 0, numRows = postProcessedExpectedResults.size(); i < numRows; i++) {
+                processedRow = rowPostProcessor
+                    .rowPostProcess(postProcessedExpectedResults.get(i));
+                postProcessedExpectedResults.set(i, processedRow);
+            }
         }
 
-        int rowIndex = 0;
-        for (Object expectedRow : postProcessedExpectedResults) {
-            Object postProcessedExpectedRow = expectedRow;
-            if (abstractReport.getRowPostProcess() != null) {
-                postProcessedExpectedRow = abstractReport.getRowPostProcess()
-                    .rowPostProcess(expectedRow);
-            }
+        // post process the entire expected collection AFTER individual
+        // rows have been processed
+        postProcessedExpectedResults = abstractReport.postProcess(
+            getAppService(), postProcessedExpectedResults);
 
+        // we may only require the actual results to be a subset of
+        // the expected results, so the actual results must be iterated in an
+        // outer loop.
+        Iterator<Object> it = postProcessedExpectedResults.iterator();
+        int actualResultsSize = 0;
+        for (Object actualRow : actualResults) {
             boolean isFound = false;
-            if (isOrdered) {
-                if (Arrays.equals((Object[]) postProcessedExpectedRow,
-                    (Object[]) actualResults.get(rowIndex))) {
-                    isFound = true;
+            if (cmpOptions.contains(CompareResult.Order)) {
+                if (it.hasNext()) {
+                    Object[] next = (Object[]) it.next();
+
+                    // the order of arguments to Arrays.equals() matters, e.g.:
+                    //
+                    // java.util.Date date = new java.util.Date();
+                    // java.util.Date stamp =
+                    // new java.sql.Timestamp(date.getTime());
+                    // assertTrue(date.equals(stamp));
+                    // assertTrue(date.compareTo(stamp) == 0);
+                    // assertTrue(stamp.compareTo(date) == 0);
+                    // assertTrue(stamp.equals(date)); // <-- FAILS
+                    if (Arrays.equals(next, (Object[]) actualRow)) {
+                        isFound = true;
+                    }
                 }
             } else {
-                for (Object actualRow : actualResults) {
-                    if (Arrays.equals((Object[]) postProcessedExpectedRow,
+                for (Object expectedRow : postProcessedExpectedResults) {
+                    if (Arrays.equals((Object[]) expectedRow,
                         (Object[]) actualRow)) {
                         isFound = true;
                         break;
                     }
                 }
             }
+
             if (!isFound) {
-                Assert.fail("expected output row not found: "
-                    + Arrays.toString((Object[]) postProcessedExpectedRow));
+                Assert.fail("did not expect this row in actual results: "
+                    + Arrays.toString((Object[]) actualRow));
             } else {
-                System.out.println("Found: "
-                    + Arrays.toString((Object[]) postProcessedExpectedRow));
+                System.out.println("found: "
+                    + Arrays.toString((Object[]) actualRow));
             }
 
-            rowIndex++;
+            actualResultsSize++;
+        }
+
+        it = null; // done with this iterator.
+
+        // cannot accurately know the size of actual results until they have all
+        // been run through once, so, do not compare actual size to expected
+        // size
+
+        if (cmpOptions.contains(CompareResult.Size)
+            && (postProcessedExpectedResults.size() != actualResultsSize)) {
+            Assert.fail("expected " + postProcessedExpectedResults.size()
+                + " results, got " + actualResultsSize);
         }
 
         return postProcessedExpectedResults;

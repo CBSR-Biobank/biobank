@@ -94,7 +94,6 @@ public class ContainerCapacityTest {
     private BiobankReport getReport() throws ApplicationException {
         BiobankReport report = BiobankReport
             .getReportByName("ContainerCapacity");
-        System.out.println(report.getClassName());
         report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
             .getId());
         report.setContainerList("");

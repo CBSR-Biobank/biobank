@@ -33,7 +33,7 @@ public class AbstractReport {
 
     protected static final String CONTAINER_LIST_SEARCH_STRING = replacePatternString(CONTAINER_LIST);
 
-    protected static final String FTA_CARD_SAMPLE_TYPE_NAME = "'DNA(Blood)'";
+    public static final String FTA_CARD_SAMPLE_TYPE_NAME = "DNA(Blood)";
 
     protected AbstractReport(String queryString, BiobankReport report) {
         this.queryString = queryString;

@@ -241,12 +241,23 @@ public abstract class AbstractReportTest {
 
     private Collection<Object> compareResults(EnumSet<CompareResult> cmpOptions)
         throws ApplicationException {
-        System.out.println("Comparing results for Report "
-            + getReport().getClassName() + " using params "
+        System.out.print("compareResults(" + cmpOptions + ") for "
+            + getReport().getClassName() + " w/ params "
             + Arrays.toString(getReport().getParams().toArray())
-            + (isInSite() ? "" : " not") + " in site " + getSiteId()
-            + " grouped by " + getReport().getGroupBy() + " in containers "
-            + getReport().getContainerList());
+            + (isInSite() ? "" : " not") + " in site " + getSiteId());
+
+        if ((getReport().getGroupBy() != null)
+            && (getReport().getGroupBy().length() > 0)) {
+            System.out.print(" grouped by " + getReport().getGroupBy());
+        }
+
+        if ((getReport().getContainerList() != null)
+            && (getReport().getContainerList().length() > 0)) {
+            System.out
+                .print(" in containers " + getReport().getContainerList());
+        }
+
+        System.out.println();
 
         Collection<Object> expectedResults = getExpectedResults();
 

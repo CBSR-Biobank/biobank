@@ -6,58 +6,98 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewPsByStudyClinicTest extends AbstractReportTest {
+    private static final Mapper<PatientVisitWrapper, Integer, PatientVisitWrapper> GROUP_BY_PATIENT = new Mapper<PatientVisitWrapper, Integer, PatientVisitWrapper>() {
+        public Integer getKey(PatientVisitWrapper patientVisit) {
+            return patientVisit.getPatient().getId();
+        }
+
+        public PatientVisitWrapper getValue(PatientVisitWrapper newPv,
+            PatientVisitWrapper oldPv) {
+            if (oldPv == null) {
+                return newPv;
+            }
+
+            return oldPv.getDateProcessed().before(newPv.getDateProcessed()) ? oldPv
+                : newPv;
+        }
+    };
+
+    public static Mapper<PatientVisitWrapper, List<Object>, Long> groupPvsByStudyAndClinicAndDateField(
+        final String dateField) {
+        final Calendar calendar = Calendar.getInstance();
+        return new Mapper<PatientVisitWrapper, List<Object>, Long>() {
+            public List<Object> getKey(PatientVisitWrapper patientVisit) {
+                calendar.setTime(patientVisit.getDateProcessed());
+
+                List<Object> key = new ArrayList<Object>();
+                key.add(patientVisit.getPatient().getStudy().getNameShort());
+                key.add(patientVisit.getShipment().getClinic().getName());
+                key.add(new Integer(calendar.get(Calendar.YEAR)));
+                key.add(new Long(getDateFieldValue(calendar, dateField)));
+
+                return key;
+            }
+
+            public Long getValue(PatientVisitWrapper type, Long pvCount) {
+                return pvCount == null ? new Long(1) : new Long(pvCount + 1);
+            }
+        };
+    }
 
     @Test
     public void testResults() throws Exception {
-        checkResults(getTopContainerIds(), new Date(0), new Date());
+        checkResults(new Date(0), new Date());
     }
 
     @Test
     public void testEmptyDateRange() throws Exception {
-        checkResults(getTopContainerIds(), new Date(), new Date(0));
+        checkResults(new Date(), new Date(0));
     }
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<AliquotWrapper> aliquots = TestReports.getInstance().getAliquots();
-        Assert.assertTrue(aliquots.size() > 0);
+        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        Assert.assertTrue(patientVisits.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        checkResults(getTopContainerIds(), aliquot.getLinkDate(),
-            aliquot.getLinkDate());
+        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+            .size() / 2);
+        checkResults(patientVisit.getDateProcessed(),
+            patientVisit.getDateProcessed());
     }
 
     @Test
-    public void testSmallDateRange() throws Exception {
-        List<AliquotWrapper> aliquots = TestReports.getInstance().getAliquots();
-        Assert.assertTrue(aliquots.size() > 0);
+    public void testSecondPatientVisitDateRange() throws Exception {
+        for (PatientWrapper patient : getPatients()) {
+            List<PatientVisitWrapper> visits = patient
+                .getPatientVisitCollection(true, true);
+            if (visits.size() >= 2) {
+                PatientVisitWrapper visit = visits.get(1);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(visit.getDateProcessed());
+                calendar.add(Calendar.HOUR_OF_DAY, 24);
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(aliquot.getLinkDate());
-        calendar.add(Calendar.HOUR_OF_DAY, 24);
+                checkResults(visit.getDateProcessed(), calendar.getTime());
+                return;
+            }
+        }
 
-        checkResults(getTopContainerIds(), aliquot.getLinkDate(),
-            calendar.getTime());
+        Assert.fail("no patient with 2 or more patient visits");
     }
 
     @Override
@@ -67,22 +107,25 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
         Date before = (Date) getReport().getParams().get(1);
 
         Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
+
+        Collection<PatientVisitWrapper> firstPatientVisits = MapperUtil.map(
+            allPatientVisits, GROUP_BY_PATIENT).values();
+
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
-            .filter(allPatientVisits, PredicateUtil.andPredicate(
+            .filter(firstPatientVisits, PredicateUtil.andPredicate(
                 patientVisitProcessedBetween(after, before),
                 patientVisitSite(isInSite(), getSiteId())));
 
-        List<Object> expectedResults = new ArrayList<Object>();
-
-        Map<List<Object>, Set<Integer>> groupedData = MapperUtil.map(
+        Map<List<Object>, Long> groupedData = MapperUtil.map(
             filteredPatientVisits,
             groupPvsByStudyAndClinicAndDateField(groupByDateField));
 
-        for (Map.Entry<List<Object>, Set<Integer>> entry : groupedData
-            .entrySet()) {
+        List<Object> expectedResults = new ArrayList<Object>();
+
+        for (Map.Entry<List<Object>, Long> entry : groupedData.entrySet()) {
             List<Object> data = new ArrayList<Object>();
             data.addAll(entry.getKey());
-            data.add(entry.getValue().size());
+            data.add(entry.getValue());
 
             expectedResults.add(data.toArray());
         }
@@ -90,10 +133,9 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(Collection<Integer> topContainerIds, Date after,
-        Date before) throws ApplicationException {
+    private void checkResults(Date after, Date before)
+        throws ApplicationException {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
-        getReport().setContainerList(StringUtils.join(topContainerIds, ","));
 
         for (String dateField : DATE_FIELDS) {
             // check the results against each possible date field
@@ -101,36 +143,5 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
 
             checkResults(EnumSet.of(CompareResult.SIZE));
         }
-    }
-
-    private static Mapper<PatientVisitWrapper, List<Object>, Set<Integer>> groupPvsByStudyAndClinicAndDateField(
-        final String dateField) {
-        final Calendar calendar = Calendar.getInstance();
-        return new Mapper<PatientVisitWrapper, List<Object>, Set<Integer>>() {
-            public List<Object> getKey(PatientVisitWrapper patientVisit) {
-                calendar.setTime(patientVisit.getDateProcessed());
-
-                List<Object> key = new ArrayList<Object>();
-                key.add(patientVisit.getPatient().getStudy().getNameShort());
-                key.add(patientVisit.getShipment().getClinic().getNameShort());
-                key.add(new Integer(calendar.get(Calendar.YEAR)));
-                key.add(new Long(getDateFieldValue(calendar, dateField)));
-
-                return key;
-            }
-
-            public Set<Integer> getValue(PatientVisitWrapper type,
-                Set<Integer> patientIds) {
-                if (patientIds == null) {
-                    patientIds = new HashSet<Integer>();
-                }
-
-                if (!patientIds.contains(type.getPatient().getId())) {
-                    patientIds.add(type.getId());
-                }
-
-                return patientIds;
-            }
-        };
     }
 }
