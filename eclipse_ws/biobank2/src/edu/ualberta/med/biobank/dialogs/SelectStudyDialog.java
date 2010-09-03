@@ -48,8 +48,7 @@ public class SelectStudyDialog extends BiobankDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
+        Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 

@@ -36,19 +36,26 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
 
     private static final int[] BOUNDS = new int[] { 130, 130, -1 };
 
+    private SiteWrapper srcSite;
+
     public SiteDispatchInfoTable(Composite parent, SiteWrapper site)
         throws ApplicationException {
         super(parent, null, HEADINGS, BOUNDS, 10);
+        this.srcSite = site;
+        loadStudyDestSites();
+    }
+
+    protected void loadStudyDestSites() throws ApplicationException {
         List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
-        for (StudyWrapper study : site.getDispatchStudies()) {
-            for (SiteWrapper destSite : site.getStudyDispachSites(study)) {
+        for (StudyWrapper study : srcSite.getDispatchStudies()) {
+            for (SiteWrapper destSite : srcSite.getStudyDispachSites(study)) {
                 StudySiteDispatch ssd = new StudySiteDispatch();
                 ssd.study = study;
                 ssd.destSite = destSite;
                 dispatchList.add(ssd);
             }
         }
-        setCollection(dispatchList);
+        reloadCollection(dispatchList);
     }
 
     @Override

@@ -2,8 +2,10 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -19,6 +21,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class SelectStudyDispatchSitesDialog extends BiobankDialog {
@@ -28,6 +32,18 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
     private SiteWrapper srcSite;
 
     private MultiSelectWidget siteMultiSelect;
+
+    private List<SiteWrapper> allSites;
+
+    private Map<Integer, StudySites> studiesDispatchRelations = new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
+
+    private StudyWrapper currentStudy;
+
+    private class StudySites {
+        public StudyWrapper study;
+        public List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
+        public List<SiteWrapper> removedSites = new ArrayList<SiteWrapper>();
+    }
 
     public SelectStudyDispatchSitesDialog(Shell parentShell, SiteWrapper srcSite) {
         super(parentShell);
@@ -49,9 +65,9 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
         studyCombo.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                StudyWrapper selectedStudy = (StudyWrapper) ((IStructuredSelection) studyCombo
+                StudyWrapper study = (StudyWrapper) ((IStructuredSelection) studyCombo
                     .getSelection()).getFirstElement();
-                setSitesSelection(selectedStudy);
+                setSitesSelection(study);
             }
         });
 
@@ -60,29 +76,64 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         siteMultiSelect.setLayoutData(gd);
+        siteMultiSelect
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
+                    List<SiteWrapper> removedSites = new ArrayList<SiteWrapper>();
+                    List<Integer> addedSitesIds = siteMultiSelect
+                        .getAddedToSelection();
+                    List<Integer> removedSitesIds = siteMultiSelect
+                        .getRemovedToSelection();
+                    for (SiteWrapper site : allSites) {
+                        if (addedSitesIds.contains(site.getId()))
+                            addedSites.add(site);
+                        if (removedSitesIds.contains(site.getId()))
+                            removedSites.add(site);
+                    }
+                    StudySites ss = studiesDispatchRelations.get(currentStudy
+                        .getId());
+                    ss.addedSites.addAll(addedSites);
+                    ss.removedSites.removeAll(removedSites);
+                    ss.removedSites.addAll(removedSites);
+                    ss.removedSites.removeAll(addedSites);
+                }
+            });
     }
 
     private void setSitesSelection(StudyWrapper study) {
+        currentStudy = study;
+        StudySites ss = studiesDispatchRelations.get(currentStudy.getId());
+        if (ss == null) {
+            ss = new StudySites();
+            ss.study = study;
+            studiesDispatchRelations.put(study.getId(), ss);
+        }
+
         Collection<SiteWrapper> currentDestSites = srcSite
             .getStudyDispachSites(study);
-        LinkedHashMap<Integer, String> availSites = new LinkedHashMap<Integer, String>();
+        LinkedHashMap<Integer, String> availableSites = new LinkedHashMap<Integer, String>();
         List<Integer> selectedSites = new ArrayList<Integer>();
         if (currentDestSites != null) {
             for (SiteWrapper site : currentDestSites) {
                 selectedSites.add(site.getId());
             }
         }
-        List<SiteWrapper> sites = null;
+        for (SiteWrapper site : ss.addedSites) {
+            selectedSites.add(site.getId());
+        }
         try {
-            sites = SiteWrapper.getSites(SessionManager.getAppService());
+            allSites = SiteWrapper.getSites(SessionManager.getAppService());
+            allSites.remove(srcSite);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error", e);
             return;
         }
-        for (SiteWrapper site : sites) {
-            availSites.put(site.getId(), site.getNameShort());
+        for (SiteWrapper site : allSites) {
+            availableSites.put(site.getId(), site.getNameShort());
         }
-        siteMultiSelect.setSelections(availSites, selectedSites);
+        siteMultiSelect.setSelections(availableSites, selectedSites);
     }
 
     @Override
@@ -92,12 +143,22 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a study and then choose which site can receive aliquots from this " + srcSite.getNameShort();
+        return "Select a study and then choose which site can receive aliquots from this "
+            + srcSite.getNameShort();
     }
 
     @Override
     protected String getTitleAreaTitle() {
         return TITLE;
+    }
+
+    @Override
+    protected void okPressed() {
+        for (StudySites ss : studiesDispatchRelations.values()) {
+            srcSite.addStudyDispatchSites(ss.study, ss.addedSites);
+            srcSite.removeStudyDispatchSites(ss.study, ss.removedSites);
+        }
+        super.okPressed();
     }
 
 }
