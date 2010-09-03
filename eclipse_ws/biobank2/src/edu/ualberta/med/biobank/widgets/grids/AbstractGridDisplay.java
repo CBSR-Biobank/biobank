@@ -60,7 +60,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 int yPosition = cellHeight * indexRow;
                 Rectangle rectangle = new Rectangle(xPosition, yPosition,
                     cellWidth, cellHeight);
-                
+
                 customDraw(e, displayWidget, rectangle, indexRow, indexCol);
                 drawRectangle(e, displayWidget, rectangle, indexRow, indexCol);
                 String topText = getTopTextForBox(displayWidget.getCells(),
@@ -136,6 +136,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     }
 
+    @SuppressWarnings("unused")
     protected void customDraw(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {

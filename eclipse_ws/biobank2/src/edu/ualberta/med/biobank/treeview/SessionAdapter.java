@@ -159,6 +159,7 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
         try {
             return ClinicWrapper.getAllClinics(appService);

@@ -20,6 +20,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentViewForm";
 
+    @SuppressWarnings("unused")
     private DispatchShipmentAdapter shipmentAdapter;
 
     private DispatchShipmentWrapper shipment;
