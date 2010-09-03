@@ -25,7 +25,8 @@ public class InvoicingReportImpl extends AbstractReport {
         + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
-        + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.patientVisit.shipment.clinic, Alias.sampleType.nameShort";
+        + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.patientVisit.shipment.clinic.nameShort, Alias.sampleType.nameShort"
+        + " ORDER BY Alias.patientVisit.patient.study.nameShort, Alias.patientVisit.shipment.clinic.nameShort, Alias.sampleType.nameShort";
 
     public InvoicingReportImpl(BiobankReport report) {
         super(QUERY, report);
