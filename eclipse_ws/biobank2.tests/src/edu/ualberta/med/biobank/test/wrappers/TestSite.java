@@ -847,7 +847,7 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetDispatchStudies() throws Exception {
+    public void testAddDispatchStudies() throws Exception {
         String name = "testGetDispatchStudies" + r.nextInt();
         SiteWrapper srcSite = SiteHelper.addSite(name);
         List<SiteWrapper> destSites = SiteHelper.addSites(name + "_dest_",
@@ -866,9 +866,34 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(studies.size(), siteDispatchStudies.size());
         Assert.assertTrue(siteDispatchStudies.containsAll(studies));
 
-        // FIXME need test for removal of studies
-        Assert.fail("need test for removal of studies");
+        // remove studies
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+        }
+        srcSite.persist();
+        srcSite.reload();
+        siteDispatchStudies = srcSite.getDispatchStudies();
+        Assert.assertNotNull(siteDispatchStudies);
+        Assert.assertEquals(0, siteDispatchStudies.size());
 
+        // now add all studies again and remove one by one
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+        }
+        srcSite.persist();
+        srcSite.reload();
+        int count = 0;
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+            ++count;
+
+            srcSite.persist();
+            srcSite.reload();
+            siteDispatchStudies = srcSite.getDispatchStudies();
+            Assert.assertNotNull(siteDispatchStudies);
+            Assert.assertEquals(studies.size() - count,
+                siteDispatchStudies.size());
+        }
     }
 
     @Test
@@ -899,13 +924,30 @@ public class TestSite extends TestDatabase {
         srcSite.reload();
         srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
 
+        Assert.assertNotNull(srcSiteDispatchSites);
         Assert.assertEquals(destSitesSet1.size() + destSitesSet2.size(),
             srcSiteDispatchSites.size());
         Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet2));
 
         // remove set 1
-        // FIXME need test for removal of dest sites
-        Assert.fail("need test for removal of dest sites");
+        srcSite.removeStudyDispatchSites(study, destSitesSet1);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(destSitesSet2.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet2));
+
+        // remove set 2
+        srcSite.removeStudyDispatchSites(study, destSitesSet2);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(0, srcSiteDispatchSites.size());
     }
 
 }
