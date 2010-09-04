@@ -11,9 +11,11 @@ import java.util.jar.JarFile;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
+import javax.xml.soap.SOAPElement;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.message.SOAPHeaderElement;
 
 public class TestClient {
     public static void main(String args[]) {
@@ -169,19 +171,16 @@ public class TestClient {
         call.addParameter("arg3", searchClassQName, ParameterMode.IN);
         call.setReturnType(org.apache.axis.encoding.XMLType.SOAP_ARRAY);
 
-        /*
-         * //This block inserts the security headers in the service call
-         * SOAPHeaderElement headerElement = new
-         * SOAPHeaderElement(call.getOperationName
-         * ().getNamespaceURI(),"CSMSecurityHeader");
-         * headerElement.setPrefix("csm");
-         * headerElement.setMustUnderstand(false); SOAPElement usernameElement =
-         * headerElement.addChildElement("username");
-         * usernameElement.addTextNode("userId"); SOAPElement passwordElement =
-         * headerElement.addChildElement("password");
-         * passwordElement.addTextNode("password");
-         * call.addHeader(headerElement);
-         */
+        // This block inserts the security headers in the service call
+        SOAPHeaderElement headerElement = new SOAPHeaderElement(call
+            .getOperationName().getNamespaceURI(), "CSMSecurityHeader");
+        headerElement.setPrefix("csm");
+        headerElement.setMustUnderstand(false);
+        SOAPElement usernameElement = headerElement.addChildElement("username");
+        usernameElement.addTextNode("userId");
+        SOAPElement passwordElement = headerElement.addChildElement("password");
+        passwordElement.addTextNode("password");
+        call.addHeader(headerElement);
 
         System.out.println("Searching for association: "
             + containingObj.getClass().getName() + "." + rolename);
