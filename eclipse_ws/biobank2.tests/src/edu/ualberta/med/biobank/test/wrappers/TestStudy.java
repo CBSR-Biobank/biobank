@@ -52,8 +52,10 @@ public class TestStudy extends TestDatabase {
 
         SiteWrapper site = SiteHelper.addSite(name, false);
         List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-        study.addSites(sites);
-        study.persist();
+        for (SiteWrapper s : sites) {
+            s.addStudies(Arrays.asList(study));
+            s.persist();
+        }
         study.reload();
 
         List<SiteWrapper> studySites = study.getSiteCollection();
@@ -76,8 +78,10 @@ public class TestStudy extends TestDatabase {
         SiteHelper.addSites(name, r.nextInt(15) + 5);
 
         List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-        study.addSites(sites);
-        study.persist();
+        for (SiteWrapper s : sites) {
+            s.addStudies(Arrays.asList(study));
+            s.persist();
+        }
         study.reload();
 
         List<SiteWrapper> sitesSorted = study.getSiteCollection(true);
@@ -87,45 +91,6 @@ public class TestStudy extends TestDatabase {
             SiteWrapper study2 = sitesSorted.get(i + 1);
             Assert.assertTrue(study1.compareTo(study2) <= 0);
         }
-    }
-
-    @Test
-    public void testAddAndRemoveSites() throws Exception {
-        String name = "testAddSites" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-        SiteHelper.addSites(name, r.nextInt(15) + 1);
-
-        List<SiteWrapper> sitesGroup1 = SiteWrapper.getSites(appService);
-        int sitesCount1 = sitesGroup1.size();
-        study.addSites(sitesGroup1);
-        study.persist();
-        study.reload();
-
-        Assert.assertEquals(sitesCount1, study.getSiteCollection().size());
-
-        // add more sites
-        int sitesCount2 = r.nextInt(15) + 1;
-        SiteHelper.addSites(name + "_G2", sitesCount2);
-
-        List<SiteWrapper> sitesGroup2 = new ArrayList<SiteWrapper>();
-        for (SiteWrapper site : SiteWrapper.getSites(appService)) {
-            if (!sitesGroup1.contains(site)) {
-                sitesGroup2.add(site);
-            }
-        }
-
-        study.addSites(sitesGroup2);
-        study.persist();
-        study.reload();
-
-        Assert.assertEquals(sitesCount1 + sitesCount2, study
-            .getSiteCollection().size());
-
-        study.removeSites(sitesGroup1);
-        Assert.assertEquals(sitesCount2, study.getSiteCollection().size());
-
-        study.removeSites(sitesGroup2);
-        Assert.assertEquals(0, study.getSiteCollection().size());
     }
 
     private static List<PatientVisitWrapper> studyAddPatientVisits(

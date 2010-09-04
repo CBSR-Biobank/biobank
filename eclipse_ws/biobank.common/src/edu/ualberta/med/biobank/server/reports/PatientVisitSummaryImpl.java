@@ -46,6 +46,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + "from patient_visit as pv where pv.patient = p and pv.shipment.clinic = c.clinic and"
         + " s=p.study and pv.dateProcessed between ? and ?) {0} {1})";
 
+    @SuppressWarnings("unused")
     private static String SQL_QUERY_STRING = "select s.nameShort, clinic.nameShort, "
         + MessageFormat.format(SQL_PVCOUNT_STRING, "=", "1")
         + ", "

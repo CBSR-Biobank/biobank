@@ -26,7 +26,6 @@ public class ClinicShipmentWrapper extends
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
     private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
-    private ClinicWrapper clinic;
 
     public ClinicShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -170,17 +169,19 @@ public class ClinicShipmentWrapper extends
     }
 
     public ClinicWrapper getClinic() {
+        ClinicWrapper clinic = (ClinicWrapper) propertiesMap.get("clinic");
         if (clinic == null) {
             Clinic c = wrappedObject.getClinic();
             if (c == null)
                 return null;
             clinic = new ClinicWrapper(appService, c);
+            propertiesMap.put("clinic", clinic);
         }
         return clinic;
     }
 
     public void setClinic(ClinicWrapper clinic) {
-        this.clinic = clinic;
+        propertiesMap.put("clinic", clinic);
         Clinic oldClinic = wrappedObject.getClinic();
         Clinic newClinic = null;
         if (clinic != null) {
@@ -394,7 +395,6 @@ public class ClinicShipmentWrapper extends
     public void resetInternalFields() {
         patientsAdded.clear();
         patientsRemoved.clear();
-        clinic = null;
     }
 
     public static List<ClinicShipmentWrapper> getTodayShipments(

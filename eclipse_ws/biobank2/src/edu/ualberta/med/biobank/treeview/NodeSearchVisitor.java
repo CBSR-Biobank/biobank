@@ -50,7 +50,7 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public AdapterBase visit(StudyGroup sGroup) {
+    public AdapterBase visit(AbstractStudyGroup sGroup) {
         if (wrapper instanceof StudyWrapper) {
             return sGroup.getChild(wrapper, true);
         }
@@ -75,7 +75,7 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public AdapterBase visit(ClinicGroup clinics) {
+    public AdapterBase visit(AbstractClinicGroup clinics) {
         if (wrapper instanceof ClinicWrapper) {
             return clinics.getChild(wrapper, true);
         }
@@ -166,7 +166,7 @@ public class NodeSearchVisitor {
         return null;
     }
 
-    public AdapterBase visit(ShipmentAdapter shipment) {
+    public AdapterBase visit(ClinicShipmentAdapter shipment) {
         if (wrapper instanceof PatientVisitWrapper) {
             return shipment.getChild(wrapper, true);
         }

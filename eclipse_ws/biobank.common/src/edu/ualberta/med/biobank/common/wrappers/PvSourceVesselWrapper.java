@@ -12,9 +12,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
 
-    private PatientVisitWrapper pv;
-    private SourceVesselWrapper ss;
-
     public PvSourceVesselWrapper(WritableApplicationService appService,
         PvSourceVessel wrappedObject) {
         super(appService, wrappedObject);
@@ -57,27 +54,24 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
+        PatientVisitWrapper pv = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         if (pv == null) {
             PatientVisit p = wrappedObject.getPatientVisit();
             if (p == null)
                 return null;
             pv = new PatientVisitWrapper(appService, p);
+            propertiesMap.put("patientVisit", pv);
         }
         return pv;
     }
 
     public void setPatientVisit(PatientVisitWrapper visit) {
-        this.pv = visit;
+        propertiesMap.put("patientVisit", visit);
         PatientVisit oldPv = wrappedObject.getPatientVisit();
         PatientVisit newPv = visit.wrappedObject;
         wrappedObject.setPatientVisit(newPv);
         propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
-    }
-
-    @Override
-    protected void resetInternalFields() {
-        this.pv = null;
-        this.ss = null;
     }
 
     public Date getTimeDrawn() {
@@ -105,17 +99,20 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     public SourceVesselWrapper getSourceVessel() {
+        SourceVesselWrapper ss = (SourceVesselWrapper) propertiesMap
+            .get("sourceVessel");
         if (ss == null) {
             SourceVessel s = wrappedObject.getSourceVessel();
             if (s == null)
                 return null;
             ss = new SourceVesselWrapper(appService, s);
+            propertiesMap.put("sourceVessel", ss);
         }
         return ss;
     }
 
     public void setSourceVessel(SourceVesselWrapper ss) {
-        this.ss = ss;
+        propertiesMap.put("sourceVessel", ss);
         SourceVessel oldSs = wrappedObject.getSourceVessel();
         SourceVessel newSs = null;
         if (ss != null) {
@@ -134,10 +131,4 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
         return 0;
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-        ss = null;
-        pv = null;
-    }
 }

@@ -71,19 +71,18 @@ public class TestClient {
                 call.addParameter("arg2", searchClassQName, ParameterMode.IN);
                 call.setReturnType(org.apache.axis.encoding.XMLType.SOAP_ARRAY);
 
-                /*
-                 * //This block inserts the security headers in the service call
-                 * SOAPHeaderElement headerElement = new
-                 * SOAPHeaderElement(call.getOperationName
-                 * ().getNamespaceURI(),"SecurityHeader");
-                 * headerElement.setPrefix("security");
-                 * headerElement.setMustUnderstand(false); SOAPElement
-                 * usernameElement = headerElement.addChildElement("testuser");
-                 * usernameElement.addTextNode("userId"); SOAPElement
-                 * passwordElement = headerElement.addChildElement("test");
-                 * passwordElement.addTextNode("password");
-                 * call.addHeader(headerElement);
-                 */
+                // This block inserts the security headers in the service call
+                SOAPHeaderElement headerElement = new SOAPHeaderElement(call
+                    .getOperationName().getNamespaceURI(), "SecurityHeader");
+                headerElement.setPrefix("security");
+                headerElement.setMustUnderstand(false);
+                SOAPElement usernameElement = headerElement
+                    .addChildElement("testuser");
+                usernameElement.addTextNode("userId");
+                SOAPElement passwordElement = headerElement
+                    .addChildElement("test");
+                passwordElement.addTextNode("password");
+                call.addHeader(headerElement);
 
                 Object o = klass.newInstance();
 

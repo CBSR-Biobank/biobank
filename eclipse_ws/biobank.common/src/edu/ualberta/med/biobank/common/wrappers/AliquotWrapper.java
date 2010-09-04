@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchContainer;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -26,10 +25,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     private AbstractObjectWithPositionManagement<AliquotPosition> objectWithPositionManagement;
-
-    private PatientVisitWrapper patientVisit;
-    private SampleTypeWrapper sampleType;
-    private ActivityStatusWrapper activityStatus;
 
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
@@ -48,29 +43,19 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             @Override
             protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
                 boolean initIfNoPosition) {
-                if (nullPositionSet) {
-                    if (rowColPosition != null) {
-                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                            appService);
-                        posWrapper.setRow(rowColPosition.row);
-                        posWrapper.setCol(rowColPosition.col);
-                        posWrapper.setAliquot(AliquotWrapper.this);
-                        wrappedObject.setAliquotPosition(posWrapper
-                            .getWrappedObject());
-                        return posWrapper;
-                    }
-                } else {
-                    AliquotPosition pos = wrappedObject.getAliquotPosition();
-                    if (pos != null) {
-                        return new AliquotPositionWrapper(appService, pos);
-                    } else if (initIfNoPosition) {
-                        AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
-                            appService);
-                        posWrapper.setAliquot(AliquotWrapper.this);
-                        wrappedObject.setAliquotPosition(posWrapper
-                            .getWrappedObject());
-                        return posWrapper;
-                    }
+                if (nullPositionSet)
+                    return null;
+
+                AliquotPosition pos = wrappedObject.getAliquotPosition();
+                if (pos != null) {
+                    return new AliquotPositionWrapper(appService, pos);
+                } else if (initIfNoPosition) {
+                    AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                        appService);
+                    posWrapper.setAliquot(AliquotWrapper.this);
+                    wrappedObject.setAliquotPosition(posWrapper
+                        .getWrappedObject());
+                    return posWrapper;
                 }
                 return null;
             }
@@ -190,7 +175,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
-        this.patientVisit = patientVisit;
+        propertiesMap.put("patientVisit", patientVisit);
         PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
         PatientVisit newPvRaw = null;
         if (patientVisit != null) {
@@ -202,11 +187,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
+        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         if (patientVisit == null) {
             PatientVisit pv = wrappedObject.getPatientVisit();
             if (pv == null)
                 return null;
-            this.patientVisit = new PatientVisitWrapper(appService, pv);
+            patientVisit = new PatientVisitWrapper(appService, pv);
+            propertiesMap.put("patientVisit", patientVisit);
         }
         return patientVisit;
     }
@@ -246,7 +234,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setSampleType(SampleTypeWrapper type) {
-        this.sampleType = type;
+        propertiesMap.put("sampleType", type);
         SampleType oldTypeRaw = wrappedObject.getSampleType();
         SampleType newTypeRaw = null;
         if (type != null) {
@@ -258,11 +246,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SampleTypeWrapper getSampleType() {
+        SampleTypeWrapper sampleType = (SampleTypeWrapper) propertiesMap
+            .get("sampleType");
         if (sampleType == null) {
             SampleType s = wrappedObject.getSampleType();
             if (s == null)
                 return null;
-            this.sampleType = new SampleTypeWrapper(appService, s);
+            sampleType = new SampleTypeWrapper(appService, s);
+            propertiesMap.put("sampleType", sampleType);
         }
         return sampleType;
     }
@@ -293,17 +284,20 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        if (activityStatus == null) {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
+        if (activity == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
-            this.activityStatus = new ActivityStatusWrapper(appService, a);
+            activity = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activity);
         }
-        return activityStatus;
+        return activity;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -326,10 +320,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public ContainerWrapper getParent() {
-        return (ContainerWrapper) objectWithPositionManagement.getParent();
+        return objectWithPositionManagement.getParent();
     }
 
-    public void setParent(AbstractContainerWrapper<?> container) {
+    public void setParent(ContainerWrapper container) {
         objectWithPositionManagement.setParent(container);
     }
 
@@ -342,6 +336,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setPosition(RowColPos rcp) {
+        if (rcp == null) {
+            setParent(null);
+        }
         objectWithPositionManagement.setPosition(rcp);
     }
 
@@ -382,6 +379,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setQuantityFromType() {
+        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         StudyWrapper study = patientVisit.getPatient().getStudy();
         Double volume = null;
         Collection<SampleStorageWrapper> sampleStorageCollection = study
@@ -433,7 +432,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " where patientVisit.patient.study.site.id = ? and activityStatus != ?",
+                + " a where a.patientVisit.shipment.site.id = ? and activityStatus != ?",
             Arrays.asList(new Object[] { site.getId(),
                 activeStatus.getWrappedObject() }));
         List<Aliquot> aliquots = appService.query(criteria);
@@ -508,36 +507,12 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return getInventoryId();
     }
 
-    @Override
-    public void resetInternalFields() {
-        patientVisit = null;
-        sampleType = null;
-        activityStatus = null;
-    }
-
-    public List<DispatchContainerWrapper> getDispatchContainerCollection()
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select cont from "
-            + DispatchContainer.class.getName()
-            + " where cont.positionCollection.aliquot.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-
-        List<DispatchContainer> conts = appService.query(criteria);
-        List<DispatchContainerWrapper> contWrappers = new ArrayList<DispatchContainerWrapper>();
-        for (DispatchContainer cont : conts) {
-            contWrappers.add(new DispatchContainerWrapper(appService, cont));
-        }
-        return contWrappers;
-    }
-
     public List<DispatchShipmentWrapper> getDispatchShipments()
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select ship from "
-                + DispatchShipment.class.getName()
-                + " where ship.sentContainerCollection.positionCollection.aliquot.id = ?",
+        HQLCriteria criteria = new HQLCriteria("select ship from "
+            + DispatchShipment.class.getName()
+            + " ship where ship.aliquotCollection.id = ?",
             Arrays.asList(new Object[] { getId() }));
-
         List<DispatchShipment> ships = appService.query(criteria);
         List<DispatchShipmentWrapper> shipWrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment ship : ships) {

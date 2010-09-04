@@ -17,7 +17,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerLabelingSchemeWrapper extends
     ModelWrapper<ContainerLabelingScheme> {
     private static List<ContainerLabelingScheme> allSchemes;
-    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemeWrappersMap;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,

@@ -78,28 +78,95 @@ public class TestSite extends TestDatabase {
     public void testGetStudyCollection() throws Exception {
         String name = "testGetStudyCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        int studiesNber = r.nextInt(15) + 1;
-        List<StudyWrapper> newStudies = StudyHelper.addStudies(name,
-            studiesNber);
 
-        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
+        try {
+            site.removeStudies(new ArrayList<StudyWrapper>());
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException e) {
+            Assert.fail("cannot call removeStudies with empty list");
+        }
+
+        List<StudyWrapper> studySet1 = StudyHelper.addStudies(name + "_s1_",
+            r.nextInt(10) + 1);
+        site.addStudies(studySet1);
         site.persist();
         site.reload();
-
         List<StudyWrapper> siteStudies = site.getStudyCollection();
 
-        Assert.assertEquals(studies.size(), siteStudies.size());
+        Assert.assertEquals(studySet1.size(), siteStudies.size());
 
-        // delete a study
-        StudyWrapper study = newStudies.get(r.nextInt(newStudies.size()));
-        studies.remove(study);
-        study.delete();
-        StudyHelper.createdStudies.remove(study);
+        // add another set
+        List<StudyWrapper> studySet2 = StudyHelper.addStudies(name + "_s2_",
+            r.nextInt(10) + 1);
+        site.addStudies(studySet2);
+        site.persist();
         site.reload();
         siteStudies = site.getStudyCollection();
 
-        Assert.assertEquals(studies.size(), siteStudies.size());
+        Assert.assertEquals(studySet1.size() + studySet2.size(),
+            siteStudies.size());
+
+        // remove studies
+        site.removeStudies(studySet1);
+        site.persist();
+        site.reload();
+        siteStudies = site.getStudyCollection();
+
+        Assert.assertEquals(studySet2.size(), siteStudies.size());
+        Assert.assertTrue(siteStudies.containsAll(studySet2));
+
+        // try and remove studies that were already removed
+        try {
+            site.removeStudies(studySet1);
+            Assert
+                .fail("should not be allowed to remove a study that is not associated with site");
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testNonAssocStudies() throws Exception {
+        String name = "testGetStudyCollection" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        try {
+            site.removeStudies(new ArrayList<StudyWrapper>());
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException e) {
+            Assert.fail("cannot call removeStudies with empty list");
+        }
+
+        // create 2 sets
+        List<StudyWrapper> studySet1 = StudyHelper.addStudies(name + "_s1_",
+            r.nextInt(10) + 1);
+        List<StudyWrapper> studySet2 = StudyHelper.addStudies(name + "_s2_",
+            r.nextInt(10) + 1);
+
+        // add set 1
+        site.addStudies(studySet1);
+        site.persist();
+        site.reload();
+        List<StudyWrapper> siteNonAssocStudies = site.getStudiesNotAssoc();
+
+        Assert.assertEquals(studySet2.size(), siteNonAssocStudies.size());
+
+        // remove set 1 and add set 2
+        site.removeStudies(studySet1);
+        site.addStudies(studySet2);
+        site.persist();
+        site.reload();
+        siteNonAssocStudies = site.getStudiesNotAssoc();
+
+        Assert.assertEquals(studySet1.size(), siteNonAssocStudies.size());
+
+        // add set 1 again
+        site.addStudies(studySet1);
+        site.persist();
+        site.reload();
+        siteNonAssocStudies = site.getStudiesNotAssoc();
+
+        Assert.assertEquals(0, siteNonAssocStudies.size());
     }
 
     @Test
@@ -134,13 +201,36 @@ public class TestSite extends TestDatabase {
         site.persist();
         site.reload();
 
+        Assert.assertEquals(studiesNber, site.getStudyCollection().size());
+
         // add one more study
-        StudyHelper.addStudy(name + "newStudy");
-        studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
+        StudyWrapper newStudy = StudyHelper.addStudy(name + "newStudy");
+        site.addStudies(Arrays.asList(newStudy));
         site.persist();
         site.reload();
         Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
+    }
+
+    @Test
+    public void testRemoveStudies() throws Exception {
+        String name = "testRemoveStudies" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudies(name, r.nextInt(15) + 1);
+
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        int studiesNber = studies.size();
+        site.addStudies(studies);
+        site.persist();
+        site.reload();
+
+        Assert.assertEquals(studiesNber, site.getStudyCollection().size());
+
+        // remove one study
+        StudyWrapper newStudy = studies.get(0);
+        site.removeStudies(Arrays.asList(newStudy));
+        site.persist();
+        site.reload();
+        Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
     }
 
     @Test
@@ -754,6 +844,110 @@ public class TestSite extends TestDatabase {
 
         site.reload();
         Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
+    }
+
+    @Test
+    public void testAddDispatchStudies() throws Exception {
+        String name = "testGetDispatchStudies" + r.nextInt();
+        SiteWrapper srcSite = SiteHelper.addSite(name);
+        List<SiteWrapper> destSites = SiteHelper.addSites(name + "_dest_",
+            r.nextInt(5) + 1);
+        List<StudyWrapper> studies = StudyHelper.addStudies(name,
+            r.nextInt(5) + 1);
+        srcSite.reload();
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+        }
+        srcSite.persist();
+        srcSite.reload();
+
+        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudies();
+        Assert.assertNotNull(siteDispatchStudies);
+        Assert.assertEquals(studies.size(), siteDispatchStudies.size());
+        Assert.assertTrue(siteDispatchStudies.containsAll(studies));
+
+        // remove studies
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+        }
+        srcSite.persist();
+        srcSite.reload();
+        siteDispatchStudies = srcSite.getDispatchStudies();
+        Assert.assertNotNull(siteDispatchStudies);
+        Assert.assertEquals(0, siteDispatchStudies.size());
+
+        // now add all studies again and remove one by one
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+        }
+        srcSite.persist();
+        srcSite.reload();
+        int count = 0;
+        for (StudyWrapper study : studies) {
+            srcSite.addStudyDispatchSites(study, destSites);
+            ++count;
+
+            srcSite.persist();
+            srcSite.reload();
+            siteDispatchStudies = srcSite.getDispatchStudies();
+            Assert.assertNotNull(siteDispatchStudies);
+            Assert.assertEquals(studies.size() - count,
+                siteDispatchStudies.size());
+        }
+    }
+
+    @Test
+    public void testAddDispatchSites() throws Exception {
+        String name = "testAddDispatchSites" + r.nextInt();
+        SiteWrapper srcSite = SiteHelper.addSite(name);
+        List<SiteWrapper> destSitesSet1 = SiteHelper.addSites(name + "_s1_",
+            r.nextInt(5) + 1);
+        List<SiteWrapper> destSitesSet2 = SiteHelper.addSites(name + "_s2_",
+            r.nextInt(5) + 1);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+
+        // add dest site set 1
+        srcSite.addStudyDispatchSites(study, destSitesSet1);
+        List<SiteWrapper> srcSiteDispatchSites = srcSite
+            .getStudyDispachSites(study);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+
+        // add dest site set 2
+        srcSite.addStudyDispatchSites(study, destSitesSet2);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(destSitesSet1.size() + destSitesSet2.size(),
+            srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet2));
+
+        // remove set 1
+        srcSite.removeStudyDispatchSites(study, destSitesSet1);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(destSitesSet2.size(), srcSiteDispatchSites.size());
+        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet2));
+
+        // remove set 2
+        srcSite.removeStudyDispatchSites(study, destSitesSet2);
+        srcSite.persist();
+        srcSite.reload();
+        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
+
+        Assert.assertNotNull(srcSiteDispatchSites);
+        Assert.assertEquals(0, srcSiteDispatchSites.size());
     }
 
 }

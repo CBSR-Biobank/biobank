@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -30,8 +31,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private AddressWrapper address;
 
-    private ActivityStatusWrapper activityStatus;
-
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
     }
@@ -48,7 +47,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "sitePvAttrCollection", "street1", "street2", "city", "province",
             "postalCode", "sentDispatchShipmentCollection",
             "sentDispatchShipmentCollection", "notificationCollection",
-            "srcDispatchInfoCollection" };
+            "srcDispatchInfoCollection", "studyCollection" };
     }
 
     public String getName() {
@@ -73,17 +72,20 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
                 return null;
             activityStatus = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put("activityStatus", activityStatus);
         }
         return activityStatus;
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        this.activityStatus = activityStatus;
+        propertiesMap.put("activityStatus", activityStatus);
         ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
         ActivityStatus rawObject = null;
         if (activityStatus != null) {
@@ -253,33 +255,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
                     + getName()
                     + ". All defined children (shipments, container types, and containers) must be removed first.");
         }
-
-    }
-
-    public void addStudies(List<StudyWrapper> studies) {
-        if ((studies == null) || (studies.size() == 0))
-            return;
-
-        Collection<Study> allStudyObjects = new HashSet<Study>();
-        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-        // already added studies
-        List<StudyWrapper> currentList = getStudyCollection();
-        if (currentList != null) {
-            for (StudyWrapper study : currentList) {
-                allStudyObjects.add(study.getWrappedObject());
-                allStudyWrappers.add(study);
-            }
-        }
-        // new studies added
-        for (StudyWrapper study : studies) {
-            allStudyObjects.add(study.getWrappedObject());
-            allStudyWrappers.add(study);
-        }
-        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-        wrappedObject.setStudyCollection(allStudyObjects);
-        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
-            allStudyObjects);
-        propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -303,6 +278,73 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(true);
+    }
+
+    public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
+        List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
+        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
+            + " s where " + getId() + " not in elements(s.siteCollection)");
+        List<Study> results = appService.query(c);
+        for (Study res : results) {
+            studyWrappers.add(new StudyWrapper(appService, res));
+        }
+        return studyWrappers;
+    }
+
+    private void setStudyCollection(Collection<Study> allStudyObjects,
+        List<StudyWrapper> allStudyWrappers) {
+        Collection<Study> oldStudys = wrappedObject.getStudyCollection();
+        wrappedObject.setStudyCollection(allStudyObjects);
+        propertyChangeSupport.firePropertyChange("contactCollection",
+            oldStudys, allStudyObjects);
+        propertiesMap.put("studyCollection", allStudyWrappers);
+    }
+
+    public void addStudies(List<StudyWrapper> studies) {
+        if ((studies == null) || (studies.size() == 0))
+            return;
+
+        Collection<Study> allStudyObjects = new HashSet<Study>();
+        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+        // already added studies
+        List<StudyWrapper> currentList = getStudyCollection();
+        if (currentList != null) {
+            for (StudyWrapper study : currentList) {
+                allStudyObjects.add(study.getWrappedObject());
+                allStudyWrappers.add(study);
+            }
+        }
+        // new studies added
+        for (StudyWrapper study : studies) {
+            allStudyObjects.add(study.getWrappedObject());
+            allStudyWrappers.add(study);
+        }
+        setStudyCollection(allStudyObjects, allStudyWrappers);
+    }
+
+    public void removeStudies(List<StudyWrapper> studiesToRemove)
+        throws BiobankCheckException {
+        if ((studiesToRemove == null) || (studiesToRemove.size() == 0))
+            return;
+
+        List<StudyWrapper> currentList = getStudyCollection();
+        if (!currentList.containsAll(studiesToRemove)) {
+            throw new BiobankCheckException(
+                "studies are not associated with site " + getNameShort());
+        }
+
+        Collection<Study> allStudyObjects = new HashSet<Study>();
+        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
+        // already added studies
+        if (currentList != null) {
+            for (StudyWrapper study : currentList) {
+                if (!studiesToRemove.contains(study)) {
+                    allStudyObjects.add(study.getWrappedObject());
+                    allStudyWrappers.add(study);
+                }
+            }
+        }
+        setStudyCollection(allStudyObjects, allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -578,14 +620,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     public void resetInternalFields() {
-        activityStatus = null;
         address = null;
     }
 
     public List<StudyWrapper> getDispatchStudies() throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("select info.study from "
             + DispatchInfo.class.getName()
-            + " as info where info.fromSite.id = ?",
+            + " as info where info.srcSite.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Study> results = appService.query(criteria);
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
@@ -595,67 +636,59 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return wrappers;
     }
 
-    /**
-     * if study == null, will get all sites to which can dispatch, for whatever
-     * study
-     */
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
-        throws ApplicationException {
-        // FIXME use the infos maps instead and do not manage null study
-        String studyString = "";
-        List<Object> params = new ArrayList<Object>();
-        params.add(getId());
-        if (study != null) {
-            studyString = " and info.study.id=?";
-            params.add(study.getId());
-        }
-        HQLCriteria criteria = new HQLCriteria(
-            "select info.destSiteCollection from "
-                + DispatchInfo.class.getName()
-                + " as info where info.srcSite.id = ?" + studyString, params);
-        List<Site> results = appService.query(criteria);
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site res : results) {
-            wrappers.add(new SiteWrapper(appService, res));
-        }
-        return wrappers;
+    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
+        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
+        if (srcMap == null)
+            return null;
+        DispatchInfoWrapper info = srcMap.get(study.getId());
+        if (info == null)
+            return null;
+        return info.getDestSiteCollection();
     }
 
-    public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
-        List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " s where " + getId() + " not in elements(s.siteCollection)");
-        List<Study> results = appService.query(c);
-        for (Study res : results) {
-            studyWrappers.add(new StudyWrapper(appService, res));
-        }
-        return studyWrappers;
-    }
-
-    public void removeStudies(List<StudyWrapper> studies) {
-        if ((studies == null) || (studies.size() == 0))
+    public void addStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> sites) {
+        if ((sites == null) || (sites.size() == 0))
             return;
+        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
+        if (infos == null) {
+            infos = new HashMap<Integer, DispatchInfoWrapper>();
+        }
+        DispatchInfoWrapper diw = infos.get(study.getId());
+        if (diw == null) {
+            diw = new DispatchInfoWrapper(appService);
+            diw.setStudy(study);
+            diw.setSrcSite(this);
+            infos.put(study.getId(), diw);
+            Collection<DispatchInfo> allsInfoObjects = wrappedObject
+                .getSrcDispatchInfoCollection();
+            if (allsInfoObjects == null) {
+                allsInfoObjects = new HashSet<DispatchInfo>();
+            }
+            allsInfoObjects.add(diw.wrappedObject);
+            wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
+        }
+        diw.addDestSites(sites);
+    }
 
-        Collection<Study> allStudyObjects = new HashSet<Study>();
-        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-        // already added studies
-        List<StudyWrapper> currentList = getStudyCollection();
-        if (currentList != null) {
-            for (StudyWrapper study : currentList) {
-                allStudyObjects.add(study.getWrappedObject());
-                allStudyWrappers.add(study);
+    public void removeStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> sites) {
+        if ((sites == null) || (sites.size() == 0))
+            return;
+        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
+        if (infos != null) {
+            DispatchInfoWrapper diw = infos.get(study.getId());
+            if (diw != null) {
+                diw.removeDestSites(sites);
+                if (diw.getDestSiteCollection().size() == 0) {
+                    infos.remove(study.getId());
+                    Collection<DispatchInfo> diList = wrappedObject
+                        .getSrcDispatchInfoCollection();
+                    diList.remove(diw.getWrappedObject());
+                    wrappedObject.setSrcDispatchInfoCollection(diList);
+                }
             }
         }
-        // new studies added
-        for (StudyWrapper study : studies) {
-            allStudyObjects.remove(study.getWrappedObject());
-            allStudyWrappers.remove(study);
-        }
-        Collection<Study> oldStudies = wrappedObject.getStudyCollection();
-        wrappedObject.setStudyCollection(allStudyObjects);
-        propertyChangeSupport.firePropertyChange("studyCollection", oldStudies,
-            allStudyObjects);
-        propertiesMap.put("studyCollection", allStudyWrappers);
     }
 
     @SuppressWarnings("unchecked")
@@ -698,29 +731,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return shipCollection;
     }
 
-    public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> sites) {
-        // FIXME need to be tested
-        if ((sites == null) || (sites.size() == 0))
-            return;
-        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
-        if (infos == null) {
-            infos = new HashMap<Integer, DispatchInfoWrapper>();
-        }
-        DispatchInfoWrapper diw = infos.get(study.getId());
-        if (diw == null) {
-            diw = new DispatchInfoWrapper(appService);
-            diw.setStudy(study);
-            diw.setSrcSite(this);
-            infos.put(study.getId(), diw);
-            Collection<DispatchInfo> allsInfoObjects = wrappedObject
-                .getSrcDispatchInfoCollection();
-            allsInfoObjects.add(diw.wrappedObject);
-            wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
-        }
-        diw.addDestSites(sites);
-    }
-
     /**
      * For one study, this site has one source dispatch info associated.
      * 
@@ -744,4 +754,14 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         return infos;
     }
+
+    public Set<ClinicWrapper> getStudyClinics() {
+        List<StudyWrapper> studies = getStudyCollection();
+        Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
+        for (StudyWrapper study : studies) {
+            clinics.addAll(study.getClinicCollection());
+        }
+        return clinics;
+    }
+
 }

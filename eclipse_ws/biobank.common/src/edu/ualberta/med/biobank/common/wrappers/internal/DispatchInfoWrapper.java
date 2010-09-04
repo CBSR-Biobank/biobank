@@ -37,7 +37,7 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "study", "fromSite" };
+        return new String[] { "study", "fromSite", "destSiteCollection" };
     }
 
     @Override
@@ -95,28 +95,28 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SiteWrapper> getToSiteCollection() {
-        List<SiteWrapper> toSiteCollection = (List<SiteWrapper>) propertiesMap
-            .get("toSiteCollection");
-        if (toSiteCollection == null) {
+    public List<SiteWrapper> getDestSiteCollection() {
+        List<SiteWrapper> destSiteCollection = (List<SiteWrapper>) propertiesMap
+            .get("destSiteCollection");
+        if (destSiteCollection == null) {
             Collection<Site> children = wrappedObject.getDestSiteCollection();
             if (children != null) {
-                toSiteCollection = new ArrayList<SiteWrapper>();
+                destSiteCollection = new ArrayList<SiteWrapper>();
                 for (Site s : children) {
-                    toSiteCollection.add(new SiteWrapper(appService, s));
+                    destSiteCollection.add(new SiteWrapper(appService, s));
                 }
-                propertiesMap.put("toSiteCollection", toSiteCollection);
+                propertiesMap.put("destSiteCollection", destSiteCollection);
             }
         }
-        return toSiteCollection;
+        return destSiteCollection;
     }
 
-    public void addDestSites(Collection<SiteWrapper> newToSites) {
-        if (newToSites != null && newToSites.size() > 0) {
+    public void addDestSites(Collection<SiteWrapper> newDestSites) {
+        if (newDestSites != null && newDestSites.size() > 0) {
             Collection<Site> allSiteObjects = new HashSet<Site>();
             List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
             // already added sites
-            List<SiteWrapper> currentList = getToSiteCollection();
+            List<SiteWrapper> currentList = getDestSiteCollection();
             if (currentList != null) {
                 for (SiteWrapper site : currentList) {
                     allSiteObjects.add(site.getWrappedObject());
@@ -124,38 +124,38 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
                 }
             }
             // new
-            for (SiteWrapper site : newToSites) {
+            for (SiteWrapper site : newDestSites) {
                 allSiteObjects.add(site.getWrappedObject());
                 allSiteWrappers.add(site);
             }
-            setToSites(allSiteObjects, allSiteWrappers);
+            setDestSites(allSiteObjects, allSiteWrappers);
         }
     }
 
-    public void removeToSites(Collection<SiteWrapper> sitesToRemove) {
-        if (sitesToRemove != null && sitesToRemove.size() > 0) {
+    public void removeDestSites(Collection<SiteWrapper> destSitesToRemove) {
+        if (destSitesToRemove != null && destSitesToRemove.size() > 0) {
             Collection<Site> allSiteObjects = new HashSet<Site>();
             List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
             // already added
-            List<SiteWrapper> currentList = getToSiteCollection();
+            List<SiteWrapper> currentList = getDestSiteCollection();
             if (currentList != null) {
                 for (SiteWrapper site : currentList) {
-                    if (!sitesToRemove.contains(site)) {
+                    if (!destSitesToRemove.contains(site)) {
                         allSiteObjects.add(site.getWrappedObject());
                         allSiteWrappers.add(site);
                     }
                 }
             }
-            setToSites(allSiteObjects, allSiteWrappers);
+            setDestSites(allSiteObjects, allSiteWrappers);
         }
     }
 
-    private void setToSites(Collection<Site> allSiteObjects,
+    private void setDestSites(Collection<Site> allSiteObjects,
         List<SiteWrapper> allSiteWrappers) {
         Collection<Site> oldCollection = wrappedObject.getDestSiteCollection();
         wrappedObject.setDestSiteCollection(allSiteObjects);
-        propertyChangeSupport.firePropertyChange("toSiteCollection",
+        propertyChangeSupport.firePropertyChange("destSiteCollection",
             oldCollection, allSiteObjects);
-        propertiesMap.put("toSiteCollection", allSiteWrappers);
+        propertiesMap.put("destSiteCollection", allSiteWrappers);
     }
 }

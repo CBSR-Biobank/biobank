@@ -60,6 +60,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 int yPosition = cellHeight * indexRow;
                 Rectangle rectangle = new Rectangle(xPosition, yPosition,
                     cellWidth, cellHeight);
+
+                customDraw(e, displayWidget, rectangle, indexRow, indexCol);
                 drawRectangle(e, displayWidget, rectangle, indexRow, indexCol);
                 String topText = getTopTextForBox(displayWidget.getCells(),
                     indexRow, indexCol);
@@ -76,6 +78,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 if (bottomText != null) {
                     drawText(e, bottomText, rectangle, SWT.BOTTOM);
                 }
+
             }
         }
     }
@@ -130,6 +133,13 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
             }
         }
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
+
+    }
+
+    @SuppressWarnings("unused")
+    protected void customDraw(PaintEvent e,
+        ContainerDisplayWidget displayWidget, Rectangle rectangle,
+        int indexRow, int indexCol) {
     }
 
     @SuppressWarnings("unused")

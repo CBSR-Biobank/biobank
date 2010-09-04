@@ -13,7 +13,7 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     // used to allow position to be assigned to null
     protected boolean nullPositionSet = false;
 
-    private AbstractContainerWrapper<?> parent;
+    private ContainerWrapper parent;
 
     protected void persist() {
         boolean origPositionSet = (!nullPositionSet && (rowColPosition != null));
@@ -80,7 +80,7 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     /**
      * @return the parent of this object
      */
-    public AbstractContainerWrapper<?> getParent() {
+    public ContainerWrapper getParent() {
         if (parent == null) {
             if (getPositionWrapper() != null)
                 parent = getPositionWrapper().getParent();
@@ -91,7 +91,7 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     /**
      * Set the parent of this object
      */
-    public void setParent(AbstractContainerWrapper<?> container) {
+    public void setParent(ContainerWrapper container) {
         this.parent = container;
         // AbstractContainerWrapper<?, ?> oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);

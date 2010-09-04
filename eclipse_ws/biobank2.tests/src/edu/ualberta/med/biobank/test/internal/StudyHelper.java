@@ -54,8 +54,6 @@ public class StudyHelper extends DbHelper {
         Assert.assertNotNull("appService is null", appService);
         for (StudyWrapper study : createdStudies) {
             study.reload();
-            // FIXME patient is part of a shipment that is part of a site:
-            // should not be able to remove the site first !
             deleteFromList(study.getDispatchInfoCollection());
             deletePatients(study.getPatientCollection());
             deleteFromList(study.getSampleStorageCollection());
@@ -63,6 +61,15 @@ public class StudyHelper extends DbHelper {
             study.delete();
         }
         createdStudies.clear();
+    }
+
+    public static void deleteCreatedStudy(StudyWrapper study) throws Exception {
+        if (!createdStudies.contains(study)) {
+            throw new Exception("Study " + study.getNameShort()
+                + " was not created by this helper");
+        }
+        createdStudies.remove(study);
+        study.delete();
     }
 
 }

@@ -92,8 +92,6 @@ public class TestShippingMethod extends TestDatabase {
         shipment3.persist();
 
         method.reload();
-        // FIXME we should have a method in ShippingMethodWrapper to retrieve
-        // shipments of type ClinicShipment and not all of them
         List<AbstractShipmentWrapper> shipments = method
             .getShipmentCollection(true);
         if (shipments.size() > 1) {

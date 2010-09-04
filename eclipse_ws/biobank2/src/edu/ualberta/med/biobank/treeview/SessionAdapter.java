@@ -53,8 +53,8 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private void addGroupNodes() {
-        addChild(new ClinicGroup(this, CLINICS_BASE_NODE_ID));
-        addChild(new StudyGroup(this, STUDIES_NODE_ID));
+        addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+        addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
         addChild(new SiteGroup(this, SITES_NODE_ID));
     }
 
@@ -159,6 +159,7 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public List<ClinicWrapper> getClinicCollection(boolean sort) {
         try {
             return ClinicWrapper.getAllClinics(appService);
