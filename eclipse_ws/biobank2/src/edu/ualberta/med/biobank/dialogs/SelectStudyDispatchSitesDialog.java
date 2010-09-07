@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -34,7 +33,7 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     private MultiSelectWidget siteMultiSelect;
 
-    private List<SiteWrapper> allSites;
+    private List<SiteWrapper> currentAllSitesForStudy;
 
     private Map<Integer, StudySites> studiesDispatchRelations = new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
 
@@ -59,9 +58,7 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
         final ComboViewer studyCombo = getWidgetCreator()
             .createComboViewerWithNoSelectionValidator(contents,
-                "Choose a study",
-                StudyWrapper.getAllStudies(SessionManager.getAppService()),
-                null, null);
+                "Choose a study", srcSite.getStudyCollection(), null, null);
 
         studyCombo.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
@@ -87,7 +84,7 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
                         .getAddedToSelection();
                     List<Integer> removedSitesIds = siteMultiSelect
                         .getRemovedToSelection();
-                    for (SiteWrapper site : allSites) {
+                    for (SiteWrapper site : currentAllSitesForStudy) {
                         if (addedSitesIds.contains(site.getId()))
                             addedSites.add(site);
                         if (removedSitesIds.contains(site.getId()))
@@ -125,13 +122,14 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             selectedSites.add(site.getId());
         }
         try {
-            allSites = SiteWrapper.getSites(SessionManager.getAppService());
-            allSites.remove(srcSite);
+            currentAllSitesForStudy = new ArrayList<SiteWrapper>(
+                study.getSiteCollection());
+            currentAllSitesForStudy.remove(srcSite);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error", e);
             return;
         }
-        for (SiteWrapper site : allSites) {
+        for (SiteWrapper site : currentAllSitesForStudy) {
             availableSites.put(site.getId(), site.getNameShort());
         }
         siteMultiSelect.setSelections(availableSites, selectedSites);

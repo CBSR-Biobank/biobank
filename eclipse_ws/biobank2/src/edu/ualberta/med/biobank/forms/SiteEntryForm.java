@@ -111,7 +111,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         section.setClient(studiesTable);
     }
 
-    private void createDispatchSection() throws ApplicationException {
+    private void createDispatchSection() {
         Section section = createSection("Dispatch");
         addSectionToolbar(section, "Add Dispatch Relation",
             new SelectionAdapter() {
@@ -182,8 +182,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         site.setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
             .getSelection()).getFirstElement());
         site.persist();
-        SessionManager.getInstance().updateSites();
 
+        SessionManager.getInstance().updateSites();
         if (newSite && !SessionManager.getInstance().isAllSitesSelected()) {
             SessionManager.getInstance().getSiteCombo().setSelection(site);
         }
@@ -196,7 +196,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void reset() throws Exception {
-        super.reset();
         ActivityStatusWrapper currentActivityStatus = site.getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
@@ -204,6 +203,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
             activityStatusComboViewer.getCombo().deselectAll();
         }
-
+        studiesTable.reload();
+        dispatchTable.reload();
+        super.reset();
     }
 }

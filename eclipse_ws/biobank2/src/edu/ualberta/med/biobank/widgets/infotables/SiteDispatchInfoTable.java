@@ -40,10 +40,10 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
     public SiteDispatchInfoTable(Composite parent, SiteWrapper site) {
         super(parent, null, HEADINGS, BOUNDS, 10);
         this.srcSite = site;
-        loadStudyDestSites();
+        reload();
     }
 
-    protected void loadStudyDestSites() {
+    public void reload() {
         List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
         List<StudyWrapper> dispatchStudies = srcSite.getDispatchStudies();
         if (dispatchStudies != null) {
