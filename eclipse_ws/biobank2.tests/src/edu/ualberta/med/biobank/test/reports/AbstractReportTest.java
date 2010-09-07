@@ -79,10 +79,6 @@ public abstract class AbstractReportTest {
         AbstractReportTest.dataSource = dataSource;
     }
 
-    public WritableApplicationService getAppService() {
-        return dataSource.getAppService();
-    }
-
     public static Predicate<AliquotWrapper> aliquotSite(final boolean isIn,
         final Integer siteId) {
         return new Predicate<AliquotWrapper>() {
@@ -244,11 +240,11 @@ public abstract class AbstractReportTest {
         return dateGroupBy;
     }
 
-    protected void setReport(BiobankReport report) {
+    protected final void setReport(BiobankReport report) {
         this.report = report;
     }
 
-    protected BiobankReport getReport() {
+    protected final BiobankReport getReport() {
         if (report == null) {
             String reportName = this.getClass().getSimpleName()
                 .replace("Test", "");
@@ -262,11 +258,11 @@ public abstract class AbstractReportTest {
         return report;
     }
 
-    protected boolean isInSite() {
+    protected final boolean isInSite() {
         return getReport().getOp() == "=";
     }
 
-    protected Integer getSiteId() {
+    protected final Integer getSiteId() {
         return getReport().getSiteId();
     }
 
@@ -283,43 +279,47 @@ public abstract class AbstractReportTest {
         }
     }
 
-    protected List<SiteWrapper> getSites() {
+    protected final WritableApplicationService getAppService() {
+        return dataSource.getAppService();
+    }
+
+    protected final List<SiteWrapper> getSites() {
         return dataSource.getSites();
     }
 
-    protected List<SampleTypeWrapper> getSampleTypes() {
+    protected final List<SampleTypeWrapper> getSampleTypes() {
         return dataSource.getSampleTypes();
     }
 
-    protected List<SampleStorageWrapper> getSampleStorages() {
+    protected final List<SampleStorageWrapper> getSampleStorages() {
         return dataSource.getSampleStorages();
     }
 
-    protected List<AliquotWrapper> getAliquots() {
+    protected final List<AliquotWrapper> getAliquots() {
         return dataSource.getAliquots();
     }
 
-    protected List<ContainerWrapper> getContainers() {
+    protected final List<ContainerWrapper> getContainers() {
         return dataSource.getContainers();
     }
 
-    protected List<ClinicWrapper> getClinics() {
+    protected final List<ClinicWrapper> getClinics() {
         return dataSource.getClinics();
     }
 
-    protected List<StudyWrapper> getStudies() {
+    protected final List<StudyWrapper> getStudies() {
         return dataSource.getStudies();
     }
 
-    protected List<ContactWrapper> getContacts() {
+    protected final List<ContactWrapper> getContacts() {
         return dataSource.getContacts();
     }
 
-    protected List<PatientVisitWrapper> getPatientVisits() {
+    protected final List<PatientVisitWrapper> getPatientVisits() {
         return dataSource.getPatientVisits();
     }
 
-    protected List<PatientWrapper> getPatients() {
+    protected final List<PatientWrapper> getPatients() {
         return dataSource.getPatients();
     }
 
