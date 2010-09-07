@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -13,12 +16,12 @@ import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 
-public class DispatchShipmentViewForm extends BiobankViewForm {
+public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(DispatchShipmentViewForm.class.getName());
+        .getLogger(DispatchShipmentReceivingEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm";
 
     @SuppressWarnings("unused")
     private DispatchShipmentAdapter shipmentAdapter;
@@ -45,10 +48,9 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private DispatchAliquotListInfoTable aliquotsToBeReceivedTable;
 
-    private DispatchAliquotListInfoTable aliquotsReceivedTable;
-
     @Override
     protected void init() throws Exception {
+        Assert.isNotNull(adapter, "Adapter should be no null");
         Assert.isTrue((adapter instanceof DispatchShipmentAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -69,13 +71,6 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        retrieveShipment();
-        setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
-        setShipmentValues();
-    }
-
-    @Override
     protected void createFormContent() throws Exception {
         form.setText("Shipment sent on " + shipment.getFormattedDateShipped()
             + " from " + shipment.getSender().getNameShort());
@@ -87,14 +82,24 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         createMainSection();
         createAliquotsNotReceivedSection();
         createAliquotsReceivedSection();
-        setShipmentValues();
+
+        Button palletButton = toolkit.createButton(page, "Scan pallet",
+            SWT.PUSH);
+        palletButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+
+            }
+        });
+        setFirstControl(palletButton);
+        toolkit.createButton(page, "Scan individual aliquots", SWT.PUSH);
     }
 
     private void createAliquotsNotReceivedSection() {
         Composite parent = createSectionWithClient("Aliquots not yet "
             + "received");
         aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
-            null);
+            shipment.getNotReceivedAliquots());
         aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsToBeReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);
@@ -102,9 +107,10 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private void createAliquotsReceivedSection() {
         Composite parent = createSectionWithClient("Aliquots received");
-        aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent, null);
-        aliquotsReceivedTable.adaptToToolkit(toolkit, true);
-        aliquotsReceivedTable
+        aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
+            shipment.getReceivedAliquots());
+        aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
+        aliquotsToBeReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);
     }
 
@@ -130,6 +136,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         statusLabel = createReadOnlyLabelledField(client, SWT.NONE, "Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
+
+        setShipmentValues();
     }
 
     private void setShipmentValues() {
@@ -144,8 +152,21 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
         setTextValue(statusLabel, shipment.getActivityStatus().getName());
         setTextValue(commentLabel, shipment.getComment());
-        aliquotsToBeReceivedTable.reloadCollection(shipment
-            .getNotReceivedAliquots());
-        aliquotsReceivedTable.reloadCollection(shipment.getReceivedAliquots());
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected String getOkMessage() {
+        return "Receiving dispatch shipment";
+    }
+
+    @Override
+    public String getNextOpenedFormID() {
+        return DispatchShipmentViewForm.ID;
     }
 }

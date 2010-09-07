@@ -588,6 +588,11 @@ public class TestAliquot extends TestDatabase {
         String name = "testGetDispatchShipments" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
         StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
+        site.addStudies(Arrays.asList(study));
+        site.persist();
+        destSite.addStudies(Arrays.asList(study));
+        destSite.persist();
+
         site.addStudyDispatchSites(study, Arrays.asList(destSite));
         site.persist();
         site.reload();
@@ -631,4 +636,5 @@ public class TestAliquot extends TestDatabase {
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment2));
     }
+
 }

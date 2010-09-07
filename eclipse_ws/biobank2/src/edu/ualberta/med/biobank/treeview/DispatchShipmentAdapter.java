@@ -14,7 +14,9 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentViewForm;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 
 public class DispatchShipmentAdapter extends AdapterBase {
 
@@ -58,8 +60,8 @@ public class DispatchShipmentAdapter extends AdapterBase {
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
-                        System.out
-                            .println("should open entry form to edit the shipment as a receiver");
+                        openForm(new FormInput(DispatchShipmentAdapter.this,
+                            false), DispatchShipmentReceivingEntryForm.ID);
                     }
                 });
             }
