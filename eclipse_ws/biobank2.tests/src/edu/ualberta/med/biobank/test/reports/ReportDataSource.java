@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -16,6 +17,8 @@ public interface ReportDataSource {
     public List<SiteWrapper> getSites();
 
     public List<SampleTypeWrapper> getSampleTypes();
+
+    public List<SampleStorageWrapper> getSampleStorages();
 
     public List<AliquotWrapper> getAliquots();
 

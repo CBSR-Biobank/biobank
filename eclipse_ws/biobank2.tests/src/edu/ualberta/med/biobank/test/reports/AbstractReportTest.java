@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -85,6 +86,20 @@ public abstract class AbstractReportTest {
         };
     }
 
+    public static Predicate<AliquotWrapper> aliquotPvProcessedBetween(
+        final Date after, final Date before) {
+        return new Predicate<AliquotWrapper>() {
+            public boolean evaluate(AliquotWrapper aliquot) {
+                return (aliquot.getPatientVisit().getDateProcessed()
+                    .after(after) || aliquot.getPatientVisit()
+                    .getDateProcessed().equals(after))
+                    && (aliquot.getPatientVisit().getDateProcessed()
+                        .before(before) || aliquot.getPatientVisit()
+                        .getDateProcessed().equals(before));
+            }
+        };
+    }
+
     public static Predicate<PatientVisitWrapper> patientVisitProcessedBetween(
         final Date after, final Date before) {
         return new Predicate<PatientVisitWrapper>() {
@@ -107,6 +122,13 @@ public abstract class AbstractReportTest {
     }
 
     public static Predicate<AliquotWrapper> aliquotTopContainerIdIn(String list) {
+        if ((list == null) || list.isEmpty()) {
+            return new Predicate<AliquotWrapper>() {
+                public boolean evaluate(AliquotWrapper aliquot) {
+                    return false;
+                }
+            };
+        }
         final List<Integer> topContainerIds = new ArrayList<Integer>();
         for (String id : list.split(",")) {
             topContainerIds.add(Integer.valueOf(id));
@@ -209,6 +231,10 @@ public abstract class AbstractReportTest {
 
     protected List<SampleTypeWrapper> getSampleTypes() {
         return dataSource.getSampleTypes();
+    }
+
+    protected List<SampleStorageWrapper> getSampleStorages() {
+        return dataSource.getSampleStorages();
     }
 
     protected List<AliquotWrapper> getAliquots() {

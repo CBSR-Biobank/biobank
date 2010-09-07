@@ -48,7 +48,7 @@ public class InvoicingReportTest extends AbstractReportTest {
             return pvCount == null ? new Long(1) : new Long(pvCount + 1);
         }
     };
-    public static final Comparator<List<String>> ORDER_STUDY_CLINIC_SAMPLE = new Comparator<List<String>>() {
+    private static final Comparator<List<String>> ORDER_STUDY_CLINIC_SAMPLE = new Comparator<List<String>>() {
         public int compare(List<String> lhs, List<String> rhs) {
             return CollectionsUtil.compareTo(lhs, rhs);
         }

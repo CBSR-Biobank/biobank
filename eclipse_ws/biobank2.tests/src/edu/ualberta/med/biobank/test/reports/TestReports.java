@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -43,6 +44,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
+import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -59,7 +61,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     ContainerCapacityTest.class, ContainerEmptyLocationsTest.class,
     DAliquotsTest.class, FTAReportTest.class, FvLPatientVisitsTest.class,
     InvoicingReportTest.class, NewPsByStudyClinicTest.class,
-    NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class })
+    NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class,
+    PatientWBCTest.class, PsByStudyTest.class, PVsByStudyTest.class,
+    QAAliquotsTest.class, SAliquotsTest.class, SampleTypePvCountTest.class,
+    SampleTypeSUsageTest.class })
 public final class TestReports implements ReportDataSource {
     public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
@@ -107,6 +112,7 @@ public final class TestReports implements ReportDataSource {
                                                  // tests
     private final List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
     private final List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+    private final List<SampleStorageWrapper> sampleStorages = new ArrayList<SampleStorageWrapper>();
     private final List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
     private final List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
     private final List<ClinicWrapper> clinics = new ArrayList<ClinicWrapper>();
@@ -226,31 +232,48 @@ public final class TestReports implements ReportDataSource {
                     getInstance().getRandString(), 1, CONTAINER_ROWS,
                     CONTAINER_COLS, true);
 
+            List<ContainerTypeWrapper> containerTypes = new ArrayList<ContainerTypeWrapper>();
             ContainerTypeWrapper containerType = ContainerTypeHelper
                 .addContainerType(site, getInstance().getRandString(),
                     getInstance().getRandString(), 1, CONTAINER_ROWS,
                     CONTAINER_COLS, false);
-            topContainerType.addChildContainerTypes(Arrays
-                .asList(containerType));
-            containerType.addChildContainerTypes(Arrays.asList(containerType));
+            containerTypes.add(containerType);
 
+            // add a "CabinetXXX" type (required for certain reports)
+            containerType = ContainerTypeHelper.addContainerType(site,
+                getInstance().getRandString(), "Cabinet"
+                    + getInstance().getRandString(), 1, CONTAINER_ROWS,
+                CONTAINER_COLS, false);
+            containerTypes.add(containerType);
+
+            // for simplicity, allow every (non-top) container type to be the
+            // child of any container type
             // TODO: don't add every sample type to every container type?
-            for (SampleTypeWrapper sampleType : getInstance().getSampleTypes()) {
-                containerType.addSampleTypes(Arrays.asList(sampleType));
+            for (ContainerTypeWrapper c : containerTypes) {
+                c.addSampleTypes(getInstance().getSampleTypes());
+                c.addChildContainerTypes(containerTypes);
+                c.persist();
             }
+            topContainerType.addChildContainerTypes(containerTypes);
             topContainerType.persist();
-            containerType.persist();
 
             // generate containers
             ContainerWrapper parentContainer, container;
             for (int i = 0; i < CONTAINERS_PER_SITE; i++) {
-                // start some containers' label with "SS" (Sample Storage) as
-                // these containers are to be ignored by some queries
-                String label = (i == 0 ? "SS" : "")
-                    + getInstance().getRandString();
+                String label = "";
+                if (i == 0) {
+                    // start some containers' label with "SS" (sent samples) as
+                    // these containers are to be ignored by some queries
+                    label = "SS";
+                }
+                label += getInstance().getRandString();
+
                 parentContainer = ContainerHelper.addContainer(label, null,
                     null, site, topContainerType);
                 getInstance().containers.add(parentContainer);
+
+                // cycle through container types
+                containerType = containerTypes.get(i % containerTypes.size());
 
                 for (int j = 1; j < CONTAINER_DEPTH; j++) {
                     container = ContainerHelper.addContainer(label, null,
@@ -290,6 +313,18 @@ public final class TestReports implements ReportDataSource {
             for (int i = 0; i < NUM_STUDIES; i++) {
                 StudyWrapper study = StudyHelper.addStudy(getInstance()
                     .getRandString());
+
+                // TODO: add sample storages?
+                // leave the last sample type unassociated with any study via
+                // SampleStorage since at least one report checks for these
+                for (int j = 0, numSampleTypes = getInstance().getSampleTypes()
+                    .size(); j < numSampleTypes - 1; j++) {
+                    SampleTypeWrapper type = getInstance().getSampleTypes()
+                        .get(j);
+                    SampleStorageWrapper sampleStorage = SampleStorageHelper
+                        .addSampleStorage(study, type);
+                    getInstance().getSampleStorages().add(sampleStorage);
+                }
 
                 Assert.assertTrue(getInstance().contacts.size() > 0);
 
@@ -482,6 +517,10 @@ public final class TestReports implements ReportDataSource {
 
     public List<PatientWrapper> getPatients() {
         return patients;
+    }
+
+    public List<SampleStorageWrapper> getSampleStorages() {
+        return sampleStorages;
     }
 
     public Collection<Object> checkReport(BiobankReport report,
