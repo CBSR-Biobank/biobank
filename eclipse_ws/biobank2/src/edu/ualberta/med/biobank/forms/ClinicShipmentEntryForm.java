@@ -43,11 +43,11 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ClinicShipmentEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm";
 
-    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new shipment record.";
+    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new clinic shipment record.";
 
-    public static final String MSG_SHIPMENT_OK = "Editing an existing shipment record.";
+    public static final String MSG_SHIPMENT_OK = "Editing an existing clinic shipment record.";
 
     private ClinicShipmentAdapter shipmentAdapter;
 
@@ -94,11 +94,11 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         }
         String tabName;
         if (shipment.isNew()) {
-            tabName = "New Shipment";
+            tabName = "New Clinic Shipment";
             shipment.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = "Shipment " + shipment.getFormattedDateReceived();
+            tabName = "Clinic Shipment " + shipment.getFormattedDateReceived();
         }
         setPartName(tabName);
     }
@@ -280,18 +280,22 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
             shipment.setWaybill(null);
         }
 
+        ShippingMethodWrapper shippingMethod = null;
         IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
             .getSelection();
         if ((shippingMethodSelection != null)
             && (shippingMethodSelection.size() > 0)) {
-            shipment
-                .setShippingMethod((ShippingMethodWrapper) shippingMethodSelection
-                    .getFirstElement());
-        } else {
-            shipment.setShippingMethod((ShippingMethodWrapper) null);
+            shippingMethod = (ShippingMethodWrapper) shippingMethodSelection
+                .getFirstElement();
         }
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-            .getSelection()).getFirstElement();
+        shipment.setShippingMethod(shippingMethod);
+
+        ActivityStatusWrapper activityStatus = null;
+        IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
+            .getSelection();
+        if ((asSelection != null) && (asSelection.size() > 0)) {
+            activityStatus = (ActivityStatusWrapper) asSelection;
+        }
         shipment.setActivityStatus(activityStatus);
         boolean newShipment = shipment.isNew();
         shipment.persist();

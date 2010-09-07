@@ -91,7 +91,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -108,6 +108,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         String tabName;
         if (containerType.isNew()) {
             tabName = "New Container Type";
+            containerType.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         } else {
             tabName = "Container Type " + containerType.getName();
         }

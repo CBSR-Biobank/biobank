@@ -1988,15 +1988,29 @@
             class="edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm"
             default="false"
             icon="icons/shipment.png"
-            id="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
-            name="Shipment Entry">
+            id="edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm"
+            name="Clinic Shipment Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ClinicShipmentViewForm"
             default="false"
             icon="icons/shipment.png"
-            id="edu.ualberta.med.biobank.forms.ShipmentViewForm"
-            name="Shipment View">
+            id="edu.ualberta.med.biobank.forms.ClinicShipmentViewForm"
+            name="Clinic Shipment View">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm"
+            default="false"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.DispatchShipmentEntryForm"
+            name="Dispatch Shipment Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+            default="false"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+            name="Dispatch Shipment View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.ReportsEditor"
@@ -2223,6 +2237,13 @@
       icon="icons/shipment.png"
       id="edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm"
       name="Dispatch Shipment Receiver Entry">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm"
+      default="false"
+      icon="icons/shipment.png"
+      id="edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm"
+      name="Dispatch Shipment Sending Entry">
 </editor>
    </extension>
    <extension
