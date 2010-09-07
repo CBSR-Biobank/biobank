@@ -43,7 +43,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private BiobankText statusLabel;
 
-    private DispatchAliquotListInfoTable aliquotsTable;
+    private DispatchAliquotListInfoTable aliquotsToBeReceivedTable;
 
     @Override
     protected void init() throws Exception {
@@ -71,7 +71,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         retrieveShipment();
         setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
         setShipmentValues();
-        aliquotsTable.reloadCollection(shipment.getAliquotCollection());
+        aliquotsToBeReceivedTable.reloadCollection(shipment
+            .getAliquotCollection());
     }
 
     @Override
@@ -84,15 +85,27 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             .get(BioBankPlugin.IMG_SHIPMENT));
 
         createMainSection();
-        createAliquotsSection();
+        createAliquotsNotReceivedSection();
+        createAliquotsReceivedSection();
     }
 
-    private void createAliquotsSection() {
-        Composite parent = createSectionWithClient("Aliquots");
-        aliquotsTable = new DispatchAliquotListInfoTable(parent,
-            shipment.getAliquotCollection());
-        aliquotsTable.adaptToToolkit(toolkit, true);
-        aliquotsTable.addDoubleClickListener(collectionDoubleClickListener);
+    private void createAliquotsNotReceivedSection() {
+        Composite parent = createSectionWithClient("Aliquots not yet "
+            + "received");
+        aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
+            shipment.getNotReceivedAliquots());
+        aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
+        aliquotsToBeReceivedTable
+            .addDoubleClickListener(collectionDoubleClickListener);
+    }
+
+    private void createAliquotsReceivedSection() {
+        Composite parent = createSectionWithClient("Aliquots received");
+        aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
+            shipment.getReceivedAliquots());
+        aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
+        aliquotsToBeReceivedTable
+            .addDoubleClickListener(collectionDoubleClickListener);
     }
 
     private void createMainSection() {

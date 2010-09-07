@@ -538,4 +538,15 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         log.setType("Aliquot");
         return log;
     }
+
+    public boolean isActive() {
+        ActivityStatusWrapper status = getActivityStatus();
+        try {
+            return status != null
+                && status.equals(ActivityStatusWrapper
+                    .getActiveActivityStatus(appService));
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

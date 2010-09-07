@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -14,10 +15,14 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.SDKQuery;
+import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchShipmentWrapper extends
     AbstractShipmentWrapper<DispatchShipment> {
+
+    private Set<AliquotWrapper> modifiedAliquots = new HashSet<AliquotWrapper>();
 
     public DispatchShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -60,6 +65,18 @@ public class DispatchShipmentWrapper extends
                 + getSender().getNameShort());
         }
         checkSenderCanSendToReceiver();
+    }
+
+    @Override
+    protected void persistDependencies(DispatchShipment origObject)
+        throws Exception {
+        List<SDKQuery> queries = new ArrayList<SDKQuery>();
+        for (AliquotWrapper aliquot : modifiedAliquots) {
+            queries.add(new UpdateExampleQuery(aliquot.getWrappedObject()));
+        }
+        if (queries.size() > 0) {
+            appService.executeBatchQuery(queries);
+        }
     }
 
     private void checkSenderCanSendToReceiver() throws BiobankCheckException {
@@ -193,6 +210,52 @@ public class DispatchShipmentWrapper extends
         return getAliquotCollection(true);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<AliquotWrapper> getReceivedAliquots(boolean sort) {
+        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
+            .get("receivedAliquots");
+        if (aliquotCollection == null) {
+            Collection<AliquotWrapper> allAliquots = getAliquotCollection(sort);
+            if (allAliquots != null) {
+                aliquotCollection = new ArrayList<AliquotWrapper>();
+                for (AliquotWrapper aliquot : allAliquots) {
+                    if (aliquot.isActive()) {
+                        aliquotCollection.add(aliquot);
+                    }
+                }
+                propertiesMap.put("receivedAliquots", aliquotCollection);
+            }
+        }
+        return aliquotCollection;
+    }
+
+    public List<AliquotWrapper> getReceivedAliquots() {
+        return getReceivedAliquots(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<AliquotWrapper> getNotReceivedAliquots(boolean sort) {
+        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
+            .get("notReceivedAliquots");
+        if (aliquotCollection == null) {
+            Collection<AliquotWrapper> allAliquots = getAliquotCollection(sort);
+            if (allAliquots != null) {
+                aliquotCollection = new ArrayList<AliquotWrapper>();
+                for (AliquotWrapper aliquot : allAliquots) {
+                    if (!aliquot.isActive()) {
+                        aliquotCollection.add(aliquot);
+                    }
+                }
+                propertiesMap.put("notReceivedAliquots", aliquotCollection);
+            }
+        }
+        return aliquotCollection;
+    }
+
+    public List<AliquotWrapper> getNotReceivedAliquots() {
+        return getNotReceivedAliquots(true);
+    }
+
     private void setAliquotCollection(Collection<Aliquot> allAliquotObjects,
         List<AliquotWrapper> allAliquotWrappers) {
         Collection<Aliquot> oldContainers = wrappedObject
@@ -203,8 +266,7 @@ public class DispatchShipmentWrapper extends
         propertiesMap.put("aliquotCollection", allAliquotWrappers);
     }
 
-    public void addAliquots(List<AliquotWrapper> newAliquots)
-        throws BiobankCheckException {
+    public void addAliquots(List<AliquotWrapper> newAliquots) throws Exception {
         if ((newAliquots == null) || (newAliquots.size() == 0))
             return;
 
@@ -218,19 +280,33 @@ public class DispatchShipmentWrapper extends
                 allAliquotWrappers.add(aliquot);
             }
         }
+        ActivityStatusWrapper dispatchedStatus = ActivityStatusWrapper
+            .getActivityStatus(getAppService(), "Dispatched");
         // new aliquots added
         for (AliquotWrapper aliquot : newAliquots) {
             if (aliquot.isNew()) {
                 throw new BiobankCheckException(
                     "Cannot add aliquot that are not already saved");
             }
+            if (aliquot.getPosition() == null) {
+                throw new BiobankCheckException(
+                    "Cannot add aliquot with no position. A position should be first assigned");
+            }
+            if (!aliquot.isActive()) {
+                throw new BiobankCheckException(
+                    "Cannot add aliquot with an activity status that is not 'Active'."
+                        + " Check comments on this aliquot for more information.");
+            }
             allAliquotObjects.add(aliquot.getWrappedObject());
+            aliquot.setActivityStatus(dispatchedStatus);
             allAliquotWrappers.add(aliquot);
+            modifiedAliquots.add(aliquot);
         }
         setAliquotCollection(allAliquotObjects, allAliquotWrappers);
     }
 
-    public void removeAliquots(List<AliquotWrapper> aliquotsToRemove) {
+    public void removeAliquots(List<AliquotWrapper> aliquotsToRemove)
+        throws Exception {
         if ((aliquotsToRemove == null) || (aliquotsToRemove.size() == 0))
             return;
 
@@ -239,10 +315,15 @@ public class DispatchShipmentWrapper extends
         // already added aliquots
         List<AliquotWrapper> currentList = getAliquotCollection();
         if (currentList != null) {
+            ActivityStatusWrapper activeStatus = ActivityStatusWrapper
+                .getActiveActivityStatus(appService);
             for (AliquotWrapper aliquot : currentList) {
                 if (!aliquotsToRemove.contains(aliquot)) {
                     allAliquotObjects.add(aliquot.getWrappedObject());
                     allAliquotWrappers.add(aliquot);
+                } else {
+                    aliquot.setActivityStatus(activeStatus);
+                    modifiedAliquots.add(aliquot);
                 }
             }
         }
@@ -254,4 +335,13 @@ public class DispatchShipmentWrapper extends
 
     }
 
+    public void receiveAliquots(List<AliquotWrapper> aliquotsToReceive)
+        throws Exception {
+        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
+        for (AliquotWrapper aliquot : aliquotsToReceive) {
+            aliquot.setActivityStatus(activeStatus);
+            modifiedAliquots.add(aliquot);
+        }
+    }
 }

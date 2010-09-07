@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable.StudySiteDispatch;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
 
@@ -38,21 +37,23 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
 
     private SiteWrapper srcSite;
 
-    public SiteDispatchInfoTable(Composite parent, SiteWrapper site)
-        throws ApplicationException {
+    public SiteDispatchInfoTable(Composite parent, SiteWrapper site) {
         super(parent, null, HEADINGS, BOUNDS, 10);
         this.srcSite = site;
-        loadStudyDestSites();
+        reload();
     }
 
-    protected void loadStudyDestSites() throws ApplicationException {
+    public void reload() {
         List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
-        for (StudyWrapper study : srcSite.getDispatchStudies()) {
-            for (SiteWrapper destSite : srcSite.getStudyDispachSites(study)) {
-                StudySiteDispatch ssd = new StudySiteDispatch();
-                ssd.study = study;
-                ssd.destSite = destSite;
-                dispatchList.add(ssd);
+        List<StudyWrapper> dispatchStudies = srcSite.getDispatchStudies();
+        if (dispatchStudies != null) {
+            for (StudyWrapper study : dispatchStudies) {
+                for (SiteWrapper destSite : srcSite.getStudyDispachSites(study)) {
+                    StudySiteDispatch ssd = new StudySiteDispatch();
+                    ssd.study = study;
+                    ssd.destSite = destSite;
+                    dispatchList.add(ssd);
+                }
             }
         }
         reloadCollection(dispatchList);
