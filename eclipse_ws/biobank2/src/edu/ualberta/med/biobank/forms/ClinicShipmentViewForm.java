@@ -13,10 +13,10 @@ import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
 
-public class ShipmentViewForm extends BiobankViewForm {
+public class ClinicShipmentViewForm extends BiobankViewForm {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(ShipmentViewForm.class.getName());
+        .getLogger(ClinicShipmentViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
     private ClinicShipmentAdapter shipmentAdapter;
@@ -41,6 +41,8 @@ public class ShipmentViewForm extends BiobankViewForm {
     private BiobankText patientCountLabel;
 
     private BiobankText patientVisitCountLabel;
+
+    private BiobankText activityStatusLabel;
 
     @Override
     protected void init() throws Exception {
@@ -108,6 +110,8 @@ public class ShipmentViewForm extends BiobankViewForm {
             "Box number");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date received");
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Activity Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
         patientCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
@@ -129,6 +133,7 @@ public class ShipmentViewForm extends BiobankViewForm {
                 .getShippingMethod().getName());
         setTextValue(boxNumberLabel, shipment.getBoxNumber());
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
+        setTextValue(activityStatusLabel, shipment.getActivityStatus());
         setTextValue(commentLabel, shipment.getComment());
         setTextValue(patientCountLabel, shipment.getPatientCollection().size());
         setTextValue(patientVisitCountLabel, shipment

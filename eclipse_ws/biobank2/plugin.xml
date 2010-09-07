@@ -1985,14 +1985,14 @@
             name="Sample Types Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
+            class="edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm"
             default="false"
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
             name="Shipment Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ShipmentViewForm"
+            class="edu.ualberta.med.biobank.forms.ClinicShipmentViewForm"
             default="false"
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.ShipmentViewForm"
