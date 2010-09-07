@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
@@ -53,9 +52,7 @@ public class PatientVisitAdapter extends AdapterBase {
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
             Assert.isNotNull(study, "study is null");
-            SiteWrapper site = visit.getShipment().getSite();
-            Assert.isNotNull(site, "site is null");
-            return site.getNameShort() + " - " + patient.getPnumber() + " - "
+            return study.getNameShort() + " - " + patient.getPnumber() + " - "
                 + getTooltipText("Patient Visit");
 
         }
