@@ -14,6 +14,7 @@
   <!--property name="${host}/" value="" /-->
   <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
+  <property name="eclipse.workspace.dir" location="eclipse_ws" />
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
@@ -283,8 +284,8 @@
     <copy todir="${eclipse.proj.dir.tools}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}"/>
     </copy>
-    <copy todir="${eclipse.proj.dir.tools}/lib">
-      <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}"/>
+    <copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
+      <filelist dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" files="biobank2-beans.jar"/>
     </copy>
   </target>
   <!-- JBoss -->
