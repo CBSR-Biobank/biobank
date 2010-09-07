@@ -868,7 +868,7 @@ public class TestSite extends TestDatabase {
 
         // remove studies
         for (StudyWrapper study : studies) {
-            srcSite.addStudyDispatchSites(study, destSites);
+            srcSite.removeStudyDispatchSites(study, destSites);
         }
         srcSite.persist();
         srcSite.reload();
@@ -884,7 +884,7 @@ public class TestSite extends TestDatabase {
         srcSite.reload();
         int count = 0;
         for (StudyWrapper study : studies) {
-            srcSite.addStudyDispatchSites(study, destSites);
+            srcSite.removeStudyDispatchSites(study, destSites);
             ++count;
 
             srcSite.persist();
@@ -946,8 +946,8 @@ public class TestSite extends TestDatabase {
         srcSite.reload();
         srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
 
-        Assert.assertNotNull(srcSiteDispatchSites);
-        Assert.assertEquals(0, srcSiteDispatchSites.size());
+        Assert.assertTrue((srcSiteDispatchSites == null)
+            || (srcSiteDispatchSites.size() == 0));
     }
 
 }

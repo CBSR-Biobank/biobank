@@ -31,6 +31,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     private AddressWrapper address;
 
+    private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
+
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
     }
@@ -234,6 +236,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
         checkNotEmpty(getNameShort(), "Short Name");
         checkNoDuplicates(Site.class, "nameShort", getNameShort(),
             "A site with short name \"" + getNameShort() + "\" already exists.");
+    }
+
+    @Override
+    protected void persistDependencies(Site origObject) throws Exception {
+        for (DispatchInfoWrapper diw : removedDispatchInfoWrapper) {
+            if (!diw.isNew()) {
+                diw.delete();
+            }
+        }
     }
 
     @Override
@@ -621,6 +632,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     public void resetInternalFields() {
         address = null;
+        removedDispatchInfoWrapper.clear();
     }
 
     public List<StudyWrapper> getDispatchStudies() throws ApplicationException {
@@ -682,9 +694,17 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 diw.removeDestSites(sites);
                 if (diw.getDestSiteCollection().size() == 0) {
                     infos.remove(study.getId());
+                    removedDispatchInfoWrapper.add(diw);
                     Collection<DispatchInfo> diList = wrappedObject
                         .getSrcDispatchInfoCollection();
-                    diList.remove(diw.getWrappedObject());
+                    DispatchInfo diToRemove = null;
+                    for (DispatchInfo di : diList) {
+                        if (di.getId().equals(diw.getId())) {
+                            diToRemove = di;
+                            break;
+                        }
+                    }
+                    diList.remove(diToRemove);
                     wrappedObject.setSrcDispatchInfoCollection(diList);
                 }
             }
