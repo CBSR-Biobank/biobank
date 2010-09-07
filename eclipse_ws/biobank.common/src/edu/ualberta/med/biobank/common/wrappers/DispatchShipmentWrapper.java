@@ -85,8 +85,9 @@ public class DispatchShipmentWrapper extends
                 .getStudyDispachSites(getStudy());
             if (possibleReceivers == null
                 || !possibleReceivers.contains(getReceiver())) {
-                throw new BiobankCheckException(getSender().getNameShort()
-                    + " cannot dispatch aliquots to "
+                throw new BiobankCheckException("site "
+                    + getSender().getNameShort()
+                    + " cannot dispatch aliquots to site "
                     + getReceiver().getNameShort() + " for study "
                     + getStudy().getNameShort());
             }
