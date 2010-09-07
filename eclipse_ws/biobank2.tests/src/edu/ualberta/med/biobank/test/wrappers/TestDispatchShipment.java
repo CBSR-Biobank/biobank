@@ -331,9 +331,14 @@ public class TestDispatchShipment extends TestDatabase {
     @Test
     public void testGetSetAliquotCollection() throws Exception {
         String name = "testGetSetAliquotCollection" + r.nextInt();
-        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
-        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        senderSite.addStudies(Arrays.asList(study));
+        senderSite.persist();
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        receiverSite.addStudies(Arrays.asList(study));
+        receiverSite.persist();
+
         senderSite.addStudyDispatchSites(study, Arrays.asList(receiverSite));
         senderSite.persist();
         senderSite.reload();
@@ -397,4 +402,5 @@ public class TestDispatchShipment extends TestDatabase {
         shipmentAliquots = shipment.getAliquotCollection();
         Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
     }
+
 }
