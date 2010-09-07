@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -16,15 +17,13 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
-import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientVisitSummaryTest {
+public class PatientVisitSummaryTest extends AbstractReportTest {
     private static final Mapper<PatientVisitWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<PatientVisitWrapper, List<String>, PvCount>() {
         public List<String> getKey(PatientVisitWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
@@ -75,7 +74,7 @@ public class PatientVisitSummaryTest {
         }
     };
 
-    private static final Comparator<List<String>> PV_STATS_COMPARATOR = new Comparator<List<String>>() {
+    private static final Comparator<List<String>> ORDER_BY_STUDY_CLINIC = new Comparator<List<String>>() {
         public int compare(List<String> lhs, List<String> rhs) {
             int comparedStudyName = lhs.get(0).compareTo(rhs.get(0));
             int comparedClinicName = lhs.get(1).compareTo(rhs.get(1));
@@ -84,22 +83,55 @@ public class PatientVisitSummaryTest {
         }
     };
 
-    private Collection<Object> getExpectedResults(final Date after,
-        final Date before) {
-        Predicate<PatientVisitWrapper> betweenDates = new Predicate<PatientVisitWrapper>() {
-            public boolean evaluate(PatientVisitWrapper pv) {
-                return (pv.getDateProcessed().after(after) || pv
-                    .getDateProcessed().equals(after))
-                    && (pv.getDateProcessed().before(before) || pv
-                        .getDateProcessed().equals(before));
-            }
-        };
+    @Test
+    public void testResults() throws Exception {
+        checkResults(new Date(0), new Date());
+    }
+
+    @Test
+    public void testEmptyDateRange() throws Exception {
+        checkResults(new Date(), new Date(0));
+    }
+
+    @Test
+    public void testSmallDatePoint() throws Exception {
+        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        Assert.assertTrue(patientVisits.size() > 0);
+
+        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+            .size() / 2);
+
+        checkResults(patientVisit.getDateProcessed(),
+            patientVisit.getDateProcessed());
+    }
+
+    @Test
+    public void testSmallDateRange() throws Exception {
+        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        Assert.assertTrue(patientVisits.size() > 0);
+
+        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+            .size() / 2);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(patientVisit.getDateProcessed());
+        calendar.add(Calendar.HOUR_OF_DAY, 24);
+
+        checkResults(patientVisit.getDateProcessed(), calendar.getTime());
+    }
+
+    @Override
+    protected Collection<Object> getExpectedResults() {
+        Date after = (Date) getReport().getParams().get(0);
+        Date before = (Date) getReport().getParams().get(1);
 
         Collection<PatientVisitWrapper> patientVisits = TestReports
             .getInstance().getPatientVisits();
 
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
-            .filter(patientVisits, betweenDates);
+            .filter(patientVisits, PredicateUtil.andPredicate(
+                patientVisitProcessedBetween(after, before),
+                patientVisitSite(isInSite(), getSiteId())));
 
         Map<List<String>, PvCount> pvCountByStudyClincPatient = MapperUtil.map(
             filteredPatientVisits, PV_COUNT_BY_STUDY_CLINIC_PATIENT);
@@ -109,7 +141,7 @@ public class PatientVisitSummaryTest {
 
         List<List<String>> keys = new ArrayList<List<String>>(
             pvStatsByStudyClinic.keySet());
-        Collections.sort(keys, PV_STATS_COMPARATOR);
+        Collections.sort(keys, ORDER_BY_STUDY_CLINIC);
 
         List<Object> expectedResults = new ArrayList<Object>();
 
@@ -131,64 +163,10 @@ public class PatientVisitSummaryTest {
         return expectedResults;
     }
 
-    private BiobankReport getReport(Date after, Date before) {
-        BiobankReport report = BiobankReport
-            .getReportByName("PatientVisitSummary");
-        report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
-            .getId());
-        report.setContainerList("");
-        report.setGroupBy("");
-
-        Object[] params = { after, before };
-        report.setParams(Arrays.asList(params));
-
-        return report;
-    }
-
-    private Collection<Object> checkReport(Date after, Date before)
+    private void checkResults(Date after, Date before)
         throws ApplicationException {
-        return TestReports.getInstance().checkReport(getReport(after, before),
-            getExpectedResults(after, before));
-    }
+        getReport().setParams(Arrays.asList((Object) after, (Object) before));
 
-    @Test
-    public void testResults() throws Exception {
-        Collection<Object> results = checkReport(new Date(0), new Date());
-        Assert.assertTrue(results.size() > 0);
-    }
-
-    @Test
-    public void testEmptyDateRange() throws Exception {
-        Collection<Object> results = checkReport(new Date(), new Date(0));
-        Assert.assertTrue(results.size() == 0);
-    }
-
-    @Test
-    public void testSmallDatePoint() throws Exception {
-        List<PatientVisitWrapper> patientVisits = TestReports.getInstance()
-            .getPatientVisits();
-        Assert.assertTrue(patientVisits.size() > 0);
-
-        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
-            .size() / 2);
-
-        checkReport(patientVisit.getDateProcessed(),
-            patientVisit.getDateProcessed());
-    }
-
-    @Test
-    public void testSmallDateRange() throws Exception {
-        List<PatientVisitWrapper> patientVisits = TestReports.getInstance()
-            .getPatientVisits();
-        Assert.assertTrue(patientVisits.size() > 0);
-
-        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
-            .size() / 2);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(patientVisit.getDateProcessed());
-        calendar.add(Calendar.HOUR_OF_DAY, 24);
-
-        checkReport(patientVisit.getDateProcessed(), calendar.getTime());
+        checkResults(EnumSet.of(CompareResult.SIZE));
     }
 }

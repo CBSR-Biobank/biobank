@@ -95,14 +95,14 @@ public class FTAReportTest extends AbstractReportTest {
 
     @Test
     public void testResults() throws Exception {
-        for (StudyWrapper study : TestReports.getInstance().getStudies()) {
+        for (StudyWrapper study : getStudies()) {
             checkResults(study.getNameShort(), new Date(0));
         }
     }
 
     @Test
     public void testCurrentDate() throws Exception {
-        for (StudyWrapper study : TestReports.getInstance().getStudies()) {
+        for (StudyWrapper study : getStudies()) {
             checkResults(study.getNameShort(), new Date());
         }
     }
@@ -112,7 +112,7 @@ public class FTAReportTest extends AbstractReportTest {
         Calendar calendar = Calendar.getInstance();
         List<PatientVisitWrapper> patientVisits;
 
-        for (StudyWrapper study : TestReports.getInstance().getStudies()) {
+        for (StudyWrapper study : getStudies()) {
             for (PatientWrapper patient : study.getPatientCollection()) {
                 patientVisits = patient.getPatientVisitCollection(true, true);
                 if (patientVisits.size() > 0) {
@@ -151,8 +151,7 @@ public class FTAReportTest extends AbstractReportTest {
         Map<String, PatientVisitWrapper> groupedPatientVisits = MapperUtil.map(
             filteredPatientVisits, GROUP_PATIENT_VISITS_BY_PNUMBER);
 
-        Collection<AliquotWrapper> allAliquots = TestReports.getInstance()
-            .getAliquots();
+        Collection<AliquotWrapper> allAliquots = getAliquots();
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, ALIQUOT_FTA_SAMPLE_TYPE);
         Map<String, AliquotWrapper> groupedAliquots = MapperUtil.map(

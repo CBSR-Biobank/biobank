@@ -72,7 +72,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
         @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
-                TestReports.ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
+                ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
                 aliquotStudyNameShortLike(studyNameShort),
                 aliquotSite(isInSite(), getSiteId())));
 

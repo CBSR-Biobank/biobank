@@ -42,7 +42,7 @@ public class QAAliquotsTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<AliquotWrapper> aliquots = TestReports.getInstance().getAliquots();
+        List<AliquotWrapper> aliquots = getAliquots();
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
@@ -53,7 +53,7 @@ public class QAAliquotsTest extends AbstractReportTest {
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<AliquotWrapper> aliquots = TestReports.getInstance().getAliquots();
+        List<AliquotWrapper> aliquots = getAliquots();
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);

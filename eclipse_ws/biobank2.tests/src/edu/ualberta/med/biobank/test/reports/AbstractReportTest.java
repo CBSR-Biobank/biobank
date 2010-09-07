@@ -33,7 +33,6 @@ import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-// TODO: extend this class
 public abstract class AbstractReportTest {
     public static enum CompareResult {
         ORDER, SIZE
@@ -45,6 +44,24 @@ public abstract class AbstractReportTest {
     public static final Predicate<ContainerWrapper> CONTAINER_IS_TOP_LEVEL = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
             return container.getParent() == null;
+        }
+    };
+    public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
+        public boolean evaluate(ContainerWrapper container) {
+            return (container.getContainerType().getSampleTypeCollection() != null)
+                && (container.getContainerType().getSampleTypeCollection()
+                    .size() > 0);
+        }
+    };
+    public static final Predicate<AliquotWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<AliquotWrapper>() {
+        public boolean evaluate(AliquotWrapper aliquot) {
+            return (aliquot.getParent() == null)
+                || !aliquot.getParent().getLabel().startsWith("SS");
+        }
+    };
+    public static final Predicate<AliquotWrapper> ALIQUOT_HAS_POSITION = new Predicate<AliquotWrapper>() {
+        public boolean evaluate(AliquotWrapper aliquot) {
+            return aliquot.getParent() != null;
         }
     };
     public static final Comparator<AliquotWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<AliquotWrapper>() {
@@ -76,12 +93,52 @@ public abstract class AbstractReportTest {
         };
     }
 
+    public static Predicate<ContainerWrapper> containerSite(final boolean isIn,
+        final Integer siteId) {
+        return new Predicate<ContainerWrapper>() {
+            public boolean evaluate(ContainerWrapper container) {
+                return isIn == container.getSite().getId().equals(siteId);
+            }
+        };
+    }
+
     public static Predicate<PatientVisitWrapper> patientVisitSite(
         final boolean isIn, final Integer siteId) {
         return new Predicate<PatientVisitWrapper>() {
             public boolean evaluate(PatientVisitWrapper patientVisit) {
                 return isIn == patientVisit.getShipment().getSite().getId()
                     .equals(siteId);
+            }
+        };
+    }
+
+    public static Predicate<AliquotWrapper> aliquotDrawnSameDay(final Date date) {
+        final Calendar wanted = Calendar.getInstance();
+        wanted.setTime(date);
+
+        return new Predicate<AliquotWrapper>() {
+            private Calendar drawn = Calendar.getInstance();
+
+            public boolean evaluate(AliquotWrapper aliquot) {
+                drawn.setTime(aliquot.getPatientVisit().getDateDrawn());
+                int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
+                int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
+                int drawnYear = drawn.get(Calendar.YEAR);
+                int wantedYear = wanted.get(Calendar.YEAR);
+                return (drawnDayOfYear == wantedDayOfYear)
+                    && (drawnYear == wantedYear);
+            }
+        };
+    }
+
+    public static Predicate<AliquotWrapper> aliquotLinkedBetween(
+        final Date after, final Date before) {
+        return new Predicate<AliquotWrapper>() {
+            public boolean evaluate(AliquotWrapper aliquot) {
+                return (aliquot.getLinkDate().after(after) || aliquot
+                    .getLinkDate().equals(after))
+                    && (aliquot.getLinkDate().before(before) || aliquot
+                        .getLinkDate().equals(before));
             }
         };
     }

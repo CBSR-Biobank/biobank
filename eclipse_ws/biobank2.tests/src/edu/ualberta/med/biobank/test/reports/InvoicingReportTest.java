@@ -98,10 +98,10 @@ public class InvoicingReportTest extends AbstractReportTest {
         @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
-                aliquotSite(isInSite(), getSiteId()), TestReports
+                aliquotSite(isInSite(), getSiteId()), AbstractReportTest
                     .aliquotLinkedBetween(processedAndLinkedAfter,
                         processedAndLinkedBefore),
-                TestReports.ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER));
+                ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER));
         Map<List<String>, Long> groupedAliquots = MapperUtil.map(
             filteredAliquots, GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE);
 

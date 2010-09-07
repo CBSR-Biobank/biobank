@@ -3,20 +3,72 @@ package edu.ualberta.med.biobank.test.reports;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class AliquotsByPalletTest {
+public class AliquotsByPalletTest extends AbstractReportTest {
+
+    @Test
+    public void testResults() throws Exception {
+        List<AliquotWrapper> allAliquots = getAliquots();
+        ContainerWrapper container, topContainer;
+
+        for (AliquotWrapper aliquot : allAliquots) {
+            container = aliquot.getParent();
+            topContainer = getTopContainer(aliquot.getParent());
+
+            if ((container != null) && (topContainer != null)) {
+                checkResults(container.getLabel(), topContainer
+                    .getContainerType().getNameShort());
+            }
+        }
+    }
+
+    @Test
+    public void testEmptyCriteria() throws Exception {
+        checkResults("", "");
+    }
+
+    @Override
+    protected Collection<Object> getExpectedResults() {
+        final String containerLabel = (String) getReport().getParams().get(0);
+        final String topContainerTypeNameShort = (String) getReport()
+            .getParams().get(1);
+
+        Collection<AliquotWrapper> allAliquots = getAliquots();
+        @SuppressWarnings("unchecked")
+        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+            allAliquots, PredicateUtil.andPredicate(
+                aliquotInContainerLabelled(containerLabel),
+                aliquotInTopContainerType(topContainerTypeNameShort),
+                aliquotSite(isInSite(), getSiteId())));
+
+        List<Object> expectedResults = new ArrayList<Object>();
+
+        for (AliquotWrapper aliquot : filteredAliquots) {
+            expectedResults.add(aliquot.getWrappedObject());
+        }
+
+        return expectedResults;
+    }
+
+    private void checkResults(String containerLabel,
+        String topContainerTypeNameShort) throws ApplicationException {
+        getReport().setParams(
+            Arrays.asList((Object) containerLabel,
+                (Object) topContainerTypeNameShort));
+
+        checkResults(EnumSet.of(CompareResult.SIZE));
+    }
+
     private static final Predicate<AliquotWrapper> aliquotInContainerLabelled(
         final String containerLabel) {
         return new Predicate<AliquotWrapper>() {
@@ -46,75 +98,5 @@ public class AliquotsByPalletTest {
             container = container.getParent();
         }
         return container;
-    }
-
-    private List<Object> getExpectedResults(final String containerLabel,
-        final String topContainerTypeNameShort) {
-        Collection<AliquotWrapper> allAliquots = TestReports.getInstance()
-            .getAliquots();
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
-            allAliquots, PredicateUtil.andPredicate(
-                aliquotInContainerLabelled(containerLabel),
-                aliquotInTopContainerType(topContainerTypeNameShort)));
-
-        List<Object> expectedResults = new ArrayList<Object>();
-
-        for (AliquotWrapper aliquot : filteredAliquots) {
-            expectedResults.add(aliquot.getWrappedObject());
-        }
-
-        return expectedResults;
-    }
-
-    private BiobankReport getReport(final String containerLabel,
-        final String topContainerTypeNameShort) {
-        BiobankReport report = BiobankReport
-            .getReportByName("AliquotsByPallet");
-        report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
-            .getId());
-        report.setContainerList("");
-        report.setGroupBy("");
-
-        Object[] params = { containerLabel, topContainerTypeNameShort };
-        report.setParams(Arrays.asList(params));
-
-        return report;
-    }
-
-    private Collection<Object> checkReport(final String containerLabel,
-        final String topContainerTypeNameShort) throws ApplicationException {
-        return TestReports.getInstance().checkReport(
-            getReport(containerLabel, topContainerTypeNameShort),
-            getExpectedResults(containerLabel, topContainerTypeNameShort));
-    }
-
-    @Test
-    public void testResults() throws Exception {
-        Collection<Object> results;
-        List<AliquotWrapper> allAliquots = TestReports.getInstance()
-            .getAliquots();
-
-        ContainerWrapper container, topContainer;
-        for (AliquotWrapper aliquot : allAliquots) {
-            container = aliquot.getParent();
-            topContainer = getTopContainer(aliquot.getParent());
-
-            if ((container != null) && (topContainer != null)) {
-                results = checkReport(container.getLabel(), topContainer
-                    .getContainerType().getNameShort());
-
-                if (container.hasAliquots()) {
-                    Assert.assertTrue(results.size() > 0);
-                } else {
-                    Assert.assertTrue(results.size() == 0);
-                }
-            }
-        }
-    }
-
-    @Test
-    public void testEmptyCriteria() throws Exception {
-        Collection<Object> results = checkReport("", "");
-        Assert.assertTrue(results.size() == 0);
     }
 }

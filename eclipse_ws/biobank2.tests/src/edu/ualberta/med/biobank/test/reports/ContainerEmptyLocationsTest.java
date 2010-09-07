@@ -3,21 +3,38 @@ package edu.ualberta.med.biobank.test.reports;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerEmptyLocationsTest {
-    private List<Object> getExpectedResults(final String containerLabel,
-        final String topContainerTypeNameShort) {
+public class ContainerEmptyLocationsTest extends AbstractReportTest {
+
+    @Test
+    public void testResults() throws Exception {
+        for (ContainerWrapper container : getContainers()) {
+            checkReport(container.getLabel(), container.getContainerType()
+                .getNameShort());
+            checkReport(container.getLabel(), "");
+        }
+    }
+
+    @Test
+    public void testEmpty() throws ApplicationException {
+        checkReport("", "");
+    }
+
+    @Override
+    protected Collection<Object> getExpectedResults() {
+        final String containerLabel = (String) getReport().getParams().get(0);
+        final String topContainerTypeNameShort = (String) getReport()
+            .getParams().get(1);
+
         Predicate<ContainerWrapper> specificContainerLabel = new Predicate<ContainerWrapper>() {
             public boolean evaluate(ContainerWrapper container) {
                 return container.getLabel().equals(containerLabel);
@@ -30,14 +47,15 @@ public class ContainerEmptyLocationsTest {
             }
         };
 
-        List<ContainerWrapper> allContainers = TestReports.getInstance()
-            .getContainers();
+        List<ContainerWrapper> allContainers = getContainers();
         Collection<ContainerWrapper> topContainers = PredicateUtil.filter(
             allContainers, PredicateUtil.andPredicate(specificContainerLabel,
                 specificContainerType));
 
         Collection<ContainerWrapper> otherContainers = PredicateUtil.filter(
-            allContainers, TestReports.CONTAINER_CAN_STORE_SAMPLES_PREDICATE);
+            allContainers, PredicateUtil.andPredicate(
+                CONTAINER_CAN_STORE_SAMPLES_PREDICATE,
+                containerSite(isInSite(), getSiteId())));
 
         List<Object> expectedResults = new ArrayList<Object>();
 
@@ -56,44 +74,12 @@ public class ContainerEmptyLocationsTest {
         return expectedResults;
     }
 
-    private BiobankReport getReport(String containerLabel,
-        String topContainerTypeShortName) {
-        BiobankReport report = BiobankReport
-            .getReportByName("ContainerEmptyLocations");
-        report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
-            .getId());
-        report.setContainerList("");
-        report.setGroupBy("");
-
-        Object[] params = { containerLabel, topContainerTypeShortName };
-        report.setParams(Arrays.asList(params));
-
-        return report;
-    }
-
-    private Collection<Object> checkReport(String containerLabel,
+    private void checkReport(String containerLabel,
         String topContainerTypeShortName) throws ApplicationException {
-        return TestReports.getInstance().checkReport(
-            getReport(containerLabel, topContainerTypeShortName),
-            getExpectedResults(containerLabel, topContainerTypeShortName));
-    }
-
-    @Test
-    public void testResults() throws Exception {
-        Collection<Object> results;
-        for (ContainerWrapper container : TestReports.getInstance()
-            .getContainers()) {
-            checkReport(container.getLabel(), container.getContainerType()
-                .getNameShort());
-            results = checkReport(container.getLabel(), "");
-            Assert.assertTrue(results.size() == 0);
-        }
-    }
-
-    @Test
-    public void testEmpty() throws ApplicationException {
-        Collection<Object> results = checkReport("", "");
-        Assert.assertTrue(results.size() == 0);
+        getReport().setParams(
+            Arrays.asList((Object) containerLabel,
+                (Object) topContainerTypeShortName));
+        checkResults(EnumSet.of(CompareResult.SIZE));
     }
 
     // TODO: test postProcess()

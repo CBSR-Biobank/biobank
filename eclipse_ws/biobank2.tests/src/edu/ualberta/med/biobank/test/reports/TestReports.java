@@ -1,25 +1,5 @@
 package edu.ualberta.med.biobank.test.reports;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -35,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
-import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -51,8 +30,22 @@ import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ AliquotCountTest.class, AliquotInvoiceByClinicTest.class,
@@ -66,24 +59,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     QAAliquotsTest.class, SAliquotsTest.class, SampleTypePvCountTest.class,
     SampleTypeSUsageTest.class })
 public final class TestReports implements ReportDataSource {
-    public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
-        public boolean evaluate(ContainerWrapper container) {
-            return (container.getContainerType().getSampleTypeCollection() != null)
-                && (container.getContainerType().getSampleTypeCollection()
-                    .size() > 0);
-        }
-    };
-    public static final Predicate<AliquotWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
-            return (aliquot.getParent() == null)
-                || !aliquot.getParent().getLabel().startsWith("SS");
-        }
-    };
-    public static final Predicate<AliquotWrapper> ALIQUOT_HAS_POSITION = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
-            return aliquot.getParent() != null;
-        }
-    };
 
     private static TestReports INSTANCE = null;
 
@@ -139,37 +114,6 @@ public final class TestReports implements ReportDataSource {
         }
 
         return INSTANCE;
-    }
-
-    public static Predicate<AliquotWrapper> aliquotLinkedBetween(
-        final Date after, final Date before) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
-                return (aliquot.getLinkDate().after(after) || aliquot
-                    .getLinkDate().equals(after))
-                    && (aliquot.getLinkDate().before(before) || aliquot
-                        .getLinkDate().equals(before));
-            }
-        };
-    }
-
-    public static Predicate<AliquotWrapper> aliquotDrawnSameDay(final Date date) {
-        final Calendar wanted = Calendar.getInstance();
-        wanted.setTime(date);
-
-        return new Predicate<AliquotWrapper>() {
-            private Calendar drawn = Calendar.getInstance();
-
-            public boolean evaluate(AliquotWrapper aliquot) {
-                drawn.setTime(aliquot.getPatientVisit().getDateDrawn());
-                int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
-                int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
-                int drawnYear = drawn.get(Calendar.YEAR);
-                int wantedYear = wanted.get(Calendar.YEAR);
-                return (drawnDayOfYear == wantedDayOfYear)
-                    && (drawnYear == wantedYear);
-            }
-        };
     }
 
     public static void generateSites() throws Exception {
@@ -315,10 +259,10 @@ public final class TestReports implements ReportDataSource {
                     .getRandString());
 
                 // TODO: add sample storages?
-                // leave the last sample type unassociated with any study via
+                // leave the first sample type unassociated with any study via
                 // SampleStorage since at least one report checks for these
-                for (int j = 0, numSampleTypes = getInstance().getSampleTypes()
-                    .size(); j < numSampleTypes - 1; j++) {
+                for (int j = 1, numSampleTypes = getInstance().getSampleTypes()
+                    .size(); j < numSampleTypes; j++) {
                     SampleTypeWrapper type = getInstance().getSampleTypes()
                         .get(j);
                     SampleStorageWrapper sampleStorage = SampleStorageHelper
@@ -521,102 +465,5 @@ public final class TestReports implements ReportDataSource {
 
     public List<SampleStorageWrapper> getSampleStorages() {
         return sampleStorages;
-    }
-
-    public Collection<Object> checkReport(BiobankReport report,
-        Collection<Object> expectedResults) throws ApplicationException {
-        return checkReport(report, expectedResults,
-            EnumSet.of(CompareResult.Size));
-    }
-
-    public static enum CompareResult {
-        Order, Size
-    };
-
-    public Collection<Object> checkReport(BiobankReport report,
-        Collection<Object> expectedResults, EnumSet<CompareResult> cmpOptions)
-        throws ApplicationException {
-        List<Object> actualResults = report.generate(getAppService());
-
-        // post process individual rows BEFORE post processing the entire
-        // collection, if necessary
-        List<Object> postProcessedExpectedResults = new ArrayList<Object>(
-            expectedResults);
-        AbstractReport abstractReport = ReportFactory.createReport(report);
-        AbstractRowPostProcess rowPostProcessor = abstractReport
-            .getRowPostProcess();
-
-        if (rowPostProcessor != null) {
-            Object processedRow;
-            for (int i = 0, numRows = postProcessedExpectedResults.size(); i < numRows; i++) {
-                processedRow = rowPostProcessor
-                    .rowPostProcess(postProcessedExpectedResults.get(i));
-                postProcessedExpectedResults.set(i, processedRow);
-            }
-        }
-
-        // post process the entire expected collection AFTER individual
-        // rows have been processed
-        postProcessedExpectedResults = abstractReport.postProcess(
-            getAppService(), postProcessedExpectedResults);
-
-        // we may only require the actual results to be a subset of
-        // the expected results, so the actual results must be iterated in an
-        // outer loop.
-        Iterator<Object> it = postProcessedExpectedResults.iterator();
-        int actualResultsSize = 0;
-        for (Object actualRow : actualResults) {
-            boolean isFound = false;
-            if (cmpOptions.contains(CompareResult.Order)) {
-                if (it.hasNext()) {
-                    Object[] next = (Object[]) it.next();
-
-                    // the order of arguments to Arrays.equals() matters, e.g.:
-                    //
-                    // java.util.Date date = new java.util.Date();
-                    // java.util.Date stamp =
-                    // new java.sql.Timestamp(date.getTime());
-                    // assertTrue(date.equals(stamp));
-                    // assertTrue(date.compareTo(stamp) == 0);
-                    // assertTrue(stamp.compareTo(date) == 0);
-                    // assertTrue(stamp.equals(date)); // <-- FAILS
-                    if (Arrays.equals(next, (Object[]) actualRow)) {
-                        isFound = true;
-                    }
-                }
-            } else {
-                for (Object expectedRow : postProcessedExpectedResults) {
-                    if (Arrays.equals((Object[]) expectedRow,
-                        (Object[]) actualRow)) {
-                        isFound = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!isFound) {
-                Assert.fail("did not expect this row in actual results: "
-                    + Arrays.toString((Object[]) actualRow));
-            } else {
-                System.out.println("found: "
-                    + Arrays.toString((Object[]) actualRow));
-            }
-
-            actualResultsSize++;
-        }
-
-        it = null; // done with this iterator.
-
-        // cannot accurately know the size of actual results until they have all
-        // been run through once, so, do not compare actual size to expected
-        // size
-
-        if (cmpOptions.contains(CompareResult.Size)
-            && (postProcessedExpectedResults.size() != actualResultsSize)) {
-            Assert.fail("expected " + postProcessedExpectedResults.size()
-                + " results, got " + actualResultsSize);
-        }
-
-        return postProcessedExpectedResults;
     }
 }

@@ -12,23 +12,72 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.server.reports.AliquotRequestImpl;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class AliquotRequestTest {
+public class AliquotRequestTest extends AbstractReportTest {
+    private static final Integer ALIQUOT_LIMIT = new Integer(5);
 
-    private List<Object> getExpectedResults(List<Object> params) {
+    @Test
+    public void testResultsForOneSetOfParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        for (AliquotWrapper aliquot : getAliquots()) {
+            params.clear();
+
+            params.add(aliquot.getPatientVisit().getPatient().getPnumber());
+            params.add(aliquot.getPatientVisit().getDateDrawn());
+            params.add(aliquot.getSampleType().getNameShort());
+            params.add(ALIQUOT_LIMIT);
+
+            checkResults(params);
+        }
+    }
+
+    @Test
+    public void testResultsForManySetsOfParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        int numIterations = 0;
+        for (AliquotWrapper aliquot : getAliquots()) {
+            addParams(params, aliquot, ALIQUOT_LIMIT);
+
+            if (++numIterations >= 3) {
+                break;
+            }
+        }
+
+        checkResults(params);
+    }
+
+    @Test
+    public void testDayWithNoResults() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+
+        Assert.assertTrue(getAliquots().size() > 0);
+
+        AliquotWrapper aliquot = getAliquots().get(0);
+        List<Object> params = new ArrayList<Object>();
+        addParams(params, aliquot, ALIQUOT_LIMIT);
+        params.set(1, calendar.getTime());
+
+        checkResults(params);
+    }
+
+    @Override
+    protected Collection<Object> getExpectedResults() {
         List<Object> expectedResults = new ArrayList<Object>();
+        List<Object> params = getReport().getParams();
 
         for (int i = 0, numParams = params.size(); i < numParams; i += 4) {
             final String pnumber = (String) params.get(i);
-            Date dateDrawn = (Date) params.get(i + 1);
+            Date dateDrawn = DateFormatter.parseToDate((String) params
+                .get(i + 1));
             final String typeName = (String) params.get(i + 2);
-            Integer maxResults = (Integer) params.get(i + 3);
+            Integer maxResults = Integer.parseInt((String) params.get(i + 3));
 
             Predicate<AliquotWrapper> aliquotPnumber = new Predicate<AliquotWrapper>() {
                 public boolean evaluate(AliquotWrapper aliquot) {
@@ -44,15 +93,14 @@ public class AliquotRequestTest {
                 }
             };
 
-            Collection<AliquotWrapper> allAliquots = TestReports.getInstance()
-                .getAliquots();
+            Collection<AliquotWrapper> allAliquots = getAliquots();
             @SuppressWarnings("unchecked")
             List<AliquotWrapper> filteredAliquots = new ArrayList<AliquotWrapper>(
                 PredicateUtil.filter(allAliquots, PredicateUtil.andPredicate(
-                    TestReports.aliquotDrawnSameDay(dateDrawn),
-                    TestReports.ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
-                    TestReports.ALIQUOT_HAS_POSITION, aliquotPnumber,
-                    aliquotSampleType)));
+                    AbstractReportTest.aliquotDrawnSameDay(dateDrawn),
+                    ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER, ALIQUOT_HAS_POSITION,
+                    aliquotPnumber, aliquotSampleType,
+                    aliquotSite(isInSite(), getSiteId()))));
 
             for (AliquotWrapper aliquot : filteredAliquots) {
                 expectedResults.add(aliquot.getWrappedObject());
@@ -67,14 +115,9 @@ public class AliquotRequestTest {
         return expectedResults;
     }
 
-    private BiobankReport getReport(List<Object> params) {
-        BiobankReport report = BiobankReport.getReportByName("AliquotRequest");
-        report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
-            .getId());
-        report.setContainerList("");
-        report.setGroupBy("");
-
-        // convert parameters to String objects for the report
+    private void checkResults(List<Object> params) throws ApplicationException {
+        // convert parameters to String objects for the report, as this is what
+        // the report expects
         List<Object> stringParams = new ArrayList<Object>();
         for (Object o : params) {
             if (o instanceof Date) {
@@ -83,20 +126,13 @@ public class AliquotRequestTest {
                 stringParams.add(o.toString());
             }
         }
+        getReport().setParams(stringParams);
 
-        report.setParams(stringParams);
-
-        return report;
-    }
-
-    private Collection<Object> checkReport(List<Object> params)
-        throws ApplicationException {
         // because this report selects a random subset of the possibly results,
         // we cannot enforce a common order or size between the expected and
         // actual results
-        return TestReports.getInstance().checkReport(getReport(params),
-            getExpectedResults(params),
-            EnumSet.noneOf(TestReports.CompareResult.class));
+
+        checkResults(EnumSet.noneOf(CompareResult.class));
     }
 
     private static void addParams(List<Object> params, AliquotWrapper aliquot,
@@ -105,54 +141,5 @@ public class AliquotRequestTest {
         params.add(aliquot.getPatientVisit().getDateDrawn());
         params.add(aliquot.getSampleType().getNameShort());
         params.add(limit);
-    }
-
-    @Test
-    public void testResultsForOneSetOfParams() throws Exception {
-        List<Object> params = new ArrayList<Object>();
-        for (AliquotWrapper aliquot : TestReports.getInstance().getAliquots()) {
-            params.clear();
-
-            params.add(aliquot.getPatientVisit().getPatient().getPnumber());
-            params.add(aliquot.getPatientVisit().getDateDrawn());
-            params.add(aliquot.getSampleType().getNameShort());
-            params.add(5);
-
-            Collection<Object> results;
-
-            results = checkReport(params);
-            Assert.assertTrue(results.size() > 0);
-        }
-    }
-
-    @Test
-    public void testResultsForManySetsOfParams() throws Exception {
-        List<Object> params = new ArrayList<Object>();
-        for (AliquotWrapper aliquot : TestReports.getInstance().getAliquots()) {
-            addParams(params, aliquot, 5);
-            if (params.size() > 12) {
-                break;
-            }
-        }
-
-        Collection<Object> results = checkReport(params);
-        Assert.assertTrue(results.size() > 0);
-    }
-
-    @Test
-    public void testDayWithNoResults() throws Exception {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-
-        Assert.assertTrue(TestReports.getInstance().getAliquots().size() > 0);
-
-        AliquotWrapper aliquot = TestReports.getInstance().getAliquots().get(0);
-        List<Object> params = new ArrayList<Object>();
-        addParams(params, aliquot, 5);
-        params.set(1, calendar.getTime());
-
-        Collection<Object> results = checkReport(params);
-        Assert.assertTrue(results.size() == 1);
     }
 }

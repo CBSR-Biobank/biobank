@@ -44,7 +44,7 @@ public class SAliquotsTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<AliquotWrapper> aliquots = TestReports.getInstance().getAliquots();
+        List<AliquotWrapper> aliquots = getAliquots();
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
@@ -54,7 +54,7 @@ public class SAliquotsTest extends AbstractReportTest {
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<AliquotWrapper> aliquots = TestReports.getInstance().getAliquots();
+        List<AliquotWrapper> aliquots = getAliquots();
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
@@ -78,7 +78,7 @@ public class SAliquotsTest extends AbstractReportTest {
         @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
-                TestReports.aliquotLinkedBetween(after, before),
+                AbstractReportTest.aliquotLinkedBetween(after, before),
                 aliquotSite(isInSite(), getSiteId()),
                 aliquotTopContainerIdIn(topContainerIdList)));
 

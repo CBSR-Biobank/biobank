@@ -39,7 +39,7 @@ public class PatientWBCTest extends AbstractReportTest {
             allAliquots, PredicateUtil.andPredicate(
                 aliquotSite(isInSite(), getSiteId()),
                 ALIQUOT_IS_DNA_SAMPLE_TYPE, ALIQUOT_IN_CABINET,
-                TestReports.ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER));
+                ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER));
 
         List<Object> expectedResults = new ArrayList<Object>();
 

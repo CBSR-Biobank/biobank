@@ -1,23 +1,19 @@
 package edu.ualberta.med.biobank.test.reports;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ContainerCapacityTest {
-    private static final Mapper<ContainerWrapper, String, ResultRow> CONTAINER_PATH_MAPPER = new Mapper<ContainerWrapper, String, ResultRow>() {
+public class ContainerCapacityTest extends AbstractReportTest {
+    private static final Mapper<ContainerWrapper, String, ResultRow> GROUP_BY_TOP_CONTAINER_ID = new Mapper<ContainerWrapper, String, ResultRow>() {
         public String getKey(ContainerWrapper container) {
             String path = getPath(container);
 
@@ -74,43 +70,28 @@ public class ContainerCapacityTest {
         Long usedSlots = new Long(0);
     }
 
-    private Collection<Object> getExpectedResults(
-        Collection<ContainerWrapper> containers) {
+    @Test
+    public void testResults() throws Exception {
+        checkResults(EnumSet.of(CompareResult.SIZE));
+    }
 
+    @Override
+    protected Collection<Object> getExpectedResults() {
         Collection<ContainerWrapper> filteredContainers = PredicateUtil.filter(
-            containers, TestReports.CONTAINER_CAN_STORE_SAMPLES_PREDICATE);
+            getContainers(), PredicateUtil.andPredicate(
+                CONTAINER_CAN_STORE_SAMPLES_PREDICATE,
+                containerSite(isInSite(), getSiteId())));
 
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (ResultRow row : MapperUtil.map(filteredContainers,
-            CONTAINER_PATH_MAPPER).values()) {
+            GROUP_BY_TOP_CONTAINER_ID).values()) {
             expectedResults.add(new Object[] { row.label, row.totalCapacity,
                 row.usedSlots });
         }
 
         return expectedResults;
     }
-
-    private BiobankReport getReport() throws ApplicationException {
-        BiobankReport report = BiobankReport
-            .getReportByName("ContainerCapacity");
-        report.setSiteInfo("=", TestReports.getInstance().getSites().get(0)
-            .getId());
-        report.setContainerList("");
-        report.setGroupBy("");
-        report.setParams(Arrays.asList());
-
-        return report;
-    }
-
-    @Test
-    public void testResults() throws Exception {
-        Collection<Object> results = TestReports.getInstance().checkReport(
-            getReport(),
-            getExpectedResults(TestReports.getInstance().getContainers()));
-        Assert.assertTrue(results.size() > 0);
-    }
-
     // TODO: test getRowPostProcess(). Test the implementations of
     // AbstractRowPostProcess instead?
 }
