@@ -34,7 +34,10 @@ public class QAAliquotsImpl extends AbstractReport {
     @Override
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
-        results = results.subList(0, numResults);
+        int lastIndex = Math.min(numResults, results.size());
+        if (lastIndex > 0) {
+            results = results.subList(0, lastIndex);
+        }
         List<Object> modifiedResults = new ArrayList<Object>();
         // get the info
         for (Object ob : results) {
