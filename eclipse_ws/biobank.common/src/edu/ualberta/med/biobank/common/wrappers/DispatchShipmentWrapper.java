@@ -224,6 +224,10 @@ public class DispatchShipmentWrapper extends
                 throw new BiobankCheckException(
                     "Cannot add aliquot that are not already saved");
             }
+            if (aliquot.getPosition() == null) {
+                throw new BiobankCheckException(
+                    "Cannot add aliquot with no position. A position should be first assigned");
+            }
             allAliquotObjects.add(aliquot.getWrappedObject());
             allAliquotWrappers.add(aliquot);
         }
