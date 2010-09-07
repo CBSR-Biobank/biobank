@@ -73,11 +73,11 @@ public abstract class AbstractReportTest {
 
     private static final String[] SITE_OPS = { "=", "!=" };
     private BiobankReport report;
-    private ReportDataSource dataSource = RandomReportDataSource.getInstance();
+    private static ReportDataSource dataSource;
 
-    // public void setReportDataSource(ReportDataSource dataSource) {
-    // this.dataSource = dataSource;
-    // }
+    protected static void setReportDataSource(ReportDataSource dataSource) {
+        AbstractReportTest.dataSource = dataSource;
+    }
 
     public WritableApplicationService getAppService() {
         return dataSource.getAppService();

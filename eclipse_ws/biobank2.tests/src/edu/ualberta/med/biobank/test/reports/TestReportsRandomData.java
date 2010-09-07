@@ -58,9 +58,8 @@ import org.junit.runners.Suite.SuiteClasses;
     PatientWBCTest.class, PsByStudyTest.class, PVsByStudyTest.class,
     QAAliquotsTest.class, SAliquotsTest.class, SampleTypePvCountTest.class,
     SampleTypeSUsageTest.class })
-public final class RandomReportDataSource implements ReportDataSource {
-
-    private static RandomReportDataSource INSTANCE = null;
+public final class TestReportsRandomData implements ReportDataSource {
+    private static TestReportsRandomData INSTANCE = null;
 
     private static final int NUM_SITES = 1;
     private static final int CONTAINER_DEPTH = 3;
@@ -97,7 +96,7 @@ public final class RandomReportDataSource implements ReportDataSource {
     private final List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
     private final List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
 
-    private RandomReportDataSource() {
+    private TestReportsRandomData() {
         try {
             AllTests.setUp();
         } catch (Exception e) {
@@ -108,9 +107,9 @@ public final class RandomReportDataSource implements ReportDataSource {
     }
 
     // TODO: better enforce singleton (e.g. prevent clone, multi-thread, etc.)
-    public static RandomReportDataSource getInstance() {
+    public static TestReportsRandomData getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new RandomReportDataSource();
+            INSTANCE = new TestReportsRandomData();
         }
 
         return INSTANCE;
@@ -162,6 +161,10 @@ public final class RandomReportDataSource implements ReportDataSource {
 
     @BeforeClass
     public static void setUp() throws Exception {
+        // make sure AbstractReportTest classes use this class as the their
+        // source of data
+        AbstractReportTest.setReportDataSource(getInstance());
+
         generateSites();
         generateSampleTypes();
 
