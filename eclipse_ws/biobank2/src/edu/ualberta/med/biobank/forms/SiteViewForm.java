@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -16,7 +13,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
@@ -24,7 +20,6 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable.StudySiteDispatch;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -186,16 +181,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private void createDispatchSection() throws ApplicationException {
         Section section = createSection("Dispatch");
-        List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
-        for (StudyWrapper study : site.getDispatchStudies()) {
-            for (SiteWrapper destSite : site.getStudyDispachSites(study)) {
-                StudySiteDispatch ssd = new StudySiteDispatch();
-                ssd.study = study;
-                ssd.destSite = destSite;
-                dispatchList.add(ssd);
-            }
-        }
-        dispatchTable = new SiteDispatchInfoTable(section, dispatchList);
+        dispatchTable = new SiteDispatchInfoTable(section, site);
         dispatchTable.adaptToToolkit(toolkit, true);
         dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
         section.setClient(dispatchTable);

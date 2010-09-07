@@ -14,11 +14,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 
 /**
  * Allows the user to choose the clinic from which the shipment comes from
@@ -37,20 +36,20 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText("Shipment Select");
+    protected String getDialogShellTitle() {
+        return "Shipment Select";
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-
-        setTitle("Select Shipment's Clinic");
-        setMessage("More than one shipment with waybill '"
+    protected String getTitleAreaMessage() {
+        return "More than one shipment with waybill '"
             + shipments.get(0).getWaybill()
-            + "' found.\nPlease choose the clinic associated with this shipment.");
-        return contents;
+            + "' found.\nPlease choose the clinic associated with this shipment.";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return "Select Shipment's Clinic";
     }
 
     @Override
@@ -67,7 +66,8 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ClinicWrapper clinic = ((ClinicShipmentWrapper) element).getClinic();
+                ClinicWrapper clinic = ((ClinicShipmentWrapper) element)
+                    .getClinic();
                 return clinic.getName();
             }
         });

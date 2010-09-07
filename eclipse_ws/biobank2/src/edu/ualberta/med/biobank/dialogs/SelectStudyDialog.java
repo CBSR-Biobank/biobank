@@ -3,20 +3,18 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
-public class SelectStudyDialog extends TitleAreaDialog {
+public class SelectStudyDialog extends BiobankDialog {
 
     public static final int ADD_BTN_ID = 100;
 
@@ -34,23 +32,23 @@ public class SelectStudyDialog extends TitleAreaDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        shell.setText(TITLE);
+    protected String getDialogShellTitle() {
+        return TITLE;
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle("Add a study to this site");
-        setMessage("Select a study");
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "Select a study";
     }
 
     @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-        Composite contents = new Composite(parentComposite, SWT.NONE);
+    protected String getTitleAreaTitle() {
+        return "Add a study to this site";
+    }
+
+    @Override
+    protected void createDialogAreaInternal(Composite parent) throws Exception {
+        Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -65,7 +63,6 @@ public class SelectStudyDialog extends TitleAreaDialog {
         });
         studyInfoTable.setCollection(studies);
         studyInfoTable.setEnabled(true);
-        return contents;
     }
 
     @Override

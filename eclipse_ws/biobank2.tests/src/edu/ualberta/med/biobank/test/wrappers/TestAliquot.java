@@ -622,8 +622,8 @@ public class TestAliquot extends TestDatabase {
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
         DispatchShipmentWrapper dShipment2 = DispatchShipmentHelper
             .newShipment(destSite, destSite2, study, method);
-        dShipment.addAliquots(Arrays.asList(aliquot));
-        dShipment.persist();
+        dShipment2.addAliquots(Arrays.asList(aliquot));
+        dShipment2.persist();
 
         aliquot.reload();
         aliquotDispatchShipments = aliquot.getDispatchShipments();

@@ -11,7 +11,9 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -39,6 +41,35 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         widgetCreator = new WidgetCreator(null);
         widgetCreator.initDataBinding();
     }
+
+    @Override
+    protected void configureShell(Shell shell) {
+        super.configureShell(shell);
+        shell.setText(getDialogShellTitle());
+    }
+
+    @Override
+    protected Control createContents(Composite parent) {
+        Control contents = super.createContents(parent);
+        setTitleImage(getTitleAreaImage());
+        setTitle(getTitleAreaTitle());
+        setMessage(getTitleAreaMessage(), getTitleAreaMessageType());
+        return contents;
+    }
+
+    protected Image getTitleAreaImage() {
+        return null;
+    }
+
+    protected int getTitleAreaMessageType() {
+        return IMessageProvider.NONE;
+    }
+
+    protected abstract String getTitleAreaMessage();
+
+    protected abstract String getTitleAreaTitle();
+
+    protected abstract String getDialogShellTitle();
 
     @Override
     protected Control createButtonBar(Composite parent) {
