@@ -125,8 +125,7 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
-        Collection<PatientVisitWrapper> patientVisits = TestReports
-            .getInstance().getPatientVisits();
+        Collection<PatientVisitWrapper> patientVisits = getPatientVisits();
 
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
             .filter(patientVisits, PredicateUtil.andPredicate(

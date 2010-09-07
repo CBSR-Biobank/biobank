@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public interface ReportDataSource {
     public List<SiteWrapper> getSites();
@@ -33,4 +34,6 @@ public interface ReportDataSource {
     public List<PatientVisitWrapper> getPatientVisits();
 
     public List<PatientWrapper> getPatients();
+
+    public WritableApplicationService getAppService();
 }

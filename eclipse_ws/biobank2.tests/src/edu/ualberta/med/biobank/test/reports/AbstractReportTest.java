@@ -73,14 +73,14 @@ public abstract class AbstractReportTest {
 
     private static final String[] SITE_OPS = { "=", "!=" };
     private BiobankReport report;
-    private ReportDataSource dataSource = TestReports.getInstance();
+    private ReportDataSource dataSource = RandomReportDataSource.getInstance();
 
     // public void setReportDataSource(ReportDataSource dataSource) {
     // this.dataSource = dataSource;
     // }
 
     public WritableApplicationService getAppService() {
-        return TestReports.getInstance().getAppService();
+        return dataSource.getAppService();
     }
 
     public static Predicate<AliquotWrapper> aliquotSite(final boolean isIn,
@@ -169,10 +169,11 @@ public abstract class AbstractReportTest {
         };
     }
 
-    public static Collection<Integer> getTopContainerIds() {
+    public static Collection<Integer> getTopContainerIds(
+        Collection<ContainerWrapper> containers) {
         Set<Integer> topContainerIds = new HashSet<Integer>();
-        for (ContainerWrapper container : PredicateUtil.filter(TestReports
-            .getInstance().getContainers(), CONTAINER_IS_TOP_LEVEL)) {
+        for (ContainerWrapper container : PredicateUtil.filter(containers,
+            CONTAINER_IS_TOP_LEVEL)) {
             topContainerIds.add(container.getId());
         }
         return topContainerIds;

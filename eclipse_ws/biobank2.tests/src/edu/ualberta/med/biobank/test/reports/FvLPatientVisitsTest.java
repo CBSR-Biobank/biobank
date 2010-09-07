@@ -49,8 +49,7 @@ public class FvLPatientVisitsTest extends AbstractReportTest {
 
     @Override
     protected Collection<Object> getExpectedResults() {
-        Collection<PatientVisitWrapper> allPatientVisits = TestReports
-            .getInstance().getPatientVisits();
+        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
             .filter(allPatientVisits, patientVisitSite(isInSite(), getSiteId()));
         Map<List<String>, List<Date>> groupedPatientVisits = MapperUtil.map(

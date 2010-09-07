@@ -34,12 +34,14 @@ public class SAliquotsTest extends AbstractReportTest {
 
     @Test
     public void testResults() throws Exception {
-        checkResults(getTopContainerIds(), new Date(0), new Date());
+        checkResults(getTopContainerIds(getContainers()), new Date(0),
+            new Date());
     }
 
     @Test
     public void testEmptyDateRange() throws Exception {
-        checkResults(getTopContainerIds(), new Date(), new Date(0));
+        checkResults(getTopContainerIds(getContainers()), new Date(), new Date(
+            0));
     }
 
     @Test
@@ -48,8 +50,8 @@ public class SAliquotsTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        checkResults(getTopContainerIds(), aliquot.getLinkDate(),
-            aliquot.getLinkDate());
+        checkResults(getTopContainerIds(getContainers()),
+            aliquot.getLinkDate(), aliquot.getLinkDate());
     }
 
     @Test
@@ -63,8 +65,8 @@ public class SAliquotsTest extends AbstractReportTest {
         calendar.setTime(aliquot.getLinkDate());
         calendar.add(Calendar.HOUR_OF_DAY, 24);
 
-        checkResults(getTopContainerIds(), aliquot.getLinkDate(),
-            calendar.getTime());
+        checkResults(getTopContainerIds(getContainers()),
+            aliquot.getLinkDate(), calendar.getTime());
     }
 
     @Override

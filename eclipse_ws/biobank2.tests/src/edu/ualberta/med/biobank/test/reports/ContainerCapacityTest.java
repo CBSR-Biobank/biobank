@@ -13,56 +13,59 @@ import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
 public class ContainerCapacityTest extends AbstractReportTest {
-    private static final Mapper<ContainerWrapper, String, ResultRow> GROUP_BY_TOP_CONTAINER_ID = new Mapper<ContainerWrapper, String, ResultRow>() {
-        public String getKey(ContainerWrapper container) {
-            String path = getPath(container);
+    private static final Mapper<ContainerWrapper, String, ResultRow> groupByTopContainerId(
+        final Collection<ContainerWrapper> containers) {
+        return new Mapper<ContainerWrapper, String, ResultRow>() {
+            public String getKey(ContainerWrapper container) {
+                String path = getPath(container);
 
-            if (path != null) {
-                int indexOfSlash = path.indexOf("/");
-                if (indexOfSlash > 0) {
-                    return path.substring(0, indexOfSlash);
-                }
-            }
-
-            return null;
-        }
-
-        public ResultRow getValue(ContainerWrapper container, ResultRow row) {
-            row = row != null ? row : new ResultRow();
-
-            if (row.label == null) {
-                for (ContainerWrapper possibleRootContainer : TestReports
-                    .getInstance().getContainers()) {
-                    String path = getPath(possibleRootContainer);
-                    String key = getKey(container);
-                    if ((path != null) && path.equals(key)) {
-                        row.label = possibleRootContainer.getLabel()
-                            + "("
-                            + possibleRootContainer.getContainerType()
-                                .getNameShort() + ")";
+                if (path != null) {
+                    int indexOfSlash = path.indexOf("/");
+                    if (indexOfSlash > 0) {
+                        return path.substring(0, indexOfSlash);
                     }
                 }
+
+                return null;
             }
 
-            row.totalCapacity += container.getContainerType().getRowCapacity()
-                * container.getContainerType().getColCapacity();
+            public ResultRow getValue(ContainerWrapper container, ResultRow row) {
+                row = row != null ? row : new ResultRow();
 
-            if (container.getAliquots() != null) {
-                row.usedSlots += container.getAliquots().size();
+                if (row.label == null) {
+                    for (ContainerWrapper possibleRootContainer : containers) {
+                        String path = getPath(possibleRootContainer);
+                        String key = getKey(container);
+                        if ((path != null) && path.equals(key)) {
+                            row.label = possibleRootContainer.getLabel()
+                                + "("
+                                + possibleRootContainer.getContainerType()
+                                    .getNameShort() + ")";
+                        }
+                    }
+                }
+
+                row.totalCapacity += container.getContainerType()
+                    .getRowCapacity()
+                    * container.getContainerType().getColCapacity();
+
+                if (container.getAliquots() != null) {
+                    row.usedSlots += container.getAliquots().size();
+                }
+
+                return row;
             }
 
-            return row;
-        }
-
-        private String getPath(ContainerWrapper container) {
-            try {
-                return container.getPath();
-            } catch (Exception e) {
-                e.printStackTrace();
+            private String getPath(ContainerWrapper container) {
+                try {
+                    return container.getPath();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
-            return null;
-        }
-    };
+        };
+    }
 
     private static class ResultRow {
         String label = null;
@@ -85,7 +88,7 @@ public class ContainerCapacityTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (ResultRow row : MapperUtil.map(filteredContainers,
-            GROUP_BY_TOP_CONTAINER_ID).values()) {
+            groupByTopContainerId(getContainers())).values()) {
             expectedResults.add(new Object[] { row.label, row.totalCapacity,
                 row.usedSlots });
         }

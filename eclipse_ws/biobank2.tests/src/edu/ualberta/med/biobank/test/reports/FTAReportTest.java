@@ -141,8 +141,7 @@ public class FTAReportTest extends AbstractReportTest {
             }
         };
 
-        Collection<PatientVisitWrapper> allPatientVisits = TestReports
-            .getInstance().getPatientVisits();
+        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
             .filter(
                 allPatientVisits,
