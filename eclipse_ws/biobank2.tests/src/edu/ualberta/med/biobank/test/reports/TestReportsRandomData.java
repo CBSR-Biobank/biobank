@@ -159,6 +159,8 @@ public final class TestReportsRandomData implements ReportDataSource {
             }).size() == 1);
     }
 
+    // TODO: refactor this setup into methods that make sense.
+
     @BeforeClass
     public static void setUp() throws Exception {
         // make sure AbstractReportTest classes use this class as the their
