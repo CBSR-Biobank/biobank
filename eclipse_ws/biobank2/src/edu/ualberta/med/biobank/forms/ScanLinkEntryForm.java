@@ -87,7 +87,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private Composite fieldsComposite;
 
-    private boolean isFakeScanRandom;
+    private boolean processScanResult;
 
     @Override
     protected void init() throws Exception {
@@ -412,22 +412,11 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
-    protected void saveUINeededInformation() {
-        super.saveUINeededInformation();
-        if (fakeScanRandom != null) {
-            isFakeScanRandom = fakeScanRandom.getSelection();
-        }
-    }
-
-    @Override
-    protected void scanAndProcessResult(IProgressMonitor monitor)
-        throws Exception {
-        launchScan(monitor);
-        final boolean everythingOk = processScanResult(monitor);
+    protected void afterScanAndProcess() {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                typesSelectionPerRowComposite.setEnabled(everythingOk);
+                typesSelectionPerRowComposite.setEnabled(processScanResult);
                 for (SampleTypeSelectionWidget typeWidget : sampleTypeWidgets) {
                     if (typeWidget.isComboEnabled()) {
                         typeWidget.setFocus();
@@ -435,7 +424,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     }
                 }
                 // Show result in grid
-                spw.setCells(cells);
+                spw.setCells(getCells());
                 setRescanMode();
                 // not needed on windows. This was if the textfield number
                 // go after 9, needed to resize on linux : need to check that
@@ -443,31 +432,33 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 // form.layout(true, true);
             }
         });
-        setScanValid(everythingOk);
+        setScanValid(processScanResult);
     }
 
     @Override
-    protected void launchFakeScan() throws Exception {
-        if (isFakeScanRandom) {
-            cells = PalletCell.getRandomScanLink();
-        } else {
-            try {
-                cells = PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                    appService, SessionManager.getInstance().getCurrentSite()
-                        .getId());
-            } catch (Exception ex) {
-                BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
-            }
+    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+        if (fakeScanRandom != null && fakeScanRandom.getSelection()) {
+            return PalletCell.getRandomScanLink();
         }
+        try {
+            return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
+                appService, SessionManager.getInstance().getCurrentSite()
+                    .getId());
+        } catch (Exception ex) {
+            BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
+        }
+        return null;
     }
 
     /**
      * go through cells retrieved from scan, set status and update the types
      * combos components
      */
-    private boolean processScanResult(IProgressMonitor monitor)
-        throws ApplicationException {
+    @Override
+    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+        processScanResult = false;
         boolean everythingOk = true;
+        Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
             for (RowColPos rcp : cells.keySet()) {
@@ -499,9 +490,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     setTypeCombosLists(typesRows);
                 }
             });
-            return everythingOk;
+            processScanResult = everythingOk;
         }
-        return false;
     }
 
     /**

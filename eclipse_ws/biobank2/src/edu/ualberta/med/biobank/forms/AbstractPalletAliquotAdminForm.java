@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -11,8 +10,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -31,12 +28,12 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
+import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -66,11 +63,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private IObservableValue scanValidValue = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
-    private String currentPlateToScan;
-
     private boolean rescanMode = false;
 
-    protected Map<RowColPos, PalletCell> cells;
+    private PalletScanManagement palletScanManagement;
 
     // the pallet container type name contains this text
     protected String palletNameContains = ""; //$NON-NLS-1$
@@ -80,7 +75,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private Label scanTubeAloneSwitch;
 
     protected ComboViewer profilesCombo;
-    private String selectedProfile;
 
     IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -107,6 +101,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             plateToScanText.setText(plateText);
         }
     };
+    protected String currentPlateToScan;
 
     @Override
     protected void init() throws Exception {
@@ -118,6 +113,74 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
         ScannerConfigPlugin.getDefault().getPreferenceStore()
             .addPropertyChangeListener(propertyListener);
+
+        palletScanManagement = new PalletScanManagement() {
+
+            @Override
+            protected void beforeScanAndProcess() {
+                AbstractPalletAliquotAdminForm.this.beforeScan();
+                currentPlateToScan = plateToScanValue.getValue().toString();
+            }
+
+            @Override
+            protected void beforeScan() {
+                setScanNotLauched(true);
+                String msgKey = "linkAssign.activitylog.scanning";//$NON-NLS-1$
+                if (isRescanMode()) {
+                    msgKey = "linkAssign.activitylog.rescanning";//$NON-NLS-1$
+                }
+                appendLogNLS(msgKey, currentPlateToScan);
+            }
+
+            @Override
+            protected Map<RowColPos, PalletCell> getFakeScanCells()
+                throws Exception {
+                return AbstractPalletAliquotAdminForm.this.getFakeScanCells();
+            }
+
+            @Override
+            protected void processScanResult(IProgressMonitor monitor)
+                throws Exception {
+                AbstractPalletAliquotAdminForm.this.processScanResult(monitor);
+            }
+
+            @Override
+            protected void beforeScanMerge() {
+                setScanHasBeenLauched(true);
+            }
+
+            @Override
+            protected void afterScan() {
+                appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
+                    cells.keySet().size());
+            }
+
+            @Override
+            protected void afterScanAndProcess() {
+                AbstractPalletAliquotAdminForm.this.afterScanAndProcess();
+            }
+
+            @Override
+            protected void scanAndProcessError(String errorMsg) {
+                setScanValid(false);
+                if (errorMsg != null && !errorMsg.isEmpty()) {
+                    appendLog(errorMsg);
+                }
+            }
+
+            @Override
+            protected void plateError() {
+                setScanNotLauched(true);
+            }
+        };
+    }
+
+    protected void beforeScan() {
+
+    }
+
+    protected void afterScanAndProcess() {
+
     }
 
     @Override
@@ -162,7 +225,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                internalScanAndProcessResult();
+                launchScanAndProcessResult();
             }
         });
         scanButton.setEnabled(false);
@@ -176,6 +239,11 @@ public abstract class AbstractPalletAliquotAdminForm extends
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             Messages.getString("linkAssign.scanValidValidationMsg")); //$NON-NLS-1$
+    }
+
+    protected void launchScanAndProcessResult() {
+        palletScanManagement.launchScanAndProcessResult(plateToScanValue
+            .getValue().toString(), getProfile(), isRescanMode());
     }
 
     protected String getProfile() {
@@ -228,7 +296,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             @Override
             public void handleEvent(Event e) {
                 if (scanButton.isEnabled()) {
-                    internalScanAndProcessResult();
+                    launchScanAndProcessResult();
                 }
             }
         });
@@ -249,115 +317,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
         cancelConfirmWidget = new CancelConfirmWidget(page, this, true);
     }
 
-    protected void internalScanAndProcessResult() {
-        saveUINeededInformation();
-        selectedProfile = this.getProfile();
-
-        IRunnableWithProgress op = new IRunnableWithProgress() {
-            @Override
-            public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scan and process...",
-                    IProgressMonitor.UNKNOWN);
-                try {
-                    scanAndProcessResult(monitor);
-                } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                    setScanValid(false);
-                } catch (Exception e) {
-                    BioBankPlugin
-                        .openAsyncError(Messages
-                            .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
-                            e);
-                    setScanValid(false);
-                    String msg = e.getMessage();
-                    if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
-                        msg = e.getCause().getMessage();
-                    }
-                    appendLog("ERROR: " + msg); //$NON-NLS-1$
-                }
-                monitor.done();
-            }
-        };
-        try {
-            new ProgressMonitorDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell()).run(true, false, op);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected void saveUINeededInformation() {
-        currentPlateToScan = plateToScanValue.getValue().toString();
-    }
-
-    protected abstract void scanAndProcessResult(IProgressMonitor monitor)
-        throws Exception;
-
-    protected void launchScan(IProgressMonitor monitor) throws Exception {
-        monitor.subTask("Launching scan");
-        setScanNotLauched(true);
-        Map<RowColPos, PalletCell> oldCells = cells;
-        String msgKey = "linkAssign.activitylog.scanning";//$NON-NLS-1$
-        if (isRescanMode()) {
-            msgKey = "linkAssign.activitylog.rescanning";//$NON-NLS-1$
-        }
-        appendLogNLS(msgKey, currentPlateToScan);
-        if (BioBankPlugin.isRealScanEnabled()) {
-            int plateNum = BioBankPlugin.getDefault().getPlateNumber(
-                currentPlateToScan);
-            if (plateNum == -1) {
-                setScanNotLauched(true);
-                BioBankPlugin.openAsyncError("Scan error",
-                    "Plate with barcode " + currentPlateToScan
-                        + " is not enabled");
-                return;
-            } else {
-                ScanCell[][] scanCells = null;
-                try {
-                    scanCells = ScannerConfigPlugin.scan(plateNum,
-                        selectedProfile);
-                    cells = PalletCell.convertArray(scanCells);
-                } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$
-                        ex, "You can still define barcodes one  by one.");
-                }
-            }
-        } else {
-            launchFakeScan();
-        }
-        setScanHasBeenLauched(true);
-        if (cells == null) {
-            cells = new HashMap<RowColPos, PalletCell>();
-        } else {
-            if (isRescanMode() && oldCells != null) {
-                // rescan: merge previous scan with new in case the scanner
-                // wasn't
-                // able to scan well
-                for (RowColPos rcp : oldCells.keySet()) {
-                    PalletCell oldScannedCell = oldCells.get(rcp);
-                    PalletCell newScannedCell = cells.get(rcp);
-                    if (PalletCell.hasValue(oldScannedCell)
-                        && PalletCell.hasValue(newScannedCell)
-                        && !oldScannedCell.getValue().equals(
-                            newScannedCell.getValue())) {
-                        cells = oldCells;
-                        throw new Exception(
-                            "Scan Aborted: previously scanned aliquot has been replaced. "
-                                + "If this is not a re-scan, reset and start again.");
-                    }
-                    if (PalletCell.hasValue(oldScannedCell)) {
-                        cells.put(rcp, oldScannedCell);
-                    }
-                }
-            }
-            appendLogNLS("linkAssign.activitylog.scanRes.total", //$NON-NLS-1$
-                cells.keySet().size());
-        }
-    }
-
     @SuppressWarnings("unused")
-    protected void launchFakeScan() throws Exception {
-
+    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+        return null;
     }
 
     @Override
@@ -379,7 +341,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void setScanNotLauched() {
         scanHasBeenLaunchedValue.setValue(false);
-        // scanTubeAloneSwitch.setVisible(false);
     }
 
     protected void setScanNotLauched(boolean async) {
@@ -409,7 +370,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void setScanHasBeenLauched() {
         scanHasBeenLaunchedValue.setValue(true);
-        // scanTubeAloneSwitch.setVisible(true);
     }
 
     protected boolean isScanHasBeenLaunched() {
@@ -453,7 +413,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private String scanTubeAloneDialog(RowColPos rcp) {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), cells, rcp);
+            .getActiveWorkbenchWindow().getShell(),
+            palletScanManagement.getCells(), rcp);
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
@@ -464,6 +425,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         if (scanTubeAloneMode && isScanHasBeenLaunched()) {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
                 .getPositionAtCoordinates(e.x, e.y);
+            Map<RowColPos, PalletCell> cells = palletScanManagement.getCells();
             if (rcp != null) {
                 PalletCell cell = cells.get(rcp);
                 if (canScanTubeAlone(cell)) {
@@ -524,12 +486,18 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 }
             }
         });
-        // scanTubeAloneSwitch.setVisible(false);
+    }
+
+    protected Map<RowColPos, PalletCell> getCells() {
+        return palletScanManagement.getCells();
     }
 
     @Override
     public void reset() throws Exception {
         scanValidValue.setValue(true);
-        cells = null;
+        palletScanManagement.reset();
     }
+
+    protected abstract void processScanResult(IProgressMonitor monitor)
+        throws Exception;
 }

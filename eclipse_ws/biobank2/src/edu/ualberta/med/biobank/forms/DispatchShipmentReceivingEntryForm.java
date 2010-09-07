@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -48,6 +49,8 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
     private DispatchAliquotListInfoTable aliquotsToBeReceivedTable;
 
+    private PalletScanManagement palletScanManagement;
+
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null");
@@ -59,6 +62,9 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
         retrieveShipment();
         setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
+
+        palletScanManagement = new PalletScanManagement();
+
     }
 
     private void retrieveShipment() {
@@ -88,7 +94,11 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         palletButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-
+                // FIXME
+                // pouvoir selectionner la plate
+                palletScanManagement.launchScanAndProcessResult("PLATE1");
+                // afficher le resultat dans une boite de dialog
+                // pouvoir scanner plate suivante
             }
         });
         setFirstControl(palletButton);

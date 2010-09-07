@@ -99,8 +99,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private Composite fieldsComposite;
 
-    private boolean isFakeScanLinkedOnly;
-
     protected boolean palletproductBarcodeTextModified;
 
     protected boolean palletPositionTextModified;
@@ -495,17 +493,18 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
-    protected void scanAndProcessResult(IProgressMonitor monitor)
-        throws Exception {
+    protected void beforeScan() {
         showOnlyPallet(false, true);
-        launchScan(monitor);
-        processScanResult(monitor);
+    }
+
+    @Override
+    protected void afterScanAndProcess() {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 cancelConfirmWidget.setFocus();
                 displayPalletPositions();
-                palletWidget.setCells(cells);
+                palletWidget.setCells(getCells());
                 setDirty(true);
                 setRescanMode();
                 page.layout(true, true);
@@ -514,29 +513,22 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
-    protected void saveUINeededInformation() {
-        super.saveUINeededInformation();
-        if (fakeScanLinkedOnlyButton != null) {
-            isFakeScanLinkedOnly = fakeScanLinkedOnlyButton.getSelection();
-        }
-    }
-
-    @Override
-    protected void launchFakeScan() throws Exception {
-        if (isFakeScanLinkedOnly) {
-            cells = PalletCell.getRandomAliquotsNotAssigned(appService,
-                SessionManager.getInstance().getCurrentSite().getId());
-        } else {
-            cells = PalletCell.getRandomAliquotsAlreadyAssigned(appService,
+    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+        if (fakeScanLinkedOnlyButton != null
+            && fakeScanLinkedOnlyButton.getSelection()) {
+            return PalletCell.getRandomAliquotsNotAssigned(appService,
                 SessionManager.getInstance().getCurrentSite().getId());
         }
+        return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
+            SessionManager.getInstance().getCurrentSite().getId());
     }
 
     /**
      * go through cells retrieved from scan, set status of aliquots to be added
      * to the current pallet
      */
-    private void processScanResult(IProgressMonitor monitor) throws Exception {
+    @Override
+    protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, AliquotWrapper> expectedAliquots = currentPalletWrapper
             .getAliquots();
         currentScanState = AliquotCellStatus.EMPTY;
@@ -545,7 +537,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 RowColPos rcp = new RowColPos(row, col);
                 monitor.subTask("Processing position "
                     + LabelingScheme.rowColToSbs(rcp));
-                PalletCell cell = cells.get(rcp);
+                PalletCell cell = getCells().get(rcp);
                 if (!isRescanMode() || cell == null || cell.getStatus() == null
                     || cell.getStatus() == AliquotCellStatus.EMPTY
                     || cell.getStatus() == AliquotCellStatus.ERROR
@@ -557,7 +549,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                             if (cell == null) {
                                 cell = new PalletCell(new ScanCell(rcp.row,
                                     rcp.col, null));
-                                cells.put(rcp, cell);
+                                getCells().put(rcp, cell);
                             }
                             cell.setExpectedAliquot(expectedAliquot);
                         }
@@ -573,7 +565,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
-        setScanValid(!cells.isEmpty()
+        setScanValid(!getCells().isEmpty()
             && currentScanState != AliquotCellStatus.ERROR);
     }
 
@@ -602,10 +594,13 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             ContainerWrapper hotelContainer = currentPalletWrapper.getParent();
             ContainerWrapper freezerContainer = hotelContainer.getParent();
 
-            freezerLabel.setText(freezerContainer.getFullInfoLabel());
-            freezerWidget.setContainerType(freezerContainer.getContainerType());
-            freezerWidget.setSelection(hotelContainer.getPosition());
-            freezerWidget.redraw();
+            if (freezerContainer != null) {
+                freezerLabel.setText(freezerContainer.getFullInfoLabel());
+                freezerWidget.setContainerType(freezerContainer
+                    .getContainerType());
+                freezerWidget.setSelection(hotelContainer.getPosition());
+                freezerWidget.redraw();
+            }
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setContainerType(hotelContainer.getContainerType());
@@ -816,6 +811,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             int totalNb = 0;
             StringBuffer sb = new StringBuffer("ALIQUOTS ASSIGNED:\n"); //$NON-NLS-1$
             try {
+                Map<RowColPos, PalletCell> cells = getCells();
                 for (RowColPos rcp : cells.keySet()) {
                     PalletCell cell = cells.get(rcp);
                     if (cell != null
@@ -1154,4 +1150,5 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     public BiobankLogger getErrorLogger() {
         return logger;
     }
+
 }
