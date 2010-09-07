@@ -111,7 +111,8 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
         return destSiteCollection;
     }
 
-    public void addDestSites(Collection<SiteWrapper> newDestSites) {
+    public void addDestSites(Collection<SiteWrapper> newDestSites)
+        throws BiobankCheckException {
         if (newDestSites != null && newDestSites.size() > 0) {
             Collection<Site> allSiteObjects = new HashSet<Site>();
             List<SiteWrapper> allSiteWrappers = new ArrayList<SiteWrapper>();
@@ -125,6 +126,15 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
             }
             // new
             for (SiteWrapper site : newDestSites) {
+                List<StudyWrapper> studies = site.getStudyCollection();
+                if (studies == null || !studies.contains(getStudy())) {
+                    throw new BiobankCheckException(
+                        "Site "
+                            + site.getNameShort()
+                            + " cannot be a destination site to dispatch aliquots from study "
+                            + getStudy().getNameShort()
+                            + ": this study should be in its studies list.");
+                }
                 allSiteObjects.add(site.getWrappedObject());
                 allSiteWrappers.add(site);
             }

@@ -177,7 +177,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
-        System.out.println(site.getDispatchStudies().size());
+        System.out.println(site.getDispatchStudies() == null ? "0" : site
+            .getDispatchStudies().size());
         site.setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
             .getSelection()).getFirstElement());
         site.persist();

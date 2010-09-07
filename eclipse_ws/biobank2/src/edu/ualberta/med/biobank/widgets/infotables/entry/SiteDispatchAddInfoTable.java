@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.widgets.infotables.entry;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SelectStudyDispatchSitesDialog;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
@@ -32,11 +31,7 @@ public class SiteDispatchAddInfoTable extends SiteDispatchInfoTable {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             site);
         dlg.open();
-        try {
-            loadStudyDestSites();
-        } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Error loading dialog", e);
-        }
+        loadStudyDestSites();
     }
 
 }

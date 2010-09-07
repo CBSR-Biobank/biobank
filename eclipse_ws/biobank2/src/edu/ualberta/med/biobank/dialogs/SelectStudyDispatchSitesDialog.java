@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -155,7 +156,12 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
     @Override
     protected void okPressed() {
         for (StudySites ss : studiesDispatchRelations.values()) {
-            srcSite.addStudyDispatchSites(ss.study, ss.addedSites);
+            try {
+                srcSite.addStudyDispatchSites(ss.study, ss.addedSites);
+            } catch (BiobankCheckException e) {
+                BioBankPlugin.openAsyncError("Error adding dispatch relation",
+                    e);
+            }
             srcSite.removeStudyDispatchSites(ss.study, ss.removedSites);
         }
         super.okPressed();

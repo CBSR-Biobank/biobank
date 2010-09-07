@@ -635,15 +635,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         removedDispatchInfoWrapper.clear();
     }
 
-    public List<StudyWrapper> getDispatchStudies() throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select info.study from "
-            + DispatchInfo.class.getName()
-            + " as info where info.srcSite.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Study> results = appService.query(criteria);
+    public List<StudyWrapper> getDispatchStudies() {
+        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
+        if (srcMap == null)
+            return null;
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
-        for (Study res : results) {
-            wrappers.add(new StudyWrapper(appService, res));
+        for (DispatchInfoWrapper diw : srcMap.values()) {
+            wrappers.add(diw.getStudy());
         }
         return wrappers;
     }
@@ -659,7 +657,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> sites) {
+        List<SiteWrapper> sites) throws BiobankCheckException {
         if ((sites == null) || (sites.size() == 0))
             return;
         Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
@@ -668,6 +666,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         DispatchInfoWrapper diw = infos.get(study.getId());
         if (diw == null) {
+            List<StudyWrapper> studies = getStudyCollection();
+            if (studies == null || !studies.contains(study)) {
+                throw new BiobankCheckException("Site " + getNameShort()
+                    + " cannot dispatch aliquots from study "
+                    + study.getNameShort()
+                    + ": this study is not part of its current studies list.");
+            }
             diw = new DispatchInfoWrapper(appService);
             diw.setStudy(study);
             diw.setSrcSite(this);
