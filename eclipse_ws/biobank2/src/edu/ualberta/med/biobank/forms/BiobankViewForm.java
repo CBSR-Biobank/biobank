@@ -109,7 +109,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     }
 
     protected void addEditAction() {
-        if (adapter.isEditable()) {
+        if ((adapter != null) && adapter.isEditable()) {
             CommandContributionItem edit = new CommandContributionItem(
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(), "Edit",

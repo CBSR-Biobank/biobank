@@ -87,6 +87,10 @@ public class TestAliquot extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
 
+        site.addStudies(Arrays.asList(study));
+        site.persist();
+        site.reload();
+
         ClinicShipmentWrapper shipment = ClinicShipmentHelper.addShipment(site,
             clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
@@ -588,11 +592,9 @@ public class TestAliquot extends TestDatabase {
         String name = "testGetDispatchShipments" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
         StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
-        site.addStudies(Arrays.asList(study));
-        site.persist();
         destSite.addStudies(Arrays.asList(study));
         destSite.persist();
-
+        destSite.reload();
         site.addStudyDispatchSites(study, Arrays.asList(destSite));
         site.persist();
         site.reload();
@@ -625,6 +627,12 @@ public class TestAliquot extends TestDatabase {
 
         // dispatch aliquot to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
+        destSite2.addStudies(Arrays.asList(study));
+        destSite2.persist();
+        destSite2.reload();
+        destSite.addStudyDispatchSites(study, Arrays.asList(destSite2));
+        destSite.persist();
+        destSite.reload();
         DispatchShipmentWrapper dShipment2 = DispatchShipmentHelper
             .newShipment(destSite, destSite2, study, method);
         dShipment2.addAliquots(Arrays.asList(aliquot));

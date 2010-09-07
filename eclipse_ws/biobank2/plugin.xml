@@ -2217,6 +2217,13 @@
       id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
       name="Dispatch Shipment View">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm"
+      default="false"
+      icon="icons/shipment.png"
+      id="edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm"
+      name="Dispatch Shipment Receiver Entry">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
