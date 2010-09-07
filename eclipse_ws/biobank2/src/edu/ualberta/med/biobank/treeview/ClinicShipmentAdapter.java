@@ -11,8 +11,8 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
-import edu.ualberta.med.biobank.forms.ShipmentViewForm;
+import edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm;
+import edu.ualberta.med.biobank.forms.ClinicShipmentViewForm;
 
 public class ClinicShipmentAdapter extends AdapterBase {
 
@@ -85,12 +85,12 @@ public class ClinicShipmentAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return ShipmentEntryForm.ID;
+        return ClinicShipmentEntryForm.ID;
     }
 
     @Override
     public String getViewFormId() {
-        return ShipmentViewForm.ID;
+        return ClinicShipmentViewForm.ID;
     }
 
 }
