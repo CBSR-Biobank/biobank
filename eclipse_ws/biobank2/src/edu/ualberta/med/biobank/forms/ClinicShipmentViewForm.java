@@ -18,8 +18,10 @@ public class ClinicShipmentViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ClinicShipmentViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ShipmentViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicShipmentViewForm";
+
     private ClinicShipmentAdapter shipmentAdapter;
+
     private ClinicShipmentWrapper shipment;
 
     private BiobankText siteLabel;

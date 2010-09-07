@@ -64,7 +64,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -75,6 +75,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         String tabName;
         if (container.isNew()) {
             tabName = "Container";
+            container.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
             if (container.hasParent()) {
                 container.setLabel(container.getParent().getLabel()
                     + container.getPositionString());
