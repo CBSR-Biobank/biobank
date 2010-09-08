@@ -77,7 +77,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_SHIPMENT));
+            .get(BioBankPlugin.IMG_CLINIC_SHIPMENT));
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);

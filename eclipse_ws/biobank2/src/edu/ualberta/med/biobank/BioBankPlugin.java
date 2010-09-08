@@ -96,7 +96,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_ASSIGN = "scanAssign";
     public static final String IMG_SCAN_LINK = "scanLink";
     public static final String IMG_SESSIONS = "sessions";
-    public static final String IMG_SHIPMENT = "shipment";
+    public static final String IMG_CLINIC_SHIPMENT = "clinicShipment";
     public static final String IMG_SITE = "site";
     public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
@@ -145,7 +145,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         classToImageKey.put(PatientVisitAdapter.class.getName(),
             BioBankPlugin.IMG_PATIENT_VISIT);
         classToImageKey.put(ClinicShipmentAdapter.class.getName(),
-            BioBankPlugin.IMG_SHIPMENT);
+            BioBankPlugin.IMG_CLINIC_SHIPMENT);
         classToImageKey.put(PatientSearchedNode.class.getName(),
             BioBankPlugin.IMG_SEARCH);
         classToImageKey.put(PatientTodayNode.class.getName(),
@@ -244,7 +244,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SCAN_EDIT, "scan_edit.png");
         registerImage(registry, IMG_SCAN_CLOSE_EDIT, "scan_close_edit.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
-        registerImage(registry, IMG_SHIPMENT, "shipment.png");
+        registerImage(registry, IMG_CLINIC_SHIPMENT, "shipment.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
