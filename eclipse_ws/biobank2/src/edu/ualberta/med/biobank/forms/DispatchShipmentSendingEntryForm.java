@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
@@ -16,6 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -23,6 +25,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 
 public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
@@ -44,6 +47,10 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     private ComboViewer destSiteComboViewer;
 
     private DateTimeWidget dateShippedWidget;
+
+    private List<AliquotWrapper> aliquots;
+
+    private AliquotListInfoTable aliquotsWidget;
 
     @Override
     protected void init() throws Exception {
@@ -86,19 +93,36 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        List<StudyWrapper> possibleStudies = site.getDispatchStudies();
         StudyWrapper study = shipment.getStudy();
 
+        if ((study == null) && (possibleStudies.size() == 1)) {
+            study = possibleStudies.get(0);
+        }
+
         studyComboViewer = createComboViewerWithNoSelectionValidator(client,
-            "Study", site.getDispatchStudies(), study,
-            "Shipment must have an receiving site");
+            "Study", possibleStudies, study,
+            "Shipment must have a receiving site");
 
         BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Sender Site");
         setTextValue(siteLabel, site.getName());
 
+        List<SiteWrapper> possibleDestSites = null;
+        SiteWrapper destSite = null;
+
+        if (study != null) {
+            possibleDestSites = site.getStudyDispachSites(study);
+            destSite = shipment.getReceiver();
+        }
+
+        if ((destSite == null) && (possibleDestSites.size() == 1)) {
+            destSite = possibleDestSites.get(0);
+        }
+
         destSiteComboViewer = createComboViewerWithNoSelectionValidator(client,
-            "Receiver Site", site.getStudyDispachSites(study),
-            shipment.getReceiver(), "Shipment must have an associated study");
+            "Receiver Site", possibleDestSites, destSite,
+            "Shipment must have an associated study");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Waybill", null,
@@ -109,7 +133,18 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             BeansObservables.observeValue(shipment, "dateShipped"),
             "Date shipped should be set");
 
+        aliquotsWidget = new AliquotListInfoTable(page, aliquots,
+            AliquotListInfoTable.ColumnsShown.PNUMBER);
+        aliquotsWidget.adaptToToolkit(toolkit, true);
+        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
+
         setFirstControl(studyComboViewer.getControl());
+
+        if ((possibleStudies == null) || (possibleStudies.size() == 0)) {
+            BioBankPlugin.openAsyncError("Sender Site Error",
+                "The current site does not have any dispatch studies associated with it.\n"
+                    + "Please close the form.");
+        }
     }
 
     @Override

@@ -13,7 +13,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -65,6 +68,11 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         return IMessageProvider.NONE;
     }
 
+    @Override
+    protected boolean isResizable() {
+        return true;
+    }
+
     protected abstract String getTitleAreaMessage();
 
     protected abstract String getTitleAreaTitle();
@@ -84,8 +92,17 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
+        Composite contents = new Composite(parentComposite, SWT.NONE);
+        GridLayout layout = new GridLayout();
+        layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+        layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+        layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+        layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+        contents.setLayout(layout);
+        contents.setLayoutData(new GridData(GridData.FILL_BOTH));
+
         try {
-            createDialogAreaInternal(parentComposite);
+            createDialogAreaInternal(contents);
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
@@ -97,6 +114,7 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         bindChangeListener();
         setupFinished = true;
         return parentComposite;

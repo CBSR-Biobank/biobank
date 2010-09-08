@@ -44,7 +44,7 @@ public class DateTimeWidget extends BiobankWidget {
         setLayout(layout);
         setLayoutData(new GridData());
 
-        if ((style & SWT.TIME) == 0) {
+        if ((style & SWT.DATE) != 0) {
             style |= CDT.DROP_DOWN | CDT.DATE_SHORT;
         }
 

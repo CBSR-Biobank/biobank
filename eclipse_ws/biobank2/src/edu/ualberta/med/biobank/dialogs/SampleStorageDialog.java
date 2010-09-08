@@ -11,6 +11,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -59,6 +60,14 @@ public class SampleStorageDialog extends BiobankDialog {
         }
         if (origSampleStorage.getSampleType() == null) {
             currentTitle = "Add " + TITLE;
+
+            try {
+                this.sampleStorage.setActivityStatus(ActivityStatusWrapper
+                    .getActiveActivityStatus(sampleStorage.getAppService()));
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Database Error",
+                    "Error while retrieving activity status");
+            }
         } else {
             currentTitle = "Edit " + TITLE;
         }
@@ -71,7 +80,7 @@ public class SampleStorageDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "";
+        return "Select the sample types used by this study";
     }
 
     @Override
@@ -88,7 +97,10 @@ public class SampleStorageDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         String selection = null;
@@ -145,6 +157,13 @@ public class SampleStorageDialog extends BiobankDialog {
             "Quantity", new String[0], PojoObservables.observeValue(
                 sampleStorage, "quantity"), new IntegerNumberValidator(
                 "Quantity should be a whole number", false));
+    }
+
+    @Override
+    protected Point getInitialSize() {
+        final Point size = super.getInitialSize();
+        size.y += convertHeightInCharsToPixels(2);
+        return size;
     }
 
     @Override

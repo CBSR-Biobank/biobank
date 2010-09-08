@@ -79,7 +79,8 @@ public class DispatchShipmentWrapper extends
         }
     }
 
-    private void checkSenderCanSendToReceiver() throws BiobankCheckException {
+    private void checkSenderCanSendToReceiver() throws BiobankCheckException,
+        WrapperException {
         if (getSender() != null && getReceiver() != null && getStudy() != null) {
             List<SiteWrapper> possibleReceivers = getSender()
                 .getStudyDispachSites(getStudy());
