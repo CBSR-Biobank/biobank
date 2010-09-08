@@ -59,7 +59,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     };
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -73,8 +73,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         }
 
         String tabName;
-        if (site.getId() == null) {
+        if (site.isNew()) {
             tabName = "New Repository Site";
+            site.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         } else {
             tabName = "Repository Site " + site.getNameShort();
         }
@@ -94,37 +96,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
         // IJavaHelpContextIds.XXXXX);
-    }
-
-    private void createStudySection() {
-        Section section = createSection("Studies");
-        addSectionToolbar(section, "Add Study", new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                studiesTable.createStudyDlg();
-            }
-        }, ContactWrapper.class);
-        studiesTable = new StudyAddInfoTable(section, site);
-        studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
-        studiesTable.addSelectionChangedListener(listener);
-        section.setClient(studiesTable);
-    }
-
-    private void createDispatchSection() {
-        Section section = createSection("Dispatch");
-        addSectionToolbar(section, "Add Dispatch Relation",
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    dispatchTable.createDispatchDialog();
-                }
-            }, ContactWrapper.class);
-        dispatchTable = new SiteDispatchAddInfoTable(section, site);
-        dispatchTable.adaptToToolkit(toolkit, true);
-        dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
-        dispatchTable.addSelectionChangedListener(listener);
-        section.setClient(dispatchTable);
     }
 
     private void createSiteSection() throws ApplicationException {
@@ -161,6 +132,37 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, BeansObservables.observeValue(site, "comment"),
             null);
+    }
+
+    private void createStudySection() {
+        Section section = createSection("Studies");
+        addSectionToolbar(section, "Add Study", new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                studiesTable.createStudyDlg();
+            }
+        }, ContactWrapper.class);
+        studiesTable = new StudyAddInfoTable(section, site);
+        studiesTable.adaptToToolkit(toolkit, true);
+        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
+        studiesTable.addSelectionChangedListener(listener);
+        section.setClient(studiesTable);
+    }
+
+    private void createDispatchSection() {
+        Section section = createSection("Dispatch");
+        addSectionToolbar(section, "Add Dispatch Relation",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    dispatchTable.createDispatchDialog();
+                }
+            }, ContactWrapper.class);
+        dispatchTable = new SiteDispatchAddInfoTable(section, site);
+        dispatchTable.adaptToToolkit(toolkit, true);
+        dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
+        dispatchTable.addSelectionChangedListener(listener);
+        section.setClient(dispatchTable);
     }
 
     @Override

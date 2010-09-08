@@ -14,7 +14,9 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
+import edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 
@@ -33,8 +35,14 @@ public class DispatchShipmentAdapter extends AdapterBase {
     protected String getLabelInternal() {
         DispatchShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "shipment is null");
-        String label = shipment.getStudy().getNameShort() + " - "
-            + shipment.getFormattedDateShipped();
+        String label = new String();
+        StudyWrapper study = shipment.getStudy();
+
+        if (study != null) {
+            label += study.getNameShort() + " - ";
+        }
+
+        label += shipment.getFormattedDateShipped();
         return label;
 
     }
@@ -110,7 +118,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return null;
+        return DispatchShipmentSendingEntryForm.ID;
     }
 
     @Override

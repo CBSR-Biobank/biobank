@@ -82,7 +82,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
             .get(BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
-        createSamplesSection();
+        createAliquotsSection();
     }
 
     private void createMainSection() throws Exception {
@@ -172,7 +172,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         table.adaptToToolkit(toolkit, true);
     }
 
-    private void createSamplesSection() {
+    private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
         aliquotWidget = new AliquotListInfoTable(parent,
             patientVisit.getAliquotCollection());

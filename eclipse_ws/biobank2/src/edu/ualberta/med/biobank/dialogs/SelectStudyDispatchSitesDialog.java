@@ -109,30 +109,30 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             studiesDispatchRelations.put(study.getId(), ss);
         }
 
-        Collection<SiteWrapper> currentDestSites = srcSite
-            .getStudyDispachSites(study);
-        LinkedHashMap<Integer, String> availableSites = new LinkedHashMap<Integer, String>();
-        List<Integer> selectedSites = new ArrayList<Integer>();
-        if (currentDestSites != null) {
-            for (SiteWrapper site : currentDestSites) {
+        try {
+            Collection<SiteWrapper> currentDestSites = srcSite
+                .getStudyDispachSites(study);
+            LinkedHashMap<Integer, String> availableSites = new LinkedHashMap<Integer, String>();
+            List<Integer> selectedSites = new ArrayList<Integer>();
+            if (currentDestSites != null) {
+                for (SiteWrapper site : currentDestSites) {
+                    selectedSites.add(site.getId());
+                }
+            }
+            for (SiteWrapper site : ss.addedSites) {
                 selectedSites.add(site.getId());
             }
-        }
-        for (SiteWrapper site : ss.addedSites) {
-            selectedSites.add(site.getId());
-        }
-        try {
             currentAllSitesForStudy = new ArrayList<SiteWrapper>(
                 study.getSiteCollection());
             currentAllSitesForStudy.remove(srcSite);
+            for (SiteWrapper site : currentAllSitesForStudy) {
+                availableSites.put(site.getId(), site.getNameShort());
+            }
+            siteMultiSelect.setSelections(availableSites, selectedSites);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error", e);
             return;
         }
-        for (SiteWrapper site : currentAllSitesForStudy) {
-            availableSites.put(site.getId(), site.getNameShort());
-        }
-        siteMultiSelect.setSelections(availableSites, selectedSites);
     }
 
     @Override

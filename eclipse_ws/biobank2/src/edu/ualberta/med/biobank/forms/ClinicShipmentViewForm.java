@@ -76,7 +76,7 @@ public class ClinicShipmentViewForm extends BiobankViewForm {
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_SHIPMENT));
+            .get(BioBankPlugin.IMG_CLINIC_SHIPMENT));
         createMainSection();
         createPatientsSection();
     }

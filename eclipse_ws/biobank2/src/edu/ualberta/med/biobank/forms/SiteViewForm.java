@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteViewForm";
@@ -179,7 +178,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setClient(topContainersTable);
     }
 
-    private void createDispatchSection() throws ApplicationException {
+    private void createDispatchSection() {
         Section section = createSection("Dispatch");
         dispatchTable = new SiteDispatchInfoTable(section, site);
         dispatchTable.adaptToToolkit(toolkit, true);

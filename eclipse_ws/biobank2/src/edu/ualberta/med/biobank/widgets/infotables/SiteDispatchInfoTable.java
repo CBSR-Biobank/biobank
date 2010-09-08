@@ -9,10 +9,14 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable.StudySiteDispatch;
 
 public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
+
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(SiteDispatchInfoTable.class.getName());
 
     public static class StudySiteDispatch {
         public StudyWrapper study;
@@ -48,11 +52,20 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
         List<StudyWrapper> dispatchStudies = srcSite.getDispatchStudies();
         if (dispatchStudies != null) {
             for (StudyWrapper study : dispatchStudies) {
-                for (SiteWrapper destSite : srcSite.getStudyDispachSites(study)) {
-                    StudySiteDispatch ssd = new StudySiteDispatch();
-                    ssd.study = study;
-                    ssd.destSite = destSite;
-                    dispatchList.add(ssd);
+                try {
+                    List<SiteWrapper> destSites = srcSite
+                        .getStudyDispachSites(study);
+                    for (SiteWrapper destSite : destSites) {
+                        StudySiteDispatch ssd = new StudySiteDispatch();
+                        ssd.study = study;
+                        ssd.destSite = destSite;
+                        dispatchList.add(ssd);
+                    }
+                } catch (Exception e) {
+                    logger
+                        .error(
+                            "Error while retrieving dispatch sites from source site",
+                            e);
                 }
             }
         }

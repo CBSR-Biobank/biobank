@@ -109,7 +109,7 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_SHIPMENT));
+            .get(BioBankPlugin.IMG_CLINIC_SHIPMENT));
         createMainSection();
         createPatientsSection();
     }

@@ -84,8 +84,10 @@ public class StudyEntryForm extends BiobankEntryForm {
         study.reload();
 
         String tabName;
-        if (study.getId() == null) {
+        if (study.isNew()) {
             tabName = "New Study";
+            study.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         } else {
             tabName = "Study " + study.getNameShort();
         }

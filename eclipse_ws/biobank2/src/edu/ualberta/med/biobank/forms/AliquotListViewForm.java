@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 public class AliquotListViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.AliquotListViewForm";
 
-    private AliquotListInfoTable samplesWidget;
+    private AliquotListInfoTable aliquotsWidget;
 
     private List<AliquotWrapper> aliquots;
 
@@ -35,10 +35,10 @@ public class AliquotListViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_BOX));
 
-        samplesWidget = new AliquotListInfoTable(page, aliquots,
+        aliquotsWidget = new AliquotListInfoTable(page, aliquots,
             AliquotListInfoTable.ColumnsShown.PNUMBER);
-        samplesWidget.adaptToToolkit(toolkit, true);
-        samplesWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsWidget.adaptToToolkit(toolkit, true);
+        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
