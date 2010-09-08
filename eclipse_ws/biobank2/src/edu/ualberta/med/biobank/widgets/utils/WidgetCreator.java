@@ -130,7 +130,12 @@ public class WidgetCreator {
         Label label;
 
         label = createLabel(composite, fieldLabel);
-        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+        int gridDataStyle = GridData.VERTICAL_ALIGN_CENTER;
+        if (widgetClass.equals(BiobankText.class)
+            && (widgetOptions & SWT.MULTI) != 0) {
+            gridDataStyle = GridData.VERTICAL_ALIGN_BEGINNING;
+        }
+        label.setLayoutData(new GridData(gridDataStyle));
         return createBoundWidget(composite, widgetClass, widgetOptions, label,
             widgetValues, modelObservableValue, validator, bindingKey);
 

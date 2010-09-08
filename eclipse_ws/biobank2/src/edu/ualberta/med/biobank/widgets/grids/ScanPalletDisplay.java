@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +14,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.profiles.TriIntC;
@@ -34,14 +33,12 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
     public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
 
-    protected List<AliquotCellStatus> statusAvailable;
-
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
     private TriIntC loadedProfile;
 
-    public ScanPalletDisplay(final ScanPalletWidget widget, boolean hasLegend) {
+    public ScanPalletDisplay(final ScanPalletWidget widget) {
         super();
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
@@ -67,22 +64,13 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         setCellWidth(SAMPLE_WIDTH);
         setCellHeight(SAMPLE_WIDTH);
         setStorageSize(ScanCell.ROW_MAX, ScanCell.COL_MAX);
-        if (hasLegend) {
-            initLegend();
-        }
     }
 
     @Override
-    public void initLegend() {
+    public void initLegend(List<CellStatus> status) {
+        super.initLegend(status);
         hasLegend = true;
-        statusAvailable = new ArrayList<AliquotCellStatus>();
-        statusAvailable.add(AliquotCellStatus.EMPTY);
-        statusAvailable.add(AliquotCellStatus.NEW);
-        statusAvailable.add(AliquotCellStatus.MOVED);
-        statusAvailable.add(AliquotCellStatus.FILLED);
-        statusAvailable.add(AliquotCellStatus.MISSING);
-        statusAvailable.add(AliquotCellStatus.ERROR);
-        legendWidth = PALLET_WIDTH / statusAvailable.size();
+        legendWidth = PALLET_WIDTH / legendStatus.size();
     }
 
     protected void setProfile(TriIntC profile) {
@@ -96,8 +84,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         e.gc.setFont(new Font(e.display, fd2));
         super.paintGrid(e, displayWidget);
         if (hasLegend) {
-            for (int i = 0; i < statusAvailable.size(); i++) {
-                AliquotCellStatus status = statusAvailable.get(i);
+            for (int i = 0; i < legendStatus.size(); i++) {
+                CellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
@@ -175,18 +163,6 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    public Cell getObjectAtCoordinates(ContainerDisplayWidget displayWidget,
-        int xPosition, int yPosition) {
-        if (displayWidget.getCells() == null) {
-            return null;
-        }
-        RowColPos rcp = getPositionAtCoordinates(xPosition, yPosition);
-        if (rcp != null) {
-            return displayWidget.getCells().get(rcp);
-        }
-        return null;
-    }
-
     public RowColPos getPositionAtCoordinates(int xPosition, int yPosition) {
         int col = xPosition / getCellWidth();
         int row = yPosition / getCellHeight();

@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Color;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
+@Deprecated
 public enum ContainerStatus {
     NOT_INITIALIZED(SWT.COLOR_WHITE, "Not Initialized"), INITIALIZED(
         SWT.COLOR_DARK_GRAY, "Initialized"), FULL(SWT.COLOR_DARK_GRAY, "Full"), FREE_LOCATIONS(
