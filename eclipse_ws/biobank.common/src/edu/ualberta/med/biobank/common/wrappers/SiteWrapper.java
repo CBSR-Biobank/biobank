@@ -646,7 +646,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return wrappers;
     }
 
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
+    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
+        throws Exception {
+        if (study == null) {
+            throw new Exception("study is null");
+        }
         Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
         if (srcMap == null)
             return null;
