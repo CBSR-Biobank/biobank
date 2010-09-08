@@ -7,7 +7,9 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -93,10 +95,15 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Sender Site");
+        setTextValue(siteLabel, site.getName());
+
         List<StudyWrapper> possibleStudies = site.getDispatchStudies();
         StudyWrapper study = shipment.getStudy();
 
-        if ((study == null) && (possibleStudies.size() == 1)) {
+        if ((study == null) && (possibleStudies != null)
+            && (possibleStudies.size() == 1)) {
             study = possibleStudies.get(0);
         }
 
@@ -104,9 +111,35 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             "Study", possibleStudies, study,
             "Shipment must have a receiving site");
 
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Sender Site");
-        setTextValue(siteLabel, site.getName());
+        studyComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection studySelection = (IStructuredSelection) studyComboViewer
+                        .getSelection();
+                    if ((studySelection != null) && (studySelection.size() > 0)) {
+                        StudyWrapper study = (StudyWrapper) studySelection
+                            .getFirstElement();
+                        try {
+                            List<SiteWrapper> possibleDestSites = site
+                                .getStudyDispachSites(study);
+                            destSiteComboViewer.setInput(possibleDestSites);
+
+                            if (possibleDestSites.size() == 1) {
+                                destSiteComboViewer
+                                    .setSelection(new StructuredSelection(
+                                        possibleDestSites.get(0)));
+                            }
+                        } catch (Exception e) {
+                            logger
+                                .error(
+                                    "Error while retrieving dispatch shipment destination sites",
+                                    e);
+                        }
+                    }
+
+                }
+            });
 
         List<SiteWrapper> possibleDestSites = null;
         SiteWrapper destSite = null;
@@ -116,7 +149,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             destSite = shipment.getReceiver();
         }
 
-        if ((destSite == null) && (possibleDestSites.size() == 1)) {
+        if ((destSite == null) && (possibleDestSites != null)
+            && (possibleDestSites.size() == 1)) {
             destSite = possibleDestSites.get(0);
         }
 
