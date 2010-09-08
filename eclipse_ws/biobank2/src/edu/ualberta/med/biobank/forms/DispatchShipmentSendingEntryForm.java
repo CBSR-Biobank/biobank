@@ -167,11 +167,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             BeansObservables.observeValue(shipment, "dateShipped"),
             "Date shipped should be set");
 
-        aliquotsWidget = new AliquotListInfoTable(page, aliquots,
-            AliquotListInfoTable.ColumnsShown.PNUMBER);
-        aliquotsWidget.adaptToToolkit(toolkit, true);
-        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
-
+        createAliquotsSection();
         setFirstControl(studyComboViewer.getControl());
 
         if ((possibleStudies == null) || (possibleStudies.size() == 0)) {
@@ -179,6 +175,14 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 "The current site does not have any dispatch studies associated with it.\n"
                     + "Please close the form.");
         }
+    }
+
+    private void createAliquotsSection() {
+        Composite parent = createSectionWithClient("Aliquots");
+        aliquotsWidget = new AliquotListInfoTable(parent, aliquots,
+            AliquotListInfoTable.ColumnsShown.PNUMBER);
+        aliquotsWidget.adaptToToolkit(toolkit, true);
+        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
     }
 
     @Override
