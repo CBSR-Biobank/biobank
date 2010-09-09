@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DAliquotsTest extends AbstractReportTest {
 
@@ -60,7 +59,7 @@ public class DAliquotsTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         String topContainerIdList = getReport().getContainerList();
         String groupByDateField = getReport().getGroupBy();
         Date after = (Date) getReport().getParams().get(0);
@@ -91,7 +90,7 @@ public class DAliquotsTest extends AbstractReportTest {
     }
 
     private void checkResults(Collection<Integer> topContainerIds, Date after,
-        Date before) throws ApplicationException {
+        Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
         getReport().setContainerList(StringUtils.join(topContainerIds, ","));
 

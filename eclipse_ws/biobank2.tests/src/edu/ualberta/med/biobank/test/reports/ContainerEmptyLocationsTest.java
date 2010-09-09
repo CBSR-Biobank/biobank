@@ -11,7 +11,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerEmptyLocationsTest extends AbstractReportTest {
 
@@ -25,12 +24,12 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
     }
 
     @Test
-    public void testEmpty() throws ApplicationException {
+    public void testEmpty() throws Exception {
         checkReport("", "");
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         final String containerLabel = (String) getReport().getParams().get(0);
         final String topContainerTypeNameShort = (String) getReport()
             .getParams().get(1);
@@ -75,7 +74,7 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
     }
 
     private void checkReport(String containerLabel,
-        String topContainerTypeShortName) throws ApplicationException {
+        String topContainerTypeShortName) throws Exception {
         getReport().setParams(
             Arrays.asList((Object) containerLabel,
                 (Object) topContainerTypeShortName));

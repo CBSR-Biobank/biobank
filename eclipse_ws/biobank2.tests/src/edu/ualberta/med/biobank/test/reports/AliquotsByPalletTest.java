@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotsByPalletTest extends AbstractReportTest {
 
@@ -38,7 +37,7 @@ public class AliquotsByPalletTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         final String containerLabel = (String) getReport().getParams().get(0);
         final String topContainerTypeNameShort = (String) getReport()
             .getParams().get(1);
@@ -61,7 +60,7 @@ public class AliquotsByPalletTest extends AbstractReportTest {
     }
 
     private void checkResults(String containerLabel,
-        String topContainerTypeNameShort) throws ApplicationException {
+        String topContainerTypeNameShort) throws Exception {
         getReport().setParams(
             Arrays.asList((Object) containerLabel,
                 (Object) topContainerTypeNameShort));

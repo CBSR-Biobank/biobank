@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class QAAliquotsTest extends AbstractReportTest {
     // cheap way to get all results
@@ -70,7 +69,7 @@ public class QAAliquotsTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         String topContainerIdList = getReport().getContainerList();
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
@@ -96,7 +95,7 @@ public class QAAliquotsTest extends AbstractReportTest {
     }
 
     private void checkResults(Collection<Integer> topContainerIds, Date after,
-        Date before, String sampleTypeNameShort) throws ApplicationException {
+        Date before, String sampleTypeNameShort) throws Exception {
         getReport().setParams(
             Arrays.asList((Object) after, (Object) before,
                 (Object) sampleTypeNameShort, (Object) NUM_RESULTS));

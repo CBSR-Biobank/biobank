@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotInvoiceByPatientTest extends AbstractReportTest {
     private static final Comparator<AliquotWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<AliquotWrapper>() {
@@ -60,7 +59,7 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
@@ -86,8 +85,7 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(Date after, Date before)
-        throws ApplicationException {
+    private void checkResults(Date after, Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
 
         checkResults(EnumSet.of(CompareResult.SIZE, CompareResult.ORDER));

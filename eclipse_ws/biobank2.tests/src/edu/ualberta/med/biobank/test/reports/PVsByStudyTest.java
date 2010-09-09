@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PVsByStudyTest extends AbstractReportTest {
     @Test
@@ -54,7 +53,7 @@ public class PVsByStudyTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         String groupByDateField = getReport().getGroupBy();
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
@@ -83,8 +82,7 @@ public class PVsByStudyTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(Date after, Date before)
-        throws ApplicationException {
+    private void checkResults(Date after, Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
 
         for (String dateField : DATE_FIELDS) {

@@ -79,7 +79,7 @@ public class ContainerCapacityTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         Collection<ContainerWrapper> filteredContainers = PredicateUtil.filter(
             getContainers(), PredicateUtil.andPredicate(
                 CONTAINER_CAN_STORE_SAMPLES_PREDICATE,

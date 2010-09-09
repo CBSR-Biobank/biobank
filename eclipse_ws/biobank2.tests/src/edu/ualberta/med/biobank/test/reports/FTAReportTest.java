@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class FTAReportTest extends AbstractReportTest {
     private static final Predicate<AliquotWrapper> ALIQUOT_FTA_SAMPLE_TYPE = new Predicate<AliquotWrapper>() {
@@ -130,7 +129,7 @@ public class FTAReportTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         final String studyNameShort = (String) getReport().getParams().get(0);
         Date firstPvDateProcessed = (Date) getReport().getParams().get(1);
 
@@ -178,7 +177,7 @@ public class FTAReportTest extends AbstractReportTest {
     }
 
     private void checkResults(String studyNameShort, Date firstPvDateProcessed)
-        throws ApplicationException {
+        throws Exception {
         getReport().setParams(
             Arrays.asList((Object) studyNameShort,
                 (Object) firstPvDateProcessed));

@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class InvoicingReportTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<String>, Long>() {
@@ -90,7 +89,7 @@ public class InvoicingReportTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         Date processedAndLinkedAfter = (Date) getReport().getParams().get(0);
         Date processedAndLinkedBefore = (Date) getReport().getParams().get(1);
 
@@ -144,8 +143,7 @@ public class InvoicingReportTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(Date after, Date before)
-        throws ApplicationException {
+    private void checkResults(Date after, Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
         checkResults(EnumSet.of(CompareResult.SIZE));
     }

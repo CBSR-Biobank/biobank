@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewPsByStudyClinicTest extends AbstractReportTest {
     private static final Mapper<PatientVisitWrapper, Integer, PatientVisitWrapper> GROUP_BY_PATIENT = new Mapper<PatientVisitWrapper, Integer, PatientVisitWrapper>() {
@@ -101,7 +100,7 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         String groupByDateField = getReport().getGroupBy();
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
@@ -133,8 +132,7 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(Date after, Date before)
-        throws ApplicationException {
+    private void checkResults(Date after, Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
 
         for (String dateField : DATE_FIELDS) {

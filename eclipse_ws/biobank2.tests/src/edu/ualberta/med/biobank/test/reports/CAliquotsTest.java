@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CAliquotsTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_AND_CLINIC = new Mapper<AliquotWrapper, List<String>, Long>() {
@@ -71,7 +70,7 @@ public class CAliquotsTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         String topContainerIdList = getReport().getContainerList();
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
@@ -96,7 +95,7 @@ public class CAliquotsTest extends AbstractReportTest {
     }
 
     private void checkResults(Collection<Integer> topContainerIds, Date after,
-        Date before) throws ApplicationException {
+        Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
         getReport().setContainerList(StringUtils.join(topContainerIds, ","));
 

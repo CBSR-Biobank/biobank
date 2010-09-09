@@ -16,11 +16,10 @@ import org.junit.Assert;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
+import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -131,10 +130,9 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                return (aliquot.getLinkDate().after(after) || aliquot
-                    .getLinkDate().equals(after))
-                    && (aliquot.getLinkDate().before(before) || aliquot
-                        .getLinkDate().equals(before));
+                Date linked = aliquot.getLinkDate();
+                return (DateCompare.compare(linked, after) <= 0)
+                    && (DateCompare.compare(linked, before) >= 0);
             }
         };
     }
@@ -143,12 +141,9 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                return (aliquot.getPatientVisit().getDateProcessed()
-                    .after(after) || aliquot.getPatientVisit()
-                    .getDateProcessed().equals(after))
-                    && (aliquot.getPatientVisit().getDateProcessed()
-                        .before(before) || aliquot.getPatientVisit()
-                        .getDateProcessed().equals(before));
+                Date processed = aliquot.getPatientVisit().getDateProcessed();
+                return (DateCompare.compare(processed, after) <= 0)
+                    && (DateCompare.compare(processed, before) >= 0);
             }
         };
     }
@@ -157,10 +152,9 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<PatientVisitWrapper>() {
             public boolean evaluate(PatientVisitWrapper patientVisit) {
-                return (patientVisit.getDateProcessed().after(after) || patientVisit
-                    .getDateProcessed().equals(after))
-                    && (patientVisit.getDateProcessed().before(before) || patientVisit
-                        .getDateProcessed().equals(before));
+                Date processed = patientVisit.getDateProcessed();
+                return (DateCompare.compare(processed, after) <= 0)
+                    && (DateCompare.compare(processed, before) >= 0);
             }
         };
     }
@@ -267,10 +261,10 @@ public abstract class AbstractReportTest {
     }
 
     // use getReport() to get the parameters
-    protected abstract Collection<Object> getExpectedResults();
+    protected abstract Collection<Object> getExpectedResults() throws Exception;
 
     protected void checkResults(EnumSet<CompareResult> cmpOptions)
-        throws ApplicationException {
+        throws Exception {
         for (SiteWrapper site : getSites()) {
             for (String op : SITE_OPS) {
                 getReport().setSiteInfo(op, site.getId());
@@ -283,48 +277,42 @@ public abstract class AbstractReportTest {
         return dataSource.getAppService();
     }
 
-    protected final List<SiteWrapper> getSites() {
+    protected final List<SiteWrapper> getSites() throws Exception {
         return dataSource.getSites();
     }
 
-    protected final List<SampleTypeWrapper> getSampleTypes() {
+    protected final List<SampleTypeWrapper> getSampleTypes() throws Exception {
         return dataSource.getSampleTypes();
     }
 
-    protected final List<SampleStorageWrapper> getSampleStorages() {
+    protected final List<SampleStorageWrapper> getSampleStorages()
+        throws Exception {
         return dataSource.getSampleStorages();
     }
 
-    protected final List<AliquotWrapper> getAliquots() {
+    protected final List<AliquotWrapper> getAliquots() throws Exception {
         return dataSource.getAliquots();
     }
 
-    protected final List<ContainerWrapper> getContainers() {
+    protected final List<ContainerWrapper> getContainers() throws Exception {
         return dataSource.getContainers();
     }
 
-    protected final List<ClinicWrapper> getClinics() {
-        return dataSource.getClinics();
-    }
-
-    protected final List<StudyWrapper> getStudies() {
+    protected final List<StudyWrapper> getStudies() throws Exception {
         return dataSource.getStudies();
     }
 
-    protected final List<ContactWrapper> getContacts() {
-        return dataSource.getContacts();
-    }
-
-    protected final List<PatientVisitWrapper> getPatientVisits() {
+    protected final List<PatientVisitWrapper> getPatientVisits()
+        throws Exception {
         return dataSource.getPatientVisits();
     }
 
-    protected final List<PatientWrapper> getPatients() {
+    protected final List<PatientWrapper> getPatients() throws Exception {
         return dataSource.getPatients();
     }
 
     private Collection<Object> compareResults(EnumSet<CompareResult> cmpOptions)
-        throws ApplicationException {
+        throws Exception {
         System.out.print("compareResults(" + cmpOptions + ") for "
             + getReport().getClassName() + " w/ params "
             + Arrays.toString(getReport().getParams().toArray())
@@ -358,23 +346,13 @@ public abstract class AbstractReportTest {
             if (cmpOptions.contains(CompareResult.ORDER)) {
                 if (it.hasNext()) {
                     Object[] next = (Object[]) it.next();
-
-                    // the order of arguments to Arrays.equals() matters, e.g.:
-                    //
-                    // java.util.Date date = new java.util.Date();
-                    // java.util.Date stamp =
-                    // new java.sql.Timestamp(date.getTime());
-                    // assertTrue(date.equals(stamp));
-                    // assertTrue(date.compareTo(stamp) == 0);
-                    // assertTrue(stamp.compareTo(date) == 0);
-                    // assertTrue(stamp.equals(date)); // <-- FAILS
-                    if (Arrays.equals(next, (Object[]) actualRow)) {
+                    if (datewiseArraysEquals(next, (Object[]) actualRow)) {
                         isFound = true;
                     }
                 }
             } else {
                 for (Object expectedRow : postProcessedExpectedResults) {
-                    if (Arrays.equals((Object[]) expectedRow,
+                    if (datewiseArraysEquals((Object[]) expectedRow,
                         (Object[]) actualRow)) {
                         isFound = true;
                         break;
@@ -406,6 +384,33 @@ public abstract class AbstractReportTest {
         }
 
         return postProcessedExpectedResults;
+    }
+
+    /**
+     * Compare two Object[] references, paying special attention to Object-s
+     * that implement Date, comparing them using a special function.
+     * 
+     * @param a1
+     * @param a2
+     * @return true if the two arrays are the same length and the Object
+     *         referenced at each corresponding index is equal.
+     */
+    private boolean datewiseArraysEquals(Object[] a1, Object[] a2) {
+        if (a1.length != a2.length) {
+            return false;
+        }
+
+        for (int i = 0; i < a1.length; i++) {
+            if ((a1[i] instanceof Date) && (a2[i] instanceof Date)) {
+                if (DateCompare.compare((Date) a1[i], (Date) a2[i]) != 0) {
+                    return false;
+                }
+            } else if (!a1[i].equals(a2[i])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private List<Object> postProcessExpectedResults(

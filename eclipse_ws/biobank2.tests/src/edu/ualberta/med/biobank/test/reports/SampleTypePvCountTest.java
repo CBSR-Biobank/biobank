@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SampleTypePvCountTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<Object>, Long>() {
@@ -64,7 +63,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         String studyNameShort = (String) getReport().getParams().get(0);
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
@@ -97,8 +96,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(String studyNameShort)
-        throws ApplicationException {
+    private void checkResults(String studyNameShort) throws Exception {
         getReport().setParams(Arrays.asList((Object) studyNameShort));
         checkResults(EnumSet.of(CompareResult.SIZE));
     }

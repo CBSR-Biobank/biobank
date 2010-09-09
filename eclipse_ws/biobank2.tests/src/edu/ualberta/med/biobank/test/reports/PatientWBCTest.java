@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientWBCTest extends AbstractReportTest {
     private static final Predicate<AliquotWrapper> ALIQUOT_IS_DNA_SAMPLE_TYPE = new Predicate<AliquotWrapper>() {
@@ -32,7 +31,7 @@ public class PatientWBCTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         Collection<AliquotWrapper> allAliquots = getAliquots();
         @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
@@ -60,7 +59,7 @@ public class PatientWBCTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults() throws ApplicationException {
+    private void checkResults() throws Exception {
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 }

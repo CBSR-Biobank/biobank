@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientVisitSummaryTest extends AbstractReportTest {
     private static final Mapper<PatientVisitWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<PatientVisitWrapper, List<String>, PvCount>() {
@@ -121,7 +120,7 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
@@ -162,8 +161,7 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(Date after, Date before)
-        throws ApplicationException {
+    private void checkResults(Date after, Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
 
         checkResults(EnumSet.of(CompareResult.SIZE));

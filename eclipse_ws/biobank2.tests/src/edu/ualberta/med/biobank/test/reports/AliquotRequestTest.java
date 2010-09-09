@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.server.reports.AliquotRequestImpl;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotRequestTest extends AbstractReportTest {
     private static final Integer ALIQUOT_LIMIT = new Integer(5);
@@ -68,7 +67,7 @@ public class AliquotRequestTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         List<Object> expectedResults = new ArrayList<Object>();
         List<Object> params = getReport().getParams();
 
@@ -115,7 +114,7 @@ public class AliquotRequestTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults(List<Object> params) throws ApplicationException {
+    private void checkResults(List<Object> params) throws Exception {
         // convert parameters to String objects for the report, as this is what
         // the report expects
         List<Object> stringParams = new ArrayList<Object>();

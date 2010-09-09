@@ -48,7 +48,7 @@ public class FvLPatientVisitsTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
             .filter(allPatientVisits, patientVisitSite(isInSite(), getSiteId()));

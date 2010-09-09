@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SampleTypeSUsageTest extends AbstractReportTest {
     private static final Comparator<SampleStorageWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SampleStorageWrapper>() {
@@ -34,7 +33,7 @@ public class SampleTypeSUsageTest extends AbstractReportTest {
     }
 
     @Override
-    protected Collection<Object> getExpectedResults() {
+    protected Collection<Object> getExpectedResults() throws Exception {
         List<SampleStorageWrapper> allSampleStorages = new ArrayList<SampleStorageWrapper>(
             getSampleStorages());
         Collections.sort(allSampleStorages, ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT);
@@ -70,7 +69,7 @@ public class SampleTypeSUsageTest extends AbstractReportTest {
         return expectedResults;
     }
 
-    private void checkResults() throws ApplicationException {
+    private void checkResults() throws Exception {
         checkResults(EnumSet.of(CompareResult.SIZE, CompareResult.ORDER));
     }
 }
