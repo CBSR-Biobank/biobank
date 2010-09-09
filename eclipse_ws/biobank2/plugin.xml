@@ -876,35 +876,6 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ReloadTodayNodeHandler"
-            commandId="edu.ualberta.med.biobank.commands.todayNodeReload">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
-               <or>
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-                  <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
-                  </reference>
-               </or>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <or>
-               <reference
-                     definitionId="biobank2.shipmentsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-            </or>
-         </enabledWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.DecodePlateHandler"
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate">
          <activeWhen>

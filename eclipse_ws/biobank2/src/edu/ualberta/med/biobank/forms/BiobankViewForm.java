@@ -123,11 +123,14 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
     protected void addReloadAction() {
         CommandContributionItem reload = new CommandContributionItem(
-            new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Reload",
-                "edu.ualberta.med.biobank.commands.reload", null, BioBankPlugin
-                    .getImageDescriptor(BioBankPlugin.IMG_RELOAD_FORM), null,
-                null, "Reload", "Reload", "Reload", SWT.NONE, "Reload", true));
+            new CommandContributionItemParameter(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
+                "Reload",
+                "edu.ualberta.med.biobank.commands.reloadViewForm",
+                null,
+                BioBankPlugin.getImageDescriptor(BioBankPlugin.IMG_RELOAD_FORM),
+                null, null, "Reload", "Reload", "Reload", SWT.NONE, "Reload",
+                true));
         form.getToolBarManager().add(reload);
     }
 

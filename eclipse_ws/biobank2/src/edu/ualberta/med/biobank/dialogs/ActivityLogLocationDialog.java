@@ -19,13 +19,13 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
-public class ActivityLogDialog extends BiobankDialog {
+public class ActivityLogLocationDialog extends BiobankDialog {
 
     private Text activityLogDirText;
     private Button browseBtn;
     private Button activityLogDirBtn;
 
-    public ActivityLogDialog(Shell parentShell) {
+    public ActivityLogLocationDialog(Shell parentShell) {
         super(parentShell);
 
         GridLayout gl = new GridLayout(3, true);
