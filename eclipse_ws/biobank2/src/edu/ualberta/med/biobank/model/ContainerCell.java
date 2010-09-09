@@ -10,7 +10,7 @@ public class ContainerCell extends Cell {
 
     private ContainerWrapper container;
 
-    private ContainerStatus status;
+    private CellStatus status;
 
     public ContainerCell() {
     }
@@ -25,11 +25,11 @@ public class ContainerCell extends Cell {
         this(row, col, null);
     }
 
-    public ContainerStatus getStatus() {
+    public CellStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ContainerStatus status) {
+    public void setStatus(CellStatus status) {
         this.status = status;
     }
 

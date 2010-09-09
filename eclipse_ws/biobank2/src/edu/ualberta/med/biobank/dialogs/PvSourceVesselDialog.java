@@ -65,6 +65,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private boolean addMode;
 
+    private String currentTitle;
+
     public PvSourceVesselDialog(Shell parent,
         PvSourceVesselWrapper pvSourceVessel,
         List<StudySourceVesselWrapper> studySourceVessels,
@@ -91,18 +93,16 @@ public class PvSourceVesselDialog extends BiobankDialog {
         }
         this.allSourceVessels = allSourceVessels;
         this.infotable = infoTable;
+        if (addMode) {
+            currentTitle = "Add " + TITLE;
+        } else {
+            currentTitle = "Edit " + TITLE;
+        }
     }
 
     @Override
     protected String getDialogShellTitle() {
-        String title = new String();
-        if (addMode) {
-            title = "Add ";
-        } else {
-            title = "Edit ";
-        }
-        title += TITLE;
-        return title;
+        return currentTitle;
     }
 
     @Override
@@ -116,11 +116,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaTitle() {
-        if (addMode) {
-            return "Add Source Vessel";
-        } else {
-            return "Edit Source Vessel";
-        }
+        return currentTitle;
     }
 
     @Override

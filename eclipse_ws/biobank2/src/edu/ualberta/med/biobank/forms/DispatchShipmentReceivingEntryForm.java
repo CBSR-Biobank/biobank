@@ -8,10 +8,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.dialogs.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -49,7 +52,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
     private DispatchAliquotListInfoTable aliquotsToBeReceivedTable;
 
-    private PalletScanManagement palletScanManagement;
+    private DispatchAliquotListInfoTable aliquotsReceivedTable;
 
     @Override
     protected void init() throws Exception {
@@ -60,11 +63,26 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (DispatchShipmentAdapter) adapter;
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
+        shipment.addWrapperListener(new WrapperListener() {
+            @Override
+            public void updated(WrapperEvent event) {
+                reloadAliquotsTables();
+            }
+
+            @Override
+            public void inserted(WrapperEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void deleted(WrapperEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+        });
         retrieveShipment();
         setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
-
-        palletScanManagement = new PalletScanManagement();
-
     }
 
     private void retrieveShipment() {
@@ -94,11 +112,8 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         palletButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                // FIXME
-                // pouvoir selectionner la plate
-                palletScanManagement.launchScanAndProcessResult("PLATE1");
-                // afficher le resultat dans une boite de dialog
-                // pouvoir scanner plate suivante
+                new DispatchReceiveScanDialog(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), shipment).open();
             }
         });
         setFirstControl(palletButton);
@@ -117,10 +132,10 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
     private void createAliquotsReceivedSection() {
         Composite parent = createSectionWithClient("Aliquots received");
-        aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
+        aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent,
             shipment.getReceivedAliquots());
-        aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
-        aliquotsToBeReceivedTable
+        aliquotsReceivedTable.adaptToToolkit(toolkit, true);
+        aliquotsReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);
     }
 
@@ -178,5 +193,11 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return DispatchShipmentViewForm.ID;
+    }
+
+    private void reloadAliquotsTables() {
+        aliquotsToBeReceivedTable.reloadCollection(shipment
+            .getNotReceivedAliquots());
+        aliquotsReceivedTable.reloadCollection(shipment.getReceivedAliquots());
     }
 }

@@ -127,8 +127,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<AliquotWrapper> aliquots = getAliquotsInSite(appService,
-            getInventoryId(), getSite());
+        List<AliquotWrapper> aliquots = getAliquots(appService,
+            getInventoryId());
         boolean alreadyExists = false;
         if (aliquots.size() > 0 && isNew()) {
             alreadyExists = true;
@@ -405,6 +405,25 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
+    }
+
+    /**
+     * search in all aliquots list. No matter which site added it.
+     */
+    public static List<AliquotWrapper> getAliquots(
+        WritableApplicationService appService, String inventoryId)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Aliquot.class.getName() + " where inventoryId = ?",
+            Arrays.asList(new Object[] { inventoryId }));
+        List<Aliquot> aliquots = appService.query(criteria);
+        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
+        for (Aliquot aliquot : aliquots) {
+            if (aliquot.getInventoryId().equals(inventoryId)) {
+                list.add(new AliquotWrapper(appService, aliquot));
+            }
+        }
+        return list;
     }
 
     public static List<AliquotWrapper> getAliquotsInSite(

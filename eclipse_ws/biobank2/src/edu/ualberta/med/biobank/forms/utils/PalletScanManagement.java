@@ -26,8 +26,6 @@ public class PalletScanManagement {
 
     public void launchScanAndProcessResult(final String plateToScan,
         final String profile, final boolean isRescanMode) {
-        beforeScanAndProcess();
-
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
@@ -55,6 +53,7 @@ public class PalletScanManagement {
             }
         };
         try {
+            beforeThreadStart();
             new ProgressMonitorDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell()).run(true, false, op);
         } catch (Exception e) {
@@ -117,7 +116,7 @@ public class PalletScanManagement {
         }
     }
 
-    protected void beforeScanAndProcess() {
+    protected void beforeThreadStart() {
 
     }
 

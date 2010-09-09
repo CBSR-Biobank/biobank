@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -12,8 +12,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerStatus;
 
 /**
  * Drawer 36 display.
@@ -37,8 +37,6 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
     private Boolean hasLegend = false;
 
-    private ArrayList<ContainerStatus> legendStatus;
-
     private static final int DRAWER_SIZE = 36;
 
     public static int LEGEND_WIDTH = 70;
@@ -46,11 +44,9 @@ public class Drawer36Display extends AbstractContainerDisplay {
     public static int LEGEND_HEIGHT = 20;
 
     @Override
-    public void initLegend() {
+    public void initLegend(List<CellStatus> status) {
+        super.initLegend(status);
         hasLegend = true;
-        legendStatus = new ArrayList<ContainerStatus>();
-        legendStatus.add(ContainerStatus.NOT_INITIALIZED);
-        legendStatus.add(ContainerStatus.INITIALIZED);
     }
 
     @Override
@@ -138,21 +134,21 @@ public class Drawer36Display extends AbstractContainerDisplay {
         }
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                ContainerStatus status = legendStatus.get(i);
+                CellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
     }
 
-    private ContainerStatus getStatus(Map<RowColPos, ? extends Cell> cells,
+    private CellStatus getStatus(Map<RowColPos, ? extends Cell> cells,
         int boxIndex) {
-        ContainerStatus status = null;
+        CellStatus status = null;
         if (cells != null) {
             status = ((ContainerCell) cells.get(new RowColPos(boxIndex - 1, 0)))
                 .getStatus();
         }
         if (status == null)
-            status = ContainerStatus.NOT_INITIALIZED;
+            status = CellStatus.NOT_INITIALIZED;
         return status;
     }
 
@@ -167,11 +163,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
     }
 
     @Override
-    public Cell getObjectAtCoordinates(ContainerDisplayWidget displayWidget,
-        int x, int y) {
-        if (displayWidget.getCells() == null) {
-            return null;
-        }
+    public RowColPos getPositionAtCoordinates(int x, int y) {
         int gridCellWidth = RECTANGLE_CELL_WIDTH;
         int gridCellHeight = SQUARE_CELL_WIDTH + RECTANGLE_CELL_HEIGHT;
         // get high level position
@@ -188,9 +180,8 @@ public class Drawer36Display extends AbstractContainerDisplay {
         // convert subcell to real cell
         int xGridCellNumOffset = 9;
         int yGridCellNumOffset = 3;
-        return displayWidget.getCells().get(
-            new RowColPos(cellNum + xGrid * xGridCellNumOffset - yGrid
-                * yGridCellNumOffset - 1, 0));
+        return new RowColPos(cellNum + xGrid * xGridCellNumOffset - yGrid
+            * yGridCellNumOffset - 1, 0);
     }
 
     protected void drawLegend(PaintEvent e, Color color, int index, String text) {

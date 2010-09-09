@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.events.PaintEvent;
@@ -9,6 +10,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 
 /**
  * This class is there to give a common parent class to grid container widgets
@@ -34,10 +36,25 @@ public abstract class AbstractContainerDisplay {
      */
     protected int maxHeight = -1;
 
-    public abstract Cell getObjectAtCoordinates(
-        ContainerDisplayWidget displayWidget, int x, int y);
+    protected List<CellStatus> legendStatus;
 
-    public abstract void initLegend();
+    public Cell getObjectAtCoordinates(ContainerDisplayWidget displayWidget,
+        int x, int y) {
+        if (displayWidget.getCells() == null) {
+            return null;
+        }
+        RowColPos rcp = getPositionAtCoordinates(x, y);
+        if (rcp != null) {
+            return displayWidget.getCells().get(rcp);
+        }
+        return null;
+    }
+
+    public abstract RowColPos getPositionAtCoordinates(int x, int y);
+
+    public void initLegend(List<CellStatus> status) {
+        this.legendStatus = status;
+    }
 
     public void setContainer(ContainerWrapper container) {
         this.container = container;

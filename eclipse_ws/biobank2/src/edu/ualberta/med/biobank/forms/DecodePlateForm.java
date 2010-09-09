@@ -17,7 +17,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -71,7 +71,7 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        spw = new ScanPalletWidget(page, false);
+        spw = new ScanPalletWidget(page);
         spw.setVisible(true);
         toolkit.adapt(spw);
 
@@ -170,8 +170,8 @@ public class DecodePlateForm extends PlateForm {
      */
     private void processCellStatus(PalletCell cell) {
         if (cell != null) {
-            cell.setStatus((cell.getValue() != null) ? AliquotCellStatus.NEW
-                : AliquotCellStatus.EMPTY);
+            cell.setStatus((cell.getValue() != null) ? CellStatus.NEW
+                : CellStatus.EMPTY);
         }
     }
 

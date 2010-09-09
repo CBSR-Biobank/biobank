@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -13,6 +14,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 
 /**
  * This class is there to give a common parent class to grid container widgets
@@ -38,7 +41,7 @@ public class ContainerDisplayWidget extends Canvas {
 
     private MultiSelectionManager multiSelectionManager;
 
-    protected AbstractContainerDisplay containerDisplay;
+    private AbstractContainerDisplay containerDisplay;
 
     /**
      * max width this container will have : used to calculate cells width
@@ -50,7 +53,13 @@ public class ContainerDisplayWidget extends Canvas {
      */
     protected int maxHeight = -1;
 
+    private List<CellStatus> cellStatus;
+
     public ContainerDisplayWidget(Composite parent) {
+        this(parent, null);
+    }
+
+    public ContainerDisplayWidget(Composite parent, List<CellStatus> cellStatus) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override
@@ -59,6 +68,7 @@ public class ContainerDisplayWidget extends Canvas {
             }
         });
         multiSelectionManager = new MultiSelectionManager(this);
+        this.cellStatus = cellStatus;
     }
 
     protected void paintGrid(PaintEvent e) {
@@ -84,12 +94,6 @@ public class ContainerDisplayWidget extends Canvas {
             return containerDisplay.getObjectAtCoordinates(this, x, y);
         }
         return null;
-    }
-
-    public void initLegend() {
-        if (containerDisplay != null) {
-            containerDisplay.initLegend();
-        }
     }
 
     public void setCells(Map<RowColPos, ? extends Cell> cells) {
@@ -156,22 +160,35 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {
+        AbstractContainerDisplay display = null;
         if (containerType == null) {
             if (createDefaultContainer) {
-                containerDisplay = new GridContainerDisplay();
-                containerDisplay.setStorageSize(3, 5);
+                display = new GridContainerDisplay();
+                display.setStorageSize(3, 5);
             }
         } else if (containerType.getName().equals("Drawer 36")) {
-            containerDisplay = new Drawer36Display();
+            display = new Drawer36Display();
         } else {
-            containerDisplay = new GridContainerDisplay();
+            display = new GridContainerDisplay();
         }
-        if (containerDisplay != null) {
-            containerDisplay.setDisplaySize(maxWidth, maxHeight);
+        if (display != null) {
+            display.setDisplaySize(maxWidth, maxHeight);
             if (containerType != null) {
-                containerDisplay.setContainerType(containerType);
+                display.setContainerType(containerType);
             }
         }
+        setContainerDisplay(display);
+    }
+
+    protected void setContainerDisplay(AbstractContainerDisplay display) {
+        containerDisplay = display;
+        if (cellStatus != null && containerDisplay != null) {
+            containerDisplay.initLegend(cellStatus);
+        }
+    }
+
+    protected AbstractContainerDisplay getContainerDisplay() {
+        return containerDisplay;
     }
 
     /**
@@ -198,6 +215,10 @@ public class ContainerDisplayWidget extends Canvas {
 
     public MultiSelectionManager getMultiSelectionManager() {
         return multiSelectionManager;
+    }
+
+    public RowColPos getPositionAtCoordinates(int x, int y) {
+        return containerDisplay.getPositionAtCoordinates(x, y);
     }
 
 }
