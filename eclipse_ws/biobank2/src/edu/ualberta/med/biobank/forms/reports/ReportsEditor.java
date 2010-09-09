@@ -319,7 +319,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                                 reportData, getColumnNames(),
                                 getColumnWidths(), 24);
                             reportTable.adaptToToolkit(toolkit, true);
-                            form.reflow(true);
+                            page.layout(true, true);
+                            book.reflow(true);
                         }
                     });
                 }
@@ -338,7 +339,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
         reportTable = new ReportTableWidget<Object>(page, null,
             new String[] { " " }, new int[] { 500 });
         reportTable.adaptToToolkit(toolkit, true);
-        form.layout(true, true);
+        page.layout(true, true);
+        book.reflow(true);
     }
 
     public void resetSearch() {

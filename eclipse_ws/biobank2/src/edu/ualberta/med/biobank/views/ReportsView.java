@@ -63,6 +63,8 @@ public class ReportsView extends ViewPart {
         AbstractReportTreeNode aliquotRoot = new AbstractReportTreeNode("");
         aliquotTree.setLayoutData(treeGd);
 
+        top.setSelection(aliquotTab);
+
         // Clinics
         clinicTab = new CTabItem(top, SWT.NONE);
         clinicTab.setText("Clinics");

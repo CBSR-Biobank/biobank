@@ -16,9 +16,10 @@ public class FTAReportImpl extends AbstractReport {
         + PatientVisit.class.getName()
         + " pv join pv.aliquotCollection as aliquots where aliquots.sampleType.nameShort ="
         + FTA_CARD_SAMPLE_TYPE_NAME
-        + " and a.patientVisit.patient.study.nameShort = ? and a.patientVisit.patient.study.site "
-        + SITE_OPERATOR + SITE_ID
-        + " group by pv having min(aliquots.dateProcessed) > ?";
+        + " and a.patientVisit.patient.study.nameShort = ? and a.patientVisit.shipment.site "
+        + SITE_OPERATOR
+        + SITE_ID
+        + " group by a.patientVisit.patient.pnumber having min(a.patientVisit.dateProcessed) > ? order by a.patientVisit.patient.pnumber";
 
     public FTAReportImpl(BiobankReport report) {
         super(QUERY, report);

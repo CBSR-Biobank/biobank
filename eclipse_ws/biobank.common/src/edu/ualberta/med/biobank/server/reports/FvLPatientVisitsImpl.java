@@ -9,7 +9,7 @@ public class FvLPatientVisitsImpl extends AbstractReport {
         + " Alias.shipment.clinic.nameShort, MIN(Alias.shipment.dateReceived),"
         + " MAX(Alias.shipment.dateReceived) from "
         + PatientVisit.class.getName()
-        + " as Alias where Alias.patient.study.site "
+        + " as Alias where Alias.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
         + " GROUP BY Alias.patient.study.nameShort, Alias.shipment.clinic.nameShort";

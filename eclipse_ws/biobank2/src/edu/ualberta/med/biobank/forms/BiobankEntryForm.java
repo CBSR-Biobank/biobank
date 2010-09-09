@@ -451,7 +451,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public void cancel() {
         try {
-            adapter.resetObject();
             boolean openView = adapter.getModelObject() != null
                 && !adapter.getModelObject().isNew();
             closeEntryOpenView(true, openView);

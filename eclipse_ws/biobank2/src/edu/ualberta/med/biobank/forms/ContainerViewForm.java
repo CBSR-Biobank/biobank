@@ -15,12 +15,14 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -29,6 +31,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -211,8 +214,17 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     protected void createVisualizeContainer() {
-        Composite client = createSectionWithClient("Container Visual");
+        Section s = createSection("Container Visual");
+        s.setLayout(new FillLayout());
+        ScrolledComposite sc = new ScrolledComposite(s, SWT.H_SCROLL);
+        sc.setExpandHorizontal(true);
+        sc.setExpandVertical(true);
+        Composite client = new Composite(sc, SWT.NONE);
         client.setLayout(new GridLayout(1, false));
+        toolkit.adapt(sc);
+        toolkit.adapt(client);
+        sc.setContent(client);
+        s.setClient(sc);
         if (!childrenOk) {
             Label label = toolkit
                 .createLabel(client,
@@ -224,6 +236,10 @@ public class ContainerViewForm extends BiobankViewForm {
             CellStatus.DEFAULT_CONTAINER_STATUS_LIST);
         containerWidget.setContainer(container);
         containerWidget.setCells(cells);
+        toolkit.adapt(containerWidget);
+
+        // Set the minimum size
+        sc.setMinSize(containerWidget.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
         containerWidget.addDragDetectListener(new DragDetectListener() {
 
