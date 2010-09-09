@@ -42,6 +42,8 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private PatientAdapter patient1Adapter;
 
+    private PatientWrapper patient1;
+
     private PatientWrapper patient2Wrapper;
 
     BiobankText study2;
@@ -65,8 +67,8 @@ public class PatientMergeForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patient1Adapter = (PatientAdapter) adapter;
-        String tabName = "Merging Patient "
-            + patient1Adapter.getWrapper().getPnumber();
+        patient1 = patient1Adapter.getWrapper();
+        String tabName = "Merging Patient " + patient1.getPnumber();
         setPartName(tabName);
         patientNotNull = new WritableValue(Boolean.FALSE, Boolean.class);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
@@ -75,10 +77,16 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient Information");
+        form.setText("Merging into Patient " + patient1.getPnumber());
         page.setLayout(new GridLayout(1, false));
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_PATIENT));
+
+        toolkit.createLabel(
+            page,
+            "Select Patient Number to merge into Patient "
+                + patient1.getPnumber() + " and press Enter", SWT.LEFT);
+
         createPatientSection();
     }
 

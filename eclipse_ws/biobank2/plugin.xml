@@ -227,7 +227,7 @@
       </command>
        <command
              id="edu.ualberta.med.biobank.commands.patients.patientMerge"
-             name="Merge patient">
+             name="Merge patients">
        </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
@@ -1131,7 +1131,14 @@
                   icon="icons/patient_add.png"
                   label="Add Patient"
                   style="push">
+            </command>      
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
+                  style="push">
             </command>
+            
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
                   icon="icons/patient_delete.png"
@@ -1457,6 +1464,12 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
                   icon="icons/patient_delete.png"
                   label="Delete Patient"
@@ -1467,12 +1480,6 @@
                         definitionId="biobank2.patientsPerspectiveSelected">
                   </reference>
                </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/merge.png"
-                  label="Merge Patient"
-                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
