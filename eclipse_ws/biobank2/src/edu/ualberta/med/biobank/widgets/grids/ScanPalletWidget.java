@@ -34,10 +34,10 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
         return false;
     }
 
-    public void loadProfile(String profile) {
-        ProfileSettings profileData = ProfileManager.instance().getProfile(
-            profile);
-        ((ScanPalletDisplay) getContainerDisplay()).setProfile(profileData);
+    public void loadProfile(String profileName) {
+        ProfileSettings profile = ProfileManager.instance().getProfile(
+            profileName);
+        ((ScanPalletDisplay) getContainerDisplay()).setProfile(profile);
         this.redraw();
     }
 
