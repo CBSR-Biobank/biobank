@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -49,6 +50,10 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     private ComboViewer destSiteComboViewer;
 
     private DateTimeWidget dateShippedWidget;
+
+    private ComboViewer shippingMethodComboViewer;
+
+    private ComboViewer activityStatusComboViewer;
 
     private List<AliquotWrapper> aliquots;
 
@@ -129,6 +134,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                                 destSiteComboViewer
                                     .setSelection(new StructuredSelection(
                                         possibleDestSites.get(0)));
+                            } else {
+                                destSiteComboViewer.setSelection(null);
                             }
                         } catch (Exception e) {
                             logger
@@ -158,6 +165,13 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             "Receiver Site", possibleDestSites, destSite,
             "Shipment must have an associated study");
 
+        ShippingMethodWrapper selectedShippingMethod = shipment
+            .getShippingMethod();
+        shippingMethodComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Shipping Method",
+            ShippingMethodWrapper.getShippingMethods(appService),
+            selectedShippingMethod, null);
+
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Waybill", null,
             BeansObservables.observeValue(shipment, "waybill"), null);
@@ -167,7 +181,20 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             BeansObservables.observeValue(shipment, "dateShipped"),
             "Date shipped should be set");
 
+        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
+            client, "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            shipment.getActivityStatus(),
+            "Container must have an activity status");
+
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null,
+            BeansObservables.observeValue(shipment, "comment"), null);
+
         createAliquotsSection();
+
+        // ---
+
         setFirstControl(studyComboViewer.getControl());
 
         if ((possibleStudies == null) || (possibleStudies.size() == 0)) {
@@ -187,6 +214,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        shipment.setSender(site);
 
         StudyWrapper study = null;
         IStructuredSelection studySelection = (IStructuredSelection) studyComboViewer
@@ -203,6 +231,28 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             destSite = (SiteWrapper) destSiteSelecion.getFirstElement();
         }
         shipment.setReceiver(destSite);
+
+        ActivityStatusWrapper activityStatus = null;
+        IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
+            .getSelection();
+        if ((asSelection != null) && (asSelection.size() > 0)) {
+            activityStatus = (ActivityStatusWrapper) asSelection
+                .getFirstElement();
+        }
+        shipment.setActivityStatus(activityStatus);
+
+        ShippingMethodWrapper shippingMethod = null;
+        IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
+            .getSelection();
+        if ((shippingMethodSelection != null)
+            && (shippingMethodSelection.size() > 0)) {
+            shippingMethod = (ShippingMethodWrapper) shippingMethodSelection
+                .getFirstElement();
+        }
+        shipment.setShippingMethod(shippingMethod);
+
+        shipment.persist();
+        // DispatchShipmentAdministrationView.reload();
     }
 
     @Override
@@ -228,6 +278,20 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             destSiteComboViewer.setSelection(new StructuredSelection(destSite));
         } else if (destSiteComboViewer.getCombo().getItemCount() > 1) {
             destSiteComboViewer.getCombo().deselectAll();
+        }
+        ShippingMethodWrapper shipMethod = shipment.getShippingMethod();
+        if (shipMethod != null) {
+            shippingMethodComboViewer.setSelection(new StructuredSelection(
+                shipMethod));
+        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
+            shippingMethodComboViewer.getCombo().deselectAll();
+        }
+        ActivityStatusWrapper activity = shipment.getActivityStatus();
+        if (activity != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                activity));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
         }
         dateShippedWidget.setDate(new Date());
     }

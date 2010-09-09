@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -26,6 +27,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -127,6 +129,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private AliquotMode aliquotMode;
 
+    private ScrolledComposite containersScroll;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -161,7 +165,15 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     private void createLocationSection() throws ApplicationException {
-        Composite client = toolkit.createComposite(page);
+        containersScroll = new ScrolledComposite(page, SWT.H_SCROLL);
+        containersScroll.setExpandHorizontal(true);
+        containersScroll.setExpandVertical(true);
+        containersScroll.setLayout(new FillLayout());
+        GridData scrollData = new GridData();
+        scrollData.horizontalAlignment = SWT.FILL;
+        scrollData.grabExcessHorizontalSpace = true;
+        containersScroll.setLayoutData(scrollData);
+        Composite client = toolkit.createComposite(containersScroll);
         GridLayout layout = new GridLayout(2, false);
         client.setLayout(layout);
         GridData gd = new GridData();
@@ -169,7 +181,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
         toolkit.paintBordersFor(client);
-
+        containersScroll.setContent(client);
         cabinetLabel = toolkit.createLabel(client, "Cabinet"); //$NON-NLS-1$
         drawerLabel = toolkit.createLabel(client, "Drawer"); //$NON-NLS-1$
 
@@ -201,6 +213,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         drawerWidget = new ContainerDisplayWidget(client);
         drawerWidget.setContainerType(drawerType, true);
         toolkit.adapt(drawerWidget);
+
+        containersScroll.setMinSize(client
+            .computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     private void createFieldsSection() throws ApplicationException {

@@ -17,7 +17,7 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
-        + "') and Alias.patientVisit.patient.study.site "
+        + "') and Alias.patientVisit.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
         + " GROUP BY pv, Alias.sampleType ORDER BY pv.patient.pnumber, pv.dateProcessed";

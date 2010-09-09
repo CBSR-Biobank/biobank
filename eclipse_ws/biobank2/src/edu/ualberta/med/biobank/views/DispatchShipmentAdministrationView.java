@@ -12,6 +12,7 @@ public class DispatchShipmentAdministrationView extends
     public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdmininistrationView";
 
     public SentDispatchShipmentGroup sentNode;
+
     public ReceivedDispatchShipmentGroup receivedNode;
 
     public DispatchShipmentAdministrationView() {

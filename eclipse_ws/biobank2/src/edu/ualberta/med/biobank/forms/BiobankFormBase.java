@@ -211,6 +211,7 @@ public abstract class BiobankFormBase extends EditorPart {
         book.setLayoutData(gd2);
         page = book.createPage("page");
         book.showPage("page");
+
         // start a new runnable so that database objects are populated in a
         // separate thread.
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {

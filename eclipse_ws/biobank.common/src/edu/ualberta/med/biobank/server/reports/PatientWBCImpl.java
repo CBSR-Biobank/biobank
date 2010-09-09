@@ -16,7 +16,7 @@ public class PatientWBCImpl extends AbstractReport {
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
-        + "') and Alias.patient.study.site "
+        + "') and Alias.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
         + " and aliquot.sampleType.name LIKE '%DNA%' and aliquot.aliquotPosition.container.id in (select path1.container.id from "
